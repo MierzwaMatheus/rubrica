@@ -32,7 +32,7 @@ export class StaticTranslationsRepository implements TranslationsRepository {
     return value;
   }
   
-  getAllStaticTranslations(locale: string): Record<string, string> {
+  getAllStaticTranslations(locale: string): Record<string, any> {
     return this.translations[locale as keyof typeof this.translations] || this.translations['pt-BR'];
   }
 }

@@ -81,7 +81,8 @@ function AsciiBanner({ name }: { name: string }) {
     figlet.text(
       name.toUpperCase(),
       { font: "Big" },
-      (_err, result) => {
+      (err, result) => {
+        if (err) { console.error("[AsciiBanner] figlet error:", err); return; }
         if (result) setArt(result);
       }
     );

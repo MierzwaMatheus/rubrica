@@ -191,4 +191,36 @@ describe("convex/seed · seedAll", () => {
 
     expect(ctx.runMutation).toHaveBeenCalledTimes(4);
   });
+
+  it("com portfolio habilitado invoca 3 core + projects.seed (4 mutations)", async () => {
+    ctx.runMutation.mockResolvedValue(undefined);
+
+    await handler(seedAll)(ctx, { enabledPlugins: ["portfolio"] });
+
+    expect(ctx.runMutation).toHaveBeenCalledTimes(4);
+  });
+
+  it("com portfolio + proposals invoca 3 core + projects.seed + seedDefaultTemplate (5 mutations)", async () => {
+    ctx.runMutation.mockResolvedValue(undefined);
+
+    await handler(seedAll)(ctx, { enabledPlugins: ["portfolio", "proposals"] });
+
+    expect(ctx.runMutation).toHaveBeenCalledTimes(5);
+  });
+
+  it("com portfolio + proposals + i18n invoca 6 mutations (todos os plugins)", async () => {
+    ctx.runMutation.mockResolvedValue(undefined);
+
+    await handler(seedAll)(ctx, { enabledPlugins: ["portfolio", "proposals", "i18n"] });
+
+    expect(ctx.runMutation).toHaveBeenCalledTimes(6);
+  });
+
+  it("com portfolio + i18n invoca 5 mutations (3 core + projects.seed + siteTexts.seed)", async () => {
+    ctx.runMutation.mockResolvedValue(undefined);
+
+    await handler(seedAll)(ctx, { enabledPlugins: ["portfolio", "i18n"] });
+
+    expect(ctx.runMutation).toHaveBeenCalledTimes(5);
+  });
 });

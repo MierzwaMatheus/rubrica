@@ -32,6 +32,7 @@ import {
   getBySlug,
   listAdmin,
   listAllPublished,
+  seed,
 } from "../../convex/posts";
 import { createMockCtx, type MockCtx } from "../_helpers/convexCtx";
 
@@ -214,5 +215,116 @@ describe("convex/posts · getBySlug / listAdmin / listAllPublished", () => {
     await handler(create)(ctx, { ...baseArgs, slug: "p2", status: "draft" });
     const published = await handler(listAllPublished)(ctx, {});
     expect(published.map((p: any) => p.slug)).toEqual(["p1"]);
+  });
+});
+
+describe("convex/posts · seed", () => {
+  let ctx: MockCtx;
+  beforeEach(() => {
+    ctx = createMockCtx();
+    getAuthUserId.mockReset();
+  });
+
+  it("em banco vazio insere exatamente 2 posts", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("posts");
+    expect(docs.length).toBe(2);
+  });
+
+  it("cada post tem slug determinístico único", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("posts");
+    const slugs = docs.map((d) => d.slug).sort();
+    expect(slugs).toEqual([
+      "convex-como-backend-reativo-alem-do-crud",
+      "transicao-de-carreira-para-tecnologia-o-que-aprendi-em-12-meses",
+    ]);
+    expect(new Set(slugs).size).toBe(slugs.length);
+  });
+
+  it("post 1 tem tags [React, Convex] e post 2 tem tags [Carreira]", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("posts");
+    const post1 = docs.find((d) => d.slug === "convex-como-backend-reativo-alem-do-crud")!;
+    const post2 = docs.find((d) => d.slug === "transicao-de-carreira-para-tecnologia-o-que-aprendi-em-12-meses")!;
+    expect(post1.tags).toEqual(["React", "Convex"]);
+    expect(post2.tags).toEqual(["Carreira"]);
+  });
+
+  it("cada post tem status 'published'", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("posts");
+    for (const doc of docs) {
+      expect(doc.status).toBe("published");
+    }
+  });
+
+  it("cada post tem featured = false", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("posts");
+    for (const doc of docs) {
+      expect(doc.featured).toBe(false);
+    }
+  });
+
+  it("cada post tem publishedAt numérico positivo e distintos", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("posts");
+    const publishedAtValues = docs.map((d) => d.publishedAt);
+    for (const value of publishedAtValues) {
+      expect(typeof value).toBe("number");
+      expect(value).toBeGreaterThan(0);
+    }
+    expect(new Set(publishedAtValues).size).toBe(publishedAtValues.length);
+  });
+
+  it("cada post tem imageUrl externa com picsum e slug determinístico", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("posts");
+    for (const doc of docs) {
+      expect(typeof doc.imageUrl).toBe("string");
+      expect(doc.imageUrl).toMatch(/^https:\/\/picsum\.photos\/seed\/[a-z0-9-]+-\d+\/800\/600$/);
+      expect(doc.imageUrl).toContain(doc.slug);
+    }
+  });
+
+  it("cada post NÃO tem imageId (apenas imageUrl externa)", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("posts");
+    for (const doc of docs) {
+      expect(doc.imageId).toBeUndefined();
+    }
+  });
+
+  it("cada post tem titleTranslations.ptBR e contentTranslations.ptBR não-vazios", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("posts");
+    for (const doc of docs) {
+      expect(doc.titleTranslations).toBeDefined();
+      expect(typeof doc.titleTranslations.ptBR).toBe("string");
+      expect(doc.titleTranslations.ptBR.length).toBeGreaterThan(0);
+      expect(doc.contentTranslations).toBeDefined();
+      expect(typeof doc.contentTranslations.ptBR).toBe("string");
+      expect(doc.contentTranslations.ptBR.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("cada post tem content em markdown com ~400 palavras em pt-BR", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("posts");
+    for (const doc of docs) {
+      expect(typeof doc.content).toBe("string");
+      const wordCount = doc.content.trim().split(/\s+/).length;
+      expect(wordCount).toBeGreaterThanOrEqual(300);
+    }
+  });
+
+  it("cada post tem createdAt numérico positivo", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("posts");
+    for (const doc of docs) {
+      expect(typeof doc.createdAt).toBe("number");
+      expect(doc.createdAt).toBeGreaterThan(0);
+    }
   });
 });

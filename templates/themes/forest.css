@@ -1,0 +1,67 @@
+/* Rubrica Theme: forest
+ * Verde musgo, off-white, tons terrosos
+ * Fonte sugerida: DM Sans (sans), JetBrains Mono (mono)
+ */
+
+:root {
+  --background: 60 20% 97%;
+  --foreground: 120 8% 12%;
+  --card: 60 20% 99%;
+  --card-foreground: 120 8% 12%;
+  --popover: 60 20% 99%;
+  --popover-foreground: 120 8% 12%;
+  --primary: 150 40% 35%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 80 15% 90%;
+  --secondary-foreground: 120 8% 12%;
+  --muted: 80 15% 90%;
+  --muted-foreground: 120 5% 45%;
+  --accent: 80 15% 90%;
+  --accent-foreground: 120 8% 12%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 80 15% 84%;
+  --input: 80 15% 84%;
+  --ring: 150 40% 35%;
+  --radius: 0.5rem;
+  --sidebar: 60 20% 95%;
+  --sidebar-foreground: 120 5% 45%;
+  --sidebar-primary: 150 40% 35%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 80 15% 90%;
+  --sidebar-accent-foreground: 120 8% 12%;
+  --sidebar-border: 80 15% 84%;
+  --sidebar-ring: 150 40% 35%;
+  --neon-purple: 150 40% 35%;
+  --neon-lime: 80 50% 40%;
+}
+
+.dark {
+  --background: 30 15% 8%;
+  --foreground: 60 15% 88%;
+  --card: 30 12% 12%;
+  --card-foreground: 60 15% 88%;
+  --popover: 30 12% 12%;
+  --popover-foreground: 60 15% 88%;
+  --primary: 150 40% 35%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 30 10% 18%;
+  --secondary-foreground: 60 15% 88%;
+  --muted: 30 10% 18%;
+  --muted-foreground: 60 8% 55%;
+  --accent: 30 10% 18%;
+  --accent-foreground: 60 15% 88%;
+  --destructive: 0 62% 50%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 30 10% 18%;
+  --input: 30 10% 18%;
+  --ring: 150 40% 35%;
+  --sidebar: 30 15% 6%;
+  --sidebar-foreground: 60 8% 55%;
+  --sidebar-primary: 150 40% 35%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 30 10% 18%;
+  --sidebar-accent-foreground: 60 15% 88%;
+  --sidebar-border: 30 10% 18%;
+  --sidebar-ring: 150 40% 35%;
+}

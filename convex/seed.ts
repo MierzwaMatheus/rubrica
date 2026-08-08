@@ -33,6 +33,10 @@ export const seedAll = internalMutation({
     if (enabledPlugins.includes("proposals")) {
       await ctx.runMutation(internal.contractTemplates.seedDefaultTemplate, {});
     }
+
+    if (enabledPlugins.includes("i18n")) {
+      await ctx.runMutation(internal.siteTexts.seed, {});
+    }
   },
 });
 

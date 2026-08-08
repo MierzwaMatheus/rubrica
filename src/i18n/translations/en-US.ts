@@ -36,6 +36,13 @@ export const enUS = {
     },
     hero: {
       description: "Transforming complex challenges into robust digital ecosystems, with a focus on architecture, innovation and technical excellence.",
+      technologies: [
+        { name: "React", color: "bg-sky-400" },
+        { name: "TypeScript", color: "bg-blue-600" },
+        { name: "Node.js", color: "bg-green-600" },
+        { name: "Next.js", color: "bg-neutral-900" },
+        { name: "Convex", color: "bg-orange-500" },
+      ],
     },
     skills: {
       title: "What I do",

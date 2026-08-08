@@ -91,17 +91,17 @@ describe("convex/siteTexts · seed", () => {
     getAuthUserId.mockResolvedValue(null);
   });
 
-  it("popula a tabela com todas as chaves dos arquivos de tradução (251 chaves)", async () => {
+  it("popula a tabela com todas as chaves dos arquivos de tradução (261 chaves)", async () => {
     await handler(seed)(ctx, {});
     const docs = ctx.db._all("siteTexts");
-    expect(docs.length).toBe(251);
+    expect(docs.length).toBe(261);
   });
 
   it("é idempotente — rodar duas vezes não duplica registros", async () => {
     await handler(seed)(ctx, {});
     await handler(seed)(ctx, {});
     const docs = ctx.db._all("siteTexts");
-    expect(docs.length).toBe(251);
+    expect(docs.length).toBe(261);
   });
 
   it("cada registro tem key em dot-notation e page igual ao primeiro segmento", async () => {
@@ -110,6 +110,19 @@ describe("convex/siteTexts · seed", () => {
     expect(homeGreeting).toBeDefined();
     expect(homeGreeting?.page).toBe("home");
     expect(homeGreeting?.ptBR).toBeTruthy();
+  });
+
+  it("inclui chaves home.hero.technologies.* com page=home e ptBR não-vazio", async () => {
+    await handler(seed)(ctx, {});
+    const techKeys = ctx.db._all("siteTexts").filter((d: any) =>
+      d.key.startsWith("home.hero.technologies."),
+    );
+    expect(techKeys.length).toBeGreaterThan(0);
+    for (const k of techKeys) {
+      expect(k.page).toBe("home");
+      expect(typeof k.ptBR).toBe("string");
+      expect(k.ptBR.length).toBeGreaterThan(0);
+    }
   });
 });
 

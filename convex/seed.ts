@@ -29,6 +29,8 @@ export const seedAll = internalMutation({
   args: { enabledPlugins: v.array(v.string()) },
   handler: async (ctx, { enabledPlugins }) => {
     await ctx.runMutation(internal.seed.seedSiteConfig, {});
+    await ctx.runMutation(internal.contactInfo.seed, {});
+    await ctx.runMutation(internal.homeContent.seed, {});
 
     if (enabledPlugins.includes("proposals")) {
       await ctx.runMutation(internal.contractTemplates.seedDefaultTemplate, {});

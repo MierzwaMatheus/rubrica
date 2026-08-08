@@ -1,5 +1,5 @@
 import { v } from 'convex/values';
-import { mutation, query } from './_generated/server';
+import { internalMutation, mutation, query } from './_generated/server';
 import { requireRole } from './auth';
 import { markPendingChanges } from './publishStatus';
 import { logAudit } from './audit';
@@ -8,6 +8,34 @@ export const get = query({
   args: {},
   handler: async (ctx) => {
     return ctx.db.query('contactInfo').first();
+  },
+});
+
+export const seed = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const existing = await ctx.db.query('contactInfo').first();
+    if (existing) return;
+
+    const now = Date.now();
+    await ctx.db.insert('contactInfo', {
+      name: 'Ana Souza',
+      role: 'Desenvolvedora Full-Stack',
+      roleTranslations: { ptBR: 'Desenvolvedora Full-Stack' },
+      email: 'ana.souza@example.com',
+      showEmail: true,
+      phone: '+55 11 99999-0000',
+      showPhone: false,
+      birthDate: '1995-03-15',
+      showBirthDate: false,
+      location: 'São Paulo, Brasil',
+      showLocation: true,
+      avatarUrl: 'https://picsum.photos/seed/ana-souza/512/512',
+      linkedinUrl: 'https://www.linkedin.com/in/ana-souza',
+      githubUrl: 'https://github.com/ana-souza',
+      behanceUrl: 'https://www.behance.net/ana-souza',
+      createdAt: now,
+    });
   },
 });
 

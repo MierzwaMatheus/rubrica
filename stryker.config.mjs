@@ -11,10 +11,11 @@ export default {
     configFile: "vitest.stryker.config.ts",
   },
   reporters: ["clear-text", "html", "progress"],
-  // Escopo da issue #82: arquivos de produção modificados pelo plano TDD.
+  // Escopo da issue #83: arquivos de produção modificados pelo plano TDD.
   mutate: [
+    "convex/contactInfo.ts",
+    "convex/homeContent.ts",
     "convex/seed.ts",
-    "cli/src/commands/setup.ts",
   ],
   ignorePatterns: ["stryker.config.mjs", ".stryker-tmp"],
   coverageAnalysis: "perTest",

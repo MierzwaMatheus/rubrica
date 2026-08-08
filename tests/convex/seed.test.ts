@@ -152,4 +152,33 @@ describe("convex/seed · seedAll (esqueleto)", () => {
 
     expect(ctx.runMutation).toHaveBeenCalledWith(internal.seed.seedSiteConfig, {});
   });
+
+  it("com enabledPlugins ['proposals'] invoca internal.contractTemplates.seedDefaultTemplate", async () => {
+    ctx.runMutation.mockResolvedValue(undefined);
+
+    await handler(seedAll)(ctx, { enabledPlugins: ["proposals"] });
+
+    expect(ctx.runMutation).toHaveBeenCalledWith(
+      internal.contractTemplates.seedDefaultTemplate,
+      {},
+    );
+  });
+
+  it("com enabledPlugins vazio NÃO invoca internal.contractTemplates.seedDefaultTemplate", async () => {
+    ctx.runMutation.mockResolvedValue(undefined);
+
+    await handler(seedAll)(ctx, { enabledPlugins: [] });
+
+    const calledTargets = ctx.runMutation.mock.calls.map((c) => c[0]);
+    expect(calledTargets).not.toContain(internal.contractTemplates.seedDefaultTemplate);
+  });
+
+  it("com enabledPlugins sem 'proposals' NÃO invoca internal.contractTemplates.seedDefaultTemplate", async () => {
+    ctx.runMutation.mockResolvedValue(undefined);
+
+    await handler(seedAll)(ctx, { enabledPlugins: ["blog", "i18n"] });
+
+    const calledTargets = ctx.runMutation.mock.calls.map((c) => c[0]);
+    expect(calledTargets).not.toContain(internal.contractTemplates.seedDefaultTemplate);
+  });
 });

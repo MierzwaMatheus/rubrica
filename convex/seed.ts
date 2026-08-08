@@ -27,8 +27,12 @@ export const setupAdmin = internalAction({
 
 export const seedAll = internalMutation({
   args: { enabledPlugins: v.array(v.string()) },
-  handler: async (ctx, _args) => {
+  handler: async (ctx, { enabledPlugins }) => {
     await ctx.runMutation(internal.seed.seedSiteConfig, {});
+
+    if (enabledPlugins.includes("proposals")) {
+      await ctx.runMutation(internal.contractTemplates.seedDefaultTemplate, {});
+    }
   },
 });
 

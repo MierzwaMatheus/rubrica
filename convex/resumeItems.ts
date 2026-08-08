@@ -1,10 +1,60 @@
 import { v } from 'convex/values';
-import { mutation, query } from './_generated/server';
+import { internalMutation, mutation, query } from './_generated/server';
 import { requireRole } from './auth';
 import { markPendingChanges } from './publishStatus';
 import { logAudit } from './audit';
 import { requirePlugin, isPluginEnabled } from './plugins';
 import { softDeleteDoc, restoreDoc } from './lib/softDelete';
+
+const RESUME_ITEMS_SEED_VALUES = [
+  { type: 'skill' as const, content: { name: 'TypeScript', level: 'Avançado' }, orderIndex: 0 },
+  { type: 'skill' as const, content: { name: 'React', level: 'Avançado' }, orderIndex: 1 },
+  { type: 'skill' as const, content: { name: 'Node.js', level: 'Intermediário' }, orderIndex: 2 },
+  {
+    type: 'experience' as const,
+    content: {
+      role: 'Desenvolvedor Full Stack',
+      period: '2023 — Atual',
+      company: 'Empresa de Tecnologia',
+      description:
+        'Desenvolvimento e manutenção de aplicações web com React, TypeScript e Node.js, com foco em qualidade de código e testes automatizados.',
+    },
+    orderIndex: 0,
+  },
+  {
+    type: 'experience' as const,
+    content: {
+      role: 'Desenvolvedor Front-end',
+      period: '2021 — 2023',
+      company: 'Agência Digital',
+      description:
+        'Construção de interfaces responsivas e acessíveis, integração com APIs REST e colaboração próxima com times de design.',
+    },
+    orderIndex: 1,
+  },
+  {
+    type: 'education' as const,
+    content: {
+      degree: 'Análise e Desenvolvimento de Sistemas',
+      period: '2018 — 2021',
+      institution: 'Universidade',
+      description:
+        'Formação em desenvolvimento de software, banco de dados, engenharia de requisitos e arquitetura de sistemas.',
+    },
+    orderIndex: 0,
+  },
+  { type: 'course' as const, content: { text: 'Arquitetura de software e Clean Architecture' }, orderIndex: 0 },
+  { type: 'course' as const, content: { text: 'Testes automatizados e TDD na prática' }, orderIndex: 1 },
+  { type: 'soft_skill' as const, content: { text: 'Comunicação clara e objetiva' }, orderIndex: 0 },
+  { type: 'soft_skill' as const, content: { text: 'Trabalho em equipe e colaboração' }, orderIndex: 1 },
+  { type: 'language' as const, content: { name: 'Português', level: 'Nativo' }, orderIndex: 0 },
+  { type: 'language' as const, content: { name: 'Inglês', level: 'Avançado' }, orderIndex: 1 },
+  {
+    type: 'volunteer' as const,
+    content: { text: 'Mentor voluntário — Programa de formação de novos desenvolvedores' },
+    orderIndex: 0,
+  },
+];
 
 const RESUME_TYPES = ['skill', 'experience', 'education', 'course', 'soft_skill', 'volunteer', 'language'] as const;
 type ResumeType = typeof RESUME_TYPES[number];
@@ -147,5 +197,19 @@ export const reorder = mutation({
     }
     await markPendingChanges(ctx);
     await logAudit(ctx, { eventType: 'admin.reorder', actorType: 'user', actorId: userId, targetType: 'resumeItem', success: true });
+  },
+});
+
+export const seed = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const existing = await ctx.db.query('resumeItems').collect();
+    if (existing.length >= RESUME_ITEMS_SEED_VALUES.length) return;
+
+    const now = Date.now();
+    const remaining = RESUME_ITEMS_SEED_VALUES.length - existing.length;
+    for (let i = 0; i < remaining; i += 1) {
+      await ctx.db.insert('resumeItems', { ...RESUME_ITEMS_SEED_VALUES[i], createdAt: now });
+    }
   },
 });

@@ -23,6 +23,7 @@ vi.mock("@convex-dev/auth/providers/Password", () => ({
 }));
 
 import { seedSiteConfig, seedAll, setupAdmin } from "../../convex/seed";
+import { internal } from "../../convex/_generated/api";
 import { createMockCtx, type MockCtx } from "../_helpers/convexCtx";
 
 const handler = (fn: any) => fn._handler ?? fn;
@@ -278,6 +279,46 @@ describe("convex/seed · seedAll", () => {
     await handler(seedAll)(ctx, { enabledPlugins: ["blog", "portfolio", "proposals", "i18n"] });
 
     expect(ctx.runMutation).toHaveBeenCalledTimes(7);
+  });
+
+  it("com resume habilitado invoca 3 core + resumeItems.seed (4 mutations)", async () => {
+    ctx.runMutation.mockResolvedValue(undefined);
+
+    await handler(seedAll)(ctx, { enabledPlugins: ["resume"] });
+
+    expect(ctx.runMutation).toHaveBeenCalledTimes(4);
+    expect(ctx.runMutation).toHaveBeenCalledWith(internal.resumeItems.seed, {});
+  });
+
+  it("sem resume não invoca resumeItems.seed", async () => {
+    ctx.runMutation.mockResolvedValue(undefined);
+
+    await handler(seedAll)(ctx, { enabledPlugins: ["blog", "portfolio", "proposals", "i18n"] });
+
+    const called = ctx.runMutation.mock.calls.some(
+      (c: unknown[]) => c[0] === internal.resumeItems.seed,
+    );
+    expect(called).toBe(false);
+  });
+
+  it("com resume + blog invoca 3 core + posts.seed + resumeItems.seed (5 mutations)", async () => {
+    ctx.runMutation.mockResolvedValue(undefined);
+
+    await handler(seedAll)(ctx, { enabledPlugins: ["resume", "blog"] });
+
+    expect(ctx.runMutation).toHaveBeenCalledTimes(5);
+    expect(ctx.runMutation).toHaveBeenCalledWith(internal.posts.seed, {});
+    expect(ctx.runMutation).toHaveBeenCalledWith(internal.resumeItems.seed, {});
+  });
+
+  it("com todos os plugins invoca 3 core + 5 plugins (8 mutations)", async () => {
+    ctx.runMutation.mockResolvedValue(undefined);
+
+    await handler(seedAll)(ctx, {
+      enabledPlugins: ["blog", "portfolio", "proposals", "i18n", "resume"],
+    });
+
+    expect(ctx.runMutation).toHaveBeenCalledTimes(8);
   });
 
 });

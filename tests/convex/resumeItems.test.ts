@@ -30,6 +30,7 @@ import {
   reorder,
   listByType,
   listAll,
+  seed,
 } from "../../convex/resumeItems";
 import { createMockCtx, type MockCtx } from "../_helpers/convexCtx";
 
@@ -173,5 +174,130 @@ describe("convex/resumeItems · update / remove / permanentDelete / restore / re
     await handler(reorder)(ctx, { items: [{ id: id1, orderIndex: 5 }, { id: id2, orderIndex: 3 }] });
     expect((await ctx.db.get(id1))!.orderIndex).toBe(5);
     expect((await ctx.db.get(id2))!.orderIndex).toBe(3);
+  });
+});
+
+describe("convex/resumeItems · seed", () => {
+  let ctx: MockCtx;
+
+  const seedAndAll = async () => {
+    await handler(seed)(ctx, {});
+    return ctx.db._all("resumeItems");
+  };
+
+  const countByType = (docs: any[], type: string) =>
+    docs.filter((d) => d.type === type).length;
+
+  beforeEach(() => {
+    ctx = createMockCtx();
+  });
+
+  it("insere exatamente 13 itens em tabela vazia", async () => {
+    const docs = await seedAndAll();
+    expect(docs.length).toBe(13);
+  });
+
+  it("distribui os itens nos 7 tipos conforme a spec", async () => {
+    const docs = await seedAndAll();
+    expect(countByType(docs, "skill")).toBe(3);
+    expect(countByType(docs, "experience")).toBe(2);
+    expect(countByType(docs, "education")).toBe(1);
+    expect(countByType(docs, "course")).toBe(2);
+    expect(countByType(docs, "soft_skill")).toBe(2);
+    expect(countByType(docs, "language")).toBe(2);
+    expect(countByType(docs, "volunteer")).toBe(1);
+  });
+
+  it("skill e language têm content com name e level não vazios", async () => {
+    const docs = await seedAndAll();
+    for (const d of docs.filter((x) => x.type === "skill" || x.type === "language")) {
+      expect(typeof d.content.name).toBe("string");
+      expect(d.content.name.length).toBeGreaterThan(0);
+      expect(typeof d.content.level).toBe("string");
+      expect(d.content.level.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("experience tem content com role, period, company e description não vazios", async () => {
+    const docs = await seedAndAll();
+    const exps = docs.filter((d) => d.type === "experience");
+    expect(exps.length).toBe(2);
+    for (const d of exps) {
+      for (const key of ["role", "period", "company", "description"]) {
+        expect(typeof d.content[key]).toBe("string");
+        expect(d.content[key].length).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it("education tem content com degree, period, institution e description não vazios", async () => {
+    const docs = await seedAndAll();
+    const edu = docs.find((d) => d.type === "education");
+    for (const key of ["degree", "period", "institution", "description"]) {
+      expect(typeof edu.content[key]).toBe("string");
+      expect(edu.content[key].length).toBeGreaterThan(0);
+    }
+  });
+
+  it("course, soft_skill e volunteer têm content com text não vazio", async () => {
+    const docs = await seedAndAll();
+    const textual = docs.filter((d) =>
+      ["course", "soft_skill", "volunteer"].includes(d.type),
+    );
+    expect(textual.length).toBe(5);
+    for (const d of textual) {
+      expect(typeof d.content.text).toBe("string");
+      expect(d.content.text.length).toBeGreaterThan(0);
+      expect(Object.keys(d.content)).toEqual(["text"]);
+    }
+  });
+
+  it("todo item tem createdAt numérico", async () => {
+    const docs = await seedAndAll();
+    for (const d of docs) {
+      expect(typeof d.createdAt).toBe("number");
+      expect(Number.isFinite(d.createdAt)).toBe(true);
+    }
+  });
+
+  it("orderIndex é monotônico crescente dentro de cada tipo", async () => {
+    const docs = await seedAndAll();
+    for (const type of ["skill", "experience", "education", "course", "soft_skill", "volunteer", "language"]) {
+      const idxs = docs.filter((d) => d.type === type).map((d) => d.orderIndex);
+      expect(idxs).toEqual([...idxs].sort((a, b) => a - b));
+      expect(new Set(idxs).size).toBe(idxs.length);
+      for (const i of idxs) expect(typeof i).toBe("number");
+    }
+  });
+
+  it("orderIndex começa em 0 para cada tipo", async () => {
+    const docs = await seedAndAll();
+    for (const type of ["skill", "experience", "education", "course", "soft_skill", "volunteer", "language"]) {
+      const idxs = docs.filter((d) => d.type === type).map((d) => d.orderIndex);
+      expect(Math.min(...idxs)).toBe(0);
+    }
+  });
+
+  it("é no-op quando a tabela já está completa (13 itens)", async () => {
+    await handler(seed)(ctx, {});
+    const before = ctx.db._all("resumeItems").length;
+    await handler(seed)(ctx, {});
+    expect(ctx.db._all("resumeItems").length).toBe(before);
+  });
+
+  it("é fill-only: com tabela parcialmente populada completa até 13", async () => {
+    ctx.db._seed("resumeItems", [
+      { type: "skill", content: { name: "Existente", level: "Avançado" }, orderIndex: 0, createdAt: 1 },
+    ]);
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("resumeItems");
+    expect(docs.length).toBe(13);
+    expect(docs.filter((d) => d.content?.name === "Existente").length).toBe(1);
+  });
+
+  it("é idempotente: rodar 2× não duplica itens", async () => {
+    await handler(seed)(ctx, {});
+    await handler(seed)(ctx, {});
+    expect(ctx.db._all("resumeItems").length).toBe(13);
   });
 });

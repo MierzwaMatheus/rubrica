@@ -1,0 +1,1034 @@
+{
+  "home.availability.label": [
+    {
+      "file": "components/AvailabilityBadge.tsx",
+      "line": 10
+    }
+  ],
+  "contactWizard.step": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 118
+    }
+  ],
+  "contactWizard.of": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 118
+    }
+  ],
+  "contactWizard.contact.title": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 282
+    }
+  ],
+  "contactWizard.contact.name": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 285
+    }
+  ],
+  "contactWizard.contact.namePlaceholder": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 287
+    }
+  ],
+  "contactWizard.contact.email": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 294
+    },
+    {
+      "file": "pages/Login.tsx",
+      "line": 72
+    }
+  ],
+  "contactWizard.contact.emailPlaceholder": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 297
+    }
+  ],
+  "contactWizard.contact.phone": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 305
+    }
+  ],
+  "contactWizard.contact.phonePlaceholder": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 307
+    }
+  ],
+  "contactWizard.contact.linkedin": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 316
+    }
+  ],
+  "contactWizard.contact.linkedinPlaceholder": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 318
+    }
+  ],
+  "contactWizard.contact.company": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 327
+    }
+  ],
+  "contactWizard.contact.companyPlaceholder": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 329
+    }
+  ],
+  "contactWizard.summary.title": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 354
+    }
+  ],
+  "contactWizard.summary.type": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 357
+    }
+  ],
+  "contactWizard.summary.origin": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 362
+    }
+  ],
+  "contactWizard.summary.contact": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 373
+    }
+  ],
+  "contactWizard.successTitle": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 393
+    }
+  ],
+  "contactWizard.successBody": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 394
+    }
+  ],
+  "contactWizard.rateLimited": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 493
+    }
+  ],
+  "contactWizard.errorMessage": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 497
+    }
+  ],
+  "contactWizard.subtitle": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 508
+    }
+  ],
+  "contactWizard.project.step1.title": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 520
+    }
+  ],
+  "contactWizard.project.step2.title": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 522
+    }
+  ],
+  "contactWizard.project.step3.title": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 524
+    }
+  ],
+  "contactWizard.project.step4.title": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 526
+    }
+  ],
+  "contactWizard.project.step4.placeholder": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 526
+    }
+  ],
+  "contactWizard.job.step1.title": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 535
+    }
+  ],
+  "contactWizard.job.step2.title": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 537
+    }
+  ],
+  "contactWizard.job.step3.title": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 539
+    }
+  ],
+  "contactWizard.job.step4.title": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 541
+    }
+  ],
+  "contactWizard.job.step4.companyPlaceholder": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 541
+    }
+  ],
+  "contactWizard.job.step4.rolePlaceholder": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 541
+    }
+  ],
+  "contactWizard.networking.step1.title": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 550
+    }
+  ],
+  "contactWizard.networking.step2.title": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 552
+    }
+  ],
+  "contactWizard.networking.step2.placeholder": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 552
+    }
+  ],
+  "contactWizard.feedback.step1.title": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 561
+    }
+  ],
+  "contactWizard.feedback.step2.title": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 563
+    }
+  ],
+  "contactWizard.feedback.step2.placeholder": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 563
+    }
+  ],
+  "contactWizard.title": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 588
+    }
+  ],
+  "common.close": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 627
+    },
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 665
+    },
+    {
+      "file": "pages/Portfolio.tsx",
+      "line": 395
+    }
+  ],
+  "contactWizard.back": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 627
+    }
+  ],
+  "contactWizard.submitting": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 638
+    }
+  ],
+  "contactWizard.submit": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 638
+    }
+  ],
+  "contactWizard.next": [
+    {
+      "file": "components/ContactWizard.tsx",
+      "line": 650
+    }
+  ],
+  "sidebar.contact": [
+    {
+      "file": "components/Sidebar.tsx",
+      "line": 204
+    }
+  ],
+  "contactWizard.trigger": [
+    {
+      "file": "components/Sidebar.tsx",
+      "line": 312
+    },
+    {
+      "file": "pages/Portfolio.tsx",
+      "line": 238
+    },
+    {
+      "file": "pages/ProjectCaseStudy.tsx",
+      "line": 299
+    }
+  ],
+  "sidebar.downloadCV": [
+    {
+      "file": "components/Sidebar.tsx",
+      "line": 323
+    }
+  ],
+  "sidebar.terminalHint": [
+    {
+      "file": "components/Sidebar.tsx",
+      "line": 327
+    }
+  ],
+  "sidebar.menu": [
+    {
+      "file": "components/Sidebar.tsx",
+      "line": 372
+    }
+  ],
+  "about.seoDescription": [
+    {
+      "file": "pages/About.tsx",
+      "line": 58
+    }
+  ],
+  "about.aboutMe.title": [
+    {
+      "file": "pages/About.tsx",
+      "line": 71
+    }
+  ],
+  "about.aboutMe.text": [
+    {
+      "file": "pages/About.tsx",
+      "line": 81
+    }
+  ],
+  "about.dailyRoutine.title": [
+    {
+      "file": "pages/About.tsx",
+      "line": 90
+    }
+  ],
+  "about.dailyRoutine.empty": [
+    {
+      "file": "pages/About.tsx",
+      "line": 105
+    }
+  ],
+  "about.tapToKnowMore": [
+    {
+      "file": "pages/About.tsx",
+      "line": 168
+    }
+  ],
+  "about.faq.title": [
+    {
+      "file": "pages/About.tsx",
+      "line": 182
+    }
+  ],
+  "about.faq.empty": [
+    {
+      "file": "pages/About.tsx",
+      "line": 200
+    }
+  ],
+  "blog.title": [
+    {
+      "file": "pages/Blog.tsx",
+      "line": 132
+    }
+  ],
+  "blog.subtitle": [
+    {
+      "file": "pages/Blog.tsx",
+      "line": 134
+    }
+  ],
+  "blog.featured": [
+    {
+      "file": "pages/Blog.tsx",
+      "line": 151
+    }
+  ],
+  "blog.readTime": [
+    {
+      "file": "pages/Blog.tsx",
+      "line": 204
+    },
+    {
+      "file": "pages/Blog.tsx",
+      "line": 272
+    },
+    {
+      "file": "pages/Blog.tsx",
+      "line": 405
+    },
+    {
+      "file": "pages/BlogPost.tsx",
+      "line": 83
+    }
+  ],
+  "blog.readNow": [
+    {
+      "file": "pages/Blog.tsx",
+      "line": 209
+    },
+    {
+      "file": "pages/Blog.tsx",
+      "line": 277
+    }
+  ],
+  "blog.searchPlaceholder": [
+    {
+      "file": "pages/Blog.tsx",
+      "line": 298
+    }
+  ],
+  "blog.filterByTags": [
+    {
+      "file": "pages/Blog.tsx",
+      "line": 315
+    },
+    {
+      "file": "pages/Blog.tsx",
+      "line": 326
+    }
+  ],
+  "blog.clear": [
+    {
+      "file": "pages/Blog.tsx",
+      "line": 335
+    }
+  ],
+  "blog.noTags": [
+    {
+      "file": "pages/Blog.tsx",
+      "line": 341
+    }
+  ],
+  "blog.noPosts": [
+    {
+      "file": "pages/Blog.tsx",
+      "line": 371
+    }
+  ],
+  "blog.comeBackSoon": [
+    {
+      "file": "pages/Blog.tsx",
+      "line": 373
+    }
+  ],
+  "blog.readMore": [
+    {
+      "file": "pages/Blog.tsx",
+      "line": 438
+    }
+  ],
+  "blog.postNotFound": [
+    {
+      "file": "pages/BlogPost.tsx",
+      "line": 27
+    }
+  ],
+  "blog.postNotFoundDescription": [
+    {
+      "file": "pages/BlogPost.tsx",
+      "line": 28
+    }
+  ],
+  "blog.backToBlog": [
+    {
+      "file": "pages/BlogPost.tsx",
+      "line": 32
+    },
+    {
+      "file": "pages/BlogPost.tsx",
+      "line": 48
+    }
+  ],
+  "home.loading": [
+    {
+      "file": "pages/Home.tsx",
+      "line": 46
+    }
+  ],
+  "home.loadingTestimonial": [
+    {
+      "file": "pages/Home.tsx",
+      "line": 52
+    }
+  ],
+  "home.subtitle": [
+    {
+      "file": "pages/Home.tsx",
+      "line": 58
+    }
+  ],
+  "home.greeting": [
+    {
+      "file": "pages/Home.tsx",
+      "line": 103
+    }
+  ],
+  "home.title": [
+    {
+      "file": "pages/Home.tsx",
+      "line": 108
+    }
+  ],
+  "home.catRole": [
+    {
+      "file": "pages/Home.tsx",
+      "line": 119
+    }
+  ],
+  "home.hero.description": [
+    {
+      "file": "pages/Home.tsx",
+      "line": 128
+    }
+  ],
+  "home.about.title": [
+    {
+      "file": "pages/Home.tsx",
+      "line": 158
+    }
+  ],
+  "home.about.loading": [
+    {
+      "file": "pages/Home.tsx",
+      "line": 174
+    }
+  ],
+  "home.testimonials.title": [
+    {
+      "file": "pages/Home.tsx",
+      "line": 232
+    }
+  ],
+  "testimonials.viewAll": [
+    {
+      "file": "pages/Home.tsx",
+      "line": 278
+    }
+  ],
+  "testimonials.leaveTestimonial": [
+    {
+      "file": "pages/Home.tsx",
+      "line": 286
+    },
+    {
+      "file": "pages/Testimonials.tsx",
+      "line": 163
+    }
+  ],
+  "auth.invalidCredentials": [
+    {
+      "file": "pages/Login.tsx",
+      "line": 46
+    }
+  ],
+  "auth.adminArea": [
+    {
+      "file": "pages/Login.tsx",
+      "line": 64
+    }
+  ],
+  "auth.enterCredentials": [
+    {
+      "file": "pages/Login.tsx",
+      "line": 66
+    }
+  ],
+  "auth.password": [
+    {
+      "file": "pages/Login.tsx",
+      "line": 84
+    }
+  ],
+  "auth.signingIn": [
+    {
+      "file": "pages/Login.tsx",
+      "line": 105
+    }
+  ],
+  "auth.signIn": [
+    {
+      "file": "pages/Login.tsx",
+      "line": 108
+    }
+  ],
+  "notFound.label": [
+    {
+      "file": "pages/NotFound.tsx",
+      "line": 79
+    }
+  ],
+  "notFound.errorCode": [
+    {
+      "file": "pages/NotFound.tsx",
+      "line": 82
+    }
+  ],
+  "notFound.cta": [
+    {
+      "file": "pages/NotFound.tsx",
+      "line": 171
+    }
+  ],
+  "portfolio.all": [
+    {
+      "file": "pages/Portfolio.tsx",
+      "line": 49
+    },
+    {
+      "file": "pages/Portfolio.tsx",
+      "line": 104
+    },
+    {
+      "file": "pages/Portfolio.tsx",
+      "line": 108
+    },
+    {
+      "file": "pages/Portfolio.tsx",
+      "line": 115
+    },
+    {
+      "file": "pages/Portfolio.tsx",
+      "line": 118
+    }
+  ],
+  "portfolio.title": [
+    {
+      "file": "pages/Portfolio.tsx",
+      "line": 140
+    }
+  ],
+  "portfolio.subtitle": [
+    {
+      "file": "pages/Portfolio.tsx",
+      "line": 142
+    }
+  ],
+  "portfolio.noImage": [
+    {
+      "file": "pages/Portfolio.tsx",
+      "line": 190
+    },
+    {
+      "file": "pages/ProjectCaseStudy.tsx",
+      "line": 153
+    }
+  ],
+  "portfolio.viewCaseStudy": [
+    {
+      "file": "pages/Portfolio.tsx",
+      "line": 228
+    }
+  ],
+  "portfolio.details": [
+    {
+      "file": "pages/Portfolio.tsx",
+      "line": 247
+    }
+  ],
+  "portfolio.noImages": [
+    {
+      "file": "pages/Portfolio.tsx",
+      "line": 298
+    }
+  ],
+  "portfolio.projectLinks": [
+    {
+      "file": "pages/Portfolio.tsx",
+      "line": 328
+    }
+  ],
+  "portfolio.liveDemo": [
+    {
+      "file": "pages/Portfolio.tsx",
+      "line": 340
+    },
+    {
+      "file": "pages/ProjectCaseStudy.tsx",
+      "line": 175
+    }
+  ],
+  "portfolio.code": [
+    {
+      "file": "pages/Portfolio.tsx",
+      "line": 356
+    },
+    {
+      "file": "pages/ProjectCaseStudy.tsx",
+      "line": 183
+    }
+  ],
+  "portfolio.image": [
+    {
+      "file": "pages/Portfolio.tsx",
+      "line": 387
+    }
+  ],
+  "portfolio.of": [
+    {
+      "file": "pages/Portfolio.tsx",
+      "line": 388
+    },
+    {
+      "file": "pages/ProjectCaseStudy.tsx",
+      "line": 320
+    }
+  ],
+  "portfolio.previousImage": [
+    {
+      "file": "pages/Portfolio.tsx",
+      "line": 436
+    },
+    {
+      "file": "pages/ProjectCaseStudy.tsx",
+      "line": 347
+    }
+  ],
+  "portfolio.nextImage": [
+    {
+      "file": "pages/Portfolio.tsx",
+      "line": 456
+    },
+    {
+      "file": "pages/ProjectCaseStudy.tsx",
+      "line": 357
+    }
+  ],
+  "portfolio.projectNotFound": [
+    {
+      "file": "pages/ProjectCaseStudy.tsx",
+      "line": 109
+    }
+  ],
+  "portfolio.projectNotFoundDescription": [
+    {
+      "file": "pages/ProjectCaseStudy.tsx",
+      "line": 110
+    }
+  ],
+  "portfolio.backToPortfolio": [
+    {
+      "file": "pages/ProjectCaseStudy.tsx",
+      "line": 114
+    },
+    {
+      "file": "pages/ProjectCaseStudy.tsx",
+      "line": 139
+    }
+  ],
+  "portfolio.caseStudy": [
+    {
+      "file": "pages/ProjectCaseStudy.tsx",
+      "line": 126
+    }
+  ],
+  "portfolio.metrics": [
+    {
+      "file": "pages/ProjectCaseStudy.tsx",
+      "line": 218
+    }
+  ],
+  "portfolio.screenshots": [
+    {
+      "file": "pages/ProjectCaseStudy.tsx",
+      "line": 242
+    }
+  ],
+  "portfolio.expandImage": [
+    {
+      "file": "pages/ProjectCaseStudy.tsx",
+      "line": 256
+    },
+    {
+      "file": "pages/ProjectCaseStudy.tsx",
+      "line": 314
+    }
+  ],
+  "portfolio.testimonial": [
+    {
+      "file": "pages/ProjectCaseStudy.tsx",
+      "line": 277
+    }
+  ],
+  "resume.title": [
+    {
+      "file": "pages/Resume.tsx",
+      "line": 49
+    }
+  ],
+  "resume.subtitle": [
+    {
+      "file": "pages/Resume.tsx",
+      "line": 51
+    }
+  ],
+  "resume.experience": [
+    {
+      "file": "pages/Resume.tsx",
+      "line": 61
+    }
+  ],
+  "resume.education": [
+    {
+      "file": "pages/Resume.tsx",
+      "line": 137
+    }
+  ],
+  "resume.courses": [
+    {
+      "file": "pages/Resume.tsx",
+      "line": 212
+    }
+  ],
+  "resume.volunteer": [
+    {
+      "file": "pages/Resume.tsx",
+      "line": 253
+    }
+  ],
+  "resume.skills": [
+    {
+      "file": "pages/Resume.tsx",
+      "line": 297
+    }
+  ],
+  "resume.softSkills": [
+    {
+      "file": "pages/Resume.tsx",
+      "line": 359
+    }
+  ],
+  "resume.languages": [
+    {
+      "file": "pages/Resume.tsx",
+      "line": 403
+    }
+  ],
+  "testimonials.title": [
+    {
+      "file": "pages/Testimonials.tsx",
+      "line": 69
+    },
+    {
+      "file": "pages/Testimonials.tsx",
+      "line": 83
+    }
+  ],
+  "testimonials.subtitle": [
+    {
+      "file": "pages/Testimonials.tsx",
+      "line": 86
+    }
+  ],
+  "testimonials.empty": [
+    {
+      "file": "pages/Testimonials.tsx",
+      "line": 109
+    }
+  ],
+  "admin.about.spanSize": [
+    {
+      "file": "pages/admin/About.tsx",
+      "line": 63
+    },
+    {
+      "file": "pages/admin/About.tsx",
+      "line": 514
+    }
+  ],
+  "common.edit": [
+    {
+      "file": "pages/admin/About.tsx",
+      "line": 70
+    },
+    {
+      "file": "pages/admin/About.tsx",
+      "line": 123
+    },
+    {
+      "file": "pages/admin/About.tsx",
+      "line": 467
+    }
+  ],
+  "common.delete": [
+    {
+      "file": "pages/admin/About.tsx",
+      "line": 79
+    },
+    {
+      "file": "pages/admin/About.tsx",
+      "line": 132
+    }
+  ],
+  "admin.about.saveSuccess": [
+    {
+      "file": "pages/admin/About.tsx",
+      "line": 294
+    }
+  ],
+  "admin.about.saveError": [
+    {
+      "file": "pages/admin/About.tsx",
+      "line": 297
+    }
+  ],
+  "admin.about.title": [
+    {
+      "file": "pages/admin/About.tsx",
+      "line": 358
+    }
+  ],
+  "admin.about.dailyRoutine": [
+    {
+      "file": "pages/admin/About.tsx",
+      "line": 363
+    },
+    {
+      "file": "pages/admin/About.tsx",
+      "line": 369
+    },
+    {
+      "file": "pages/admin/About.tsx",
+      "line": 467
+    }
+  ],
+  "admin.about.faq": [
+    {
+      "file": "pages/admin/About.tsx",
+      "line": 364
+    },
+    {
+      "file": "pages/admin/About.tsx",
+      "line": 423
+    },
+    {
+      "file": "pages/admin/About.tsx",
+      "line": 467
+    }
+  ],
+  "admin.about.addDailyRoutine": [
+    {
+      "file": "pages/admin/About.tsx",
+      "line": 385
+    }
+  ],
+  "admin.about.addFaq": [
+    {
+      "file": "pages/admin/About.tsx",
+      "line": 439
+    }
+  ],
+  "common.add": [
+    {
+      "file": "pages/admin/About.tsx",
+      "line": 467
+    }
+  ],
+  "admin.about.editDailyRoutine": [
+    {
+      "file": "pages/admin/About.tsx",
+      "line": 471
+    }
+  ],
+  "admin.about.editFaq": [
+    {
+      "file": "pages/admin/About.tsx",
+      "line": 472
+    }
+  ],
+  "admin.about.imageUrl": [
+    {
+      "file": "pages/admin/About.tsx",
+      "line": 479
+    }
+  ],
+  "admin.home.changeImage": [
+    {
+      "file": "pages/admin/About.tsx",
+      "line": 495
+    }
+  ],
+  "admin.home.selectImage": [
+    {
+      "file": "pages/admin/About.tsx",
+      "line": 495
+    }
+  ],
+  "admin.about.description": [
+    {
+      "file": "pages/admin/About.tsx",
+      "line": 503
+    }
+  ],
+  "admin.about.question": [
+    {
+      "file": "pages/admin/About.tsx",
+      "line": 534
+    }
+  ],
+  "admin.about.answer": [
+    {
+      "file": "pages/admin/About.tsx",
+      "line": 544
+    }
+  ],
+  "common.cancel": [
+    {
+      "file": "pages/admin/About.tsx",
+      "line": 556
+    }
+  ],
+  "common.save": [
+    {
+      "file": "pages/admin/About.tsx",
+      "line": 557
+    }
+  ]
+}

@@ -35,13 +35,7 @@ export const ptBR = {
       title: "O que falam sobre mim",
     },
     hero: {
-      description: "Transformo desafios complexos em ecossistemas digitais robustos, liderando arquitetura, inovação e excelência técnica.",
-      technologies: [
-        { name: "React", color: "bg-neon-lime" },
-        { name: "TypeScript", color: "bg-neon-lime" },
-        { name: "Arquitetura de Sistemas", color: "bg-neon-purple" },
-        { name: "DevOps & Infraestrutura", color: "bg-neon-purple" }
-      ],
+      description: "Transformando desafios complexos em ecossistemas digitais robustos, com foco em arquitetura, inovação e excelência técnica.",
     },
     skills: {
       title: "O que eu faço",
@@ -49,6 +43,16 @@ export const ptBR = {
     availability: {
       label: "disponível para novos projetos",
     },
+    catRole: "cat role.txt",
+    loading: "Carregando informações do perfil...\n\nSincronizando dados do banco de dados, processando traduções e preparando experiência personalizada. Por favor, aguarde enquanto o sistema carrega todas as informações.",
+    loadingTestimonial: "\"Carregando depoimento...\"",
+  },
+  testimonials: {
+    title: "Depoimentos",
+    subtitle: "Experiências de clientes e colaboradores que trabalharam comigo.",
+    empty: "Nenhum depoimento publicado ainda.",
+    leaveTestimonial: "Deixar meu depoimento",
+    viewAll: "Ver todos os depoimentos →",
   },
   portfolio: {
     title: "Portfólio",
@@ -59,14 +63,14 @@ export const ptBR = {
     noImages: "Sem imagens disponíveis",
     projectLinks: "Links do Projeto",
     code: "Código",
-    liveDemo: "Live Demo",
+    liveDemo: "Demo ao Vivo",
     image: "Imagem",
     of: "de",
     expandImage: "Expandir imagem",
     previousImage: "Imagem anterior",
     nextImage: "Próxima imagem",
     viewCaseStudy: "$ view --case-study",
-    caseStudy: "Case Study",
+    caseStudy: "Estudo de Caso",
     backToPortfolio: "Voltar ao Portfólio",
     problem: "O Problema",
     solution: "A Solução",
@@ -84,6 +88,7 @@ export const ptBR = {
     language: "Idioma",
     languagePT: "Português",
     languageEN: "English",
+    terminalHint: "Pressione ~ para o terminal",
   },
   resume: {
     title: "Currículo",
@@ -116,12 +121,14 @@ export const ptBR = {
     loadMore: "Carregar mais",
   },
   about: {
+    seoDescription: "Conheça a trajetória, rotina e perguntas frequentes sobre este portfolio profissional.",
     title: "Sobre Mim",
     subtitle: "Conheça um pouco mais sobre quem eu sou",
     aboutMe: {
       title: "Sobre mim",
       text: "Sou um cara da tecnologia que vive de desafios e se amarra em criar coisas com um visual incrível. Minha missão é fazer com que cada projeto não só funcione, mas deixe o cliente de queixo caído com um design que é a cara da marca.\n\nQuando não estou na frente do computador, meu mundo gira em outro ritmo. O rap é a trilha sonora do meu dia, e meu tempo livre é dividido entre aventuras épicas em RPGs de mesa e board games com a galera. E, por mais que eu pareça meio marrento, confesso que sou fã de um bom romance, daqueles quase platônicos. Ah, e New Girl foi uma maratona que me pegou de jeito no ano passado.\n\nMeu sonho de viagem é um pouco diferente: quero muito conhecer tribos indígenas e entender na prática como é o dia a dia deles. Você provavelmente vai me ver por aí sempre com meus fones de ouvido e alguns colares de prata. Para mim, encarar um desafio técnico, como montar meu próprio servidor ou testar uma tecnologia nova, é pura diversão e um jeito de aprender na prática.",
     },
+    tapToKnowMore: "Toque para Saber Mais",
     dailyRoutine: {
       title: "Meu dia-a-dia",
       empty: "Nenhum item adicionado ainda",
@@ -147,30 +154,118 @@ export const ptBR = {
     rateLimited: "Muitas tentativas. Aguarde um momento.",
     summaryTitle: "Resumo",
     flows: {
-      project: { label: "Tenho um projeto", description: "Quero desenvolver algo novo" },
-      job: { label: "Oportunidade de emprego", description: "Tenho uma vaga para você" },
-      networking: { label: "Networking / Colaboração", description: "Quero trocar ideias" },
-      feedback: { label: "Feedback / Dúvida", description: "Tenho uma pergunta ou sugestão" },
+      project: {
+        label: "Tenho um projeto",
+        description: "Quero desenvolver algo novo",
+      },
+      job: {
+        label: "Oportunidade de emprego",
+        description: "Tenho uma vaga para você",
+      },
+      networking: {
+        label: "Networking / Colaboração",
+        description: "Quero trocar ideias",
+      },
+      feedback: {
+        label: "Feedback / Dúvida",
+        description: "Tenho uma pergunta ou sugestão",
+      },
     },
     project: {
-      step1: { title: "Qual o tipo de projeto?", options: { webapp: "Web App / SaaS", mobile: "Mobile", landing: "Landing Page", system: "Sistema Interno", consulting: "Consultoria Técnica", other: "Outro" } },
-      step2: { title: "Qual o prazo estimado?", options: { urgent: "Urgente (< 1 mês)", short: "Curto (1–3 meses)", medium: "Médio (3–6 meses)", flexible: "Sem pressa" } },
-      step3: { title: "Qual o orçamento estimado?", options: { small: "Até R$ 5.000", medium: "R$ 5.000 – R$ 15.000", large: "R$ 15.000 – R$ 30.000", enterprise: "Acima de R$ 30.000", unknown: "Ainda não sei" } },
-      step4: { title: "Descreva o projeto", placeholder: "Conte um pouco sobre o que você tem em mente..." },
+      step1: {
+        title: "Qual o tipo de projeto?",
+        options: {
+          webapp: "Web App / SaaS",
+          mobile: "Mobile",
+          landing: "Landing Page",
+          system: "Sistema Interno",
+          consulting: "Consultoria Técnica",
+          other: "Outro",
+        },
+      },
+      step2: {
+        title: "Qual o prazo estimado?",
+        options: {
+          urgent: "Urgente (< 1 mês)",
+          short: "Curto (1–3 meses)",
+          medium: "Médio (3–6 meses)",
+          flexible: "Sem pressa",
+        },
+      },
+      step3: {
+        title: "Qual o orçamento estimado?",
+        options: {
+          small: "Até R$ 5.000",
+          medium: "R$ 5.000 – R$ 15.000",
+          large: "R$ 15.000 – R$ 30.000",
+          enterprise: "Acima de R$ 30.000",
+          unknown: "Ainda não sei",
+        },
+      },
+      step4: {
+        title: "Descreva o projeto",
+        placeholder: "Conte um pouco sobre o que você tem em mente...",
+      },
     },
     job: {
-      step1: { title: "Qual o tipo de oportunidade?", options: { clt: "CLT", pj: "PJ / Contrato", freelance: "Freelance" } },
-      step2: { title: "Qual a modalidade?", options: { remote: "Remoto", hybrid: "Híbrido", onsite: "Presencial" } },
-      step3: { title: "Qual a área principal?", options: { frontend: "Frontend", fullstack: "Full Stack", techlead: "Tech Lead / Arquitetura" } },
-      step4: { title: "Empresa e cargo ofertado", companyPlaceholder: "Nome da empresa", rolePlaceholder: "Título do cargo" },
+      step1: {
+        title: "Qual o tipo de oportunidade?",
+        options: {
+          clt: "CLT",
+          pj: "PJ / Contrato",
+          freelance: "Freelance",
+        },
+      },
+      step2: {
+        title: "Qual a modalidade?",
+        options: {
+          remote: "Remoto",
+          hybrid: "Híbrido",
+          onsite: "Presencial",
+        },
+      },
+      step3: {
+        title: "Qual a área principal?",
+        options: {
+          frontend: "Frontend",
+          fullstack: "Full Stack",
+          techlead: "Tech Lead / Arquitetura",
+        },
+      },
+      step4: {
+        title: "Empresa e cargo ofertado",
+        companyPlaceholder: "Nome da empresa",
+        rolePlaceholder: "Título do cargo",
+      },
     },
     networking: {
-      step1: { title: "Como você me encontrou?", options: { blog: "Blog / Artigos", linkedin: "LinkedIn", referral: "Indicação", portfolio: "Portfólio" } },
-      step2: { title: "Sobre o que você quer conversar?", placeholder: "Qual é o assunto de interesse?" },
+      step1: {
+        title: "Como você me encontrou?",
+        options: {
+          blog: "Blog / Artigos",
+          linkedin: "LinkedIn",
+          referral: "Indicação",
+          portfolio: "Portfólio",
+        },
+      },
+      step2: {
+        title: "Sobre o que você quer conversar?",
+        placeholder: "Qual é o assunto de interesse?",
+      },
     },
     feedback: {
-      step1: { title: "Sobre o que é o feedback?", options: { post: "Um post do blog", project: "Um projeto específico", general: "Portfolio em geral" } },
-      step2: { title: "Sua mensagem", placeholder: "Escreva aqui..." },
+      step1: {
+        title: "Sobre o que é o feedback?",
+        options: {
+          post: "Um post do blog",
+          project: "Um projeto específico",
+          general: "Portfolio em geral",
+        },
+      },
+      step2: {
+        title: "Sua mensagem",
+        placeholder: "Escreva aqui...",
+      },
     },
     contact: {
       title: "Seus dados de contato",
@@ -239,16 +334,32 @@ export const ptBR = {
       deleteError: "Erro ao excluir.",
     },
   },
+  auth: {
+    adminArea: "Área Administrativa",
+    enterCredentials: "Entre com suas credenciais para acessar o painel",
+    emailPlaceholder: "admin@exemplo.com",
+    password: "Senha",
+    signingIn: "Entrando...",
+    signIn: "Entrar",
+    invalidCredentials: "Credenciais inválidas. Verifique seu email e senha.",
+  },
   notFound: {
     label: "erro do sistema",
     errorCode: "ERR_ROTA_NAO_ENCONTRADA",
-    lines: [
-      "> processo encerrado com código 404",
-      "> rota não encontrada no manifesto",
-      "> verificando handlers de fallback...",
-      "> nenhum encontrado. abortando.",
-    ],
+    lines: {
+      0: "> processo encerrado com código 404",
+      1: "> rota não encontrada no manifesto",
+      2: "> verificando handlers de fallback...",
+      3: "> nenhum encontrado. abortando.",
+    },
     cta: "voltar ao início",
   },
+  proposals: {
+    clause6: "1. **Transferência de Titularidade:** Após a quitação integral do valor total previsto neste contrato, a CONTRATADA transfere ao CONTRATANTE a propriedade total sobre o código-fonte desenvolvido e a titularidade das contas de infraestrutura criadas especificamente para este projeto.\n\n2. **Direitos de Portfólio:** A CONTRATADA reserva para si o direito de imagem da aplicação para fins de divulgação de seu trabalho e portfólio profissional. Isso inclui a exibição de capturas de tela, vídeos de funcionamento e o compartilhamento de trechos de código não críticos (que não exponham vulnerabilidades ou segredos de negócio do cliente) para fins de demonstração técnica.",
+    clause7: "1. **Aceite Tácito:** Após a entrega da solução, o CONTRATANTE terá um prazo de **5 (cinco) dias corridos** para manifestar sua intenção de iniciar o período de homologação. Caso não haja manifestação neste prazo, a entrega será considerada finalizada e aceita para todos os fins de direito.\n\n2. **Período de Homologação:** Caso o CONTRATANTE se manifeste dentro dos 5 dias iniciais, terá um prazo adicional de **30 (trinta) dias corridos** para realizar testes e solicitar ajustes.\n\n3. **Limitação de Correções:** Neste período de 30 dias, o CONTRATANTE terá direito a submeter até **2 (duas) listas consolidadas de correções de bugs**. Falhas decorrentes de correções anteriores não serão contabilizadas nesta limitação.\n\n4. **Manutenção Posterior:** Findo o prazo de 30 dias ou exauridas as listas de correção, qualquer nova alteração, funcionalidade ou suporte será objeto de novo orçamento a parte.",
+    clause8: "1. **Serviços de Terceiros:** A CONTRATADA não se responsabiliza por instabilidades, interrupções de serviço, perda de dados ou alterações de preços praticadas pelos provedores de infraestrutura (servidores, bancos de dados, APIs).\n\n2. **Garantia de Não-Bloqueio (Lock-in):** A CONTRATADA garante que a arquitetura do sistema não utilizará tecnologias que impeçam a migração futura para outros provedores, assegurando a portabilidade do sistema.\n\n3. **Mudança de Stack:** Caso o CONTRATANTE deseje alterar a infraestrutura ou tecnologias escolhidas após o início do projeto, um novo orçamento será apresentado considerando o progresso já realizado e a complexidade da migração.",
+    clause9: "1. **Controlador de Dados:** O CONTRATANTE figura como único Controlador dos dados (nos termos da Lei 13.709/18 - LGPD), sendo o responsável exclusivo por coletar autorizações, garantir a integridade, privacidade e atender às solicitações de exclusão ou acesso de seus próprios clientes.\n\n2. **Uso da Ferramenta:** Por ser o proprietário final da aplicação, cabe ao CONTRATANTE garantir que o uso do software esteja em conformidade com as normas legais vigentes, isentando a CONTRATADA de qualquer mau uso ou vazamento decorrente da gestão das contas e acessos.",
+    clause11: "Esta proposta, quando aceita eletronicamente, constitui contrato válido entre as partes, nos termos do Código Civil Brasileiro.",
+    clause12: "Fica eleito o foro da comarca de Itapevi – SP para dirimir quaisquer controvérsias oriundas deste contrato, com renúncia a qualquer outro, por mais privilegiado que seja.",
+  },
 };
-

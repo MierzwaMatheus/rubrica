@@ -35,13 +35,7 @@ export const enUS = {
       title: "What they say about me",
     },
     hero: {
-      description: "I transform complex challenges into robust digital ecosystems, leading architecture, innovation and technical excellence.",
-      technologies: [
-        { name: "React", color: "bg-neon-lime" },
-        { name: "TypeScript", color: "bg-neon-lime" },
-        { name: "Systems Architecture", color: "bg-neon-purple" },
-        { name: "DevOps & Infrastructure", color: "bg-neon-purple" }
-      ],
+      description: "Transforming complex challenges into robust digital ecosystems, with a focus on architecture, innovation and technical excellence.",
     },
     skills: {
       title: "What I do",
@@ -49,6 +43,16 @@ export const enUS = {
     availability: {
       label: "available for new projects",
     },
+    catRole: "cat role.txt",
+    loading: "Loading profile information...\n\nSyncing database data, processing translations and preparing personalized experience. Please wait while the system loads all information.",
+    loadingTestimonial: "\"Loading testimonial...\"",
+  },
+  testimonials: {
+    title: "Testimonials",
+    subtitle: "Experiences from clients and collaborators I've worked with.",
+    empty: "No testimonials published yet.",
+    leaveTestimonial: "Leave my testimonial",
+    viewAll: "View all testimonials →",
   },
   portfolio: {
     title: "Portfolio",
@@ -84,6 +88,7 @@ export const enUS = {
     language: "Language",
     languagePT: "Português",
     languageEN: "English",
+    terminalHint: "Press ~ for terminal",
   },
   resume: {
     title: "Resume",
@@ -116,12 +121,14 @@ export const enUS = {
     loadMore: "Load more",
   },
   about: {
+    seoDescription: "Get to know the journey, daily routine and frequently asked questions about this professional portfolio.",
     title: "About Me",
     subtitle: "Get to know a little more about who I am",
     aboutMe: {
       title: "About me",
       text: "I'm a tech guy who lives on challenges and loves creating things with incredible visuals. My mission is to make every project not only work, but leave the client amazed with a design that represents the brand.\n\nWhen I'm not in front of the computer, my world spins at a different pace. Rap is the soundtrack of my day, and my free time is divided between epic adventures in tabletop RPGs and board games with the crew. And, even though I might seem a bit tough, I confess I'm a fan of a good romance, those almost platonic ones. Oh, and New Girl was a marathon that got me last year.\n\nMy travel dream is a bit different: I really want to meet indigenous tribes and understand in practice what their daily life is like. You'll probably see me around always with my headphones and some silver necklaces. For me, facing a technical challenge, like setting up my own server or testing a new technology, is pure fun and a way to learn hands-on.",
     },
+    tapToKnowMore: "Tap to Learn More",
     dailyRoutine: {
       title: "My day-to-day",
       empty: "No items added yet",
@@ -147,30 +154,118 @@ export const enUS = {
     rateLimited: "Too many attempts. Please wait a moment.",
     summaryTitle: "Summary",
     flows: {
-      project: { label: "I have a project", description: "I want to build something new" },
-      job: { label: "Job opportunity", description: "I have a position for you" },
-      networking: { label: "Networking / Collaboration", description: "I want to exchange ideas" },
-      feedback: { label: "Feedback / Question", description: "I have a question or suggestion" },
+      project: {
+        label: "I have a project",
+        description: "I want to build something new",
+      },
+      job: {
+        label: "Job opportunity",
+        description: "I have a position for you",
+      },
+      networking: {
+        label: "Networking / Collaboration",
+        description: "I want to exchange ideas",
+      },
+      feedback: {
+        label: "Feedback / Question",
+        description: "I have a question or suggestion",
+      },
     },
     project: {
-      step1: { title: "What type of project?", options: { webapp: "Web App / SaaS", mobile: "Mobile", landing: "Landing Page", system: "Internal System", consulting: "Technical Consulting", other: "Other" } },
-      step2: { title: "What's the estimated timeline?", options: { urgent: "Urgent (< 1 month)", short: "Short (1–3 months)", medium: "Medium (3–6 months)", flexible: "No rush" } },
-      step3: { title: "What's the estimated budget?", options: { small: "Up to R$ 5,000", medium: "R$ 5,000 – R$ 15,000", large: "R$ 15,000 – R$ 30,000", enterprise: "Above R$ 30,000", unknown: "Not sure yet" } },
-      step4: { title: "Describe the project", placeholder: "Tell me a bit about what you have in mind..." },
+      step1: {
+        title: "What type of project?",
+        options: {
+          webapp: "Web App / SaaS",
+          mobile: "Mobile",
+          landing: "Landing Page",
+          system: "Internal System",
+          consulting: "Technical Consulting",
+          other: "Other",
+        },
+      },
+      step2: {
+        title: "What's the estimated timeline?",
+        options: {
+          urgent: "Urgent (< 1 month)",
+          short: "Short (1–3 months)",
+          medium: "Medium (3–6 months)",
+          flexible: "No rush",
+        },
+      },
+      step3: {
+        title: "What's the estimated budget?",
+        options: {
+          small: "Up to R$ 5,000",
+          medium: "R$ 5,000 – R$ 15,000",
+          large: "R$ 15,000 – R$ 30,000",
+          enterprise: "Above R$ 30,000",
+          unknown: "Not sure yet",
+        },
+      },
+      step4: {
+        title: "Describe the project",
+        placeholder: "Tell me a bit about what you have in mind...",
+      },
     },
     job: {
-      step1: { title: "What type of opportunity?", options: { clt: "Full-time (CLT)", pj: "Contractor (PJ)", freelance: "Freelance" } },
-      step2: { title: "What's the work modality?", options: { remote: "Remote", hybrid: "Hybrid", onsite: "On-site" } },
-      step3: { title: "What's the main area?", options: { frontend: "Frontend", fullstack: "Full Stack", techlead: "Tech Lead / Architecture" } },
-      step4: { title: "Company and position", companyPlaceholder: "Company name", rolePlaceholder: "Job title" },
+      step1: {
+        title: "What type of opportunity?",
+        options: {
+          clt: "Full-time (CLT)",
+          pj: "Contractor (PJ)",
+          freelance: "Freelance",
+        },
+      },
+      step2: {
+        title: "What's the work modality?",
+        options: {
+          remote: "Remote",
+          hybrid: "Hybrid",
+          onsite: "On-site",
+        },
+      },
+      step3: {
+        title: "What's the main area?",
+        options: {
+          frontend: "Frontend",
+          fullstack: "Full Stack",
+          techlead: "Tech Lead / Architecture",
+        },
+      },
+      step4: {
+        title: "Company and position",
+        companyPlaceholder: "Company name",
+        rolePlaceholder: "Job title",
+      },
     },
     networking: {
-      step1: { title: "How did you find me?", options: { blog: "Blog / Articles", linkedin: "LinkedIn", referral: "Referral", portfolio: "Portfolio" } },
-      step2: { title: "What would you like to talk about?", placeholder: "What's the topic of interest?" },
+      step1: {
+        title: "How did you find me?",
+        options: {
+          blog: "Blog / Articles",
+          linkedin: "LinkedIn",
+          referral: "Referral",
+          portfolio: "Portfolio",
+        },
+      },
+      step2: {
+        title: "What would you like to talk about?",
+        placeholder: "What's the topic of interest?",
+      },
     },
     feedback: {
-      step1: { title: "What is your feedback about?", options: { post: "A blog post", project: "A specific project", general: "Portfolio in general" } },
-      step2: { title: "Your message", placeholder: "Write here..." },
+      step1: {
+        title: "What is your feedback about?",
+        options: {
+          post: "A blog post",
+          project: "A specific project",
+          general: "Portfolio in general",
+        },
+      },
+      step2: {
+        title: "Your message",
+        placeholder: "Write here...",
+      },
     },
     contact: {
       title: "Your contact details",
@@ -239,16 +334,24 @@ export const enUS = {
       deleteError: "Error deleting.",
     },
   },
+  auth: {
+    adminArea: "Administrative Area",
+    enterCredentials: "Sign in with your credentials to access the dashboard",
+    emailPlaceholder: "admin@example.com",
+    password: "Password",
+    signingIn: "Signing in...",
+    signIn: "Sign in",
+    invalidCredentials: "Invalid credentials. Check your email and password.",
+  },
   notFound: {
     label: "system error",
     errorCode: "ERR_ROUTE_NOT_FOUND",
-    lines: [
-      "> process exited with code 404",
-      "> route not found in manifest",
-      "> scanning fallback handlers...",
-      "> none matched. abort.",
-    ],
+    lines: {
+      0: "> process exited with code 404",
+      1: "> route not found in manifest",
+      2: "> scanning fallback handlers...",
+      3: "> none matched. abort.",
+    },
     cta: "back to home",
   },
 };
-

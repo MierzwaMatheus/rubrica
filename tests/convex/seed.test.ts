@@ -311,14 +311,84 @@ describe("convex/seed · seedAll", () => {
     expect(ctx.runMutation).toHaveBeenCalledWith(internal.resumeItems.seed, {});
   });
 
-  it("com todos os plugins invoca 3 core + 5 plugins (8 mutations)", async () => {
+  it("com todos os plugins invoca 3 core + 6 plugins (10 mutations: about tem 2)", async () => {
+    ctx.runMutation.mockResolvedValue(undefined);
+
+    await handler(seedAll)(ctx, {
+      enabledPlugins: ["blog", "portfolio", "proposals", "i18n", "resume", "about"],
+    });
+
+    expect(ctx.runMutation).toHaveBeenCalledTimes(10);
+  });
+
+  it("com about habilitado invoca 3 core + aboutDailyRoutine.seed + aboutFaq.seed (5 mutations)", async () => {
+    ctx.runMutation.mockResolvedValue(undefined);
+
+    await handler(seedAll)(ctx, { enabledPlugins: ["about"] });
+
+    expect(ctx.runMutation).toHaveBeenCalledTimes(5);
+    expect(ctx.runMutation).toHaveBeenCalledWith(internal.aboutDailyRoutine.seed, {});
+    expect(ctx.runMutation).toHaveBeenCalledWith(internal.aboutFaq.seed, {});
+  });
+
+  it("sem about não invoca aboutDailyRoutine.seed nem aboutFaq.seed", async () => {
     ctx.runMutation.mockResolvedValue(undefined);
 
     await handler(seedAll)(ctx, {
       enabledPlugins: ["blog", "portfolio", "proposals", "i18n", "resume"],
     });
 
-    expect(ctx.runMutation).toHaveBeenCalledTimes(8);
+    const dailyCalled = ctx.runMutation.mock.calls.some(
+      (c: unknown[]) => c[0] === internal.aboutDailyRoutine.seed,
+    );
+    const faqCalled = ctx.runMutation.mock.calls.some(
+      (c: unknown[]) => c[0] === internal.aboutFaq.seed,
+    );
+    expect(dailyCalled).toBe(false);
+    expect(faqCalled).toBe(false);
   });
 
+  it("com about + resume invoca 3 core + resumeItems.seed + aboutDailyRoutine.seed + aboutFaq.seed (6 mutations)", async () => {
+    ctx.runMutation.mockResolvedValue(undefined);
+
+    await handler(seedAll)(ctx, { enabledPlugins: ["about", "resume"] });
+
+    expect(ctx.runMutation).toHaveBeenCalledTimes(6);
+    expect(ctx.runMutation).toHaveBeenCalledWith(internal.resumeItems.seed, {});
+    expect(ctx.runMutation).toHaveBeenCalledWith(internal.aboutDailyRoutine.seed, {});
+    expect(ctx.runMutation).toHaveBeenCalledWith(internal.aboutFaq.seed, {});
+  });
+
+  it("com about + blog invoca 3 core + posts.seed + aboutDailyRoutine.seed + aboutFaq.seed (6 mutations)", async () => {
+    ctx.runMutation.mockResolvedValue(undefined);
+
+    await handler(seedAll)(ctx, { enabledPlugins: ["about", "blog"] });
+
+    expect(ctx.runMutation).toHaveBeenCalledTimes(6);
+    expect(ctx.runMutation).toHaveBeenCalledWith(internal.posts.seed, {});
+    expect(ctx.runMutation).toHaveBeenCalledWith(internal.aboutDailyRoutine.seed, {});
+    expect(ctx.runMutation).toHaveBeenCalledWith(internal.aboutFaq.seed, {});
+  });
+
+  it("com about + i18n invoca 3 core + siteTexts.seed + aboutDailyRoutine.seed + aboutFaq.seed (6 mutations)", async () => {
+    ctx.runMutation.mockResolvedValue(undefined);
+
+    await handler(seedAll)(ctx, { enabledPlugins: ["about", "i18n"] });
+
+    expect(ctx.runMutation).toHaveBeenCalledTimes(6);
+    expect(ctx.runMutation).toHaveBeenCalledWith(internal.siteTexts.seed, {});
+    expect(ctx.runMutation).toHaveBeenCalledWith(internal.aboutDailyRoutine.seed, {});
+    expect(ctx.runMutation).toHaveBeenCalledWith(internal.aboutFaq.seed, {});
+  });
+
+  it("com about + portfolio invoca 3 core + projects.seed + aboutDailyRoutine.seed + aboutFaq.seed (6 mutations)", async () => {
+    ctx.runMutation.mockResolvedValue(undefined);
+
+    await handler(seedAll)(ctx, { enabledPlugins: ["about", "portfolio"] });
+
+    expect(ctx.runMutation).toHaveBeenCalledTimes(6);
+    expect(ctx.runMutation).toHaveBeenCalledWith(internal.projects.seed, {});
+    expect(ctx.runMutation).toHaveBeenCalledWith(internal.aboutDailyRoutine.seed, {});
+    expect(ctx.runMutation).toHaveBeenCalledWith(internal.aboutFaq.seed, {});
+  });
 });

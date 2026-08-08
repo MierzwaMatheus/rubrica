@@ -43,6 +43,10 @@ export const seedAll = internalMutation({
     if (enabledPlugins.includes("i18n")) {
       await ctx.runMutation(internal.siteTexts.seed, {});
     }
+
+    if (enabledPlugins.includes("blog")) {
+      await ctx.runMutation(internal.posts.seed, {});
+    }
   },
 });
 

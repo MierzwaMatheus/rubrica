@@ -168,28 +168,27 @@ const NAV_ITEMS = NAV_ITEMS_KEYS
               const isActive = location === item.href;
               return (
                 <li key={item.href}>
-                  <Link href={item.href}>
-                    <a
+                  <Link
+                    href={item.href}
+                    className={cn(
+                      "flex items-center px-4 py-3 rounded-md text-sm font-medium transition-all duration-300 group relative overflow-hidden",
+                      isActive
+                        ? "text-white bg-white/5 border border-white/5"
+                        : "text-gray-400 hover:text-white hover:bg-white/5"
+                    )}
+                  >
+                    {isActive && (
+                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-neon-purple shadow-[0_0_10px_rgba(168,85,247,0.5)]"></div>
+                    )}
+                    <item.icon
                       className={cn(
-                        "flex items-center px-4 py-3 rounded-md text-sm font-medium transition-all duration-300 group relative overflow-hidden",
+                        "mr-3 h-4 w-4 transition-colors",
                         isActive
-                          ? "text-white bg-white/5 border border-white/5"
-                          : "text-gray-400 hover:text-white hover:bg-white/5"
+                          ? "text-neon-purple"
+                          : "text-gray-500 group-hover:text-neon-purple"
                       )}
-                    >
-                      {isActive && (
-                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-neon-purple shadow-[0_0_10px_rgba(168,85,247,0.5)]"></div>
-                      )}
-                      <item.icon
-                        className={cn(
-                          "mr-3 h-4 w-4 transition-colors",
-                          isActive
-                            ? "text-neon-purple"
-                            : "text-gray-500 group-hover:text-neon-purple"
-                        )}
-                      />
-                      {item.label}
-                    </a>
+                    />
+                    {item.label}
                   </Link>
                 </li>
               );

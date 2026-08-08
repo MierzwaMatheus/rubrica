@@ -8,6 +8,15 @@ export interface TerminalLine {
   text: string;
 }
 
+export interface TerminalOwnerInfo {
+  name: string;
+  slug: string;
+  role: string;
+  email?: string;
+  githubUrl?: string;
+  linkedinUrl?: string;
+}
+
 const COMMANDS = [
   "help",
   "home",
@@ -27,17 +36,20 @@ const COMMANDS = [
   "quit",
 ];
 
-const WELCOME_LINES: TerminalLine[] = [
-  { type: "welcome", text: "Welcome to matheus-mierzwa terminal v1.0" },
-  { type: "welcome", text: "Type 'help' to see available commands." },
-  { type: "welcome", text: "─────────────────────────────────────────" },
-];
+function buildWelcomeLines(slug: string): TerminalLine[] {
+  return [
+    { type: "welcome", text: `Welcome to ${slug} terminal v1.0` },
+    { type: "welcome", text: "Type 'help' to see available commands." },
+    { type: "welcome", text: "─────────────────────────────────────────" },
+  ];
+}
 
 interface UseTerminalOptions {
   posts: BlogPost[];
   onNavigate: (path: string) => void;
   onClose: () => void;
   onThemeToggle?: () => void;
+  ownerInfo?: TerminalOwnerInfo;
 }
 
 export function useTerminal({
@@ -45,8 +57,12 @@ export function useTerminal({
   onNavigate,
   onClose,
   onThemeToggle,
+  ownerInfo,
 }: UseTerminalOptions) {
-  const [lines, setLines] = useState<TerminalLine[]>(WELCOME_LINES);
+  const slug = ownerInfo?.slug ?? "portfolio";
+  const welcomeLines = buildWelcomeLines(slug);
+
+  const [lines, setLines] = useState<TerminalLine[]>(welcomeLines);
   const [input, setInput] = useState("");
   const [cmdHistory, setCmdHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
@@ -71,7 +87,7 @@ export function useTerminal({
       const trimmed = raw.trim();
       if (!trimmed) return;
 
-      addLine({ type: "input", text: `visitor@matheus-mierzwa:~$ ${trimmed}` });
+      addLine({ type: "input", text: `visitor@${slug}:~$ ${trimmed}` });
 
       const [cmd, ...args] = trimmed.toLowerCase().split(/\s+/);
 
@@ -88,7 +104,7 @@ export function useTerminal({
             "  open <slug>   → Navigate to a blog post",
             "  contact       → Show contact info",
             "  ls            → List available pages",
-            "  whoami        → Who is this guy?",
+            "  whoami        → Who is this?",
             "  theme         → Toggle dark/light mode",
             "  clear         → Clear terminal",
             "  exit          → Close terminal",
@@ -142,14 +158,21 @@ export function useTerminal({
           break;
         }
 
-        case "contact":
-          [
-            "Contact:",
-            "  email    mierzwa.oliveira@gmail.com",
-            "  github   github.com/MierzwaMatheus",
-            "  linkedin linkedin.com/in/matheus-mierzwa",
-          ].forEach(t => addLine({ type: "output", text: t }));
+        case "contact": {
+          const lines: string[] = ["Contact:"];
+          if (ownerInfo?.email) lines.push(`  email    ${ownerInfo.email}`);
+          if (ownerInfo?.githubUrl) {
+            const github = ownerInfo.githubUrl.replace(/^https?:\/\//, "");
+            lines.push(`  github   ${github}`);
+          }
+          if (ownerInfo?.linkedinUrl) {
+            const linkedin = ownerInfo.linkedinUrl.replace(/^https?:\/\//, "");
+            lines.push(`  linkedin ${linkedin}`);
+          }
+          if (lines.length === 1) lines.push("  No contact info configured.");
+          lines.forEach(t => addLine({ type: "output", text: t }));
           break;
+        }
 
         case "ls":
           [
@@ -165,7 +188,9 @@ export function useTerminal({
         case "whoami":
           addLine({
             type: "output",
-            text: "matheus mierzwa — software developer",
+            text: ownerInfo
+              ? `${ownerInfo.name} — ${ownerInfo.role}`
+              : "portfolio owner — software developer",
           });
           break;
 
@@ -179,7 +204,7 @@ export function useTerminal({
           break;
 
         case "clear":
-          setLines(WELCOME_LINES);
+          setLines(buildWelcomeLines(slug));
           return;
 
         case "exit":
@@ -191,7 +216,7 @@ export function useTerminal({
           addLine({ type: "error", text: `command not found: ${cmd}` });
       }
     },
-    [addLine, navigate, posts, onClose, onThemeToggle]
+    [addLine, navigate, posts, onClose, onThemeToggle, ownerInfo, slug]
   );
 
   const submit = useCallback(() => {

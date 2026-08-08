@@ -15,6 +15,8 @@ import { printContractPDF } from "@/utils/contractPDF";
 import { usePlaygroundStorage } from "@/hooks/usePlaygroundStorage";
 import type { PlaygroundProposal } from "@/components/playground/PlaygroundProposalDialog";
 import { Helmet } from "react-helmet-async";
+import { useQuery } from "convex/react";
+import { api } from "../../../convex/_generated/api";
 
 function toLegacyProposal(p: PlaygroundProposal) {
   return {
@@ -49,6 +51,7 @@ export default function PlaygroundProposalView() {
   const rawProposal = useMemo(() => proposals.find(p => p.slug === slug) ?? null, [proposals, slug]);
   const proposal = useMemo(() => rawProposal ? toLegacyProposal(rawProposal) : null, [rawProposal]);
 
+  const contactInfo = useQuery(api.contactInfo.get);
   const isExpired = rawProposal ? Date.now() > rawProposal.expiresAt : false;
 
   const calculateValidUntil = (createdAt: number) => {
@@ -177,11 +180,15 @@ export default function PlaygroundProposalView() {
                     <span className="w-1 h-8 bg-neon-purple rounded-full" />
                     Apresentação
                   </h2>
-                  <div className="text-lg text-gray-300 leading-relaxed space-y-4">
-                    <p>Olá, tudo bem?</p>
-                    <p>Antes de tudo, agradeço o interesse! Sou Matheus Mierzwa, Arquiteto de Soluções Digitais e Tech Lead Frontend com mais de 4 anos de experiência transformando desafios complexos em ecossistemas digitais robustos.</p>
-                    <p>Minha expertise vai além de código. Desenho arquiteturas escaláveis, lidero equipes técnicas, defino padrões de excelência e conduzo decisões estratégicas que impactam produtos inteiros.</p>
-                    <p>Meu objetivo é simples: transformar sua visão em uma solução que seja simultaneamente elegante, escalável e inteligente.</p>
+                  <div className="text-lg text-gray-300 leading-relaxed space-y-4 whitespace-pre-line">
+                    {contactInfo?.proposalIntro || (
+                      <>
+                        <p>Olá, tudo bem?</p>
+                        <p>Antes de tudo, agradeço o interesse! Estamos aqui para transformar sua visão em uma solução elegante, escalável e inteligente.</p>
+                        <p>Nossa expertise vai além de código — desenhamos arquiteturas escaláveis, definimos padrões de excelência e conduzimos decisões estratégicas que impactam produtos inteiros.</p>
+                        <p>Vamos conversar sobre como isso pode funcionar no seu projeto?</p>
+                      </>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -352,7 +359,7 @@ export default function PlaygroundProposalView() {
             )}
 
             <motion.footer variants={itemVariants} className="text-center border-t border-white/10 pt-8 pb-4">
-              <p className="text-gray-500 text-sm">© 2025 Matheus Mierzwa. Todos os direitos reservados.</p>
+              <p className="text-gray-500 text-sm">© {new Date().getFullYear()} {contactInfo?.name}. Todos os direitos reservados.</p>
               <p className="text-gray-600 text-xs mt-2">Esta proposta é confidencial e destinada apenas ao cliente especificado.</p>
             </motion.footer>
           </motion.div>

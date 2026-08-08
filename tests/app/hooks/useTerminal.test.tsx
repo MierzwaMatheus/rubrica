@@ -62,6 +62,22 @@ describe("useTerminal · welcome", () => {
     expect(hook.result.current.lines).toHaveLength(3);
     expect(hook.result.current.lines[0].type).toBe("welcome");
   });
+
+  it("welcome text does not contain personal name when no ownerInfo", () => {
+    const hook = renderTerminal();
+    const welcome = hook.result.current.lines[0].text;
+    expect(welcome).not.toContain("matheus");
+    expect(welcome).not.toContain("mierzwa");
+    expect(welcome).toContain("portfolio");
+  });
+
+  it("welcome text uses ownerInfo.slug when provided", () => {
+    const hook = renderTerminal({
+      ownerInfo: { name: "Ana Lima", slug: "ana-lima", role: "Designer UX" },
+    });
+    const welcome = hook.result.current.lines[0].text;
+    expect(welcome).toContain("ana-lima");
+  });
 });
 
 describe("useTerminal · commands", () => {
@@ -145,12 +161,31 @@ describe("useTerminal · commands", () => {
     expect(last.text).toContain("post not found");
   });
 
-  it("contact prints contact info", () => {
+  it("contact without ownerInfo prints no contact info message", () => {
     const hook = renderTerminal();
     pressEnter(hook, "contact");
     const text = hook.result.current.lines.map((l) => l.text).join("\n");
     expect(text).toContain("Contact:");
-    expect(text).toContain("email");
+    expect(text).not.toContain("mierzwa");
+    expect(text).toContain("No contact info configured");
+  });
+
+  it("contact with ownerInfo prints email, github and linkedin", () => {
+    const hook = renderTerminal({
+      ownerInfo: {
+        name: "Ana Lima",
+        slug: "ana-lima",
+        role: "Designer UX",
+        email: "ana@example.com",
+        githubUrl: "https://github.com/ana",
+        linkedinUrl: "https://linkedin.com/in/ana",
+      },
+    });
+    pressEnter(hook, "contact");
+    const text = hook.result.current.lines.map((l) => l.text).join("\n");
+    expect(text).toContain("ana@example.com");
+    expect(text).toContain("github.com/ana");
+    expect(text).toContain("linkedin.com/in/ana");
   });
 
   it("ls prints pages list", () => {
@@ -161,12 +196,23 @@ describe("useTerminal · commands", () => {
     ).toBe(true);
   });
 
-  it("whoami prints identity", () => {
+  it("whoami without ownerInfo prints generic fallback", () => {
     const hook = renderTerminal();
     pressEnter(hook, "whoami");
-    expect(
-      hook.result.current.lines.some((l) => l.text.includes("matheus mierzwa")),
-    ).toBe(true);
+    const text = hook.result.current.lines.map((l) => l.text).join("\n");
+    expect(text).not.toContain("matheus");
+    expect(text).not.toContain("mierzwa");
+    expect(text).toContain("portfolio owner");
+  });
+
+  it("whoami with ownerInfo prints name and role", () => {
+    const hook = renderTerminal({
+      ownerInfo: { name: "Ana Lima", slug: "ana-lima", role: "Designer UX", email: "ana@example.com" },
+    });
+    pressEnter(hook, "whoami");
+    const text = hook.result.current.lines.map((l) => l.text).join("\n");
+    expect(text).toContain("Ana Lima");
+    expect(text).toContain("Designer UX");
   });
 
   it("theme calls onThemeToggle", () => {

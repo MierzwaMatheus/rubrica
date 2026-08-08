@@ -136,59 +136,59 @@ describe("convex/seed · seedAll", () => {
     ctx = createMockCtx();
   });
 
-  it("com lista vazia de plugins invoca apenas seedSiteConfig (1 mutation)", async () => {
+  it("com lista vazia de plugins invoca os seeds core (3 mutations)", async () => {
     ctx.runMutation.mockResolvedValue(undefined);
 
     await handler(seedAll)(ctx, { enabledPlugins: [] });
 
-    expect(ctx.runMutation).toHaveBeenCalledTimes(1);
+    expect(ctx.runMutation).toHaveBeenCalledTimes(3);
   });
 
-  it("com plugins irrelevantes também invoca apenas seedSiteConfig", async () => {
+  it("com plugins irrelevantes também invoca os seeds core (3 mutations)", async () => {
     ctx.runMutation.mockResolvedValue(undefined);
 
     await handler(seedAll)(ctx, { enabledPlugins: ["blog", "analytics"] });
 
-    expect(ctx.runMutation).toHaveBeenCalledTimes(1);
+    expect(ctx.runMutation).toHaveBeenCalledTimes(3);
   });
 
-  it("com proposals habilitado invoca seedSiteConfig + seedDefaultTemplate (2 mutations)", async () => {
+  it("com proposals habilitado invoca 3 core + seedDefaultTemplate (4 mutations)", async () => {
     ctx.runMutation.mockResolvedValue(undefined);
 
     await handler(seedAll)(ctx, { enabledPlugins: ["proposals"] });
 
-    expect(ctx.runMutation).toHaveBeenCalledTimes(2);
+    expect(ctx.runMutation).toHaveBeenCalledTimes(4);
   });
 
-  it("com i18n habilitado invoca seedSiteConfig + siteTexts.seed (2 mutations)", async () => {
+  it("com i18n habilitado invoca 3 core + siteTexts.seed (4 mutations)", async () => {
     ctx.runMutation.mockResolvedValue(undefined);
 
     await handler(seedAll)(ctx, { enabledPlugins: ["i18n"] });
 
-    expect(ctx.runMutation).toHaveBeenCalledTimes(2);
+    expect(ctx.runMutation).toHaveBeenCalledTimes(4);
   });
 
-  it("com proposals + i18n invoca os três seeds (3 mutations)", async () => {
+  it("com proposals + i18n invoca 3 core + seedDefaultTemplate + siteTexts.seed (5 mutations)", async () => {
     ctx.runMutation.mockResolvedValue(undefined);
 
     await handler(seedAll)(ctx, { enabledPlugins: ["proposals", "i18n"] });
 
-    expect(ctx.runMutation).toHaveBeenCalledTimes(3);
+    expect(ctx.runMutation).toHaveBeenCalledTimes(5);
   });
 
-  it("com proposals mas não i18n invoca 2 mutations (sem siteTexts.seed)", async () => {
+  it("com proposals mas não i18n invoca 4 mutations (3 core + seedDefaultTemplate, sem siteTexts.seed)", async () => {
     ctx.runMutation.mockResolvedValue(undefined);
 
     await handler(seedAll)(ctx, { enabledPlugins: ["proposals", "blog"] });
 
-    expect(ctx.runMutation).toHaveBeenCalledTimes(2);
+    expect(ctx.runMutation).toHaveBeenCalledTimes(4);
   });
 
-  it("com i18n mas não proposals invoca 2 mutations (sem seedDefaultTemplate)", async () => {
+  it("com i18n mas não proposals invoca 4 mutations (3 core + siteTexts.seed, sem seedDefaultTemplate)", async () => {
     ctx.runMutation.mockResolvedValue(undefined);
 
     await handler(seedAll)(ctx, { enabledPlugins: ["i18n", "blog"] });
 
-    expect(ctx.runMutation).toHaveBeenCalledTimes(2);
+    expect(ctx.runMutation).toHaveBeenCalledTimes(4);
   });
 });

@@ -105,8 +105,13 @@ export function mapBlogPost(c: any): BlogPost {
 
 export function mapContactInfo(c: any): ContactInfo {
   return {
+    name: c?.name ?? "",
     role: c?.role ?? "",
     role_translations: mapTranslations(c?.roleTranslations ?? c?.role_translations),
+    email: c?.email ?? "",
+    show_email: c?.showEmail ?? c?.show_email ?? false,
+    phone: c?.phone ?? "",
+    show_phone: c?.showPhone ?? c?.show_phone ?? false,
   };
 }
 

@@ -2,6 +2,8 @@ import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import {
   generateContractHTML,
   printContractPDF,
+  formatClauseContent,
+  parseTemplateContent,
 } from "@/utils/contractPDF";
 
 const baseProposal = {
@@ -56,9 +58,10 @@ describe("contractPDF · generateContractHTML", () => {
     expect(html).toContain("data:image/png;base64,SIGNATURE");
   });
 
-  it("includes the contractor's default name (uppercased) when no contactInfo", () => {
-    const html = generateContractHTML(baseProposal, baseAcceptance, "");
-    expect(html).toContain("MATHEUS MIERZWA");
+  it("renders empty contractor name when no contactInfo provided", () => {
+    const html = generateContractHTML(baseProposal, baseAcceptance, "", undefined, "");
+    expect(html).not.toContain("MATHEUS MIERZWA");
+    expect(html).not.toContain("57.900.589");
   });
 
   it("uses provided contactInfo name (uppercased) when present", () => {
@@ -99,11 +102,86 @@ describe("contractPDF · generateContractHTML", () => {
     expect(html).toContain("abc123hash");
   });
 
+  it("converts numbered list items (1. item) to <ol><li>...</li></ol>", () => {
+    const html = generateContractHTML(baseProposal, baseAcceptance, "");
+    // Cláusulas 6–9 do template contêm itens "1. **texto**" que devem virar <ol><li>
+    expect(html).toMatch(/<ol>[^]*<li>[^]*Transferência de Titularidade[^]*<\/li>[^]*<\/ol>/);
+  });
+
+  it("groups consecutive numbered items into a single <ol>", () => {
+    const html = generateContractHTML(baseProposal, baseAcceptance, "");
+    // Cláusula 6 tem itens "1. ..." e "2. ..." consecutivos — devem formar um único <ol>
+    const olMatches = html.match(/<ol>/g) ?? [];
+    expect(olMatches.length).toBeGreaterThanOrEqual(1);
+    // O primeiro <ol> deve conter múltiplos <li> (não múltiplos <ol>)
+    const firstOl = html.match(/<ol>([\s\S]*?)<\/ol>/)?.[0] ?? "";
+    const liCount = (firstOl.match(/<li>/g) ?? []).length;
+    expect(liCount).toBeGreaterThan(1);
+  });
+
+  it("handles bullet and numbered lists in same clause without mixing tags", () => {
+    const html = generateContractHTML(
+      { ...baseProposal, rescision_policy: "- Alpha\n1. Beta" },
+      baseAcceptance,
+      "",
+    );
+    expect(html).toMatch(/<ul>[^]*<li>Alpha<\/li>[^]*<\/ul>/);
+    expect(html).toMatch(/<ol>[^]*<li>Beta<\/li>[^]*<\/ol>/);
+  });
+
   it("uses contractId='—' fallback when slug missing", () => {
     const { slug: _slug, ...noSlug } = baseProposal as any;
     void _slug;
     const html = generateContractHTML(noSlug, baseAcceptance, "");
     expect(html).toContain("Contrato Eletrônico — —");
+  });
+});
+
+describe("formatClauseContent", () => {
+  it("converte **bold** para <strong>", () => {
+    expect(formatClauseContent("**negrito**")).toContain("<strong>negrito</strong>");
+  });
+
+  it("converte ### Título para <strong>", () => {
+    expect(formatClauseContent("### Meu Título")).toContain("<strong>Meu Título</strong>");
+  });
+
+  it("converte - item para <ul><li>", () => {
+    const result = formatClauseContent("- Alpha\n- Beta");
+    expect(result).toMatch(/<ul>[^]*<li>Alpha<\/li>[^]*<\/ul>/);
+    expect(result).toContain("<li>Beta</li>");
+  });
+
+  it("converte 1. item para <ol><li>", () => {
+    const result = formatClauseContent("1. Primeiro\n2. Segundo");
+    expect(result).toMatch(/<ol>[^]*<li>Primeiro<\/li>[^]*<\/ol>/);
+  });
+
+  it("mantém {{variavel}} literalmente sem interpolar", () => {
+    const result = formatClauseContent("Assinado por {{client_name}}.");
+    expect(result).toContain("{{client_name}}");
+  });
+
+  it("converte \\n\\n em quebra de parágrafo", () => {
+    const result = formatClauseContent("Parágrafo A\n\nParágrafo B");
+    expect(result).toContain("</p><p>");
+  });
+});
+
+describe("parseTemplateContent", () => {
+  it("separa header de cláusulas pelo marcador ###", () => {
+    const content = "Cabeçalho\n### CLÁUSULA 1\nCorpo 1\n### CLÁUSULA 2\nCorpo 2";
+    const { header, clauses } = parseTemplateContent(content);
+    expect(header).toContain("Cabeçalho");
+    expect(clauses).toHaveLength(2);
+    expect(clauses[0]).toContain("CLÁUSULA 1");
+    expect(clauses[1]).toContain("CLÁUSULA 2");
+  });
+
+  it("retorna header vazio e array vazio para conteúdo sem ###", () => {
+    const { header, clauses } = parseTemplateContent("Só cabeçalho");
+    expect(header).toContain("Só cabeçalho");
+    expect(clauses).toHaveLength(0);
   });
 });
 

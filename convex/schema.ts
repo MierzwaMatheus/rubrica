@@ -28,10 +28,7 @@ const resumeItemVariants = v.union(
     type: v.literal('skill'),
     content: v.object({ name: v.string(), level: v.string() }),
     contentTranslations: v.optional(
-      v.object({
-        ptBR: v.optional(v.object({ name: v.optional(v.string()), level: v.optional(v.string()) })),
-        enUS: v.optional(v.object({ name: v.optional(v.string()), level: v.optional(v.string()) })),
-      }),
+      v.object({ name: v.optional(v.string()), level: v.optional(v.string()) }),
     ),
     orderIndex: v.number(),
     createdAt: v.number(),
@@ -321,6 +318,8 @@ export default defineSchema({
     linkedinUrl: v.optional(v.string()),
     githubUrl: v.optional(v.string()),
     behanceUrl: v.optional(v.string()),
+    proposalIntro: v.optional(v.string()),
+    proposalAiContext: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.optional(v.number()),
   }),
@@ -385,6 +384,8 @@ export default defineSchema({
     updatedAt: v.optional(v.number()),
     deletedAt: v.optional(v.number()),
     deletedBy: v.optional(v.id('users')),
+    templateId: v.optional(v.id('contractTemplates')),
+    templateSnapshot: v.optional(v.string()),
   })
     .index('by_slug', ['slug'])
     .index('by_userId', ['userId'])
@@ -645,4 +646,33 @@ export default defineSchema({
     .index('by_targetType_and_targetId', ['targetType', 'targetId'])
     .index('by_createdAt', ['createdAt'])
     .index('by_expiresAt', ['expiresAt']),
+
+  // ── siteConfig ─────────────────────────────────────────────────────────────
+  siteConfig: defineTable({
+    key: v.string(),
+    value: v.any(),
+    createdAt: v.number(),
+    updatedAt: v.optional(v.number()),
+  }).index('by_key', ['key']),
+
+  // ── contractTemplates ──────────────────────────────────────────────────────
+  contractTemplates: defineTable({
+    name: v.string(),
+    description: v.optional(v.string()),
+    content: v.string(),
+    isDefault: v.boolean(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index('by_is_default', ['isDefault']),
+
+  // ── siteTexts ──────────────────────────────────────────────────────────────
+  siteTexts: defineTable({
+    key: v.string(),
+    page: v.string(),
+    ptBR: v.string(),
+    enUS: v.optional(v.string()),
+    updatedAt: v.optional(v.number()),
+  })
+    .index('by_key', ['key'])
+    .index('by_page', ['page']),
 });

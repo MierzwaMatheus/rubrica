@@ -6,7 +6,7 @@ import { logAudit } from './audit';
 
 const PUBLIC_HOME_KEYS = new Set([
   'about_text', 'availability_status', 'contact_wizard_enabled',
-  'hero_title', 'hero_subtitle', 'about_short',
+  'hero_title', 'hero_subtitle', 'about_short', 'hero_tags',
 ]);
 
 export const getByKey = query({

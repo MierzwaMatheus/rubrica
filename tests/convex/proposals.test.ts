@@ -36,6 +36,8 @@ import {
   requestErasure,
   exportTitularData,
   resetPassword,
+  snapshotTemplate,
+  snapshotTemplateOnView,
 } from "../../convex/proposals";
 import { createMockCtx, type MockCtx } from "../_helpers/convexCtx";
 
@@ -109,6 +111,115 @@ describe("convex/proposals · create", () => {
     getAuthUserId.mockResolvedValue("u1");
     await expect(handler(create)(ctx, baseProposalArgs)).rejects.toThrow("Forbidden");
   });
+
+  it("persists templateId when provided", async () => {
+    asRoot(ctx);
+    const templateId = ctx.db._seed("contractTemplates", [
+      { name: "Padrão", content: "# Contrato", isDefault: true, createdAt: Date.now(), updatedAt: Date.now() },
+    ])[0]._id;
+    const id = await handler(create)(ctx, { ...baseProposalArgs, slug: "acme-template", templateId });
+    const proposal = await ctx.db.get(id);
+    expect(proposal!.templateId).toBe(templateId);
+  });
+});
+
+describe("convex/proposals · snapshotTemplate", () => {
+  let ctx: MockCtx;
+  beforeEach(() => {
+    ctx = createMockCtx();
+    getAuthUserId.mockReset();
+  });
+
+  function seedTemplate(overrides: Record<string, unknown> = {}) {
+    const [id] = ctx.db._seed("contractTemplates", [
+      { name: "Padrão", content: "# Contrato Padrão", isDefault: true, createdAt: Date.now(), updatedAt: Date.now(), ...overrides },
+    ]);
+    return id;
+  }
+
+  async function createProposal(extra: Record<string, unknown> = {}) {
+    asRoot(ctx);
+    return handler(create)(ctx, { ...baseProposalArgs, slug: `slug-${Date.now()}`, ...extra });
+  }
+
+  it("sets templateSnapshot from default template when proposal has no templateId", async () => {
+    seedTemplate();
+    const id = await createProposal();
+    await handler(snapshotTemplate)(ctx, { proposalId: id });
+    const proposal = await ctx.db.get(id);
+    expect(proposal!.templateSnapshot).toBe("# Contrato Padrão");
+  });
+
+  it("uses the specific templateId when present on the proposal", async () => {
+    seedTemplate();
+    const specificId = seedTemplate({ name: "Específico", content: "# Específico", isDefault: false });
+    const id = await createProposal({ templateId: specificId });
+    await handler(snapshotTemplate)(ctx, { proposalId: id });
+    const proposal = await ctx.db.get(id);
+    expect(proposal!.templateSnapshot).toBe("# Específico");
+  });
+
+  it("does not overwrite existing templateSnapshot (idempotent)", async () => {
+    seedTemplate({ content: "# Novo Conteúdo" });
+    const id = await createProposal();
+    await ctx.db.patch(id, { templateSnapshot: "# Snapshot Anterior" });
+    await handler(snapshotTemplate)(ctx, { proposalId: id });
+    const proposal = await ctx.db.get(id);
+    expect(proposal!.templateSnapshot).toBe("# Snapshot Anterior");
+  });
+});
+
+describe("convex/proposals · snapshotTemplateOnView", () => {
+  let ctx: MockCtx;
+  beforeEach(() => {
+    ctx = createMockCtx();
+    getAuthUserId.mockReset();
+  });
+
+  function seedTemplate(overrides: Record<string, unknown> = {}) {
+    const [id] = ctx.db._seed("contractTemplates", [
+      { name: "Padrão", content: "# Contrato Padrão", isDefault: true, createdAt: Date.now(), updatedAt: Date.now(), ...overrides },
+    ]);
+    return id;
+  }
+
+  async function createProposalAnon(extra: Record<string, unknown> = {}) {
+    asRoot(ctx);
+    const id = await handler(create)(ctx, { ...baseProposalArgs, slug: `slug-view-${Date.now()}`, ...extra });
+    getAuthUserId.mockReset();
+    return id;
+  }
+
+  it("sets templateSnapshot from default template when called without auth", async () => {
+    seedTemplate();
+    const id = await createProposalAnon();
+    const proposal = await ctx.db.get(id);
+    await handler(snapshotTemplateOnView)(ctx, { slug: proposal!.slug });
+    const updated = await ctx.db.get(id);
+    expect(updated!.templateSnapshot).toBe("# Contrato Padrão");
+  });
+
+  it("does not overwrite existing templateSnapshot (idempotent)", async () => {
+    seedTemplate({ content: "# Novo Conteúdo" });
+    const id = await createProposalAnon();
+    const proposal = await ctx.db.get(id);
+    await ctx.db.patch(id, { templateSnapshot: "# Snapshot Anterior" });
+    await handler(snapshotTemplateOnView)(ctx, { slug: proposal!.slug });
+    const updated = await ctx.db.get(id);
+    expect(updated!.templateSnapshot).toBe("# Snapshot Anterior");
+  });
+
+  it("uses the specific templateId when present on the proposal", async () => {
+    seedTemplate();
+    const [specificId] = ctx.db._seed("contractTemplates", [
+      { name: "Específico", content: "# Template Específico", isDefault: false, createdAt: Date.now(), updatedAt: Date.now() },
+    ]);
+    const id = await createProposalAnon({ templateId: specificId });
+    const proposal = await ctx.db.get(id);
+    await handler(snapshotTemplateOnView)(ctx, { slug: proposal!.slug });
+    const updated = await ctx.db.get(id);
+    expect(updated!.templateSnapshot).toBe("# Template Específico");
+  });
 });
 
 describe("convex/proposals · update", () => {
@@ -156,6 +267,17 @@ describe("convex/proposals · update", () => {
     await expect(
       handler(update)(ctx, { id, title: "x" }),
     ).rejects.toThrow("immutable");
+  });
+
+  it("persists templateId when updated", async () => {
+    asRoot(ctx);
+    const [{ _id: templateId }] = ctx.db._seed("contractTemplates", [
+      { name: "Padrão", content: "# Contrato", isDefault: true, createdAt: Date.now(), updatedAt: Date.now() },
+    ]);
+    const id = await handler(create)(ctx, baseProposalArgs);
+    await handler(update)(ctx, { id, templateId });
+    const updated = await ctx.db.get(id);
+    expect(updated!.templateId).toBe(templateId);
   });
 });
 

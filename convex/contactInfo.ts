@@ -31,6 +31,8 @@ export const update = mutation({
     linkedinUrl: v.optional(v.string()),
     githubUrl: v.optional(v.string()),
     behanceUrl: v.optional(v.string()),
+    proposalIntro: v.optional(v.string()),
+    proposalAiContext: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const { userId } = await requireRole(ctx, ['root', 'admin']);

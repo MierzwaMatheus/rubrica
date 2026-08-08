@@ -45,4 +45,11 @@ crons.daily(
   internal.playground.cleanupExpired,
 );
 
+// Seed siteConfig with rubricalConfig values on first deploy (idempotent)
+crons.daily(
+  'seedSiteConfig',
+  { hourUTC: 6, minuteUTC: 0 },
+  internal.seed.seedSiteConfig,
+);
+
 export default crons;

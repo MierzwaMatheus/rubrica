@@ -1,6 +1,6 @@
 import { v } from 'convex/values';
 import { action, internalAction } from './_generated/server';
-import { internal } from './_generated/api';
+import { internal, api } from './_generated/api';
 
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
@@ -128,6 +128,9 @@ export const translateBatch = action({
     const roleDoc = await ctx.runQuery(internal.auth.getUserRoleQuery, { userId: actorData.userId });
     const allowedRoles = ['root', 'admin', 'content-editor', 'blog-editor'];
     if (!roleDoc || !allowedRoles.includes(roleDoc.role)) throw new Error('Forbidden');
+
+    const i18nEnabled = await ctx.runQuery(api.plugins.checkPlugin, { pluginId: 'i18n' });
+    if (!i18nEnabled) return { translatedTexts: args.texts };
 
     const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) throw new Error('OPENROUTER_API_KEY not configured');

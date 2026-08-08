@@ -1,6 +1,11 @@
 export interface ContactInfo {
+  name?: string;
   role: string;
   role_translations?: Record<string, string>;
+  email?: string;
+  show_email?: boolean;
+  phone?: string;
+  show_phone?: boolean;
 }
 
 export interface AboutData {

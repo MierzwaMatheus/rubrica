@@ -1,4 +1,5 @@
 import { DEFAULT_RESCISION_POLICY } from "@/constants/rescisionPolicy";
+import { interpolateTemplate, formatArrayAsList } from "@/utils/contractTemplate";
 
 export interface ProposalData {
   title?: string;
@@ -71,6 +72,44 @@ export function generatePaymentMethods(value: number): string[] {
   ];
 }
 
+export function resolveTemplateContent(
+  proposal: { templateSnapshot?: string | null },
+  defaultTemplate: { content: string } | null | undefined,
+): string | undefined {
+  return proposal.templateSnapshot ?? defaultTemplate?.content ?? undefined;
+}
+
+/**
+ * Aplica os dados de uma proposta e aceite a um template de contrato com variáveis {{var}}.
+ */
+export function applyProposalToTemplate(
+  templateContent: string,
+  proposal: ProposalData,
+  acceptance: AcceptanceData,
+): string {
+  const scopeItems = proposal.scope
+    ? typeof proposal.scope === 'string' ? [proposal.scope] : proposal.scope
+    : [];
+  const vars: Record<string, string> = {
+    client_name: acceptance.client_name,
+    client_email: acceptance.client_email,
+    client_role: acceptance.client_role ?? '',
+    client_document: formatDocument(acceptance.client_document),
+    scope: formatArrayAsList(scopeItems),
+    conditions: formatArrayAsList(proposal.conditions ?? []),
+    timeline: formatArrayAsList(
+      (proposal.timeline ?? []).map(t => `${t.step} – ${t.period}`)
+    ),
+    investment_value: `R$ ${proposal.investment_value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+    accepted_at: new Date(acceptance.accepted_at).toLocaleDateString('pt-BR', { timeZone: 'UTC' }),
+    objective: typeof proposal.objective === 'string' ? proposal.objective : (proposal.objective ?? []).join('\n\n'),
+    delivery_date: proposal.delivery_date ? new Date(proposal.delivery_date).toLocaleDateString('pt-BR') : '',
+    payment_methods: formatArrayAsList(proposal.payment_methods ?? []),
+    rescission_policy: proposal.rescision_policy || DEFAULT_RESCISION_POLICY,
+  };
+  return interpolateTemplate(templateContent, vars);
+}
+
 /**
  * Gera o conteúdo completo do contrato com todas as cláusulas
  */
@@ -87,10 +126,8 @@ export function generateContractContent(
   
   const docType = formattedDoc.includes('/') ? 'CNPJ' : 'CPF';
 
-  // Cabeçalho com identificação das partes
-  const header = `**CONTRATADA:** MATHEUS MIERZWA LEME DE OLIVEIRA, inscrito no CNPJ sob nº 57.900.589/0001-00, com sede na Rua do Ouvidor, 480, Jd Califórnia, Barueri - SP.
-
-**CONTRATANTE:** ${acceptanceData.client_name}${formattedDoc ? `, inscrito no ${docType} sob nº ${formattedDoc}` : ''}${acceptanceData.client_email ? `, com e-mail ${acceptanceData.client_email}` : ''}.
+  // Cabeçalho com identificação do contratante
+  const header = `**CONTRATANTE:** ${acceptanceData.client_name}${formattedDoc ? `, inscrito no ${docType} sob nº ${formattedDoc}` : ''}${acceptanceData.client_email ? `, com e-mail ${acceptanceData.client_email}` : ''}.
 
 ---
 

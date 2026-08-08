@@ -13,7 +13,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:convex": "vitest run tests/convex",
-    "test:app": "vitest run tests/app"
+    "test:app": "vitest run tests/app",
+    "mutation:diff": "stryker run stryker.issue84.config.mjs"
   },
   "dependencies": {
     "@auth/core": "^0.37.4",

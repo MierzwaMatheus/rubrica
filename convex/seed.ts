@@ -32,6 +32,10 @@ export const seedAll = internalMutation({
     await ctx.runMutation(internal.contactInfo.seed, {});
     await ctx.runMutation(internal.homeContent.seed, {});
 
+    if (enabledPlugins.includes("portfolio")) {
+      await ctx.runMutation(internal.projects.seed, {});
+    }
+
     if (enabledPlugins.includes("proposals")) {
       await ctx.runMutation(internal.contractTemplates.seedDefaultTemplate, {});
     }

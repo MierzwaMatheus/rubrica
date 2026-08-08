@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
@@ -22,6 +23,7 @@ interface ProposalDialogProps {
 export function ProposalDialog({ open, onOpenChange, proposal, onSave }: ProposalDialogProps) {
     const proposalsData = useQuery(api.proposals.listAdmin, { filter: "all" });
     const proposals = proposalsData ?? [];
+    const templates: any[] = useQuery(api.contractTemplates.list) ?? [];
 
     const createProposal = useMutation(api.proposals.create);
     const updateProposal = useMutation(api.proposals.update);
@@ -35,6 +37,8 @@ export function ProposalDialog({ open, onOpenChange, proposal, onSave }: Proposa
     const [objective, setObjective] = useState("");
     const [deliveryDate, setDeliveryDate] = useState("");
     const [investmentValue, setInvestmentValue] = useState("");
+
+    const [templateId, setTemplateId] = useState<Id<"contractTemplates"> | undefined>(undefined);
 
     // Scope & Timeline
     const [scopeItems, setScopeItems] = useState<string[]>([]);
@@ -63,6 +67,7 @@ export function ProposalDialog({ open, onOpenChange, proposal, onSave }: Proposa
                 setInvestmentValue(proposal.investmentValue?.toString().replace('.', ',') || "");
                 setScopeItems(Array.isArray(proposal.scope) ? proposal.scope : []);
                 setTimelineItems(Array.isArray(proposal.timeline) ? proposal.timeline : []);
+                setTemplateId(proposal.templateId ?? undefined);
 
                 const savedConditions: string[] = proposal.conditions || [];
                 const defaultConditions = [
@@ -82,6 +87,8 @@ export function ProposalDialog({ open, onOpenChange, proposal, onSave }: Proposa
                 ));
             } else {
                 resetForm();
+                const defaultTemplate = templates.find((t: any) => t.isDefault);
+                if (defaultTemplate) setTemplateId(defaultTemplate._id);
             }
         }
     }, [open, proposal]);
@@ -133,6 +140,7 @@ export function ProposalDialog({ open, onOpenChange, proposal, onSave }: Proposa
                     investmentValue: investment,
                     paymentMethods: proposal.paymentMethods ?? [],
                     conditions: selectedConditions,
+                    templateId,
                 });
                 toast.success("Proposta atualizada com sucesso!");
                 onSave();
@@ -150,6 +158,7 @@ export function ProposalDialog({ open, onOpenChange, proposal, onSave }: Proposa
                     paymentMethods: [],
                     conditions: selectedConditions,
                     rescissionPolicy: DEFAULT_RESCISION_POLICY,
+                    templateId,
                 });
                 toast.success("Proposta criada com sucesso!");
                 onSave();
@@ -371,6 +380,27 @@ export function ProposalDialog({ open, onOpenChange, proposal, onSave }: Proposa
                             ))}
                         </div>
                     </div>
+
+                    {templates.length > 0 && (
+                        <div>
+                            <Label className="block text-sm mb-1">Template de Contrato</Label>
+                            <Select
+                                value={templateId ?? ""}
+                                onValueChange={(v) => setTemplateId(v as Id<"contractTemplates">)}
+                            >
+                                <SelectTrigger className="bg-background border-input w-full">
+                                    <SelectValue placeholder="Selecionar template..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {templates.map((t: any) => (
+                                        <SelectItem key={t._id} value={t._id}>
+                                            {t.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    )}
 
                     <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
                         <Button variant="ghost" onClick={() => {

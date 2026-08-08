@@ -21,6 +21,6 @@
     "isolatedModules": true,
     "noEmit": true
   },
-  "include": ["./**/*"],
+  "include": ["./**/*", "../rubrica.config.ts"],
   "exclude": ["./_generated"]
 }

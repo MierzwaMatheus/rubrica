@@ -2,6 +2,8 @@ import { describe, it, expect } from "vitest";
 import {
   generatePaymentMethods,
   generateContractContent,
+  applyProposalToTemplate,
+  resolveTemplateContent,
 } from "@/utils/contractGenerator";
 import { DEFAULT_RESCISION_POLICY } from "@/constants/rescisionPolicy";
 
@@ -212,9 +214,126 @@ describe("contractGenerator · generateContractContent", () => {
     expect(text).toContain("CLÁUSULA 12");
   });
 
-  it("includes the contractor identification in header", () => {
+  it("does not include hardcoded contractor personal data in header", () => {
     const { header } = generateContractContent(baseProposal, baseAcceptance);
-    expect(header).toContain("MATHEUS MIERZWA");
-    expect(header).toContain("57.900.589/0001-00");
+    expect(header).not.toContain("MATHEUS MIERZWA");
+    expect(header).not.toContain("57.900.589");
+  });
+});
+
+describe("contractGenerator · applyProposalToTemplate", () => {
+  it("substitutes {{client_name}} with acceptance.client_name", () => {
+    const result = applyProposalToTemplate(
+      "Contrato para {{client_name}}.",
+      baseProposal,
+      baseAcceptance,
+    );
+    expect(result).toBe("Contrato para John Doe.");
+  });
+
+  it("substitutes {{scope}} with formatArrayAsList output", () => {
+    const result = applyProposalToTemplate(
+      "Escopo:\n{{scope}}",
+      { ...baseProposal, scope: ["Item A", "Item B"] },
+      baseAcceptance,
+    );
+    expect(result).toBe("Escopo:\n• Item A\n• Item B");
+  });
+
+  it("substitutes {{conditions}} with formatArrayAsList output", () => {
+    const result = applyProposalToTemplate(
+      "Condições:\n{{conditions}}",
+      { ...baseProposal, conditions: ["Cond C"] },
+      baseAcceptance,
+    );
+    expect(result).toBe("Condições:\n• Cond C");
+  });
+
+  it("returns empty string for empty template", () => {
+    expect(applyProposalToTemplate("", baseProposal, baseAcceptance)).toBe("");
+  });
+
+  it("preserves {{unknown}} variable when not in map", () => {
+    const result = applyProposalToTemplate(
+      "{{unknown_var}} e {{client_name}}",
+      baseProposal,
+      baseAcceptance,
+    );
+    expect(result).toBe("{{unknown_var}} e John Doe");
+  });
+
+  it("substitutes {{client_document}} with CPF mask for 11 digits", () => {
+    const result = applyProposalToTemplate(
+      "Doc: {{client_document}}",
+      baseProposal,
+      { ...baseAcceptance, client_document: "12345678900" },
+    );
+    expect(result).toBe("Doc: 123.456.789-00");
+  });
+
+  it("substitutes {{client_document}} with CNPJ mask for 14 digits", () => {
+    const result = applyProposalToTemplate(
+      "Doc: {{client_document}}",
+      baseProposal,
+      { ...baseAcceptance, client_document: "12345678000190" },
+    );
+    expect(result).toBe("Doc: 12.345.678/0001-90");
+  });
+
+  it("substitutes {{investment_value}} with pt-BR currency format", () => {
+    const result = applyProposalToTemplate(
+      "Valor: {{investment_value}}",
+      { ...baseProposal, investment_value: 1500 },
+      baseAcceptance,
+    );
+    expect(result).toBe("Valor: R$ 1.500,00");
+  });
+
+  it("substitutes {{accepted_at}} with pt-BR date", () => {
+    const result = applyProposalToTemplate(
+      "Aceito em: {{accepted_at}}",
+      baseProposal,
+      { ...baseAcceptance, accepted_at: "2024-06-15T00:00:00Z" },
+    );
+    expect(result).toBe("Aceito em: 15/06/2024");
+  });
+
+  it("substitutes {{timeline}} with formatted step - period lines", () => {
+    const result = applyProposalToTemplate(
+      "Cronograma:\n{{timeline}}",
+      {
+        ...baseProposal,
+        timeline: [
+          { step: "Design", period: "1 semana" },
+          { step: "Dev", period: "2 semanas" },
+        ],
+      },
+      baseAcceptance,
+    );
+    expect(result).toBe("Cronograma:\n• Design – 1 semana\n• Dev – 2 semanas");
+  });
+});
+
+describe("contractGenerator · resolveTemplateContent", () => {
+  it("returns templateSnapshot when present", () => {
+    const result = resolveTemplateContent(
+      { templateSnapshot: "### CLÁUSULA\nConteúdo" },
+      { content: "outro template" },
+    );
+    expect(result).toBe("### CLÁUSULA\nConteúdo");
+  });
+
+  it("falls back to defaultTemplate.content when templateSnapshot is absent", () => {
+    const result = resolveTemplateContent(
+      { templateSnapshot: null },
+      { content: "default content" },
+    );
+    expect(result).toBe("default content");
+  });
+
+  it("returns undefined for legacy proposals with no template", () => {
+    expect(resolveTemplateContent({}, null)).toBeUndefined();
+    expect(resolveTemplateContent({ templateSnapshot: null }, null)).toBeUndefined();
+    expect(resolveTemplateContent({}, undefined)).toBeUndefined();
   });
 });

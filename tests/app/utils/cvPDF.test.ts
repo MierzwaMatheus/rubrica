@@ -213,4 +213,14 @@ describe("cvPDF · generateCV (HTML output)", () => {
     expect(lastBlobContents).toContain("11999");
     expect(lastBlobContents).toMatch(/&nbsp;\|&nbsp;/);
   });
+
+  it("header-name é vazio quando contactInfo.name é string vazia", () => {
+    generateCV({ ...baseContact, name: "" }, [], [], "pt-BR", "");
+    expect(lastBlobContents).toContain('<div class="header-name"></div>');
+  });
+
+  it("header-name exibe o nome quando contactInfo.name está preenchido", () => {
+    generateCV({ ...baseContact, name: "Jane Doe" }, [], [], "pt-BR", "");
+    expect(lastBlobContents).toContain("Jane Doe");
+  });
 });

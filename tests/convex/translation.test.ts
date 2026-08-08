@@ -9,7 +9,9 @@ vi.mock("@convex-dev/auth/server", () => ({
 
 vi.mock("@convex-dev/auth/providers/Password", () => ({ Password: () => ({}) }));
 
-import { runTranslateBatch } from "../../convex/translation";
+import { runTranslateBatch, translateBatch } from "../../convex/translation";
+
+const handler = (fn: any) => fn._handler ?? fn;
 
 const FAKE_KEY = "test-api-key";
 
@@ -125,5 +127,26 @@ describe("runTranslateBatch", () => {
     const result = await promise;
 
     expect(result.translatedTexts).toEqual(["Hello", "World"]);
+  });
+});
+
+describe("translateBatch — plugin i18n desativado", () => {
+  it("retorna passthrough sem chamar API quando i18n está desativado", async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+
+    const ctx = {
+      runQuery: vi.fn()
+        .mockResolvedValueOnce({ userId: "u1" })           // requireAuthQuery
+        .mockResolvedValueOnce({ role: "admin" })           // getUserRoleQuery
+        .mockResolvedValueOnce(false),                      // checkPlugin i18n = desativado
+      runMutation: vi.fn(),
+      runAction: vi.fn(),
+    };
+
+    const result = await handler(translateBatch)(ctx, { texts: ["Olá", "Mundo"] });
+
+    expect(result).toEqual({ translatedTexts: ["Olá", "Mundo"] });
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });

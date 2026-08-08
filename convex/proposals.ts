@@ -229,6 +229,7 @@ export const create = mutation({
     rescissionPolicyTranslations: v.optional(
       v.object({ 'ptBR': v.string(), 'enUS': v.optional(v.string()) }),
     ),
+    templateId: v.optional(v.id('contractTemplates')),
   },
   handler: async (ctx, args) => {
     await requirePlugin(ctx, 'proposals');
@@ -266,6 +267,54 @@ export const create = mutation({
   },
 });
 
+export const snapshotTemplate = mutation({
+  args: { proposalId: v.id('proposals') },
+  handler: async (ctx, { proposalId }) => {
+    await requireRole(ctx, ['root', 'admin', 'proposal-editor']);
+    const proposal = await ctx.db.get(proposalId);
+    if (!proposal) throw new Error('Proposal not found');
+    if (proposal.templateSnapshot) return;
+
+    let template: { content: string } | null = null;
+    if (proposal.templateId) {
+      template = await ctx.db.get(proposal.templateId);
+    } else {
+      template = await ctx.db
+        .query('contractTemplates')
+        .withIndex('by_is_default', (q) => q.eq('isDefault', true))
+        .unique();
+    }
+    if (!template) throw new Error('No template found');
+
+    await ctx.db.patch(proposalId, { templateSnapshot: template.content });
+  },
+});
+
+export const snapshotTemplateOnView = mutation({
+  args: { slug: v.string() },
+  handler: async (ctx, { slug }) => {
+    const proposal = await ctx.db
+      .query('proposals')
+      .withIndex('by_slug', (q) => q.eq('slug', slug))
+      .unique();
+    if (!proposal) return;
+    if (proposal.templateSnapshot) return;
+
+    let template: { content: string } | null = null;
+    if (proposal.templateId) {
+      template = await ctx.db.get(proposal.templateId);
+    } else {
+      template = await ctx.db
+        .query('contractTemplates')
+        .withIndex('by_is_default', (q) => q.eq('isDefault', true))
+        .unique();
+    }
+    if (!template) return;
+
+    await ctx.db.patch(proposal._id, { templateSnapshot: template.content });
+  },
+});
+
 export const update = mutation({
   args: {
     id: v.id('proposals'),
@@ -287,6 +336,7 @@ export const update = mutation({
     password: v.optional(v.string()),
     rescissionPolicy: v.optional(v.string()),
     expiresAt: v.optional(v.number()),
+    templateId: v.optional(v.id('contractTemplates')),
   },
   handler: async (ctx, args) => {
     await requirePlugin(ctx, 'proposals');
@@ -300,9 +350,12 @@ export const update = mutation({
     const newVersion = proposal.version + 1;
     const hashedPassword = plainPassword ? await hashPassword(plainPassword) : undefined;
 
+    const templateChanged = args.templateId !== undefined && args.templateId !== proposal.templateId;
+
     await ctx.db.patch(id, {
       ...fields,
       ...(hashedPassword !== undefined ? { password: hashedPassword } : {}),
+      ...(templateChanged ? { templateSnapshot: undefined } : {}),
       version: newVersion,
       updatedAt: Date.now(),
     });

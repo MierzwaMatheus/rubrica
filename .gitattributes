@@ -1,0 +1,13 @@
+# Arquivos excluídos do tarball de release do GitHub (export-ignore)
+TASKS.md              export-ignore
+PRD.md                export-ignore
+ideas.md              export-ignore
+docs/                 export-ignore
+domain/               export-ignore
+.windsurf/            export-ignore
+vercel.json           export-ignore
+scripts/              export-ignore
+tests/                export-ignore
+package-lock.json     export-ignore
+tsconfig.scripts.json export-ignore
+.gitkeep              export-ignore

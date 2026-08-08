@@ -278,6 +278,29 @@ describe("convex/posts · seed", () => {
     expect(new Set(publishedAtValues).size).toBe(publishedAtValues.length);
   });
 
+  it("post índice 0 tem publishedAt MENOR que post índice 1 (post mais antigo vem primeiro)", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("posts");
+    const post1 = docs.find((d) => d.slug === "convex-como-backend-reativo-alem-do-crud")!;
+    const post2 = docs.find((d) => d.slug === "transicao-de-carreira-para-tecnologia-o-que-aprendi-em-12-meses")!;
+    // Post 1 deve ter publishedAt MENOR (1 dia no passado) — não maior, não igual.
+    expect(post1.publishedAt).toBeLessThan(post2.publishedAt);
+    // Diferença exata deve ser próximo de 1 dia (86_400_000 ms).
+    expect(post2.publishedAt - post1.publishedAt).toBe(86_400_000);
+  });
+
+  it("publishedAt é exatamente now - 86_400_000 para o post mais antigo", async () => {
+    const before = Date.now();
+    await handler(seed)(ctx, {});
+    const after = Date.now();
+    const docs = ctx.db._all("posts");
+    const post1 = docs.find((d) => d.slug === "convex-como-backend-reativo-alem-do-crud")!;
+    // publishedAt de post 1 = now - 86_400_000, então deve ser MENOR que o before (now).
+    expect(post1.publishedAt).toBeLessThanOrEqual(before - 86_400_000);
+    // Mas não muito menor (within tolerance).
+    expect(post1.publishedAt).toBeGreaterThanOrEqual(after - 86_400_000 - 1000);
+  });
+
   it("cada post tem imageUrl externa com picsum e slug determinístico", async () => {
     await handler(seed)(ctx, {});
     const docs = ctx.db._all("posts");

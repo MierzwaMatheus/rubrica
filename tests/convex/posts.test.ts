@@ -327,4 +327,79 @@ describe("convex/posts · seed", () => {
       expect(doc.createdAt).toBeGreaterThan(0);
     }
   });
+
+  it("em banco vazio insere exatamente 2 posts (idempotência inicial)", async () => {
+    await handler(seed)(ctx, {});
+    expect(ctx.db._all("posts").length).toBe(2);
+  });
+
+  it("com 1 post pré-existente, seed insere só o que falta → vai para 2", async () => {
+    ctx.db._seed("posts", [
+      {
+        title: "Post Existente",
+        titleTranslations: { ptBR: "Post Existente" },
+        slug: "post-existente",
+        content: "Conteúdo existente",
+        contentTranslations: { ptBR: "Conteúdo existente" },
+        tags: ["x"],
+        featured: false,
+        status: "published",
+        publishedAt: 100,
+        createdAt: 1,
+      },
+    ]);
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("posts");
+    expect(docs.length).toBe(2);
+    expect(docs.find((d) => d.slug === "post-existente")).toBeDefined();
+    const seededSlugs = docs
+      .map((d) => d.slug)
+      .filter(
+        (s) =>
+          s === "convex-como-backend-reativo-alem-do-crud" ||
+          s === "transicao-de-carreira-para-tecnologia-o-que-aprendi-em-12-meses",
+      );
+    expect(seededSlugs.length).toBe(1);
+  });
+
+  it("com 2 posts pré-existentes, seed é no-op (não duplica nem sobrescreve)", async () => {
+    ctx.db._seed("posts", [
+      {
+        title: "Existente 1",
+        titleTranslations: { ptBR: "Existente 1" },
+        slug: "post-existente-1",
+        content: "x",
+        contentTranslations: { ptBR: "x" },
+        tags: ["x"],
+        featured: false,
+        status: "published",
+        publishedAt: 100,
+        createdAt: 1,
+      },
+      {
+        title: "Existente 2",
+        titleTranslations: { ptBR: "Existente 2" },
+        slug: "post-existente-2",
+        content: "y",
+        contentTranslations: { ptBR: "y" },
+        tags: ["y"],
+        featured: false,
+        status: "published",
+        publishedAt: 200,
+        createdAt: 2,
+      },
+    ]);
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("posts");
+    expect(docs.length).toBe(2);
+    expect(docs.map((d) => d.slug).sort()).toEqual(["post-existente-1", "post-existente-2"]);
+    expect(docs.find((d) => d.slug === "post-existente-1")!.createdAt).toBe(1);
+    expect(docs.find((d) => d.slug === "post-existente-2")!.createdAt).toBe(2);
+  });
+
+  it("rodar seed 2x seguidas mantém exatamente 2 posts", async () => {
+    await handler(seed)(ctx, {});
+    await handler(seed)(ctx, {});
+    expect(ctx.db._all("posts").length).toBe(2);
+  });
 });

@@ -414,7 +414,8 @@ export const seed = internalMutation({
     if (existing.length >= 2) return;
 
     const now = Date.now();
-    for (let i = 0; i < POSTS_SEED_VALUES.length; i += 1) {
+    const remaining = POSTS_SEED_VALUES.length - existing.length;
+    for (let i = 0; i < remaining; i += 1) {
       const post = POSTS_SEED_VALUES[i];
       const publishedAt = i === 0 ? now - 86_400_000 : now;
       await ctx.db.insert('posts', { ...post, createdAt: now, publishedAt });

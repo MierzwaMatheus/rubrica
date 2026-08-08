@@ -32,6 +32,7 @@ import {
   setTranslations,
   unpublish,
   createWithAvatar,
+  seed,
 } from "../../convex/testimonials";
 import { createMockCtx, type MockCtx } from "../_helpers/convexCtx";
 
@@ -241,5 +242,132 @@ describe("convex/testimonials · createWithAvatar", () => {
       text: "Z",
     });
     expect((await ctx.db.get(id))!.imageId).toBeUndefined();
+  });
+});
+
+describe("convex/testimonials · seed", () => {
+  let ctx: MockCtx;
+
+  const seedAndAll = async () => {
+    await handler(seed)(ctx, {});
+    return ctx.db._all("testimonials");
+  };
+
+  beforeEach(() => {
+    ctx = createMockCtx();
+  });
+
+  it("insere exatamente 3 depoimentos em tabela vazia", async () => {
+    const docs = await seedAndAll();
+    expect(docs.length).toBe(3);
+  });
+
+  it("primeiro item é Carlos Mendes (CEO, Agência Digital X) com o texto correto", async () => {
+    const docs = await seedAndAll();
+    const carlos = docs.find((d) => d.name === "Carlos Mendes");
+    expect(carlos).toBeTruthy();
+    expect(carlos.role).toBe("CEO, Agência Digital X");
+    expect(carlos.roleTranslations).toEqual({ ptBR: "CEO, Agência Digital X" });
+    expect(carlos.text).toBe(
+      "A Ana entregou o projeto dentro do prazo com qualidade acima do esperado. Recomendo sem reservas.",
+    );
+    expect(carlos.textTranslations).toEqual({
+      ptBR: "A Ana entregou o projeto dentro do prazo com qualidade acima do esperado. Recomendo sem reservas.",
+    });
+  });
+
+  it("último item é Ricardo Alves (CTO, SaaS Z) com o texto correto", async () => {
+    const docs = await seedAndAll();
+    const ricardo = docs.find((d) => d.name === "Ricardo Alves");
+    expect(ricardo).toBeTruthy();
+    expect(ricardo.role).toBe("CTO, SaaS Z");
+    expect(ricardo.roleTranslations).toEqual({ ptBR: "CTO, SaaS Z" });
+    expect(ricardo.text).toBe(
+      "Expertise técnica impressionante. O código entregue era limpo, bem estruturado e fácil de manter.",
+    );
+    expect(ricardo.textTranslations).toEqual({
+      ptBR: "Expertise técnica impressionante. O código entregue era limpo, bem estruturado e fácil de manter.",
+    });
+  });
+
+  it("meio do array é Patrícia Lima (Product Owner, Fintech Y)", async () => {
+    const docs = await seedAndAll();
+    const patricia = docs.find((d) => d.name === "Patrícia Lima");
+    expect(patricia).toBeTruthy();
+    expect(patricia.role).toBe("Product Owner, Fintech Y");
+    expect(patricia.roleTranslations).toEqual({ ptBR: "Product Owner, Fintech Y" });
+    expect(patricia.text).toBe(
+      "Comunicação excelente durante todo o projeto. Sempre proativa em reportar impedimentos e propor soluções.",
+    );
+    expect(patricia.textTranslations).toEqual({
+      ptBR: "Comunicação excelente durante todo o projeto. Sempre proativa em reportar impedimentos e propor soluções.",
+    });
+  });
+
+  it("todos os 3 itens têm showOnHome === true", async () => {
+    const docs = await seedAndAll();
+    expect(docs).toHaveLength(3);
+    for (const d of docs) {
+      expect(d.showOnHome).toBe(true);
+    }
+  });
+
+  it("orderIndex é 0, 1, 2 (sem repetições)", async () => {
+    const docs = await seedAndAll();
+    const idxs = docs.map((d) => d.orderIndex).sort((a, b) => a - b);
+    expect(idxs).toEqual([0, 1, 2]);
+  });
+
+  it("todos os 3 itens têm imageUrl preenchido com picsum determinístico", async () => {
+    const docs = await seedAndAll();
+    expect(docs).toHaveLength(3);
+    for (const d of docs) {
+      expect(typeof d.imageUrl).toBe("string");
+      expect(d.imageUrl.length).toBeGreaterThan(0);
+      expect(d.imageUrl).toMatch(/^https:\/\/picsum\.photos\/seed\/[a-z0-9-]+\/256\/256$/);
+    }
+  });
+
+  it("todo item tem createdAt numérico", async () => {
+    const docs = await seedAndAll();
+    for (const d of docs) {
+      expect(typeof d.createdAt).toBe("number");
+      expect(Number.isFinite(d.createdAt)).toBe(true);
+    }
+  });
+
+  it("é idempotente: rodar 2× não duplica", async () => {
+    await handler(seed)(ctx, {});
+    await handler(seed)(ctx, {});
+    expect(ctx.db._all("testimonials").length).toBe(3);
+  });
+
+  it("com tabela parcialmente populada insere a partir do começo do seed sem duplicar itens pré-existentes que não estão no seed", async () => {
+    ctx.db._seed("testimonials", [
+      {
+        name: "Pré-existente",
+        role: "Outro",
+        text: "Outro",
+        orderIndex: 0,
+        showOnHome: true,
+        createdAt: 1,
+      },
+    ]);
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("testimonials");
+    // existing.length=1, remaining=3-1=2 → insere seed[0] (Carlos) e seed[1] (Patrícia).
+    // Total final: 1 (pré-existente) + 2 = 3.
+    expect(docs.length).toBe(3);
+    expect(docs.some((d) => d.name === "Pré-existente")).toBe(true);
+    expect(docs.some((d) => d.name === "Carlos Mendes")).toBe(true);
+    expect(docs.some((d) => d.name === "Patrícia Lima")).toBe(true);
+    expect(docs.some((d) => d.name === "Ricardo Alves")).toBe(false);
+  });
+
+  it("não persiste campo rating (não existe no schema)", async () => {
+    const docs = await seedAndAll();
+    for (const d of docs) {
+      expect(d.rating).toBeUndefined();
+    }
   });
 });

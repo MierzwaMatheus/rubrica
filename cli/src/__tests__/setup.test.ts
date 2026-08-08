@@ -799,4 +799,30 @@ describe("runSetup — Ciclo 9: siteTexts seed", () => {
     expect(payload.enabledPlugins).toEqual(["blog", "i18n"]);
     expect(payload.enabledPlugins).not.toContain("proposals");
   });
+
+  it("chamada seed:seedAll tem estrutura exata: convex run seed:seedAll --data {enabledPlugins} (ordem importa)", async () => {
+    vi.mocked(textPrompt)
+      .mockResolvedValueOnce("https://meusite.com")
+      .mockResolvedValueOnce("admin@teste.com")
+      .mockResolvedValue("");
+
+    vi.mocked(passwordPrompt)
+      .mockResolvedValueOnce("minhaSenha123456")
+      .mockResolvedValueOnce("minhaSenha123456");
+
+    const deps = makeAdminSetup();
+    await runSetup(deps);
+
+    const fileCalls = (deps.execFileSync as ReturnType<typeof vi.fn>).mock.calls as [string, string[], object][];
+    const seedAllCall = fileCalls.find((c) => c[1].includes("seed:seedAll"));
+    expect(seedAllCall).toBeDefined();
+    const args = seedAllCall![1];
+    const runIdx = args.indexOf("run");
+    const seedAllIdx = args.indexOf("seed:seedAll");
+    const dataFlagIdx = args.indexOf("--data");
+    expect(runIdx).toBeGreaterThan(-1);
+    expect(seedAllIdx).toBe(runIdx + 1);
+    expect(dataFlagIdx).toBe(seedAllIdx + 1);
+    expect(args[dataFlagIdx + 1]).toMatch(/^\{.*"enabledPlugins".*\}$/);
+  });
 });

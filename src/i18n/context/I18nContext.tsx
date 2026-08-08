@@ -37,8 +37,12 @@ export function I18nProvider({
   translationService,
 }: I18nProviderProps) {
   const siteTextsRecords = useQuery(api.siteTexts.getAll);
+  // Use Dynamic apenas quando há records de tradução no Convex.
+  // Quando siteTextsRecords é undefined (loading) ou [] (vazio, ex.: plugin i18n
+  // desabilitado), usa Static (pt-BR/en-US hardcoded) para evitar que t() retorne
+  // a chave literal como fallback.
   const resolvedRepository: TranslationsRepository = translationsRepository
-    ?? (siteTextsRecords !== undefined
+    ?? (siteTextsRecords && siteTextsRecords.length > 0
       ? new DynamicTranslationsRepository(siteTextsRecords)
       : new StaticTranslationsRepository());
 

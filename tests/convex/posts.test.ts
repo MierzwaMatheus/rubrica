@@ -32,6 +32,7 @@ import {
   getBySlug,
   listAdmin,
   listAllPublished,
+  seed,
 } from "../../convex/posts";
 import { createMockCtx, type MockCtx } from "../_helpers/convexCtx";
 
@@ -214,5 +215,214 @@ describe("convex/posts · getBySlug / listAdmin / listAllPublished", () => {
     await handler(create)(ctx, { ...baseArgs, slug: "p2", status: "draft" });
     const published = await handler(listAllPublished)(ctx, {});
     expect(published.map((p: any) => p.slug)).toEqual(["p1"]);
+  });
+});
+
+describe("convex/posts · seed", () => {
+  let ctx: MockCtx;
+  beforeEach(() => {
+    ctx = createMockCtx();
+    getAuthUserId.mockReset();
+  });
+
+  it("em banco vazio insere exatamente 2 posts", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("posts");
+    expect(docs.length).toBe(2);
+  });
+
+  it("cada post tem slug determinístico único", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("posts");
+    const slugs = docs.map((d) => d.slug).sort();
+    expect(slugs).toEqual([
+      "convex-como-backend-reativo-alem-do-crud",
+      "transicao-de-carreira-para-tecnologia-o-que-aprendi-em-12-meses",
+    ]);
+    expect(new Set(slugs).size).toBe(slugs.length);
+  });
+
+  it("post 1 tem tags [React, Convex] e post 2 tem tags [Carreira]", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("posts");
+    const post1 = docs.find((d) => d.slug === "convex-como-backend-reativo-alem-do-crud")!;
+    const post2 = docs.find((d) => d.slug === "transicao-de-carreira-para-tecnologia-o-que-aprendi-em-12-meses")!;
+    expect(post1.tags).toEqual(["React", "Convex"]);
+    expect(post2.tags).toEqual(["Carreira"]);
+  });
+
+  it("cada post tem status 'published'", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("posts");
+    for (const doc of docs) {
+      expect(doc.status).toBe("published");
+    }
+  });
+
+  it("cada post tem featured = false", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("posts");
+    for (const doc of docs) {
+      expect(doc.featured).toBe(false);
+    }
+  });
+
+  it("cada post tem publishedAt numérico positivo e distintos", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("posts");
+    const publishedAtValues = docs.map((d) => d.publishedAt);
+    for (const value of publishedAtValues) {
+      expect(typeof value).toBe("number");
+      expect(value).toBeGreaterThan(0);
+    }
+    expect(new Set(publishedAtValues).size).toBe(publishedAtValues.length);
+  });
+
+  it("post índice 0 tem publishedAt MENOR que post índice 1 (post mais antigo vem primeiro)", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("posts");
+    const post1 = docs.find((d) => d.slug === "convex-como-backend-reativo-alem-do-crud")!;
+    const post2 = docs.find((d) => d.slug === "transicao-de-carreira-para-tecnologia-o-que-aprendi-em-12-meses")!;
+    // Post 1 deve ter publishedAt MENOR (1 dia no passado) — não maior, não igual.
+    expect(post1.publishedAt).toBeLessThan(post2.publishedAt);
+    // Diferença exata deve ser próximo de 1 dia (86_400_000 ms).
+    expect(post2.publishedAt - post1.publishedAt).toBe(86_400_000);
+  });
+
+  it("publishedAt é exatamente now - 86_400_000 para o post mais antigo", async () => {
+    const before = Date.now();
+    await handler(seed)(ctx, {});
+    const after = Date.now();
+    const docs = ctx.db._all("posts");
+    const post1 = docs.find((d) => d.slug === "convex-como-backend-reativo-alem-do-crud")!;
+    // publishedAt de post 1 = now - 86_400_000, então deve ser MENOR que o before (now).
+    expect(post1.publishedAt).toBeLessThanOrEqual(before - 86_400_000);
+    // Mas não muito menor (within tolerance).
+    expect(post1.publishedAt).toBeGreaterThanOrEqual(after - 86_400_000 - 1000);
+  });
+
+  it("cada post tem imageUrl externa com picsum e slug determinístico", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("posts");
+    for (const doc of docs) {
+      expect(typeof doc.imageUrl).toBe("string");
+      expect(doc.imageUrl).toMatch(/^https:\/\/picsum\.photos\/seed\/[a-z0-9-]+-\d+\/800\/600$/);
+      expect(doc.imageUrl).toContain(doc.slug);
+    }
+  });
+
+  it("cada post NÃO tem imageId (apenas imageUrl externa)", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("posts");
+    for (const doc of docs) {
+      expect(doc.imageId).toBeUndefined();
+    }
+  });
+
+  it("cada post tem titleTranslations.ptBR e contentTranslations.ptBR não-vazios", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("posts");
+    for (const doc of docs) {
+      expect(doc.titleTranslations).toBeDefined();
+      expect(typeof doc.titleTranslations.ptBR).toBe("string");
+      expect(doc.titleTranslations.ptBR.length).toBeGreaterThan(0);
+      expect(doc.contentTranslations).toBeDefined();
+      expect(typeof doc.contentTranslations.ptBR).toBe("string");
+      expect(doc.contentTranslations.ptBR.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("cada post tem content em markdown com ~400 palavras em pt-BR", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("posts");
+    for (const doc of docs) {
+      expect(typeof doc.content).toBe("string");
+      const wordCount = doc.content.trim().split(/\s+/).length;
+      expect(wordCount).toBeGreaterThanOrEqual(300);
+    }
+  });
+
+  it("cada post tem createdAt numérico positivo", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("posts");
+    for (const doc of docs) {
+      expect(typeof doc.createdAt).toBe("number");
+      expect(doc.createdAt).toBeGreaterThan(0);
+    }
+  });
+
+  it("em banco vazio insere exatamente 2 posts (idempotência inicial)", async () => {
+    await handler(seed)(ctx, {});
+    expect(ctx.db._all("posts").length).toBe(2);
+  });
+
+  it("com 1 post pré-existente, seed insere só o que falta → vai para 2", async () => {
+    ctx.db._seed("posts", [
+      {
+        title: "Post Existente",
+        titleTranslations: { ptBR: "Post Existente" },
+        slug: "post-existente",
+        content: "Conteúdo existente",
+        contentTranslations: { ptBR: "Conteúdo existente" },
+        tags: ["x"],
+        featured: false,
+        status: "published",
+        publishedAt: 100,
+        createdAt: 1,
+      },
+    ]);
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("posts");
+    expect(docs.length).toBe(2);
+    expect(docs.find((d) => d.slug === "post-existente")).toBeDefined();
+    const seededSlugs = docs
+      .map((d) => d.slug)
+      .filter(
+        (s) =>
+          s === "convex-como-backend-reativo-alem-do-crud" ||
+          s === "transicao-de-carreira-para-tecnologia-o-que-aprendi-em-12-meses",
+      );
+    expect(seededSlugs.length).toBe(1);
+  });
+
+  it("com 2 posts pré-existentes, seed é no-op (não duplica nem sobrescreve)", async () => {
+    ctx.db._seed("posts", [
+      {
+        title: "Existente 1",
+        titleTranslations: { ptBR: "Existente 1" },
+        slug: "post-existente-1",
+        content: "x",
+        contentTranslations: { ptBR: "x" },
+        tags: ["x"],
+        featured: false,
+        status: "published",
+        publishedAt: 100,
+        createdAt: 1,
+      },
+      {
+        title: "Existente 2",
+        titleTranslations: { ptBR: "Existente 2" },
+        slug: "post-existente-2",
+        content: "y",
+        contentTranslations: { ptBR: "y" },
+        tags: ["y"],
+        featured: false,
+        status: "published",
+        publishedAt: 200,
+        createdAt: 2,
+      },
+    ]);
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("posts");
+    expect(docs.length).toBe(2);
+    expect(docs.map((d) => d.slug).sort()).toEqual(["post-existente-1", "post-existente-2"]);
+    expect(docs.find((d) => d.slug === "post-existente-1")!.createdAt).toBe(1);
+    expect(docs.find((d) => d.slug === "post-existente-2")!.createdAt).toBe(2);
+  });
+
+  it("rodar seed 2x seguidas mantém exatamente 2 posts", async () => {
+    await handler(seed)(ctx, {});
+    await handler(seed)(ctx, {});
+    expect(ctx.db._all("posts").length).toBe(2);
   });
 });

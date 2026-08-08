@@ -147,7 +147,7 @@ describe("convex/seed · seedAll", () => {
   it("com plugins irrelevantes também invoca os seeds core (3 mutations)", async () => {
     ctx.runMutation.mockResolvedValue(undefined);
 
-    await handler(seedAll)(ctx, { enabledPlugins: ["blog", "analytics"] });
+    await handler(seedAll)(ctx, { enabledPlugins: ["analytics", "newsletter"] });
 
     expect(ctx.runMutation).toHaveBeenCalledTimes(3);
   });
@@ -176,20 +176,20 @@ describe("convex/seed · seedAll", () => {
     expect(ctx.runMutation).toHaveBeenCalledTimes(5);
   });
 
-  it("com proposals mas não i18n invoca 4 mutations (3 core + seedDefaultTemplate, sem siteTexts.seed)", async () => {
+  it("com proposals mas não i18n invoca 5 mutations (3 core + seedDefaultTemplate + posts.seed)", async () => {
     ctx.runMutation.mockResolvedValue(undefined);
 
     await handler(seedAll)(ctx, { enabledPlugins: ["proposals", "blog"] });
 
-    expect(ctx.runMutation).toHaveBeenCalledTimes(4);
+    expect(ctx.runMutation).toHaveBeenCalledTimes(5);
   });
 
-  it("com i18n mas não proposals invoca 4 mutations (3 core + siteTexts.seed, sem seedDefaultTemplate)", async () => {
+  it("com i18n mas não proposals invoca 5 mutations (3 core + siteTexts.seed + posts.seed)", async () => {
     ctx.runMutation.mockResolvedValue(undefined);
 
     await handler(seedAll)(ctx, { enabledPlugins: ["i18n", "blog"] });
 
-    expect(ctx.runMutation).toHaveBeenCalledTimes(4);
+    expect(ctx.runMutation).toHaveBeenCalledTimes(5);
   });
 
   it("com portfolio habilitado invoca 3 core + projects.seed (4 mutations)", async () => {
@@ -223,4 +223,61 @@ describe("convex/seed · seedAll", () => {
 
     expect(ctx.runMutation).toHaveBeenCalledTimes(5);
   });
+
+  it("com blog habilitado invoca 3 core + posts.seed (4 mutations)", async () => {
+    ctx.runMutation.mockResolvedValue(undefined);
+
+    await handler(seedAll)(ctx, { enabledPlugins: ["blog"] });
+
+    expect(ctx.runMutation).toHaveBeenCalledTimes(4);
+  });
+
+  it("com blog + portfolio invoca 3 core + projects.seed + posts.seed (5 mutations)", async () => {
+    ctx.runMutation.mockResolvedValue(undefined);
+
+    await handler(seedAll)(ctx, { enabledPlugins: ["blog", "portfolio"] });
+
+    expect(ctx.runMutation).toHaveBeenCalledTimes(5);
+  });
+
+  it("com blog + i18n invoca 3 core + posts.seed + siteTexts.seed (5 mutations)", async () => {
+    ctx.runMutation.mockResolvedValue(undefined);
+
+    await handler(seedAll)(ctx, { enabledPlugins: ["blog", "i18n"] });
+
+    expect(ctx.runMutation).toHaveBeenCalledTimes(5);
+  });
+
+  it("com blog + proposals invoca 3 core + seedDefaultTemplate + posts.seed (5 mutations)", async () => {
+    ctx.runMutation.mockResolvedValue(undefined);
+
+    await handler(seedAll)(ctx, { enabledPlugins: ["blog", "proposals"] });
+
+    expect(ctx.runMutation).toHaveBeenCalledTimes(5);
+  });
+
+  it("com blog + portfolio + i18n invoca 3 core + projects.seed + posts.seed + siteTexts.seed (6 mutations)", async () => {
+    ctx.runMutation.mockResolvedValue(undefined);
+
+    await handler(seedAll)(ctx, { enabledPlugins: ["blog", "portfolio", "i18n"] });
+
+    expect(ctx.runMutation).toHaveBeenCalledTimes(6);
+  });
+
+  it("com blog + proposals + i18n invoca 3 core + seedDefaultTemplate + posts.seed + siteTexts.seed (6 mutations)", async () => {
+    ctx.runMutation.mockResolvedValue(undefined);
+
+    await handler(seedAll)(ctx, { enabledPlugins: ["blog", "proposals", "i18n"] });
+
+    expect(ctx.runMutation).toHaveBeenCalledTimes(6);
+  });
+
+  it("com blog + portfolio + proposals + i18n invoca todos os plugins (7 mutations)", async () => {
+    ctx.runMutation.mockResolvedValue(undefined);
+
+    await handler(seedAll)(ctx, { enabledPlugins: ["blog", "portfolio", "proposals", "i18n"] });
+
+    expect(ctx.runMutation).toHaveBeenCalledTimes(7);
+  });
+
 });

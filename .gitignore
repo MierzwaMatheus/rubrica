@@ -110,6 +110,9 @@ temp/
 .stryker-tmp/
 reports/
 
+# TDD planning scratchpad (skill tdd-issue)
+.tdd/
+
 # Build generated files
 public/data/
 public/sitemap.xml

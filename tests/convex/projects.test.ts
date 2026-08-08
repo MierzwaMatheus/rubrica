@@ -278,4 +278,26 @@ describe("convex/projects · seed", () => {
     expect(result!.slug).toBe("sistema-de-agendamento-online");
     expect(result!.title).toBeDefined();
   });
+
+  it("cada projeto tem externalImageUrls com 2 URLs picsum.photos determinísticas", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("projects");
+    for (const doc of docs) {
+      expect(Array.isArray(doc.externalImageUrls)).toBe(true);
+      expect(doc.externalImageUrls.length).toBe(2);
+      expect(doc.externalImageUrls[0]).toBe(`https://picsum.photos/seed/${doc.slug}-1/800/600`);
+      expect(doc.externalImageUrls[1]).toBe(`https://picsum.photos/seed/${doc.slug}-2/800/600`);
+    }
+  });
+
+  it("list expande externalImageUrls em array images com 2 entries por projeto", async () => {
+    await handler(seed)(ctx, {});
+    const result = await handler(list)(ctx, {});
+    expect(result.length).toBe(2);
+    for (const project of result) {
+      expect(project.images).toHaveLength(2);
+      expect(project.images[0].url).toBe(`https://picsum.photos/seed/${project.slug}-1/800/600`);
+      expect(project.images[1].url).toBe(`https://picsum.photos/seed/${project.slug}-2/800/600`);
+    }
+  });
 });

@@ -271,6 +271,10 @@ const PROJECTS_SEED_VALUES = [
     descriptionTranslations: {
       ptBR: 'Plataforma completa para agendamento de serviços online, com painel administrativo, gestão de profissionais e integração com calendário.',
     },
+    externalImageUrls: [
+      'https://picsum.photos/seed/sistema-de-agendamento-online-1/800/600',
+      'https://picsum.photos/seed/sistema-de-agendamento-online-2/800/600',
+    ],
     orderIndex: 0,
     demoLink: 'https://agendamento-demo.example.com',
     githubLink: 'https://github.com/example/agendamento-online',
@@ -306,6 +310,10 @@ const PROJECTS_SEED_VALUES = [
     descriptionTranslations: {
       ptBR: 'Aplicativo mobile para controle financeiro pessoal com categorização automática, metas de economia e relatórios visuais.',
     },
+    externalImageUrls: [
+      'https://picsum.photos/seed/app-de-financas-pessoais-1/800/600',
+      'https://picsum.photos/seed/app-de-financas-pessoais-2/800/600',
+    ],
     orderIndex: 1,
     demoLink: 'https://financas-demo.example.com',
     githubLink: 'https://github.com/example/financas-pessoais',

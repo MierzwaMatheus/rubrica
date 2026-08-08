@@ -300,4 +300,42 @@ describe("convex/projects · seed", () => {
       expect(project.images[1].url).toBe(`https://picsum.photos/seed/${project.slug}-2/800/600`);
     }
   });
+
+  it("é idempotente: rodar seed 2x mantém exatamente 2 docs", async () => {
+    await handler(seed)(ctx, {});
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("projects");
+    expect(docs.length).toBe(2);
+  });
+
+  it("em banco já populado (>= 2 projetos), seed é no-op: não duplica nem sobrescreve", async () => {
+    ctx.db._seed("projects", [
+      {
+        title: "Projeto Existente 1",
+        description: "desc",
+        tags: ["x"],
+        imageIds: [],
+        externalImageUrls: [],
+        slug: "projeto-existente-1",
+        orderIndex: 99,
+        createdAt: 1,
+      },
+      {
+        title: "Projeto Existente 2",
+        description: "desc",
+        tags: ["x"],
+        imageIds: [],
+        externalImageUrls: [],
+        slug: "projeto-existente-2",
+        orderIndex: 100,
+        createdAt: 2,
+      },
+    ]);
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("projects");
+    expect(docs.length).toBe(2);
+    expect(docs.map((d) => d.title).sort()).toEqual(["Projeto Existente 1", "Projeto Existente 2"]);
+    expect(docs.find((d) => d.slug === "projeto-existente-1")!.orderIndex).toBe(99);
+    expect(docs.find((d) => d.slug === "projeto-existente-2")!.orderIndex).toBe(100);
+  });
 });

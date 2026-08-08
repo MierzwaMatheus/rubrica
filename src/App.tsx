@@ -20,6 +20,7 @@ import AdminAbout from "./pages/admin/About";
 import AdminAiResumes from "./pages/admin/AiResumes";
 import AdminLogs from "./pages/admin/Logs";
 import { AuthProvider } from "./contexts/AuthContext";
+import { ThemeApplier } from "./components/ThemeApplier";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { I18nProvider } from "./i18n/context/I18nContext";
 import Resume from "./pages/Resume";
@@ -41,13 +42,18 @@ import { ConvexClientProvider, convex } from "./providers/ConvexClientProvider";
 import { ConvexTranslationService } from "./i18n/implementations/ConvexTranslationService";
 import { Terminal } from "./components/Terminal";
 import { AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { sidebarRepository } from "@/repositories/instances";
 import { ContactWizardProvider } from "./contexts/ContactWizardContext";
 import { ContactWizardModal } from "./components/ContactWizardModal";
 import AdminContactRequests from "./pages/admin/ContactRequests";
 import AdminPlugins from "./pages/admin/Plugins";
+import AdminSiteConfig from "./pages/admin/SiteConfig";
 import AdminTestimonials from "./pages/admin/Testimonials";
 import AdminLgpdErasure from "./pages/admin/LgpdErasure";
+import AdminContractTemplates from "./pages/admin/ContractTemplates";
+import AdminTextos from "./pages/admin/Textos";
 import TestimonialsPage from "./pages/Testimonials";
 import { PluginsProvider } from "./contexts/PluginsContext";
 import { PluginRoute } from "./components/PluginRoute";
@@ -199,6 +205,18 @@ function Router() {
             allowedRoles={["root", "admin"]}
           />
         </Route>
+        <Route path="/admin/textos">
+          <ProtectedRoute
+            component={AdminTextos}
+            allowedRoles={["root", "admin", "content-editor"]}
+          />
+        </Route>
+        <Route path="/admin/site-config">
+          <ProtectedRoute
+            component={AdminSiteConfig}
+            allowedRoles={["root", "admin"]}
+          />
+        </Route>
         <Route path="/admin/depoimentos">
           <ProtectedRoute
             component={() => <PluginRoute pluginId="testimonials"><AdminTestimonials /></PluginRoute>}
@@ -207,6 +225,12 @@ function Router() {
         </Route>
         <Route path="/admin/lgpd">
           <ProtectedRoute component={AdminLgpdErasure} allowedRoles={["root"]} />
+        </Route>
+        <Route path="/admin/contracts">
+          <ProtectedRoute
+            component={() => <PluginRoute pluginId="contract-templates"><AdminContractTemplates /></PluginRoute>}
+            allowedRoles={["root", "admin"]}
+          />
         </Route>
       </Switch>
       </>
@@ -311,6 +335,28 @@ function AppContent() {
   const isAdminRoute = location.startsWith("/admin");
   const [terminalOpen, setTerminalOpen] = useState(false);
 
+  const { data: sidebarContact } = useQuery({
+    queryKey: ["sidebar", "contact"],
+    queryFn: () => sidebarRepository.getContactInfo(),
+    staleTime: Infinity,
+  });
+
+  const ownerInfo = useMemo(() => {
+    if (!sidebarContact) return undefined;
+    const slug = (sidebarContact.name ?? "portfolio")
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "");
+    return {
+      name: sidebarContact.name ?? "",
+      slug: slug || "portfolio",
+      role: sidebarContact.role ?? "professional",
+      email: sidebarContact.email,
+      githubUrl: sidebarContact.github_url,
+      linkedinUrl: sidebarContact.linkedin_url,
+    };
+  }, [sidebarContact]);
+
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (isAdminRoute) return;
@@ -330,7 +376,7 @@ function AppContent() {
       <Router />
       <AnimatePresence>
         {terminalOpen && !isAdminRoute && (
-          <Terminal onClose={() => setTerminalOpen(false)} />
+          <Terminal onClose={() => setTerminalOpen(false)} ownerInfo={ownerInfo} />
         )}
       </AnimatePresence>
       <Analytics />
@@ -345,6 +391,7 @@ function App() {
       <ErrorBoundary>
         <ConvexClientProvider>
           <QueryProvider>
+            <ThemeApplier />
             <AuthProvider>
               <I18nProvider translationService={translationService}>
                 <ThemeProvider defaultTheme="dark">

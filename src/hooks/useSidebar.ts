@@ -16,12 +16,12 @@ export function useSidebar(repository: SidebarRepository) {
   });
 
   const contactRole = useMemo(() => {
-    if (!contactInfoRaw) return "Front-End Developer";
+    if (!contactInfoRaw) return "";
     return (
       contactInfoRaw.role_translations?.[locale] ||
       contactInfoRaw.role_translations?.["pt-BR"] ||
       contactInfoRaw.role ||
-      "Front-End Developer"
+      ""
     );
   }, [contactInfoRaw, locale]);
 

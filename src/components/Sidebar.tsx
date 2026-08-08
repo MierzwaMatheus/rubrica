@@ -109,14 +109,17 @@ const NAV_ITEMS = NAV_ITEMS_KEYS
           ) : (
             <div className="relative h-28 w-28 rounded-full mb-4 overflow-hidden border-2 border-neon-purple group cursor-pointer">
               <div className="absolute inset-0 bg-gradient-to-br from-neon-purple to-neon-lime opacity-30 group-hover:opacity-50 transition-opacity duration-500"></div>
-              <img
-                src={
-                  contactInfo?.avatar_url ||
-                  "https://i.postimg.cc/6pWwxrLf/IMG-20220823-232153-2.jpg"
-                }
-                alt={contactInfo?.name || "Matheus Mierzwa"}
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-              />
+              {contactInfo?.avatar_url ? (
+                <img
+                  src={contactInfo.avatar_url}
+                  alt={contactInfo.name || ""}
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+              ) : (
+                <div className="h-full w-full flex items-center justify-center bg-neon-purple/20 text-white text-3xl font-bold select-none">
+                  {contactInfo?.name?.[0]?.toUpperCase() || <User className="h-10 w-10 opacity-50" />}
+                </div>
+              )}
             </div>
           )}
 
@@ -124,7 +127,7 @@ const NAV_ITEMS = NAV_ITEMS_KEYS
             <Skeleton className="h-6 w-40 mb-3" />
           ) : (
             <h1 className="font-bold text-xl text-white mb-3 text-center">
-              {contactInfo?.name || "Matheus Mierzwa"}
+              {contactInfo?.name || ""}
             </h1>
           )}
 
@@ -141,7 +144,7 @@ const NAV_ITEMS = NAV_ITEMS_KEYS
               ) : (
                 <>
                   <div className="text-white/90 font-medium">
-                    {contactInfo?.role || "Front-End Developer"}
+                    {contactInfo?.role || ""}
                   </div>
                   {/* <div className="text-white/70 text-[10px]">& UI Designer</div> */}
                 </>
@@ -321,7 +324,7 @@ const NAV_ITEMS = NAV_ITEMS_KEYS
           </Button>
 
           <p className="text-center text-[10px] text-white/20 font-mono mt-1">
-            Press <kbd className="px-1 py-0.5 rounded bg-white/10 text-white/40">~</kbd> for terminal
+            {t("sidebar.terminalHint")}
           </p>
         </div>
       </div>
@@ -334,17 +337,20 @@ const NAV_ITEMS = NAV_ITEMS_KEYS
       <div className="fixed top-0 left-0 right-0 h-16 bg-background/90 backdrop-blur-md border-b border-white/10 z-50 flex items-center justify-between px-4 lg:hidden">
         <div className="flex items-center">
           <div className="h-8 w-8 rounded-full overflow-hidden border border-neon-purple mr-3">
-            <img
-              src={
-                contactInfo?.avatar_url ||
-                "https://i.postimg.cc/6pWwxrLf/IMG-20220823-232153-2.jpg"
-              }
-              alt={contactInfo?.name || "Matheus Mierzwa"}
-              className="h-full w-full object-cover"
-            />
+            {contactInfo?.avatar_url ? (
+              <img
+                src={contactInfo.avatar_url}
+                alt={contactInfo.name || ""}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <div className="h-full w-full flex items-center justify-center bg-neon-purple/20 text-white text-sm font-bold select-none">
+                {contactInfo?.name?.[0]?.toUpperCase() || <User className="h-4 w-4 opacity-50" />}
+              </div>
+            )}
           </div>
           <span className="font-bold text-white text-sm">
-            {contactInfo?.name || "Matheus Mierzwa"}
+            {contactInfo?.name || ""}
           </span>
         </div>
 

@@ -789,4 +789,15 @@ describe("2.12 — arquivos de layout são TypeScript sintaticamente válidos", 
       );
     }
   });
+
+  it("layout brutalist — Navbar.tsx não usa caminho excessivo para convex/pluginRegistry", () => {
+    // O applyLayout copia Navbar.tsx para src/components/Navbar.tsx. O caminho
+    // correto para `convex/pluginRegistry` (na raiz do projeto) é `../../convex/pluginRegistry`.
+    // `../../../convex/pluginRegistry` sairia da raiz e quebraria a resolução.
+    const filePath = resolve(TEMPLATES_DIR, "brutalist/Navbar.tsx");
+    const content = readFileSync(filePath, "utf-8");
+    expect(content, "Navbar.tsx não deve ter ../../../convex/pluginRegistry").not.toMatch(
+      /from\s+["']\.\.\/\.\.\/\.\.\/convex\/pluginRegistry["']/,
+    );
+  });
 });

@@ -1,5 +1,5 @@
 import { v } from 'convex/values';
-import { mutation, query } from './_generated/server';
+import { mutation, query, internalMutation } from './_generated/server';
 import { requireRole } from './auth';
 import { markPendingChanges } from './publishStatus';
 import { logAudit } from './audit';
@@ -258,5 +258,91 @@ export const reorder = mutation({
     }
     await markPendingChanges(ctx);
     await logAudit(ctx, { eventType: 'admin.reorder', actorType: 'user', actorId: userId, targetType: 'project', success: true });
+  },
+});
+
+const PROJECTS_SEED_VALUES = [
+  {
+    title: 'Sistema de Agendamento Online',
+    titleTranslations: { ptBR: 'Sistema de Agendamento Online' },
+    slug: 'sistema-de-agendamento-online',
+    tags: ['Next.js', 'TypeScript', 'PostgreSQL'],
+    description: 'Plataforma completa para agendamento de serviços online com painel administrativo e gestão de profissionais.',
+    descriptionTranslations: {
+      ptBR: 'Plataforma completa para agendamento de serviços online, com painel administrativo, gestão de profissionais e integração com calendário.',
+    },
+    orderIndex: 0,
+    demoLink: 'https://agendamento-demo.example.com',
+    githubLink: 'https://github.com/example/agendamento-online',
+    caseStudy: {
+      problem: 'Profissionais autônomos perdiam clientes por gerenciar agenda manualmente em planilhas.',
+      solution: 'Plataforma web com agendamento em tempo real, confirmação automática e gestão centralizada de profissionais.',
+      results: 'Reduziu em 70% o tempo gasto em administração de agenda e aumentou o faturamento médio em 25%.',
+      metrics: [
+        { label: 'Agendamentos/mês', value: '1.200+', icon: 'calendar' },
+        { label: 'Taxa de no-show', value: '−65%', icon: 'trending-down' },
+        { label: 'NPS', value: '72', icon: 'star' },
+      ],
+      testimonial: {
+        text: 'Economizo 4 horas por semana e nunca mais perdi um cliente por conflito de agenda.',
+        author: 'Marina Lopes',
+        role: 'Fisioterapeuta',
+      },
+    },
+    caseStudyTranslations: {
+      ptBR: {
+        problem: 'Profissionais autônomos perdiam clientes por gerenciar agenda manualmente em planilhas.',
+        solution: 'Plataforma web com agendamento em tempo real, confirmação automática e gestão centralizada de profissionais.',
+        results: 'Reduziu em 70% o tempo gasto em administração de agenda e aumentou o faturamento médio em 25%.',
+      },
+    },
+  },
+  {
+    title: 'App de Finanças Pessoais',
+    titleTranslations: { ptBR: 'App de Finanças Pessoais' },
+    slug: 'app-de-financas-pessoais',
+    tags: ['React Native', 'TypeScript', 'SQLite'],
+    description: 'Aplicativo mobile para controle financeiro pessoal com categorização automática e metas de economia.',
+    descriptionTranslations: {
+      ptBR: 'Aplicativo mobile para controle financeiro pessoal com categorização automática, metas de economia e relatórios visuais.',
+    },
+    orderIndex: 1,
+    demoLink: 'https://financas-demo.example.com',
+    githubLink: 'https://github.com/example/financas-pessoais',
+    caseStudy: {
+      problem: 'Usuários abandonavam apps de finanças por complexidade excessiva e cadastro manual de cada transação.',
+      solution: 'App mobile com categorização automática via SMS/email e visualização simples em cards mensais.',
+      results: '85% dos usuários ativos após 30 dias (média do mercado: 25%).',
+      metrics: [
+        { label: 'Usuários ativos', value: '15k', icon: 'users' },
+        { label: 'Retenção 30d', value: '85%', icon: 'trending-up' },
+        { label: 'Nota App Store', value: '4.8', icon: 'star' },
+      ],
+      testimonial: {
+        text: 'Finalmente um app de finanças que não me faz desistir depois de uma semana.',
+        author: 'Rafael Mendes',
+        role: 'Engenheiro de Software',
+      },
+    },
+    caseStudyTranslations: {
+      ptBR: {
+        problem: 'Usuários abandonavam apps de finanças por complexidade excessiva e cadastro manual de cada transação.',
+        solution: 'App mobile com categorização automática via SMS/email e visualização simples em cards mensais.',
+        results: '85% dos usuários ativos após 30 dias (média do mercado: 25%).',
+      },
+    },
+  },
+];
+
+export const seed = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const existing = await ctx.db.query('projects').collect();
+    if (existing.length >= 2) return;
+
+    const now = Date.now();
+    for (const project of PROJECTS_SEED_VALUES) {
+      await ctx.db.insert('projects', { ...project, imageIds: [], createdAt: now });
+    }
   },
 });

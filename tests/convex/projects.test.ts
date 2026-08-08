@@ -31,6 +31,7 @@ import {
   permanentDelete,
   restore,
   reorder,
+  seed,
 } from "../../convex/projects";
 import { createMockCtx, type MockCtx } from "../_helpers/convexCtx";
 
@@ -150,5 +151,131 @@ describe("convex/projects · create / update / remove / permanentDelete / restor
     });
     expect((await ctx.db.get(id1))!.orderIndex).toBe(9);
     expect((await ctx.db.get(id2))!.orderIndex).toBe(5);
+  });
+});
+
+describe("convex/projects · seed", () => {
+  let ctx: MockCtx;
+  beforeEach(() => {
+    ctx = createMockCtx();
+  });
+
+  it("em banco vazio insere exatamente 2 projetos", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("projects");
+    expect(docs.length).toBe(2);
+  });
+
+  it("cada projeto tem slug determinístico único", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("projects");
+    const slugs = docs.map((d) => d.slug).sort();
+    expect(slugs).toEqual(["app-de-financas-pessoais", "sistema-de-agendamento-online"]);
+  });
+
+  it("cada projeto tem orderIndex sequencial (0 e 1)", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("projects");
+    const orderIndexes = docs.map((d) => d.orderIndex).sort((a, b) => a - b);
+    expect(orderIndexes).toEqual([0, 1]);
+  });
+
+  it("cada projeto tem titleTranslations.ptBR não-vazio", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("projects");
+    for (const doc of docs) {
+      expect(doc.titleTranslations).toBeDefined();
+      expect(typeof doc.titleTranslations.ptBR).toBe("string");
+      expect(doc.titleTranslations.ptBR.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("cada projeto tem descriptionTranslations.ptBR não-vazio", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("projects");
+    for (const doc of docs) {
+      expect(doc.descriptionTranslations).toBeDefined();
+      expect(typeof doc.descriptionTranslations.ptBR).toBe("string");
+      expect(doc.descriptionTranslations.ptBR.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("cada projeto tem caseStudy com problem/solution/results/metrics/testimonial não-vazios", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("projects");
+    for (const doc of docs) {
+      expect(doc.caseStudy).toBeDefined();
+      expect(typeof doc.caseStudy.problem).toBe("string");
+      expect(doc.caseStudy.problem.length).toBeGreaterThan(0);
+      expect(typeof doc.caseStudy.solution).toBe("string");
+      expect(doc.caseStudy.solution.length).toBeGreaterThan(0);
+      expect(typeof doc.caseStudy.results).toBe("string");
+      expect(doc.caseStudy.results.length).toBeGreaterThan(0);
+      expect(Array.isArray(doc.caseStudy.metrics)).toBe(true);
+      expect(doc.caseStudy.metrics.length).toBeGreaterThan(0);
+      expect(doc.caseStudy.testimonial).toBeDefined();
+      expect(typeof doc.caseStudy.testimonial.text).toBe("string");
+      expect(doc.caseStudy.testimonial.text.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("cada projeto tem caseStudyTranslations.ptBR com problem/solution/results não-vazios", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("projects");
+    for (const doc of docs) {
+      expect(doc.caseStudyTranslations).toBeDefined();
+      expect(doc.caseStudyTranslations.ptBR).toBeDefined();
+      expect(typeof doc.caseStudyTranslations.ptBR.problem).toBe("string");
+      expect(doc.caseStudyTranslations.ptBR.problem.length).toBeGreaterThan(0);
+      expect(typeof doc.caseStudyTranslations.ptBR.solution).toBe("string");
+      expect(doc.caseStudyTranslations.ptBR.solution.length).toBeGreaterThan(0);
+      expect(typeof doc.caseStudyTranslations.ptBR.results).toBe("string");
+      expect(doc.caseStudyTranslations.ptBR.results.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("cada projeto tem imageIds como array vazio", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("projects");
+    for (const doc of docs) {
+      expect(doc.imageIds).toEqual([]);
+    }
+  });
+
+  it("cada projeto tem createdAt numérico positivo", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("projects");
+    for (const doc of docs) {
+      expect(typeof doc.createdAt).toBe("number");
+      expect(doc.createdAt).toBeGreaterThan(0);
+    }
+  });
+
+  it("cada projeto tem demoLink e githubLink como strings não-vazias", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("projects");
+    for (const doc of docs) {
+      expect(typeof doc.demoLink).toBe("string");
+      expect(doc.demoLink.length).toBeGreaterThan(0);
+      expect(typeof doc.githubLink).toBe("string");
+      expect(doc.githubLink.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("cada projeto tem tags como array não-vazio", async () => {
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("projects");
+    for (const doc of docs) {
+      expect(Array.isArray(doc.tags)).toBe(true);
+      expect(doc.tags.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("getBySlug retorna o projeto correto por slug", async () => {
+    await handler(seed)(ctx, {});
+    const result = await handler(getBySlug)(ctx, { slug: "sistema-de-agendamento-online" });
+    expect(result).not.toBeNull();
+    expect(result!.slug).toBe("sistema-de-agendamento-online");
+    expect(result!.title).toBeDefined();
   });
 });

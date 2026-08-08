@@ -1,6 +1,6 @@
 import { useBlogPosts } from "@/hooks/useBlog";
 import { blogRepository } from "@/repositories/instances";
-import { Masthead } from "../Masthead";
+import { Masthead } from "../components/Masthead";
 
 export default function Blog() {
   const { posts, featuredPosts, isLoading } = useBlogPosts(blogRepository);

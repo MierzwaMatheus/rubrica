@@ -1,6 +1,6 @@
 import { useHome } from "@/hooks/useHome";
 import { homeRepository } from "@/repositories/instances";
-import { Masthead } from "../Masthead";
+import { Masthead } from "../components/Masthead";
 
 export default function Home() {
   const { contactRole, services, testimonials, isLoading } = useHome(homeRepository);

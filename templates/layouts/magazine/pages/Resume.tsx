@@ -1,6 +1,6 @@
 import { useResume } from "@/hooks/useResume";
 import { resumeRepository } from "@/repositories/instances";
-import { Masthead } from "../Masthead";
+import { Masthead } from "../components/Masthead";
 
 export default function Resume() {
   const { getItemsByType, isLoading } = useResume(resumeRepository);

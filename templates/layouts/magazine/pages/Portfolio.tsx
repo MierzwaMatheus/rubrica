@@ -1,6 +1,6 @@
 import { usePortfolio } from "@/hooks/usePortfolio";
 import { portfolioRepository } from "@/repositories/instances";
-import { Masthead } from "../Masthead";
+import { Masthead } from "../components/Masthead";
 
 export default function Portfolio() {
   const { projects, isLoading } = usePortfolio(portfolioRepository);

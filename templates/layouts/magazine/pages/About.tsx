@@ -1,6 +1,6 @@
 import { useAbout } from "@/hooks/useAbout";
 import { aboutRepository } from "@/repositories/instances";
-import { Masthead } from "../Masthead";
+import { Masthead } from "../components/Masthead";
 
 export default function About() {
   const { dailyRoutine, faq, isLoading } = useAbout(aboutRepository);

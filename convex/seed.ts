@@ -51,6 +51,11 @@ export const seedAll = internalMutation({
     if (enabledPlugins.includes("resume")) {
       await ctx.runMutation(internal.resumeItems.seed, {});
     }
+
+    if (enabledPlugins.includes("about")) {
+      await ctx.runMutation(internal.aboutDailyRoutine.seed, {});
+      await ctx.runMutation(internal.aboutFaq.seed, {});
+    }
   },
 });
 

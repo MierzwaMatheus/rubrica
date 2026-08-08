@@ -1,5 +1,5 @@
 import { v } from 'convex/values';
-import { mutation, query } from './_generated/server';
+import { internalMutation, mutation, query } from './_generated/server';
 import { requireRole } from './auth';
 import { markPendingChanges } from './publishStatus';
 import { logAudit } from './audit';
@@ -94,5 +94,39 @@ export const restore = mutation({
     await restoreDoc(ctx, 'aboutFaq', args.id);
     await markPendingChanges(ctx);
     await logAudit(ctx, { eventType: 'admin.restore', actorType: 'user', actorId: userId, targetType: 'aboutFaq', targetId: args.id, metadata: { label: existing?.question }, success: true });
+  },
+});
+
+const ABOUT_FAQ_SEED_VALUES = [
+  {
+    question: 'Aceita projetos remotos?',
+    answer: 'Sim, trabalho 100% remoto com clientes de qualquer região.',
+    displayOrder: 0,
+  },
+  {
+    question: 'Qual é o seu stack preferido?',
+    answer: 'React no frontend, Node.js ou Convex no backend, com TypeScript em tudo.',
+    displayOrder: 1,
+  },
+  {
+    question: 'Como é o seu processo de trabalho?',
+    answer:
+      'Começo com um briefing detalhado, defino escopo e entregas, itero com feedback frequente.',
+    displayOrder: 2,
+  },
+];
+
+export const seed = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const existing = await ctx.db.query('aboutFaq').collect();
+    if (existing.length >= ABOUT_FAQ_SEED_VALUES.length) return;
+
+    const now = Date.now();
+    const remaining = ABOUT_FAQ_SEED_VALUES.length - existing.length;
+    for (let i = 0; i < remaining; i += 1) {
+      const item = ABOUT_FAQ_SEED_VALUES[i];
+      await ctx.db.insert('aboutFaq', { ...item, createdAt: now });
+    }
   },
 });

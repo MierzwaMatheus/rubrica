@@ -1,6 +1,5 @@
 import { useResume } from "@/hooks/useResume";
 import { resumeRepository } from "@/repositories/instances";
-import { Masthead } from "../components/Masthead";
 
 export default function Resume() {
   const { getItemsByType, isLoading } = useResume(resumeRepository);
@@ -15,7 +14,6 @@ export default function Resume() {
   const pad = 48;
   return (
     <div style={{ background: "var(--bg)", color: "var(--text)", fontFamily: "var(--font-sans)", minHeight: "100%" }}>
-      <Masthead page="Currículo" issue="A Crônica Profissional" />
       <div style={{ padding: `${pad}px ${pad}px ${pad - 12}px`, textAlign: "center" }}>
         <h1 style={{ fontFamily: "var(--font-sans)", fontSize: 96, fontWeight: 500, letterSpacing: "-0.02em", margin: 0, lineHeight: 0.95 }}>
           <em style={{ color: "var(--primary)" }}>Curriculum</em> Vitæ

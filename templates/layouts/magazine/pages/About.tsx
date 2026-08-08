@@ -1,6 +1,5 @@
 import { useAbout } from "@/hooks/useAbout";
 import { aboutRepository } from "@/repositories/instances";
-import { Masthead } from "../components/Masthead";
 
 export default function About() {
   const { dailyRoutine, faq, isLoading } = useAbout(aboutRepository);
@@ -8,7 +7,6 @@ export default function About() {
   const pad = 48;
   return (
     <div style={{ background: "var(--bg)", color: "var(--text)", fontFamily: "var(--font-sans)", minHeight: "100%" }}>
-      <Masthead page="Sobre Mim" issue="Personal Essays" />
       <div style={{ padding: `${pad}px ${pad}px ${pad - 12}px`, textAlign: "center" }}>
         <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--primary)", marginBottom: 16 }}>↘ Ensaio Pessoal</div>
         <h1 style={{ fontFamily: "var(--font-sans)", fontSize: 92, fontWeight: 500, letterSpacing: "-0.02em", margin: 0, lineHeight: 0.95 }}>O cara da <em style={{ color: "var(--primary)" }}>tecnologia</em>,<br />fora do <em style={{ color: "var(--accent)" }}>computador</em>.</h1>

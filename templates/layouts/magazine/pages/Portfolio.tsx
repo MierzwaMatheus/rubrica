@@ -1,6 +1,5 @@
 import { usePortfolio } from "@/hooks/usePortfolio";
 import { portfolioRepository } from "@/repositories/instances";
-import { Masthead } from "../components/Masthead";
 
 export default function Portfolio() {
   const { projects, isLoading } = usePortfolio(portfolioRepository);
@@ -9,7 +8,6 @@ export default function Portfolio() {
   const allTags = Array.from(new Set(projects.flatMap((p) => p.tags ?? [])));
   return (
     <div style={{ background: "var(--bg)", color: "var(--text)", fontFamily: "var(--font-sans)", minHeight: "100%" }}>
-      <Masthead page="Portfólio" issue="Index of Works" />
       <div style={{ padding: `${pad}px ${pad}px ${pad - 12}px`, textAlign: "center" }}>
         <h1 style={{ fontFamily: "var(--font-sans)", fontSize: 96, fontWeight: 500, letterSpacing: "-0.02em", margin: 0, lineHeight: 0.95 }}><em style={{ color: "var(--primary)" }}>Obras</em> Selecionadas</h1>
         <p style={{ fontFamily: "var(--font-sans)", fontStyle: "italic", fontSize: 19, opacity: 0.7, marginTop: 14 }}>{projects.length} projetos · Curadoria pessoal</p>

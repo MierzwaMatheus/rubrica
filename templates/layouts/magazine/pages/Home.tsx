@@ -1,6 +1,5 @@
 import { useHome } from "@/hooks/useHome";
 import { homeRepository } from "@/repositories/instances";
-import { Masthead } from "../components/Masthead";
 
 export default function Home() {
   const { contactRole, services, testimonials, isLoading } = useHome(homeRepository);
@@ -11,7 +10,6 @@ export default function Home() {
 
   return (
     <div style={{ background: "var(--bg)", color: "var(--text)", fontFamily: "var(--font-sans)", minHeight: "100%" }}>
-      <Masthead page="Início" issue="A Edição do Engenheiro" />
 
       {/* Hero */}
       <div style={{ padding: `${pad + 12}px ${pad}px ${pad}px`, display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: pad, alignItems: "end" }}>

@@ -816,13 +816,19 @@ describe("runSetup — Ciclo 9: siteTexts seed", () => {
     const fileCalls = (deps.execFileSync as ReturnType<typeof vi.fn>).mock.calls as [string, string[], object][];
     const seedAllCall = fileCalls.find((c) => c[1].includes("seed:seedAll"));
     expect(seedAllCall).toBeDefined();
+    const executable = seedAllCall![0];
     const args = seedAllCall![1];
     const runIdx = args.indexOf("run");
+    const convexIdx = args.indexOf("convex");
     const seedAllIdx = args.indexOf("seed:seedAll");
     const dataFlagIdx = args.indexOf("--data");
-    expect(runIdx).toBeGreaterThan(-1);
-    expect(seedAllIdx).toBe(runIdx + 1);
-    expect(dataFlagIdx).toBe(seedAllIdx + 1);
+    // executable deve ser "npx" (Stryker mutante seed.ts:254 - baixa severidade, mas trivial de testar)
+    expect(executable).toBe("npx");
+    // args deve ser ["convex", "run", "seed:seedAll", "--data", JSON.stringify({...})]
+    expect(convexIdx).toBe(0);
+    expect(runIdx).toBe(1);
+    expect(seedAllIdx).toBe(2);
+    expect(dataFlagIdx).toBe(3);
     expect(args[dataFlagIdx + 1]).toMatch(/^\{.*"enabledPlugins".*\}$/);
   });
 });

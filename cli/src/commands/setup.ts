@@ -245,24 +245,18 @@ export async function runSetup(deps: RunSetupDeps = {}): Promise<void> {
     }
   }
 
-  // Seed template padrão de contrato (se proposals habilitado)
-  if (plugins["proposals"]) {
-    try {
-      execFileSync(
-        "npx",
-        ["convex", "run", "contractTemplates:seedDefaultTemplate"],
-        { stdio: "pipe" }
-      );
-    } catch {
-      // não crítico — admin pode criar o template manualmente
-    }
-  }
-
-  // Seed textos de UI padrão
+  // Seed orquestrado: seedSiteConfig + (proposals → seedDefaultTemplate) + (i18n → siteTexts:seed)
+  const enabledPlugins = Object.entries(plugins)
+    .filter(([, on]) => on)
+    .map(([id]) => id);
   try {
-    execFileSync("npx", ["convex", "run", "siteTexts:seed"], { stdio: "pipe" });
+    execFileSync(
+      "npx",
+      ["convex", "run", "seed:seedAll", "--data", JSON.stringify({ enabledPlugins })],
+      { stdio: "pipe" }
+    );
   } catch {
-    // não crítico — textos podem ser populados manualmente
+    // não crítico — admin pode rodar seedAll manualmente depois
   }
 
   // Seed de identidade no Convex (siteConfig + contactInfo) a partir do rubrica.json

@@ -25,6 +25,21 @@ export const setupAdmin = internalAction({
   },
 });
 
+export const seedAll = internalMutation({
+  args: { enabledPlugins: v.array(v.string()) },
+  handler: async (ctx, { enabledPlugins }) => {
+    await ctx.runMutation(internal.seed.seedSiteConfig, {});
+
+    if (enabledPlugins.includes("proposals")) {
+      await ctx.runMutation(internal.contractTemplates.seedDefaultTemplate, {});
+    }
+
+    if (enabledPlugins.includes("i18n")) {
+      await ctx.runMutation(internal.siteTexts.seed, {});
+    }
+  },
+});
+
 export const seedSiteConfig = internalMutation({
   handler: async (ctx) => {
     const existing = await ctx.db.query("siteConfig").collect();

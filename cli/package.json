@@ -1,0 +1,51 @@
+{
+  "name": "create-rubrica",
+  "version": "0.3.8",
+  "description": "CLI para criar e configurar projetos Rubrica — portfólio profissional com React + Convex",
+  "type": "module",
+  "bin": {
+    "create-rubrica": "./dist/index.js",
+    "rubrica": "./dist/index.js"
+  },
+  "files": [
+    "dist/index.js",
+    "README.md"
+  ],
+  "keywords": [
+    "portfolio",
+    "cli",
+    "react",
+    "convex",
+    "create-app",
+    "rubrica"
+  ],
+  "author": "Matheus Mierzwa",
+  "license": "MIT",
+  "homepage": "https://github.com/matheusmierzwa/rubrica",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/matheusmierzwa/rubrica.git",
+    "directory": "cli"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "dev": "tsup --watch"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.9.1",
+    "jose": "^6.0.10"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@vitest/coverage-v8": "^3.2.4",
+    "memfs": "^4.17.0",
+    "msw": "^2.8.0",
+    "tsup": "^8.3.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  }
+}

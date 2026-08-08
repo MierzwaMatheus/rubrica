@@ -1,74 +1,14 @@
-import { defineConfig, type Plugin } from "vite";
+import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
-import reactInspector from "vite-plugin-react-inspector";
 import { vitePluginManusRuntime } from "vite-plugin-manus-runtime";
 import path from "path";
 
-const isDev = process.env.NODE_ENV !== "production";
-
-/**
- * Plugin para ajustar caminhos do react-inspector
- * Usado APENAS em desenvolvimento
- */
-function transformInspectorPaths(): Plugin {
-  const srcPath = path.resolve(import.meta.dirname, "src");
-
-  return {
-    name: "transform-inspector-paths",
-    enforce: "post",
-    transform(code, id) {
-      if (
-        !isDev ||
-        id.includes("node_modules") ||
-        !code ||
-        !code.includes("data-react-inspector")
-      ) {
-        return null;
-      }
-
-      const patterns = [
-        /data-react-inspector\s*=\s*["']([^"']+)["']/g,
-        /"data-react-inspector"\s*:\s*"([^"]+)"/g,
-        /'data-react-inspector'\s*:\s*'([^']+)'/g,
-      ];
-
-      let modified = false;
-      let transformedCode = code;
-
-      for (const regex of patterns) {
-        transformedCode = transformedCode.replace(regex, (match, fullPath) => {
-          const parts = fullPath.split(":");
-          const filePath = parts[0];
-          const location = parts.slice(1).join(":");
-
-          if (filePath && filePath.startsWith(srcPath)) {
-            const relativePath = path.relative(srcPath, filePath);
-            const newPath = `src/${relativePath}${location ? ":" + location : ""}`;
-            modified = true;
-            return match.replace(fullPath, newPath);
-          }
-
-          return match;
-        });
-      }
-
-      return modified ? { code: transformedCode, map: null } : null;
-    },
-  };
-}
-
 export default defineConfig({
-  // index.html agora está na raiz, então NÃO existe root customizado
-
   plugins: [
     react(),
     tailwindcss(),
     vitePluginManusRuntime(),
-
-    // Debug apenas em desenvolvimento
-    isDev && reactInspector(),
-    isDev && transformInspectorPaths(),
   ].filter(Boolean),
 
   resolve: {
@@ -82,7 +22,7 @@ export default defineConfig({
   build: {
     outDir: "dist",        // dist na raiz (padrão do Vite e da Vercel)
     emptyOutDir: true,
-    sourcemap: isDev,
+    sourcemap: process.env.NODE_ENV !== "production",
   },
 
   server: {

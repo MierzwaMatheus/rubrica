@@ -1,6 +1,6 @@
 {
   "name": "create-rubrica",
-  "version": "0.3.14",
+  "version": "0.3.15",
   "description": "CLI para criar e configurar projetos Rubrica — portfólio profissional com React + Convex",
   "type": "module",
   "bin": {

@@ -40,6 +40,24 @@ describe("convex/contactInfo · seed", () => {
     expect(doc.roleTranslations.ptBR.length).toBeGreaterThan(0);
   });
 
+  it("popula role com texto específico (ptBR)", async () => {
+    await handler(seed)(ctx, {});
+    const doc = ctx.db._all("contactInfo")[0];
+    expect(doc.role).toBe("Desenvolvedora Full-Stack");
+  });
+
+  it("popula birthDate em formato AAAA-MM-DD", async () => {
+    await handler(seed)(ctx, {});
+    const doc = ctx.db._all("contactInfo")[0];
+    expect(doc.birthDate).toBe("1995-03-15");
+  });
+
+  it("popula location com cidade/país ptBR", async () => {
+    await handler(seed)(ctx, {});
+    const doc = ctx.db._all("contactInfo")[0];
+    expect(doc.location).toBe("São Paulo, Brasil");
+  });
+
   it("popula phone em formato brasileiro", async () => {
     await handler(seed)(ctx, {});
     const doc = ctx.db._all("contactInfo")[0];

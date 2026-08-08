@@ -47,6 +47,10 @@ export const seedAll = internalMutation({
     if (enabledPlugins.includes("blog")) {
       await ctx.runMutation(internal.posts.seed, {});
     }
+
+    if (enabledPlugins.includes("resume")) {
+      await ctx.runMutation(internal.resumeItems.seed, {});
+    }
   },
 });
 

@@ -25,6 +25,13 @@ export const setupAdmin = internalAction({
   },
 });
 
+export const seedAll = internalMutation({
+  args: { enabledPlugins: v.array(v.string()) },
+  handler: async (ctx, _args) => {
+    await ctx.runMutation(internal.seed.seedSiteConfig, {});
+  },
+});
+
 export const seedSiteConfig = internalMutation({
   handler: async (ctx) => {
     const existing = await ctx.db.query("siteConfig").collect();

@@ -22,7 +22,8 @@ vi.mock("@convex-dev/auth/providers/Password", () => ({
   Password: () => ({}),
 }));
 
-import { seedSiteConfig, setupAdmin } from "../../convex/seed";
+import { seedSiteConfig, seedAll, setupAdmin } from "../../convex/seed";
+import { internal } from "../../convex/_generated/api";
 import { createMockCtx, type MockCtx } from "../_helpers/convexCtx";
 
 const handler = (fn: any) => fn._handler ?? fn;
@@ -126,5 +127,29 @@ describe("convex/seed · setupAdmin", () => {
       expect.anything(), // internal.users.assignRoleInternal
       expect.objectContaining({ userId: "user_1", role: "root" }),
     );
+  });
+});
+
+describe("convex/seed · seedAll (esqueleto)", () => {
+  let ctx: MockCtx;
+
+  beforeEach(() => {
+    ctx = createMockCtx();
+  });
+
+  it("invoca internal.seed.seedSiteConfig com lista de plugins vazia", async () => {
+    ctx.runMutation.mockResolvedValue(undefined);
+
+    await handler(seedAll)(ctx, { enabledPlugins: [] });
+
+    expect(ctx.runMutation).toHaveBeenCalledWith(internal.seed.seedSiteConfig, {});
+  });
+
+  it("invoca internal.seed.seedSiteConfig independentemente dos plugins fornecidos", async () => {
+    ctx.runMutation.mockResolvedValue(undefined);
+
+    await handler(seedAll)(ctx, { enabledPlugins: ["blog", "analytics"] });
+
+    expect(ctx.runMutation).toHaveBeenCalledWith(internal.seed.seedSiteConfig, {});
   });
 });

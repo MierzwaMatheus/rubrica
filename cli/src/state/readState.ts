@@ -29,7 +29,7 @@ export type RubricaState = {
 };
 
 const DEFAULT_STATE: RubricaState = {
-  version: "0.0.0",
+  version: "0.3.8",
   layout: "cyberpunk",
   theme: "editorial-cream",
   fontSans: "Inter",

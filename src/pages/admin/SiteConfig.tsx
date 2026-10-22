@@ -32,6 +32,17 @@ function isValidHex(hex: string): boolean {
   return /^#[0-9a-fA-F]{6}$/.test(hex);
 }
 
+/** Cor atual de uma variável do contrato (src/index.css) em hex, para o <input type="color">. */
+function activeThemeHex(cssVar: string, fallback: string): string {
+  const probe = document.createElement("span");
+  probe.style.color = `var(${cssVar})`;
+  document.body.appendChild(probe);
+  const rgb = getComputedStyle(probe).color.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+  probe.remove();
+  if (!rgb) return fallback;
+  return "#" + rgb.slice(1, 4).map((n) => Number(n).toString(16).padStart(2, "0")).join("");
+}
+
 type ContrastBadgeProps = { hex: string; bg: string; testId: string };
 
 function ContrastBadge({ hex, bg, testId }: ContrastBadgeProps) {
@@ -120,13 +131,14 @@ export default function AdminSiteConfig() {
   useEffect(() => {
     if (rawConfig !== undefined && !initialized) {
       const cfg = Object.fromEntries(rawConfig.map((d) => [d.key, d.value]));
-      const bg = (cfg.theme_background as string) || "#09090b";
+      // Sem cor salva, parte do tema ativo: salvar uma cor não pode trocar as outras três.
+      const bg = (cfg.theme_background as string) || activeThemeHex("--bg", "#09090b");
       setBgColor(bg); setBgHex(bg);
-      const fg = (cfg.theme_foreground as string) || "#fafafa";
+      const fg = (cfg.theme_foreground as string) || activeThemeHex("--text", "#fafafa");
       setFgColor(fg); setFgHex(fg);
-      const primary = (cfg.theme_primary as string) || "#6366f1";
+      const primary = (cfg.theme_primary as string) || activeThemeHex("--primary", "#6366f1");
       setPrimaryColor(primary); setPrimaryHex(primary);
-      const accent = (cfg.theme_accent as string) || "#f59e0b";
+      const accent = (cfg.theme_accent as string) || activeThemeHex("--accent", "#f59e0b");
       setAccentColor(accent); setAccentHex(accent);
       setFontSans((cfg.theme_font_sans as string) || "Inter");
       setFontMono((cfg.theme_font_mono as string) || "JetBrains Mono");

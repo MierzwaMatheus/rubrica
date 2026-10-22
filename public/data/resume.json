@@ -1,883 +1,447 @@
 [
   {
-    "_creationTime": 1777643671869.0007,
-    "_id": "mn76hjnkvs5ap92q19qfcwvzpd85xsyy",
+    "_creationTime": 1768435200049,
+    "_id": "sample00000000000000000000000000001e",
+    "createdAt": 1768435200050,
+    "type": "experience",
     "content": {
-      "text": "Liderança Técnica"
+      "company": "Norte Labs",
+      "role": "Product Designer Sênior",
+      "period": "2024 - atual",
+      "description": "<ul><li>Lidera o design system usado por quatro produtos.</li><li>Conduz pesquisa contínua com clientes.</li></ul>"
     },
     "contentTranslations": {
-      "enUS": "Technical Leadership",
-      "ptBR": "Liderança Técnica"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 0,
-    "type": "soft_skill"
-  },
-  {
-    "_creationTime": 1777643671869.0042,
-    "_id": "mn7cw8cs7h3dvc30c7r74p1was85whfm",
-    "content": {
-      "degree": "Técnologo",
-      "description": "    <ul>\n        <li>Formação com foco em governança de TI, segurança da informação e alinhamento estratégico entre tecnologia e objetivos de negócios.</li>\n        <li>Desenvolvimento de habilidades críticas para liderança técnica de equipes, gerenciamento de projetos de TI e integração de soluções inovadoras.</li>\n        <li>Resultados relevantes:\n            <ul>\n                <li>Editor-chefe do blog de tecnologia Retec, liderando projetos de comunicação técnica.</li>\n                <li>Nota máxima no TCC, com projeto para conectar ONGs de resgate animal a adotantes interessados.</li>\n            </ul>\n        </li>\n    </ul>",
-      "institution": "Fatec de Barueri",
-      "period": "2020-2023"
-    },
-    "contentTranslations": {
-      "enUS": {
-        "degree": "Technologist",
-        "description": "<ul>\n        <li>Training focused on IT governance, information security, and strategic alignment between technology and business objectives.</li>\n        <li>Development of critical skills for technical team leadership, IT project management, and integration of innovative solutions.</li>\n        <li>Relevant achievements:\n            <ul>\n                <li>Editor-in-chief of the Retec technology blog, leading technical communication projects.</li>\n                <li>Perfect score on the final project, with a project to connect animal rescue NGOs to interested adopters.</li>\n            </ul>\n        </li>\n    </ul>"
-      },
       "ptBR": {
-        "degree": "Técnologo",
-        "description": "<ul>\n        <li>Formação com foco em governança de TI, segurança da informação e alinhamento estratégico entre tecnologia e objetivos de negócios.</li>\n        <li>Desenvolvimento de habilidades críticas para liderança técnica de equipes, gerenciamento de projetos de TI e integração de soluções inovadoras.</li>\n        <li>Resultados relevantes:\n            <ul>\n                <li>Editor-chefe do blog de tecnologia Retec, liderando projetos de comunicação técnica.</li>\n                <li>Nota máxima no TCC, com projeto para conectar ONGs de resgate animal a adotantes interessados.</li>\n            </ul>\n        </li>\n    </ul>"
+        "role": "Product Designer Sênior",
+        "description": "<ul><li>Lidera o design system usado por quatro produtos.</li><li>Conduz pesquisa contínua com clientes.</li></ul>"
+      },
+      "enUS": {
+        "role": "Senior Product Designer",
+        "description": "<ul><li>Lidera o design system usado por quatro produtos.</li><li>Conduz pesquisa contínua com clientes.</li></ul>"
       }
     },
-    "createdAt": 1777643671869,
-    "orderIndex": 0,
-    "type": "education"
+    "orderIndex": 0
   },
   {
-    "_creationTime": 1777643671869.0054,
-    "_id": "mn70p4t1zzgx1cr3pbqxmkk9f985w4kp",
+    "_creationTime": 1768435200050,
+    "_id": "sample00000000000000000000000000001f",
+    "createdAt": 1768435200051,
+    "type": "experience",
     "content": {
-      "company": "InBot",
-      "description": "<p>\n  Fui promovido a <strong>Líder Técnico</strong> após demonstrar <strong>impacto estratégico</strong> na revitalização da principal plataforma da empresa. \n  Lidero a <strong>arquitetura</strong>, o <strong>desenvolvimento</strong> e a <strong>infraestrutura</strong> de todas as soluções front-end.\n</p>\n\n<br />\n\n<h3>Liderança em Arquitetura e Infraestrutura</h3>\n<ul>\n  <li>\n    Liderei a <strong>análise e decisão</strong> de migrar o sistema de autenticação legado para <strong>Keycloak</strong>, arquitetando um <strong>ecossistema de login centralizado</strong> e um <strong>painel de gerenciamento de usuários</strong> para toda a empresa.\n  </li>\n  <li>\n    Persuadi a <strong>liderança (COO/CTO)</strong> a adotar a <strong>Vercel</strong> em vez de soluções inadequadas, assumindo a <strong>responsabilidade total pela infraestrutura de front-end</strong>.\n  </li>\n  <li>\n    Implementei <strong>do zero</strong> o <strong>pipeline de CI/CD</strong> com GitHub Actions e a estratégia de <strong>Git Flow</strong>, instituindo <strong>ambientes de homologação</strong> inexistentes e eliminando configurações <strong>hardcoded</strong> por meio de <strong>variáveis de ambiente</strong>.\n  </li>\n</ul>\n\n<br />\n\n<h3>Liderança de Produto e Inovação</h3>\n<ul>\n  <li>\n    Liderei a <strong>reconstrução da principal interface administrativa</strong> da empresa com <strong>React</strong> e <strong>TypeScript</strong>, após obter <strong>autonomia total da diretoria</strong> para definir a <strong>arquitetura</strong> e o <strong>Design System</strong>.\n  </li>\n  <li>\n    Idealizei e desenvolvi uma <strong>plataforma de documentação inovadora</strong> que gera interface e navegação <strong>dinamicamente a partir de Markdown</strong>, permitindo criação de conteúdo <strong>sem necessidade de código</strong>.\n  </li>\n  <li>\n    Arquitetei e entreguei <strong>múltiplas plataformas complexas</strong>, incluindo um <strong>Broker de IA</strong>, um <strong>sistema de gestão para restaurantes (HRC)</strong> e uma <strong>ferramenta de criação de agentes de IA</strong> para não-técnicos (<strong>InCity</strong>).\n  </li>\n</ul>\n\n<br />\n\n<h3>Liderança de Equipe e Mentoria</h3>\n<ul>\n  <li>\n    Lidero tecnicamente a <strong>equipe de front-end</strong>, definindo <strong>arquiteturas</strong>, <strong>padrões de código</strong> e <strong>boas práticas</strong>, além de realizar <strong>code reviews</strong> e <strong>mentoria</strong> para elevar a <strong>qualidade técnica</strong> do time.\n  </li>\n</ul>\n",
-      "period": "Jan-2025 - atual",
-      "role": "Líder Técnico de Front-End"
+      "company": "Lumen",
+      "role": "Designer de Produto",
+      "period": "2021 - 2024",
+      "description": "<ul><li>Redesenhou o fluxo de agendamento.</li><li>Reduziu em 40% os chamados de suporte.</li></ul>"
     },
     "contentTranslations": {
-      "enUS": {
-        "description": "<p>\n  I was promoted to <strong>Technical Lead</strong> after demonstrating <strong>strategic impact</strong> in revitalizing the company's main platform.\n  I lead the <strong>architecture</strong>, <strong>development</strong>, and <strong>infrastructure</strong> of all front-end solutions.\n</p>\n\n<br />\n\n<h3>Architecture and Infrastructure Leadership</h3>\n<ul>\n  <li>\n    I led the <strong>analysis and decision</strong> to migrate the legacy authentication system to <strong>Keycloak</strong>, architecting a <strong>centralized login ecosystem</strong> and a <strong>user management panel</strong> for the entire company.\n  </li>\n  <li>\n    I persuaded <strong>leadership (COO/CTO)</strong> to adopt <strong>Vercel</strong> instead of unsuitable solutions, assuming <strong>full responsibility for the front-end infrastructure</strong>.\n  </li>\n  <li>\n    I implemented a <strong>CI/CD pipeline from scratch</strong> with GitHub Actions and the <strong>Git Flow</strong> strategy, establishing non-existent <strong>staging environments</strong> and eliminating <strong>hardcoded</strong> configurations through <strong>environment variables</strong>.\n  </li>\n</ul>\n\n<br />\n\n<h3>Product Leadership and Innovation</h3>\n<ul>\n  <li>\n    I led the <strong>rebuilding of the company's main administrative interface</strong> with <strong>React</strong> and <strong>TypeScript</strong>, after obtaining <strong>full autonomy from the board</strong> to define the <strong>architecture</strong> and <strong>Design System</strong>.\n  </li>\n  <li>\n    I conceived and developed an <strong>innovative documentation platform</strong> that generates interface and navigation <strong>dynamically from Markdown</strong>, allowing content creation <strong>without the need for code</strong>.\n  </li>\n  <li>\n    I architected and delivered <strong>multiple complex platforms</strong>, including an <strong>AI Broker</strong>, a <strong>management system for restaurants (HRC)</strong>, and an <strong>AI agent creation tool</strong> for non-technical users (<strong>InCity</strong>).\n  </li>\n</ul>\n\n<br />\n\n<h3>Team Leadership and Mentoring</h3>\n<ul>\n  <li>\n    I technically lead the <strong>front-end team</strong>, defining <strong>architectures</strong>, <strong>code standards</strong>, and <strong>best practices</strong>, in addition to conducting <strong>code reviews</strong> and <strong>mentoring</strong> to raise the team's <strong>technical quality</strong>.\n  </li>\n</ul>",
-        "role": "Front-End Tech Lead"
-      },
       "ptBR": {
-        "description": "<p>\n  Fui promovido a <strong>Líder Técnico</strong> após demonstrar <strong>impacto estratégico</strong> na revitalização da principal plataforma da empresa. \n  Lidero a <strong>arquitetura</strong>, o <strong>desenvolvimento</strong> e a <strong>infraestrutura</strong> de todas as soluções front-end.\n</p>\n\n<br />\n\n<h3>Liderança em Arquitetura e Infraestrutura</h3>\n<ul>\n  <li>\n    Liderei a <strong>análise e decisão</strong> de migrar o sistema de autenticação legado para <strong>Keycloak</strong>, arquitetando um <strong>ecossistema de login centralizado</strong> e um <strong>painel de gerenciamento de usuários</strong> para toda a empresa.\n  </li>\n  <li>\n    Persuadi a <strong>liderança (COO/CTO)</strong> a adotar a <strong>Vercel</strong> em vez de soluções inadequadas, assumindo a <strong>responsabilidade total pela infraestrutura de front-end</strong>.\n  </li>\n  <li>\n    Implementei <strong>do zero</strong> o <strong>pipeline de CI/CD</strong> com GitHub Actions e a estratégia de <strong>Git Flow</strong>, instituindo <strong>ambientes de homologação</strong> inexistentes e eliminando configurações <strong>hardcoded</strong> por meio de <strong>variáveis de ambiente</strong>.\n  </li>\n</ul>\n\n<br />\n\n<h3>Liderança de Produto e Inovação</h3>\n<ul>\n  <li>\n    Liderei a <strong>reconstrução da principal interface administrativa</strong> da empresa com <strong>React</strong> e <strong>TypeScript</strong>, após obter <strong>autonomia total da diretoria</strong> para definir a <strong>arquitetura</strong> e o <strong>Design System</strong>.\n  </li>\n  <li>\n    Idealizei e desenvolvi uma <strong>plataforma de documentação inovadora</strong> que gera interface e navegação <strong>dinamicamente a partir de Markdown</strong>, permitindo criação de conteúdo <strong>sem necessidade de código</strong>.\n  </li>\n  <li>\n    Arquitetei e entreguei <strong>múltiplas plataformas complexas</strong>, incluindo um <strong>Broker de IA</strong>, um <strong>sistema de gestão para restaurantes (HRC)</strong> e uma <strong>ferramenta de criação de agentes de IA</strong> para não-técnicos (<strong>InCity</strong>).\n  </li>\n</ul>\n\n<br />\n\n<h3>Liderança de Equipe e Mentoria</h3>\n<ul>\n  <li>\n    Lidero tecnicamente a <strong>equipe de front-end</strong>, definindo <strong>arquiteturas</strong>, <strong>padrões de código</strong> e <strong>boas práticas</strong>, além de realizar <strong>code reviews</strong> e <strong>mentoria</strong> para elevar a <strong>qualidade técnica</strong> do time.\n  </li>\n</ul>",
-        "role": "Líder Técnico de Front-End"
+        "role": "Designer de Produto",
+        "description": "<ul><li>Redesenhou o fluxo de agendamento.</li><li>Reduziu em 40% os chamados de suporte.</li></ul>"
+      },
+      "enUS": {
+        "role": "Product Designer",
+        "description": "<ul><li>Redesenhou o fluxo de agendamento.</li><li>Reduziu em 40% os chamados de suporte.</li></ul>"
       }
     },
-    "createdAt": 1777643671869,
-    "orderIndex": 0,
-    "type": "experience"
+    "orderIndex": 1
   },
   {
-    "_creationTime": 1777643671869.0137,
-    "_id": "mn7a4mre9q4sv9jrhm5ybj4ved85xa7f",
+    "_creationTime": 1768435200051,
+    "_id": "sample00000000000000000000000000001g",
+    "createdAt": 1768435200052,
+    "type": "experience",
     "content": {
-      "level": "95",
-      "name": "IA IDE's"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 0,
-    "type": "skill"
-  },
-  {
-    "_creationTime": 1777643671869.0012,
-    "_id": "mn72rs2rd7z6kj4jdhq5d68b5h85xczq",
-    "content": {
-      "degree": "Técnico",
-      "description": " <ul>\n        <li>Base sólida em princípios de gestão organizacional, planejamento estratégico, e gerenciamento de recursos e operações.</li>\n        <li>Fortalecimento de capacidades analíticas e de organização de projetos, aplicáveis à gestão de times e desenvolvimento de produtos digitais.</li>\n        <li>Destaques:\n            <ul>\n                <li>Aprofundamento em fundamentos de economia e mercado, com aplicação prática no suporte à tomada de decisões estratégicas.</li>\n            </ul>\n        </li>\n    </ul>",
-      "institution": "Etec de Barueri",
-      "period": "2015-2017"
+      "company": "Estúdio Orbe",
+      "role": "Desenvolvimento Front-end",
+      "period": "2019 - 2021",
+      "description": "<ul><li>Construiu interfaces em React para clientes de varejo.</li></ul>"
     },
     "contentTranslations": {
-      "enUS": {
-        "degree": "Technical",
-        "description": "<ul>\n        <li>Solid foundation in organizational management principles, strategic planning, and resource and operations management.</li>\n        <li>Strengthened analytical and project organization skills, applicable to team management and digital product development.</li>\n        <li>Highlights:\n            <ul>\n                <li>In-depth understanding of economics and market fundamentals, with practical application in supporting strategic decision-making.</li>\n            </ul>\n        </li>\n    </ul>"
-      },
       "ptBR": {
-        "degree": "Técnico",
-        "description": "<ul>\n        <li>Base sólida em princípios de gestão organizacional, planejamento estratégico, e gerenciamento de recursos e operações.</li>\n        <li>Fortalecimento de capacidades analíticas e de organização de projetos, aplicáveis à gestão de times e desenvolvimento de produtos digitais.</li>\n        <li>Destaques:\n            <ul>\n                <li>Aprofundamento em fundamentos de economia e mercado, com aplicação prática no suporte à tomada de decisões estratégicas.</li>\n            </ul>\n        </li>\n    </ul>"
+        "role": "Desenvolvimento Front-end",
+        "description": "<ul><li>Construiu interfaces em React para clientes de varejo.</li></ul>"
+      },
+      "enUS": {
+        "role": "Front-end Development",
+        "description": "<ul><li>Construiu interfaces em React para clientes de varejo.</li></ul>"
       }
     },
-    "createdAt": 1777643671869,
-    "orderIndex": 1,
-    "type": "education"
+    "orderIndex": 2
   },
   {
-    "_creationTime": 1777643671869.0085,
-    "_id": "mn77e3ae3hg6qkzy373sjh13v185xqzx",
+    "_creationTime": 1768435200052,
+    "_id": "sample00000000000000000000000000001h",
+    "createdAt": 1768435200053,
+    "type": "education",
     "content": {
-      "level": "95",
-      "name": "React.js"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 1,
-    "type": "skill"
-  },
-  {
-    "_creationTime": 1777643671869.0093,
-    "_id": "mn7eqr8h74f16pbaqhxwqfckqh85xe8n",
-    "content": {
-      "company": "InBot",
-      "description": "    <ul>\n        <li>Revitalização completa das interfaces da plataforma administrativa e de clientes utilizando JS Puro (por solicitação), resultando em uma <strong>melhoria de 30% na usabilidade percebida</strong> (feedback de usuários).</li>\n        <li><strong>Criação de um novo padrão visual</strong> e guia de estilo para a plataforma, garantindo consistência e escalabilidade do design.</li>\n        <li>Implementação de soluções de programação utilizando IA para automação de tarefas internas de desenvolvimento, <strong>otimizando o tempo de codificação em 40%</strong>.</li>\n    </ul>",
-      "period": "2024-Jan-2025",
-      "role": "Programador Front-End e UI Designer"
+      "degree": "Bacharelado em Design",
+      "institution": "Universidade Exemplo",
+      "period": "2015 - 2019",
+      "description": "<ul><li>Projeto final sobre interfaces acessíveis.</li></ul>"
     },
     "contentTranslations": {
-      "enUS": {
-        "description": "<ul>\n        <li>Complete revitalization of the administrative and client platform interfaces using Vanilla JS (as requested), resulting in a <strong>30% improvement in perceived usability</strong> (user feedback).</li>\n        <li><strong>Creation of a new visual standard</strong> and style guide for the platform, ensuring design consistency and scalability.</li>\n        <li>Implementation of AI-powered programming solutions to automate internal development tasks, <strong>optimizing coding time by 40%</strong>.</li>\n    </ul>",
-        "role": "Front-End Developer and UI Designer"
-      },
       "ptBR": {
-        "description": "<ul>\n        <li>Revitalização completa das interfaces da plataforma administrativa e de clientes utilizando JS Puro (por solicitação), resultando em uma <strong>melhoria de 30% na usabilidade percebida</strong> (feedback de usuários).</li>\n        <li><strong>Criação de um novo padrão visual</strong> e guia de estilo para a plataforma, garantindo consistência e escalabilidade do design.</li>\n        <li>Implementação de soluções de programação utilizando IA para automação de tarefas internas de desenvolvimento, <strong>otimizando o tempo de codificação em 40%</strong>.</li>\n    </ul>",
-        "role": "Programador Front-End e UI Designer"
+        "degree": "Bacharelado em Design",
+        "description": "<ul><li>Projeto final sobre interfaces acessíveis.</li></ul>"
+      },
+      "enUS": {
+        "degree": "Bachelor of Design",
+        "description": "<ul><li>Final project on accessible interfaces.</li></ul>"
       }
     },
-    "createdAt": 1777643671869,
-    "orderIndex": 1,
-    "type": "experience"
+    "orderIndex": 3
   },
   {
-    "_creationTime": 1777643671868.9988,
-    "_id": "mn7fd7brqx1qgxzv1ygq7kb99d85wf3r",
+    "_creationTime": 1768435200053,
+    "_id": "sample00000000000000000000000000001i",
+    "createdAt": 1768435200054,
+    "type": "education",
     "content": {
-      "company": "Roxus Studio",
-      "description": " <ul>\n        <li>Desenvolvimento de diversas landing pages e plataformas corporativas, contribuindo para um <strong>aumento médio de 20% na taxa de conversão</strong> dos clientes.</li>\n        <li>Gerenciamento de projetos de front-end ponta a ponta, desde o briefing até a entrega final, mantendo um <strong>índice de satisfação do cliente acima de 90%</strong>.</li>\n        <li>Implementação de bibliotecas de componentes reutilizáveis em TypeScript, <strong>acelerando o desenvolvimento de novos projetos em 25%</strong>.</li>\n    </ul>",
-      "period": "2022-2024",
-      "role": "Programador Front-End e UI/UX Designer"
+      "degree": "Especialização em UX",
+      "institution": "Escola Exemplo",
+      "period": "2020",
+      "description": "<ul><li>Projeto final sobre interfaces acessíveis.</li></ul>"
     },
     "contentTranslations": {
-      "enUS": {
-        "description": "<ul>\n        <li>Developed multiple landing pages and corporate platforms, contributing to an <strong>average increase of 20% in client conversion rates</strong>.</li>\n        <li>Managed end-to-end front-end projects, from briefing to final delivery, maintaining a <strong>customer satisfaction rate above 90%</strong>.</li>\n        <li>Implemented reusable component libraries in TypeScript, <strong>accelerating the development of new projects by 25%</strong>.</li>\n    </ul>",
-        "role": "Front-End Developer and UI/UX Designer"
-      },
       "ptBR": {
-        "description": "<ul>\n        <li>Desenvolvimento de diversas landing pages e plataformas corporativas, contribuindo para um <strong>aumento médio de 20% na taxa de conversão</strong> dos clientes.</li>\n        <li>Gerenciamento de projetos de front-end ponta a ponta, desde o briefing até a entrega final, mantendo um <strong>índice de satisfação do cliente acima de 90%</strong>.</li>\n        <li>Implementação de bibliotecas de componentes reutilizáveis em TypeScript, <strong>acelerando o desenvolvimento de novos projetos em 25%</strong>.</li>\n    </ul>",
-        "role": "Programador Front-End e UI/UX Designer"
+        "degree": "Especialização em UX",
+        "description": "<ul><li>Projeto final sobre interfaces acessíveis.</li></ul>"
+      },
+      "enUS": {
+        "degree": "UX Specialization",
+        "description": "<ul><li>Final project on accessible interfaces.</li></ul>"
       }
     },
-    "createdAt": 1777643671869,
-    "orderIndex": 2,
-    "type": "experience"
+    "orderIndex": 4
   },
   {
-    "_creationTime": 1777643671869.0105,
-    "_id": "mn7dfk8n1t6j52khmka72425jx85xssz",
+    "_creationTime": 1768435200054,
+    "_id": "sample00000000000000000000000000001j",
+    "createdAt": 1768435200055,
+    "type": "skill",
     "content": {
-      "text": "Mentoría e Desenvolvimento de Equipes"
+      "name": "Figma",
+      "level": "95"
+    },
+    "orderIndex": 5
+  },
+  {
+    "_creationTime": 1768435200055,
+    "_id": "sample00000000000000000000000000001k",
+    "createdAt": 1768435200056,
+    "type": "skill",
+    "content": {
+      "name": "Pesquisa com usuários",
+      "level": "90"
+    },
+    "orderIndex": 6
+  },
+  {
+    "_creationTime": 1768435200056,
+    "_id": "sample00000000000000000000000000001l",
+    "createdAt": 1768435200057,
+    "type": "skill",
+    "content": {
+      "name": "Design Systems",
+      "level": "92"
+    },
+    "orderIndex": 7
+  },
+  {
+    "_creationTime": 1768435200057,
+    "_id": "sample00000000000000000000000000001m",
+    "createdAt": 1768435200058,
+    "type": "skill",
+    "content": {
+      "name": "React",
+      "level": "85"
+    },
+    "orderIndex": 8
+  },
+  {
+    "_creationTime": 1768435200058,
+    "_id": "sample00000000000000000000000000001n",
+    "createdAt": 1768435200059,
+    "type": "skill",
+    "content": {
+      "name": "TypeScript",
+      "level": "80"
+    },
+    "orderIndex": 9
+  },
+  {
+    "_creationTime": 1768435200059,
+    "_id": "sample00000000000000000000000000001o",
+    "createdAt": 1768435200060,
+    "type": "skill",
+    "content": {
+      "name": "Prototipação",
+      "level": "88"
+    },
+    "orderIndex": 10
+  },
+  {
+    "_creationTime": 1768435200060,
+    "_id": "sample00000000000000000000000000001p",
+    "createdAt": 1768435200061,
+    "type": "skill",
+    "content": {
+      "name": "Acessibilidade",
+      "level": "82"
+    },
+    "orderIndex": 11
+  },
+  {
+    "_creationTime": 1768435200061,
+    "_id": "sample00000000000000000000000000001q",
+    "createdAt": 1768435200062,
+    "type": "skill",
+    "content": {
+      "name": "CSS",
+      "level": "86"
+    },
+    "orderIndex": 12
+  },
+  {
+    "_creationTime": 1768435200062,
+    "_id": "sample00000000000000000000000000001r",
+    "createdAt": 1768435200063,
+    "type": "skill",
+    "content": {
+      "name": "Motion",
+      "level": "70"
+    },
+    "orderIndex": 13
+  },
+  {
+    "_creationTime": 1768435200063,
+    "_id": "sample00000000000000000000000000001s",
+    "createdAt": 1768435200064,
+    "type": "skill",
+    "content": {
+      "name": "Testes de usabilidade",
+      "level": "84"
+    },
+    "orderIndex": 14
+  },
+  {
+    "_creationTime": 1768435200064,
+    "_id": "sample00000000000000000000000000001t",
+    "createdAt": 1768435200065,
+    "type": "skill",
+    "content": {
+      "name": "Escrita de UX",
+      "level": "75"
+    },
+    "orderIndex": 15
+  },
+  {
+    "_creationTime": 1768435200065,
+    "_id": "sample00000000000000000000000000001u",
+    "createdAt": 1768435200066,
+    "type": "skill",
+    "content": {
+      "name": "Next.js",
+      "level": "65"
+    },
+    "orderIndex": 16
+  },
+  {
+    "_creationTime": 1768435200066,
+    "_id": "sample00000000000000000000000000001v",
+    "createdAt": 1768435200067,
+    "type": "soft_skill",
+    "content": {
+      "text": "Comunicação"
     },
     "contentTranslations": {
-      "enUS": "Team Mentoring and Development",
-      "ptBR": "Mentoría e Desenvolvimento de Equipes"
+      "ptBR": "Comunicação",
+      "enUS": "Communication"
     },
-    "createdAt": 1777643671869,
-    "orderIndex": 2,
-    "type": "soft_skill"
+    "orderIndex": 17
   },
   {
-    "_creationTime": 1777643671869.0122,
-    "_id": "mn72srecnz6bj01f364dhfgbt985xwej",
+    "_creationTime": 1768435200067,
+    "_id": "sample00000000000000000000000000001w",
+    "createdAt": 1768435200068,
+    "type": "soft_skill",
     "content": {
-      "level": "95",
-      "name": "TypeScript"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 2,
-    "type": "skill"
-  },
-  {
-    "_creationTime": 1777643671869.002,
-    "_id": "mn706k2yqer2cg039jcffpx3ns85wads",
-    "content": {
-      "level": "92",
-      "name": "Tailwind CSS"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 3,
-    "type": "skill"
-  },
-  {
-    "_creationTime": 1777643671869.0083,
-    "_id": "mn70v02xyenjxj2y81kf9wqadh85wqy7",
-    "content": {
-      "text": "Pensamento Estratégico"
+      "text": "Facilitação"
     },
     "contentTranslations": {
-      "enUS": "Strategic Thinking",
-      "ptBR": "Pensamento Estratégico"
+      "ptBR": "Facilitação",
+      "enUS": "Facilitation"
     },
-    "createdAt": 1777643671869,
-    "orderIndex": 3,
-    "type": "soft_skill"
+    "orderIndex": 18
   },
   {
-    "_creationTime": 1777643671869.0078,
-    "_id": "mn76v2phr0g1fhy1qzzzkc6d7985wnqz",
+    "_creationTime": 1768435200068,
+    "_id": "sample00000000000000000000000000001x",
+    "createdAt": 1768435200069,
+    "type": "soft_skill",
     "content": {
-      "level": "90",
-      "name": "Vite"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 4,
-    "type": "skill"
-  },
-  {
-    "_creationTime": 1777643671869.0127,
-    "_id": "mn758dmnp4pvpf77r4s0bfbhg185w8k8",
-    "content": {
-      "text": "Comunicação Estratégica"
+      "text": "Pensamento sistêmico"
     },
     "contentTranslations": {
-      "enUS": "Strategic Communication",
-      "ptBR": "Comunicação Estratégica"
+      "ptBR": "Pensamento sistêmico",
+      "enUS": "Systems thinking"
     },
-    "createdAt": 1777643671869,
-    "orderIndex": 4,
-    "type": "soft_skill"
+    "orderIndex": 19
   },
   {
-    "_creationTime": 1777643671868.9995,
-    "_id": "mn74r9cvwvr5stj2crpevn7vz585wmkg",
+    "_creationTime": 1768435200069,
+    "_id": "sample00000000000000000000000000001y",
+    "createdAt": 1768435200070,
+    "type": "soft_skill",
     "content": {
-      "level": "85",
-      "name": "n8n"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 5,
-    "type": "skill"
-  },
-  {
-    "_creationTime": 1777643671869.0103,
-    "_id": "mn73j9j0tyjgva5rt7sdwmtszd85wwcw",
-    "content": {
-      "text": "Solução de Problemas Complexos"
+      "text": "Empatia"
     },
     "contentTranslations": {
-      "enUS": "Complex Problem Solving",
-      "ptBR": "Solução de Problemas Complexos"
+      "ptBR": "Empatia",
+      "enUS": "Empathy"
     },
-    "createdAt": 1777643671869,
-    "orderIndex": 5,
-    "type": "soft_skill"
+    "orderIndex": 20
   },
   {
-    "_creationTime": 1777643671869.003,
-    "_id": "mn72w3mttm87vcqfj5v2qgh3th85wse5",
+    "_creationTime": 1768435200070,
+    "_id": "sample00000000000000000000000000001z",
+    "createdAt": 1768435200071,
+    "type": "soft_skill",
     "content": {
-      "level": "88",
-      "name": "Bootstrap"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 6,
-    "type": "skill"
-  },
-  {
-    "_creationTime": 1777643671869.009,
-    "_id": "mn7czjr9t0h722f9tg8h1bh8s185wb3w",
-    "content": {
-      "text": "Trabalho em Equipe"
+      "text": "Organização"
     },
     "contentTranslations": {
-      "enUS": "Teamwork",
-      "ptBR": "Trabalho em Equipe"
+      "ptBR": "Organização",
+      "enUS": "Organization"
     },
-    "createdAt": 1777643671869,
-    "orderIndex": 6,
-    "type": "soft_skill"
+    "orderIndex": 21
   },
   {
-    "_creationTime": 1777643671868.9976,
-    "_id": "mn7ddydd450n4yeemtvvhqe00n85xktb",
+    "_creationTime": 1768435200071,
+    "_id": "sample000000000000000000000000000020",
+    "createdAt": 1768435200072,
+    "type": "soft_skill",
     "content": {
-      "text": "Criatividade e Inovação"
+      "text": "Curiosidade"
     },
     "contentTranslations": {
-      "enUS": "Creativity and Innovation",
-      "ptBR": "Criatividade e Inovação"
+      "ptBR": "Curiosidade",
+      "enUS": "Curiosity"
     },
-    "createdAt": 1777643671869,
-    "orderIndex": 7,
-    "type": "soft_skill"
+    "orderIndex": 22
   },
   {
-    "_creationTime": 1777643671869.0027,
-    "_id": "mn78v9kcngq2j156esjfvg2z6985w589",
+    "_creationTime": 1768435200072,
+    "_id": "sample000000000000000000000000000021",
+    "createdAt": 1768435200073,
+    "type": "language",
     "content": {
-      "level": "88",
-      "name": "Git"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 7,
-    "type": "skill"
-  },
-  {
-    "_creationTime": 1777643671868.9998,
-    "_id": "mn72qq94bems9b9gnsmd2vhr5n85xz3n",
-    "content": {
-      "level": "85",
-      "name": "DB SQL"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 8,
-    "type": "skill"
-  },
-  {
-    "_creationTime": 1777643671869.0005,
-    "_id": "mn79876nhyhvttgbd9hr5mjn1s85w3m6",
-    "content": {
-      "text": "Autogestão e Autonomia"
+      "name": "Português",
+      "level": "Nativo"
     },
     "contentTranslations": {
-      "enUS": "Self-Management and Autonomy",
-      "ptBR": "Autogestão e Autonomia"
+      "ptBR": "Português",
+      "enUS": "Portuguese"
     },
-    "createdAt": 1777643671869,
-    "orderIndex": 8,
-    "type": "soft_skill"
+    "orderIndex": 23
   },
   {
-    "_creationTime": 1777643671868.998,
-    "_id": "mn7bgzanf8wms32jj0pvhfhh0985wvj6",
+    "_creationTime": 1768435200073,
+    "_id": "sample000000000000000000000000000022",
+    "createdAt": 1768435200074,
+    "type": "language",
     "content": {
-      "text": "Rápido Aprendizado"
+      "name": "Inglês",
+      "level": "Avançado"
     },
     "contentTranslations": {
-      "enUS": "Quick Learning",
-      "ptBR": "Rápido Aprendizado"
+      "ptBR": "Inglês",
+      "enUS": "English"
     },
-    "createdAt": 1777643671869,
-    "orderIndex": 9,
-    "type": "soft_skill"
+    "orderIndex": 24
   },
   {
-    "_creationTime": 1777643671869.0034,
-    "_id": "mn7c61yx46m1xqctzhjfz296g585wddp",
+    "_creationTime": 1768435200074,
+    "_id": "sample000000000000000000000000000023",
+    "createdAt": 1768435200075,
+    "type": "course",
     "content": {
-      "level": "88",
-      "name": "Figma"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 9,
-    "type": "skill"
-  },
-  {
-    "_creationTime": 1777643671869,
-    "_id": "mn72yyfh9eckd90w7j2wcmjwxs85wdx7",
-    "content": {
-      "level": "45",
-      "name": "React Native"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 10,
-    "type": "skill"
-  },
-  {
-    "_creationTime": 1777643671869.004,
-    "_id": "mn74q35wek0ehdjv18tnq6s0bx85w5d6",
-    "content": {
-      "text": "Comprometimento com Excelência"
+      "text": "Design de Interação — Curso Exemplo"
     },
     "contentTranslations": {
-      "enUS": "Commitment to Excellence",
-      "ptBR": "Comprometimento com Excelência"
+      "ptBR": "Design de Interação — Curso Exemplo",
+      "enUS": "Design de Interação — Curso Exemplo"
     },
-    "createdAt": 1777643671869,
-    "orderIndex": 10,
-    "type": "soft_skill"
+    "orderIndex": 25
   },
   {
-    "_creationTime": 1777643671869.0051,
-    "_id": "mn705s7npq65sm6hk58zh4a3fh85wb7t",
+    "_creationTime": 1768435200075,
+    "_id": "sample000000000000000000000000000024",
+    "createdAt": 1768435200076,
+    "type": "course",
     "content": {
-      "text": "Visão Estratégica de Produto"
+      "text": "Acessibilidade na Web — Curso Exemplo"
     },
     "contentTranslations": {
-      "enUS": "Product Strategic Vision",
-      "ptBR": "Visão Estratégica de Produto"
+      "ptBR": "Acessibilidade na Web — Curso Exemplo",
+      "enUS": "Acessibilidade na Web — Curso Exemplo"
     },
-    "createdAt": 1777643671869,
-    "orderIndex": 11,
-    "type": "soft_skill"
+    "orderIndex": 26
   },
   {
-    "_creationTime": 1777643671869.0095,
-    "_id": "mn75k33yzsbrv0bx4n0hz4a06h85wvg0",
+    "_creationTime": 1768435200076,
+    "_id": "sample000000000000000000000000000025",
+    "createdAt": 1768435200077,
+    "type": "course",
     "content": {
-      "level": "45",
-      "name": "Expo"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 11,
-    "type": "skill"
-  },
-  {
-    "_creationTime": 1777643671869.0002,
-    "_id": "mn77xp6sgh0phdk8pzyr7t716185wjvs",
-    "content": {
-      "text": "Influência em Decisões C-Level"
+      "text": "Facilitação de Workshops — Curso Exemplo"
     },
     "contentTranslations": {
-      "enUS": "Influence on C-Level Decisions",
-      "ptBR": "Influência em Decisões C-Level"
+      "ptBR": "Facilitação de Workshops — Curso Exemplo",
+      "enUS": "Facilitação de Workshops — Curso Exemplo"
     },
-    "createdAt": 1777643671869,
-    "orderIndex": 12,
-    "type": "soft_skill"
+    "orderIndex": 27
   },
   {
-    "_creationTime": 1777643671869.0115,
-    "_id": "mn73b9meknynh2bgyh6avp0rgx85xpba",
+    "_creationTime": 1768435200077,
+    "_id": "sample000000000000000000000000000026",
+    "createdAt": 1768435200078,
+    "type": "course",
     "content": {
-      "level": "80",
-      "name": "DB NoSQL"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 12,
-    "type": "skill"
-  },
-  {
-    "_creationTime": 1777643671869.008,
-    "_id": "mn7ddes0nhph2vtr1y9jaf8psx85wb1d",
-    "content": {
-      "level": "95",
-      "name": "HTML5"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 13,
-    "type": "skill"
-  },
-  {
-    "_creationTime": 1777643671868.9985,
-    "_id": "mn781dq6eaeamt7ertmh4kw3bh85wyp0",
-    "content": {
-      "level": "90",
-      "name": "JavaScript (ES6+)"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 14,
-    "type": "skill"
-  },
-  {
-    "_creationTime": 1777643671869.0046,
-    "_id": "mn781z6rg1047xd9mjtjvr411n85x2qa",
-    "content": {
-      "level": "95",
-      "name": "CSS3"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 15,
-    "type": "skill"
-  },
-  {
-    "_creationTime": 1777643671869.0059,
-    "_id": "mn7a0d7s7peffgqpw2dt88mf7x85w1b8",
-    "content": {
-      "level": "80",
-      "name": "Next.JS"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 16,
-    "type": "skill"
-  },
-  {
-    "_creationTime": 1777643671869.006,
-    "_id": "mn752bzchptr4ybpb1rqceqsd185x6kk",
-    "content": {
-      "level": "90",
-      "name": "Vercel"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 17,
-    "type": "skill"
-  },
-  {
-    "_creationTime": 1777643671869.0112,
-    "_id": "mn73p0swfh7n2pjy1gqmvkaze985w5c2",
-    "content": {
-      "level": "85",
-      "name": "Keycloak"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 18,
-    "type": "skill"
-  },
-  {
-    "_creationTime": 1777643671868.9978,
-    "_id": "mn72kchzttezj80825ew323p0185wz64",
-    "content": {
-      "level": "85",
-      "name": "GitHub Actions"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 19,
-    "type": "skill"
-  },
-  {
-    "_creationTime": 1777643671869.0125,
-    "_id": "mn745xy81qhw8bp83e9t58a7z185wz5e",
-    "content": {
-      "level": "85",
-      "name": "Supabase"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 20,
-    "type": "skill"
-  },
-  {
-    "_creationTime": 1777643671869.001,
-    "_id": "mn72ghr0wnfd5mpyqmxbrxya0n85xkqg",
-    "content": {
-      "level": "85",
-      "name": "Firebase"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 21,
-    "type": "skill"
-  },
-  {
-    "_creationTime": 1777643671869.0015,
-    "_id": "mn7awgpe6c51pzxxpqjfpcq2fh85w5tq",
-    "content": {
-      "level": "Nativo",
-      "name": "Português"
+      "text": "Fundamentos de Dados — Curso Exemplo"
     },
     "contentTranslations": {
-      "enUS": "Portuguese.",
-      "ptBR": "Português"
+      "ptBR": "Fundamentos de Dados — Curso Exemplo",
+      "enUS": "Fundamentos de Dados — Curso Exemplo"
     },
-    "createdAt": 1777643671869,
-    "orderIndex": 21,
-    "type": "language"
+    "orderIndex": 28
   },
   {
-    "_creationTime": 1777643671869.005,
-    "_id": "mn73v5jtcptzjh7avzbxvppaj985xp55",
+    "_creationTime": 1768435200078,
+    "_id": "sample000000000000000000000000000027",
+    "createdAt": 1768435200079,
+    "type": "volunteer",
     "content": {
-      "level": "Avançado",
-      "name": "Inglês"
+      "text": "Mentoria voluntária para pessoas em transição de carreira"
     },
     "contentTranslations": {
-      "enUS": "English",
-      "ptBR": "Inglês"
+      "ptBR": "Mentoria voluntária para pessoas em transição de carreira",
+      "enUS": "Volunteer mentoring for people changing careers"
     },
-    "createdAt": 1777643671869,
-    "orderIndex": 22,
-    "type": "language"
+    "orderIndex": 29
   },
   {
-    "_creationTime": 1777643671869.011,
-    "_id": "mn77cxfxsxcwk38hbzhwnfe92985xf1r",
+    "_creationTime": 1768435200079,
+    "_id": "sample000000000000000000000000000028",
+    "createdAt": 1768435200080,
+    "type": "volunteer",
     "content": {
-      "level": "88",
-      "name": "Framer Motion"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 22,
-    "type": "skill"
-  },
-  {
-    "_creationTime": 1777643671869.013,
-    "_id": "mn7862xwz82533d0j3f14a7bd185wrgc",
-    "content": {
-      "level": "85",
-      "name": "React Query"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 23,
-    "type": "skill"
-  },
-  {
-    "_creationTime": 1777643671869.0037,
-    "_id": "mn7awg8sx70tkk7xa15qyx798s85x0gn",
-    "content": {
-      "level": "80",
-      "name": "Zod"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 24,
-    "type": "skill"
-  },
-  {
-    "_creationTime": 1777643671869.007,
-    "_id": "mn7agk8h254nebe9jvrjqv476h85x9sd",
-    "content": {
-      "level": "85",
-      "name": "React Hook Form"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 25,
-    "type": "skill"
-  },
-  {
-    "_creationTime": 1777643671868.9973,
-    "_id": "mn79wscbm6gr7cc9hdx3vr9wy185wzc1",
-    "content": {
-      "level": "85",
-      "name": "REST API"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 26,
-    "type": "skill"
-  },
-  {
-    "_creationTime": 1777643671869.0107,
-    "_id": "mn7fdfhpfcx1n4a2k200e8hnwx85x2qa",
-    "content": {
-      "level": "85",
-      "name": "CI/CD"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 27,
-    "type": "skill"
-  },
-  {
-    "_creationTime": 1777643671869.0044,
-    "_id": "mn771mwf4wpvx1j3xreyg1tby185x0wq",
-    "content": {
-      "level": "90",
-      "name": "Design Systems"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 28,
-    "type": "skill"
-  },
-  {
-    "_creationTime": 1777643671869.0088,
-    "_id": "mn73cm8f33fgvvzaak69z5d5kx85xb6a",
-    "content": {
-      "level": "88",
-      "name": "UI/UX Design"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 29,
-    "type": "skill"
-  },
-  {
-    "_creationTime": 1777643671869.0142,
-    "_id": "mn71fkgxth6937p95rxpsjz0y585wb49",
-    "content": {
-      "level": "80",
-      "name": "Gemini API"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 30,
-    "type": "skill"
-  },
-  {
-    "_creationTime": 1777643671869.0024,
-    "_id": "mn76h3xkvtnq8r0r2tkq1g8pr585x1cg",
-    "content": {
-      "level": "75",
-      "name": "LangChain"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 31,
-    "type": "skill"
-  },
-  {
-    "_creationTime": 1777643671869.0117,
-    "_id": "mn7e2265ehs61fr8t1s4cy0qr185wcv4",
-    "content": {
-      "text": "RYLA (Treinamento de Liderança) - Rotary Club"
+      "text": "Oficinas de design em escolas públicas"
     },
     "contentTranslations": {
-      "enUS": "RYLA (Leadership Training) - Rotary Club",
-      "ptBR": "RYLA (Treinamento de Liderança) - Rotary Club"
+      "ptBR": "Oficinas de design em escolas públicas",
+      "enUS": "Design workshops in public schools"
     },
-    "createdAt": 1777643671869,
-    "orderIndex": 32,
-    "type": "course"
-  },
-  {
-    "_creationTime": 1777643671869.0056,
-    "_id": "mn78qfpwcfqtr13m0qw6pg7wdx85wkva",
-    "content": {
-      "text": "NLW Together - Trilha ReactJS - Rocketseat"
-    },
-    "contentTranslations": {
-      "enUS": "NLW Together - ReactJS Path - Rocketseat",
-      "ptBR": "NLW Together - Trilha ReactJS - Rocketseat"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 33,
-    "type": "course"
-  },
-  {
-    "_creationTime": 1777643671869.0073,
-    "_id": "mn7647ykag3kc18133f84rf9fd85xj9y",
-    "content": {
-      "text": "NLW Heat- Trilha Origin- Rocketseat"
-    },
-    "contentTranslations": {
-      "enUS": "NLW Heat - Origin Path - Rocketseat",
-      "ptBR": "NLW Heat- Trilha Origin- Rocketseat"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 34,
-    "type": "course"
-  },
-  {
-    "_creationTime": 1777643671869.014,
-    "_id": "mn79wb81xkvaa6bjdsep2p8p6585wjyq",
-    "content": {
-      "text": "NLW Return- Trilha Origin- Rocketseat"
-    },
-    "contentTranslations": {
-      "enUS": "NLW Return - Origin Path - Rocketseat",
-      "ptBR": "NLW Return- Trilha Origin- Rocketseat"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 35,
-    "type": "course"
-  },
-  {
-    "_creationTime": 1777643671868.9983,
-    "_id": "mn7bvqdcs8mngj2ejrc36ctyhx85xj93",
-    "content": {
-      "text": "Programação para internet com JS - DIO"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 36,
-    "type": "course"
-  },
-  {
-    "_creationTime": 1777643671869.0076,
-    "_id": "mn7e2xvqvbpgm07sy7yq8hygcx85w6nh",
-    "content": {
-      "text": "ChatGPT - Do Zero ao Avançado - Udemy"
-    },
-    "contentTranslations": {
-      "enUS": "ChatGPT - From Zero to Advanced - Udemy",
-      "ptBR": "ChatGPT - Do Zero ao Avançado - Udemy"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 37,
-    "type": "course"
-  },
-  {
-    "_creationTime": 1777643671868.9993,
-    "_id": "mn7acxmxhjy3jdmmj268mw6jbx85xv3t",
-    "content": {
-      "text": "IT Essentials"
-    },
-    "contentTranslations": {
-      "enUS": "IT Essentials",
-      "ptBR": "IT Essentials"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 38,
-    "type": "course"
-  },
-  {
-    "_creationTime": 1777643671868.999,
-    "_id": "mn7cy8gdrmn6xm226yedc70xy185xr2z",
-    "content": {
-      "text": "Brandy - Design Academy"
-    },
-    "contentTranslations": {
-      "enUS": "Brandy - Design Academy",
-      "ptBR": "Brandy - Design Academy"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 39,
-    "type": "course"
-  },
-  {
-    "_creationTime": 1777643671869.012,
-    "_id": "mn794hw7kn7vnxdhhzwqmc77e985xp7c",
-    "content": {
-      "text": "Ilustrator PRO - Design Academy"
-    },
-    "contentTranslations": {
-      "enUS": "Illustrator PRO - Design Academy",
-      "ptBR": "Ilustrator PRO - Design Academy"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 40,
-    "type": "course"
-  },
-  {
-    "_creationTime": 1777643671869.0068,
-    "_id": "mn70k6dk4x71jpyzn5b24q39a985xxg6",
-    "content": {
-      "text": "Branding - Construção de Marca - GINEAD"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 41,
-    "type": "course"
-  },
-  {
-    "_creationTime": 1777643671869.0022,
-    "_id": "mn7352qjb13eg72bc1pzfwdvks85wjqb",
-    "content": {
-      "text": "Estratégia de Comercialização - GINEAD"
-    },
-    "contentTranslations": {
-      "enUS": "Go-to-Market Strategy - GINEAD",
-      "ptBR": "Estratégia de Comercialização - GINEAD"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 42,
-    "type": "course"
-  },
-  {
-    "_creationTime": 1777643671869.0132,
-    "_id": "mn71ta1rqvs02marsaxzfzeka585w5dg",
-    "content": {
-      "text": "Prevenção a Fraude - Bradesco"
-    },
-    "contentTranslations": {
-      "enUS": "Fraud Prevention - Bradesco",
-      "ptBR": "Prevenção a Fraude - Bradesco"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 43,
-    "type": "course"
-  },
-  {
-    "_creationTime": 1777643671869.01,
-    "_id": "mn73bpbqbs69v80bbnwstw7mr985xc9j",
-    "content": {
-      "text": "Atendimento ao cliente - Bradesco"
-    },
-    "contentTranslations": {
-      "enUS": "Customer Service - Bradesco",
-      "ptBR": "Atendimento ao cliente - Bradesco"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 44,
-    "type": "course"
-  },
-  {
-    "_creationTime": 1777643671869.0098,
-    "_id": "mn765wfhyyabe7ebjptyh0r8y185xf2t",
-    "content": {
-      "text": "Diretor de Imagem Pública Rotaract Club Barueri Gestão 2019-2020"
-    },
-    "contentTranslations": {
-      "enUS": "Public Image Director, Rotaract Club of Barueri, 2019-2020",
-      "ptBR": "Diretor de Imagem Pública Rotaract Club Barueri Gestão 2019-2020"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 45,
-    "type": "volunteer"
-  },
-  {
-    "_creationTime": 1777643671869.0032,
-    "_id": "mn73r22600txm7bwq5gzxafng185w29e",
-    "content": {
-      "text": "Participação em projeto de plantio de mais de 1000 árvores na baixada santista"
-    },
-    "contentTranslations": {
-      "enUS": "Participation in a project to plant over 1,000 trees in the Baixada Santista region",
-      "ptBR": "Participação em projeto de plantio de mais de 1000 árvores na baixada santista"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 46,
-    "type": "volunteer"
-  },
-  {
-    "_creationTime": 1777643671869.0134,
-    "_id": "mn7bzkerpnbw06z8bpenp15z2s85w0qb",
-    "content": {
-      "text": "Professor em projeto de informática básica para idosos"
-    },
-    "contentTranslations": {
-      "enUS": "Professor for a basic computer skills project for senior citizens",
-      "ptBR": "Professor em projeto de informática básica para idosos"
-    },
-    "createdAt": 1777643671869,
-    "orderIndex": 47,
-    "type": "volunteer"
+    "orderIndex": 30
   }
 ]

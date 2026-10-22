@@ -1,6 +1,6 @@
 # create-rubrica
 
-CLI para criar e configurar projetos [Rubrica](https://github.com/matheusmierzwa/rubrica) — sistema de portfólio profissional com React + Convex.
+CLI para criar e configurar projetos [Rubrica](https://github.com/MierzwaMatheus/rubrica) — sistema de portfólio profissional com React + Convex.
 
 ## Instalação
 

@@ -4,7 +4,7 @@
 
 ### 1.1 Product Name
 
-**Matheus Mierzwa Portfolio Platform**
+**Rubrica — Portfolio Platform**
 
 ### 1.2 Product Description
 

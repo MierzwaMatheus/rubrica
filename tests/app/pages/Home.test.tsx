@@ -8,6 +8,7 @@ vi.mock("@/hooks/useSiteConfig", () => ({
 
 vi.mock("@/repositories/instances", () => ({
   homeRepository: {},
+  sidebarRepository: {},
 }));
 
 vi.mock("@/hooks/useHome", () => ({

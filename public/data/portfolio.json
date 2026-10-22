@@ -1,2032 +1,266 @@
 [
   {
-    "_creationTime": 1777643674133.4153,
-    "_id": "kx79q630rvvshqddeyejhy09ws85wc5m",
-    "createdAt": 1777643674133,
-    "demoLink": "https://youtu.be/VuJWWDeVPqI",
-    "description": "A Toca do Gordzilla tinha um problema: o sistema de pedidos era eficiente, mas a marca se perdia. Em um mercado saturado, ser \"apenas mais um\" não é uma opção.",
-    "descriptionTranslations": {
-      "enUS": "Gordzilla's Lair had a problem: their ordering system was efficient, but their brand was getting lost. In a saturated market, being \"just another one\" is not an option.",
-      "ptBR": "A Toca do Gordzilla tinha um problema: o sistema de pedidos era eficiente, mas a marca se perdia. Em um mercado saturado, ser \"apenas mais um\" não é uma opção."
+    "_creationTime": 1768435200026,
+    "_id": "sample00000000000000000000000000000r",
+    "createdAt": 1768435200027,
+    "title": "Lumen Saúde",
+    "titleTranslations": {
+      "ptBR": "Lumen Saúde",
+      "enUS": "Lumen Health"
     },
-    "imageIds": [
-      "kn72c6h3a2zpb304v4k2kpc25x85xcmq",
-      "kn70av88brc84zc06bvgre8qvn85wtq0",
-      "kn7btqpbvjepnhjpzh9s3q54x985xj4z",
-      "kn70082akmnkvhc5tpv1xc2hrn85xgbp",
-      "kn76b6xrdhp3d13rjhkfdta3ph85wayc",
-      "kn7f9tm4d4j178e6paxc1nr33985w8hd",
-      "kn78akg7bpktkqhzd8a87p3xqd85wkkr",
-      "kn7fp5gje945w5p10eeyf9f99185w247",
-      "kn758jvac643nvjb1v3gwns5g585xqk0",
-      "kn7bh0s0rq3885pmjakxcyf9t585wbr1",
-      "kn74rm2wxe81r98wmbgwe4pn6185xjgy",
-      "kn7886rjvm32pmq19e9aj3c6cs85w2jn",
-      "kn77nnepw9gxjzx44tqh3fcbmh85xkt0",
-      "kn73zrekqtdz8cvp8g1y0yrw3585wp80",
-      "kn7fc0fp5n3r6hppfd5fgqg46h85xv69",
-      "kn70jt4p1x17adegawh5dgae1h85wn91",
-      "kn78y8w5tck9d00x3ng4gc3d5585x1y6",
-      "kn7fn7nncd7werbbvthdpehbz585xs0c",
-      "kn7apr4zwy6dw828fsygkfaqtd85xszc",
-      "kn75ch048vqf4rny336zbbpxgn85wsza",
-      "kn73wz35p00tj2fvhev683f6g185wbjf",
-      "kn71k2pe4h88f1qwtq75rcbpax85x16x",
-      "kn78e8qf0pqrd1n5ddksrxm7ad85wn1a",
-      "kn7989z9cyj1zbe1s231j666gd85x7f1"
+    "description": "Redesign do app de agendamento de uma rede de clínicas, com foco em acessibilidade.",
+    "descriptionTranslations": {
+      "ptBR": "Redesign do app de agendamento de uma rede de clínicas, com foco em acessibilidade.",
+      "enUS": "Redesign of a clinic network's scheduling app, focused on accessibility."
+    },
+    "longDescription": "Redesign do app de agendamento de uma rede de clínicas, com foco em acessibilidade.",
+    "longDescriptionTranslations": {
+      "ptBR": "Redesign do app de agendamento de uma rede de clínicas, com foco em acessibilidade.",
+      "enUS": "Redesign of a clinic network's scheduling app, focused on accessibility."
+    },
+    "tags": [
+      "Product Design",
+      "React",
+      "Acessibilidade"
     ],
     "images": [
       {
-        "_creationTime": 1777642596900.9932,
-        "_id": "kn72c6h3a2zpb304v4k2kpc25x85xcmq",
-        "createdAt": 1777642596901,
-        "displayName": "capa-toca.jpg",
-        "fileSize": 1434407,
-        "folderId": "kh7af99w1ercjymwyxvvravtj585w6gc",
-        "mimeType": "image/jpeg",
-        "storageId": "kg26pnr115g12vy481rw11602n85x235",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/561922ca-06c3-4e5e-8052-8cbe0de4507c"
-      },
-      {
-        "_creationTime": 1777642613849.6467,
-        "_id": "kn70av88brc84zc06bvgre8qvn85wtq0",
-        "createdAt": 1777642613849,
-        "displayName": "1.png",
-        "fileSize": 272957,
-        "folderId": "kh7af99w1ercjymwyxvvravtj585w6gc",
-        "mimeType": "image/png",
-        "storageId": "kg2c9qx0t285djr036bv9r30n985wr1t",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/f8fbfd10-080f-41e8-b905-bde6091debc4"
-      },
-      {
-        "_creationTime": 1777642596075.4993,
-        "_id": "kn7btqpbvjepnhjpzh9s3q54x985xj4z",
-        "createdAt": 1777642596075,
-        "displayName": "2.png",
-        "fileSize": 197051,
-        "folderId": "kh7af99w1ercjymwyxvvravtj585w6gc",
-        "mimeType": "image/png",
-        "storageId": "kg29cj6a4131frh5ezf2btcstx85wk82",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/066c79ab-7a7e-45e9-befd-205dab7da7e7"
-      },
-      {
-        "_creationTime": 1777642603184.426,
-        "_id": "kn70082akmnkvhc5tpv1xc2hrn85xgbp",
-        "createdAt": 1777642603184,
-        "displayName": "5.png",
-        "fileSize": 100569,
-        "folderId": "kh7af99w1ercjymwyxvvravtj585w6gc",
-        "mimeType": "image/png",
-        "storageId": "kg27f3caqrk3dgbfy9pas89xgd85x4er",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/3c3ee9f5-ef34-4db0-9ae7-8efe41dc0cea"
-      },
-      {
-        "_creationTime": 1777642604620.927,
-        "_id": "kn76b6xrdhp3d13rjhkfdta3ph85wayc",
-        "createdAt": 1777642604621,
-        "displayName": "3.png",
-        "fileSize": 193279,
-        "folderId": "kh7af99w1ercjymwyxvvravtj585w6gc",
-        "mimeType": "image/png",
-        "storageId": "kg2dybffd7p1kb12mtzxya1n1985wc4y",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/2c63408b-90f2-4f5a-9668-b492d247bc9a"
-      },
-      {
-        "_creationTime": 1777642616217.4321,
-        "_id": "kn7f9tm4d4j178e6paxc1nr33985w8hd",
-        "createdAt": 1777642616217,
-        "displayName": "4.png",
-        "fileSize": 89467,
-        "folderId": "kh7af99w1ercjymwyxvvravtj585w6gc",
-        "mimeType": "image/png",
-        "storageId": "kg2cdtxe79v5fc54ms5qy113e985w4fb",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/90221a56-0f7e-4616-994b-0ea5b9c2ae5e"
-      },
-      {
-        "_creationTime": 1777642632359.175,
-        "_id": "kn78akg7bpktkqhzd8a87p3xqd85wkkr",
-        "createdAt": 1777642632359,
-        "displayName": "7.png",
-        "fileSize": 250480,
-        "folderId": "kh7af99w1ercjymwyxvvravtj585w6gc",
-        "mimeType": "image/png",
-        "storageId": "kg26ccdvjtmzt9kjxa0gka4fxx85w3qr",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/ec842147-9918-4ba6-b355-f98b9dcafea9"
-      },
-      {
-        "_creationTime": 1777642620607.8882,
-        "_id": "kn7fp5gje945w5p10eeyf9f99185w247",
-        "createdAt": 1777642620607,
-        "displayName": "8.png",
-        "fileSize": 120794,
-        "folderId": "kh7af99w1ercjymwyxvvravtj585w6gc",
-        "mimeType": "image/png",
-        "storageId": "kg2fbf4pkzh2ngqkyyargf03g185xj0d",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/167bae57-e5f7-4100-9080-333f90504379"
-      },
-      {
-        "_creationTime": 1777642598064.7363,
-        "_id": "kn758jvac643nvjb1v3gwns5g585xqk0",
-        "createdAt": 1777642598064,
-        "displayName": "6.png",
-        "fileSize": 107392,
-        "folderId": "kh7af99w1ercjymwyxvvravtj585w6gc",
-        "mimeType": "image/png",
-        "storageId": "kg21c8xsqtyq9enz0pe0tahefd85wafk",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/471803b7-1643-45c5-853a-3dda46fb92a7"
-      },
-      {
-        "_creationTime": 1777642621929.0454,
-        "_id": "kn7bh0s0rq3885pmjakxcyf9t585wbr1",
-        "createdAt": 1777642621929,
-        "displayName": "9.png",
-        "fileSize": 163148,
-        "folderId": "kh7af99w1ercjymwyxvvravtj585w6gc",
-        "mimeType": "image/png",
-        "storageId": "kg21cx1b8ztx4t0axf8qn1mxhx85wtzh",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/bcc9fd5b-2369-48cd-a992-5135add1879a"
-      },
-      {
-        "_creationTime": 1777642631151.7043,
-        "_id": "kn74rm2wxe81r98wmbgwe4pn6185xjgy",
-        "createdAt": 1777642631151,
-        "displayName": "10.png",
-        "fileSize": 117385,
-        "folderId": "kh7af99w1ercjymwyxvvravtj585w6gc",
-        "mimeType": "image/png",
-        "storageId": "kg2fyzw3afadvad25r7vragn1985xr1w",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/db1cd4b4-e621-4226-a453-0bca4f0aa2ef"
-      },
-      {
-        "_creationTime": 1777642600867.7788,
-        "_id": "kn7886rjvm32pmq19e9aj3c6cs85w2jn",
-        "createdAt": 1777642600867,
-        "displayName": "11.png",
-        "fileSize": 191961,
-        "folderId": "kh7af99w1ercjymwyxvvravtj585w6gc",
-        "mimeType": "image/png",
-        "storageId": "kg20xxqsbn31d99xr579fny5rx85xvzw",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/fa910e20-ad6c-4b82-ba75-2571c429f7d4"
-      },
-      {
-        "_creationTime": 1777642601367.3398,
-        "_id": "kn77nnepw9gxjzx44tqh3fcbmh85xkt0",
-        "createdAt": 1777642601367,
-        "displayName": "12.png",
-        "fileSize": 190940,
-        "folderId": "kh7af99w1ercjymwyxvvravtj585w6gc",
-        "mimeType": "image/png",
-        "storageId": "kg29qm7r7rjf77g2mcac7fenj185wggt",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/f55a179e-9241-4d79-8cf0-b24f8673a318"
-      },
-      {
-        "_creationTime": 1777642608933.523,
-        "_id": "kn73zrekqtdz8cvp8g1y0yrw3585wp80",
-        "createdAt": 1777642608933,
-        "displayName": "13.png",
-        "fileSize": 226974,
-        "folderId": "kh7af99w1ercjymwyxvvravtj585w6gc",
-        "mimeType": "image/png",
-        "storageId": "kg283zk781kb979b9vmqgp3xv185xcga",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/dc1d1771-c7f5-46ca-827d-1010bff9cf4c"
-      },
-      {
-        "_creationTime": 1777642615620.468,
-        "_id": "kn7fc0fp5n3r6hppfd5fgqg46h85xv69",
-        "createdAt": 1777642615620,
-        "displayName": "14.png",
-        "fileSize": 174613,
-        "folderId": "kh7af99w1ercjymwyxvvravtj585w6gc",
-        "mimeType": "image/png",
-        "storageId": "kg2bs09jmvarzg3r3g01mhygqn85w2f2",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/275c2b3e-d21b-4967-8f6c-ab70078042af"
-      },
-      {
-        "_creationTime": 1777642597503.6516,
-        "_id": "kn70jt4p1x17adegawh5dgae1h85wn91",
-        "createdAt": 1777642597503,
-        "displayName": "15.png",
-        "fileSize": 190907,
-        "folderId": "kh7af99w1ercjymwyxvvravtj585w6gc",
-        "mimeType": "image/png",
-        "storageId": "kg23nggdwqjm494wq2nmxfbbyh85xw3z",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/1730af04-9676-4466-95bb-0edb156a5f86"
-      },
-      {
-        "_creationTime": 1777642603853.417,
-        "_id": "kn78y8w5tck9d00x3ng4gc3d5585x1y6",
-        "createdAt": 1777642603853,
-        "displayName": "16.png",
-        "fileSize": 211894,
-        "folderId": "kh7af99w1ercjymwyxvvravtj585w6gc",
-        "mimeType": "image/png",
-        "storageId": "kg28rkmr59me59kyg2j008rs9185w075",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/9a06e907-a1d6-4d09-b154-067a9307792c"
-      },
-      {
-        "_creationTime": 1777642609997.8694,
-        "_id": "kn7fn7nncd7werbbvthdpehbz585xs0c",
-        "createdAt": 1777642609997,
-        "displayName": "17.png",
-        "fileSize": 93508,
-        "folderId": "kh7af99w1ercjymwyxvvravtj585w6gc",
-        "mimeType": "image/png",
-        "storageId": "kg2bsq9tywzg7bfggh32q2pqch85xc9h",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/58f7bc8a-b3c1-4a61-b65b-6aede55eb0b7"
-      },
-      {
-        "_creationTime": 1777642592446.281,
-        "_id": "kn7apr4zwy6dw828fsygkfaqtd85xszc",
-        "createdAt": 1777642592446,
-        "displayName": "18.png",
-        "fileSize": 57580,
-        "folderId": "kh7af99w1ercjymwyxvvravtj585w6gc",
-        "mimeType": "image/png",
-        "storageId": "kg24a7ma3qhhwt1bhce6mvb54d85xwm8",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/d4c083ed-c09b-418c-82bb-d3a002211a53"
-      },
-      {
-        "_creationTime": 1777642600310.2332,
-        "_id": "kn75ch048vqf4rny336zbbpxgn85wsza",
-        "createdAt": 1777642600310,
-        "displayName": "19.png",
-        "fileSize": 62462,
-        "folderId": "kh7af99w1ercjymwyxvvravtj585w6gc",
-        "mimeType": "image/png",
-        "storageId": "kg29x9bcn2hw2ebpcjcdvtnvtn85w2zq",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/22038d46-d790-4ef5-b606-27bf74b2ba2b"
-      },
-      {
-        "_creationTime": 1777642594310.1726,
-        "_id": "kn73wz35p00tj2fvhev683f6g185wbjf",
-        "createdAt": 1777642594310,
-        "displayName": "20.png",
-        "fileSize": 86884,
-        "folderId": "kh7af99w1ercjymwyxvvravtj585w6gc",
-        "mimeType": "image/png",
-        "storageId": "kg2fbc06tjzjneyr0b87chh4fs85wyc6",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/f9830f04-8394-4fd5-98fa-8a9ffbc18bd7"
-      },
-      {
-        "_creationTime": 1777642629582.9438,
-        "_id": "kn71k2pe4h88f1qwtq75rcbpax85x16x",
-        "createdAt": 1777642629583,
-        "displayName": "21.png",
-        "fileSize": 85181,
-        "folderId": "kh7af99w1ercjymwyxvvravtj585w6gc",
-        "mimeType": "image/png",
-        "storageId": "kg284mbhwsc32136tt6bpv0a2985w42e",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/27fd67aa-b305-442c-965d-c5662f397d98"
-      },
-      {
-        "_creationTime": 1777642627199.5605,
-        "_id": "kn78e8qf0pqrd1n5ddksrxm7ad85wn1a",
-        "createdAt": 1777642627199,
-        "displayName": "22.png",
-        "fileSize": 87264,
-        "folderId": "kh7af99w1ercjymwyxvvravtj585w6gc",
-        "mimeType": "image/png",
-        "storageId": "kg2bkczt6tdkeyzrnz1q3m3wzh85wphz",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/0a0d2b63-92a7-4d2b-b98b-6c247ed20ad1"
-      },
-      {
-        "_creationTime": 1777642626084.5671,
-        "_id": "kn7989z9cyj1zbe1s231j666gd85x7f1",
-        "createdAt": 1777642626084,
-        "displayName": "23.png",
-        "fileSize": 99117,
-        "folderId": "kh7af99w1ercjymwyxvvravtj585w6gc",
-        "mimeType": "image/png",
-        "storageId": "kg2arbc5wkm7jmze3p1dg6a7dx85wy4j",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/e8d61e8d-9806-407a-9de8-52355de77e4a"
+        "_creationTime": 1768435200025,
+        "_id": "sample00000000000000000000000000000q",
+        "createdAt": 1768435200026,
+        "displayName": "projeto-1.svg",
+        "fileSize": 2048,
+        "folderId": "samples",
+        "mimeType": "image/svg+xml",
+        "storageId": "sample00000000000000000000000000000q",
+        "url": "/samples/projeto-1.svg"
       }
     ],
-    "longDescription": "A Toca do Gordzilla tinha um problema: o sistema de pedidos era eficiente, mas a marca se perdia. Em um mercado saturado, ser \"apenas mais um\" não é uma opção.\n\nA solução? Construir um sistema próprio, onde a interface é a extensão da identidade da marca.\n\nA gente transformou o cardápio em um campo de batalha temático:\n🍔 **Produtos viraram \"Monstros\"**\n🧬 **Adicionais viraram \"Mutações\"** que deixam o Monstro mais forte.\n\nO sistema administrativo fala a mesma língua: \"A fera está dormindo\" (sem pedidos), \"Enviar para a chapa\", etc.\n\nE o design? Usamos o **Neo-Brutalismo** para dar a cara da marca: cores chapadas, bordas retas, sombras marcadas. Uma estética que grita exclusividade e força.\n\nO resultado é um sistema que não só gerencia pedidos, mas **vende a experiência** da Toca do Gordzilla. É a prova de que a tecnologia deve servir à personalidade da marca, e não o contrário.\n\nLink completo para o projeto no blog: https://www.mmlo.com.br/blog/toca-do-gordzilla",
-    "longDescriptionTranslations": {
-      "enUS": "Gordzilla's Lair had a problem: their ordering system was efficient, but their brand got lost in the shuffle. In a saturated market, being \"just another\" option is not a viable strategy.\n\nThe solution? Build a proprietary system where the interface is an extension of the brand's identity.\n\nWe transformed the menu into a themed battlefield:\n🍔 **Products became \"Monsters.\"**\n🧬 **Add-ons became \"Mutations\"** that make the Monster stronger.\n\nThe administrative system speaks the same language: \"The beast is sleeping\" (no orders), \"Send to the grill,\" etc.\n\nAnd the design? We used **Neo-Brutalism** to create the brand's look and feel: solid colors, straight edges, pronounced shadows. An aesthetic that screams exclusivity and power.\n\nThe result is a system that not only manages orders but **sells the experience** of Gordzilla's Lair. It's proof that technology should serve the brand's personality, not the other way around.\n\nFull project link on the blog: https://www.mmlo.com.br/blog/toca-do-gordzilla",
-      "ptBR": "A Toca do Gordzilla tinha um problema: o sistema de pedidos era eficiente, mas a marca se perdia. Em um mercado saturado, ser \"apenas mais um\" não é uma opção.\n\nA solução? Construir um sistema próprio, onde a interface é a extensão da identidade da marca.\n\nA gente transformou o cardápio em um campo de batalha temático:\n🍔 **Produtos viraram \"Monstros\"**\n🧬 **Adicionais viraram \"Mutações\"** que deixam o Monstro mais forte.\n\nO sistema administrativo fala a mesma língua: \"A fera está dormindo\" (sem pedidos), \"Enviar para a chapa\", etc.\n\nE o design? Usamos o **Neo-Brutalismo** para dar a cara da marca: cores chapadas, bordas retas, sombras marcadas. Uma estética que grita exclusividade e força.\n\nO resultado é um sistema que não só gerencia pedidos, mas **vende a experiência** da Toca do Gordzilla. É a prova de que a tecnologia deve servir à personalidade da marca, e não o contrário.\n\nLink completo para o projeto no blog: https://www.mmlo.com.br/blog/toca-do-gordzilla"
-    },
+    "imageIds": [
+      "sample00000000000000000000000000000q"
+    ],
+    "demoLink": "",
     "orderIndex": 0,
-    "tags": [
-      "React",
-      "TypeScript",
-      "TailwindCSS",
-      "Vite",
-      "Firebase",
-      "Cursor",
-      "Vercel"
-    ],
-    "title": "Toca do Gordzills",
-    "titleTranslations": {
-      "enUS": "Gordzills' Lair",
-      "ptBR": "Toca do Gordzills"
-    },
-    "updatedAt": 1777683530348
+    "updatedAt": 1768435200000
   },
   {
-    "_creationTime": 1777643674133.415,
-    "_id": "kx7d9dp7r3n3q015mpy6ymm4kn85xe8v",
-    "createdAt": 1777643674133,
-    "demoLink": "https://youtu.be/t7gJuxH5ye0",
-    "description": "O momento mais importante de um projeto não é quando ele funciona, mas quando ele te força a questionar a própria fundação.",
-    "descriptionTranslations": {
-      "enUS": "The most important moment in a project isn't when it works, but when it forces you to question its very foundation.",
-      "ptBR": "O momento mais importante de um projeto não é quando ele funciona, mas quando ele te força a questionar a própria fundação."
+    "_creationTime": 1768435200028,
+    "_id": "sample00000000000000000000000000000t",
+    "createdAt": 1768435200029,
+    "title": "Norte Design System",
+    "titleTranslations": {
+      "ptBR": "Norte Design System",
+      "enUS": "Norte Design System"
     },
-    "githubLink": "https://github.com/MierzwaMatheus/forge-code",
-    "imageIds": [
-      "kn7et90yt7y6fc5f2d8z87aq5d85wmmw",
-      "kn76zgkazfesq9r0t1f4p92fwh85w7ga",
-      "kn7f8csmdqgdy25kw2avt5h9xx85wez4",
-      "kn75z3vvam4h8x7kktgredp83h85xezg",
-      "kn77k7n4vxq7vav1qxhtt46nss85xb5t",
-      "kn7ds4tjd7xn1ezztg9rdpw6rd85wpee",
-      "kn776emnc8n4nwa3sctmfs8hsn85xvvg"
+    "description": "Biblioteca de componentes e tokens usada por quatro produtos da empresa.",
+    "descriptionTranslations": {
+      "ptBR": "Biblioteca de componentes e tokens usada por quatro produtos da empresa.",
+      "enUS": "Component and token library used by four of the company's products."
+    },
+    "longDescription": "Biblioteca de componentes e tokens usada por quatro produtos da empresa.",
+    "longDescriptionTranslations": {
+      "ptBR": "Biblioteca de componentes e tokens usada por quatro produtos da empresa.",
+      "enUS": "Component and token library used by four of the company's products."
+    },
+    "tags": [
+      "Design System",
+      "TypeScript",
+      "Storybook"
     ],
     "images": [
       {
-        "_creationTime": 1777642606990.0105,
-        "_id": "kn7et90yt7y6fc5f2d8z87aq5d85wmmw",
-        "createdAt": 1777642606990,
-        "displayName": "projetos inbot.jpg",
-        "fileSize": 513573,
-        "folderId": "kh7frcy4rh0sckn2h7sw48bk0585xtdp",
-        "mimeType": "image/jpeg",
-        "storageId": "kg23hv8mg8q1p06rwwag7vkzp985wj6d",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/6093d2dd-1004-4629-8e16-23c2cdcdaf4f"
-      },
-      {
-        "_creationTime": 1777642631653.7905,
-        "_id": "kn76zgkazfesq9r0t1f4p92fwh85w7ga",
-        "createdAt": 1777642631653,
-        "displayName": "2.png",
-        "fileSize": 80868,
-        "folderId": "kh7frcy4rh0sckn2h7sw48bk0585xtdp",
-        "mimeType": "image/png",
-        "storageId": "kg28ffpj2b13tmd2mpjpaex0g185wwzn",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/c2e74f69-c7fd-46bc-828e-ca0862ab021d"
-      },
-      {
-        "_creationTime": 1777642621307.721,
-        "_id": "kn7f8csmdqgdy25kw2avt5h9xx85wez4",
-        "createdAt": 1777642621307,
-        "displayName": "3.png",
-        "fileSize": 141080,
-        "folderId": "kh7frcy4rh0sckn2h7sw48bk0585xtdp",
-        "mimeType": "image/png",
-        "storageId": "kg29gteaqretahrnge094dk89d85wwrw",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/61edbe14-d2ab-40c1-8f7d-260a932364d8"
-      },
-      {
-        "_creationTime": 1777642615020.3853,
-        "_id": "kn75z3vvam4h8x7kktgredp83h85xezg",
-        "createdAt": 1777642615020,
-        "displayName": "4.png",
-        "fileSize": 72214,
-        "folderId": "kh7frcy4rh0sckn2h7sw48bk0585xtdp",
-        "mimeType": "image/png",
-        "storageId": "kg201xj4hkjnkm2eme7r5be6sd85wrpc",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/8611afec-6bc5-47da-9e07-f7e66cfe7aea"
-      },
-      {
-        "_creationTime": 1777642607666.8198,
-        "_id": "kn77k7n4vxq7vav1qxhtt46nss85xb5t",
-        "createdAt": 1777642607666,
-        "displayName": "5.png",
-        "fileSize": 129630,
-        "folderId": "kh7frcy4rh0sckn2h7sw48bk0585xtdp",
-        "mimeType": "image/png",
-        "storageId": "kg2d8fsafkb7g7z77a0gtzxx6h85x4zr",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/a64091c9-e143-421a-8502-a22fb4c4263d"
-      },
-      {
-        "_creationTime": 1777642617223.6519,
-        "_id": "kn7ds4tjd7xn1ezztg9rdpw6rd85wpee",
-        "createdAt": 1777642617223,
-        "displayName": "6.png",
-        "fileSize": 108966,
-        "folderId": "kh7frcy4rh0sckn2h7sw48bk0585xtdp",
-        "mimeType": "image/png",
-        "storageId": "kg297kevn83r2d2pnjf2wb2ep185xsz0",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/08c0eb30-e8ff-4fe0-9f68-b5365203ec6f"
-      },
-      {
-        "_creationTime": 1777642626667.6833,
-        "_id": "kn776emnc8n4nwa3sctmfs8hsn85xvvg",
-        "createdAt": 1777642626667,
-        "displayName": "7.png",
-        "fileSize": 82956,
-        "folderId": "kh7frcy4rh0sckn2h7sw48bk0585xtdp",
-        "mimeType": "image/png",
-        "storageId": "kg29asv6x8z6fvpjeysbxsh6ms85x60y",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/9e564e98-35e3-4aef-9a00-8802cca42750"
+        "_creationTime": 1768435200027,
+        "_id": "sample00000000000000000000000000000s",
+        "createdAt": 1768435200028,
+        "displayName": "projeto-2.svg",
+        "fileSize": 2048,
+        "folderId": "samples",
+        "mimeType": "image/svg+xml",
+        "storageId": "sample00000000000000000000000000000s",
+        "url": "/samples/projeto-2.svg"
       }
     ],
-    "longDescriptionTranslations": {
-      "enUS": "The most important moment in a project isn't when it works, but when it forces you to question its very foundation.\n\nI started building #CodeForge with a simple idea: using AI to plan projects. But I soon realized the problem: AI \"agrees\" with everything, and technical rigor is lost.\n\nThat's when the project took a radical turn. Code Forge isn't a code generator. It's an **Evidence-Driven Development System**. It guides you from the very beginning of a project to the end with **complete traceability**.\n\nThe premise is uncomfortable: If verifiable evidence doesn't exist, no conclusion is valid.\n\nCode Forge enforces rigor through:\n1️⃣ **Numbered Steps:** Each step has an explicit objective and mandatory tests.\n2️⃣ **Evidence as a Contract:** The user runs the tests and attaches the evidence (logs, prints, outputs).\n3️⃣ **AI as Auditor:** The AI acts as a cold, impartial auditor. It doesn't give opinions; it **verifies** whether the attached evidence proves the completion criteria. The result is binary: ACCEPTED or REJECTED.\n\nThis eliminates subjectivity, the \"it works on my machine\" excuse, and workarounds. Code Forge formalizes the method we use to build high-quality software: **demand proof**.\n\nThe project is open source. If you value rigor, come and audit the process!",
-      "ptBR": "O momento mais importante de um projeto não é quando ele funciona, mas quando ele te força a questionar a própria fundação.\n\nEu comecei a construir o #CodeForge com uma ideia simples: usar IA para planejar projetos. Mas logo percebi o problema: a IA \"concorda\" com tudo, e o rigor técnico se perde.\n\nFoi aí que o projeto deu uma guinada radical. O Code Forge não é um gerador de código. É um **Sistema de Desenvolvimento Guiado por Evidência**. Ele é o guia de como sair de um projeto do zero e chegar ao final com **rastreabilidade total**.\n\nA premissa é desconfortável: Se não existe evidência verificável, não existe conclusão válida.\n\nO Code Forge impõe rigor através de:\n1️⃣ **Steps Numerados:** Cada etapa tem um objetivo explícito e testes obrigatórios.\n2️⃣ **Evidência como Contrato:** O usuário executa os testes e anexa as evidências (logs, prints, outputs).\n3️⃣ **IA como Auditor:** A IA atua como um auditor frio e imparcial. Ela não opina, ela **verifica** se a evidência anexada prova o critério de conclusão. O resultado é binário: ACCEPTED ou REJECTED.\n\nIsso elimina a subjetividade, o \"funciona na minha máquina\" e o \"jeitinho\". O Code Forge formaliza o método que usamos para construir software de alta qualidade: **exigir prova**.\n\nO projeto é open source. Se você valoriza o rigor, venha auditar o processo!"
-    },
+    "imageIds": [
+      "sample00000000000000000000000000000s"
+    ],
+    "demoLink": "",
     "orderIndex": 1,
-    "tags": [
-      "MongoDB",
-      "Express",
-      "React",
-      "Node.js",
-      "Docker",
-      "Cursor",
-      "TailwindCSS"
-    ],
-    "title": "Forge Code",
-    "titleTranslations": {
-      "enUS": "Forge Code",
-      "ptBR": "Forge Code"
-    }
+    "updatedAt": 1768435200000
   },
   {
-    "_creationTime": 1777643674133.4148,
-    "_id": "kx784getc21zm569trbx6tdw6h85w2xc",
-    "caseStudy": {
-      "metrics": [
-        {
-          "icon": "Lock",
-          "label": "Sistemas de autenticação",
-          "value": "2 fluxos distintos"
-        },
-        {
-          "icon": "Shield",
-          "label": "Isolamento de dados",
-          "value": "100% multi-tenant"
-        },
-        {
-          "icon": "Database",
-          "label": "Camada de dados dinâmica",
-          "value": "Collections flexíveis"
-        },
-        {
-          "icon": "Key",
-          "label": "Controle de acesso",
-          "value": "RLS implementado"
-        },
-        {
-          "icon": "Globe",
-          "label": "Aplicação cliente real",
-          "value": "1 integração completa"
-        }
-      ],
-      "problem": "Após dominar projetos básicos com a stack MERN, surgiu uma limitação clara: a ausência de desafios que exigissem decisões arquiteturais reais. Projetos simples não forçavam a lidar com problemas como escalabilidade, segurança avançada ou isolamento de dados. Isso criava uma lacuna entre o conhecimento adquirido em tutoriais e a complexidade de sistemas reais.\n\nAlém disso, faltava experiência prática com conceitos críticos de backend moderno, como multi-tenancy, autenticação em múltiplos níveis e controle granular de acesso a dados. Sem um projeto que centralizasse esses desafios, o aprendizado permanecia fragmentado e superficial.",
-      "results": "O projeto resultou em um sistema BaaS funcional, com autenticação robusta, isolamento completo entre tenants e controle granular de acesso a dados. Mais importante, proporcionou domínio prático sobre conceitos avançados de backend, incluindo segurança de APIs, arquitetura multi-tenant e design de sistemas escaláveis.\n\nA validação com uma aplicação cliente real demonstrou que o OliBase vai além de um projeto acadêmico, funcionando como uma base sólida para sistemas reais. O aprendizado obtido elevou significativamente a capacidade de projetar e implementar soluções complexas de forma estruturada e segura.",
-      "solution": "A solução foi desenvolver o OliBase, um Backend as a Service inspirado em Firebase e Supabase, com foco em aprendizado profundo. A arquitetura foi construída sobre a stack MERN, com Node.js e Express gerenciando a API, MongoDB como banco de dados e React para o dashboard administrativo. Redis foi utilizado para otimizações e gerenciamento de sessões.\n\nO sistema foi projetado desde o início como multi-tenant real, exigindo a separação completa de dados entre projetos. Foram implementados dois fluxos de autenticação distintos: um para administradores do dashboard e outro para usuários finais das aplicações clientes. A segurança foi reforçada com API Keys por projeto e JWTs com validação rigorosa de pertencimento.\\n\\nUm dos principais diferenciais foi a criação de um Data Layer dinâmico, permitindo collections e documentos flexíveis. Sobre isso, foi implementado um sistema de Row Level Security (RLS), garantindo que cada usuário acessasse apenas seus próprios dados. Essa lógica foi construída com middlewares complexos e regras customizáveis.\n\nPara validar o sistema, foi desenvolvida uma aplicação cliente real chamada Eventum, que consome a API do OliBase, realiza autenticação, operações CRUD e gera logs visíveis no dashboard. Isso comprovou a aplicabilidade prática da arquitetura."
+    "_creationTime": 1768435200030,
+    "_id": "sample00000000000000000000000000000v",
+    "createdAt": 1768435200031,
+    "title": "Atelier 9",
+    "titleTranslations": {
+      "ptBR": "Atelier 9",
+      "enUS": "Atelier 9"
     },
-    "caseStudyTranslations": {
-      "enUS": {
-        "problem": "After mastering basic projects with the MERN stack, a clear limitation emerged: the absence of challenges that demanded real architectural decisions. Simple projects didn't force me to deal with problems like scalability, advanced security, or data isolation. This created a gap between the knowledge acquired in tutorials and the complexity of real-world systems.\n\nFurthermore, I lacked practical experience with critical modern backend concepts such as multi-tenancy, multi-level authentication, and granular data access control. Without a project that centralized these challenges, learning remained fragmented and superficial.",
-        "results": "The project resulted in a functional BaaS system featuring robust authentication, complete tenant isolation, and granular data access control. More importantly, it provided practical mastery of advanced backend concepts, including API security, multi-tenant architecture, and scalable system design.\n\nValidation with a real client application demonstrated that OliBase goes beyond an academic project, serving as a solid foundation for real-world systems. The knowledge gained significantly enhanced the ability to design and implement complex solutions in a structured and secure manner.",
-        "solution": "The solution was to develop OliBase, a Backend as a Service inspired by Firebase and Supabase, with a focus on deep learning. The architecture was built on the MERN stack, with Node.js and Express managing the API, MongoDB as the database, and React for the administrative dashboard. Redis was used for optimizations and session management.\n\nThe system was designed from the outset as truly multi-tenant, requiring complete data separation between projects. Two distinct authentication flows were implemented: one for dashboard administrators and another for end-users of client applications. Security was reinforced with API Keys per project and JWTs with rigorous ownership validation.\n\nOne of the main differentiators was the creation of a dynamic Data Layer, allowing flexible collections and documents. On top of this, a Row Level Security (RLS) system was implemented, ensuring that each user only accessed their own data. This logic was built with complex middleware and customizable rules.\n\nTo validate the system, a real client application called Eventum was developed, which consumes the OliBase API, performs authentication, CRUD operations, and generates logs visible in the dashboard. This proved the practical applicability of the architecture."
-      },
-      "ptBR": {
-        "problem": "Após dominar projetos básicos com a stack MERN, surgiu uma limitação clara: a ausência de desafios que exigissem decisões arquiteturais reais. Projetos simples não forçavam a lidar com problemas como escalabilidade, segurança avançada ou isolamento de dados. Isso criava uma lacuna entre o conhecimento adquirido em tutoriais e a complexidade de sistemas reais.\n\nAlém disso, faltava experiência prática com conceitos críticos de backend moderno, como multi-tenancy, autenticação em múltiplos níveis e controle granular de acesso a dados. Sem um projeto que centralizasse esses desafios, o aprendizado permanecia fragmentado e superficial.",
-        "results": "O projeto resultou em um sistema BaaS funcional, com autenticação robusta, isolamento completo entre tenants e controle granular de acesso a dados. Mais importante, proporcionou domínio prático sobre conceitos avançados de backend, incluindo segurança de APIs, arquitetura multi-tenant e design de sistemas escaláveis.\n\nA validação com uma aplicação cliente real demonstrou que o OliBase vai além de um projeto acadêmico, funcionando como uma base sólida para sistemas reais. O aprendizado obtido elevou significativamente a capacidade de projetar e implementar soluções complexas de forma estruturada e segura.",
-        "solution": "A solução foi desenvolver o OliBase, um Backend as a Service inspirado em Firebase e Supabase, com foco em aprendizado profundo. A arquitetura foi construída sobre a stack MERN, com Node.js e Express gerenciando a API, MongoDB como banco de dados e React para o dashboard administrativo. Redis foi utilizado para otimizações e gerenciamento de sessões.\n\nO sistema foi projetado desde o início como multi-tenant real, exigindo a separação completa de dados entre projetos. Foram implementados dois fluxos de autenticação distintos: um para administradores do dashboard e outro para usuários finais das aplicações clientes. A segurança foi reforçada com API Keys por projeto e JWTs com validação rigorosa de pertencimento.\\n\\nUm dos principais diferenciais foi a criação de um Data Layer dinâmico, permitindo collections e documentos flexíveis. Sobre isso, foi implementado um sistema de Row Level Security (RLS), garantindo que cada usuário acessasse apenas seus próprios dados. Essa lógica foi construída com middlewares complexos e regras customizáveis.\n\nPara validar o sistema, foi desenvolvida uma aplicação cliente real chamada Eventum, que consome a API do OliBase, realiza autenticação, operações CRUD e gera logs visíveis no dashboard. Isso comprovou a aplicabilidade prática da arquitetura."
-      }
-    },
-    "createdAt": 1777643674133,
-    "demoLink": "https://youtu.be/Ryy0Fvo4A68",
-    "description": "O OliBase é a prova de que um projeto de estudos pode se transformar em um desafio arquitetural de alto nível. Inspirado em BaaS como Firebase e Supabase, este projeto MERN (MongoDB, Express, React, Node) foi construído do zero para dominar a criação de sistemas complexos, implementando autenticação multi-tenant, isolamento de dados rigoroso e Row Level Security (RLS), culminando em um BaaS funcional com dashboard de gerenciamento e um aplicativo cliente real (Eventum) para validar cada camada de segurança e arquitetura.",
+    "description": "Loja online para uma marca de cerâmica autoral, do branding ao checkout.",
     "descriptionTranslations": {
-      "enUS": "OliBase is proof that a study project can evolve into a high-level architectural undertaking. Inspired by BaaS solutions like Firebase and Supabase, this MERN (MongoDB, Express, React, Node) project was built from the ground up to master the creation of complex systems. It implements multi-tenant authentication, strict data isolation, and Row Level Security (RLS), culminating in a functional BaaS with a management dashboard and a real-world client application (Eventum) to validate each layer of security and architecture.",
-      "ptBR": "O OliBase é a prova de que um projeto de estudos pode se transformar em um desafio arquitetural de alto nível. Inspirado em BaaS como Firebase e Supabase, este projeto MERN (MongoDB, Express, React, Node) foi construído do zero para dominar a criação de sistemas complexos, implementando autenticação multi-tenant, isolamento de dados rigoroso e Row Level Security (RLS), culminando em um BaaS funcional com dashboard de gerenciamento e um aplicativo cliente real (Eventum) para validar cada camada de segurança e arquitetura."
+      "ptBR": "Loja online para uma marca de cerâmica autoral, do branding ao checkout.",
+      "enUS": "Online store for an independent ceramics brand, from branding to checkout."
     },
-    "githubLink": "https://github.com/MierzwaMatheus/OliBase",
-    "imageIds": [
-      "kn7c6qctwjesww6x09gdwgnxe985ww4w",
-      "kn7d8vpb4e2tkk84ye7bqp87e185wn7k",
-      "kn77114s1dfgw1pktd1pz32yx585xkwa",
-      "kn751vnabk9602bzgffyn3kfhx85wvy5",
-      "kn75yz6vnk5q2jz90q14k72y3n85x4n5",
-      "kn721vzj3dhnfwt0510czm022985xf8s",
-      "kn7eher7j27ck38c20gfnz3bts85waqc",
-      "kn7e2hqwhm1dnkf9f0q5rw8td585xmfw",
-      "kn79k459vvg5mwe6z47rq0svds85wydg"
+    "longDescription": "Loja online para uma marca de cerâmica autoral, do branding ao checkout.",
+    "longDescriptionTranslations": {
+      "ptBR": "Loja online para uma marca de cerâmica autoral, do branding ao checkout.",
+      "enUS": "Online store for an independent ceramics brand, from branding to checkout."
+    },
+    "tags": [
+      "E-commerce",
+      "Branding",
+      "Next.js"
     ],
     "images": [
       {
-        "_creationTime": 1777642599727.5457,
-        "_id": "kn7c6qctwjesww6x09gdwgnxe985ww4w",
-        "createdAt": 1777642599727,
-        "displayName": "capa-olibase.jpg",
-        "fileSize": 882071,
-        "folderId": "kh70dzcgt33590srkdxcnp1k2985xk75",
-        "mimeType": "image/jpeg",
-        "storageId": "kg20zrj3efs0bgc2hxen820dah85xp77",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/20a32239-3e00-43bc-9ce9-d2ace9047c0e"
-      },
-      {
-        "_creationTime": 1777642629988.5596,
-        "_id": "kn7d8vpb4e2tkk84ye7bqp87e185wn7k",
-        "createdAt": 1777642629988,
-        "displayName": "2025-12-20_02-26.png",
-        "fileSize": 45554,
-        "folderId": "kh70dzcgt33590srkdxcnp1k2985xk75",
-        "mimeType": "image/png",
-        "storageId": "kg25nsabv16h0mxcc5j2gqa11985x8cm",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/1a138da7-74ca-4958-ab3d-f101365af12a"
-      },
-      {
-        "_creationTime": 1777642594845.6,
-        "_id": "kn77114s1dfgw1pktd1pz32yx585xkwa",
-        "createdAt": 1777642594845,
-        "displayName": "2025-12-20_02-26_1.png",
-        "fileSize": 84451,
-        "folderId": "kh70dzcgt33590srkdxcnp1k2985xk75",
-        "mimeType": "image/png",
-        "storageId": "kg22tkm4p27nrcgch8a4n5978h85w3nn",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/c2d55ccf-8ec0-4e28-9724-030cfcc5abeb"
-      },
-      {
-        "_creationTime": 1777642630475.4724,
-        "_id": "kn751vnabk9602bzgffyn3kfhx85wvy5",
-        "createdAt": 1777642630475,
-        "displayName": "2025-12-20_02-27.png",
-        "fileSize": 98301,
-        "folderId": "kh70dzcgt33590srkdxcnp1k2985xk75",
-        "mimeType": "image/png",
-        "storageId": "kg2f71c9zhrfd1242yqrpr1rzd85wqah",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/d5fc92e1-a4ae-4463-bc71-b95781987118"
-      },
-      {
-        "_creationTime": 1777642606362.2422,
-        "_id": "kn75yz6vnk5q2jz90q14k72y3n85x4n5",
-        "createdAt": 1777642606362,
-        "displayName": "2025-12-20_02-27_1.png",
-        "fileSize": 25328,
-        "folderId": "kh70dzcgt33590srkdxcnp1k2985xk75",
-        "mimeType": "image/png",
-        "storageId": "kg25grg4fqa2788qj44d33zn1185wbqg",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/eb7df6e1-439b-403f-b1bf-a9ba09ca6742"
-      },
-      {
-        "_creationTime": 1777642627690.2961,
-        "_id": "kn721vzj3dhnfwt0510czm022985xf8s",
-        "createdAt": 1777642627690,
-        "displayName": "2025-12-20_02-28.png",
-        "fileSize": 83776,
-        "folderId": "kh70dzcgt33590srkdxcnp1k2985xk75",
-        "mimeType": "image/png",
-        "storageId": "kg26j8ag5n9a083fhgpggg450d85wqv9",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/4a5c1085-b48e-4062-aad5-1180d3e7af86"
-      },
-      {
-        "_creationTime": 1777642628921.9934,
-        "_id": "kn7eher7j27ck38c20gfnz3bts85waqc",
-        "createdAt": 1777642628922,
-        "displayName": "2025-12-20_02-28_1.png",
-        "fileSize": 107995,
-        "folderId": "kh70dzcgt33590srkdxcnp1k2985xk75",
-        "mimeType": "image/png",
-        "storageId": "kg2c9trbtxagw0kna6fayg356185wb73",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/4ba6e393-d406-47bf-83ac-b8e4a452b24b"
-      },
-      {
-        "_creationTime": 1777642619895.4104,
-        "_id": "kn7e2hqwhm1dnkf9f0q5rw8td585xmfw",
-        "createdAt": 1777642619895,
-        "displayName": "2025-12-20_02-273.png",
-        "fileSize": 181535,
-        "folderId": "kh70dzcgt33590srkdxcnp1k2985xk75",
-        "mimeType": "image/png",
-        "storageId": "kg27gfasfmdcymyk1q0bwh6y4185xdcj",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/0c510896-eebe-4b70-b6e5-348c4a5418e1"
-      },
-      {
-        "_creationTime": 1777642623056.4062,
-        "_id": "kn79k459vvg5mwe6z47rq0svds85wydg",
-        "createdAt": 1777642623056,
-        "displayName": "2025-12-20_02-271.png",
-        "fileSize": 48160,
-        "folderId": "kh70dzcgt33590srkdxcnp1k2985xk75",
-        "mimeType": "image/png",
-        "storageId": "kg2fpef0jqk45y28rfthda5f2585x5be",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/98034f76-261d-4f90-9b41-674c5ae0d534"
+        "_creationTime": 1768435200029,
+        "_id": "sample00000000000000000000000000000u",
+        "createdAt": 1768435200030,
+        "displayName": "projeto-3.svg",
+        "fileSize": 2048,
+        "folderId": "samples",
+        "mimeType": "image/svg+xml",
+        "storageId": "sample00000000000000000000000000000u",
+        "url": "/samples/projeto-3.svg"
       }
     ],
-    "longDescription": "A jornada começou com a imersão no MERN Stack (MongoDB, Express, React, Node). Embora os projetos pequenos fossem concluídos com sucesso, faltava um desafio que forçasse a tomada de decisões arquiteturais complexas. O objetivo era ir além do tutorial, abraçar a refatoração e entender o \"porquê\" das coisas.\n\nA inspiração veio dos Backends as a Service (BaaS) como Firebase e Supabase. A ideia foi construir um clone simplificado, o OliBase, usando MERN, não como produto comercial, mas como um projeto técnico profundo focado em aprendizado.\n\nO projeto nasceu com uma regra de ouro: ser multi-tenant de verdade. Isso exigiu a criação de dois sistemas de autenticação separados: um para os usuários do dashboard (administradores) e outro para os usuários finais das aplicações. A segurança foi garantida por API Keys vinculadas a projetos e JWTs com validação rígida de pertencimento. Essa fase forçou o estudo aprofundado de auth flows, segurança de APIs e separação de responsabilidades.\n\nO ponto de virada foi a implementação do Data Layer próprio, com Collections e Documents dinâmicos. O OliBase ganhou o Row Level Security (RLS), inspirado no Supabase, garantindo que usuários só acessassem seus próprios dados e que projetos nunca enxergassem os dados uns dos outros. Cada regra de RLS exigiu testes e ajustes de middleware, revelando a profundidade do backend \"de verdade\".\n\nPara gerenciar essa complexidade, foi criado um dashboard completo em React, consumindo a própria API construída em Node + Express e MongoDB. O dashboard permite o gerenciamento de projetos, usuários finais, collections, RLS e a visualização de logs de execução.\n\nA validação final veio com o Eventum, uma aplicação cliente real. O Eventum autentica usuários via OliBase, realiza operações CRUD protegidas por RLS e gera logs visíveis no dashboard. Isso provou que o OliBase não é apenas um backend teórico, mas um sistema funcional usado por uma aplicação real.\n\nO que começou como um projeto de estudos se tornou um BaaS funcional com autenticação robusta, isolamento multi-tenant, RLS e um app cliente real. Este projeto consolida o domínio prático de MongoDB, Express, React e Node, provando a capacidade de construir sistemas complexos.\n\nPost Completo no Blog: https://www.mmlo.com.br/blog/odisseia-do-olibase",
-    "longDescriptionTranslations": {
-      "enUS": "The journey began with immersion in the MERN Stack (MongoDB, Express, React, Node). Although small projects were completed successfully, there was a lack of a challenge that would force complex architectural decisions. The goal was to go beyond the tutorial, embrace refactoring, and understand the \"why\" behind things.\n\nThe inspiration came from Backends as a Service (BaaS) like Firebase and Supabase. The idea was to build a simplified clone, OliBase, using MERN, not as a commercial product, but as a deep technical project focused on learning.\n\nThe project was born with a golden rule: to be truly multi-tenant. This required the creation of two separate authentication systems: one for dashboard users (administrators) and another for end-users of the applications. Security was ensured by API Keys linked to projects and JWTs with strict ownership validation. This phase forced an in-depth study of auth flows, API security, and separation of concerns.\n\nThe turning point was the implementation of our own Data Layer, with dynamic Collections and Documents. OliBase gained Row Level Security (RLS), inspired by Supabase, ensuring that users only accessed their own data and that projects never saw each other's data. Each RLS rule required middleware testing and adjustments, revealing the depth of a \"real\" backend.\n\nTo manage this complexity, a complete dashboard was created in React, consuming its own API built in Node + Express and MongoDB. The dashboard allows management of projects, end-users, collections, RLS, and viewing execution logs.\n\nThe final validation came with Eventum, a real client application. Eventum authenticates users via OliBase, performs CRUD operations protected by RLS, and generates logs visible in the dashboard. This proved that OliBase is not just a theoretical backend, but a functional system used by a real application.\n\nWhat started as a study project became a functional BaaS with robust authentication, multi-tenant isolation, RLS, and a real client app. This project consolidates the practical mastery of MongoDB, Express, React, and Node, proving the ability to build complex systems.\n\nFull Post on the Blog: https://www.mmlo.com.br/blog/odisseia-do-olibase",
-      "ptBR": "A jornada começou com a imersão no MERN Stack (MongoDB, Express, React, Node). Embora os projetos pequenos fossem concluídos com sucesso, faltava um desafio que forçasse a tomada de decisões arquiteturais complexas. O objetivo era ir além do tutorial, abraçar a refatoração e entender o \"porquê\" das coisas.\n\nA inspiração veio dos Backends as a Service (BaaS) como Firebase e Supabase. A ideia foi construir um clone simplificado, o OliBase, usando MERN, não como produto comercial, mas como um projeto técnico profundo focado em aprendizado.\n\nO projeto nasceu com uma regra de ouro: ser multi-tenant de verdade. Isso exigiu a criação de dois sistemas de autenticação separados: um para os usuários do dashboard (administradores) e outro para os usuários finais das aplicações. A segurança foi garantida por API Keys vinculadas a projetos e JWTs com validação rígida de pertencimento. Essa fase forçou o estudo aprofundado de auth flows, segurança de APIs e separação de responsabilidades.\n\nO ponto de virada foi a implementação do Data Layer próprio, com Collections e Documents dinâmicos. O OliBase ganhou o Row Level Security (RLS), inspirado no Supabase, garantindo que usuários só acessassem seus próprios dados e que projetos nunca enxergassem os dados uns dos outros. Cada regra de RLS exigiu testes e ajustes de middleware, revelando a profundidade do backend \"de verdade\".\n\nPara gerenciar essa complexidade, foi criado um dashboard completo em React, consumindo a própria API construída em Node + Express e MongoDB. O dashboard permite o gerenciamento de projetos, usuários finais, collections, RLS e a visualização de logs de execução.\n\nA validação final veio com o Eventum, uma aplicação cliente real. O Eventum autentica usuários via OliBase, realiza operações CRUD protegidas por RLS e gera logs visíveis no dashboard. Isso provou que o OliBase não é apenas um backend teórico, mas um sistema funcional usado por uma aplicação real.\n\nO que começou como um projeto de estudos se tornou um BaaS funcional com autenticação robusta, isolamento multi-tenant, RLS e um app cliente real. Este projeto consolida o domínio prático de MongoDB, Express, React e Node, provando a capacidade de construir sistemas complexos.\n\nPost Completo no Blog: https://www.mmlo.com.br/blog/odisseia-do-olibase"
-    },
+    "imageIds": [
+      "sample00000000000000000000000000000u"
+    ],
+    "demoLink": "",
     "orderIndex": 2,
-    "slug": "olibase",
-    "tags": [
-      "MongoDB",
-      "Express",
-      "React",
-      "Node.js",
-      "Redis",
-      "REST API",
-      "TypeScript"
-    ],
-    "title": "OliBase: Micro BaaS",
-    "titleTranslations": {
-      "enUS": "OliBase: Micro BaaS",
-      "ptBR": "OliBase: Micro BaaS"
-    },
-    "updatedAt": 1777691700935
+    "updatedAt": 1768435200000
   },
   {
-    "_creationTime": 1777643674133.413,
-    "_id": "kx7ezcxxtt4r8pt8n78ffxjkhh85xhd9",
-    "createdAt": 1777643674133,
-    "description": "Portfólio profissional full-stack com CMS integrado. React + TypeScript + Supabase para gerenciar projetos, blog, currículo, propostas comerciais e conteúdo com painel administrativo robusto.",
-    "descriptionTranslations": {
-      "enUS": "Full-stack professional portfolio with integrated CMS. React + TypeScript + Supabase to manage projects, blog, resume, business proposals, and content with a robust admin panel.",
-      "ptBR": "Portfólio profissional full-stack com CMS integrado. React + TypeScript + Supabase para gerenciar projetos, blog, currículo, propostas comerciais e conteúdo com painel administrativo robusto."
+    "_creationTime": 1768435200032,
+    "_id": "sample00000000000000000000000000000x",
+    "createdAt": 1768435200033,
+    "title": "Orbe Analytics",
+    "titleTranslations": {
+      "ptBR": "Orbe Analytics",
+      "enUS": "Orbe Analytics"
     },
-    "githubLink": "https://github.com/MierzwaMatheus/portfolio-new",
-    "imageIds": [
-      "kn753w47xsefq0jjbnftv215rn85wnfq",
-      "kn718z7g98nv9b9eep4zr414rd85w3hm",
-      "kn779ew0gwk5r30e9c614fem0s85xtx3",
-      "kn7fdhj6ghv8y39w5jh8z89w0h85xatc",
-      "kn78rkp76r7d0ck74cneyktd2985xm90",
-      "kn781pg783kzcm1xrnbnt0f0r585xfy8",
-      "kn7egx4mmegyffdvsxxae08w0985wew2",
-      "kn7ddf6gepbhpcgqtzcaq237xx85x8wy",
-      "kn75642x4dqpwnywdbnenqwkyx85wcr1",
-      "kn7f881yg209f6ht144bm43c0585x7n4",
-      "kn724spzmjghypp4ecmc8mr1zs85wcr4",
-      "kn75bna9v7n9sn938g58sz3r2d85xh7g",
-      "kn7f2ne06t5mbxmgqfwkndxped85xybd"
+    "description": "Painel de métricas em tempo real para times de produto.",
+    "descriptionTranslations": {
+      "ptBR": "Painel de métricas em tempo real para times de produto.",
+      "enUS": "Real-time metrics dashboard for product teams."
+    },
+    "longDescription": "Painel de métricas em tempo real para times de produto.",
+    "longDescriptionTranslations": {
+      "ptBR": "Painel de métricas em tempo real para times de produto.",
+      "enUS": "Real-time metrics dashboard for product teams."
+    },
+    "tags": [
+      "Dashboard",
+      "React",
+      "Dados"
     ],
     "images": [
       {
-        "_creationTime": 1777642754187.4978,
-        "_id": "kn753w47xsefq0jjbnftv215rn85wnfq",
-        "createdAt": 1777642754187,
-        "displayName": "1765762308983-a6vz3k.jpg",
-        "fileSize": 640694,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/jpeg",
-        "storageId": "kg2er7w9y0amq31e33q95xyskd85xvvt",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/ee961022-b5a5-4bde-80e8-0e56139d9fd5"
-      },
-      {
-        "_creationTime": 1777642614481.43,
-        "_id": "kn718z7g98nv9b9eep4zr414rd85w3hm",
-        "createdAt": 1777642614481,
-        "displayName": "pagamento.png",
-        "fileSize": 108496,
-        "folderId": "kh76s4pa1521yw38yy6eyjrf6n85x9fr",
-        "mimeType": "image/png",
-        "storageId": "kg2a5cnzga4cmy1gn6cgsmdebn85w1z5",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/850f56f9-932a-469d-9307-d6078e8b6237"
-      },
-      {
-        "_creationTime": 1777642754820.607,
-        "_id": "kn779ew0gwk5r30e9c614fem0s85xtx3",
-        "createdAt": 1777642754820,
-        "displayName": "1765762503064-9q36a5.png",
-        "fileSize": 49912,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg2cy1a8q8r5zzm2wybg0mvmxx85wssz",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/72e7dfe1-e805-4d34-bab8-30ae332ae591"
-      },
-      {
-        "_creationTime": 1777642755594.1514,
-        "_id": "kn7fdhj6ghv8y39w5jh8z89w0h85xatc",
-        "createdAt": 1777642755594,
-        "displayName": "1765762503064-eb45u5.png",
-        "fileSize": 505297,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg26hpxgy4bt7vcn7rqtdhh3s585wcz2",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/a2bbdf79-15a8-467f-aee4-58b31616cd07"
-      },
-      {
-        "_creationTime": 1777642756245.2236,
-        "_id": "kn78rkp76r7d0ck74cneyktd2985xm90",
-        "createdAt": 1777642756245,
-        "displayName": "1765762503064-jz6t1r.png",
-        "fileSize": 319728,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg247y5yxp8dv39sv8gjyx1ndn85x9th",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/80b523a3-2400-44fd-83ac-d44924c67194"
-      },
-      {
-        "_creationTime": 1777642622566.7034,
-        "_id": "kn781pg783kzcm1xrnbnt0f0r585xfy8",
-        "createdAt": 1777642622566,
-        "displayName": "2025-12-16_23-20.png",
-        "fileSize": 136073,
-        "folderId": "kh76s4pa1521yw38yy6eyjrf6n85x9fr",
-        "mimeType": "image/png",
-        "storageId": "kg20gcpca6sbn9bxdp9d37by9585wsta",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/aee6b4e1-dd1d-40fc-984e-6e9f391a7d63"
-      },
-      {
-        "_creationTime": 1777642623653.137,
-        "_id": "kn7egx4mmegyffdvsxxae08w0985wew2",
-        "createdAt": 1777642623653,
-        "displayName": "2025-12-16_23-20_1.png",
-        "fileSize": 120940,
-        "folderId": "kh76s4pa1521yw38yy6eyjrf6n85x9fr",
-        "mimeType": "image/png",
-        "storageId": "kg2egpmwqxxk273reycxk7g2q585wvdg",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/e3f14fa1-ee2d-4b24-b794-9505393c3a60"
-      },
-      {
-        "_creationTime": 1777642756761.0134,
-        "_id": "kn7ddf6gepbhpcgqtzcaq237xx85x8wy",
-        "createdAt": 1777642756761,
-        "displayName": "1765762503065-8m1ixx.png",
-        "fileSize": 124226,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg24a98jnpxyqtwaxm1rfwa1ex85xch4",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/fdee6ebe-b944-4ee5-9a51-d8689b8fc3d7"
-      },
-      {
-        "_creationTime": 1777642757253.208,
-        "_id": "kn75642x4dqpwnywdbnenqwkyx85wcr1",
-        "createdAt": 1777642757253,
-        "displayName": "1765762503065-f116tn.png",
-        "fileSize": 85827,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg2bct4s6cds5m9d33cw62styx85xmsn",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/72a9de0b-c77b-45e3-ac9f-670d38cfe42b"
-      },
-      {
-        "_creationTime": 1777642757904.23,
-        "_id": "kn7f881yg209f6ht144bm43c0585x7n4",
-        "createdAt": 1777642757904,
-        "displayName": "1765762503065-jbaexl.png",
-        "fileSize": 114406,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg223jsx4xre602zn68z9dcvvd85xaan",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/cb7ee63b-0be8-4e27-8368-ab4d3477c9db"
-      },
-      {
-        "_creationTime": 1777642758492.83,
-        "_id": "kn724spzmjghypp4ecmc8mr1zs85wcr4",
-        "createdAt": 1777642758492,
-        "displayName": "1765762503065-jcdjgq.png",
-        "fileSize": 72446,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg28m42kcwfkkha3hgr90zqbc585w66r",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/2cbef2f4-7c82-4130-992f-5b9ce2b6f739"
-      },
-      {
-        "_creationTime": 1777642759076.8384,
-        "_id": "kn75bna9v7n9sn938g58sz3r2d85xh7g",
-        "createdAt": 1777642759076,
-        "displayName": "1765762503065-kg1g9d.png",
-        "fileSize": 163827,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg21n9qh0mkeyagwn46bztx4wh85whms",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/40733e9b-86fb-4ab5-af44-f9ba986354e5"
-      },
-      {
-        "_creationTime": 1777642759624.1514,
-        "_id": "kn7f2ne06t5mbxmgqfwkndxped85xybd",
-        "createdAt": 1777642759624,
-        "displayName": "1765762503065-xehlkp.png",
-        "fileSize": 60070,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg23c0g2wzjr9xepw7esn0thgd85wmgt",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/d1858c34-b73f-48a5-977c-9d1ffa552bd4"
+        "_creationTime": 1768435200031,
+        "_id": "sample00000000000000000000000000000w",
+        "createdAt": 1768435200032,
+        "displayName": "projeto-4.svg",
+        "fileSize": 2048,
+        "folderId": "samples",
+        "mimeType": "image/svg+xml",
+        "storageId": "sample00000000000000000000000000000w",
+        "url": "/samples/projeto-4.svg"
       }
     ],
-    "longDescriptionTranslations": {
-      "enUS": "For a developer, your portfolio is more than just a website—it's a statement of values, skills, and vision. This project was born from the need to create a platform that not only showcases work but also tells stories through well-structured code.\nThe vision was clear: to build a portfolio as impressive as the projects it displays. A place where visitors could explore not just what was done, but how it was done. A space that exudes modernity, performance, and attention to detail.\nThe architecture is full-stack by design. On the frontend, React 19 with TypeScript offers safe typing and reusable components. Vite ensures fast builds and hot module replacement during development. Tailwind CSS + Radix UI create an accessible and visually coherent interface. Framer Motion adds smooth animations that don't distract but delight.\nThe backend is serverless with Supabase. PostgreSQL stores structured data (projects, posts, resume, proposals). Storage manages images without complications. Authentication via Supabase Auth offers security without overhead. Row Level Security (RLS) ensures that sensitive data remains private.\nThe public area is a showcase. The homepage features a welcoming hero section, followed by \"About Me\" (manageable content), a grid of services/skills, customer testimonials, and strategic calls to action. The portfolio displays projects in a grid with tag filters, an image carousel, a fullscreen viewer, and links to the demo and source code. Each project can be reordered via drag and drop—because order matters in first impressions.\nThe resume is structured into categories: professional experiences, academic background, technical skills, languages, certifications, and personal interests. Everything is orderable via admin, ensuring that the most relevant information appears first. The blog offers posts with tags, search, pagination, and markdown/HTML rendering. Featured posts appear first, creating a narrative.\nCommercial proposals are living documents. Each proposal has a validity of 10 days, a visual status (approved, pending, expired), and can be downloaded in PDF format. It's not just a form—it's a professional sales tool.\nThe administrative area is where the magic happens. The dashboard shows real-time statistics: how many projects, articles, proposals. Quick shortcuts allow you to create content without navigating. The project manager offers complete CRUD functionality with multiple image uploads, a tag system, drag-and-drop ordering, and a preview before publishing. The blog manager uses TipTap—an extensible rich text editor that allows rich formatting without leaving the browser.\nResume management is intuitive: add items by category, order as needed. Proposal management offers templates, automatic expiration validation, and slug generation. Home management allows you to edit content, services, and testimonials without touching code. Contact management centralizes social media information and data visibility.\nThe authentication system is robust. Different roles (root, admin, proposal-editor) offer granular control. Only root can create new users. Only admins can manage content. Proposal-editors focus only on proposals. Automatic token refresh ensures secure sessions. ProtectedRoute verifies permissions before rendering any administrative page.\nPerformance is an obsession. Vite offers aggressive tree-shaking. Lazy loading of routes reduces the initial bundle size. Images are optimized in Supabase Storage. TypeScript prevents bugs at compile time. ESLint + Prettier ensure clean and consistent code.\nThe responsive design works on desktop, tablet, and mobile. The dark theme is standard, but a light theme is available with persistence. Smooth animations with Framer Motion are not just pretty—they communicate state and transition. Every interaction is carefully considered.\nThis portfolio is not just a project—it's a manifesto on how to build software with excellence. It's code that you can study, learn from, and use as a reference. It's a place where visitors see not only what you do, but how you think.",
-      "ptBR": "Quando você é desenvolvedor, seu portfólio é mais que um site — é uma declaração de valores, habilidades e visão. Este projeto nasceu da necessidade de criar uma plataforma que não apenas exibisse trabalho, mas que contasse histórias através de código bem estruturado.\nA visão era clara: construir um portfólio que fosse tão impressionante quanto os projetos que exibe. Um lugar onde visitantes pudessem explorar não apenas o que foi feito, mas como foi feito. Um espaço que respirasse modernidade, performance e atenção aos detalhes.\nA arquitetura é full-stack por design. No frontend, React 19 com TypeScript oferece tipagem segura e componentes reutilizáveis. Vite garante builds rápidos e hot module replacement durante desenvolvimento. Tailwind CSS + Radix UI criam uma interface acessível e visualmente coerente. Framer Motion adiciona animações suaves que não distraem, mas encantam.\nO backend é serverless com Supabase. PostgreSQL armazena dados estruturados (projetos, posts, currículo, propostas). Storage gerencia imagens sem complicações. Autenticação via Supabase Auth oferece segurança sem overhead. Row Level Security (RLS) garante que dados sensíveis permaneçam privados.\nA área pública é um showcase. A página inicial apresenta uma seção hero acolhedora, seguida por \"Sobre Mim\" (conteúdo gerenciável), grid de serviços/habilidades, depoimentos de clientes, e chamadas à ação estratégicas. O portfólio exibe projetos em grid com filtros por tags, carrossel de imagens, visualizador fullscreen, links para demo e código-fonte. Cada projeto pode ser reordenado via drag and drop — porque ordem importa na primeira impressão.\nO currículo é estruturado em categorias: experiências profissionais, formação acadêmica, habilidades técnicas, idiomas, certificações e interesses pessoais. Tudo ordenável via admin, garantindo que as informações mais relevantes apareçam primeiro. O blog oferece posts com tags, busca, paginação e renderização de markdown/HTML. Posts em destaque aparecem primeiro, criando narrativa.\nPropostas comerciais são documentos vivos. Cada proposta tem validade de 10 dias, status visual (aprovada, pendente, expirada), e pode ser baixada em PDF. Não é apenas um formulário — é uma ferramenta de vendas profissional.\nA área administrativa é onde a magia acontece. Dashboard mostra estatísticas em tempo real: quantos projetos, artigos, propostas. Atalhos rápidos permitem criar conteúdo sem navegar. O gerenciador de projetos oferece CRUD completo com upload múltiplo de imagens, sistema de tags, ordenação via drag and drop, e preview antes de publicar. O gerenciador de blog usa TipTap — um editor de texto rico extensível que permite formatação rica sem deixar o navegador.\nGerenciamento de currículo é intuitivo: adicione itens por categoria, ordene conforme necessário. Gerenciamento de propostas oferece templates, validação automática de expiração, e geração de slugs. Gerenciamento da home permite editar conteúdo, serviços e depoimentos sem tocar código. Gerenciamento de contato centraliza informações de redes sociais e visibilidade de dados.\nO sistema de autenticação é robusto. Diferentes roles (root, admin, proposal-editor) oferecem controle granular. Apenas root pode criar novos usuários. Apenas admins podem gerenciar conteúdo. Proposal-editors focam apenas em propostas. Refresh automático de tokens garante sessões seguras. ProtectedRoute verifica permissões antes de renderizar qualquer página administrativa.\nA performance é obsessiva. Vite oferece tree-shaking agressivo. Lazy loading de rotas reduz bundle inicial. Imagens são otimizadas no Supabase Storage. TypeScript previne bugs em tempo de compilação. ESLint + Prettier garantem código limpo e consistente.\nO design responsivo funciona em desktop, tablet e mobile. Tema dark é padrão, mas tema light está disponível com persistência. Animações suaves com Framer Motion não são apenas bonitas — comunicam estado e transição. Cada interação é pensada.\nEste portfólio não é apenas um projeto — é um manifesto de como construir software com excelência. É código que você pode estudar, aprender, e usar como referência. É um lugar onde visitantes veem não apenas o que você faz, mas como você pensa."
-    },
+    "imageIds": [
+      "sample00000000000000000000000000000w"
+    ],
+    "demoLink": "",
     "orderIndex": 3,
-    "tags": [
-      "React",
-      "Vite",
-      "Cursor",
-      "TypeScript",
-      "Supabase"
-    ],
-    "title": "Página Portfólio Pessoal",
-    "titleTranslations": {
-      "enUS": "Personal Portfolio Page",
-      "ptBR": "Página Portfólio Pessoal"
-    }
+    "updatedAt": 1768435200000
   },
   {
-    "_creationTime": 1777643674133.4104,
-    "_id": "kx7eptv7864dv90qbek5wqczqd85xkv8",
-    "createdAt": 1777643674133,
-    "description": "Sistema administrativo de gestão de mesas e reservas para Hard Rock Cafe com autenticação Keycloak. (Sistema administrativo confidencial)",
-    "descriptionTranslations": {
-      "enUS": "Hard Rock Cafe table and reservation management administration system with Keycloak authentication. (Confidential administration system)",
-      "ptBR": "Sistema administrativo de gestão de mesas e reservas para Hard Rock Cafe com autenticação Keycloak. (Sistema administrativo confidencial)"
+    "_creationTime": 1768435200034,
+    "_id": "sample00000000000000000000000000000z",
+    "createdAt": 1768435200035,
+    "title": "Rota Verde",
+    "titleTranslations": {
+      "ptBR": "Rota Verde",
+      "enUS": "Green Route"
     },
-    "imageIds": [
-      "kn799x86ndw44fw95kjh86kt7585why1",
-      "kn7e5rb2h72fzh0sv7jf1px1an85wsfj",
-      "kn77fhv50tfvb2pzetrqytmkms85wj3a",
-      "kn7dtvq2h2cexcza5tfr9ayaex85xbgk",
-      "kn7a1hm92gk7bmssxrhc36mscd85xapk",
-      "kn77vmbnjq68z81x2svnhh6k5h85xmfv",
-      "kn7bzc00ccz5baes75e0zmn0gh85w6gk"
+    "description": "App de mobilidade urbana que sugere trajetos com menor emissão.",
+    "descriptionTranslations": {
+      "ptBR": "App de mobilidade urbana que sugere trajetos com menor emissão.",
+      "enUS": "Urban mobility app that suggests lower-emission routes."
+    },
+    "longDescription": "App de mobilidade urbana que sugere trajetos com menor emissão.",
+    "longDescriptionTranslations": {
+      "ptBR": "App de mobilidade urbana que sugere trajetos com menor emissão.",
+      "enUS": "Urban mobility app that suggests lower-emission routes."
+    },
+    "tags": [
+      "Mobile",
+      "Product Design",
+      "Mapas"
     ],
     "images": [
       {
-        "_creationTime": 1777642725082.05,
-        "_id": "kn799x86ndw44fw95kjh86kt7585why1",
-        "createdAt": 1777642725082,
-        "displayName": "1765760685879.jpg",
-        "fileSize": 1657257,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/jpeg",
-        "storageId": "kg2699f90vxth2am30047m9w4n85wmt1",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/381e3d3f-f26c-48cb-990d-94ca1613f946"
-      },
-      {
-        "_creationTime": 1777642725983.0947,
-        "_id": "kn7e5rb2h72fzh0sv7jf1px1an85wsfj",
-        "createdAt": 1777642725983,
-        "displayName": "1765761132597-myoe4.png",
-        "fileSize": 528945,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg2df3qyf0eg029xx59y3cnxp185xj14",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/dd8bbb1a-aafe-4997-b1dc-abe71e2d6595"
-      },
-      {
-        "_creationTime": 1777642726546.7537,
-        "_id": "kn77fhv50tfvb2pzetrqytmkms85wj3a",
-        "createdAt": 1777642726546,
-        "displayName": "1765761132598-sodzsg.png",
-        "fileSize": 533174,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg2d9wpw400fxsd5jxz2z96a3x85wtfp",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/275909dc-1ff9-48ab-940e-3447eb52e4d7"
-      },
-      {
-        "_creationTime": 1777642727396.302,
-        "_id": "kn7dtvq2h2cexcza5tfr9ayaex85xbgk",
-        "createdAt": 1777642727396,
-        "displayName": "1765761132598-yq8ruh.png",
-        "fileSize": 598617,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg2adevw7dm1t3rr4whppbw28s85xfjq",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/0030abf5-1de8-4fa4-a5ff-7c4eac750fdf"
-      },
-      {
-        "_creationTime": 1777642728189.7327,
-        "_id": "kn7a1hm92gk7bmssxrhc36mscd85xapk",
-        "createdAt": 1777642728189,
-        "displayName": "1765761132599-axupvn.png",
-        "fileSize": 297587,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg24azdg0xxsv8hp5czn498bfs85w8fh",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/77573cb5-bd19-4b4f-a107-b26311f97390"
-      },
-      {
-        "_creationTime": 1777642728827.2646,
-        "_id": "kn77vmbnjq68z81x2svnhh6k5h85xmfv",
-        "createdAt": 1777642728827,
-        "displayName": "1765761132600-lxtz8.png",
-        "fileSize": 458196,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg2aac7jj5qc9mvnhfnbcs7vt585wysq",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/2e97a1cc-7157-47a7-9de3-be00dca284d3"
-      },
-      {
-        "_creationTime": 1777642729496.3396,
-        "_id": "kn7bzc00ccz5baes75e0zmn0gh85w6gk",
-        "createdAt": 1777642729496,
-        "displayName": "1765761132601-dqcmr.png",
-        "fileSize": 442425,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg25rpjqdqpcx27007b3ytjsgn85wj06",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/e169d437-41d6-4030-99fd-4f18c2342200"
+        "_creationTime": 1768435200033,
+        "_id": "sample00000000000000000000000000000y",
+        "createdAt": 1768435200034,
+        "displayName": "projeto-5.svg",
+        "fileSize": 2048,
+        "folderId": "samples",
+        "mimeType": "image/svg+xml",
+        "storageId": "sample00000000000000000000000000000y",
+        "url": "/samples/projeto-5.svg"
       }
     ],
-    "longDescriptionTranslations": {
-      "enUS": "HRC Table Management is a comprehensive web system developed for Hard Rock Cafe that automates the management of tables, reservations, and customers. The application offers an intuitive dashboard with a real-time view of the status of all 51 tables, distributed between the ground floor and mezzanine, with statuses (available, reserved, occupied, unavailable) and complete CRUD operations. The reservation module allows users to create, edit, and cancel reservations with intelligent capacity validation, support for disabled customers, and special notes. Customer management includes reservation history, preferences, and the date of the last visit. Advanced settings allow users to define recurring closed days, time-based blocks, special events, and different capacity percentages for weekdays and weekends. The system generates occupancy and revenue reports with graphical visualizations. Authentication is via Keycloak with role-based access control, a RESTful API with Zod schema validation, and a responsive design with shadcn/ui components.",
-      "ptBR": "HRC Gestão de Mesas é um sistema web completo desenvolvido para o Hard Rock Cafe que automatiza o gerenciamento de mesas, reservas e clientes. A aplicação oferece um dashboard intuitivo com visualização em tempo real do status das 51 mesas distribuídas entre térreo e mezzanino, com estados (disponível, reservada, ocupada, indisponível) e operações CRUD completas. O módulo de reservas permite criar, editar e cancelar reservas com validação inteligente de capacidade, suporte a clientes PCD e observações especiais. A gestão de clientes inclui histórico de reservas, preferências e data da última visita. Configurações avançadas permitem definir dias fechados com recorrência, bloqueios por faixa horária, eventos especiais e percentuais de capacidade diferenciados para dias úteis e finais de semana. O sistema gera relatórios de ocupação e receita com visualizações gráficas. Autenticação via Keycloak com role-based access control, API RESTful com validação de schemas Zod e design responsivo com componentes shadcn/ui."
-    },
+    "imageIds": [
+      "sample00000000000000000000000000000y"
+    ],
+    "demoLink": "",
     "orderIndex": 4,
-    "tags": [
-      "React",
-      "TypeScript",
-      "Vite",
-      "TailwindCSS",
-      "Keycloak",
-      "REST API",
-      "React Query",
-      "Recharts",
-      "Zod",
-      "React Hook Form"
-    ],
-    "title": "HRC Gestão de Mesas",
-    "titleTranslations": {
-      "enUS": "HRC Table Management",
-      "ptBR": "HRC Gestão de Mesas"
-    }
+    "updatedAt": 1768435200000
   },
   {
-    "_creationTime": 1777643674133.4106,
-    "_id": "kx786ykn6twnmxzbd0tmryvtqx85wnae",
-    "createdAt": 1777643674133,
-    "description": "Plataforma administrativa completa para gerenciamento do sistema InBot com dashboards e análise de dados. (Sistema administrativo confidencial)",
-    "descriptionTranslations": {
-      "enUS": "Comprehensive administrative platform for managing the InBot system, featuring dashboards and data analytics. (Confidential administrative system)",
-      "ptBR": "Plataforma administrativa completa para gerenciamento do sistema InBot com dashboards e análise de dados. (Sistema administrativo confidencial)"
+    "_creationTime": 1768435200036,
+    "_id": "sample000000000000000000000000000011",
+    "createdAt": 1768435200037,
+    "title": "Caderno Aberto",
+    "titleTranslations": {
+      "ptBR": "Caderno Aberto",
+      "enUS": "Open Notebook"
     },
-    "imageIds": [
-      "kn71g5f3svzjn85npj7vm451jd85wdn2",
-      "kn79krteq8j1a0f0jc9zk7ew6985x0am",
-      "kn7e785yehh46pawcevc9t5dj585xayp",
-      "kn78a9x82td45k41xr9hybnfq985xrsb",
-      "kn7bgyspbfr00d4qp5d2ntp2n185x8d1",
-      "kn73k02qgfbe4b0a6ar6mn8jhs85wpzp",
-      "kn7121d13cxz9k8sh0q8ky0xtn85xab4",
-      "kn74s23k8r4fwwxf9w9yzwbn3185w78x",
-      "kn76ffq3vzg7grnbnw0fdm42qh85x64c",
-      "kn76rmjvsvkvexaphq7vcm25qs85wkng",
-      "kn71ekmwbywh8qxfnwbba0cv8h85wbm5"
+    "description": "Plataforma de cursos com editor colaborativo de aulas.",
+    "descriptionTranslations": {
+      "ptBR": "Plataforma de cursos com editor colaborativo de aulas.",
+      "enUS": "Course platform with a collaborative lesson editor."
+    },
+    "longDescription": "Plataforma de cursos com editor colaborativo de aulas.",
+    "longDescriptionTranslations": {
+      "ptBR": "Plataforma de cursos com editor colaborativo de aulas.",
+      "enUS": "Course platform with a collaborative lesson editor."
+    },
+    "tags": [
+      "Educação",
+      "React",
+      "Editor"
     ],
     "images": [
       {
-        "_creationTime": 1777642730173.817,
-        "_id": "kn71g5f3svzjn85npj7vm451jd85wdn2",
-        "createdAt": 1777642730173,
-        "displayName": "1765761531662-b9feh.jpg",
-        "fileSize": 1100562,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/jpeg",
-        "storageId": "kg27ve6b6pngf8twdhy5bpjpxh85x3d8",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/3505a2a9-48f0-4c86-b4c4-c76b74383577"
-      },
-      {
-        "_creationTime": 1777642730733.663,
-        "_id": "kn79krteq8j1a0f0jc9zk7ew6985x0am",
-        "createdAt": 1777642730733,
-        "displayName": "1765761362771-jx7zr.png",
-        "fileSize": 311446,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg201ncw3k99hv8ghtj07p6y6185wq8s",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/716dfe20-d82b-48fe-abc1-059f73e77148"
-      },
-      {
-        "_creationTime": 1777642731346.0913,
-        "_id": "kn7e785yehh46pawcevc9t5dj585xayp",
-        "createdAt": 1777642731346,
-        "displayName": "1765761362773-al6zcq.png",
-        "fileSize": 325780,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg28wfdnkvbp5ee8k1h7hr1w1h85xg6q",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/70f52225-47b5-4fe9-8668-727c9b4b7a65"
-      },
-      {
-        "_creationTime": 1777642732111.1526,
-        "_id": "kn78a9x82td45k41xr9hybnfq985xrsb",
-        "createdAt": 1777642732111,
-        "displayName": "1765761362774-htugq.png",
-        "fileSize": 557439,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg2cwr64vkjcqc1w4jzrfbpev585wxnf",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/25d34f42-2c43-4214-b647-1e066473dd62"
-      },
-      {
-        "_creationTime": 1777642732943.8037,
-        "_id": "kn7bgyspbfr00d4qp5d2ntp2n185x8d1",
-        "createdAt": 1777642732943,
-        "displayName": "1765761362776-338emp.png",
-        "fileSize": 440402,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg22g285ernqq1p62svx6nh4fh85wgms",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/3e8d8678-2fb3-4a49-87a2-3dd3e6304ea8"
-      },
-      {
-        "_creationTime": 1777642733829.117,
-        "_id": "kn73k02qgfbe4b0a6ar6mn8jhs85wpzp",
-        "createdAt": 1777642733829,
-        "displayName": "1765761362777-hyqzd.png",
-        "fileSize": 533678,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg2bb3pagzbrsbqa3jzmgvd62985w9cs",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/71eae708-f0d7-4a51-8d2a-e9279cc86e82"
-      },
-      {
-        "_creationTime": 1777642734584.4304,
-        "_id": "kn7121d13cxz9k8sh0q8ky0xtn85xab4",
-        "createdAt": 1777642734584,
-        "displayName": "1765761362778-nvdzzn.png",
-        "fileSize": 310192,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg2e7g7pat0fgycs4stps9245x85xsfv",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/1e7f2380-c869-4d57-a50a-284cff694553"
-      },
-      {
-        "_creationTime": 1777642735267.7258,
-        "_id": "kn74s23k8r4fwwxf9w9yzwbn3185w78x",
-        "createdAt": 1777642735267,
-        "displayName": "1765761362779-nwt59l.png",
-        "fileSize": 323958,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg2090nv1ea55ffs228v2tagxn85wbhb",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/d5797b6d-6ab4-4574-84a0-94b90063b1dd"
-      },
-      {
-        "_creationTime": 1777642736002.2717,
-        "_id": "kn76ffq3vzg7grnbnw0fdm42qh85x64c",
-        "createdAt": 1777642736002,
-        "displayName": "1765761362780-e7w3qt.png",
-        "fileSize": 354333,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg25dhhxv50bvv5t5g2w31x2gs85xh1p",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/86b49d37-ca7c-4214-989a-212c84659a5f"
-      },
-      {
-        "_creationTime": 1777642736827.2708,
-        "_id": "kn76rmjvsvkvexaphq7vcm25qs85wkng",
-        "createdAt": 1777642736827,
-        "displayName": "1765761362780-j6bktg.png",
-        "fileSize": 325784,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg23fdzmmzyb3echthxjsd4vtd85wtv2",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/298832b9-cb76-4f87-84fa-7244ef6ba44b"
-      },
-      {
-        "_creationTime": 1777642737534.059,
-        "_id": "kn71ekmwbywh8qxfnwbba0cv8h85wbm5",
-        "createdAt": 1777642737534,
-        "displayName": "1765761362781-aq6x8m.png",
-        "fileSize": 347200,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg20b9c8n5mf2ecnq5ntbva6r985w3ky",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/9d0580ed-773b-44ba-8eae-c3766ce3b8be"
+        "_creationTime": 1768435200035,
+        "_id": "sample000000000000000000000000000010",
+        "createdAt": 1768435200036,
+        "displayName": "projeto-6.svg",
+        "fileSize": 2048,
+        "folderId": "samples",
+        "mimeType": "image/svg+xml",
+        "storageId": "sample000000000000000000000000000010",
+        "url": "/samples/projeto-6.svg"
       }
     ],
-    "longDescriptionTranslations": {
-      "enUS": "InBot Admin is a modern web application that provides a comprehensive administrative interface for the InBot chatbot and automated service system. The main dashboard displays conversation metrics, user data, and resolution rates with interactive charts. The content manager allows users to create, edit, and publish FAQs organized by categories (Account, Payment, Security, Technical) with a draft and publish system. The curation features include management of evaluations with advanced filters and bulk processing, as well as management of unanswered questions (IDKs) with automatic categorization. The journey dashboard offers a drag-and-drop grid system with resizable, customizable metric cards, interactive charts, and advanced filters by flow and period. It includes a file manager with support for multiple formats, a service dashboard with KPIs, an event database, and chatbot personality configuration. Authentication is via Keycloak, with integration to multiple API endpoints and a responsive interface with light/dark themes.",
-      "ptBR": "InBot Admin é uma aplicação web moderna que fornece uma interface administrativa completa para o sistema InBot de chatbots e atendimento automatizado. O dashboard principal exibe métricas de conversas, usuários e taxa de resolução com gráficos interativos. O gerenciador de conteúdo permite criar, editar e publicar FAQs organizadas por categorias (Conta, Pagamento, Segurança, Técnico) com sistema de rascunho e publicação. A curadoria inclui gestão de avaliações com filtros avançados e tratativa em massa, além de gerenciamento de perguntas não respondidas (IDKs) com categorização automática. O dashboard de jornadas oferece um sistema de grid arrastável e redimensionável com cards de métricas personalizáveis, gráficos interativos e filtros avançados por fluxo e período. Inclui gerenciador de arquivos com suporte a múltiplos formatos, dashboard de atendimento com KPIs, banco de dados de eventos e configuração da personalidade do chatbot. Autenticação via Keycloak, integração com múltiplos endpoints de API e interface responsiva com tema claro/escuro."
-    },
+    "imageIds": [
+      "sample000000000000000000000000000010"
+    ],
+    "demoLink": "",
     "orderIndex": 5,
-    "tags": [
-      "React",
-      "TypeScript",
-      "Vite",
-      "TailwindCSS",
-      "Keycloak",
-      "React Query",
-      "Recharts",
-      "Zod",
-      "React Hook Form",
-      "REST API"
-    ],
-    "title": "InBot Admin",
-    "titleTranslations": {
-      "enUS": "InBot Admin",
-      "ptBR": "InBot Admin"
-    }
-  },
-  {
-    "_creationTime": 1777643674133.4102,
-    "_id": "kx7arpbq13pm21zy8aw35a3e9185xq3j",
-    "createdAt": 1777643674133,
-    "description": "Plataforma SaaS completa para gerenciamento de agendamentos profissionais com integração WhatsApp e Stripe. (Sistema administrativo confidencial)",
-    "descriptionTranslations": {
-      "enUS": "Comprehensive SaaS platform for managing professional appointments with WhatsApp and Stripe integration. (Confidential administrative system)",
-      "ptBR": "Plataforma SaaS completa para gerenciamento de agendamentos profissionais com integração WhatsApp e Stripe. (Sistema administrativo confidencial)"
-    },
-    "imageIds": [
-      "kn7emktfrqjz2d2qy523tjk73h85x1hc",
-      "kn77kv9df95catvkwcn05y8g0d85xbq9",
-      "kn71spt1kg4y04rwjyh22w2j7s85xqs9",
-      "kn74pcqva2dpyjjzqshk0xs9kd85x83f",
-      "kn78wa92dy8qvbem8e4esmj9n585xtze",
-      "kn78f693bs9v185tmszmhfrkmn85wyyt",
-      "kn7d9z7k1hccb95c33yds346h585wr36"
-    ],
-    "images": [
-      {
-        "_creationTime": 1777642719484.754,
-        "_id": "kn7emktfrqjz2d2qy523tjk73h85x1hc",
-        "createdAt": 1777642719484,
-        "displayName": "1765761692968-8n8lm.jpg",
-        "fileSize": 588226,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/jpeg",
-        "storageId": "kg2aca67sq8w8trrj4mfxzndhs85xe33",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/4733b957-80fe-49a0-aace-174cd33858d4"
-      },
-      {
-        "_creationTime": 1777642720723.664,
-        "_id": "kn77kv9df95catvkwcn05y8g0d85xbq9",
-        "createdAt": 1777642720723,
-        "displayName": "1765761715087-camq4j.png",
-        "fileSize": 48706,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg2eabg6cg6x7n166r1qcgvrrx85xnqw",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/3ebf11bb-e2fc-4070-9a1e-0af98d59cf9c"
-      },
-      {
-        "_creationTime": 1777642721564.0613,
-        "_id": "kn71spt1kg4y04rwjyh22w2j7s85xqs9",
-        "createdAt": 1777642721564,
-        "displayName": "1765761715087-x6xh2z.png",
-        "fileSize": 200911,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg20kvrvenfe7qtmhgzf26zmdd85wzts",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/836b3496-c777-4c5b-a6d2-9c5fa060ef01"
-      },
-      {
-        "_creationTime": 1777642722199.3364,
-        "_id": "kn74pcqva2dpyjjzqshk0xs9kd85x83f",
-        "createdAt": 1777642722199,
-        "displayName": "1765761715088-2chz7y.png",
-        "fileSize": 114144,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg2e7a4wq893dcpmtryvnkgvcx85w6hc",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/35bdd4f2-c456-4bf1-a4d2-42e3fa356115"
-      },
-      {
-        "_creationTime": 1777642722976.2993,
-        "_id": "kn78wa92dy8qvbem8e4esmj9n585xtze",
-        "createdAt": 1777642722976,
-        "displayName": "1765761715089-7p97bm.png",
-        "fileSize": 131492,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg29w7ebshx5y8pmmfj7t5whw185xyvh",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/209203f9-4491-4dfd-b30b-25677066dd34"
-      },
-      {
-        "_creationTime": 1777642723522.8704,
-        "_id": "kn78f693bs9v185tmszmhfrkmn85wyyt",
-        "createdAt": 1777642723522,
-        "displayName": "1765761715090-odqja.png",
-        "fileSize": 89153,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg2dtzfxtrjhv2f8mne7ecyjq985wsbs",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/b0ac8879-1d76-40ca-a65f-69f0b0b17b35"
-      },
-      {
-        "_creationTime": 1777642724092.9714,
-        "_id": "kn7d9z7k1hccb95c33yds346h585wr36",
-        "createdAt": 1777642724093,
-        "displayName": "1765761715091-r8sshr.png",
-        "fileSize": 70038,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg2cj6nt9rpb79wnszmbx6b86185xyk7",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/f2b8a7b2-7559-4a4c-88b8-fec3a2dc3660"
-      }
-    ],
-    "longDescriptionTranslations": {
-      "enUS": "Agenda Fácil is a robust SaaS platform developed for freelancers and small businesses that need to automate their scheduling process. The solution offers an intuitive dashboard to manage appointments in different views (day, week, month), with status filters and smart navigation. Professionals can create and manage services with customizable durations, prices, and icons, with limits varying by plan. The system integrates with WhatsApp to automatically send confirmations and reminders 24 hours and 1 hour in advance, as well as cancellation notifications with customizable templates. Clients access a public scheduling page with service selection, an interactive calendar, and automatically calculated available time slots. The backend uses Supabase with PostgreSQL, serverless Edge Functions, and Stripe integration for recurring payments. It includes analytical reports, client management, multi-professional team (Premium plan), and advanced time and buffer settings.",
-      "ptBR": "Agenda Fácil é uma plataforma SaaS robusta desenvolvida para profissionais autônomos e pequenos negócios que precisam automatizar seu processo de agendamento. A solução oferece um dashboard intuitivo para gerenciar agendamentos em diferentes vistas (dia, semana, mês), com filtros por status e navegação inteligente. Profissionais podem criar e gerenciar serviços com duração customizável, preços e ícones, com limites variáveis conforme o plano. O sistema integra-se com WhatsApp para envio automático de confirmações, lembretes 24h e 1h antes, além de notificações de cancelamento com templates personalizáveis. Clientes acessam uma página pública de agendamento com seleção de serviços, calendário interativo e slots disponíveis calculados automaticamente. O backend utiliza Supabase com PostgreSQL, Edge Functions serverless e integração com Stripe para pagamentos recorrentes. Inclui relatórios analíticos, gerenciamento de clientes, equipe multi-profissional (plano Premium) e configurações avançadas de horários e buffers."
-    },
-    "orderIndex": 6,
-    "tags": [
-      "React",
-      "TypeScript",
-      "Vite",
-      "TailwindCSS",
-      "Framer Motion",
-      "Supabase",
-      "PostgreSQL",
-      "Stripe",
-      "REST API",
-      "Firebase"
-    ],
-    "title": "Agenda Fácil",
-    "titleTranslations": {
-      "enUS": "Easy Scheduling",
-      "ptBR": "Agenda Fácil"
-    }
-  },
-  {
-    "_creationTime": 1777643674133.411,
-    "_id": "kx7b43bgybcp5q93e1a8zy3xgh85wgv4",
-    "createdAt": 1777643674133,
-    "description": "Plataforma para criação e gerenciamento de agentes de IA com integração Gemini e análise de logs. (Sistema administrativo confidencial)",
-    "descriptionTranslations": {
-      "enUS": "Platform for creating and managing AI agents with Gemini integration and log analysis. (Confidential administrative system)",
-      "ptBR": "Plataforma para criação e gerenciamento de agentes de IA com integração Gemini e análise de logs. (Sistema administrativo confidencial)"
-    },
-    "imageIds": [
-      "kn77brjpy0y7zptbqpw6wr287185xpja",
-      "kn7a197xj1ahfjqqpgzj15qs7585wwgt",
-      "kn76h0fsfctteaygtm943wt0wd85w2yx",
-      "kn7e4qxpkxt35qb26rjy9pkkt985wwh7",
-      "kn711gvz1de7g5ekrhs19pt97985wpn8",
-      "kn7cbqfzn7yxpk5n37p8k7vxsn85wcw2",
-      "kn70eb54yxe75emk9gqj9ngcad85wnht",
-      "kn7a0pbv4m3z3qg4tfq7n6rn7h85wcwc"
-    ],
-    "images": [
-      {
-        "_creationTime": 1777642738120.8318,
-        "_id": "kn77brjpy0y7zptbqpw6wr287185xpja",
-        "createdAt": 1777642738120,
-        "displayName": "1765761770924-0fygh1s.jpg",
-        "fileSize": 604306,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/jpeg",
-        "storageId": "kg2fn8etdbrq63af1x9bkdw3z585wenk",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/2b4957c9-7798-4b45-9c41-7d868f48fafc"
-      },
-      {
-        "_creationTime": 1777642738862.36,
-        "_id": "kn7a197xj1ahfjqqpgzj15qs7585wwgt",
-        "createdAt": 1777642738862,
-        "displayName": "1765761780527-mpug4j.png",
-        "fileSize": 350740,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg2acxy01rqkegzprymvtp02n985w2d1",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/27e97db0-57f7-4a61-b0dd-4b89f7735832"
-      },
-      {
-        "_creationTime": 1777642739391.0774,
-        "_id": "kn76h0fsfctteaygtm943wt0wd85w2yx",
-        "createdAt": 1777642739391,
-        "displayName": "1765761780528-ntct0b.png",
-        "fileSize": 256211,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg2dcyht5b3j7hbmv7hxqppdtd85wdnq",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/2bfb35a9-b556-4b6c-903e-91aedaa11c5d"
-      },
-      {
-        "_creationTime": 1777642740101.6543,
-        "_id": "kn7e4qxpkxt35qb26rjy9pkkt985wwh7",
-        "createdAt": 1777642740101,
-        "displayName": "1765761780528-r2pzxz.png",
-        "fileSize": 346618,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg2bjb1mtx1nya62sb1rhxtfyn85w6kz",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/7df3a16b-5e8d-482b-98e0-8c47bb146d54"
-      },
-      {
-        "_creationTime": 1777642740752.9033,
-        "_id": "kn711gvz1de7g5ekrhs19pt97985wpn8",
-        "createdAt": 1777642740752,
-        "displayName": "1765761780533-02n0ja.png",
-        "fileSize": 294084,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg2eb86b265sxf3p22r666zsx185wabj",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/c96fade1-90d2-44ff-bd15-1efa7327f650"
-      },
-      {
-        "_creationTime": 1777642741557.7866,
-        "_id": "kn7cbqfzn7yxpk5n37p8k7vxsn85wcw2",
-        "createdAt": 1777642741557,
-        "displayName": "1765761780533-a6x1vi.png",
-        "fileSize": 320329,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg281kmxakw110mt6mxz0hgkan85xfw2",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/04913a4f-be78-4009-99c2-edf321d97a2c"
-      },
-      {
-        "_creationTime": 1777642742363.7747,
-        "_id": "kn70eb54yxe75emk9gqj9ngcad85wnht",
-        "createdAt": 1777642742363,
-        "displayName": "1765761780534-3b8z9.png",
-        "fileSize": 327686,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg2czbvdf698etdbweftgvvj0585xtwz",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/d5ff57fb-9cdc-4d7f-b703-d5a8f9230eee"
-      },
-      {
-        "_creationTime": 1777642742905.7275,
-        "_id": "kn7a0pbv4m3z3qg4tfq7n6rn7h85wcwc",
-        "createdAt": 1777642742905,
-        "displayName": "1765761780534-uqt3t8.png",
-        "fileSize": 365322,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg26v6ftkqh8h5qykc1k96tv5s85xqr2",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/5826ec8f-a603-4949-8eb1-4f9e2c765962"
-      }
-    ],
-    "longDescriptionTranslations": {
-      "enUS": "InCity is a modern web platform that allows you to create, manage, and interact with custom Artificial Intelligence agents. The agent dashboard offers a grid view with search by name/description/tag, filters by categories, and sorting by name, creation date, or last updated date. Agent creation follows a multi-step form with identity (name, client, description, tag) and logic (system prompt, user prompt, personality, variables) sections. The AI-assisted prompt generator uses Google Gemini to automatically generate and enrich structured prompts. Dynamic variable system with automatic detection in prompts and mandatory validation. Selection of templates as a base and duplication of existing agents. Data Sheet modal for advanced data collection configuration. Interaction logs with filters by date and specific agent, pagination, and details of each interaction. Management of tags and clients with customizable colors. Keycloak authentication, global state with Zustand, integration with Google Generative AI, and responsive design.",
-      "ptBR": "InCity é uma plataforma web moderna que permite criar, gerenciar e interagir com agentes de Inteligência Artificial personalizados. O painel de agentes oferece visualização em grid com busca por nome/descrição/tag, filtros por categorias e ordenação por nome, data de criação ou última atualização. A criação de agentes segue um formulário multi-etapas com seções de identidade (nome, cliente, descrição, tag) e lógica (system prompt, user prompt, personalidade, variáveis). O gerador de prompts assistido por IA utiliza Google Gemini para gerar e enriquecer prompts estruturados automaticamente. Sistema de variáveis dinâmicas com detecção automática nos prompts e validação de obrigatoriedade. Seleção de templates como base e duplicação de agentes existentes. Modal de Fichas para configuração avançada de coleta de dados. Logs de interações com filtros por data e agente específico, paginação e detalhes de cada interação. Gerenciamento de tags e clientes com cores customizáveis. Autenticação Keycloak, estado global com Zustand, integração com Google Generative AI e design responsivo."
-    },
-    "orderIndex": 7,
-    "tags": [
-      "React",
-      "TypeScript",
-      "Vite",
-      "TailwindCSS",
-      "Zustand",
-      "Keycloak",
-      "Gemini API",
-      "React Query",
-      "Framer Motion",
-      "REST API"
-    ],
-    "title": "InCity",
-    "titleTranslations": {
-      "enUS": "InCity",
-      "ptBR": "InCity"
-    }
-  },
-  {
-    "_creationTime": 1777643674133.4114,
-    "_id": "kx7e146zw0br489r10qng3zrfs85xm46",
-    "createdAt": 1777643674133,
-    "description": "Plataforma moderna de documentação técnica com busca avançada, renderização Markdown e API interativa. (Sistema administrativo confidencial)",
-    "descriptionTranslations": {
-      "enUS": "Modern technical documentation platform with advanced search, Markdown rendering, and interactive API. (Confidential administrative system)",
-      "ptBR": "Plataforma moderna de documentação técnica com busca avançada, renderização Markdown e API interativa. (Sistema administrativo confidencial)"
-    },
-    "imageIds": [
-      "kn7dvc1nbvwef8btk14stzy70185wxs7",
-      "kn7ch958ggwje9cp7w1da0qrnd85w1sp",
-      "kn7c3kn3ntjf3v7fad048b353985wtvg"
-    ],
-    "images": [
-      {
-        "_creationTime": 1777642749252.2725,
-        "_id": "kn7dvc1nbvwef8btk14stzy70185wxs7",
-        "createdAt": 1777642749252,
-        "displayName": "1765761834202-9pe9vb.jpg",
-        "fileSize": 511322,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/jpeg",
-        "storageId": "kg2026yvbps4pczxzrvhm8rrts85wbx4",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/078b0e9c-e7e3-4e32-ad66-d70f506c373f"
-      },
-      {
-        "_creationTime": 1777642749993.4849,
-        "_id": "kn7ch958ggwje9cp7w1da0qrnd85w1sp",
-        "createdAt": 1777642749993,
-        "displayName": "1765761843521-jvqdm9.png",
-        "fileSize": 184208,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg2dc9kk8kvwj38q8twhwn4y2585w1aw",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/21bd4542-cef5-4782-9dcf-902f03b924ba"
-      },
-      {
-        "_creationTime": 1777642750832.864,
-        "_id": "kn7c3kn3ntjf3v7fad048b353985wtvg",
-        "createdAt": 1777642750832,
-        "displayName": "1765761843521-onjea.png",
-        "fileSize": 353569,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg22d47h4t34tfjc2z34rx2mq985w8w1",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/f67d2be2-028a-4a30-9dca-3758cb2846d1"
-      }
-    ],
-    "longDescriptionTranslations": {
-      "enUS": "Inscribe is a documentation platform developed for InBot that offers a view of public and internal technical documentation, as well as interactive API documentation. The system dynamically renders Markdown files from the /public/docs/ folder, with support for YAML frontmatter for metadata, syntax highlighting with highlight.js, and a button to copy code in blocks. It features automatic table of contents generation from headings with hash navigation to specific sections. A real-time search system indexes documents on startup and searches by title, description, tags, and content, with relevance scoring and match highlighting. API documentation includes interactive visualization of OpenAPI/Swagger endpoints, organization by tags/categories, complete details for each endpoint (method, path, parameters, request body, responses, security), and an integrated API tester. Authentication is handled via Keycloak, with protection of internal routes and role verification. The responsive interface features a dynamic sidebar that collapses on desktop and becomes a drawer on mobile, a light/dark theme with persistence, breadcrumbs, and visual indicators for the active page. Firebase Functions are used for serverless processing.",
-      "ptBR": "Inscribe é uma plataforma de documentação desenvolvida para o InBot que oferece visualização de documentação técnica pública e interna, além de documentação interativa de APIs. O sistema renderiza dinamicamente arquivos Markdown da pasta /public/docs/ com suporte a frontmatter YAML para metadados, realce de sintaxe com highlight.js e botão de copiar código em blocos. Geração automática de tabela de conteúdos a partir dos headings com navegação por hash para seções específicas. Sistema de busca em tempo real que indexa documentos na inicialização e busca por título, descrição, tags e conteúdo com scoring de relevância e destaque de matches. Documentação de API com visualização interativa de endpoints OpenAPI/Swagger, organização por tags/categorias, detalhes completos de cada endpoint (método, path, parâmetros, request body, responses, segurança) e testador de API integrado. Autenticação via Keycloak com proteção de rotas internas e verificação de roles. Interface responsiva com sidebar dinâmica colapsável em desktop e drawer em mobile, tema claro/escuro com persistência, breadcrumbs e indicadores visuais de página ativa. Firebase Functions para processamento serverless."
-    },
-    "orderIndex": 8,
-    "tags": [
-      "React",
-      "TypeScript",
-      "Vite",
-      "TailwindCSS",
-      "Keycloak",
-      "Firebase",
-      "React Query",
-      "Marked",
-      "REST API",
-      "Radix UI"
-    ],
-    "title": "Inscribe - Documentação InBot",
-    "titleTranslations": {
-      "enUS": "Inscribe - InBot Documentation",
-      "ptBR": "Inscribe - Documentação InBot"
-    }
-  },
-  {
-    "_creationTime": 1777643674133.4111,
-    "_id": "kx75dd0hq5915cxy0c02ze6wn985xd0v",
-    "createdAt": 1777643674133,
-    "description": "Aplicação administrativa para gestão de usuários e permissões do ecossistema InBot com RBAC. (Sistema administrativo confidencial)",
-    "descriptionTranslations": {
-      "enUS": "Administrative application for managing users and permissions within the InBot ecosystem using RBAC. (Confidential administrative system)",
-      "ptBR": "Aplicação administrativa para gestão de usuários e permissões do ecossistema InBot com RBAC. (Sistema administrativo confidencial)"
-    },
-    "imageIds": [
-      "kn74skqq9pbryk4dhhb0k5ne0d85wa1r",
-      "kn707038rqp4mfh7eh4tkq646985w717",
-      "kn7b58gmtgpfg0hgk3twcvyras85w6yg",
-      "kn732xms6meazyy7fe6sxbw3qx85wcqw",
-      "kn78kz9xw1qhkwha8krs9b27nn85wj9j",
-      "kn786m02hcc21hb3xs9b0bk08585w675",
-      "kn77g9ykvfm02jpwtkb65gypcn85xztf",
-      "kn7c16qfrr0khxd2a8kxzkbwz985w4ye"
-    ],
-    "images": [
-      {
-        "_creationTime": 1777642743932.6243,
-        "_id": "kn74skqq9pbryk4dhhb0k5ne0d85wa1r",
-        "createdAt": 1777642743932,
-        "displayName": "1765761918934-mno5fw.jpg",
-        "fileSize": 1105468,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/jpeg",
-        "storageId": "kg20ac8vhkr5mjk2kqa8dmcm8s85xgw2",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/c77e7df4-1c1d-4c71-85df-438f3a27ab20"
-      },
-      {
-        "_creationTime": 1777642744615.3418,
-        "_id": "kn707038rqp4mfh7eh4tkq646985w717",
-        "createdAt": 1777642744615,
-        "displayName": "1765761935425-f5w0z.png",
-        "fileSize": 333199,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg26v2zkj9atjdk2qjdspnt60h85xx26",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/e506e375-410f-4c99-aad7-282f2a57afe0"
-      },
-      {
-        "_creationTime": 1777642745162.4658,
-        "_id": "kn7b58gmtgpfg0hgk3twcvyras85w6yg",
-        "createdAt": 1777642745162,
-        "displayName": "1765761935426-fipvxj.png",
-        "fileSize": 282747,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg2bd7za85pdjm4n4gsdqfnw8185xrya",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/9115b492-a919-4426-af78-43ab50904ab7"
-      },
-      {
-        "_creationTime": 1777642745970.582,
-        "_id": "kn732xms6meazyy7fe6sxbw3qx85wcqw",
-        "createdAt": 1777642745970,
-        "displayName": "1765761935427-njkkow.png",
-        "fileSize": 271389,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg20d2dw77mh452x3pd666ak7d85xzvq",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/32d6c256-c80c-4b68-8d59-2b0ba29a940c"
-      },
-      {
-        "_creationTime": 1777642746520.6145,
-        "_id": "kn78kz9xw1qhkwha8krs9b27nn85wj9j",
-        "createdAt": 1777642746520,
-        "displayName": "1765761935427-om87zl.png",
-        "fileSize": 221332,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg217bqsn0qycf6xxk36pkc64h85xwj6",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/e28149a1-c4c8-4d6c-9530-87e54c897f3a"
-      },
-      {
-        "_creationTime": 1777642747089.3665,
-        "_id": "kn786m02hcc21hb3xs9b0bk08585w675",
-        "createdAt": 1777642747089,
-        "displayName": "1765761935428-ehl7o6.png",
-        "fileSize": 257437,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg20qsb8d75sg6kg6megpx1cq185xc9b",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/78930727-8473-4878-b20d-102cf7548e6c"
-      },
-      {
-        "_creationTime": 1777642747606.6753,
-        "_id": "kn77g9ykvfm02jpwtkb65gypcn85xztf",
-        "createdAt": 1777642747606,
-        "displayName": "1765761935429-pxqa0n.png",
-        "fileSize": 339248,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg234q4j1zcjcjxbp86xsmy4zh85x83j",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/8a235936-e989-4c8a-a2e5-426c5bd81ea7"
-      },
-      {
-        "_creationTime": 1777642748389.1687,
-        "_id": "kn7c16qfrr0khxd2a8kxzkbwz985w4ye",
-        "createdAt": 1777642748389,
-        "displayName": "1765761935429-q00e6b.png",
-        "fileSize": 218828,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/png",
-        "storageId": "kg2dxke33ns2w524m9s0zf09t185x2c6",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/714cf53e-81f9-4896-b6a1-cdcd230979ba"
-      }
-    ],
-    "longDescriptionTranslations": {
-      "enUS": "InProfile is a modern web application developed to manage users, groups, and permissions within the InBot ecosystem. The main interface features a generic and reusable data table with real-time search, configurable pagination, column sorting, multiple selection, and customizable row actions. Functionalities include creating new users with fields for username, email, first name, last name, password, and status; editing information for existing users; deleting users with a confirmation modal; and managing permission groups. User add/edit modal with form validation using React Hook Form and Zod. Modal for managing groups associated with each user with multiple selection. Authentication system via Keycloak with mandatory role verification, automatic token refresh, and session persistence. Route protection with a ProtectedRoute component that verifies authentication and permissions. Responsive layout with collapsible sidebar, header with user information, and logout. UI components based on shadcn/ui with light/dark theme support.",
-      "ptBR": "InProfile é uma aplicação web moderna desenvolvida para gerenciar usuários, grupos e permissões do ecossistema InBot. A interface principal apresenta uma tabela de dados genérica e reutilizável com busca em tempo real, paginação configurável, ordenação por colunas, seleção múltipla e ações customizáveis por linha. Funcionalidades incluem criar novos usuários com campos de username, email, nome, sobrenome, senha e status, editar informações de usuários existentes, excluir usuários com modal de confirmação e gerenciar grupos de permissões. Modal de adição/edição de usuários com validação de formulários usando React Hook Form e Zod. Modal para gerenciar grupos associados a cada usuário com seleção múltipla. Sistema de autenticação via Keycloak com verificação de roles obrigatórias, refresh automático de tokens e persistência de sessão. Proteção de rotas com componente ProtectedRoute que verifica autenticação e permissões. Layout responsivo com sidebar colapsável, header com informações do usuário e logout. Componentes UI baseados em shadcn/ui com suporte a tema claro/escuro."
-    },
-    "orderIndex": 9,
-    "tags": [
-      "React",
-      "TypeScript",
-      "Vite",
-      "TailwindCSS",
-      "Keycloak",
-      "React Query",
-      "Zod",
-      "React Hook Form",
-      "REST API",
-      "Radix UI"
-    ],
-    "title": "InProfile",
-    "titleTranslations": {
-      "enUS": "InProfile",
-      "ptBR": "InProfile"
-    }
-  },
-  {
-    "_creationTime": 1777643674133.4126,
-    "_id": "kx75a9qnvnrsknbcxgkpgj4b5985xavk",
-    "createdAt": 1777643674133,
-    "demoLink": "https://ideaforge-ia.vercel.app/",
-    "description": "IdeaForge - Desenvolva uma Estratégia para seu Negócio",
-    "descriptionTranslations": {
-      "enUS": "IdeaForge - Develop a Strategy for Your Business",
-      "ptBR": "IdeaForge - Desenvolva uma Estratégia para seu Negócio"
-    },
-    "externalImageUrls": [
-      "https://i.postimg.cc/6QxwKxQf/favIF0.png"
-    ],
-    "githubLink": "https://github.com/MierzwaMatheus/ideaforge-ia/",
-    "imageIds": [],
-    "images": [
-      {
-        "url": "https://i.postimg.cc/6QxwKxQf/favIF0.png"
-      }
-    ],
-    "longDescriptionTranslations": {
-      "enUS": "IdeaForge is a revolutionary platform for entrepreneurs and creatives that transforms vague ideas into structured projects with actionable documents. Using specialized AI, IdeaForge provides feedback from multiple perspectives to refine your idea and generate essential documents such as pitch decks, business model canvases, and landing pages.",
-      "ptBR": "IdeaForge é uma plataforma revolucionária para empreendedores e criativos que transforma ideias vagas em projetos estruturados com documentos acionáveis. Utilizando IA especializada, o IdeaForge oferece feedback de múltiplas perspectivas para refinar sua ideia e gerar documentos essenciais como pitch decks, business canvas e landing pages."
-    },
-    "orderIndex": 10,
-    "tags": [
-      "React",
-      "TypeScript",
-      "TailwindCSS",
-      "Vite",
-      "Firebase",
-      "Cursor",
-      "Vercel",
-      "Gemini API"
-    ],
-    "title": "IdeaForge - Desenvolva uma Estratégia para seu Negócio",
-    "titleTranslations": {
-      "enUS": "IdeaForge - Develop a Strategy for Your Business",
-      "ptBR": "IdeaForge - Desenvolva uma Estratégia para seu Negócio"
-    }
-  },
-  {
-    "_creationTime": 1777643674133.4128,
-    "_id": "kx74jap3hz3kxb9dky4hcgt42585w5bf",
-    "createdAt": 1777643674133,
-    "demoLink": "https://mythoscape-gm.web.app/",
-    "description": "Mythoscape - Mestre com IA",
-    "descriptionTranslations": {
-      "enUS": "Mythoscape - AI Master",
-      "ptBR": "Mythoscape - Mestre com IA"
-    },
-    "externalImageUrls": [
-      "https://mythoscape-gm.web.app/assets/images/og-img0.png"
-    ],
-    "githubLink": "https://github.com/MierzwaMatheus/mythoscape",
-    "imageIds": [],
-    "images": [
-      {
-        "url": "https://mythoscape-gm.web.app/assets/images/og-img0.png"
-      }
-    ],
-    "longDescriptionTranslations": {
-      "enUS": "MythoScape is a digital RPG platform that uses a specialist agent architecture with generative AI (Gemini/Google) to automate game mastering. The system integrates React, TypeScript, and Firebase Realtime Database, ensuring real-time updates, traceability, and narrative automation, with secure access control and modularity for agent expansion.",
-      "ptBR": "MythoScape é uma plataforma de RPG digital que utiliza uma arquitetura de agentes especialistas com IA generativa (Gemini/Google) para mestrar campanhas de forma automatizada. O sistema integra React, TypeScript e Firebase Realtime Database, garantindo atualização em tempo real, rastreabilidade e automação narrativa, com controle de acesso seguro e modularidade para expansão de agentes."
-    },
-    "orderIndex": 11,
-    "tags": [
-      "React Native",
-      "Expo",
-      "TailwindCSS",
-      "Cursor",
-      "Supabase",
-      "Gemini API"
-    ],
-    "title": "Mythoscape - Mestre com IA",
-    "titleTranslations": {
-      "enUS": "Mythoscape - AI Master",
-      "ptBR": "Mythoscape - Mestre com IA"
-    }
-  },
-  {
-    "_creationTime": 1777643674133.4124,
-    "_id": "kx75z2r57k8qxh63enxhpw5bxs85xc67",
-    "createdAt": 1777643674133,
-    "demoLink": "https://tucano-financas.web.app/shopping",
-    "description": "Tucano - Organize suas finanças e controle suas compras",
-    "descriptionTranslations": {
-      "enUS": "Tucano - Organize Your Finances and Track Your Purchases",
-      "ptBR": "Tucano - Organize suas finanças e controle suas compras"
-    },
-    "externalImageUrls": [
-      "https://i.postimg.cc/kMLz6myM/img0.png"
-    ],
-    "githubLink": "https://github.com/MierzwaMatheus/tucano/",
-    "imageIds": [],
-    "images": [
-      {
-        "url": "https://i.postimg.cc/kMLz6myM/img0.png"
-      }
-    ],
-    "longDescriptionTranslations": {
-      "enUS": "Tucano is a modern, accessible, mobile-first application that integrates:\n\n    🛒 Monthly shopping list management\n    💰 Income and expense planning\n    💳 Smart credit card spending tracking\n    📊 Dashboard and filter-based visualization\n\nYou'll be able to control what you buy, how you pay, and where your money is going—in a clean way, without complex spreadsheets.",
-      "ptBR": "Tucano é uma aplicação mobile-first, moderna e acessível que integra:\n\n    🛒 Gestão de listas de compras mensais\n    💰 Planejamento de receitas e despesas\n    💳 Controle inteligente de gastos no cartão de crédito\n    📊 Visualização por dashboards e filtros\n\nVocê poderá controlar o que compra, como paga e para onde seu dinheiro está indo — de forma limpa, sem planilhas complexas."
-    },
-    "orderIndex": 12,
-    "tags": [
-      "React",
-      "TypeScript",
-      "TailwindCSS",
-      "Vite",
-      "Firebase",
-      "GitHub",
-      "Cursor"
-    ],
-    "title": "Tucano - Organize suas finanças e controle suas compras",
-    "titleTranslations": {
-      "enUS": "Tucano - Organize Your Finances and Track Your Purchases",
-      "ptBR": "Tucano - Organize suas finanças e controle suas compras"
-    }
-  },
-  {
-    "_creationTime": 1777643674133.4116,
-    "_id": "kx73trqk9b3y1vw4514y53xxd985x6ka",
-    "createdAt": 1777643674133,
-    "demoLink": "https://festival-inverno.web.app/",
-    "description": "Site responsivo para o 18º Festival de Inverno de Boituva 2025 com programação, personagens e integração com chatbot.",
-    "descriptionTranslations": {
-      "enUS": "Responsive website for the 18th Boituva Winter Festival 2025, featuring the schedule, characters, and chatbot integration.",
-      "ptBR": "Site responsivo para o 18º Festival de Inverno de Boituva 2025 com programação, personagens e integração com chatbot."
-    },
-    "imageIds": [
-      "kn72nxv8m02264zpqfz1nahpsh85ww98"
-    ],
-    "images": [
-      {
-        "_creationTime": 1777642751719.8496,
-        "_id": "kn72nxv8m02264zpqfz1nahpsh85ww98",
-        "createdAt": 1777642751719,
-        "displayName": "1765761998562-y6tl2c.jpg",
-        "fileSize": 1035751,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/jpeg",
-        "storageId": "kg2fw4gq8n3psws1e9311c3x3n85x4rz",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/8de13ec1-106c-407c-b6d3-978a9ff106e7"
-      }
-    ],
-    "longDescriptionTranslations": {
-      "enUS": "The Boituva Winter Festival website is a modern, responsive site developed to promote the 18th Boituva Winter Festival 2025, a cultural event that combines art, music, gastronomy, and community support. The site features well-structured sections, including a homepage with a hero section highlighting the event (July 16-19, 2025), festival information with a history dating back to 2008, and impressive numbers (18 years, 4 days, 2 stages). There is also a detailed schedule with tabs for music and workshops, highlighting renowned artists such as Edson Beltrami (flute), Ellen Hummel (oboe), and other award-winning musicians. A section on characters that embody the spirit of the event (Galan, Glacya, Nivélia, Elora) includes thematic descriptions. The site also lists sponsors and philanthropic entities that support the event, and provides location information with an integrated map, address (Avenida Pereira Ignacio, 101, Boituva-SP), hours, and access tips. Integration with a virtual assistant chatbot (Galan) offers 24/7 support with automated service. The responsive design features intuitive navigation, smooth animations with snowflakes, a cool and welcoming color palette, and clear calls to action to reserve a spot and learn about the festival.",
-      "ptBR": "Festival de Inverno de Boituva é um site moderno e responsivo desenvolvido para promover o 18º Festival de Inverno de Boituva 2025, um evento cultural que une arte, música, gastronomia e solidariedade. O site apresenta seções bem estruturadas incluindo página inicial com hero section destacando o evento (16 a 19 de julho, 2025), informações sobre o festival com histórico desde 2008 e números impressionantes (18 anos, 4 dias, 2 palcos). Programação detalhada com abas para música e oficinas, destacando artistas renomados como Edson Beltrami (flauta), Ellen Hummel (oboé) e outros músicos premiados. Seção de personagens que personificam o espírito do evento (Galan, Glacya, Nivélia, Elora) com descrições temáticas. Listagem de patrocinadores e entidades filantrópicas que apoiam o evento. Informações de localização com mapa integrado, endereço (Avenida Pereira Ignacio, 101, Boituva-SP), horários e dicas de acesso. Integração com chatbot assistente virtual (Galan) para suporte 24/7 com atendimento automatizado. Design responsivo com navegação intuitiva, animações suaves com flocos de neve, paleta de cores fria e acolhedora, e chamadas à ação claras para garantir lugar e conhecer o festival."
-    },
-    "orderIndex": 13,
-    "tags": [
-      "React",
-      "Vite",
-      "TypeScript",
-      "TailwindCSS",
-      "Framer Motion",
-      "Firebase"
-    ],
-    "title": "Festival de Inverno de Boituva",
-    "titleTranslations": {
-      "enUS": "Boituva Winter Festival",
-      "ptBR": "Festival de Inverno de Boituva"
-    }
-  },
-  {
-    "_creationTime": 1777643674133.4119,
-    "_id": "kx7aw8xtdw0zry39r9czevkpvh85wh9j",
-    "createdAt": 1777643674133,
-    "demoLink": "https://evento-conexao-familiar.web.app/",
-    "description": "Site responsivo para evento religioso Conexão Familiar com programação, patrocinadores e assistente virtual.",
-    "descriptionTranslations": {
-      "enUS": "Responsive website for the Conexão Familiar religious event, featuring the schedule, sponsors, and a virtual assistant.",
-      "ptBR": "Site responsivo para evento religioso Conexão Familiar com programação, patrocinadores e assistente virtual."
-    },
-    "imageIds": [
-      "kn71kmtb8skta9p2dv8kqxcx2185w9qt"
-    ],
-    "images": [
-      {
-        "_creationTime": 1777642752423.8623,
-        "_id": "kn71kmtb8skta9p2dv8kqxcx2185w9qt",
-        "createdAt": 1777642752423,
-        "displayName": "1765762030419-c9pcp4.jpg",
-        "fileSize": 1150139,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/jpeg",
-        "storageId": "kg25e9ygrgdkdem0qzswhkdgz585xpwt",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/b45372a4-3c40-4776-bd76-1e3bc1cee797"
-      }
-    ],
-    "longDescriptionTranslations": {
-      "enUS": "Conexão Familiar is a responsive website developed to promote the 1st Conexão Familiar, a faith-based celebration event organized by the São Francisco de Assis Parish. The website has a clear purpose: to strengthen family bonds of love and faith through a 3-day immersion (August 1, 2, and 3, 2025) featuring talks, moments of prayer, praise concerts, and activities for all ages. The homepage highlights the event's theme (\"Abide in My Love\" - John 15:9) with calls to action to secure a spot and learn more about the event. The schedule is organized by tabs for each day (Friday, Saturday, Sunday) with times for welcome, worship, opening with Eucharistic Jesus, and concerts by Catholic communities such as Colo de Deus and Walmir Alencar. There is also a sponsors section with logos of local companies that support family evangelization. Location information is provided for the same event center in Boituva, including a map, address, directions, free parking, and complete infrastructure (masses, talks, concerts, kids' area, food court). Integration with the Padre Marcos virtual assistant offers 24/7 support to answer questions, assist with registration, and provide program guidance. The responsive design features a color palette in shades of blue and green, clear navigation, and smooth animations.",
-      "ptBR": "Conexão Familiar é um site responsivo desenvolvido para promover o 1º Conexão Familiar, um evento de fé e celebração organizado pela Paróquia São Francisco de Assis. O site apresenta uma proposta clara: fortalecer os laços de amor e fé em família através de uma imersão de 3 dias (1, 2 e 3 de agosto de 2025) com palestras, momentos de oração, shows de louvor e atividades para todas as idades. A página inicial destaca o tema do evento (\"Permanecei no Meu Amor\" - João 15,9) com chamadas à ação para garantir lugar e conhecer o evento. Programação organizada por abas para cada dia (sexta-feira, sábado, domingo) com horários de acolhida, louvor, abertura com Jesus Eucarístico e shows de comunidades católicas como Colo de Deus e Walmir Alencar. Seção de patrocinadores com logos de empresas locais que apoiam a evangelização familiar. Informações de localização no mesmo centro de eventos de Boituva com mapa, endereço, instruções de chegada, estacionamento gratuito e estrutura completa (missas, palestras, shows, espaço kids, praça de alimentação). Integração com assistente virtual Padre Marcos que oferece atendimento 24/7 para esclarecer dúvidas, auxiliar inscrições e fornecer orientações sobre programação. Design responsivo com paleta de cores em tons de azul e verde, navegação clara e animações suaves."
-    },
-    "orderIndex": 14,
-    "tags": [
-      "React",
-      "Vite",
-      "TypeScript",
-      "TailwindCSS",
-      "Firebase"
-    ],
-    "title": "Conexão Familiar - Evento de Fé",
-    "titleTranslations": {
-      "enUS": "Family Connection - Faith Event",
-      "ptBR": "Conexão Familiar - Evento de Fé"
-    }
-  },
-  {
-    "_creationTime": 1777643674133.412,
-    "_id": "kx70ky0x78p0hxxabkmzf599jn85wntq",
-    "createdAt": 1777643674133,
-    "demoLink": "https://gabhu-page.vercel.app/",
-    "description": "Site portfólio para compositor e ex-integrante do Raça Negra com galeria de shows, discografia e formulário de contato.",
-    "descriptionTranslations": {
-      "enUS": "Portfolio website for composer and former member of Raça Negra, featuring a gallery of performances, discography, and contact form.",
-      "ptBR": "Site portfólio para compositor e ex-integrante do Raça Negra com galeria de shows, discografia e formulário de contato."
-    },
-    "imageIds": [
-      "kn75xv7sgz5ha32zkjdw1xpzex85xwf9"
-    ],
-    "images": [
-      {
-        "_creationTime": 1777642753381.3828,
-        "_id": "kn75xv7sgz5ha32zkjdw1xpzex85xwf9",
-        "createdAt": 1777642753381,
-        "displayName": "1765762049557-k7sir9.jpg",
-        "fileSize": 640793,
-        "folderId": "kh78dh194f3zaaw00m6wbrkcah85w3j5",
-        "mimeType": "image/jpeg",
-        "storageId": "kg2ffbrkk2tp6e0wed3h9v0pf185wmzk",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/aa5041b8-fd42-47b6-bd3a-ab6c0e548813"
-      }
-    ],
-    "longDescriptionTranslations": {
-      "enUS": "Gabhu is a professional portfolio website developed for Gabhu, a composer, singer, and music producer who was formerly a member of the band Raça Negra. The website features a modern visual identity that reflects his musical journey, with a hero section highlighting his name, profession, and legacy in Brazilian music. The main navigation includes tabs for Raça Negra Legacy, Solo Career, Discography, Gallery, and Contact. The media gallery has a filter system to view all 22 items, including recent shows (6), the Raça Negra era (8), behind the scenes (4), and interviews (4), allowing users to explore his career in an organized manner. Service sections include live shows and performances, music production encompassing composition, arrangements, artistic direction, and consulting, as well as exclusive compositions for artists, jingles, special events, and soundtracks. A comprehensive contact form includes fields for name, email, phone, service selection, event date, location, and message, enabling users to request quotes for shows and productions. Multiple contact options (phone, email, WhatsApp) and links to social media (Instagram, TikTok, YouTube) are provided. The responsive design features a professional hero image, a warm and inviting color palette, elegant typography, and clear call-to-actions for contact and quote requests.",
-      "ptBR": "Gabhu é um site portfólio profissional desenvolvido para Gabhu, compositor, cantor e produtor musical ex-integrante da banda Raça Negra. O site apresenta uma identidade visual moderna que reflete sua trajetória musical, com seção hero destacando seu nome, profissão e legado na música brasileira. A navegação principal inclui abas para Legado Raça Negra, Carreira Solo, Discografia, Galeria e Contato. Galeria de mídia com sistema de filtros para visualizar todos os 22 itens, shows recentes (6), era Raça Negra (8), bastidores (4) e entrevistas (4), permitindo explorar sua carreira de forma organizada. Seções de serviços incluem shows e apresentações ao vivo, produção musical com composição, arranjos, direção artística e consultoria, além de composições exclusivas para artistas, jingles, eventos especiais e trilhas sonoras. Formulário de contato completo com campos para nome, email, telefone, seleção de serviço, data do evento, local e mensagem, permitindo solicitar orçamentos para shows e produções. Informações de contato múltiplas (telefone, email, WhatsApp) e links para redes sociais (Instagram, TikTok, YouTube). Design responsivo com imagem de destaque profissional, paleta de cores quentes e acolhedoras, tipografia elegante e call-to-actions claras para contato e solicitações de orçamento."
-    },
-    "orderIndex": 15,
-    "tags": [
-      "React",
-      "Vite",
-      "TypeScript",
-      "TailwindCSS",
-      "Vercel"
-    ],
-    "title": "Gabhu - Portfólio Musical",
-    "titleTranslations": {
-      "enUS": "Gabhu - Music Portfolio",
-      "ptBR": "Gabhu - Portfólio Musical"
-    }
-  },
-  {
-    "_creationTime": 1777643674133.4136,
-    "_id": "kx79hh7tz195wsxx6fj3am17m185w825",
-    "createdAt": 1777643674133,
-    "demoLink": "https://fluxora-plan.web.app/",
-    "description": "Fluxora",
-    "descriptionTranslations": {
-      "enUS": "Fluxora",
-      "ptBR": "Fluxora"
-    },
-    "externalImageUrls": [
-      "https://i.postimg.cc/bwYvzcHM/fluxora.png"
-    ],
-    "githubLink": "https://github.com/MierzwaMatheus/fluxora",
-    "imageIds": [],
-    "images": [
-      {
-        "url": "https://i.postimg.cc/bwYvzcHM/fluxora.png"
-      }
-    ],
-    "longDescriptionTranslations": {
-      "enUS": "This project was created for personal use as a simple expense tracker and shopping list manager. It features financial planning list creation with income and expenses recorded by category, and tracking of paid and unpaid items. Shopping lists include budgeting, new product registration in the database, organization by category, tracking of purchased and unpurchased items, and automatic quantity x price calculations. Registration and account creation are available for use.",
-      "ptBR": "Projeto criado para uso pessoal, sendo um simples gestor de gastos e lista de compras. Funções de criação de listas de planejamento financeiro com entradas e saídas registradas por categorias, e controle do que foi pago e o que ainda não. Já listas de compras com orçamento, cadastro de novos produtos no banco de dados, organização por categorias, controle do que foi comprado e o que ainda não, e cálculos automáticos de quantia x preço. Disponível para cadastro e uso, com criação de conta."
-    },
-    "orderIndex": 16,
-    "tags": [
-      "Vite",
-      "TailwindCSS",
-      "React",
-      "Supabase",
-      "Cursor"
-    ],
-    "title": "Fluxora",
-    "titleTranslations": {
-      "enUS": "Fluxora",
-      "ptBR": "Fluxora"
-    }
-  },
-  {
-    "_creationTime": 1777643674133.4133,
-    "_id": "kx784ve6q5gkpsr72vdk155d1x85x102",
-    "createdAt": 1777643674133,
-    "demoLink": "https://magicmoon-tattoo-homolog.web.app/",
-    "description": "MagicMoon Tattoo",
-    "descriptionTranslations": {
-      "enUS": "MagicMoon Tattoo",
-      "ptBR": "MagicMoon Tattoo"
-    },
-    "externalImageUrls": [
-      "https://i.postimg.cc/8cMPKTdK/magicmoon.png"
-    ],
-    "githubLink": "https://github.com/MierzwaMatheus/magicmoon-tattoo",
-    "imageIds": [],
-    "images": [
-      {
-        "url": "https://i.postimg.cc/8cMPKTdK/magicmoon.png"
-      }
-    ],
-    "longDescriptionTranslations": {
-      "enUS": "Portfolio site for tattoo artist Pietra. Includes key information, style-based search filters, and most importantly, an administrative area accessible via the /admin URL with the password \"admin\". This area allows adding new tattoos, which are saved in Firebase's Realtime Database. The version below is the staging version, not yet connected to Firebase and with a weak access password, used for project approval. The production version contains a strong password and all database connections are already established.",
-      "ptBR": "Site portfólio para a tatuadora Pietra. Com informações importantes, filtros de busca por estilos, mas principalmente, uma área administrativa acessada pela url /admin, com a senha \"admin\", nesta área, é possível adicionar tatuagens novas, que são salvas no realtimeDB do firebase. A versão abaixo é a versão de homologação, ainda não ligada com o firebase e com senha de acesso fraca, usada para aprovação do projeto, a versão de produção contém senha forte e todas as ligações com BD já feitas."
-    },
-    "orderIndex": 17,
-    "tags": [
-      "React",
-      "Vite",
-      "TailwindCSS",
-      "Firebase",
-      "Cursor"
-    ],
-    "title": "MagicMoon Tattoo",
-    "titleTranslations": {
-      "enUS": "MagicMoon Tattoo",
-      "ptBR": "MagicMoon Tattoo"
-    }
-  },
-  {
-    "_creationTime": 1777643674133.4143,
-    "_id": "kx76zqky2031dqjg08r35xs6dx85xc7t",
-    "createdAt": 1777643674133,
-    "demoLink": "https://hardrock-curitiba.web.app/",
-    "description": "Hard Rock Café LP",
-    "descriptionTranslations": {
-      "enUS": "Hard Rock Cafe LP",
-      "ptBR": "Hard Rock Café LP"
-    },
-    "externalImageUrls": [
-      "https://i.postimg.cc/R0TS2vYq/hard-rock.png"
-    ],
-    "imageIds": [],
-    "images": [
-      {
-        "url": "https://i.postimg.cc/R0TS2vYq/hard-rock.png"
-      }
-    ],
-    "longDescriptionTranslations": {
-      "enUS": "Page created to showcase Rocksy, Hard Rock Curitiba's new ChatBot. It features interactive elements, sound effects, and animations made purely with CSS and JS.",
-      "ptBR": "Página criada para apresentar o novo chatBot da Hard Rock Curitiba, a Rocksy. Conta com elementos interativos, efeitos sonoros e animações feitas puramente com CSS e JS."
-    },
-    "orderIndex": 18,
-    "tags": [
-      "JavaScript",
-      "CSS3",
-      "HTML5"
-    ],
-    "title": "Hard Rock Café LP",
-    "titleTranslations": {
-      "enUS": "Hard Rock Cafe LP",
-      "ptBR": "Hard Rock Café LP"
-    }
-  },
-  {
-    "_creationTime": 1777643674133.4146,
-    "_id": "kx70dh3w569jhvts30ppxdfv2x85x1vf",
-    "createdAt": 1777643674133,
-    "demoLink": "https://kamaradaluna.web.app/",
-    "description": "Nutri Kamarada Luna LP",
-    "descriptionTranslations": {
-      "enUS": "Nutri Kamarada Luna SF",
-      "ptBR": "Nutri Kamarada Luna LP"
-    },
-    "externalImageUrls": [
-      "https://i.postimg.cc/6QK6H8YD/kmarada.png"
-    ],
-    "imageIds": [],
-    "images": [
-      {
-        "url": "https://i.postimg.cc/6QK6H8YD/kmarada.png"
-      }
-    ],
-    "longDescriptionTranslations": {
-      "enUS": "Landing page developed for Luna Sardinha, a nutritionist who needed a dedicated page for her services. The page highlights the nutritionist's background, which has a communist leaning, and her involvement in social movements fighting for equality. It also highlights the popular nutrition program, through which she provides nutritional consultations at affordable prices, bringing access to nutrition to lower income segments of society.",
-      "ptBR": "Landing Page desenvolvida para Luna Sardinha, uma nutricionista que precisava de uma página exclusiva para seu serviço como nutricionista. A página destaca a história da nutricionista, que tem um viés comunista e participa de lutas sociais em busca de igualdade. Também é destacado o programa de nutrição popular, onde ela realiza atendimentos nutricionais com valores populares, levando o acesso a nutrição a classes mais baixas da sociedade."
-    },
-    "orderIndex": 19,
-    "tags": [
-      "HTML5",
-      "JavaScript",
-      "CSS3"
-    ],
-    "title": "Nutri Kamarada Luna LP",
-    "titleTranslations": {
-      "enUS": "Nutri Kamarada Luna SF",
-      "ptBR": "Nutri Kamarada Luna LP"
-    }
-  },
-  {
-    "_creationTime": 1777643674133.4138,
-    "_id": "kx7c3ty9abm0k5r1g7jzwxbys585w2v4",
-    "createdAt": 1777643674133,
-    "demoLink": "https://www.behance.net/gallery/196447187/UX-UI-WildGuardian",
-    "description": "UX | UI WildGuardian",
-    "descriptionTranslations": {
-      "enUS": "UX | UI WildGuardian",
-      "ptBR": "UX | UI WildGuardian"
-    },
-    "externalImageUrls": [
-      "https://mir-s3-cdn-cf.behance.net/project_modules/disp/3993ed196447187.661ff51311de9.jpg"
-    ],
-    "imageIds": [],
-    "images": [
-      {
-        "url": "https://mir-s3-cdn-cf.behance.net/project_modules/disp/3993ed196447187.661ff51311de9.jpg"
-      }
-    ],
-    "longDescriptionTranslations": {
-      "enUS": "Driven by a deep passion for environmental issues, especially the preservation of our wildlife, and observing the financial challenges faced by NGOs and conservation institutions, the WildGuardian project was born. The idea is an innovative web platform that allows nature enthusiasts to sponsor wild or exotic animals from these institutions. Through a monthly subscription, supporters not only contribute financially to the rescue and care of these animals, but also gain access to exclusive content and interaction opportunities, creating a closer connection with the cause and the animals they help protect.",
-      "ptBR": "Movido por uma profunda paixão por questões ambientais, especialmente pela preservação da nossa fauna, e observando os desafios financeiros enfrentados por ONGs e instituições de conservação, nasceu o projeto WildGuardian. A ideia é uma plataforma web inovadora que permite que entusiastas da natureza apadrinhem animais silvestres ou exóticos dessas instituições. Através de uma assinatura mensal, os apoiadores não só contribuem financeiramente para o resgate e cuidado desses animais, mas também ganham acesso a conteúdo exclusivo e oportunidades de interação, criando uma conexão mais próxima com a causa e os animais que ajudam a proteger."
-    },
-    "orderIndex": 20,
-    "tags": [
-      "Figma"
-    ],
-    "title": "UX | UI WildGuardian",
-    "titleTranslations": {
-      "enUS": "UX | UI WildGuardian",
-      "ptBR": "UX | UI WildGuardian"
-    }
-  },
-  {
-    "_creationTime": 1777643674133.414,
-    "_id": "kx7bqx6z4vz7jy8tvhehscnhv185xt8e",
-    "createdAt": 1777643674133,
-    "demoLink": "https://www.behance.net/gallery/195162333/UX-UI-Sampa-Invest-Group",
-    "description": "UX | UI Sampa Invest Group",
-    "descriptionTranslations": {
-      "enUS": "UX | UI Sampa Invest Group",
-      "ptBR": "UX | UI Sampa Invest Group"
-    },
-    "externalImageUrls": [
-      "https://mir-s3-cdn-cf.behance.net/project_modules/disp/2bc480195162333.6608f3f1ae1db.jpg"
-    ],
-    "imageIds": [],
-    "images": [
-      {
-        "url": "https://mir-s3-cdn-cf.behance.net/project_modules/disp/2bc480195162333.6608f3f1ae1db.jpg"
-      }
-    ],
-    "longDescriptionTranslations": {
-      "enUS": "The Sampa redesign project was born from the need to enhance the mobile experience for its customers, who, despite preferring to use the site on their cell phones, faced several design flaws. The initiative, driven by direct user feedback and the challenge set by the CEO, evolved from a simple fix to a complete visual and functional revitalization of the site, applying a new identity to the company. For me, this undertaking represented a stimulating opportunity to go further, challenging my knowledge in UI/UX, exploring new techniques, and expanding my skills, all while contributing directly to the evolution of Sampa and a significantly improved user experience.",
-      "ptBR": "O projeto de redesign da Sampa nasceu da necessidade de aprimorar a experiência mobile dos seus clientes, que, apesar de preferirem usar o site pelo celular, enfrentavam diversos erros de design. A iniciativa, impulsionada pelo feedback direto dos usuários e pelo desafio proposto pelo CEO, evoluiu de uma simples correção para uma completa revitalização visual e funcional do site, aplicando uma nova identidade à empresa. Para mim, essa empreitada representou uma oportunidade estimulante de ir além, desafiando meus conhecimentos em UI/UX, explorando novas técnicas e expandindo minhas habilidades, tudo isso enquanto contribuía diretamente para a evolução da Sampa e para uma experiência de usuário significativamente melhorada."
-    },
-    "orderIndex": 21,
-    "tags": [
-      "Figma"
-    ],
-    "title": "UX | UI Sampa Invest Group",
-    "titleTranslations": {
-      "enUS": "UX | UI Sampa Invest Group",
-      "ptBR": "UX | UI Sampa Invest Group"
-    }
+    "updatedAt": 1768435200000
   }
 ]

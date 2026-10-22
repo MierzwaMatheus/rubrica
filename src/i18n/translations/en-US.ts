@@ -26,7 +26,7 @@ export const enUS = {
   home: {
     greeting: "whoami",
     title: "Hi! I'm",
-    subtitle: "> Tech Lead Frontend & FuHome.tsx:69ll-Stack Engineer",
+    subtitle: "> Professional portfolio",
     about: {
       title: " About me ",
       loading: "Loading about me...",
@@ -35,14 +35,8 @@ export const enUS = {
       title: "What they say about me",
     },
     hero: {
-      description: "Transforming complex challenges into robust digital ecosystems, with a focus on architecture, innovation and technical excellence.",
-      technologies: [
-        { name: "React", color: "bg-sky-400" },
-        { name: "TypeScript", color: "bg-blue-600" },
-        { name: "Node.js", color: "bg-green-600" },
-        { name: "Next.js", color: "bg-neutral-900" },
-        { name: "Convex", color: "bg-orange-500" },
-      ],
+      description: "Projects, career and ideas in one place.",
+      technologies: [],
     },
     skills: {
       title: "What I do",
@@ -133,7 +127,7 @@ export const enUS = {
     subtitle: "Get to know a little more about who I am",
     aboutMe: {
       title: "About me",
-      text: "I'm a tech guy who lives on challenges and loves creating things with incredible visuals. My mission is to make every project not only work, but leave the client amazed with a design that represents the brand.\n\nWhen I'm not in front of the computer, my world spins at a different pace. Rap is the soundtrack of my day, and my free time is divided between epic adventures in tabletop RPGs and board games with the crew. And, even though I might seem a bit tough, I confess I'm a fan of a good romance, those almost platonic ones. Oh, and New Girl was a marathon that got me last year.\n\nMy travel dream is a bit different: I really want to meet indigenous tribes and understand in practice what their daily life is like. You'll probably see me around always with my headphones and some silver necklaces. For me, facing a technical challenge, like setting up my own server or testing a new technology, is pure fun and a way to learn hands-on.",
+      text: "Tell a bit about yourself here: your path, what drives you at work and what you enjoy doing when you're not working.\n\nThis text can be edited in the admin panel, under Texts.",
     },
     tapToKnowMore: "Tap to Learn More",
     dailyRoutine: {

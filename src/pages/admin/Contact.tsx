@@ -3,6 +3,7 @@ import { AdminLayout } from "./Dashboard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ImagePicker } from "@/components/admin/ImagePicker";
@@ -43,6 +44,11 @@ export default function AdminContact() {
     behance: ""
   });
 
+  const [proposalData, setProposalData] = useState({
+    proposalIntro: "",
+    proposalAiContext: "",
+  });
+
   useEffect(() => {
     if (data) {
       const rolePT = data.roleTranslations?.ptBR || data.role || "";
@@ -63,6 +69,10 @@ export default function AdminContact() {
         linkedin: data.linkedinUrl || "",
         github: data.githubUrl || "",
         behance: data.behanceUrl || ""
+      });
+      setProposalData({
+        proposalIntro: (data as any).proposalIntro || "",
+        proposalAiContext: (data as any).proposalAiContext || "",
       });
     }
   }, [data]);
@@ -96,6 +106,8 @@ export default function AdminContact() {
         linkedinUrl: socialMedia.linkedin,
         githubUrl: socialMedia.github,
         behanceUrl: socialMedia.behance,
+        proposalIntro: proposalData.proposalIntro || undefined,
+        proposalAiContext: proposalData.proposalAiContext || undefined,
       });
       toast.success("Alterações salvas com sucesso!");
     } catch (error) {
@@ -271,6 +283,33 @@ export default function AdminContact() {
                 value={socialMedia.behance}
                 onChange={(e) => handleSocialChange("behance", e.target.value)}
                 className="bg-white/5 border-white/10 text-white"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-card border-white/10">
+          <CardHeader>
+            <CardTitle className="text-white">Propostas Comerciais</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label className="text-white">Texto de apresentação nas propostas</Label>
+              <Textarea
+                value={proposalData.proposalIntro}
+                onChange={(e) => setProposalData(prev => ({ ...prev, proposalIntro: e.target.value }))}
+                placeholder="Olá, tudo bem? Antes de tudo, agradeço o interesse! Sou [seu nome], [sua profissão]..."
+                className="bg-white/5 border-white/10 text-white min-h-[120px]"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-white">Perfil para geração de propostas por IA</Label>
+              <p className="text-xs text-gray-500">Descreva sua experiência, área de atuação e diferenciais. A IA usará este contexto para gerar propostas personalizadas.</p>
+              <Textarea
+                value={proposalData.proposalAiContext}
+                onChange={(e) => setProposalData(prev => ({ ...prev, proposalAiContext: e.target.value }))}
+                placeholder="Ex: Designer com 5 anos de experiência em branding e identidade visual para pequenas e médias empresas. Especialidade em logotipos, guias de marca e materiais impressos..."
+                className="bg-white/5 border-white/10 text-white min-h-[120px]"
               />
             </div>
           </CardContent>

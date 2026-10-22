@@ -1,345 +1,337 @@
 {
   "services": [
     {
-      "_creationTime": 1777643670077.2305,
-      "_id": "ms715c4amz5b5tykarhjfq5nh585x2ag",
-      "createdAt": 1777643670077,
-      "description": "Otimizo cada milissegundo. Desde build tools (Vite) até estratégias de deployment (Vercel), implemento pipelines que garantem qualidade, velocidade e confiabilidade. Automação, monitoramento e excelência operacional são minha obsessão.\n",
-      "descriptionTranslations": {
-        "enUS": "I optimize every millisecond. From built tools (Vite) to deployment strategies (Vercel), implement pipelines that ensure quality, speed and reliability. Automation, monitoring and operational excellence are my obsession.\n.",
-        "ptBR": "Otimizo cada milissegundo. Desde build tools (Vite) até estratégias de deployment (Vercel), implemento pipelines que garantem qualidade, velocidade e confiabilidade. Automação, monitoramento e excelência operacional são minha obsessão."
-      },
-      "orderIndex": 0,
-      "title": "Performance & DevOps Frontend",
+      "_creationTime": 1768435200001,
+      "_id": "sample000000000000000000000000000002",
+      "createdAt": 1768435200002,
+      "title": "Design de Produto",
       "titleTranslations": {
-        "enUS": "Performance & DevOps Frontend",
-        "ptBR": "Performance & DevOps Frontend"
-      }
+        "ptBR": "Design de Produto",
+        "enUS": "Product Design"
+      },
+      "description": "Pesquisa, fluxos e protótipos que viram decisões claras para o time.",
+      "descriptionTranslations": {
+        "ptBR": "Pesquisa, fluxos e protótipos que viram decisões claras para o time.",
+        "enUS": "Research, flows and prototypes that turn into clear decisions for the team."
+      },
+      "orderIndex": 0
     },
     {
-      "_creationTime": 1777643670077.2307,
-      "_id": "ms7bhye6bhdj3h4j7xb27twcpn85wazj",
-      "createdAt": 1777643670077,
-      "description": "Desenho ecossistemas digitais robustos que crescem com seu negócio. Desde autenticação centralizada (Keycloak) até infraestrutura de CI/CD (GitHub Actions, Vercel), defino padrões técnicos que garantem segurança, performance e manutenibilidade. Cada decisão arquitetural é estratégica.",
-      "descriptionTranslations": {
-        "enUS": "Design robust digital ecosystems that grow with your business. From centralized authentication (Keycloak) to CI/CD infrastructure (GitHub Actions, Vercel), I define technical standards that ensure security, performance and maintenance. Every architectural decision is strategic.",
-        "ptBR": "Desenho ecossistemas digitais robustos que crescem com seu negócio. Desde autenticação centralizada (Keycloak) até infraestrutura de CI/CD (GitHub Actions, Vercel), defino padrões técnicos que garantem segurança, performance e manutenibilidade. Cada decisão arquitetural é estratégica."
-      },
-      "orderIndex": 1,
-      "title": "Arquitetura de Sistemas Escaláveis",
+      "_creationTime": 1768435200002,
+      "_id": "sample000000000000000000000000000003",
+      "createdAt": 1768435200003,
+      "title": "Interfaces Front-end",
       "titleTranslations": {
-        "enUS": "Scalable Systems Architecture",
-        "ptBR": "Arquitetura de Sistemas Escaláveis"
-      }
+        "ptBR": "Interfaces Front-end",
+        "enUS": "Front-end Interfaces"
+      },
+      "description": "Componentes acessíveis e rápidos, prontos para crescer com o produto.",
+      "descriptionTranslations": {
+        "ptBR": "Componentes acessíveis e rápidos, prontos para crescer com o produto.",
+        "enUS": "Accessible, fast components ready to grow with the product."
+      },
+      "orderIndex": 1
     },
     {
-      "_creationTime": 1777643670077.231,
-      "_id": "ms72mxr1qfj7970ts3z40z1txs85xdvw",
-      "createdAt": 1777643670077,
-      "description": "Guio equipes de engenharia na construção de soluções de alta qualidade. Defino arquiteturas, estabeleço padrões de código, realizo code reviews estratégicos e mentoro desenvolvedores para elevar o nível técnico. Meu foco: transformar times em máquinas de inovação.\n",
-      "descriptionTranslations": {
-        "enUS": "I guide engineering teams in the construction of high quality solutions. I define architectures, establish code standards, perform code strategic reviews and mentor developers to raise the technical level. My focus: turning teams into innovation machines.\n.",
-        "ptBR": "Guio equipes de engenharia na construção de soluções de alta qualidade. Defino arquiteturas, estabeleço padrões de código, realizo code reviews estratégicos e mentoro desenvolvedores para elevar o nível técnico. Meu foco: transformar times em máquinas de inovação."
-      },
-      "orderIndex": 2,
-      "title": "Liderança Técnica & Mentoria",
+      "_creationTime": 1768435200003,
+      "_id": "sample000000000000000000000000000004",
+      "createdAt": 1768435200004,
+      "title": "Design Systems",
       "titleTranslations": {
-        "enUS": "Technical Leadership & Mentoria",
-        "ptBR": "Liderança Técnica & Mentoria"
-      }
+        "ptBR": "Design Systems",
+        "enUS": "Design Systems"
+      },
+      "description": "Tokens, bibliotecas e documentação que mantêm tudo consistente.",
+      "descriptionTranslations": {
+        "ptBR": "Tokens, bibliotecas e documentação que mantêm tudo consistente.",
+        "enUS": "Tokens, libraries and docs that keep everything consistent."
+      },
+      "orderIndex": 2
     },
     {
-      "_creationTime": 1777643670077.2312,
-      "_id": "ms7ef54gy78cd2ppc5jgc66md185xd1c",
-      "createdAt": 1777643670077,
-      "description": "Crio interfaces que não apenas encantam visualmente, mas que resolvem problemas reais com elegância. Integro IA de forma inteligente (Gemini, LLMs), construo dashboards que revelam insights, e desenho jornadas que transformam usuários em defensores da marca.\n",
-      "descriptionTranslations": {
-        "enUS": "I create interfaces that not only delight visually, but solve real problems with elegance. Integro IA intelligently (Gemini, LLMs), I build dashboards that reveal insights, and design journeys that transform users into brand advocates.\n.",
-        "ptBR": "Crio interfaces que não apenas encantam visualmente, mas que resolvem problemas reais com elegância. Integro IA de forma inteligente (Gemini, LLMs), construo dashboards que revelam insights, e desenho jornadas que transformam usuários em defensores da marca."
-      },
-      "orderIndex": 3,
-      "title": "Experiências Digitais Inteligentes",
+      "_creationTime": 1768435200004,
+      "_id": "sample000000000000000000000000000005",
+      "createdAt": 1768435200005,
+      "title": "Consultoria",
       "titleTranslations": {
-        "enUS": "Intelligent Digital Experiences",
-        "ptBR": "Experiências Digitais Inteligentes"
-      }
+        "ptBR": "Consultoria",
+        "enUS": "Consulting"
+      },
+      "description": "Diagnóstico de UX e roadmap técnico para produtos em evolução.",
+      "descriptionTranslations": {
+        "ptBR": "Diagnóstico de UX e roadmap técnico para produtos em evolução.",
+        "enUS": "UX audits and technical roadmaps for evolving products."
+      },
+      "orderIndex": 3
     }
   ],
   "testimonials": [
     {
-      "_creationTime": 1777643670860.619,
-      "_id": "mx77z5jyyg4h1yeyv5td47xf8x85wbpw",
-      "createdAt": 1777643670860,
-      "imageUrl": "https://roxus-studio.web.app/assets/images/depoimentos/lucas.jpeg",
-      "name": "Lucas",
-      "orderIndex": 0,
-      "role": "CEO ForgeCode",
-      "text": "Obrigado Matheus pela modernização da nossa marca. Foi essencial essa reformulação! Superou as espectativas, trabalho rápido e muito eficiente. Nós da Forge Code agradecemos muito a atenção e os serviços prestados!\n",
+      "_creationTime": 1768435200005,
+      "_id": "sample000000000000000000000000000006",
+      "createdAt": 1768435200006,
+      "name": "Bruna Costa",
+      "role": "Head de Produto, Lumen",
+      "text": "Trabalho cuidadoso do começo ao fim. O redesign reduziu pela metade as dúvidas no suporte.",
       "textTranslations": {
-        "enUS": "Thank you Matheus for the modernization of our brand. This recasting was essential! You've overcome expectations, fast work and very efficient. We from Forge Code We thank you very much for the attention and services provided!\n!",
-        "ptBR": "Obrigado Matheus pela modernização da nossa marca. Foi essencial essa reformulação! Superou as espectativas, trabalho rápido e muito eficiente. Nós da Forge Code agradecemos muito a atenção e os serviços prestados!"
-      }
+        "ptBR": "Trabalho cuidadoso do começo ao fim. O redesign reduziu pela metade as dúvidas no suporte.",
+        "enUS": "Careful work from start to finish. The redesign halved our support questions."
+      },
+      "imageUrl": "",
+      "orderIndex": 0
     },
     {
-      "_creationTime": 1777643670860.6191,
-      "_id": "mx77gesv0x1tbs5j71522p506d85xs1p",
-      "createdAt": 1777643670860,
-      "imageUrl": "https://roxus-studio.web.app/assets/images/cartoes/fabio-oliveira.jpeg",
-      "name": "Fabio Oliveira",
-      "orderIndex": 1,
-      "role": "CEO Sampa Invest Group",
-      "text": "Cara, a minha marca ficou top demais! Sério, eu fiquei impressionado com o que a Roxus conseguiu fazer. Eu já esperava algo legal, mas isso foi muito além! Com certeza vou recomendar para todos os meus amigos e colegas de trabalho.",
+      "_creationTime": 1768435200006,
+      "_id": "sample000000000000000000000000000007",
+      "createdAt": 1768435200007,
+      "name": "Diego Alves",
+      "role": "CTO, Norte Labs",
+      "text": "Entregou um design system que o time inteiro adotou sem atrito.",
       "textTranslations": {
-        "enUS": "Dude, my brand's too topped! Seriously, I was impressed with what Roxus was able to do. I expected something nice, but that went way beyond! I'll definitely recommend it to all my friends and coworkers.",
-        "ptBR": "Cara, a minha marca ficou top demais! Sério, eu fiquei impressionado com o que a Roxus conseguiu fazer. Eu já esperava algo legal, mas isso foi muito além! Com certeza vou recomendar para todos os meus amigos e colegas de trabalho."
-      }
+        "ptBR": "Entregou um design system que o time inteiro adotou sem atrito.",
+        "enUS": "Delivered a design system the whole team adopted without friction."
+      },
+      "imageUrl": "",
+      "orderIndex": 1
     },
     {
-      "_creationTime": 1777643670860.6194,
-      "_id": "mx712zay07npc58kp7p9t05p4585w6j6",
-      "createdAt": 1777643670860,
-      "imageUrl": "https://roxus-studio.web.app/assets/images/depoimentos/maria%20cecilia.jpg",
-      "name": "Maria Cecilia",
-      "orderIndex": 2,
-      "role": "CEO Aroma & Latte",
-      "text": "Quando iniciei o projeto não tinha certeza se era um bom investimento, agora já passaram 3 meses e nós percebemos um aumento de 30% no marketing orgânico da marca. A forma que a Roxus encaminhou o projeto fez os clientes se sentirem muito mais próximos da nossa marca.",
+      "_creationTime": 1768435200007,
+      "_id": "sample000000000000000000000000000008",
+      "createdAt": 1768435200008,
+      "name": "Carla Mendes",
+      "role": "Fundadora, Atelier 9",
+      "text": "Entendeu o negócio antes de desenhar a primeira tela. Fez toda a diferença.",
       "textTranslations": {
-        "enUS": "When I started the project I wasn't sure if it was a good investment, now it's been three months and we realized a 30% increase in organic brand marketing. The way Roxus forwarded the project made customers feel much closer to our brand.",
-        "ptBR": "Quando iniciei o projeto não tinha certeza se era um bom investimento, agora já passaram 3 meses e nós percebemos um aumento de 30% no marketing orgânico da marca. A forma que a Roxus encaminhou o projeto fez os clientes se sentirem muito mais próximos da nossa marca."
-      }
+        "ptBR": "Entendeu o negócio antes de desenhar a primeira tela. Fez toda a diferença.",
+        "enUS": "Understood the business before drawing the first screen. It made all the difference."
+      },
+      "imageUrl": "",
+      "orderIndex": 2
     },
     {
-      "_creationTime": 1777643670860.6196,
-      "_id": "mx7cbdhvgv6qw8rvgsvp6jtb0h85wrnn",
-      "createdAt": 1777643670860,
-      "imageUrl": "https://roxus-studio.web.app/assets/images/depoimentos/Luiz%20Cossolin.jpeg",
-      "name": "Luiz Cossolin",
-      "orderIndex": 3,
-      "role": "CEO Paith",
-      "text": "Valeu demais pelo trabalho! Desde o início, aprendi muito sobre identidade visual. A primeira chamada que tivemos esclareceu todas as dúvidas e permitiu explicar bem o que eu queria. O questionário é bastante completo, e o serviço de atendimento está em outro nível.",
+      "_creationTime": 1768435200008,
+      "_id": "sample000000000000000000000000000009",
+      "createdAt": 1768435200009,
+      "name": "Rafael Lima",
+      "role": "PM, Orbe",
+      "text": "Comunicação clara e prazos cumpridos. Voltaríamos a trabalhar juntos.",
       "textTranslations": {
-        "enUS": "Thanks so much for the work! From the beginning, I learned a lot about visual identity. The first call we had clarified all the doubts and allowed me to explain what I wanted. The questionnaire is quite complete, and the service is at another level.",
-        "ptBR": "Valeu demais pelo trabalho! Desde o início, aprendi muito sobre identidade visual. A primeira chamada que tivemos esclareceu todas as dúvidas e permitiu explicar bem o que eu queria. O questionário é bastante completo, e o serviço de atendimento está em outro nível."
-      }
+        "ptBR": "Comunicação clara e prazos cumpridos. Voltaríamos a trabalhar juntos.",
+        "enUS": "Clear communication and deadlines met. We would work together again."
+      },
+      "imageUrl": "",
+      "orderIndex": 3
     }
   ],
   "faq": [
     {
-      "_creationTime": 1777643670349.4844,
-      "_id": "j972a4r2dmf6ybnfb3411ynxyh85wyqc",
-      "answer": "Música é companhia constante. Rap me ajuda a focar, pensar e entrar no ritmo certo das coisas. Fone de ouvido praticamente faz parte do corpo. Sem som, tudo anda meio torto.",
-      "answerTranslations": {
-        "enUS": "Music is a constant companion. Rap helps me focus, think, and get into the right rhythm. Headphones are practically a part of my body. Without sound, everything feels off-kilter.",
-        "ptBR": "Música é companhia constante. Rap me ajuda a focar, pensar e entrar no ritmo certo das coisas. Fone de ouvido praticamente faz parte do corpo. Sem som, tudo anda meio torto."
-      },
-      "createdAt": 1777643670349,
-      "displayOrder": 0,
-      "question": "Por que música é tão importante pra você?",
+      "_creationTime": 1768435200009,
+      "_id": "sample00000000000000000000000000000a",
+      "createdAt": 1768435200010,
+      "question": "Como funciona um projeto com você?",
       "questionTranslations": {
-        "enUS": "Why is music so important to you?",
-        "ptBR": "Por que música é tão importante pra você?"
-      }
+        "ptBR": "Como funciona um projeto com você?",
+        "enUS": "How does a project with you work?"
+      },
+      "answer": "Começamos com uma conversa sobre o problema, seguimos para um diagnóstico curto e só então partimos para o design e o código.",
+      "answerTranslations": {
+        "ptBR": "Começamos com uma conversa sobre o problema, seguimos para um diagnóstico curto e só então partimos para o design e o código.",
+        "enUS": "We start with a conversation about the problem, move to a short diagnosis and only then go into design and code."
+      },
+      "displayOrder": 0
     },
     {
-      "_creationTime": 1777643670349.4849,
-      "_id": "j97659f3rp8kdm3nngahtf152585x6cn",
-      "answer": "Quando desligo do trampo, quase sempre tô com música no ouvido ou em volta de uma mesa com amigos. Curto rap, RPG de mesa e board games. Gosto de jogo que tem regra, estratégia e história, nada muito aleatório. É meu jeito de relaxar sem desligar o cérebro de vez.",
-      "answerTranslations": {
-        "enUS": "When I get off work, I’m almost always listening to music or hanging out with friends. I enjoy rap, tabletop RPGs, and board games. I like games with rules, strategy, and a story—nothing too random. It's my way of relaxing without completely shutting off my brain.",
-        "ptBR": "Quando desligo do trampo, quase sempre tô com música no ouvido ou em volta de uma mesa com amigos. Curto rap, RPG de mesa e board games. Gosto de jogo que tem regra, estratégia e história, nada muito aleatório. É meu jeito de relaxar sem desligar o cérebro de vez."
-      },
-      "createdAt": 1777643670349,
-      "displayOrder": 0,
-      "question": "O que você faz quando não está trabalhando?",
+      "_creationTime": 1768435200010,
+      "_id": "sample00000000000000000000000000000b",
+      "createdAt": 1768435200011,
+      "question": "Você trabalha com times internos?",
       "questionTranslations": {
-        "enUS": "What do you do when you're not working?",
-        "ptBR": "O que você faz quando não está trabalhando?"
-      }
+        "ptBR": "Você trabalha com times internos?",
+        "enUS": "Do you work with in-house teams?"
+      },
+      "answer": "Sim. Boa parte dos projetos é feita lado a lado com o time do cliente.",
+      "answerTranslations": {
+        "ptBR": "Sim. Boa parte dos projetos é feita lado a lado com o time do cliente.",
+        "enUS": "Yes. Most projects are done side by side with the client's team."
+      },
+      "displayOrder": 1
     },
     {
-      "_creationTime": 1777643670349.4856,
-      "_id": "j97dpsmhqj2pw1qz27gjbx1am585xtms",
-      "answer": "Apesar do jeito mais fechado, quase marrento às vezes, curto romance. Principalmente aqueles quase platônicos, cheios de silêncio e sentimento não dito. Contradição? Talvez. Mas funciona.",
-      "answerTranslations": {
-        "enUS": "Despite my reserved demeanor, almost cocky at times, I enjoy romance. Especially the almost platonic kind, full of silence and unspoken feelings. A contradiction? Maybe. But it works.",
-        "ptBR": "Apesar do jeito mais fechado, quase marrento às vezes, curto romance. Principalmente aqueles quase platônicos, cheios de silêncio e sentimento não dito. Contradição? Talvez. Mas funciona."
-      },
-      "createdAt": 1777643670349,
-      "displayOrder": 2,
-      "question": "Tem algo em você que as pessoas normalmente não esperam?",
+      "_creationTime": 1768435200011,
+      "_id": "sample00000000000000000000000000000c",
+      "createdAt": 1768435200012,
+      "question": "Quais ferramentas você usa?",
       "questionTranslations": {
-        "enUS": "Is there something about you that people usually don't expect?",
-        "ptBR": "Tem algo em você que as pessoas normalmente não esperam?"
-      }
+        "ptBR": "Quais ferramentas você usa?",
+        "enUS": "What tools do you use?"
+      },
+      "answer": "Figma para design, React e TypeScript para front-end, e o que o projeto pedir.",
+      "answerTranslations": {
+        "ptBR": "Figma para design, React e TypeScript para front-end, e o que o projeto pedir.",
+        "enUS": "Figma for design, React and TypeScript for front-end, and whatever the project needs."
+      },
+      "displayOrder": 2
     },
     {
-      "_creationTime": 1777643670349.485,
-      "_id": "j974e3vyv1nmcy97gqfrrp8dr185x8bp",
-      "answer": "Tenho muita curiosidade sobre outros modos de viver. Quero conhecer tribos indígenas e entender como é o dia a dia delas, sem romantizar, só observar e aprender. Ver o mundo por outras lentes sempre muda alguma coisa por dentro.",
-      "answerTranslations": {
-        "enUS": "I'm very curious about other ways of life. I want to visit indigenous tribes and understand their daily lives, without romanticizing them, just observing and learning. Seeing the world through other lenses always changes something inside.",
-        "ptBR": "Tenho muita curiosidade sobre outros modos de viver. Quero conhecer tribos indígenas e entender como é o dia a dia delas, sem romantizar, só observar e aprender. Ver o mundo por outras lentes sempre muda alguma coisa por dentro."
-      },
-      "createdAt": 1777643670349,
-      "displayOrder": 3,
-      "question": "O que mais te desperta curiosidade fora da tecnologia?",
+      "_creationTime": 1768435200012,
+      "_id": "sample00000000000000000000000000000d",
+      "createdAt": 1768435200013,
+      "question": "Atende projetos pequenos?",
       "questionTranslations": {
-        "enUS": "What sparks your curiosity outside of technology?",
-        "ptBR": "O que mais te desperta curiosidade fora da tecnologia?"
-      }
-    },
-    {
-      "_creationTime": 1777643670349.4854,
-      "_id": "j97b3wh1wzact3en9b9qk6n0kn85wa9s",
-      "answer": "Com ânimo real. Desafio técnico pra mim é diversão. Aprender framework novo, configurar servidor do zero, montar homelab… tudo isso é parte do jogo. Dá trabalho, mas sempre ensina algo que fica.",
-      "answerTranslations": {
-        "enUS": "With genuine enthusiasm. Technical challenges are fun for me. Learning a new framework, configuring a server from scratch, setting up a homelab... it's all part of the game. It takes work, but it always teaches you something that sticks with you.",
-        "ptBR": "Com ânimo real. Desafio técnico pra mim é diversão. Aprender framework novo, configurar servidor do zero, montar homelab… tudo isso é parte do jogo. Dá trabalho, mas sempre ensina algo que fica."
+        "ptBR": "Atende projetos pequenos?",
+        "enUS": "Do you take small projects?"
       },
-      "createdAt": 1777643670349,
-      "displayOrder": 4,
-      "question": "Como você encara desafios?",
-      "questionTranslations": {
-        "enUS": "How do you approach challenges?",
-        "ptBR": "Como você encara desafios?"
-      }
-    },
-    {
-      "_creationTime": 1777643670349.4846,
-      "_id": "j97d86880rbt2739yewjz6atn185wf6b",
-      "answer": "O visual final. Ver tudo pronto e perceber que aquilo conversa com a personalidade da marca, que faz sentido, que impacta quem vai usar. Quando o cliente bate o olho e fala “é exatamente isso”, aí valeu.",
+      "answer": "Sim, desde que exista um objetivo claro para medir o resultado.",
       "answerTranslations": {
-        "enUS": "The final look. Seeing everything finished and realizing that it reflects the brand's personality, that it makes sense, that it impacts the user. When the client sees it and says, \"That's exactly it,\" then it was all worth it.",
-        "ptBR": "O visual final. Ver tudo pronto e perceber que aquilo conversa com a personalidade da marca, que faz sentido, que impacta quem vai usar. Quando o cliente bate o olho e fala “é exatamente isso”, aí valeu."
+        "ptBR": "Sim, desde que exista um objetivo claro para medir o resultado.",
+        "enUS": "Yes, as long as there is a clear goal to measure the result."
       },
-      "createdAt": 1777643670349,
-      "displayOrder": 5,
-      "question": "O que mais te motiva ao criar algo novo?",
-      "questionTranslations": {
-        "enUS": "What motivates you most when creating something new?",
-        "ptBR": "O que mais te motiva ao criar algo novo?"
-      }
+      "displayOrder": 3
     }
   ],
   "dailyRoutine": [
     {
-      "_creationTime": 1777643671158.229,
-      "_id": "j57atbqyy93apn7235t0xk3van85xdgr",
-      "createdAt": 1777643671158,
-      "description": "Viagem com a família pós natal. ",
+      "_creationTime": 1768435200014,
+      "_id": "sample00000000000000000000000000000f",
+      "createdAt": 1768435200015,
+      "description": "Manhã de pesquisa com usuários.",
       "descriptionTranslations": {
-        "enUS": "Post-Christmas family trip.",
-        "ptBR": "Viagem com a família pós natal."
+        "ptBR": "Manhã de pesquisa com usuários.",
+        "enUS": "Morning of user research."
       },
       "displayOrder": 0,
       "image": {
-        "_creationTime": 1777642618447.359,
-        "_id": "kn75btp6n94w6h49mycngetse585xfjd",
-        "createdAt": 1777642618447,
-        "displayName": "IMG_20260108_232816_488.jpg",
-        "fileSize": 289484,
-        "folderId": "kh77v4vjdvw0nr6vpjppv5kqtd85xwrg",
-        "mimeType": "image/jpeg",
-        "storageId": "kg2bn2vxzjz0zdejs30r99689585w8kg",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/71ffc738-8991-4843-a58d-e06bd616f229"
+        "_creationTime": 1768435200013,
+        "_id": "sample00000000000000000000000000000e",
+        "createdAt": 1768435200014,
+        "displayName": "rotina-1.svg",
+        "fileSize": 2048,
+        "folderId": "samples",
+        "mimeType": "image/svg+xml",
+        "storageId": "sample00000000000000000000000000000e",
+        "url": "/samples/rotina-1.svg"
       },
-      "imageId": "kn75btp6n94w6h49mycngetse585xfjd",
-      "spanSize": "1x1"
+      "imageId": "sample00000000000000000000000000000e",
+      "spanSize": "2x2"
     },
     {
-      "_creationTime": 1777643671158.2288,
-      "_id": "j570he7dsc4jbp4vfdspnajaks85x44y",
-      "createdAt": 1777643671158,
-      "description": "Apenas uma foto de paisagem que eu gosto muito.",
+      "_creationTime": 1768435200016,
+      "_id": "sample00000000000000000000000000000h",
+      "createdAt": 1768435200017,
+      "description": "Rascunhos antes de abrir o Figma.",
       "descriptionTranslations": {
-        "enUS": "Just a landscape photo I really like.",
-        "ptBR": "Apenas uma foto de paisagem que eu gosto muito."
+        "ptBR": "Rascunhos antes de abrir o Figma.",
+        "enUS": "Sketches before opening Figma."
       },
       "displayOrder": 1,
       "image": {
-        "_creationTime": 1777642608409.0254,
-        "_id": "kn7aqfgwme4zmwazjyqtm6mkf985wavv",
-        "createdAt": 1777642608409,
-        "displayName": "IMG-20240301-WA0033.jpg",
-        "fileSize": 454027,
-        "folderId": "kh77v4vjdvw0nr6vpjppv5kqtd85xwrg",
-        "mimeType": "image/jpeg",
-        "storageId": "kg26qth81arvzx41gdxm7ez24x85xfwf",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/1e994f43-f69d-4246-9395-cc4929cc4017"
+        "_creationTime": 1768435200015,
+        "_id": "sample00000000000000000000000000000g",
+        "createdAt": 1768435200016,
+        "displayName": "rotina-2.svg",
+        "fileSize": 2048,
+        "folderId": "samples",
+        "mimeType": "image/svg+xml",
+        "storageId": "sample00000000000000000000000000000g",
+        "url": "/samples/rotina-2.svg"
       },
-      "imageId": "kn7aqfgwme4zmwazjyqtm6mkf985wavv",
-      "spanSize": "1x2"
+      "imageId": "sample00000000000000000000000000000g",
+      "spanSize": "1x1"
     },
     {
-      "_creationTime": 1777643671158.2285,
-      "_id": "j576h91xem12td4v1khy7zvca185xnp5",
-      "createdAt": 1777643671158,
-      "description": "Jogando Imperium na folga prolongada de fim de ano",
+      "_creationTime": 1768435200018,
+      "_id": "sample00000000000000000000000000000j",
+      "createdAt": 1768435200019,
+      "description": "Revisão de código com o time.",
       "descriptionTranslations": {
-        "enUS": "Playing Imperium during the extended year-end break",
-        "ptBR": "Jogando Imperium na folga prolongada de fim de ano"
+        "ptBR": "Revisão de código com o time.",
+        "enUS": "Code review with the team."
       },
       "displayOrder": 2,
       "image": {
-        "_creationTime": 1777642612204.939,
-        "_id": "kn74crchc8r85zpb52awmvaqgx85x01k",
-        "createdAt": 1777642612205,
-        "displayName": "IMG_20260103_193652_124.webp",
-        "fileSize": 770638,
-        "folderId": "kh77v4vjdvw0nr6vpjppv5kqtd85xwrg",
-        "mimeType": "image/webp",
-        "storageId": "kg2acvpnjwpae3w6g7dk5qz1vh85wr4a",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/9a5df97c-799a-442f-ac2d-98a111f63833"
+        "_creationTime": 1768435200017,
+        "_id": "sample00000000000000000000000000000i",
+        "createdAt": 1768435200018,
+        "displayName": "rotina-3.svg",
+        "fileSize": 2048,
+        "folderId": "samples",
+        "mimeType": "image/svg+xml",
+        "storageId": "sample00000000000000000000000000000i",
+        "url": "/samples/rotina-3.svg"
       },
-      "imageId": "kn74crchc8r85zpb52awmvaqgx85x01k",
+      "imageId": "sample00000000000000000000000000000i",
       "spanSize": "1x1"
     },
     {
-      "_creationTime": 1777643671158.2283,
-      "_id": "j576ev3vxsjnxznsyx289xvt2h85x1y8",
-      "createdAt": 1777643671158,
-      "description": "Brincando de grafitte no meu quarto",
+      "_creationTime": 1768435200020,
+      "_id": "sample00000000000000000000000000000l",
+      "createdAt": 1768435200021,
+      "description": "Café e leitura no fim da tarde.",
       "descriptionTranslations": {
-        "enUS": "Playing graffiti in my room",
-        "ptBR": "Brincando de grafitte no meu quarto"
+        "ptBR": "Café e leitura no fim da tarde.",
+        "enUS": "Coffee and reading in the late afternoon."
       },
       "displayOrder": 3,
       "image": {
-        "_creationTime": 1777642602605.6047,
-        "_id": "kn72zcvgxvy1epse55vs8p140185w98v",
-        "createdAt": 1777642602605,
-        "displayName": "PXL_20250321_174017505 (1).jpg",
-        "fileSize": 374847,
-        "folderId": "kh77v4vjdvw0nr6vpjppv5kqtd85xwrg",
-        "mimeType": "image/jpeg",
-        "storageId": "kg229ywbgc0b9pfh3s39bjgm6n85w1ar",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/84c5e310-e5aa-4ac4-9797-ba80534db4b1"
+        "_creationTime": 1768435200019,
+        "_id": "sample00000000000000000000000000000k",
+        "createdAt": 1768435200020,
+        "displayName": "rotina-4.svg",
+        "fileSize": 2048,
+        "folderId": "samples",
+        "mimeType": "image/svg+xml",
+        "storageId": "sample00000000000000000000000000000k",
+        "url": "/samples/rotina-4.svg"
       },
-      "imageId": "kn72zcvgxvy1epse55vs8p140185w98v",
-      "spanSize": "1x1"
+      "imageId": "sample00000000000000000000000000000k",
+      "spanSize": "2x1"
     },
     {
-      "_creationTime": 1777643671158.2292,
-      "_id": "j577v0s81xk1sev7hjbs78qnwn85x6jq",
-      "createdAt": 1777643671158,
-      "description": "Lembranças de um passado onde tudo era mais simples",
+      "_creationTime": 1768435200022,
+      "_id": "sample00000000000000000000000000000n",
+      "createdAt": 1768435200023,
+      "description": "Workshop de design system.",
       "descriptionTranslations": {
-        "enUS": "Memories of a past when everything was simpler.",
-        "ptBR": "Lembranças de um passado onde tudo era mais simples"
+        "ptBR": "Workshop de design system.",
+        "enUS": "Design system workshop."
       },
       "displayOrder": 4,
       "image": {
-        "_creationTime": 1777642616747.5107,
-        "_id": "kn7bqxenkxdh0m2728pnc1yz2985wk1h",
-        "createdAt": 1777642616747,
-        "displayName": "FB_IMG_1759586145594.jpg",
-        "fileSize": 52060,
-        "folderId": "kh77v4vjdvw0nr6vpjppv5kqtd85xwrg",
-        "mimeType": "image/jpeg",
-        "storageId": "kg20fg1rcfs3xfvdzq8njb2aex85w83c",
-        "url": "https://precise-husky-581.convex.cloud/api/storage/47230762-ddcf-4c24-8192-58ae62515c3a"
+        "_creationTime": 1768435200021,
+        "_id": "sample00000000000000000000000000000m",
+        "createdAt": 1768435200022,
+        "displayName": "rotina-5.svg",
+        "fileSize": 2048,
+        "folderId": "samples",
+        "mimeType": "image/svg+xml",
+        "storageId": "sample00000000000000000000000000000m",
+        "url": "/samples/rotina-5.svg"
       },
-      "imageId": "kn7bqxenkxdh0m2728pnc1yz2985wk1h",
+      "imageId": "sample00000000000000000000000000000m",
+      "spanSize": "1x1"
+    },
+    {
+      "_creationTime": 1768435200024,
+      "_id": "sample00000000000000000000000000000p",
+      "createdAt": 1768435200025,
+      "description": "Fim de semana longe das telas.",
+      "descriptionTranslations": {
+        "ptBR": "Fim de semana longe das telas.",
+        "enUS": "Weekend away from screens."
+      },
+      "displayOrder": 5,
+      "image": {
+        "_creationTime": 1768435200023,
+        "_id": "sample00000000000000000000000000000o",
+        "createdAt": 1768435200024,
+        "displayName": "rotina-6.svg",
+        "fileSize": 2048,
+        "folderId": "samples",
+        "mimeType": "image/svg+xml",
+        "storageId": "sample00000000000000000000000000000o",
+        "url": "/samples/rotina-6.svg"
+      },
+      "imageId": "sample00000000000000000000000000000o",
       "spanSize": "1x1"
     }
   ]

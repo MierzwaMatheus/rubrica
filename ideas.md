@@ -1,4 +1,4 @@
-# Brainstorming de Design - Portfólio Matheus Mierzwa
+# Brainstorming de Design - Rubrica
 
 <response>
 <probability>0.08</probability>

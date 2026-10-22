@@ -26,7 +26,7 @@ export const ptBR = {
   home: {
     greeting: "whoami",
     title: "Oi! Eu sou o",
-    subtitle: "> Tech Lead Frontend & Engenheiro Full-Stack",
+    subtitle: "> Portfólio profissional",
     about: {
       title: " Sobre mim ",
       loading: "Carregando sobre mim...",
@@ -35,14 +35,8 @@ export const ptBR = {
       title: "O que falam sobre mim",
     },
     hero: {
-      description: "Transformando desafios complexos em ecossistemas digitais robustos, com foco em arquitetura, inovação e excelência técnica.",
-      technologies: [
-        { name: "React", color: "bg-sky-400" },
-        { name: "TypeScript", color: "bg-blue-600" },
-        { name: "Node.js", color: "bg-green-600" },
-        { name: "Next.js", color: "bg-neutral-900" },
-        { name: "Convex", color: "bg-orange-500" },
-      ],
+      description: "Projetos, trajetória e ideias reunidos em um só lugar.",
+      technologies: [],
     },
     skills: {
       title: "O que eu faço",
@@ -133,7 +127,7 @@ export const ptBR = {
     subtitle: "Conheça um pouco mais sobre quem eu sou",
     aboutMe: {
       title: "Sobre mim",
-      text: "Sou um cara da tecnologia que vive de desafios e se amarra em criar coisas com um visual incrível. Minha missão é fazer com que cada projeto não só funcione, mas deixe o cliente de queixo caído com um design que é a cara da marca.\n\nQuando não estou na frente do computador, meu mundo gira em outro ritmo. O rap é a trilha sonora do meu dia, e meu tempo livre é dividido entre aventuras épicas em RPGs de mesa e board games com a galera. E, por mais que eu pareça meio marrento, confesso que sou fã de um bom romance, daqueles quase platônicos. Ah, e New Girl foi uma maratona que me pegou de jeito no ano passado.\n\nMeu sonho de viagem é um pouco diferente: quero muito conhecer tribos indígenas e entender na prática como é o dia a dia deles. Você provavelmente vai me ver por aí sempre com meus fones de ouvido e alguns colares de prata. Para mim, encarar um desafio técnico, como montar meu próprio servidor ou testar uma tecnologia nova, é pura diversão e um jeito de aprender na prática.",
+      text: "Conte aqui um pouco sobre você: sua trajetória, o que te motiva no trabalho e o que você gosta de fazer quando não está trabalhando.\n\nEste texto pode ser editado no painel admin, em Textos.",
     },
     tapToKnowMore: "Toque para Saber Mais",
     dailyRoutine: {

@@ -17,7 +17,8 @@ import { useTranslation } from "@/i18n/hooks/useTranslation";
 import { useI18n } from "@/i18n/context/I18nContext";
 import { useHome } from "@/hooks/useHome";
 import { useSiteConfig } from "@/hooks/useSiteConfig";
-import { homeRepository } from "@/repositories/instances";
+import { homeRepository, sidebarRepository } from "@/repositories/instances";
+import { useSidebar } from "@/hooks/useSidebar";
 import { useMatrixText } from "@/hooks/useMatrixText";
 import { AvailabilityBadge } from "@/components/AvailabilityBadge";
 import { TestimonialWizard } from "@/components/TestimonialWizard";
@@ -28,6 +29,8 @@ export default function Home() {
   const { t, tValue } = useTranslation();
   const { isLoading: i18nLoading } = useI18n();
   const siteConfig = useSiteConfig();
+  const { contactInfo } = useSidebar(sidebarRepository);
+  const ownerFirstName = contactInfo?.name?.split(" ")[0] ?? "";
   const { contactRole, aboutText, services, testimonials, availability, isLoading } =
     useHome(homeRepository);
   const [wizardOpen, setWizardOpen] = useState(false);
@@ -99,7 +102,7 @@ export default function Home() {
             <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-white leading-tight tracking-tight mb-4">
               <span className="text-neon-purple">{t("home.title")}</span> <br />
               <span className="relative inline-block">
-                Matheus
+                {ownerFirstName}
                 <span className="absolute -bottom-2 left-0 w-full h-1.5 bg-neon-lime rounded-full"></span>
               </span>
             </h1>

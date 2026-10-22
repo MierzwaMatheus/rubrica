@@ -305,14 +305,18 @@ export default function Proposal() {
                   <span className="w-1 h-8 bg-neon-purple rounded-full" />
                   Apresentação
                 </h2>
-                <div className="text-lg text-gray-300 leading-relaxed space-y-4">
-                  <p>Olá, tudo bem?</p>
-                  <p>
-                  Antes de tudo, agradeço o interesse!{authorName && ` Sou ${authorName}.`}
-                  </p>
-                  <p>
-                  Meu objetivo é simples: transformar sua visão em uma solução que seja simultaneamente elegante, escalável e inteligente. Vamos conversar sobre como isso pode funcionar no seu projeto?
-                  </p>
+                <div className="text-lg text-gray-300 leading-relaxed space-y-4 whitespace-pre-line">
+                  {contactInfo?.proposalIntro || (
+                    <>
+                      <p>Olá, tudo bem?</p>
+                      <p>
+                      Antes de tudo, agradeço o interesse!{authorName && ` Sou ${authorName}.`}
+                      </p>
+                      <p>
+                      Meu objetivo é simples: transformar sua visão em uma solução que seja simultaneamente elegante, escalável e inteligente. Vamos conversar sobre como isso pode funcionar no seu projeto?
+                      </p>
+                    </>
+                  )}
                 </div>
               </CardContent>
             </Card>

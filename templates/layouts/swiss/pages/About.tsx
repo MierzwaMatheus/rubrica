@@ -56,7 +56,7 @@ export default function SwissAbout() {
               lineHeight: 0.92,
             }}
           >
-            O cara da tecnologia,
+            Quem faz o trabalho,
             <br />
             fora do{" "}
             <span

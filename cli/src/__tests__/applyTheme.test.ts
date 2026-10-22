@@ -1,5 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { Volume } from "memfs";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { applyTheme } from "../transforms/applyTheme.js";
 
 function makeFsModule(vol: InstanceType<typeof Volume>) {
@@ -102,6 +104,67 @@ describe("applyTheme", () => {
     expect(first).toBe(second);
     const rootMatches = second.match(/:root \{/g) ?? [];
     expect(rootMatches.length).toBe(1);
+  });
+
+  it("substitui no lugar as vars do contrato já declaradas no :root, sem duplicar", async () => {
+    const css = `:root {\n  --bg: hsl(0 0% 8%);\n  --primary: hsl(271 91% 65%);\n  --surface: hsl(from var(--bg) h s calc(l - 4));\n  --radius: 0.5rem;\n}\n`;
+    const vol = Volume.fromJSON({ "/project/src/index.css": css });
+    const fs = makeFsModule(vol);
+
+    await applyTheme({ preset: "midnight-blue" }, "/project/src/index.css", fs);
+
+    const result = vol.readFileSync("/project/src/index.css", "utf-8") as string;
+    expect(result).toContain("--bg: #0a1224;");
+    expect(result).toContain("--primary: #06b6d4;");
+    expect(result).toContain("--surface: hsl(from var(--bg) h s calc(l - 4));");
+    expect(result).toContain("--radius: 0.5rem;");
+    expect(result.match(/--bg:/g)).toHaveLength(1);
+    expect(result.match(/--primary:/g)).toHaveLength(1);
+  });
+
+  it("não confunde --primary com --on-primary ou --sidebar-primary", async () => {
+    const css = `:root {\n  --on-primary: #ffffff;\n  --sidebar-primary: red;\n}\n`;
+    const vol = Volume.fromJSON({ "/project/src/index.css": css });
+    const fs = makeFsModule(vol);
+
+    await applyTheme({ preset: "solar-warm" }, "/project/src/index.css", fs);
+
+    const result = vol.readFileSync("/project/src/index.css", "utf-8") as string;
+    expect(result).toContain("--on-primary: #ffffff;");
+    expect(result).toContain("--sidebar-primary: red;");
+    expect(result).toContain("--primary: #f97316;");
+  });
+
+  it("atualiza as vars do contrato que o .dark redeclara, para o modo escuro não sobrescrever o tema", async () => {
+    const css = `:root {\n  --primary: hsl(263 90% 66%);\n}\n\n.dark {\n  --primary: hsl(263 90% 66%);\n  --background: 0 0% 8%;\n}\n`;
+    const vol = Volume.fromJSON({ "/project/src/index.css": css });
+    const fs = makeFsModule(vol);
+
+    await applyTheme({ preset: "paper-noir" }, "/project/src/index.css", fs);
+
+    const result = vol.readFileSync("/project/src/index.css", "utf-8") as string;
+    const dark = result.match(/\.dark \{([^}]*)\}/s)?.[1] ?? "";
+    expect(dark).toContain("--primary: #ef4444");
+    expect(dark).toContain("--background: 0 0% 8%");
+    expect(dark).not.toContain("--bg:");
+  });
+
+  it("aplicado ao src/index.css real, mantém os tokens derivados e o --radius", async () => {
+    const realCss = readFileSync(resolve(import.meta.dirname, "../../../src/index.css"), "utf-8");
+    const vol = Volume.fromJSON({ "/project/src/index.css": realCss });
+    const fs = makeFsModule(vol);
+
+    await applyTheme({ preset: "editorial-cream" }, "/project/src/index.css", fs);
+
+    const result = vol.readFileSync("/project/src/index.css", "utf-8") as string;
+    const root = result.match(/\n:root \{([^}]*)\}/s)?.[1] ?? "";
+    for (const v of ["--bg: #faf7f2", "--text: #1a1614", "--primary: #a855f7", "--accent: #ef4444"]) {
+      expect(root).toContain(v);
+    }
+    for (const kept of ["--surface:", "--subtle:", "--line:", "--text-muted:", "--radius:"]) {
+      expect(root).toContain(kept);
+    }
+    expect(result).toContain("--color-primary: var(--primary);");
   });
 
   it("preset inexistente lança erro descritivo", async () => {
@@ -214,6 +277,8 @@ describe("applyTheme", () => {
     "--destructive-foreground:",
   ];
 
+  const CONTRACT_VARS = /^\s*--(bg|text|primary|accent)\s*:.*$/gm;
+
   for (const preset of PRESETS_ALL) {
     it(`${preset}: não injeta vars HSL legadas no CSS`, async () => {
       const vol = Volume.fromJSON({ "/project/src/index.css": stubCss });
@@ -222,14 +287,26 @@ describe("applyTheme", () => {
       await applyTheme({ preset }, "/project/src/index.css", fs);
 
       const result = vol.readFileSync("/project/src/index.css", "utf-8") as string;
-      // Extrai somente o bloco :root injetado
+      const before = stubCss.match(/:root \{([^}]*)\}/s)?.[1] ?? "";
       const rootBlock = result.match(/:root \{([^}]*)\}/s)?.[1] ?? "";
       for (const legacy of LEGACY_VARS) {
-        expect(rootBlock, `${preset} não deve conter "${legacy}"`).not.toContain(legacy);
+        const count = (s: string) => s.split(legacy).length - 1;
+        expect(count(rootBlock), `${preset} não deve injetar "${legacy}"`).toBe(count(before));
       }
     });
 
-    it(`${preset}: bloco :root contém apenas as 4 vars do contrato hex`, async () => {
+    it(`${preset}: altera só as 4 vars do contrato e preserva o resto do :root`, async () => {
+      const vol = Volume.fromJSON({ "/project/src/index.css": stubCss });
+      const fs = makeFsModule(vol);
+
+      await applyTheme({ preset }, "/project/src/index.css", fs);
+
+      const result = vol.readFileSync("/project/src/index.css", "utf-8") as string;
+      const strip = (s: string) => (s.match(/:root \{([^}]*)\}/s)?.[1] ?? "").replace(CONTRACT_VARS, "").replace(/\s+/g, " ").trim();
+      expect(strip(result)).toBe(strip(stubCss));
+    });
+
+    it(`${preset}: bloco :root contém as 4 vars do contrato hex`, async () => {
       const vol = Volume.fromJSON({ "/project/src/index.css": stubCss });
       const fs = makeFsModule(vol);
 

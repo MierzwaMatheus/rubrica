@@ -4,9 +4,9 @@ import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
   { href: "/", label: "Início", icon: Home },
-  { href: "/resume", label: "Currículo", icon: Briefcase },
+  { href: "/curriculo", label: "Currículo", icon: Briefcase },
   { href: "/portfolio", label: "Portfólio", icon: FolderOpen },
-  { href: "/about", label: "Sobre", icon: User },
+  { href: "/sobre", label: "Sobre", icon: User },
   { href: "/blog", label: "Blog", icon: FileText },
 ];
 

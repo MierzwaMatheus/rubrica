@@ -385,9 +385,9 @@ export default function BentoHome() {
         }}
       >
         {[
-          { label: "Currículo", to: "/resume" },
+          { label: "Currículo", to: "/curriculo" },
           { label: "Portfólio", to: "/portfolio" },
-          { label: "Sobre Mim", to: "/about" },
+          { label: "Sobre Mim", to: "/sobre" },
           { label: "Blog", to: "/blog" },
         ].map((item) => (
           <Link

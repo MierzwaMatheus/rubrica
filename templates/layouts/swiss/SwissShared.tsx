@@ -1,71 +1,7 @@
-import { Link, useLocation } from "wouter";
 import { useSiteConfig } from "@/hooks/useSiteConfig";
 import { useHome } from "@/hooks/useHome";
 import { useSidebar } from "@/hooks/useSidebar";
 import { homeRepository, sidebarRepository } from "@/repositories/instances";
-
-const NAV_ITEMS = [
-  { label: "Início", href: "/" },
-  { label: "Currículo", href: "/curriculo" },
-  { label: "Portfólio", href: "/portfolio" },
-  { label: "Sobre Mim", href: "/sobre" },
-  { label: "Blog", href: "/blog" },
-];
-
-export function SwissNav() {
-  const [location] = useLocation();
-  return (
-    <nav
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(5, 1fr)",
-        borderTop: "2px solid var(--text)",
-        borderBottom: "2px solid var(--text)",
-        fontFamily: "var(--font-sans)",
-      }}
-    >
-      {NAV_ITEMS.map((it, i) => {
-        const active = location === it.href || (it.href !== "/" && location.startsWith(it.href));
-        return (
-          <Link
-            key={it.href}
-            href={it.href}
-            style={{
-              padding: "14px 18px",
-              textDecoration: "none",
-              color: active ? "var(--bg)" : "var(--text)",
-              background: active ? "var(--text)" : "transparent",
-              borderRight: i < NAV_ITEMS.length - 1 ? "1px solid var(--text)" : "none",
-              display: "flex",
-              alignItems: "baseline",
-              gap: 14,
-            }}
-          >
-            <span
-              style={{
-                fontSize: 11,
-                fontWeight: 400,
-                fontVariantNumeric: "tabular-nums",
-                opacity: active ? 0.65 : 0.55,
-              }}
-            >
-              .{String(i + 1).padStart(2, "0")}
-            </span>
-            <span
-              style={{
-                fontSize: 14,
-                fontWeight: active ? 800 : 600,
-                letterSpacing: "-0.01em",
-              }}
-            >
-              {it.label}
-            </span>
-          </Link>
-        );
-      })}
-    </nav>
-  );
-}
 
 export function SwissCorners({ page, idx, total = 5 }: { page: string; idx: number; total?: number }) {
   const siteConfig = useSiteConfig();
@@ -281,7 +217,6 @@ export function SwissShell({
     >
       <SwissCorners page={page} idx={idx} />
       <SwissMasthead />
-      <SwissNav />
       <div>{children}</div>
       <SwissFooter />
     </div>

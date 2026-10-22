@@ -2,6 +2,7 @@ import { RSSFeedGenerator } from "../domain/use-cases/rss-feed-generator.js";
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
+import { rubricalConfig } from "../rubrica.config";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -9,18 +10,18 @@ const __dirname = dirname(__filename);
 const BLOG_DATA_PATH = join(__dirname, "..", "public", "data", "blog.json");
 const OUTPUT_PATH = join(__dirname, "..", "public", "rss.xml");
 
-const SITE_URL = process.env.SITE_URL || "https://matheusmierzwa.com";
+const SITE_URL = (process.env.SITE_URL || rubricalConfig.siteUrl).replace(/\/+$/, "");
+const AUTHOR = rubricalConfig.authorName || rubricalConfig.siteName;
 
 const RSS_CONFIG = {
   siteUrl: SITE_URL,
   rssUrl: `${SITE_URL}/rss.xml`,
-  siteTitle: "Matheus Mierzwa - Blog",
-  siteDescription:
-    "Artigos sobre tecnologia, desenvolvimento frontend, arquitetura de software e inovação digital",
-  authorName: "Matheus Mierzwa",
-  authorEmail: "contato@matheusmierzwa.com",
-  language: "pt-BR",
-  copyright: `Copyright © Matheus Mierzwa. Todos os direitos reservados.`,
+  siteTitle: rubricalConfig.rssTitle,
+  siteDescription: rubricalConfig.rssDescription,
+  authorName: AUTHOR,
+  authorEmail: rubricalConfig.authorEmail,
+  language: rubricalConfig.lang,
+  copyright: `Copyright © ${AUTHOR}. Todos os direitos reservados.`,
 };
 
 function generateRSSFeed(): void {

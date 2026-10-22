@@ -1,5 +1,6 @@
 import { httpAction } from './_generated/server';
 import { internal } from './_generated/api';
+import { allowedOrigins, siteUrl } from './lib/siteUrl';
 
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
@@ -25,7 +26,7 @@ async function callOpenRouter(
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${apiKey}`,
-      'HTTP-Referer': 'https://www.mmlo.com.br',
+      'HTTP-Referer': siteUrl(),
       'X-Title': 'Portfolio Playground',
     },
     body: JSON.stringify({
@@ -154,12 +155,6 @@ async function generateProduction(apiKey: string, jobDescription: string, locale
 
 // ── HTTP Action ───────────────────────────────────────────────────────────────
 
-const ALLOWED_ORIGINS = new Set([
-  'https://www.mmlo.com.br',
-  'http://localhost:5173',
-  'http://localhost:5174',
-]);
-
 function corsHeaders(origin: string): Record<string, string> {
   return {
     'Access-Control-Allow-Origin': origin,
@@ -179,7 +174,7 @@ export const aiProxy = httpAction(async (ctx, req) => {
   const origin = req.headers.get('origin');
 
   // Block requests from disallowed origins (server-to-server bypasses browser CORS)
-  if (!origin || !ALLOWED_ORIGINS.has(origin)) {
+  if (!origin || !allowedOrigins().has(origin)) {
     return new Response('Forbidden', { status: 403 });
   }
 

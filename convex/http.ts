@@ -3,6 +3,7 @@ import { httpAction } from './_generated/server';
 import { internal } from './_generated/api';
 import { auth } from './auth';
 import { aiProxy } from './playgroundAi';
+import { allowedOrigins } from './lib/siteUrl';
 
 const http = httpRouter();
 
@@ -44,13 +45,6 @@ async function verifyStripeSignature(payload: string, header: string, secret: st
   }
 }
 
-const ALLOWED_ORIGINS = new Set([
-  'https://www.mmlo.com.br',
-  'http://localhost:3000',
-  'http://localhost:5173',
-  'http://localhost:5174',
-]);
-
 function corsHeaders(origin: string): Record<string, string> {
   return {
     'Access-Control-Allow-Origin': origin,
@@ -62,7 +56,7 @@ function corsHeaders(origin: string): Record<string, string> {
 
 function apiJson(body: unknown, status = 200, origin: string | null = null) {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-  if (origin && ALLOWED_ORIGINS.has(origin)) Object.assign(headers, corsHeaders(origin));
+  if (origin && allowedOrigins().has(origin)) Object.assign(headers, corsHeaders(origin));
   return new Response(JSON.stringify(body), { status, headers });
 }
 
@@ -76,7 +70,7 @@ function makeApiHandler(
   return httpAction(async (ctx, req) => {
     const origin = req.headers.get('origin');
     if (req.method === 'OPTIONS') {
-      if (!origin || !ALLOWED_ORIGINS.has(origin)) return new Response('Forbidden', { status: 403 });
+      if (!origin || !allowedOrigins().has(origin)) return new Response('Forbidden', { status: 403 });
       return new Response(null, { status: 204, headers: corsHeaders(origin) });
     }
     const ip = extractIp(req);

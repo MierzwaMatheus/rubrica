@@ -3,6 +3,7 @@
 import { v } from 'convex/values';
 import { action } from './_generated/server';
 import { internal, api } from './_generated/api';
+import { siteUrl } from './lib/siteUrl';
 
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
@@ -18,7 +19,7 @@ async function callOpenRouter(
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${apiKey}`,
-      'HTTP-Referer': 'https://www.mmlo.com.br',
+      'HTTP-Referer': siteUrl(),
       'X-Title': 'Portfolio AI Resume Generator',
     },
     body: JSON.stringify({

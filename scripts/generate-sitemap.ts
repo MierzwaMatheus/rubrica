@@ -1,11 +1,12 @@
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
+import { rubricalConfig } from "../rubrica.config";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const SITE_URL = process.env.SITE_URL || "https://www.mmlo.com.br";
+const SITE_URL = (process.env.SITE_URL || rubricalConfig.siteUrl).replace(/\/+$/, "");
 const TODAY = new Date().toISOString().split("T")[0];
 
 const BLOG_DATA_PATH = join(__dirname, "..", "public", "data", "blog.json");

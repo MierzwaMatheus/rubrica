@@ -166,7 +166,7 @@ export function ContractModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl h-[90vh] flex flex-col p-0">
-        <DialogHeader className="px-6 pt-6 pb-4 border-b border-white/10 shrink-0">
+        <DialogHeader className="px-6 pt-6 pb-4 border-b border-foreground/10 shrink-0">
           <DialogTitle className="text-2xl font-bold flex items-center gap-2">
             <FileText className="w-6 h-6 text-neon-purple" />
             Contrato Eletrônico
@@ -199,7 +199,7 @@ export function ContractModal({
 
           <div
             ref={contentRef}
-            className="prose prose-invert prose-headings:text-white prose-p:text-gray-300 prose-strong:text-white prose-ul:text-gray-300 prose-li:text-gray-300 prose-hr:border-white/10 max-w-none prose-p:leading-relaxed prose-p:mb-6 prose-h2:mt-10 prose-h2:mb-5 prose-h3:mt-8 prose-h3:mb-4 prose-ul:my-6 prose-ol:my-6 prose-ul:pl-6 prose-ol:pl-6 prose-li:mb-3 prose-blockquote:border-l-4 prose-blockquote:border-neon-purple prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-400"
+            className="prose prose-invert prose-headings:text-foreground-strong prose-p:text-foreground/90 prose-strong:text-foreground-strong prose-ul:text-foreground/90 prose-li:text-foreground/90 prose-hr:border-foreground/10 max-w-none prose-p:leading-relaxed prose-p:mb-6 prose-h2:mt-10 prose-h2:mb-5 prose-h3:mt-8 prose-h3:mb-4 prose-ul:my-6 prose-ol:my-6 prose-ul:pl-6 prose-ol:pl-6 prose-li:mb-3 prose-blockquote:border-l-4 prose-blockquote:border-neon-purple prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-foreground/65"
           >
             {resolvedContent ? (
               <ReactMarkdown components={markdownComponents}>{normalizeMarkdown(resolvedContent)}</ReactMarkdown>
@@ -216,25 +216,25 @@ export function ContractModal({
           </div>
 
           {/* Canvas de assinatura manuscrita */}
-          <div className="mt-8 pt-8 border-t border-white/10">
+          <div className="mt-8 pt-8 border-t border-foreground/10">
             <Card className="bg-card/50 backdrop-blur-sm border-neon-purple/30">
               <CardContent className="p-6 space-y-4">
                 <div className="flex items-center gap-3 mb-2">
                   <Pen className="w-5 h-5 text-neon-purple" />
                   <h3 className="text-lg font-bold">Sua Assinatura Manuscrita</h3>
                 </div>
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-foreground/65">
                   Assine com o mouse ou toque na área abaixo. A imagem será incorporada ao contrato PDF.
                 </p>
 
-                <div className="relative rounded-md border border-white/20 bg-white" style={{ height: 120 }}>
+                <div className="relative rounded-md border border-foreground/20 bg-white" style={{ height: 120 }}>
                   <canvas
                     ref={canvasRef}
                     style={{ width: "100%", height: "100%", borderRadius: "6px", display: "block", cursor: "crosshair" }}
                   />
                   {isSignatureEmpty && (
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <span className="text-gray-400 text-sm select-none">Assine aqui</span>
+                      <span className="text-foreground/65 text-sm select-none">Assine aqui</span>
                     </div>
                   )}
                 </div>
@@ -244,7 +244,7 @@ export function ContractModal({
                     variant="ghost"
                     size="sm"
                     onClick={handleClearSignature}
-                    className="text-gray-400 hover:text-white gap-1"
+                    className="text-foreground/65 hover:text-foreground-strong gap-1"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     Limpar
@@ -263,7 +263,7 @@ export function ContractModal({
                   <h3 className="text-xl font-bold">Assinatura Digital</h3>
                 </div>
 
-                <div className="space-y-2 text-sm text-gray-300">
+                <div className="space-y-2 text-sm text-foreground/90">
                   <p>Ao clicar em "Assinar Digitalmente", você confirma que:</p>
                   <ul className="list-disc list-inside space-y-1 ml-2">
                     <li>Leu e compreendeu todos os termos deste contrato</li>

@@ -232,7 +232,7 @@ export default function AiResumes() {
               className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm border transition-colors ${
                 includeDeleted
                   ? 'border-red-500/50 bg-red-500/10 text-red-400'
-                  : 'border-white/10 bg-white/5 text-gray-400 hover:text-white'
+                  : 'border-foreground/10 bg-foreground/5 text-foreground/65 hover:text-foreground-strong'
               }`}
             >
               <RotateCcw className="w-3.5 h-3.5" />

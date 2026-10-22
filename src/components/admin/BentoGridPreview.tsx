@@ -59,7 +59,7 @@ function SortablePreviewCard({ item, index }: { item: DailyRoutineItem; index: n
       </div>
       <div className="text-center">
         <div className="text-4xl font-bold mb-1">{index + 1}</div>
-        <div className="text-xs font-normal text-gray-400">
+        <div className="text-xs font-normal text-foreground/65">
           {item.span_size || '1x1'}
         </div>
       </div>
@@ -73,12 +73,12 @@ export function BentoGridPreview({ items }: BentoGridPreviewProps) {
 
   return (
     <div className="space-y-4">
-      <div className="text-sm text-gray-400 mb-2">
+      <div className="text-sm text-foreground/65 mb-2">
         Preview do Layout do Bento Grid (arraste para reordenar)
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 auto-rows-[200px] p-4 bg-white/5 border border-white/10 rounded-xl">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 auto-rows-[200px] p-4 bg-foreground/5 border border-foreground/10 rounded-xl">
         {sortedItems.length === 0 ? (
-          <div className="col-span-full flex items-center justify-center h-32 text-gray-500 text-sm">
+          <div className="col-span-full flex items-center justify-center h-32 text-foreground/42 text-sm">
             Nenhum item adicionado ainda
           </div>
         ) : (
@@ -87,7 +87,7 @@ export function BentoGridPreview({ items }: BentoGridPreviewProps) {
           ))
         )}
       </div>
-      <div className="text-xs text-gray-500 space-y-1">
+      <div className="text-xs text-foreground/42 space-y-1">
         <p>• Os números indicam a ordem de exibição</p>
         <p>• Os tamanhos (1x1, 1x2, 2x1, 2x2) mostram quantas células cada card ocupa</p>
         <p>• O grid tem 2 colunas no mobile e 3 colunas no desktop</p>

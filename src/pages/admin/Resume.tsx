@@ -68,7 +68,7 @@ function SortableSimpleItem({
 
   if (isEditing) {
     return (
-      <div ref={setNodeRef} style={style} className="flex items-center gap-2 bg-card border border-white/10 p-3 rounded-md">
+      <div ref={setNodeRef} style={style} className="flex items-center gap-2 bg-card border border-foreground/10 p-3 rounded-md">
         <Input
           value={editingText}
           onChange={(e) => onTextChange(e.target.value)}
@@ -76,13 +76,13 @@ function SortableSimpleItem({
             if (e.key === 'Enter') onSave(id);
             else if (e.key === 'Escape') onCancel();
           }}
-          className="flex-1 bg-white/5 border-white/10 text-white"
+          className="flex-1 bg-foreground/5 border-foreground/10 text-foreground-strong"
           autoFocus
         />
         <Button variant="ghost" size="icon" onClick={() => onSave(id)} className="text-green-400 hover:text-green-300 hover:bg-green-400/10">
           <Check className="w-4 h-4" />
         </Button>
-        <Button variant="ghost" size="icon" onClick={onCancel} className="text-gray-400 hover:text-gray-300 hover:bg-gray-400/10">
+        <Button variant="ghost" size="icon" onClick={onCancel} className="text-foreground/65 hover:text-foreground/90 hover:bg-gray-400/10">
           <X className="w-4 h-4" />
         </Button>
       </div>
@@ -90,13 +90,13 @@ function SortableSimpleItem({
   }
 
   return (
-    <div ref={setNodeRef} style={style} className={`flex items-center gap-2 bg-card border p-3 rounded-md group ${isDeleted ? 'opacity-60 border-red-500/30' : 'border-white/10'}`}>
+    <div ref={setNodeRef} style={style} className={`flex items-center gap-2 bg-card border p-3 rounded-md group ${isDeleted ? 'opacity-60 border-red-500/30' : 'border-foreground/10'}`}>
       {!isDeleted && (
-        <div {...attributes} {...listeners} className="cursor-move text-gray-500 hover:text-white">
+        <div {...attributes} {...listeners} className="cursor-move text-foreground/42 hover:text-foreground-strong">
           <GripVertical className="w-4 h-4" />
         </div>
       )}
-      <span className="flex-1 text-white">{text}</span>
+      <span className="flex-1 text-foreground-strong">{text}</span>
       {isDeleted && (
         <div className="flex items-center gap-1.5 text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded px-2 py-0.5">
           <ShieldAlert className="w-3 h-3" />Deletado
@@ -127,10 +127,10 @@ function SortableExperienceCard({ item, onEdit, onDelete, onRestore }: { item: R
 
   return (
     <div ref={setNodeRef} style={style}>
-      <Card className={`bg-card group ${isDeleted ? 'opacity-60 border-red-500/30' : 'border-white/10'}`}>
+      <Card className={`bg-card group ${isDeleted ? 'opacity-60 border-red-500/30' : 'border-foreground/10'}`}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-lg font-medium text-white flex items-center gap-2">
-            {!isDeleted && <div {...attributes} {...listeners} className="cursor-move"><GripVertical className="w-4 h-4 text-gray-500 hover:text-white" /></div>}
+          <CardTitle className="text-lg font-medium text-foreground-strong flex items-center gap-2">
+            {!isDeleted && <div {...attributes} {...listeners} className="cursor-move"><GripVertical className="w-4 h-4 text-foreground/42 hover:text-foreground-strong" /></div>}
             <div className="flex flex-col gap-1">
               {item.content.role}
               {isDeleted && (
@@ -150,8 +150,8 @@ function SortableExperienceCard({ item, onEdit, onDelete, onRestore }: { item: R
           </div>
         </CardHeader>
         <CardContent>
-          <p className="text-neon-green text-sm mb-2">{item.content.company} | {item.content.period}</p>
-          <p className="text-gray-400 text-sm line-clamp-2">{item.content.description}</p>
+          <p className="text-neon-lime text-sm mb-2">{item.content.company} | {item.content.period}</p>
+          <p className="text-foreground/65 text-sm line-clamp-2">{item.content.description}</p>
         </CardContent>
       </Card>
     </div>
@@ -165,10 +165,10 @@ function SortableEducationCard({ item, onEdit, onDelete, onRestore }: { item: Re
 
   return (
     <div ref={setNodeRef} style={style}>
-      <Card className={`bg-card group ${isDeleted ? 'opacity-60 border-red-500/30' : 'border-white/10'}`}>
+      <Card className={`bg-card group ${isDeleted ? 'opacity-60 border-red-500/30' : 'border-foreground/10'}`}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-lg font-medium text-white flex items-center gap-2">
-            {!isDeleted && <div {...attributes} {...listeners} className="cursor-move"><GripVertical className="w-4 h-4 text-gray-500 hover:text-white" /></div>}
+          <CardTitle className="text-lg font-medium text-foreground-strong flex items-center gap-2">
+            {!isDeleted && <div {...attributes} {...listeners} className="cursor-move"><GripVertical className="w-4 h-4 text-foreground/42 hover:text-foreground-strong" /></div>}
             <div className="flex flex-col gap-1">
               {item.content.degree}
               {isDeleted && (
@@ -188,8 +188,8 @@ function SortableEducationCard({ item, onEdit, onDelete, onRestore }: { item: Re
           </div>
         </CardHeader>
         <CardContent>
-          <p className="text-neon-green text-sm mb-2">{item.content.institution} | {item.content.period}</p>
-          <p className="text-gray-400 text-sm line-clamp-2">{item.content.description}</p>
+          <p className="text-neon-lime text-sm mb-2">{item.content.institution} | {item.content.period}</p>
+          <p className="text-foreground/65 text-sm line-clamp-2">{item.content.description}</p>
         </CardContent>
       </Card>
     </div>
@@ -203,12 +203,12 @@ function SortableSkillCard({ item, onEdit, onDelete, onRestore }: { item: Resume
 
   return (
     <div ref={setNodeRef} style={style}>
-      <Card className={`bg-card group ${isDeleted ? 'opacity-60 border-red-500/30' : 'border-white/10'}`}>
+      <Card className={`bg-card group ${isDeleted ? 'opacity-60 border-red-500/30' : 'border-foreground/10'}`}>
         <CardContent className="pt-6 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            {!isDeleted && <div {...attributes} {...listeners} className="cursor-move"><GripVertical className="w-4 h-4 text-gray-500 hover:text-white" /></div>}
+            {!isDeleted && <div {...attributes} {...listeners} className="cursor-move"><GripVertical className="w-4 h-4 text-foreground/42 hover:text-foreground-strong" /></div>}
             <div>
-              <h4 className="text-white font-medium">{item.content.name}</h4>
+              <h4 className="text-foreground-strong font-medium">{item.content.name}</h4>
               {isDeleted && (
                 <div className="flex items-center gap-1.5 text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded px-2 py-0.5 w-fit mt-1">
                   <ShieldAlert className="w-3 h-3" />Deletado
@@ -216,10 +216,10 @@ function SortableSkillCard({ item, onEdit, onDelete, onRestore }: { item: Resume
               )}
               {!isDeleted && (
                 <div className="flex items-center gap-2 mt-2">
-                  <div className="w-32 h-2 bg-white/10 rounded-full overflow-hidden">
-                    <div className="h-full bg-neon-green" style={{ width: `${item.content.level}%` }} />
+                  <div className="w-32 h-2 bg-foreground/10 rounded-full overflow-hidden">
+                    <div className="h-full bg-neon-lime" style={{ width: `${item.content.level}%` }} />
                   </div>
-                  <span className="text-neon-green text-sm font-medium">{item.content.level}%</span>
+                  <span className="text-neon-lime text-sm font-medium">{item.content.level}%</span>
                 </div>
               )}
             </div>
@@ -245,13 +245,13 @@ function SortableLanguageCard({ item, onEdit, onDelete, onRestore }: { item: Res
 
   return (
     <div ref={setNodeRef} style={style}>
-      <Card className={`bg-card group ${isDeleted ? 'opacity-60 border-red-500/30' : 'border-white/10'}`}>
+      <Card className={`bg-card group ${isDeleted ? 'opacity-60 border-red-500/30' : 'border-foreground/10'}`}>
         <CardContent className="pt-6 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            {!isDeleted && <div {...attributes} {...listeners} className="cursor-move"><GripVertical className="w-4 h-4 text-gray-500 hover:text-white" /></div>}
+            {!isDeleted && <div {...attributes} {...listeners} className="cursor-move"><GripVertical className="w-4 h-4 text-foreground/42 hover:text-foreground-strong" /></div>}
             <div>
-              <h4 className="text-white font-medium">{item.content.name}</h4>
-              <p className="text-neon-green text-sm">{item.content.level}</p>
+              <h4 className="text-foreground-strong font-medium">{item.content.name}</h4>
+              <p className="text-neon-lime text-sm">{item.content.level}</p>
               {isDeleted && (
                 <div className="flex items-center gap-1.5 text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded px-2 py-0.5 w-fit mt-1">
                   <ShieldAlert className="w-3 h-3" />Deletado
@@ -583,8 +583,8 @@ export default function AdminResume() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-white">Currículo</h1>
-            <p className="text-gray-400">Gerencie suas experiências, formação e habilidades</p>
+            <h1 className="text-3xl font-bold text-foreground-strong">Currículo</h1>
+            <p className="text-foreground/65">Gerencie suas experiências, formação e habilidades</p>
           </div>
           {isRoot && (
             <button
@@ -592,7 +592,7 @@ export default function AdminResume() {
               className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm border transition-colors ${
                 includeDeleted
                   ? 'border-red-500/50 bg-red-500/10 text-red-400'
-                  : 'border-white/10 bg-white/5 text-gray-400 hover:text-white'
+                  : 'border-foreground/10 bg-foreground/5 text-foreground/65 hover:text-foreground-strong'
               }`}
             >
               <RotateCcw className="w-3.5 h-3.5" />
@@ -602,7 +602,7 @@ export default function AdminResume() {
         </div>
 
         <Tabs defaultValue="experience" className="w-full">
-          <TabsList className="bg-white/5 border border-white/10 w-full justify-start overflow-x-auto">
+          <TabsList className="bg-foreground/5 border border-foreground/10 w-full justify-start overflow-x-auto">
             <TabsTrigger value="experience">Experiência</TabsTrigger>
             <TabsTrigger value="education">Formação</TabsTrigger>
             <TabsTrigger value="skill">Habilidades</TabsTrigger>
@@ -688,7 +688,7 @@ export default function AdminResume() {
                 value={newSoftSkill}
                 onChange={(e) => setNewSoftSkill(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleAddSimpleItem('soft_skill')}
-                className="bg-white/5 border-white/10 text-white"
+                className="bg-foreground/5 border-foreground/10 text-foreground-strong"
               />
               <Button onClick={() => handleAddSimpleItem('soft_skill')} className="bg-neon-purple hover:bg-neon-purple/90 text-white">
                 <Plus className="w-4 h-4 mr-2" /> Adicionar
@@ -726,7 +726,7 @@ export default function AdminResume() {
                 value={newCourse}
                 onChange={(e) => setNewCourse(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleAddSimpleItem('course')}
-                className="bg-white/5 border-white/10 text-white"
+                className="bg-foreground/5 border-foreground/10 text-foreground-strong"
               />
               <Button onClick={() => handleAddSimpleItem('course')} className="bg-neon-purple hover:bg-neon-purple/90 text-white">
                 <Plus className="w-4 h-4 mr-2" /> Adicionar
@@ -787,7 +787,7 @@ export default function AdminResume() {
                 value={newVolunteer}
                 onChange={(e) => setNewVolunteer(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleAddSimpleItem('volunteer')}
-                className="bg-white/5 border-white/10 text-white"
+                className="bg-foreground/5 border-foreground/10 text-foreground-strong"
               />
               <Button onClick={() => handleAddSimpleItem('volunteer')} className="bg-neon-purple hover:bg-neon-purple/90 text-white">
                 <Plus className="w-4 h-4 mr-2" /> Adicionar
@@ -821,9 +821,9 @@ export default function AdminResume() {
         </Tabs>
 
         <Dialog open={!!activeModal} onOpenChange={() => handleCloseModal()}>
-          <DialogContent className="bg-background border-white/10 max-w-2xl max-h-[85vh] flex flex-col p-0">
+          <DialogContent className="bg-background border-foreground/10 max-w-2xl max-h-[85vh] flex flex-col p-0">
             <DialogHeader className="shrink-0 px-6 pt-6 pb-4">
-              <DialogTitle className="text-white">
+              <DialogTitle className="text-foreground-strong">
                 {editingItem ? "Editar" : "Adicionar"} {
                   activeModal === "experience" ? "Experiência" :
                     activeModal === "education" ? "Formação" :
@@ -841,20 +841,20 @@ export default function AdminResume() {
                   <>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label className="text-white">Cargo</Label>
-                        <Input name="role" defaultValue={editingItem?.content.role} className="bg-white/5 border-white/10 text-white" required />
+                        <Label className="text-foreground-strong">Cargo</Label>
+                        <Input name="role" defaultValue={editingItem?.content.role} className="bg-foreground/5 border-foreground/10 text-foreground-strong" required />
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-white">Empresa</Label>
-                        <Input name="company" defaultValue={editingItem?.content.company} className="bg-white/5 border-white/10 text-white" required />
+                        <Label className="text-foreground-strong">Empresa</Label>
+                        <Input name="company" defaultValue={editingItem?.content.company} className="bg-foreground/5 border-foreground/10 text-foreground-strong" required />
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-white">Período</Label>
-                      <Input name="period" defaultValue={editingItem?.content.period} className="bg-white/5 border-white/10 text-white" required />
+                      <Label className="text-foreground-strong">Período</Label>
+                      <Input name="period" defaultValue={editingItem?.content.period} className="bg-foreground/5 border-foreground/10 text-foreground-strong" required />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-white">Descrição</Label>
+                      <Label className="text-foreground-strong">Descrição</Label>
                       <RichTextEditor
                         content={experienceDescription}
                         onChange={setExperienceDescription}
@@ -867,20 +867,20 @@ export default function AdminResume() {
                   <>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label className="text-white">Curso/Grau</Label>
-                        <Input name="degree" defaultValue={editingItem?.content.degree} className="bg-white/5 border-white/10 text-white" required />
+                        <Label className="text-foreground-strong">Curso/Grau</Label>
+                        <Input name="degree" defaultValue={editingItem?.content.degree} className="bg-foreground/5 border-foreground/10 text-foreground-strong" required />
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-white">Instituição</Label>
-                        <Input name="institution" defaultValue={editingItem?.content.institution} className="bg-white/5 border-white/10 text-white" required />
+                        <Label className="text-foreground-strong">Instituição</Label>
+                        <Input name="institution" defaultValue={editingItem?.content.institution} className="bg-foreground/5 border-foreground/10 text-foreground-strong" required />
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-white">Período</Label>
-                      <Input name="period" defaultValue={editingItem?.content.period} className="bg-white/5 border-white/10 text-white" required />
+                      <Label className="text-foreground-strong">Período</Label>
+                      <Input name="period" defaultValue={editingItem?.content.period} className="bg-foreground/5 border-foreground/10 text-foreground-strong" required />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-white">Descrição</Label>
+                      <Label className="text-foreground-strong">Descrição</Label>
                       <RichTextEditor
                         content={educationDescription}
                         onChange={setEducationDescription}
@@ -892,13 +892,13 @@ export default function AdminResume() {
                 {activeModal === "skill" && (
                   <>
                     <div className="space-y-2">
-                      <Label className="text-white">Nome da Habilidade</Label>
-                      <Input name="name" defaultValue={editingItem?.content.name} className="bg-white/5 border-white/10 text-white" required />
+                      <Label className="text-foreground-strong">Nome da Habilidade</Label>
+                      <Input name="name" defaultValue={editingItem?.content.name} className="bg-foreground/5 border-foreground/10 text-foreground-strong" required />
                     </div>
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <Label className="text-white">Nível de Domínio</Label>
-                        <span className="text-neon-green text-sm font-medium">{skillLevel[0]}%</span>
+                        <Label className="text-foreground-strong">Nível de Domínio</Label>
+                        <span className="text-neon-lime text-sm font-medium">{skillLevel[0]}%</span>
                       </div>
                       <Slider
                         value={skillLevel}
@@ -915,21 +915,21 @@ export default function AdminResume() {
                 {activeModal === "language" && (
                   <>
                     <div className="space-y-2">
-                      <Label className="text-white">Idioma</Label>
-                      <Input name="name" defaultValue={editingItem?.content.name} className="bg-white/5 border-white/10 text-white" required />
+                      <Label className="text-foreground-strong">Idioma</Label>
+                      <Input name="name" defaultValue={editingItem?.content.name} className="bg-foreground/5 border-foreground/10 text-foreground-strong" required />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-white">Nível</Label>
+                      <Label className="text-foreground-strong">Nível</Label>
                       <Select value={languageLevel} onValueChange={setLanguageLevel} required>
-                        <SelectTrigger className="bg-white/5 border-white/10 text-white w-full">
+                        <SelectTrigger className="bg-foreground/5 border-foreground/10 text-foreground-strong w-full">
                           <SelectValue placeholder="Selecione o nível" />
                         </SelectTrigger>
-                        <SelectContent className="bg-background border-white/10">
-                          <SelectItem value="Básico" className="text-white focus:bg-white/10">Básico</SelectItem>
-                          <SelectItem value="Intermediário" className="text-white focus:bg-white/10">Intermediário</SelectItem>
-                          <SelectItem value="Avançado" className="text-white focus:bg-white/10">Avançado</SelectItem>
-                          <SelectItem value="Fluente" className="text-white focus:bg-white/10">Fluente</SelectItem>
-                          <SelectItem value="Nativo" className="text-white focus:bg-white/10">Nativo</SelectItem>
+                        <SelectContent className="bg-background border-foreground/10">
+                          <SelectItem value="Básico" className="text-foreground-strong focus:bg-foreground/10">Básico</SelectItem>
+                          <SelectItem value="Intermediário" className="text-foreground-strong focus:bg-foreground/10">Intermediário</SelectItem>
+                          <SelectItem value="Avançado" className="text-foreground-strong focus:bg-foreground/10">Avançado</SelectItem>
+                          <SelectItem value="Fluente" className="text-foreground-strong focus:bg-foreground/10">Fluente</SelectItem>
+                          <SelectItem value="Nativo" className="text-foreground-strong focus:bg-foreground/10">Nativo</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -938,8 +938,8 @@ export default function AdminResume() {
 
               </form>
             </div>
-            <div className="flex justify-end gap-2 pt-4 pb-6 px-6 border-t border-white/10 shrink-0">
-              <Button type="button" variant="ghost" onClick={handleCloseModal} className="text-gray-400">Cancelar</Button>
+            <div className="flex justify-end gap-2 pt-4 pb-6 px-6 border-t border-foreground/10 shrink-0">
+              <Button type="button" variant="ghost" onClick={handleCloseModal} className="text-foreground/65">Cancelar</Button>
               <Button type="submit" form="resume-form" disabled={isTranslating} className="bg-neon-purple hover:bg-neon-purple/90 text-white">{isTranslating ? 'Traduzindo...' : 'Salvar'}</Button>
             </div>
           </DialogContent>

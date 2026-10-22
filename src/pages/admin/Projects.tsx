@@ -35,21 +35,21 @@ function IconPicker({ value, onChange }: { value?: string; onChange: (name: stri
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 bg-white/5 border border-white/10 text-white rounded-md px-3 h-9 text-sm hover:bg-white/10 transition-colors min-w-[90px]"
+        className="flex items-center gap-2 bg-foreground/5 border border-foreground/10 text-foreground-strong rounded-md px-3 h-9 text-sm hover:bg-foreground/10 transition-colors min-w-[90px]"
       >
-        {SelectedIcon ? <SelectedIcon className="w-4 h-4 text-neon-purple shrink-0" /> : <span className="text-gray-500">Ícone</span>}
-        {value && <span className="text-xs text-gray-400 truncate max-w-[60px]">{value}</span>}
+        {SelectedIcon ? <SelectedIcon className="w-4 h-4 text-neon-purple shrink-0" /> : <span className="text-foreground/42">Ícone</span>}
+        {value && <span className="text-xs text-foreground/65 truncate max-w-[60px]">{value}</span>}
       </button>
       {open && (
-        <div className="absolute z-50 top-full mt-1 left-0 bg-[#1a1a1a] border border-white/10 rounded-xl shadow-2xl p-3 w-72">
-          <div className="flex items-center gap-2 mb-3 bg-white/5 border border-white/10 rounded-lg px-2">
-            <Search className="w-3 h-3 text-gray-500 shrink-0" />
+        <div className="absolute z-50 top-full mt-1 left-0 bg-muted border border-foreground/10 rounded-xl shadow-2xl p-3 w-72">
+          <div className="flex items-center gap-2 mb-3 bg-foreground/5 border border-foreground/10 rounded-lg px-2">
+            <Search className="w-3 h-3 text-foreground/42 shrink-0" />
             <input
               autoFocus
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Buscar ícone..."
-              className="bg-transparent text-white text-sm py-1.5 outline-none w-full placeholder-gray-500"
+              className="bg-transparent text-foreground-strong text-sm py-1.5 outline-none w-full placeholder-gray-500"
             />
           </div>
           <div className="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
@@ -64,7 +64,7 @@ function IconPicker({ value, onChange }: { value?: string; onChange: (name: stri
                   onClick={() => { onChange(name); setOpen(false); setSearch(''); }}
                   className={`p-2 rounded-lg hover:bg-neon-purple/20 transition-colors flex items-center justify-center ${value === name ? 'bg-neon-purple/30 border border-neon-purple/50' : ''}`}
                 >
-                  <Icon className="w-4 h-4 text-gray-300" />
+                  <Icon className="w-4 h-4 text-foreground/90" />
                 </button>
               );
             })}
@@ -73,7 +73,7 @@ function IconPicker({ value, onChange }: { value?: string; onChange: (name: stri
             <button
               type="button"
               onClick={() => { onChange(''); setOpen(false); }}
-              className="mt-2 w-full text-xs text-gray-500 hover:text-red-400 transition-colors text-center"
+              className="mt-2 w-full text-xs text-foreground/42 hover:text-red-400 transition-colors text-center"
             >
               Remover ícone
             </button>
@@ -161,14 +161,14 @@ function SortableProjectCard({
 
   return (
     <div ref={setNodeRef} style={style}>
-      <Card className={`bg-card overflow-hidden group ${isDeleted ? 'opacity-60 border-red-500/30' : 'border-white/10'}`}>
+      <Card className={`bg-card overflow-hidden group ${isDeleted ? 'opacity-60 border-red-500/30' : 'border-foreground/10'}`}>
         <div className="relative h-48">
           {coverUrl ? (
             <img src={coverUrl} alt={project.title} className="w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-full bg-white/5 flex items-center justify-center text-gray-500">Sem imagem</div>
+            <div className="w-full h-full bg-foreground/5 flex items-center justify-center text-foreground/42">Sem imagem</div>
           )}
-          <div className="absolute top-2 right-2 bg-background/60 px-2 py-1 rounded text-xs text-white">
+          <div className="absolute top-2 right-2 bg-background/60 px-2 py-1 rounded text-xs text-foreground-strong">
             {project.images?.length || 0} imagens
           </div>
           {!isDeleted && (
@@ -190,7 +190,7 @@ function SortableProjectCard({
           )}
         </div>
         <CardHeader>
-          <CardTitle className="text-white flex justify-between items-start">
+          <CardTitle className="text-foreground-strong flex justify-between items-start">
             <div className="flex flex-col gap-1">
               {project.title}
               {isDeleted && (
@@ -202,16 +202,16 @@ function SortableProjectCard({
             </div>
             {!isDeleted && (
               <div {...attributes} {...listeners} className="cursor-move">
-                <GripVertical className="w-5 h-5 text-gray-500 hover:text-white transition-colors" />
+                <GripVertical className="w-5 h-5 text-foreground/42 hover:text-foreground-strong transition-colors" />
               </div>
             )}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-400 text-sm line-clamp-2 mb-4">{project.description}</p>
+          <p className="text-foreground/65 text-sm line-clamp-2 mb-4">{project.description}</p>
           <div className="flex flex-wrap gap-2">
             {project.tags?.map(tag => (
-              <Badge key={tag} variant="secondary" className="bg-white/5 text-gray-300 border-white/10">{tag}</Badge>
+              <Badge key={tag} variant="secondary" className="bg-foreground/5 text-foreground/90 border-foreground/10">{tag}</Badge>
             ))}
           </div>
         </CardContent>
@@ -239,11 +239,11 @@ function SortableImageItem({
   };
 
   return (
-    <div ref={setNodeRef} style={style} className="relative group aspect-video rounded-md overflow-hidden border border-white/10">
+    <div ref={setNodeRef} style={style} className="relative group aspect-video rounded-md overflow-hidden border border-foreground/10">
       {img.url ? (
         <img src={img.url} alt={`Project ${index + 1}`} className="w-full h-full object-cover" />
       ) : (
-        <div className="w-full h-full bg-white/5" />
+        <div className="w-full h-full bg-foreground/5" />
       )}
       <button
         type="button"
@@ -255,12 +255,12 @@ function SortableImageItem({
       <div
         {...attributes}
         {...listeners}
-        className="absolute top-1 left-1 bg-background/60 text-white p-1 rounded cursor-move opacity-0 group-hover:opacity-100 transition-opacity z-10"
+        className="absolute top-1 left-1 bg-background/60 text-foreground-strong p-1 rounded cursor-move opacity-0 group-hover:opacity-100 transition-opacity z-10"
       >
         <GripVertical className="w-3 h-3" />
       </div>
       {index === 0 && (
-        <div className="absolute bottom-0 left-0 right-0 bg-background/60 text-white text-xs py-1 text-center">
+        <div className="absolute bottom-0 left-0 right-0 bg-background/60 text-foreground-strong text-xs py-1 text-center">
           Capa
         </div>
       )}
@@ -582,8 +582,8 @@ export default function AdminProjects() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-white">Projetos</h1>
-            <p className="text-gray-400">Gerencie os projetos exibidos no seu portfólio</p>
+            <h1 className="text-3xl font-bold text-foreground-strong">Projetos</h1>
+            <p className="text-foreground/65">Gerencie os projetos exibidos no seu portfólio</p>
           </div>
           <div className="flex gap-2 items-center">
             {isRoot && (
@@ -592,14 +592,14 @@ export default function AdminProjects() {
                 className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm border transition-colors ${
                   includeDeleted
                     ? 'border-red-500/50 bg-red-500/10 text-red-400'
-                    : 'border-white/10 bg-white/5 text-gray-400 hover:text-white'
+                    : 'border-foreground/10 bg-foreground/5 text-foreground/65 hover:text-foreground-strong'
                 }`}
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 {includeDeleted ? 'Ocultar deletados' : 'Ver deletados'}
               </button>
             )}
-            <Button variant="outline" className="border-white/10 text-white hover:bg-white/5" onClick={() => setIsImportOpen(true)}>
+            <Button variant="outline" className="border-foreground/10 text-foreground-strong hover:bg-foreground/5" onClick={() => setIsImportOpen(true)}>
               <Upload className="w-4 h-4 mr-2" />
               Importar JSON
             </Button>
@@ -611,9 +611,9 @@ export default function AdminProjects() {
         </div>
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="bg-background border-white/10 max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="bg-background border-foreground/10 max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-white">
+              <DialogTitle className="text-foreground-strong">
                 {editingProject ? "Editar Projeto" : "Adicionar Novo Projeto"}
               </DialogTitle>
               <VisuallyHidden>
@@ -622,24 +622,24 @@ export default function AdminProjects() {
             </DialogHeader>
             <form onSubmit={handleSave} className="space-y-6 mt-4">
               <div className="space-y-2">
-                <Label htmlFor="title" className="text-white">Título</Label>
-                <Input name="title" id="title" defaultValue={editingProject ? getProjectField(editingProject, 'title') : ''} className="bg-white/5 border-white/10 text-white" required />
+                <Label htmlFor="title" className="text-foreground-strong">Título</Label>
+                <Input name="title" id="title" defaultValue={editingProject ? getProjectField(editingProject, 'title') : ''} className="bg-foreground/5 border-foreground/10 text-foreground-strong" required />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="slug" className="text-white">Slug (URL)</Label>
+                <Label htmlFor="slug" className="text-foreground-strong">Slug (URL)</Label>
                 <div className="flex gap-2">
                   <Input
                     id="slug"
                     value={slug}
                     onChange={e => setSlug(e.target.value)}
                     placeholder="meu-projeto"
-                    className="bg-white/5 border-white/10 text-white"
+                    className="bg-foreground/5 border-foreground/10 text-foreground-strong"
                   />
                   <Button
                     type="button"
                     variant="outline"
-                    className="border-white/10 text-gray-400 hover:text-white whitespace-nowrap"
+                    className="border-foreground/10 text-foreground/65 hover:text-foreground-strong whitespace-nowrap"
                     onClick={() => {
                       const titleEl = document.getElementById('title') as HTMLInputElement;
                       if (titleEl?.value) setSlug(generateSlug(titleEl.value));
@@ -649,22 +649,22 @@ export default function AdminProjects() {
                   </Button>
                 </div>
                 {slug && (
-                  <p className="text-xs text-gray-500">/portfolio/{slug}</p>
+                  <p className="text-xs text-foreground/42">/portfolio/{slug}</p>
                 )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description" className="text-white">Descrição Curta</Label>
-                <Textarea name="description" id="description" defaultValue={editingProject ? getProjectField(editingProject, 'description') : ''} className="bg-white/5 border-white/10 text-white" required />
+                <Label htmlFor="description" className="text-foreground-strong">Descrição Curta</Label>
+                <Textarea name="description" id="description" defaultValue={editingProject ? getProjectField(editingProject, 'description') : ''} className="bg-foreground/5 border-foreground/10 text-foreground-strong" required />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="long_description" className="text-white">Descrição Longa</Label>
-                <Textarea name="long_description" id="long_description" defaultValue={editingProject ? getProjectField(editingProject, 'longDescription') : ''} className="bg-white/5 border-white/10 text-white h-32" />
+                <Label htmlFor="long_description" className="text-foreground-strong">Descrição Longa</Label>
+                <Textarea name="long_description" id="long_description" defaultValue={editingProject ? getProjectField(editingProject, 'longDescription') : ''} className="bg-foreground/5 border-foreground/10 text-foreground-strong h-32" />
               </div>
 
               <div className="space-y-2">
-                <Label className="text-white">Galeria de Imagens</Label>
+                <Label className="text-foreground-strong">Galeria de Imagens</Label>
                 <DndContext
                   sensors={imageSensors}
                   collisionDetection={closestCenter}
@@ -683,73 +683,73 @@ export default function AdminProjects() {
                           onRemove={removeImage}
                         />
                       ))}
-                      <div className="aspect-video flex items-center justify-center border border-dashed border-white/20 rounded-md bg-white/5">
+                      <div className="aspect-video flex items-center justify-center border border-dashed border-foreground/20 rounded-md bg-foreground/5">
                         <ImagePicker onSelect={addImage} multiple />
                       </div>
                     </div>
                   </SortableContext>
                 </DndContext>
-                <p className="text-xs text-gray-500">A primeira imagem será usada como capa do projeto. Arraste as imagens para reordená-las.</p>
+                <p className="text-xs text-foreground/42">A primeira imagem será usada como capa do projeto. Arraste as imagens para reordená-las.</p>
               </div>
 
               <div className="space-y-2">
-                <Label className="text-white">Tags</Label>
+                <Label className="text-foreground-strong">Tags</Label>
                 <ProjectTagsInput selectedTags={selectedTags} onChange={setSelectedTags} />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="demo" className="text-white">Link Demo</Label>
-                  <Input name="demo" id="demo" defaultValue={editingProject?.demoLink} placeholder="https://" className="bg-white/5 border-white/10 text-white" />
+                  <Label htmlFor="demo" className="text-foreground-strong">Link Demo</Label>
+                  <Input name="demo" id="demo" defaultValue={editingProject?.demoLink} placeholder="https://" className="bg-foreground/5 border-foreground/10 text-foreground-strong" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="github" className="text-white">Link GitHub</Label>
-                  <Input name="github" id="github" defaultValue={editingProject?.githubLink} placeholder="https://" className="bg-white/5 border-white/10 text-white" />
+                  <Label htmlFor="github" className="text-foreground-strong">Link GitHub</Label>
+                  <Input name="github" id="github" defaultValue={editingProject?.githubLink} placeholder="https://" className="bg-foreground/5 border-foreground/10 text-foreground-strong" />
                 </div>
               </div>
 
               <Accordion type="single" collapsible>
-                <AccordionItem value="case-study" className="border-white/10">
-                  <AccordionTrigger className="text-white hover:text-neon-purple">
+                <AccordionItem value="case-study" className="border-foreground/10">
+                  <AccordionTrigger className="text-foreground-strong hover:text-neon-purple">
                     Case Study (opcional)
                   </AccordionTrigger>
                   <AccordionContent className="space-y-4 pt-2">
                     <div className="space-y-2">
-                      <Label className="text-white">O Problema</Label>
+                      <Label className="text-foreground-strong">O Problema</Label>
                       <Textarea
                         value={caseStudyProblem}
                         onChange={e => setCaseStudyProblem(e.target.value)}
                         placeholder="Descreva o contexto e o desafio que motivou o projeto..."
-                        className="bg-white/5 border-white/10 text-white h-24"
+                        className="bg-foreground/5 border-foreground/10 text-foreground-strong h-24"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-white">A Solução</Label>
+                      <Label className="text-foreground-strong">A Solução</Label>
                       <Textarea
                         value={caseStudySolution}
                         onChange={e => setCaseStudySolution(e.target.value)}
                         placeholder="Como o problema foi resolvido, arquitetura e decisões técnicas..."
-                        className="bg-white/5 border-white/10 text-white h-24"
+                        className="bg-foreground/5 border-foreground/10 text-foreground-strong h-24"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-white">Os Resultados</Label>
+                      <Label className="text-foreground-strong">Os Resultados</Label>
                       <Textarea
                         value={caseStudyResults}
                         onChange={e => setCaseStudyResults(e.target.value)}
                         placeholder="Impacto, métricas, feedback obtido..."
-                        className="bg-white/5 border-white/10 text-white h-20"
+                        className="bg-foreground/5 border-foreground/10 text-foreground-strong h-20"
                       />
                     </div>
 
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <Label className="text-white">Métricas</Label>
+                        <Label className="text-foreground-strong">Métricas</Label>
                         <Button
                           type="button"
                           variant="outline"
                           size="sm"
-                          className="border-white/10 text-gray-400 hover:text-white"
+                          className="border-foreground/10 text-foreground/65 hover:text-foreground-strong"
                           onClick={() => setMetrics([...metrics, { label: '', value: '', icon: '' }])}
                         >
                           <Plus className="w-3 h-3 mr-1" /> Adicionar
@@ -765,13 +765,13 @@ export default function AdminProjects() {
                             value={m.value}
                             onChange={e => setMetrics(metrics.map((x, idx) => idx === i ? { ...x, value: e.target.value } : x))}
                             placeholder="Ex: 70%"
-                            className="bg-white/5 border-white/10 text-white w-24"
+                            className="bg-foreground/5 border-foreground/10 text-foreground-strong w-24"
                           />
                           <Input
                             value={m.label}
                             onChange={e => setMetrics(metrics.map((x, idx) => idx === i ? { ...x, label: e.target.value } : x))}
                             placeholder="Rótulo"
-                            className="bg-white/5 border-white/10 text-white flex-1"
+                            className="bg-foreground/5 border-foreground/10 text-foreground-strong flex-1"
                           />
                           <Button
                             type="button"
@@ -793,21 +793,21 @@ export default function AdminProjects() {
                           id="testimonial-enabled"
                           checked={testimonialEnabled}
                           onChange={e => setTestimonialEnabled(e.target.checked)}
-                          className="rounded border-white/20"
+                          className="rounded border-foreground/20"
                         />
-                        <Label htmlFor="testimonial-enabled" className="text-white cursor-pointer">Incluir depoimento</Label>
+                        <Label htmlFor="testimonial-enabled" className="text-foreground-strong cursor-pointer">Incluir depoimento</Label>
                       </div>
                       {testimonialEnabled && (
-                        <div className="space-y-2 pl-6 border-l border-white/10">
+                        <div className="space-y-2 pl-6 border-l border-foreground/10">
                           <Textarea
                             value={testimonialText}
                             onChange={e => setTestimonialText(e.target.value)}
                             placeholder="Texto do depoimento..."
-                            className="bg-white/5 border-white/10 text-white h-20"
+                            className="bg-foreground/5 border-foreground/10 text-foreground-strong h-20"
                           />
                           <div className="grid grid-cols-2 gap-2">
-                            <Input value={testimonialAuthor} onChange={e => setTestimonialAuthor(e.target.value)} placeholder="Nome do autor" className="bg-white/5 border-white/10 text-white" />
-                            <Input value={testimonialRole} onChange={e => setTestimonialRole(e.target.value)} placeholder="Cargo / empresa" className="bg-white/5 border-white/10 text-white" />
+                            <Input value={testimonialAuthor} onChange={e => setTestimonialAuthor(e.target.value)} placeholder="Nome do autor" className="bg-foreground/5 border-foreground/10 text-foreground-strong" />
+                            <Input value={testimonialRole} onChange={e => setTestimonialRole(e.target.value)} placeholder="Cargo / empresa" className="bg-foreground/5 border-foreground/10 text-foreground-strong" />
                           </div>
                         </div>
                       )}
@@ -817,7 +817,7 @@ export default function AdminProjects() {
               </Accordion>
 
               <div className="flex justify-end gap-2 pt-4">
-                <Button type="button" variant="ghost" onClick={() => setIsDialogOpen(false)} className="text-gray-400">Cancelar</Button>
+                <Button type="button" variant="ghost" onClick={() => setIsDialogOpen(false)} className="text-foreground/65">Cancelar</Button>
                 <Button type="submit" disabled={isTranslating} className="bg-neon-purple hover:bg-neon-purple/90 text-white">{isTranslating ? 'Traduzindo...' : 'Salvar'}</Button>
               </div>
             </form>
@@ -825,7 +825,7 @@ export default function AdminProjects() {
         </Dialog>
 
         {isLoading ? (
-          <div className="text-white">Carregando projetos...</div>
+          <div className="text-foreground-strong">Carregando projetos...</div>
         ) : (
           <DndContext
             sensors={sensors}
@@ -854,44 +854,44 @@ export default function AdminProjects() {
 
       {/* JSON Import Dialog */}
       <Dialog open={isImportOpen} onOpenChange={setIsImportOpen}>
-        <DialogContent className="bg-background border-white/10 max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="bg-background border-foreground/10 max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-white">Importar Projeto via JSON</DialogTitle>
+            <DialogTitle className="text-foreground-strong">Importar Projeto via JSON</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 mt-4">
             <div className="flex gap-2">
               <Button
                 type="button"
                 variant="outline"
-                className="border-white/10 text-gray-400 hover:text-white"
+                className="border-foreground/10 text-foreground/65 hover:text-foreground-strong"
                 onClick={copyPrompt}
               >
                 {promptCopied ? <Check className="w-4 h-4 mr-2 text-green-400" /> : <Copy className="w-4 h-4 mr-2" />}
                 {promptCopied ? 'Copiado!' : 'Copiar Prompt para IA'}
               </Button>
-              <p className="text-xs text-gray-500 self-center">Gere o JSON com ChatGPT, Claude ou Gemini</p>
+              <p className="text-xs text-foreground/42 self-center">Gere o JSON com ChatGPT, Claude ou Gemini</p>
             </div>
 
             <Tabs defaultValue="paste">
-              <TabsList className="bg-white/5 border border-white/10">
-                <TabsTrigger value="paste" className="text-gray-400 data-[state=active]:text-white">Colar JSON</TabsTrigger>
-                <TabsTrigger value="upload" className="text-gray-400 data-[state=active]:text-white">Upload de Arquivo</TabsTrigger>
+              <TabsList className="bg-foreground/5 border border-foreground/10">
+                <TabsTrigger value="paste" className="text-foreground/65 data-[state=active]:text-foreground-strong">Colar JSON</TabsTrigger>
+                <TabsTrigger value="upload" className="text-foreground/65 data-[state=active]:text-foreground-strong">Upload de Arquivo</TabsTrigger>
               </TabsList>
               <TabsContent value="paste" className="mt-3">
                 <Textarea
                   value={importJson}
                   onChange={e => { setImportJson(e.target.value); setImportError(''); }}
                   placeholder='{ "title": "Meu Projeto", "slug": "meu-projeto", ... }'
-                  className="bg-white/5 border-white/10 text-white font-mono text-xs h-48"
+                  className="bg-foreground/5 border-foreground/10 text-foreground-strong font-mono text-xs h-48"
                 />
               </TabsContent>
               <TabsContent value="upload" className="mt-3">
                 <div
-                  className="border-2 border-dashed border-white/20 rounded-lg p-8 text-center cursor-pointer hover:border-neon-purple/50 transition-colors"
+                  className="border-2 border-dashed border-foreground/20 rounded-lg p-8 text-center cursor-pointer hover:border-neon-purple/50 transition-colors"
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  <Upload className="w-8 h-8 text-gray-500 mx-auto mb-2" />
-                  <p className="text-gray-400 text-sm">Clique para selecionar um arquivo .json</p>
+                  <Upload className="w-8 h-8 text-foreground/42 mx-auto mb-2" />
+                  <p className="text-foreground/65 text-sm">Clique para selecionar um arquivo .json</p>
                   {importJson && <p className="text-green-400 text-xs mt-2">Arquivo carregado ✓</p>}
                 </div>
                 <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleFileUpload} />
@@ -903,7 +903,7 @@ export default function AdminProjects() {
             )}
 
             <div className="flex justify-end gap-2">
-              <Button type="button" variant="ghost" onClick={() => { setIsImportOpen(false); setImportJson(''); setImportError(''); }} className="text-gray-400">Cancelar</Button>
+              <Button type="button" variant="ghost" onClick={() => { setIsImportOpen(false); setImportJson(''); setImportError(''); }} className="text-foreground/65">Cancelar</Button>
               <Button
                 type="button"
                 onClick={() => processJsonImport(importJson)}

@@ -9,10 +9,10 @@ const SYNTAX_ITEMS = [
 
 export function TemplateSyntaxGuide() {
   return (
-    <div className="rounded-md border border-white/10 bg-white/5 px-3 py-2 text-xs text-gray-400">
-      <p className="mb-1.5 font-medium text-gray-300">
+    <div className="rounded-md border border-foreground/10 bg-foreground/5 px-3 py-2 text-xs text-foreground/65">
+      <p className="mb-1.5 font-medium text-foreground/90">
         Sintaxe suportada{" "}
-        <span className="font-normal text-gray-500">(não é Markdown padrão)</span>
+        <span className="font-normal text-foreground/42">(não é Markdown padrão)</span>
       </p>
       <div className="flex flex-wrap gap-x-4 gap-y-1">
         {SYNTAX_ITEMS.map(({ token, description }) => (

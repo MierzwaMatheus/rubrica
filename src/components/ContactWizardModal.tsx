@@ -12,7 +12,7 @@ export function ContactWizardModal() {
 
   return (
     <Dialog open={isOpen && wizardEnabled} onOpenChange={(open) => { if (!open) closeWizard(); }}>
-      <DialogContent className="sm:max-w-lg lg:max-w-2xl bg-background border border-white/10 p-6 max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-lg lg:max-w-2xl bg-background border border-foreground/10 p-6 max-h-[90vh] overflow-y-auto">
         <ContactWizard
           initialFlow={trigger.flowType}
           sourceContext={trigger.sourceContext}

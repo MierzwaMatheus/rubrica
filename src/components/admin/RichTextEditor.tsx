@@ -115,7 +115,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-invert max-w-none min-h-[150px] p-4 focus:outline-none text-gray-300 tiptap',
+        class: 'prose prose-invert max-w-none min-h-[150px] p-4 focus:outline-none text-foreground/90 tiptap',
       },
     },
   });
@@ -235,7 +235,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
   }
 
   return (
-    <div className="border border-white/10 rounded-md bg-white/5 flex flex-col">
+    <div className="border border-foreground/10 rounded-md bg-foreground/5 flex flex-col">
       <style>{`
         .tiptap ul {
           list-style-type: disc;
@@ -301,14 +301,14 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
           max-width: 100%;
         }
       `}</style>
-      <div className="flex flex-wrap gap-1 p-2 border-b border-white/10 bg-background sticky top-0 z-20 shrink-0">
+      <div className="flex flex-wrap gap-1 p-2 border-b border-foreground/10 bg-background sticky top-0 z-20 shrink-0">
         {/* Cabeçalhos */}
         <Button
           type="button"
           variant="ghost"
           size="sm"
           onClick={handleHeading1}
-          className={editor.isActive('heading', { level: 1 }) ? 'bg-neon-purple/20 text-neon-purple' : 'text-gray-400'}
+          className={editor.isActive('heading', { level: 1 }) ? 'bg-neon-purple/20 text-neon-purple' : 'text-foreground/65'}
           title="Título 1"
         >
           <Heading1 className="w-4 h-4" />
@@ -318,7 +318,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
           variant="ghost"
           size="sm"
           onClick={handleHeading2}
-          className={editor.isActive('heading', { level: 2 }) ? 'bg-neon-purple/20 text-neon-purple' : 'text-gray-400'}
+          className={editor.isActive('heading', { level: 2 }) ? 'bg-neon-purple/20 text-neon-purple' : 'text-foreground/65'}
           title="Título 2"
         >
           <Heading2 className="w-4 h-4" />
@@ -328,13 +328,13 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
           variant="ghost"
           size="sm"
           onClick={handleHeading3}
-          className={editor.isActive('heading', { level: 3 }) ? 'bg-neon-purple/20 text-neon-purple' : 'text-gray-400'}
+          className={editor.isActive('heading', { level: 3 }) ? 'bg-neon-purple/20 text-neon-purple' : 'text-foreground/65'}
           title="Título 3"
         >
           <Heading3 className="w-4 h-4" />
         </Button>
         
-        <div className="w-px h-6 bg-white/10 mx-1" />
+        <div className="w-px h-6 bg-foreground/10 mx-1" />
         
         {/* Formatação de texto */}
         <Button
@@ -342,7 +342,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
           variant="ghost"
           size="sm"
           onClick={handleBold}
-          className={editor.isActive('bold') ? 'bg-neon-purple/20 text-neon-purple' : 'text-gray-400'}
+          className={editor.isActive('bold') ? 'bg-neon-purple/20 text-neon-purple' : 'text-foreground/65'}
           title="Negrito"
         >
           <Bold className="w-4 h-4" />
@@ -352,7 +352,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
           variant="ghost"
           size="sm"
           onClick={handleItalic}
-          className={editor.isActive('italic') ? 'bg-neon-purple/20 text-neon-purple' : 'text-gray-400'}
+          className={editor.isActive('italic') ? 'bg-neon-purple/20 text-neon-purple' : 'text-foreground/65'}
           title="Itálico"
         >
           <Italic className="w-4 h-4" />
@@ -362,13 +362,13 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
           variant="ghost"
           size="sm"
           onClick={handleUnderline}
-          className={editor.isActive('underline') ? 'bg-neon-purple/20 text-neon-purple' : 'text-gray-400'}
+          className={editor.isActive('underline') ? 'bg-neon-purple/20 text-neon-purple' : 'text-foreground/65'}
           title="Sublinhado"
         >
           <UnderlineIcon className="w-4 h-4" />
         </Button>
         
-        <div className="w-px h-6 bg-white/10 mx-1" />
+        <div className="w-px h-6 bg-foreground/10 mx-1" />
         
         {/* Listas */}
         <Button
@@ -376,7 +376,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
           variant="ghost"
           size="sm"
           onClick={handleBulletList}
-          className={editor.isActive('bulletList') ? 'bg-neon-purple/20 text-neon-purple' : 'text-gray-400'}
+          className={editor.isActive('bulletList') ? 'bg-neon-purple/20 text-neon-purple' : 'text-foreground/65'}
           title="Lista com marcadores"
         >
           <List className="w-4 h-4" />
@@ -386,7 +386,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
           variant="ghost"
           size="sm"
           onClick={handleOrderedList}
-          className={editor.isActive('orderedList') ? 'bg-neon-purple/20 text-neon-purple' : 'text-gray-400'}
+          className={editor.isActive('orderedList') ? 'bg-neon-purple/20 text-neon-purple' : 'text-foreground/65'}
           title="Lista numerada"
         >
           <ListOrdered className="w-4 h-4" />
@@ -396,7 +396,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
           variant="ghost"
           size="sm"
           onClick={handleBlockquote}
-          className={editor.isActive('blockquote') ? 'bg-neon-purple/20 text-neon-purple' : 'text-gray-400'}
+          className={editor.isActive('blockquote') ? 'bg-neon-purple/20 text-neon-purple' : 'text-foreground/65'}
           title="Citação"
         >
           <Quote className="w-4 h-4" />
@@ -406,7 +406,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
           variant="ghost"
           size="sm"
           onClick={handleCodeBlock}
-          className={editor.isActive('codeBlock') ? 'bg-neon-purple/20 text-neon-purple' : 'text-gray-400'}
+          className={editor.isActive('codeBlock') ? 'bg-neon-purple/20 text-neon-purple' : 'text-foreground/65'}
           title="Bloco de código"
         >
           <Code className="w-4 h-4" />
@@ -421,7 +421,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
           <Minus className="w-4 h-4" />
         </Button>
         
-        <div className="w-px h-6 bg-white/10 mx-1" />
+        <div className="w-px h-6 bg-foreground/10 mx-1" />
         
         {/* Links e imagens */}
         <Button
@@ -429,7 +429,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
           variant="ghost"
           size="sm"
           onClick={openLinkDialog}
-          className={editor.isActive('link') ? 'bg-neon-purple/20 text-neon-purple' : 'text-gray-400'}
+          className={editor.isActive('link') ? 'bg-neon-purple/20 text-neon-purple' : 'text-foreground/65'}
           title="Inserir link"
         >
           <LinkIcon className="w-4 h-4" />
@@ -444,7 +444,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
           <ImageIcon className="w-4 h-4" />
         </Button>
         
-        <div className="w-px h-6 bg-white/10 mx-1" />
+        <div className="w-px h-6 bg-foreground/10 mx-1" />
         
         {/* Alinhamento */}
         <Button
@@ -452,7 +452,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
           variant="ghost"
           size="sm"
           onClick={handleAlignLeft}
-          className={editor.isActive({ textAlign: 'left' }) ? 'bg-neon-purple/20 text-neon-purple' : 'text-gray-400'}
+          className={editor.isActive({ textAlign: 'left' }) ? 'bg-neon-purple/20 text-neon-purple' : 'text-foreground/65'}
           title="Alinhar à esquerda"
         >
           <AlignLeft className="w-4 h-4" />
@@ -462,7 +462,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
           variant="ghost"
           size="sm"
           onClick={handleAlignCenter}
-          className={editor.isActive({ textAlign: 'center' }) ? 'bg-neon-purple/20 text-neon-purple' : 'text-gray-400'}
+          className={editor.isActive({ textAlign: 'center' }) ? 'bg-neon-purple/20 text-neon-purple' : 'text-foreground/65'}
           title="Centralizar"
         >
           <AlignCenter className="w-4 h-4" />
@@ -472,7 +472,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
           variant="ghost"
           size="sm"
           onClick={handleAlignRight}
-          className={editor.isActive({ textAlign: 'right' }) ? 'bg-neon-purple/20 text-neon-purple' : 'text-gray-400'}
+          className={editor.isActive({ textAlign: 'right' }) ? 'bg-neon-purple/20 text-neon-purple' : 'text-foreground/65'}
           title="Alinhar à direita"
         >
           <AlignRight className="w-4 h-4" />
@@ -486,7 +486,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
           variant="ghost"
           size="sm"
           onClick={toggleCodeView}
-          className={showCodeView ? 'bg-neon-purple/20 text-neon-purple' : 'text-gray-400'}
+          className={showCodeView ? 'bg-neon-purple/20 text-neon-purple' : 'text-foreground/65'}
           title={showCodeView ? 'Ver visualização' : 'Ver código HTML'}
         >
           {showCodeView ? <Eye className="w-4 h-4" /> : <Code2 className="w-4 h-4" />}
@@ -497,7 +497,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
           size="sm"
           onClick={handleUndo}
           disabled={!editor.can().undo()}
-          className="text-gray-400"
+          className="text-foreground/65"
           title="Desfazer"
         >
           <Undo className="w-4 h-4" />
@@ -508,7 +508,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
           size="sm"
           onClick={handleRedo}
           disabled={!editor.can().redo()}
-          className="text-gray-400"
+          className="text-foreground/65"
           title="Refazer"
         >
           <Redo className="w-4 h-4" />
@@ -519,7 +519,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
           <textarea
             value={codeContent}
             onChange={(e) => setCodeContent(e.target.value)}
-            className="w-full min-h-[150px] p-4 bg-black/20 text-gray-300 font-mono text-sm border-0 focus:outline-none focus:ring-2 focus:ring-neon-purple/50"
+            className="w-full min-h-[150px] p-4 bg-black/20 text-foreground/90 font-mono text-sm border-0 focus:outline-none focus:ring-2 focus:ring-neon-purple/50"
             style={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap' }}
             placeholder="Edite o HTML aqui..."
           />
@@ -530,29 +530,29 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
       
       {/* Dialog para inserir link */}
       <Dialog open={linkDialogOpen} onOpenChange={setLinkDialogOpen}>
-        <DialogContent className="bg-background border-white/10">
+        <DialogContent className="bg-background border-foreground/10">
           <DialogHeader>
-            <DialogTitle className="text-white">Inserir Link</DialogTitle>
+            <DialogTitle className="text-foreground-strong">Inserir Link</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="link-text" className="text-white">Texto do Link (opcional)</Label>
+              <Label htmlFor="link-text" className="text-foreground-strong">Texto do Link (opcional)</Label>
               <Input
                 id="link-text"
                 value={linkText}
                 onChange={(e) => setLinkText(e.target.value)}
                 placeholder="Digite o texto do link"
-                className="bg-white/5 border-white/10 text-white"
+                className="bg-foreground/5 border-foreground/10 text-foreground-strong"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="link-url" className="text-white">URL *</Label>
+              <Label htmlFor="link-url" className="text-foreground-strong">URL *</Label>
               <Input
                 id="link-url"
                 value={linkUrl}
                 onChange={(e) => setLinkUrl(e.target.value)}
                 placeholder="https://exemplo.com"
-                className="bg-white/5 border-white/10 text-white"
+                className="bg-foreground/5 border-foreground/10 text-foreground-strong"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
@@ -563,7 +563,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
             </div>
           </div>
           <DialogFooter>
-            <Button type="button" variant="ghost" onClick={() => setLinkDialogOpen(false)} className="text-gray-400">
+            <Button type="button" variant="ghost" onClick={() => setLinkDialogOpen(false)} className="text-foreground/65">
               Cancelar
             </Button>
             <Button type="button" onClick={handleSetLink} className="bg-neon-purple hover:bg-neon-purple/90 text-white">
@@ -575,19 +575,19 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
 
       {/* Dialog para inserir imagem */}
       <Dialog open={imageDialogOpen} onOpenChange={setImageDialogOpen}>
-        <DialogContent className="bg-background border-white/10">
+        <DialogContent className="bg-background border-foreground/10">
           <DialogHeader>
-            <DialogTitle className="text-white">Inserir Imagem</DialogTitle>
+            <DialogTitle className="text-foreground-strong">Inserir Imagem</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="image-url" className="text-white">URL da Imagem *</Label>
+              <Label htmlFor="image-url" className="text-foreground-strong">URL da Imagem *</Label>
               <Input
                 id="image-url"
                 value={imageUrl}
                 onChange={(e) => setImageUrl(e.target.value)}
                 placeholder="https://exemplo.com/imagem.jpg"
-                className="bg-white/5 border-white/10 text-white"
+                className="bg-foreground/5 border-foreground/10 text-foreground-strong"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
@@ -598,14 +598,14 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
             </div>
             {imageUrl && (
               <div className="mt-4">
-                <img src={imageUrl} alt="Preview" className="max-w-full h-auto rounded-lg border border-white/10" onError={(e) => {
+                <img src={imageUrl} alt="Preview" className="max-w-full h-auto rounded-lg border border-foreground/10" onError={(e) => {
                   e.currentTarget.style.display = 'none';
                 }} />
               </div>
             )}
           </div>
           <DialogFooter>
-            <Button type="button" variant="ghost" onClick={() => setImageDialogOpen(false)} className="text-gray-400">
+            <Button type="button" variant="ghost" onClick={() => setImageDialogOpen(false)} className="text-foreground/65">
               Cancelar
             </Button>
             <Button type="button" onClick={handleSetImage} className="bg-neon-purple hover:bg-neon-purple/90 text-white" disabled={!imageUrl}>

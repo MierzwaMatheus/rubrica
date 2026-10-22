@@ -202,7 +202,7 @@ export function ProposalDialog({ open, onOpenChange, proposal, onSave }: Proposa
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="bg-card border-white/10 max-w-2xl w-full max-h-[85vh] overflow-y-scroll text-white">
+            <DialogContent className="bg-card border-foreground/10 max-w-2xl w-full max-h-[85vh] overflow-y-scroll text-foreground-strong">
                 <DialogHeader>
                     <DialogTitle className="text-xl font-bold">
                         {proposal ? "Editar Proposta" : "Nova Proposta"}
@@ -290,7 +290,7 @@ export function ProposalDialog({ open, onOpenChange, proposal, onSave }: Proposa
                         </div>
                         <ul className="space-y-1">
                             {scopeItems.map((item, index) => (
-                                <li key={index} className="flex items-center justify-between bg-white/5 p-2 rounded text-sm">
+                                <li key={index} className="flex items-center justify-between bg-foreground/5 p-2 rounded text-sm">
                                     <span>{item}</span>
                                     <button onClick={() => handleRemoveScopeItem(index)} className="text-red-400 hover:text-red-300">
                                         <X className="w-4 h-4" />
@@ -319,7 +319,7 @@ export function ProposalDialog({ open, onOpenChange, proposal, onSave }: Proposa
                         </div>
                         <ul className="space-y-1">
                             {timelineItems.map((item, index) => (
-                                <li key={index} className="flex items-center justify-between bg-white/5 p-2 rounded text-sm">
+                                <li key={index} className="flex items-center justify-between bg-foreground/5 p-2 rounded text-sm">
                                     <span>{item.step} - {item.period}</span>
                                     <button onClick={() => handleRemoveTimelineItem(index)} className="text-red-400 hover:text-red-300">
                                         <X className="w-4 h-4" />
@@ -341,7 +341,7 @@ export function ProposalDialog({ open, onOpenChange, proposal, onSave }: Proposa
                     <div>
                         <Label className="block text-sm mb-1">Valor do Projeto</Label>
                         <div className="relative">
-                            <span className="absolute left-3 top-2.5 text-gray-400 text-sm">R$</span>
+                            <span className="absolute left-3 top-2.5 text-foreground/65 text-sm">R$</span>
                             <Input
                                 className="bg-background border-input pl-8"
                                 placeholder="0,00"
@@ -364,7 +364,7 @@ export function ProposalDialog({ open, onOpenChange, proposal, onSave }: Proposa
                                             newConditions[i].checked = e.target.checked;
                                             setConditions(newConditions);
                                         }}
-                                        className="mt-1 rounded border-gray-300"
+                                        className="mt-1 rounded border-foreground/80"
                                     />
                                     <Textarea
                                         value={condition.text}

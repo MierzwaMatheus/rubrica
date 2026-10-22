@@ -35,32 +35,32 @@ export default function Plugins() {
       <div key={plugin.id} className={isChild ? 'ml-6 mt-3' : ''}>
         <div
           className={`bg-card border rounded-xl p-6 flex flex-col gap-4 ${
-            isChild ? 'border-white/5 bg-white/[0.02]' : 'border-white/10'
+            isChild ? 'border-foreground/5 bg-white/[0.02]' : 'border-foreground/10'
           }`}
         >
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 {isChild && (
-                  <GitBranch className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
+                  <GitBranch className="w-3.5 h-3.5 text-foreground/42 flex-shrink-0" />
                 )}
-                <h3 className="font-semibold text-white">{plugin.label}</h3>
+                <h3 className="font-semibold text-foreground-strong">{plugin.label}</h3>
                 <Badge
                   variant="outline"
-                  className="text-xs border-white/20 text-gray-400"
+                  className="text-xs border-foreground/20 text-foreground/65"
                 >
                   {plugin.minRole}
                 </Badge>
                 {isChild && (
                   <Badge
                     variant="outline"
-                    className="text-xs border-white/10 text-gray-500"
+                    className="text-xs border-foreground/10 text-foreground/42"
                   >
                     sub-plugin
                   </Badge>
                 )}
               </div>
-              <p className="text-sm text-gray-400 mt-1">{plugin.description}</p>
+              <p className="text-sm text-foreground/65 mt-1">{plugin.description}</p>
             </div>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -85,7 +85,7 @@ export default function Plugins() {
               {plugin.tables.map(table => (
                 <span
                   key={table}
-                  className="text-xs bg-white/5 text-gray-500 px-2 py-0.5 rounded font-mono"
+                  className="text-xs bg-foreground/5 text-foreground/42 px-2 py-0.5 rounded font-mono"
                 >
                   {table}
                 </span>
@@ -103,8 +103,8 @@ export default function Plugins() {
     <AdminLayout>
       <div className="space-y-8">
         <header>
-          <h1 className="text-3xl font-bold text-white">Plugins</h1>
-          <p className="text-gray-400 mt-2">
+          <h1 className="text-3xl font-bold text-foreground-strong">Plugins</h1>
+          <p className="text-foreground/65 mt-2">
             Ative ou desative funcionalidades independentes do sistema.
           </p>
         </header>

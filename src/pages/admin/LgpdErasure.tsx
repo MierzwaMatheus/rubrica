@@ -98,43 +98,43 @@ export default function AdminLgpdErasure() {
         <div className="flex items-center gap-3">
           <ShieldAlert className="w-6 h-6 text-neon-purple" />
           <div>
-            <h1 className="text-2xl font-bold text-white">LGPD — Gestão de Titulares</h1>
-            <p className="text-sm text-gray-400 mt-0.5">
+            <h1 className="text-2xl font-bold text-foreground-strong">LGPD — Gestão de Titulares</h1>
+            <p className="text-sm text-foreground/65 mt-0.5">
               Busca, exportação e exclusão de dados pessoais por titular. Somente root.
             </p>
           </div>
         </div>
 
         {/* Busca */}
-        <Card className="bg-card border-white/10">
+        <Card className="bg-card border-foreground/10">
           <CardHeader>
-            <CardTitle className="text-white text-base">Identificar titular</CardTitle>
+            <CardTitle className="text-foreground-strong text-base">Identificar titular</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1 space-y-1.5">
-                <Label htmlFor="email" className="text-gray-400 text-xs">E-mail</Label>
+                <Label htmlFor="email" className="text-foreground/65 text-xs">E-mail</Label>
                 <Input
                   id="email"
                   type="email"
                   placeholder="titular@exemplo.com"
                   value={searchEmail}
                   onChange={(e) => setSearchEmail(e.target.value)}
-                  className="bg-background border-white/10 text-white"
+                  className="bg-background border-foreground/10 text-foreground-strong"
                 />
               </div>
               <div className="flex-1 space-y-1.5">
-                <Label htmlFor="doc" className="text-gray-400 text-xs">CPF / CNPJ (só números)</Label>
+                <Label htmlFor="doc" className="text-foreground/65 text-xs">CPF / CNPJ (só números)</Label>
                 <Input
                   id="doc"
                   placeholder="000.000.000-00"
                   value={searchDoc}
                   onChange={(e) => setSearchDoc(e.target.value)}
-                  className="bg-background border-white/10 text-white"
+                  className="bg-background border-foreground/10 text-foreground-strong"
                 />
               </div>
               <div className="flex items-end">
-                <Button type="submit" variant="outline" className="border-white/20 text-white gap-2">
+                <Button type="submit" variant="outline" className="border-foreground/20 text-foreground-strong gap-2">
                   <Search className="w-4 h-4" />
                   Buscar
                 </Button>
@@ -145,12 +145,12 @@ export default function AdminLgpdErasure() {
 
         {/* Resultados */}
         {hasSearch && (
-          <Card className="bg-card border-white/10">
+          <Card className="bg-card border-foreground/10">
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-white text-base">
+              <CardTitle className="text-foreground-strong text-base">
                 Dados encontrados
                 {exportData === undefined && (
-                  <span className="ml-2 text-gray-400 text-xs font-normal">carregando…</span>
+                  <span className="ml-2 text-foreground/65 text-xs font-normal">carregando…</span>
                 )}
               </CardTitle>
               {hasData && (
@@ -158,7 +158,7 @@ export default function AdminLgpdErasure() {
                   <Button
                     size="sm"
                     variant="outline"
-                    className="border-white/20 text-white gap-2"
+                    className="border-foreground/20 text-foreground-strong gap-2"
                     onClick={handleExportJson}
                   >
                     <FileDown className="w-4 h-4" />
@@ -178,7 +178,7 @@ export default function AdminLgpdErasure() {
             </CardHeader>
             <CardContent className="space-y-4">
               {exportData !== undefined && !hasData && (
-                <p className="text-gray-400 text-sm">Nenhum dado pessoal encontrado para esse titular.</p>
+                <p className="text-foreground/65 text-sm">Nenhum dado pessoal encontrado para esse titular.</p>
               )}
               {exportData && (
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -194,16 +194,16 @@ export default function AdminLgpdErasure() {
 
         {/* Confirmação de erasure */}
         <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-          <AlertDialogContent className="bg-card border-white/10">
+          <AlertDialogContent className="bg-card border-foreground/10">
             <AlertDialogHeader>
-              <AlertDialogTitle className="text-white flex items-center gap-2">
+              <AlertDialogTitle className="text-foreground-strong flex items-center gap-2">
                 <AlertTriangle className="w-5 h-5 text-red-400" />
                 Confirmar anonimização
               </AlertDialogTitle>
-              <AlertDialogDescription className="text-gray-400 space-y-2">
+              <AlertDialogDescription className="text-foreground/65 space-y-2">
                 <span className="block">
                   Esta operação irá substituir todos os dados pessoais deste titular por
-                  <strong className="text-white"> [ANONIMIZADO]</strong> em todas as tabelas.
+                  <strong className="text-foreground-strong"> [ANONIMIZADO]</strong> em todas as tabelas.
                 </span>
                 <span className="block">
                   A operação é <strong className="text-red-400">irreversível</strong>. Os registros em si
@@ -212,7 +212,7 @@ export default function AdminLgpdErasure() {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel className="border-white/20 text-white bg-transparent">Cancelar</AlertDialogCancel>
+              <AlertDialogCancel className="border-foreground/20 text-foreground-strong bg-transparent">Cancelar</AlertDialogCancel>
               <AlertDialogAction
                 className="bg-red-600 hover:bg-red-700 text-white"
                 onClick={handleErasure}
@@ -230,10 +230,10 @@ export default function AdminLgpdErasure() {
 
 function SummaryCard({ label, count }: { label: string; count: number }) {
   return (
-    <div className="rounded-lg border border-white/10 bg-background p-3 space-y-1">
-      <p className="text-xs text-gray-400">{label}</p>
+    <div className="rounded-lg border border-foreground/10 bg-background p-3 space-y-1">
+      <p className="text-xs text-foreground/65">{label}</p>
       <div className="flex items-center gap-2">
-        <span className="text-2xl font-bold text-white">{count}</span>
+        <span className="text-2xl font-bold text-foreground-strong">{count}</span>
         {count > 0 && <Badge variant="destructive" className="text-xs">PII</Badge>}
       </div>
     </div>

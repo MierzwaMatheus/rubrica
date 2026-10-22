@@ -48,7 +48,7 @@ function PlaygroundSidebar() {
       <Button
         variant="ghost"
         size="icon"
-        className="fixed top-4 left-4 z-50 md:hidden text-white"
+        className="fixed top-4 left-4 z-50 md:hidden text-foreground-strong"
         onClick={() => setIsOpen(!isOpen)}
       >
         {isOpen ? <X /> : <Menu />}
@@ -56,7 +56,7 @@ function PlaygroundSidebar() {
 
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 w-64 bg-sidebar border-r border-white/10 transform transition-transform duration-300 ease-in-out md:translate-x-0",
+          "fixed inset-y-0 left-0 z-40 w-64 bg-sidebar border-r border-foreground/10 transform transition-transform duration-300 ease-in-out md:translate-x-0",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
@@ -64,9 +64,9 @@ function PlaygroundSidebar() {
           {/* Same header as admin */}
           <div className="mb-6 flex items-center space-x-2">
             <div className="h-8 w-8 rounded bg-neon-purple flex items-center justify-center">
-              <span className="font-bold text-white">A</span>
+              <span className="font-bold text-foreground-strong">A</span>
             </div>
-            <span className="text-xl font-bold text-white">Admin Panel</span>
+            <span className="text-xl font-bold text-foreground-strong">Admin Panel</span>
           </div>
 
           {/* Demo mode badge — só o que diferencia do admin real */}
@@ -88,7 +88,7 @@ function PlaygroundSidebar() {
                 return (
                   <div
                     key={i}
-                    className="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600 cursor-not-allowed select-none"
+                    className="flex items-center space-x-3 px-4 py-3 rounded-lg text-foreground/25 cursor-not-allowed select-none"
                     title="Não disponível no playground"
                   >
                     <item.icon className="w-5 h-5" />
@@ -104,7 +104,7 @@ function PlaygroundSidebar() {
                       "flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors",
                       isActive
                         ? "bg-neon-purple/10 text-neon-purple border border-neon-purple/20"
-                        : "text-gray-400 hover:text-white hover:bg-white/5"
+                        : "text-foreground/65 hover:text-foreground-strong hover:bg-foreground/5"
                     )}
                     onClick={() => setIsOpen(false)}
                   >
@@ -117,9 +117,9 @@ function PlaygroundSidebar() {
           </nav>
 
           {/* Footer — em vez de "Sair", link para o portfólio */}
-          <div className="pt-6 border-t border-white/10">
+          <div className="pt-6 border-t border-foreground/10">
             <Link href="/">
-              <a className="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors">
+              <a className="flex items-center space-x-3 px-4 py-3 rounded-lg text-foreground/65 hover:text-foreground-strong hover:bg-foreground/5 transition-colors">
                 <ExternalLink className="w-5 h-5" />
                 <span>Voltar ao portfólio</span>
               </a>
@@ -133,7 +133,7 @@ function PlaygroundSidebar() {
 
 export function PlaygroundLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-background text-white">
+    <div className="min-h-screen bg-background text-foreground-strong">
       <PlaygroundSidebar />
       <main className="md:ml-64 p-8 pt-20 md:pt-8">{children}</main>
     </div>

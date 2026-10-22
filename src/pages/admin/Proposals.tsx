@@ -65,7 +65,7 @@ function DownloadContractButton({ proposal }: { proposal: any }) {
     <Button
       variant="ghost"
       size="icon"
-      className="h-8 w-8 text-gray-400 hover:text-white hover:bg-white/10"
+      className="h-8 w-8 text-foreground/65 hover:text-foreground-strong hover:bg-foreground/10"
       onClick={handleDownload}
       disabled={loading || !acceptanceRaw}
       title="Baixar contrato"
@@ -412,7 +412,7 @@ export default function AdminProposals() {
     <AdminLayout>
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <h1 className="text-2xl sm:text-3xl font-bold text-white flex items-center gap-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground-strong flex items-center gap-2">
             <span className="text-neon-purple">📄</span> Propostas Comerciais
           </h1>
           <div className="flex flex-wrap gap-2">
@@ -422,7 +422,7 @@ export default function AdminProposals() {
                 className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm border transition-colors ${
                   includeDeleted
                     ? 'border-red-500/50 bg-red-500/10 text-red-400'
-                    : 'border-white/10 bg-white/5 text-gray-400 hover:text-white'
+                    : 'border-foreground/10 bg-foreground/5 text-foreground/65 hover:text-foreground-strong'
                 }`}
               >
                 <RotateCcw className="w-3.5 h-3.5" />
@@ -433,12 +433,12 @@ export default function AdminProposals() {
               <DialogTrigger asChild>
                 <Button
                   variant="outline"
-                  className="bg-background hover:bg-background/90 text-white border-white/20 text-xs sm:text-sm"
+                  className="bg-background hover:bg-background/90 text-foreground-strong border-foreground/20 text-xs sm:text-sm"
                 >
                   <Upload className="w-4 h-4 sm:mr-2" /> <span className="hidden sm:inline">Importar JSON</span>
                 </Button>
               </DialogTrigger>
-              <DialogContent className="bg-card border-white/10 max-w-2xl w-[calc(100vw-2rem)] sm:w-full max-h-[85vh] overflow-y-scroll text-white">
+              <DialogContent className="bg-card border-foreground/10 max-w-2xl w-[calc(100vw-2rem)] sm:w-full max-h-[85vh] overflow-y-scroll text-foreground-strong">
                 <DialogHeader>
                   <DialogTitle className="text-xl font-bold">
                     Importar Proposta via JSON
@@ -448,8 +448,8 @@ export default function AdminProposals() {
                   </VisuallyHidden>
                 </DialogHeader>
 
-                <div className="rounded-md border border-white/10 bg-white/5 p-4 space-y-2">
-                  <p className="text-sm text-gray-300">
+                <div className="rounded-md border border-foreground/10 bg-foreground/5 p-4 space-y-2">
+                  <p className="text-sm text-foreground/90">
                     Use o prompt abaixo com qualquer LLM (ChatGPT, Claude, Gemini) para gerar o JSON da proposta automaticamente.
                     Preencha as informações do cliente no topo do prompt antes de enviar.
                   </p>
@@ -485,12 +485,12 @@ export default function AdminProposals() {
                       />
                       <Button
                         variant="outline"
-                        className="w-full bg-background hover:bg-background/90 text-white border-white/20"
+                        className="w-full bg-background hover:bg-background/90 text-foreground-strong border-foreground/20"
                         onClick={() => document.getElementById('json-upload')?.click()}
                       >
                         <Upload className="w-4 h-4 mr-2" /> Escolher Arquivo JSON
                       </Button>
-                      <p className="text-xs text-gray-500 mt-2">
+                      <p className="text-xs text-foreground/42 mt-2">
                         Selecione um arquivo JSON válido com a estrutura da proposta
                       </p>
                     </div>
@@ -505,7 +505,7 @@ export default function AdminProposals() {
                         value={jsonPasteContent}
                         onChange={(e) => setJsonPasteContent(e.target.value)}
                       />
-                      <p className="text-xs text-gray-500 mt-2">
+                      <p className="text-xs text-foreground/42 mt-2">
                         Cole o conteúdo completo do JSON no campo acima
                       </p>
                     </div>
@@ -536,7 +536,7 @@ export default function AdminProposals() {
                   <Plus className="w-4 h-4 sm:mr-2" /> <span className="hidden sm:inline">Nova Proposta</span>
                 </Button>
               </DialogTrigger>
-              <DialogContent className="bg-card border-white/10 max-w-2xl w-full max-h-[85vh] flex flex-col text-white p-0 min-h-0">
+              <DialogContent className="bg-card border-foreground/10 max-w-2xl w-full max-h-[85vh] flex flex-col text-foreground-strong p-0 min-h-0">
                 <DialogHeader className="px-6 pt-6 pb-4">
                   <DialogTitle className="text-xl font-bold">
                     {editingProposal ? "Editar Proposta" : "Nova Proposta"}
@@ -624,7 +624,7 @@ export default function AdminProposals() {
                     </div>
                     <ul className="space-y-1">
                       {scopeItems.map((item, index) => (
-                        <li key={index} className="flex items-center justify-between bg-white/5 p-2 rounded text-sm gap-2">
+                        <li key={index} className="flex items-center justify-between bg-foreground/5 p-2 rounded text-sm gap-2">
                           <span className="flex-1 wrap-break-word min-w-0">{item}</span>
                           <button onClick={() => handleRemoveScopeItem(index)} className="text-red-400 hover:text-red-300 shrink-0">
                             <X className="w-4 h-4" />
@@ -653,7 +653,7 @@ export default function AdminProposals() {
                     </div>
                     <ul className="space-y-1">
                       {timelineItems.map((item, index) => (
-                        <li key={index} className="flex items-center justify-between bg-white/5 p-2 rounded text-sm gap-2">
+                        <li key={index} className="flex items-center justify-between bg-foreground/5 p-2 rounded text-sm gap-2">
                           <span className="flex-1 wrap-break-word min-w-0">{item.step} - {item.period}</span>
                           <button onClick={() => handleRemoveTimelineItem(index)} className="text-red-400 hover:text-red-300 shrink-0">
                             <X className="w-4 h-4" />
@@ -675,7 +675,7 @@ export default function AdminProposals() {
                   <div>
                     <Label className="block text-sm mb-1">Valor do Projeto</Label>
                     <div className="relative">
-                      <span className="absolute left-3 top-2.5 text-gray-400 text-sm">R$</span>
+                      <span className="absolute left-3 top-2.5 text-foreground/65 text-sm">R$</span>
                       <Input
                         className="bg-background border-input pl-8"
                         placeholder="0,00"
@@ -698,7 +698,7 @@ export default function AdminProposals() {
                               newConditions[i].checked = e.target.checked;
                               setConditions(newConditions);
                             }}
-                            className="mt-1 rounded border-gray-300 shrink-0"
+                            className="mt-1 rounded border-foreground/80 shrink-0"
                           />
                           <Textarea
                             value={condition.text}
@@ -760,7 +760,7 @@ export default function AdminProposals() {
                         )}
                       </div>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-foreground/42 mt-1">
                       Se definida, o cliente precisará informar esta senha para acessar a proposta.
                     </p>
                   </div>
@@ -774,13 +774,13 @@ export default function AdminProposals() {
                       value={rescisionPolicy}
                       onChange={(e) => setRescisionPolicy(e.target.value)}
                     />
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-foreground/42 mt-1">
                       Esta política será exibida na proposta e deve incluir hipóteses de rescisão, multas ou proporcionalidades, procedimentos e prazos.
                     </p>
                   </div>
                 </div>
 
-                <div className="border-t border-white/10 px-6 py-4 mt-auto flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 gap-2 bg-card">
+                <div className="border-t border-foreground/10 px-6 py-4 mt-auto flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 gap-2 bg-card">
                   <Button variant="ghost" onClick={() => {
                     setIsModalOpen(false);
                     resetForm();
@@ -804,23 +804,23 @@ export default function AdminProposals() {
           </TabsList>
 
           <TabsContent value="all" className="mt-6">
-            <div className="rounded-md border border-white/10 overflow-hidden">
+            <div className="rounded-md border border-foreground/10 overflow-hidden">
               <Table>
-                <TableHeader className="bg-white/5">
-                  <TableRow className="border-white/10 hover:bg-white/5">
-                    <TableHead className="text-gray-300">Cliente</TableHead>
-                    <TableHead className="text-gray-300">Data de Criação</TableHead>
-                    <TableHead className="text-gray-300">Validade</TableHead>
-                    <TableHead className="text-gray-300">Status</TableHead>
-                    <TableHead className="text-gray-300 text-right">Ações</TableHead>
+                <TableHeader className="bg-foreground/5">
+                  <TableRow className="border-foreground/10 hover:bg-foreground/5">
+                    <TableHead className="text-foreground/90">Cliente</TableHead>
+                    <TableHead className="text-foreground/90">Data de Criação</TableHead>
+                    <TableHead className="text-foreground/90">Validade</TableHead>
+                    <TableHead className="text-foreground/90">Status</TableHead>
+                    <TableHead className="text-foreground/90 text-right">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {isLoading ? (
-                    <TableRow><TableCell colSpan={5} className="text-center text-gray-400 py-8">Carregando...</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={5} className="text-center text-foreground/65 py-8">Carregando...</TableCell></TableRow>
                   ) : proposals.filter((p: any) => !p.isAccepted).map((proposal: any) => (
-                    <TableRow key={proposal._id} className={`border-white/10 hover:bg-white/5 ${proposal.deletedAt ? 'opacity-60' : ''}`}>
-                      <TableCell className="font-medium text-white">
+                    <TableRow key={proposal._id} className={`border-foreground/10 hover:bg-foreground/5 ${proposal.deletedAt ? 'opacity-60' : ''}`}>
+                      <TableCell className="font-medium text-foreground-strong">
                         <div className="flex items-center gap-2 flex-wrap">
                           {proposal.clientName}
                           {proposal.deletedAt && (
@@ -831,8 +831,8 @@ export default function AdminProposals() {
                           )}
                         </div>
                       </TableCell>
-                      <TableCell className="text-gray-400">{formatTimestampDate(proposal.createdAt)}</TableCell>
-                      <TableCell className="text-gray-400">{calculateValidUntilTs(proposal.createdAt)}</TableCell>
+                      <TableCell className="text-foreground/65">{formatTimestampDate(proposal.createdAt)}</TableCell>
+                      <TableCell className="text-foreground/65">{calculateValidUntilTs(proposal.createdAt)}</TableCell>
                       <TableCell>
                         <div className="flex flex-col gap-1">
                           {!proposal.deletedAt && (
@@ -840,14 +840,14 @@ export default function AdminProposals() {
                               variant="outline"
                               className={`${getStatus(proposal.createdAt) === "Ativo"
                                   ? "bg-green-500/10 text-green-500 border-green-500/20"
-                                  : "bg-gray-500/10 text-gray-500 border-gray-500/20"
+                                  : "bg-gray-500/10 text-foreground/42 border-foreground/8"
                                 }`}
                             >
                               {getStatus(proposal.createdAt)}
                             </Badge>
                           )}
                           {proposal.version > 1 && (
-                            <span className="text-xs text-gray-500">v{proposal.version}</span>
+                            <span className="text-xs text-foreground/42">v{proposal.version}</span>
                           )}
                         </div>
                       </TableCell>
@@ -868,7 +868,7 @@ export default function AdminProposals() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 text-gray-400 hover:text-white hover:bg-white/10"
+                            className="h-8 w-8 text-foreground/65 hover:text-foreground-strong hover:bg-foreground/10"
                             onClick={() => handleEdit(proposal)}
                           >
                             <Pencil className="h-4 w-4" />
@@ -884,7 +884,7 @@ export default function AdminProposals() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 text-gray-400 hover:text-white hover:bg-white/10"
+                            className="h-8 w-8 text-foreground/65 hover:text-foreground-strong hover:bg-foreground/10"
                             onClick={() => handleReload(proposal)}
                           >
                             <RefreshCw className="h-4 w-4" />
@@ -892,7 +892,7 @@ export default function AdminProposals() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 text-gray-400 hover:text-white hover:bg-white/10"
+                            className="h-8 w-8 text-foreground/65 hover:text-foreground-strong hover:bg-foreground/10"
                             onClick={() => handleCopyLink(proposal.slug)}
                           >
                             <LinkIcon className="h-4 w-4" />
@@ -909,36 +909,36 @@ export default function AdminProposals() {
           </TabsContent>
 
           <TabsContent value="accepted" className="mt-6">
-            <div className="rounded-md border border-white/10 overflow-hidden">
+            <div className="rounded-md border border-foreground/10 overflow-hidden">
               <Table>
-                <TableHeader className="bg-white/5">
-                  <TableRow className="border-white/10 hover:bg-white/5">
-                    <TableHead className="text-gray-300">Cliente</TableHead>
-                    <TableHead className="text-gray-300">Data de Criação</TableHead>
-                    <TableHead className="text-gray-300">Data de Aceite</TableHead>
-                    <TableHead className="text-gray-300">Senha de Acesso</TableHead>
-                    <TableHead className="text-gray-300">Status</TableHead>
-                    <TableHead className="text-gray-300 text-right">Ações</TableHead>
+                <TableHeader className="bg-foreground/5">
+                  <TableRow className="border-foreground/10 hover:bg-foreground/5">
+                    <TableHead className="text-foreground/90">Cliente</TableHead>
+                    <TableHead className="text-foreground/90">Data de Criação</TableHead>
+                    <TableHead className="text-foreground/90">Data de Aceite</TableHead>
+                    <TableHead className="text-foreground/90">Senha de Acesso</TableHead>
+                    <TableHead className="text-foreground/90">Status</TableHead>
+                    <TableHead className="text-foreground/90 text-right">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {proposals.filter((p: any) => p.isAccepted).map((proposal: any) => (
-                    <TableRow key={proposal._id} className="border-white/10 hover:bg-white/5">
-                      <TableCell className="font-medium text-white">
+                    <TableRow key={proposal._id} className="border-foreground/10 hover:bg-foreground/5">
+                      <TableCell className="font-medium text-foreground-strong">
                         {proposal.clientName}
                         <Badge variant="outline" className="ml-2 bg-green-500/10 text-green-500 border-green-500/20 text-xs">
                           Aceita
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-gray-400">{formatTimestampDate(proposal.createdAt)}</TableCell>
-                      <TableCell className="text-gray-400">
+                      <TableCell className="text-foreground/65">{formatTimestampDate(proposal.createdAt)}</TableCell>
+                      <TableCell className="text-foreground/65">
                         {proposal.acceptedAt ? formatTimestampDate(proposal.acceptedAt) : '-'}
                       </TableCell>
-                      <TableCell className="text-gray-400">
+                      <TableCell className="text-foreground/65">
                         {proposal.password ? (
                           <span className="text-yellow-400 text-sm font-medium">Protegida</span>
                         ) : (
-                          <span className="text-gray-500 text-sm">Pública</span>
+                          <span className="text-foreground/42 text-sm">Pública</span>
                         )}
                       </TableCell>
                       <TableCell>
@@ -950,7 +950,7 @@ export default function AdminProposals() {
                             Aceita
                           </Badge>
                           {proposal.version > 1 && (
-                            <span className="text-xs text-gray-500">v{proposal.version}</span>
+                            <span className="text-xs text-foreground/42">v{proposal.version}</span>
                           )}
                         </div>
                       </TableCell>
@@ -959,7 +959,7 @@ export default function AdminProposals() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 text-gray-400 hover:text-white hover:bg-white/10"
+                            className="h-8 w-8 text-foreground/65 hover:text-foreground-strong hover:bg-foreground/10"
                             onClick={() => handleReload(proposal)}
                           >
                             <RefreshCw className="h-4 w-4" />
@@ -967,7 +967,7 @@ export default function AdminProposals() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 text-gray-400 hover:text-white hover:bg-white/10"
+                            className="h-8 w-8 text-foreground/65 hover:text-foreground-strong hover:bg-foreground/10"
                             onClick={() => handleCopyLink(proposal.slug)}
                           >
                             <LinkIcon className="h-4 w-4" />

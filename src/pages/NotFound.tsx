@@ -34,7 +34,7 @@ function useGlitch(text: string, active: boolean) {
   return display;
 }
 
-const LINE_COLORS = ["text-red-400", "text-gray-500", "text-gray-600", "text-yellow-500/70"];
+const LINE_COLORS = ["text-red-400", "text-foreground/42", "text-foreground/25", "text-yellow-500/70"];
 const LINE_DELAYS = [0.4, 0.9, 1.4, 1.9];
 
 export default function NotFound() {
@@ -78,7 +78,7 @@ export default function NotFound() {
           <span className="font-mono text-xs text-neon-purple tracking-widest uppercase">
             {t("notFound.label")}
           </span>
-          <span className="ml-auto font-mono text-[10px] text-gray-700">
+          <span className="ml-auto font-mono text-[10px] text-foreground/20">
             {t("notFound.errorCode")}
           </span>
         </motion.div>
@@ -93,7 +93,7 @@ export default function NotFound() {
           onMouseLeave={() => setHovered(false)}
         >
           <span
-            className="font-mono text-[9rem] font-black leading-none tracking-tighter text-white/5 select-none"
+            className="font-mono text-[9rem] font-black leading-none tracking-tighter text-foreground-strong/5 select-none"
             aria-hidden
             style={{ WebkitTextStroke: "1px rgba(168,85,247,0.15)" }}
           >
@@ -112,7 +112,7 @@ export default function NotFound() {
             {label}
           </span>
           <span
-            className="absolute inset-0 font-mono text-[9rem] font-black leading-none tracking-tighter text-white/90"
+            className="absolute inset-0 font-mono text-[9rem] font-black leading-none tracking-tighter text-foreground-strong/90"
             style={{ WebkitTextStroke: "1px rgba(255,255,255,0.06)" }}
           >
             {label}

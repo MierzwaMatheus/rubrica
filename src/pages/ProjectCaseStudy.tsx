@@ -106,8 +106,8 @@ export default function ProjectCaseStudy() {
   if (!project) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
-        <h1 className="text-3xl font-bold text-white">{t("portfolio.projectNotFound")}</h1>
-        <p className="text-gray-400">{t("portfolio.projectNotFoundDescription")}</p>
+        <h1 className="text-3xl font-bold text-foreground-strong">{t("portfolio.projectNotFound")}</h1>
+        <p className="text-foreground/65">{t("portfolio.projectNotFoundDescription")}</p>
         <Link href="/portfolio">
           <Button variant="outline" className="mt-4">
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -134,14 +134,14 @@ export default function ProjectCaseStudy() {
       >
         {/* Back link */}
         <Link href="/portfolio">
-          <Button variant="ghost" className="text-gray-400 hover:text-white -ml-4">
+          <Button variant="ghost" className="text-foreground/65 hover:text-foreground-strong -ml-4">
             <ArrowLeft className="mr-2 h-4 w-4" />
             {t("portfolio.backToPortfolio")}
           </Button>
         </Link>
 
         {/* Hero */}
-        <div className="relative rounded-2xl overflow-hidden border border-white/10">
+        <div className="relative rounded-2xl overflow-hidden border border-foreground/10">
           {project.images && project.images.length > 0 ? (
             <img
               src={project.images[0]}
@@ -149,13 +149,13 @@ export default function ProjectCaseStudy() {
               className="w-full h-64 md:h-80 object-cover"
             />
           ) : (
-            <div className="w-full h-64 md:h-80 bg-white/5 flex items-center justify-center text-gray-500">
+            <div className="w-full h-64 md:h-80 bg-foreground/5 flex items-center justify-center text-foreground/42">
               {t("portfolio.noImage")}
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
-            <h1 className="text-3xl md:text-5xl font-bold text-white mb-3">{project.title}</h1>
+            <h1 className="text-3xl md:text-5xl font-bold text-foreground-strong mb-3">{project.title}</h1>
             <div className="flex flex-wrap gap-2 mb-4">
               {project.tags?.map((tag: string) => (
                 <Badge
@@ -178,7 +178,7 @@ export default function ProjectCaseStudy() {
               )}
               {project.github_link && (
                 <a href={project.github_link} target="_blank" rel="noopener noreferrer">
-                  <Button size="sm" variant="outline" className="border-white/20 text-white hover:bg-white/10">
+                  <Button size="sm" variant="outline" className="border-foreground/20 text-foreground-strong hover:bg-foreground/10">
                     <Github className="mr-2 h-4 w-4" />
                     {t("portfolio.code")}
                   </Button>
@@ -204,9 +204,9 @@ export default function ProjectCaseStudy() {
               >
                 <div className="flex items-center gap-3 mb-3">
                   <Icon className={`h-5 w-5 ${iconColor} shrink-0`} />
-                  <h2 className="text-lg font-semibold text-white">{t(labelKey)}</h2>
+                  <h2 className="text-lg font-semibold text-foreground-strong">{t(labelKey)}</h2>
                 </div>
-                <p className="text-gray-300 leading-relaxed whitespace-pre-line">{cs[key]}</p>
+                <p className="text-foreground/90 leading-relaxed whitespace-pre-line">{cs[key]}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -215,7 +215,7 @@ export default function ProjectCaseStudy() {
         {/* Metrics */}
         {cs && cs.metrics && cs.metrics.length > 0 && (
           <div>
-            <h2 className="text-xl font-bold text-white mb-4">{t("portfolio.metrics")}</h2>
+            <h2 className="text-xl font-bold text-foreground-strong mb-4">{t("portfolio.metrics")}</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {cs.metrics.map((metric, i) => (
                 <motion.div
@@ -223,13 +223,13 @@ export default function ProjectCaseStudy() {
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: i * 0.07 }}
-                  className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col items-center justify-center text-center gap-2 min-h-[100px]"
+                  className="bg-foreground/5 border border-foreground/10 rounded-xl p-4 flex flex-col items-center justify-center text-center gap-2 min-h-[100px]"
                 >
                   {metric.icon && (
                     <DynamicIcon name={metric.icon} className="h-5 w-5 text-neon-purple shrink-0" />
                   )}
                   <div className="text-2xl font-bold text-neon-purple leading-tight break-words w-full">{metric.value}</div>
-                  <div className="text-xs text-gray-400 leading-snug">{metric.label}</div>
+                  <div className="text-xs text-foreground/65 leading-snug">{metric.label}</div>
                 </motion.div>
               ))}
             </div>
@@ -239,12 +239,12 @@ export default function ProjectCaseStudy() {
         {/* Screenshots carousel */}
         {project.images && project.images.length > 0 && (
           <div>
-            <h2 className="text-xl font-bold text-white mb-4">{t("portfolio.screenshots")}</h2>
+            <h2 className="text-xl font-bold text-foreground-strong mb-4">{t("portfolio.screenshots")}</h2>
             <Carousel className="w-full">
               <CarouselContent>
                 {project.images.map((img: string, idx: number) => (
                   <CarouselItem key={idx} className="md:basis-1/2">
-                    <div className="aspect-video rounded-lg overflow-hidden border border-white/10 relative group">
+                    <div className="aspect-video rounded-lg overflow-hidden border border-foreground/10 relative group">
                       <img
                         src={img}
                         alt={`${project.title} - ${idx + 1}`}
@@ -255,31 +255,31 @@ export default function ProjectCaseStudy() {
                         className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
                         aria-label={t("portfolio.expandImage")}
                       >
-                        <div className="bg-background/80 backdrop-blur-sm p-3 rounded-full border border-white/20 hover:border-neon-purple transition-colors">
-                          <ZoomIn className="w-5 h-5 text-white" />
+                        <div className="bg-background/80 backdrop-blur-sm p-3 rounded-full border border-foreground/20 hover:border-neon-purple transition-colors">
+                          <ZoomIn className="w-5 h-5 text-foreground-strong" />
                         </div>
                       </button>
                     </div>
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              <CarouselPrevious className="left-2 bg-background/50 border-white/10 text-white hover:bg-neon-purple hover:border-neon-purple" />
-              <CarouselNext className="right-2 bg-background/50 border-white/10 text-white hover:bg-neon-purple hover:border-neon-purple" />
+              <CarouselPrevious className="left-2 bg-background/50 border-foreground/10 text-foreground-strong hover:bg-neon-purple hover:border-neon-purple" />
+              <CarouselNext className="right-2 bg-background/50 border-foreground/10 text-foreground-strong hover:bg-neon-purple hover:border-neon-purple" />
             </Carousel>
           </div>
         )}
 
         {/* Testimonial */}
         {cs?.testimonial && (
-          <div className="border-l-4 border-neon-purple bg-white/5 rounded-r-xl p-6">
-            <h2 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+          <div className="border-l-4 border-neon-purple bg-foreground/5 rounded-r-xl p-6">
+            <h2 className="text-lg font-semibold text-foreground-strong mb-3 flex items-center gap-2">
               <Quote className="h-5 w-5 text-neon-purple" />
               {t("portfolio.testimonial")}
             </h2>
-            <p className="text-gray-300 italic leading-relaxed mb-3">"{cs.testimonial.text}"</p>
+            <p className="text-foreground/90 italic leading-relaxed mb-3">"{cs.testimonial.text}"</p>
             <p className="text-neon-purple font-medium">{cs.testimonial.author}</p>
             {cs.testimonial.role && (
-              <p className="text-gray-500 text-sm">{cs.testimonial.role}</p>
+              <p className="text-foreground/42 text-sm">{cs.testimonial.role}</p>
             )}
           </div>
         )}
@@ -288,8 +288,8 @@ export default function ProjectCaseStudy() {
         {wizardEnabled && (
           <div className="mt-10 rounded-xl border border-neon-purple/20 bg-neon-purple/5 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
-              <p className="text-white font-semibold text-sm">Gostou do que viu?</p>
-              <p className="text-gray-400 text-xs mt-0.5">Entre em contato para discutir um projeto similar</p>
+              <p className="text-foreground-strong font-semibold text-sm">Gostou do que viu?</p>
+              <p className="text-foreground/65 text-xs mt-0.5">Entre em contato para discutir um projeto similar</p>
             </div>
             <Button
               onClick={() => openWizard({ flowType: "project", sourceContext: `case-study:${params?.slug ?? ""}` })}
@@ -308,20 +308,20 @@ export default function ProjectCaseStudy() {
           <Dialog open onOpenChange={() => setExpandedImage(null)}>
             <DialogContent
               showCloseButton={false}
-              className="!fixed !inset-2 !max-w-none !w-auto !h-auto !translate-x-0 !translate-y-0 !top-0 !left-0 bg-black/97 border-white/10 p-0 flex flex-col"
+              className="!fixed !inset-2 !max-w-none !w-auto !h-auto !translate-x-0 !translate-y-0 !top-0 !left-0 bg-black/97 border-foreground/10 p-0 flex flex-col"
             >
               <VisuallyHidden>
                 <span>{t("portfolio.expandImage")}</span>
               </VisuallyHidden>
 
               {/* Controls bar */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 shrink-0">
-                <span className="text-gray-400 text-sm">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-foreground/10 shrink-0">
+                <span className="text-foreground/65 text-sm">
                   {expandedImage.index + 1} {t("portfolio.of")} {expandedImage.images.length}
                 </span>
                 <button
                   onClick={() => setExpandedImage(null)}
-                  className="bg-white/10 hover:bg-white/20 text-white p-2 rounded-full transition-colors"
+                  className="bg-foreground/10 hover:bg-foreground/20 text-foreground-strong p-2 rounded-full transition-colors"
                   aria-label="Fechar"
                 >
                   <LucideIcons.X className="w-5 h-5" />

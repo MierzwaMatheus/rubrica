@@ -14,7 +14,7 @@ interface TerminalProps {
 
 function LineText({ line }: { line: TerminalLine }) {
   const colorMap: Record<TerminalLine["type"], string> = {
-    input: "text-white",
+    input: "text-foreground-strong",
     output: "text-green-400",
     error: "text-red-400",
     nav: "text-yellow-400",
@@ -63,18 +63,18 @@ export function Terminal({ onClose, ownerInfo }: TerminalProps) {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 40 }}
         transition={{ duration: 0.2, ease: "easeOut" }}
-        className="w-full max-w-2xl bg-[#0d0d0d] border border-white/10 rounded-xl shadow-2xl overflow-hidden"
+        className="w-full max-w-2xl bg-[#0d0d0d] border border-foreground/10 rounded-xl shadow-2xl overflow-hidden"
         onClick={e => e.stopPropagation()}
       >
         {/* Title bar */}
-        <div className="flex items-center gap-2 px-4 py-3 bg-[#1a1a1a] border-b border-white/10">
+        <div className="flex items-center gap-2 px-4 py-3 bg-muted border-b border-foreground/10">
           <span className="w-3 h-3 rounded-full bg-red-500 cursor-pointer" onClick={onClose} />
           <span className="w-3 h-3 rounded-full bg-yellow-400" />
           <span className="w-3 h-3 rounded-full bg-green-500" />
-          <span className="flex-1 text-center text-xs text-white/40 font-mono">
+          <span className="flex-1 text-center text-xs text-foreground-strong/40 font-mono">
             {slug} — terminal
           </span>
-          <button onClick={onClose} className="text-white/30 hover:text-white/70 transition-colors">
+          <button onClick={onClose} className="text-foreground-strong/30 hover:text-foreground-strong/70 transition-colors">
             <X size={14} />
           </button>
         </div>
@@ -88,7 +88,7 @@ export function Terminal({ onClose, ownerInfo }: TerminalProps) {
         </div>
 
         {/* Input */}
-        <div className="flex items-center gap-2 px-4 py-3 border-t border-white/10 bg-[#111]">
+        <div className="flex items-center gap-2 px-4 py-3 border-t border-foreground/10 bg-[#111]">
           <span className="font-mono text-sm text-green-400 shrink-0">
             visitor@{slug}:~$
           </span>
@@ -97,7 +97,7 @@ export function Terminal({ onClose, ownerInfo }: TerminalProps) {
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="flex-1 bg-transparent font-mono text-sm text-white outline-none caret-green-400"
+            className="flex-1 bg-transparent font-mono text-sm text-foreground-strong outline-none caret-green-400"
             autoComplete="off"
             spellCheck={false}
           />

@@ -36,7 +36,13 @@ export const ptBR = {
     },
     hero: {
       description: "Projetos, trajetória e ideias reunidos em um só lugar.",
-      technologies: [],
+      technologies: [
+        { name: "Figma", color: "bg-pink-500" },
+        { name: "React", color: "bg-sky-400" },
+        { name: "TypeScript", color: "bg-blue-600" },
+        { name: "Design Systems", color: "bg-violet-500" },
+        { name: "Acessibilidade", color: "bg-emerald-500" },
+      ],
     },
     skills: {
       title: "O que eu faço",

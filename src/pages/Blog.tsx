@@ -128,14 +128,14 @@ export default function Blog() {
         <header className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <h1 className="text-3xl font-bold text-white">
+              <h1 className="text-3xl font-bold text-foreground-strong">
                 {t("blog.title")}
               </h1>
-              <p className="text-gray-400">{t("blog.subtitle")}</p>
+              <p className="text-foreground/65">{t("blog.subtitle")}</p>
             </div>
             <a
               href="/rss.xml"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-colors text-white/80 hover:text-white"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 transition-colors text-foreground-strong/80 hover:text-foreground-strong"
               aria-label="Subscribe to RSS feed"
             >
               <Rss className="w-5 h-5" />
@@ -147,13 +147,13 @@ export default function Blog() {
         {/* Featured Posts Carousel */}
         {featuredPosts.length > 0 && (
           <motion.section variants={item} className="space-y-6">
-            <h2 className="text-xl font-bold text-white">
+            <h2 className="text-xl font-bold text-foreground-strong">
               {t("blog.featured")}
             </h2>
 
             {featuredPosts.length === 1 ? (
               <Link href={`/blog/${featuredPosts[0].slug}`}>
-                <div className="relative rounded-2xl overflow-hidden group cursor-pointer border border-white/5 shadow-2xl h-[400px]">
+                <div className="relative rounded-2xl overflow-hidden group cursor-pointer border border-foreground/5 shadow-2xl h-[400px]">
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent z-10"></div>
                   <img
                     src={
@@ -174,23 +174,23 @@ export default function Blog() {
                       {featuredPosts[0].tags?.map((tag: string) => (
                         <Badge
                           key={tag}
-                          className="bg-white/10 hover:bg-white/20 text-white border-none backdrop-blur-sm"
+                          className="bg-foreground/10 hover:bg-foreground/20 text-foreground-strong border-none backdrop-blur-sm"
                         >
                           {tag}
                         </Badge>
                       ))}
                     </div>
 
-                    <h3 className="text-2xl md:text-4xl font-bold text-white mb-4 leading-tight max-w-4xl">
+                    <h3 className="text-2xl md:text-4xl font-bold text-foreground-strong mb-4 leading-tight max-w-4xl">
                       {featuredPosts[0].title}
                     </h3>
 
-                    <p className="text-gray-300 text-lg mb-6 max-w-3xl line-clamp-2">
+                    <p className="text-foreground/90 text-lg mb-6 max-w-3xl line-clamp-2">
                       {featuredPosts[0].subtitle}
                     </p>
 
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center text-sm text-gray-400 space-x-4">
+                      <div className="flex items-center text-sm text-foreground/65 space-x-4">
                         <span>
                           {new Date(
                             featuredPosts[0].published_at
@@ -221,7 +221,7 @@ export default function Blog() {
                       className="pl-2 md:pl-4 basis-full"
                     >
                       <Link href={`/blog/${post.slug}`}>
-                        <div className="relative rounded-2xl overflow-hidden group cursor-pointer border border-white/5 shadow-2xl h-[400px]">
+                        <div className="relative rounded-2xl overflow-hidden group cursor-pointer border border-foreground/5 shadow-2xl h-[400px]">
                           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent z-10"></div>
                           <img
                             src={
@@ -242,23 +242,23 @@ export default function Blog() {
                               {post.tags?.map((tag: string) => (
                                 <Badge
                                   key={tag}
-                                  className="bg-white/10 hover:bg-white/20 text-white border-none backdrop-blur-sm"
+                                  className="bg-foreground/10 hover:bg-foreground/20 text-foreground-strong border-none backdrop-blur-sm"
                                 >
                                   {tag}
                                 </Badge>
                               ))}
                             </div>
 
-                            <h3 className="text-2xl md:text-4xl font-bold text-white mb-4 leading-tight max-w-4xl">
+                            <h3 className="text-2xl md:text-4xl font-bold text-foreground-strong mb-4 leading-tight max-w-4xl">
                               {post.title}
                             </h3>
 
-                            <p className="text-gray-300 text-lg mb-6 max-w-3xl line-clamp-2">
+                            <p className="text-foreground/90 text-lg mb-6 max-w-3xl line-clamp-2">
                               {post.subtitle}
                             </p>
 
                             <div className="flex items-center justify-between">
-                              <div className="flex items-center text-sm text-gray-400 space-x-4">
+                              <div className="flex items-center text-sm text-foreground/65 space-x-4">
                                 <span>
                                   {new Date(
                                     post.published_at
@@ -283,8 +283,8 @@ export default function Blog() {
                     </CarouselItem>
                   ))}
                 </CarouselContent>
-                <CarouselPrevious className="left-4 border-white/20 bg-background/50 hover:bg-background/70 text-white hover:text-white" />
-                <CarouselNext className="right-4 border-white/20 bg-background/50 hover:bg-background/70 text-white hover:text-white" />
+                <CarouselPrevious className="left-4 border-foreground/20 bg-background/50 hover:bg-background/70 text-foreground-strong hover:text-foreground-strong" />
+                <CarouselNext className="right-4 border-foreground/20 bg-background/50 hover:bg-background/70 text-foreground-strong hover:text-foreground-strong" />
               </Carousel>
             )}
           </motion.section>
@@ -293,10 +293,10 @@ export default function Blog() {
         {/* Search and Filter */}
         <motion.div variants={item} className="flex flex-col md:flex-row gap-4">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground/42" />
             <Input
               placeholder={t("blog.searchPlaceholder")}
-              className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-neon-purple/50 focus:ring-neon-purple/20"
+              className="pl-10 bg-foreground/5 border-foreground/10 text-foreground-strong placeholder:text-foreground/42 focus:border-neon-purple/50 focus:ring-neon-purple/20"
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
             />
@@ -305,7 +305,7 @@ export default function Blog() {
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
-                className={`border-white/10 text-gray-300 hover:text-white hover:bg-white/5 ${
+                className={`border-foreground/10 text-foreground/90 hover:text-foreground-strong hover:bg-foreground/5 ${
                   selectedTags.length > 0
                     ? "border-neon-purple/50 bg-neon-purple/10"
                     : ""
@@ -320,16 +320,16 @@ export default function Blog() {
                 )}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-80 bg-background/95 border-white/10 backdrop-blur-sm">
+            <PopoverContent className="w-80 bg-background/95 border-foreground/10 backdrop-blur-sm">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-semibold text-white">Filtrar por tags</h4>
+                  <h4 className="font-semibold text-foreground-strong">Filtrar por tags</h4>
                   {selectedTags.length > 0 && (
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={clearTagFilters}
-                      className="h-7 px-2 text-xs text-gray-400 hover:text-white"
+                      className="h-7 px-2 text-xs text-foreground/65 hover:text-foreground-strong"
                     >
                       <X className="h-3 w-3 mr-1" />
                       {t("blog.clear")}
@@ -338,20 +338,20 @@ export default function Blog() {
                 </div>
                 <div className="max-h-64 overflow-y-auto space-y-2">
                   {allTags.length === 0 ? (
-                    <p className="text-sm text-gray-400">{t("blog.noTags")}</p>
+                    <p className="text-sm text-foreground/65">{t("blog.noTags")}</p>
                   ) : (
                     allTags.map(tag => (
                       <div
                         key={tag}
-                        className="flex items-center space-x-2 cursor-pointer hover:bg-white/5 rounded-md p-2 transition-colors"
+                        className="flex items-center space-x-2 cursor-pointer hover:bg-foreground/5 rounded-md p-2 transition-colors"
                         onClick={() => handleTagToggle(tag)}
                       >
                         <Checkbox
                           checked={selectedTags.includes(tag)}
                           onCheckedChange={() => handleTagToggle(tag)}
-                          className="border-white/20 data-[state=checked]:bg-neon-purple data-[state=checked]:border-neon-purple"
+                          className="border-foreground/20 data-[state=checked]:bg-neon-purple data-[state=checked]:border-neon-purple"
                         />
-                        <label className="text-sm text-gray-300 cursor-pointer flex-1">
+                        <label className="text-sm text-foreground/90 cursor-pointer flex-1">
                           {tag}
                         </label>
                       </div>
@@ -368,15 +368,15 @@ export default function Blog() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {filteredPosts.length === 0 ? (
               <div className="col-span-2 text-center py-12">
-                <p className="text-gray-400 text-lg">{t("blog.noPosts")}</p>
-                <p className="text-gray-500 text-sm mt-2">
+                <p className="text-foreground/65 text-lg">{t("blog.noPosts")}</p>
+                <p className="text-foreground/42 text-sm mt-2">
                   {t("blog.comeBackSoon")}
                 </p>
               </div>
             ) : (
               filteredPosts.map(post => (
                 <Link key={post.id} href={`/blog/${post.slug}`}>
-                  <div className="group rounded-xl bg-card border border-white/5 overflow-hidden hover:border-neon-purple/30 transition-all duration-300 flex flex-col h-full cursor-pointer">
+                  <div className="group rounded-xl bg-card border border-foreground/5 overflow-hidden hover:border-neon-purple/30 transition-all duration-300 flex flex-col h-full cursor-pointer">
                     <div className="relative h-48 overflow-hidden">
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10"></div>
                       <img
@@ -393,7 +393,7 @@ export default function Blog() {
                     </div>
 
                     <div className="p-6 flex flex-col flex-1">
-                      <div className="flex items-center text-xs text-gray-500 mb-3 space-x-3">
+                      <div className="flex items-center text-xs text-foreground/42 mb-3 space-x-3">
                         <span>
                           {new Date(post.published_at).toLocaleDateString(
                             "pt-BR"
@@ -406,11 +406,11 @@ export default function Blog() {
                         </span>
                       </div>
 
-                      <h3 className="text-xl font-bold text-white mb-3 group-hover:text-neon-purple transition-colors">
+                      <h3 className="text-xl font-bold text-foreground-strong mb-3 group-hover:text-neon-purple transition-colors">
                         {post.title}
                       </h3>
 
-                      <p className="text-gray-400 text-sm mb-6 line-clamp-2 flex-1">
+                      <p className="text-foreground/65 text-sm mb-6 line-clamp-2 flex-1">
                         {post.subtitle}
                       </p>
 
@@ -419,7 +419,7 @@ export default function Blog() {
                           <Badge
                             key={tag}
                             variant="secondary"
-                            className="bg-white/5 hover:bg-white/10 text-gray-300 border border-white/5 text-[10px]"
+                            className="bg-foreground/5 hover:bg-foreground/10 text-foreground/90 border border-foreground/5 text-[10px]"
                           >
                             {tag}
                           </Badge>
@@ -427,7 +427,7 @@ export default function Blog() {
                         {post.tags?.length > 3 && (
                           <Badge
                             variant="secondary"
-                            className="bg-white/5 text-gray-300 border border-white/5 text-[10px]"
+                            className="bg-foreground/5 text-foreground/90 border border-foreground/5 text-[10px]"
                           >
                             +{post.tags.length - 3}
                           </Badge>

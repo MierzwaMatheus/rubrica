@@ -37,11 +37,11 @@ function VideoUsageBar() {
     percent >= 90 ? "bg-red-500" : percent >= 70 ? "bg-yellow-500" : "bg-neon-lime";
 
   return (
-    <div className="flex items-center gap-3 text-sm text-gray-400">
+    <div className="flex items-center gap-3 text-sm text-foreground/65">
       <span className="flex-shrink-0">
         Vídeos hoje: {usage.usedMB} MB / {usage.limitMB} MB
       </span>
-      <div className="flex-1 max-w-48 bg-white/10 rounded-full h-1.5">
+      <div className="flex-1 max-w-48 bg-foreground/10 rounded-full h-1.5">
         <div
           className={cn("h-1.5 rounded-full transition-all", color)}
           style={{ width: `${percent}%` }}
@@ -119,14 +119,14 @@ function SubmissionCard({ item }: { item: Submission }) {
   });
 
   return (
-    <div className="bg-[#1a1a1a] border border-white/5 rounded-xl p-5 space-y-4">
+    <div className="bg-muted border border-foreground/5 rounded-xl p-5 space-y-4">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
           {(item.avatarUrl || item.imageUrl) ? (
             <img
               src={item.avatarUrl ?? item.imageUrl}
               alt={item.name}
-              className="w-10 h-10 rounded-full object-cover border border-white/10 flex-shrink-0"
+              className="w-10 h-10 rounded-full object-cover border border-foreground/10 flex-shrink-0"
             />
           ) : (
             <div className="w-10 h-10 rounded-full bg-neon-purple/20 flex items-center justify-center text-neon-purple font-bold text-sm flex-shrink-0">
@@ -134,12 +134,12 @@ function SubmissionCard({ item }: { item: Submission }) {
             </div>
           )}
           <div>
-            <p className="font-semibold text-white text-sm">{item.name}</p>
-            <p className="text-xs text-gray-400">
+            <p className="font-semibold text-foreground-strong text-sm">{item.name}</p>
+            <p className="text-xs text-foreground/65">
               {item.role}
               {item.company ? ` · ${item.company}` : ""}
             </p>
-            <p className="text-xs text-gray-600">{item.email}</p>
+            <p className="text-xs text-foreground/25">{item.email}</p>
           </div>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
@@ -157,12 +157,12 @@ function SubmissionCard({ item }: { item: Submission }) {
               <><FileText className="w-3 h-3 mr-1 inline" />Texto</>
             )}
           </Badge>
-          <span className="text-xs text-gray-600">{createdAt}</span>
+          <span className="text-xs text-foreground/25">{createdAt}</span>
         </div>
       </div>
 
       {item.type === "text" && item.text && (
-        <p className="text-sm text-gray-300 italic leading-relaxed border-l-2 border-white/10 pl-3">
+        <p className="text-sm text-foreground/90 italic leading-relaxed border-l-2 border-foreground/10 pl-3">
           "{item.text}"
         </p>
       )}
@@ -176,7 +176,7 @@ function SubmissionCard({ item }: { item: Submission }) {
       )}
 
       {item.type === "video" && !item.videoUrl && item.status === "rejected" && (
-        <p className="text-xs text-gray-600 italic">Vídeo removido do storage</p>
+        <p className="text-xs text-foreground/25 italic">Vídeo removido do storage</p>
       )}
 
       <div className="flex flex-wrap gap-2 pt-1">
@@ -244,7 +244,7 @@ function SubmissionCard({ item }: { item: Submission }) {
             onClick={() => run("restore", () => restoreMutation({ id: item._id }))}
             disabled={loading !== null}
             variant="outline"
-            className="border-gray-700 text-gray-400 hover:bg-gray-900/20 text-xs"
+            className="border-foreground/15 text-foreground/65 hover:bg-gray-900/20 text-xs"
           >
             {loading === "restore" ? <Loader2 className="w-3 h-3 animate-spin" /> : <><RotateCcw className="w-3 h-3 mr-1" />Restaurar</>}
           </Button>
@@ -262,7 +262,7 @@ function SubmissionCard({ item }: { item: Submission }) {
                   "text-xs",
                   testimonialDoc?.showOnHome
                     ? "border-neon-lime/50 text-neon-lime hover:bg-neon-lime/10"
-                    : "border-gray-700 text-gray-400 hover:bg-gray-900/20",
+                    : "border-foreground/15 text-foreground/65 hover:bg-gray-900/20",
                 )}
               >
                 {loading === "toggleHome" ? <Loader2 className="w-3 h-3 animate-spin" /> : (
@@ -370,62 +370,62 @@ function AdminCreateForm() {
   }
 
   return (
-    <div className="bg-[#1a1a1a] border border-white/10 rounded-xl overflow-hidden">
+    <div className="bg-muted border border-foreground/10 rounded-xl overflow-hidden">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center justify-between px-5 py-4 text-sm font-medium text-white hover:bg-white/5 transition-colors"
+        className="w-full flex items-center justify-between px-5 py-4 text-sm font-medium text-foreground-strong hover:bg-foreground/5 transition-colors"
       >
         <span className="flex items-center gap-2">
           <Plus className="w-4 h-4 text-neon-purple" />
           Cadastrar depoimento manualmente
         </span>
-        {open ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
+        {open ? <ChevronUp className="w-4 h-4 text-foreground/65" /> : <ChevronDown className="w-4 h-4 text-foreground/65" />}
       </button>
       {open && (
-        <form onSubmit={handleSubmit} className="px-5 pb-5 space-y-4 border-t border-white/5 pt-4">
+        <form onSubmit={handleSubmit} className="px-5 pb-5 space-y-4 border-t border-foreground/5 pt-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label className="text-xs text-gray-400">Nome *</Label>
-              <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex: João Silva" className="bg-white/5 border-white/10 text-white text-sm h-9" required />
+              <Label className="text-xs text-foreground/65">Nome *</Label>
+              <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex: João Silva" className="bg-foreground/5 border-foreground/10 text-foreground-strong text-sm h-9" required />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs text-gray-400">Cargo / Empresa *</Label>
-              <Input value={role} onChange={(e) => setRole(e.target.value)} placeholder="Ex: CTO na Acme" className="bg-white/5 border-white/10 text-white text-sm h-9" required />
+              <Label className="text-xs text-foreground/65">Cargo / Empresa *</Label>
+              <Input value={role} onChange={(e) => setRole(e.target.value)} placeholder="Ex: CTO na Acme" className="bg-foreground/5 border-foreground/10 text-foreground-strong text-sm h-9" required />
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label className="text-xs text-gray-400">Depoimento *</Label>
-            <Textarea value={text} onChange={(e) => setText(e.target.value)} placeholder="Texto do depoimento..." className="bg-white/5 border-white/10 text-white text-sm min-h-[80px] resize-none" required />
+            <Label className="text-xs text-foreground/65">Depoimento *</Label>
+            <Textarea value={text} onChange={(e) => setText(e.target.value)} placeholder="Texto do depoimento..." className="bg-foreground/5 border-foreground/10 text-foreground-strong text-sm min-h-[80px] resize-none" required />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-xs text-gray-400">Foto (opcional, máx. {MAX_AVATAR_MB} MB)</Label>
+            <Label className="text-xs text-foreground/65">Foto (opcional, máx. {MAX_AVATAR_MB} MB)</Label>
             <div className="flex items-center gap-3">
               {avatarPreview ? (
-                <img src={avatarPreview} alt="preview" className="w-10 h-10 rounded-full object-cover border border-white/10 flex-shrink-0" />
+                <img src={avatarPreview} alt="preview" className="w-10 h-10 rounded-full object-cover border border-foreground/10 flex-shrink-0" />
               ) : (
-                <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
-                  <ImageIcon className="w-4 h-4 text-gray-600" />
+                <div className="w-10 h-10 rounded-full bg-foreground/5 border border-foreground/10 flex items-center justify-center flex-shrink-0">
+                  <ImageIcon className="w-4 h-4 text-foreground/25" />
                 </div>
               )}
               <label className="cursor-pointer">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 text-xs text-gray-300 hover:bg-white/10 transition-colors">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-foreground/10 bg-foreground/5 text-xs text-foreground/90 hover:bg-foreground/10 transition-colors">
                   <ImageIcon className="w-3 h-3" />
                   {avatarPreview ? "Trocar foto" : "Adicionar foto"}
                 </span>
                 <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
               </label>
               {avatarPreview && (
-                <button type="button" onClick={() => { setAvatarFile(null); setAvatarPreview(null); }} className="text-xs text-gray-500 hover:text-gray-300">
+                <button type="button" onClick={() => { setAvatarFile(null); setAvatarPreview(null); }} className="text-xs text-foreground/42 hover:text-foreground/90">
                   Remover
                 </button>
               )}
             </div>
           </div>
-          <p className="text-xs text-gray-600">
+          <p className="text-xs text-foreground/25">
             Criado diretamente como publicado. Use "Exibir na home" para mostrá-lo na seção da home.
           </p>
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="ghost" size="sm" onClick={reset} className="text-gray-400 text-xs">Cancelar</Button>
+            <Button type="button" variant="ghost" size="sm" onClick={reset} className="text-foreground/65 text-xs">Cancelar</Button>
             <Button type="submit" size="sm" disabled={saving} className="bg-neon-purple hover:bg-neon-purple/90 text-white text-xs">
               {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : "Cadastrar"}
             </Button>
@@ -526,11 +526,11 @@ function DirectTestimonialsTab() {
   }
 
   if (testimonials === undefined) {
-    return <div className="flex items-center justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-gray-500" /></div>;
+    return <div className="flex items-center justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-foreground/42" /></div>;
   }
 
   if (testimonials.length === 0) {
-    return <div className="text-center py-16 text-gray-500 text-sm">Nenhum depoimento publicado ainda.</div>;
+    return <div className="text-center py-16 text-foreground/42 text-sm">Nenhum depoimento publicado ainda.</div>;
   }
 
   return (
@@ -543,7 +543,7 @@ function DirectTestimonialsTab() {
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm border transition-colors ${
               includeDeleted
                 ? 'border-red-500/50 bg-red-500/10 text-red-400'
-                : 'border-white/10 bg-white/5 text-gray-400 hover:text-white'
+                : 'border-foreground/10 bg-foreground/5 text-foreground/65 hover:text-foreground-strong'
             }`}
           >
             <RotateCcw className="w-3.5 h-3.5" />
@@ -558,25 +558,25 @@ function DirectTestimonialsTab() {
         const isDeleted = !!(item as any).deletedAt;
 
         return (
-          <div key={item._id} className={`bg-[#1a1a1a] border rounded-xl p-5 space-y-3 ${isDeleted ? 'opacity-60 border-red-500/30' : 'border-white/5'}`}>
+          <div key={item._id} className={`bg-muted border rounded-xl p-5 space-y-3 ${isDeleted ? 'opacity-60 border-red-500/30' : 'border-foreground/5'}`}>
             {isEditing ? (
               <div className="space-y-3">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <Label className="text-xs text-gray-400">Nome</Label>
-                    <Input value={editName} onChange={(e) => setEditName(e.target.value)} className="bg-white/5 border-white/10 text-white text-sm h-8" />
+                    <Label className="text-xs text-foreground/65">Nome</Label>
+                    <Input value={editName} onChange={(e) => setEditName(e.target.value)} className="bg-foreground/5 border-foreground/10 text-foreground-strong text-sm h-8" />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-xs text-gray-400">Cargo</Label>
-                    <Input value={editRole} onChange={(e) => setEditRole(e.target.value)} className="bg-white/5 border-white/10 text-white text-sm h-8" />
+                    <Label className="text-xs text-foreground/65">Cargo</Label>
+                    <Input value={editRole} onChange={(e) => setEditRole(e.target.value)} className="bg-foreground/5 border-foreground/10 text-foreground-strong text-sm h-8" />
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-xs text-gray-400">Texto</Label>
-                  <Textarea value={editText} onChange={(e) => setEditText(e.target.value)} className="bg-white/5 border-white/10 text-white text-sm min-h-[72px] resize-none" />
+                  <Label className="text-xs text-foreground/65">Texto</Label>
+                  <Textarea value={editText} onChange={(e) => setEditText(e.target.value)} className="bg-foreground/5 border-foreground/10 text-foreground-strong text-sm min-h-[72px] resize-none" />
                 </div>
                 <div className="flex gap-2 justify-end">
-                  <Button size="sm" variant="ghost" onClick={() => { setEditing(null); setEditingItem(null); }} className="text-gray-400 text-xs">Cancelar</Button>
+                  <Button size="sm" variant="ghost" onClick={() => { setEditing(null); setEditingItem(null); }} className="text-foreground/65 text-xs">Cancelar</Button>
                   <Button size="sm" disabled={saving} onClick={() => handleSave(item._id)} className="bg-neon-purple hover:bg-neon-purple/90 text-white text-xs">
                     {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : "Salvar"}
                   </Button>
@@ -587,15 +587,15 @@ function DirectTestimonialsTab() {
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
                     {item.imageUrl ? (
-                      <img src={item.imageUrl} alt={item.name} className="w-10 h-10 rounded-full object-cover border border-white/10 flex-shrink-0" />
+                      <img src={item.imageUrl} alt={item.name} className="w-10 h-10 rounded-full object-cover border border-foreground/10 flex-shrink-0" />
                     ) : (
                       <div className="w-10 h-10 rounded-full bg-neon-purple/20 flex items-center justify-center text-neon-purple font-bold text-sm flex-shrink-0">
                         {initials}
                       </div>
                     )}
                     <div>
-                      <p className="font-semibold text-white text-sm">{item.name}</p>
-                      <p className="text-xs text-gray-400">{(item as any).roleTranslations?.ptBR ?? item.role}</p>
+                      <p className="font-semibold text-foreground-strong text-sm">{item.name}</p>
+                      <p className="text-xs text-foreground/65">{(item as any).roleTranslations?.ptBR ?? item.role}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
@@ -611,17 +611,17 @@ function DirectTestimonialsTab() {
                     )}
                   </div>
                 </div>
-                <p className="text-sm text-gray-300 italic border-l-2 border-white/10 pl-3 leading-relaxed">
+                <p className="text-sm text-foreground/90 italic border-l-2 border-foreground/10 pl-3 leading-relaxed">
                   "{(item as any).textTranslations?.ptBR ?? item.text}"
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {!isDeleted && (
                     <>
                       <Button size="sm" variant="outline" onClick={() => handleToggle(item._id)}
-                        className={cn("text-xs", item.showOnHome ? "border-neon-lime/50 text-neon-lime hover:bg-neon-lime/10" : "border-gray-700 text-gray-400 hover:bg-gray-900/20")}>
+                        className={cn("text-xs", item.showOnHome ? "border-neon-lime/50 text-neon-lime hover:bg-neon-lime/10" : "border-foreground/15 text-foreground/65 hover:bg-gray-900/20")}>
                         {item.showOnHome ? <><EyeOff className="w-3 h-3 mr-1" />Remover da home</> : <><Home className="w-3 h-3 mr-1" />Exibir na home</>}
                       </Button>
-                      <Button size="sm" variant="outline" onClick={() => openEdit(item)} className="border-gray-700 text-gray-400 hover:bg-gray-900/20 text-xs">
+                      <Button size="sm" variant="outline" onClick={() => openEdit(item)} className="border-foreground/15 text-foreground/65 hover:bg-gray-900/20 text-xs">
                         <Pencil className="w-3 h-3 mr-1" />Editar
                       </Button>
                     </>
@@ -677,8 +677,8 @@ export default function AdminTestimonials() {
       <div className="p-6 max-w-4xl mx-auto space-y-6">
         <div className="flex items-start justify-between flex-wrap gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-white">Depoimentos</h1>
-            <p className="text-gray-400 text-sm mt-1">
+            <h1 className="text-2xl font-bold text-foreground-strong">Depoimentos</h1>
+            <p className="text-foreground/65 text-sm mt-1">
               Modere e publique depoimentos enviados por visitantes
             </p>
           </div>
@@ -687,7 +687,7 @@ export default function AdminTestimonials() {
 
         <AdminCreateForm />
 
-        <div className="flex gap-1 bg-white/5 rounded-lg p-1 w-fit">
+        <div className="flex gap-1 bg-foreground/5 rounded-lg p-1 w-fit">
           {TABS.map((tab) => (
             <button
               key={tab.value}
@@ -695,8 +695,8 @@ export default function AdminTestimonials() {
               className={cn(
                 "px-4 py-1.5 rounded-md text-sm font-medium transition-all",
                 activeTab === tab.value
-                  ? "bg-white/10 text-white"
-                  : "text-gray-400 hover:text-gray-300",
+                  ? "bg-foreground/10 text-foreground-strong"
+                  : "text-foreground/65 hover:text-foreground/90",
               )}
             >
               {tab.label}
@@ -713,10 +713,10 @@ export default function AdminTestimonials() {
           <DirectTestimonialsTab />
         ) : submissions === undefined ? (
           <div className="flex items-center justify-center py-16">
-            <Loader2 className="w-6 h-6 animate-spin text-gray-500" />
+            <Loader2 className="w-6 h-6 animate-spin text-foreground/42" />
           </div>
         ) : submissions.length === 0 ? (
-          <div className="text-center py-16 text-gray-500">
+          <div className="text-center py-16 text-foreground/42">
             <p>Nenhum depoimento {activeTab === "pending" ? "pendente" : activeTab === "approved" ? "aprovado" : activeTab === "rejected" ? "rejeitado" : "publicado"}</p>
           </div>
         ) : (

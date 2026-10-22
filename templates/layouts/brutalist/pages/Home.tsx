@@ -328,6 +328,7 @@ export default function Home() {
               animation: "brut-blink 1s steps(1) infinite",
             }}
           />
+          <style>{`@keyframes brut-blink { 50% { opacity: 0; } }`}</style>
         </div>
       </div>
     </div>

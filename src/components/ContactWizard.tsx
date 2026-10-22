@@ -98,11 +98,11 @@ function OptionCard({
       className={cn(
         "w-full text-left px-4 py-3 rounded-md border font-mono text-sm transition-all duration-200",
         selected
-          ? "border-neon-purple bg-neon-purple/10 text-white"
-          : "border-white/10 bg-white/5 text-gray-300 hover:border-white/30 hover:bg-white/10"
+          ? "border-neon-purple bg-neon-purple/10 text-foreground-strong"
+          : "border-foreground/10 bg-foreground/5 text-foreground/90 hover:border-foreground/30 hover:bg-foreground/10"
       )}
     >
-      <span className={cn("mr-2", selected ? "text-neon-purple" : "text-gray-500")}>{">"}</span>
+      <span className={cn("mr-2", selected ? "text-neon-purple" : "text-foreground/42")}>{">"}</span>
       {label}
     </button>
   );
@@ -114,11 +114,11 @@ function ProgressBar({ current, total }: { current: number; total: number }) {
   const pct = total > 0 ? Math.round((current / total) * 100) : 0;
   return (
     <div className="space-y-1.5">
-      <div className="flex justify-between text-[10px] font-mono text-gray-500">
+      <div className="flex justify-between text-[10px] font-mono text-foreground/42">
         <span>{t("contactWizard.step")} {current} {t("contactWizard.of")} {total}</span>
         <span>{pct}%</span>
       </div>
-      <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
+      <div className="h-1 w-full bg-foreground/10 rounded-full overflow-hidden">
         <motion.div
           className="h-full bg-neon-purple rounded-full"
           initial={false}
@@ -209,14 +209,14 @@ function TextStep({
           value={current ?? ""}
           onChange={(e) => dispatch({ type: "SET_ANSWER", key: answerKey, value: e.target.value })}
           rows={5}
-          className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 resize-none font-mono text-sm"
+          className="bg-foreground/5 border-foreground/10 text-foreground-strong placeholder:text-foreground/25 resize-none font-mono text-sm"
         />
       ) : (
         <Input
           placeholder={placeholder}
           value={current ?? ""}
           onChange={(e) => dispatch({ type: "SET_ANSWER", key: answerKey, value: e.target.value })}
-          className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 font-mono text-sm"
+          className="bg-foreground/5 border-foreground/10 text-foreground-strong placeholder:text-foreground/25 font-mono text-sm"
         />
       )}
     </div>
@@ -249,13 +249,13 @@ function DualTextStep({
           placeholder={companyPlaceholder}
           value={answers[companyKey] ?? ""}
           onChange={(e) => dispatch({ type: "SET_ANSWER", key: companyKey, value: e.target.value })}
-          className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 font-mono text-sm"
+          className="bg-foreground/5 border-foreground/10 text-foreground-strong placeholder:text-foreground/25 font-mono text-sm"
         />
         <Input
           placeholder={rolePlaceholder}
           value={answers[roleKey] ?? ""}
           onChange={(e) => dispatch({ type: "SET_ANSWER", key: roleKey, value: e.target.value })}
-          className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 font-mono text-sm"
+          className="bg-foreground/5 border-foreground/10 text-foreground-strong placeholder:text-foreground/25 font-mono text-sm"
         />
       </div>
     </div>
@@ -282,54 +282,54 @@ function ContactStep({
       <h3 className="font-mono text-sm text-neon-lime">{t("contactWizard.contact.title")}</h3>
       <div className="space-y-3">
         <div>
-          <Label className="text-xs text-gray-400 font-mono mb-1 block">{t("contactWizard.contact.name")}</Label>
+          <Label className="text-xs text-foreground/65 font-mono mb-1 block">{t("contactWizard.contact.name")}</Label>
           <Input
             placeholder={t("contactWizard.contact.namePlaceholder")}
             value={contactInfo.name}
             onChange={(e) => dispatch({ type: "SET_CONTACT", field: "name", value: e.target.value })}
-            className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 font-mono text-sm"
+            className="bg-foreground/5 border-foreground/10 text-foreground-strong placeholder:text-foreground/25 font-mono text-sm"
           />
         </div>
         <div>
-          <Label className="text-xs text-gray-400 font-mono mb-1 block">{t("contactWizard.contact.email")}</Label>
+          <Label className="text-xs text-foreground/65 font-mono mb-1 block">{t("contactWizard.contact.email")}</Label>
           <Input
             type="email"
             placeholder={t("contactWizard.contact.emailPlaceholder")}
             value={contactInfo.email}
             onChange={(e) => dispatch({ type: "SET_CONTACT", field: "email", value: e.target.value })}
-            className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 font-mono text-sm"
+            className="bg-foreground/5 border-foreground/10 text-foreground-strong placeholder:text-foreground/25 font-mono text-sm"
           />
         </div>
         {requirePhone && (
           <div>
-            <Label className="text-xs text-gray-400 font-mono mb-1 block">{t("contactWizard.contact.phone")}</Label>
+            <Label className="text-xs text-foreground/65 font-mono mb-1 block">{t("contactWizard.contact.phone")}</Label>
             <Input
               placeholder={t("contactWizard.contact.phonePlaceholder")}
               value={contactInfo.phone ?? ""}
               onChange={(e) => dispatch({ type: "SET_CONTACT", field: "phone", value: e.target.value })}
-              className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 font-mono text-sm"
+              className="bg-foreground/5 border-foreground/10 text-foreground-strong placeholder:text-foreground/25 font-mono text-sm"
             />
           </div>
         )}
         {requireLinkedin && (
           <div>
-            <Label className="text-xs text-gray-400 font-mono mb-1 block">{t("contactWizard.contact.linkedin")}</Label>
+            <Label className="text-xs text-foreground/65 font-mono mb-1 block">{t("contactWizard.contact.linkedin")}</Label>
             <Input
               placeholder={t("contactWizard.contact.linkedinPlaceholder")}
               value={contactInfo.linkedin ?? ""}
               onChange={(e) => dispatch({ type: "SET_CONTACT", field: "linkedin", value: e.target.value })}
-              className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 font-mono text-sm"
+              className="bg-foreground/5 border-foreground/10 text-foreground-strong placeholder:text-foreground/25 font-mono text-sm"
             />
           </div>
         )}
         {requireCompany && (
           <div>
-            <Label className="text-xs text-gray-400 font-mono mb-1 block">{t("contactWizard.contact.company")}</Label>
+            <Label className="text-xs text-foreground/65 font-mono mb-1 block">{t("contactWizard.contact.company")}</Label>
             <Input
               placeholder={t("contactWizard.contact.companyPlaceholder")}
               value={contactInfo.company ?? ""}
               onChange={(e) => dispatch({ type: "SET_CONTACT", field: "company", value: e.target.value })}
-              className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 font-mono text-sm"
+              className="bg-foreground/5 border-foreground/10 text-foreground-strong placeholder:text-foreground/25 font-mono text-sm"
             />
           </div>
         )}
@@ -352,25 +352,25 @@ function SummaryStep({
   return (
     <div className="space-y-4">
       <h3 className="font-mono text-sm text-neon-lime">{t("contactWizard.summary.title")}</h3>
-      <div className="rounded-md border border-white/10 bg-white/5 p-4 space-y-3 font-mono text-xs text-gray-300">
+      <div className="rounded-md border border-foreground/10 bg-foreground/5 p-4 space-y-3 font-mono text-xs text-foreground/90">
         <div>
-          <span className="text-gray-500">{t("contactWizard.summary.type")}: </span>
+          <span className="text-foreground/42">{t("contactWizard.summary.type")}: </span>
           <span className="text-neon-lime">{flowLabel}</span>
         </div>
         {sourceContext && (
           <div>
-            <span className="text-gray-500">{t("contactWizard.summary.origin")}: </span>
+            <span className="text-foreground/42">{t("contactWizard.summary.origin")}: </span>
             <span>{sourceContext}</span>
           </div>
         )}
         {answerEntries.map(([k, v]) => (
           <div key={k}>
-            <span className="text-gray-500">{k}: </span>
+            <span className="text-foreground/42">{k}: </span>
             <span>{v}</span>
           </div>
         ))}
-        <div className="pt-2 border-t border-white/10">
-          <div className="text-gray-500 mb-1">{t("contactWizard.summary.contact")}:</div>
+        <div className="pt-2 border-t border-foreground/10">
+          <div className="text-foreground/42 mb-1">{t("contactWizard.summary.contact")}:</div>
           <div>{state.contactInfo.name}</div>
           <div>{state.contactInfo.email}</div>
           {state.contactInfo.phone && <div>{state.contactInfo.phone}</div>}
@@ -390,8 +390,8 @@ function SuccessScreen() {
       <div className="h-16 w-16 rounded-full bg-neon-purple/20 border border-neon-purple flex items-center justify-center">
         <Check className="h-8 w-8 text-neon-purple" />
       </div>
-      <h3 className="font-mono text-lg text-white">{t("contactWizard.successTitle")}</h3>
-      <p className="text-gray-400 text-sm max-w-xs">{t("contactWizard.successBody")}</p>
+      <h3 className="font-mono text-lg text-foreground-strong">{t("contactWizard.successTitle")}</h3>
+      <p className="text-foreground/65 text-sm max-w-xs">{t("contactWizard.successBody")}</p>
     </div>
   );
 }
@@ -582,10 +582,10 @@ export function ContactWizard({
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-1">
           <div className="font-mono text-xs text-neon-purple">portfolio</div>
-          <div className="font-mono text-xs text-gray-600">/</div>
-          <div className="font-mono text-xs text-gray-400">contato</div>
+          <div className="font-mono text-xs text-foreground/25">/</div>
+          <div className="font-mono text-xs text-foreground/65">contato</div>
         </div>
-        <h2 className="text-xl font-bold text-white">{t("contactWizard.title")}</h2>
+        <h2 className="text-xl font-bold text-foreground-strong">{t("contactWizard.title")}</h2>
         {state.flow && !state.isSuccess && (
           <div className="mt-3">
             <ProgressBar current={state.currentStep} total={totalSteps} />
@@ -613,7 +613,7 @@ export function ContactWizard({
 
       {/* Navigation */}
       {!state.isSuccess && (
-        <div className="mt-6 flex items-center justify-between border-t border-white/10 pt-4">
+        <div className="mt-6 flex items-center justify-between border-t border-foreground/10 pt-4">
           <Button
             variant="ghost"
             size="sm"
@@ -621,7 +621,7 @@ export function ContactWizard({
               if (state.currentStep === 0) onClose();
               else dispatch({ type: "PREV" });
             }}
-            className="text-gray-400 hover:text-white font-mono text-xs"
+            className="text-foreground/65 hover:text-foreground-strong font-mono text-xs"
           >
             <ArrowLeft className="mr-1.5 h-3 w-3" />
             {state.currentStep === 0 ? t("common.close") : t("contactWizard.back")}
@@ -660,7 +660,7 @@ export function ContactWizard({
             variant="outline"
             size="sm"
             onClick={onClose}
-            className="border-white/20 text-gray-400 hover:text-white font-mono text-xs"
+            className="border-foreground/20 text-foreground/65 hover:text-foreground-strong font-mono text-xs"
           >
             {t("common.close")}
           </Button>

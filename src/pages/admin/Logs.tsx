@@ -450,7 +450,7 @@ export default function AdminLogs() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 border-b border-white/10">
+        <div className="flex gap-1 border-b border-foreground/10">
           <button
             onClick={() => setTab("system")}
             className={`px-4 py-2 text-sm font-mono transition-colors border-b-2 -mb-px ${tab === "system" ? "border-neon-purple text-neon-purple" : "border-transparent text-muted-foreground hover:text-foreground"}`}

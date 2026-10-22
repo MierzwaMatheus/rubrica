@@ -273,7 +273,7 @@ function AdminSidebar() {
       <Button
         variant="ghost"
         size="icon"
-        className="fixed top-4 left-4 z-50 md:hidden text-white"
+        className="fixed top-4 left-4 z-50 md:hidden text-foreground-strong"
         onClick={() => setIsOpen(!isOpen)}
       >
         {isOpen ? <X /> : <Menu />}
@@ -282,16 +282,16 @@ function AdminSidebar() {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 w-64 bg-sidebar border-r border-white/10 transform transition-transform duration-300 ease-in-out md:translate-x-0",
+          "fixed inset-y-0 left-0 z-40 w-64 bg-sidebar border-r border-foreground/10 transform transition-transform duration-300 ease-in-out md:translate-x-0",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         <div className="flex flex-col h-full overflow-y-auto p-6">
           <div className="mb-8 flex items-center space-x-2">
             <div className="h-8 w-8 rounded bg-neon-purple flex items-center justify-center">
-              <span className="font-bold text-white">A</span>
+              <span className="font-bold text-foreground-strong">A</span>
             </div>
-            <span className="text-xl font-bold text-white">Admin Panel</span>
+            <span className="text-xl font-bold text-foreground-strong">Admin Panel</span>
           </div>
 
           <nav className="flex-1">
@@ -301,14 +301,14 @@ function AdminSidebar() {
                 <div key={group.label} className="mb-2">
                   <button
                     onClick={() => toggleGroup(group.label)}
-                    className="w-full flex items-center justify-between px-3 py-1.5 rounded hover:bg-white/5 transition-colors group"
+                    className="w-full flex items-center justify-between px-3 py-1.5 rounded hover:bg-foreground/5 transition-colors group"
                   >
-                    <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 group-hover:text-gray-400 transition-colors">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-foreground/42 group-hover:text-foreground/65 transition-colors">
                       {group.label}
                     </span>
                     <ChevronDown
                       className={cn(
-                        "w-3 h-3 text-gray-600 group-hover:text-gray-400 transition-all duration-200",
+                        "w-3 h-3 text-foreground/25 group-hover:text-foreground/65 transition-all duration-200",
                         isCollapsed && "-rotate-90"
                       )}
                     />
@@ -327,20 +327,20 @@ function AdminSidebar() {
                                     "flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors",
                                     isActive
                                       ? "bg-neon-purple/10 text-neon-purple border border-neon-purple/20"
-                                      : "text-gray-400 hover:text-white hover:bg-white/5"
+                                      : "text-foreground/65 hover:text-foreground-strong hover:bg-foreground/5"
                                   )}
                                 >
                                   <item.icon className="w-4 h-4 shrink-0" />
                                   <div className="min-w-0">
                                     <p className="text-sm font-medium leading-none">{item.label}</p>
-                                    <p className="text-xs text-gray-500 truncate mt-0.5">{item.description}</p>
+                                    <p className="text-xs text-foreground/42 truncate mt-0.5">{item.description}</p>
                                   </div>
                                 </a>
                               </Link>
                             </TooltipTrigger>
-                            <TooltipContent side="right" className="max-w-48 bg-zinc-900 border border-white/10 text-white">
-                              <p className="font-medium text-white">{item.label}</p>
-                              <p className="text-xs text-gray-400 mt-0.5">{item.description}</p>
+                            <TooltipContent side="right" className="max-w-48 bg-zinc-900 border border-foreground/10 text-foreground-strong">
+                              <p className="font-medium text-foreground-strong">{item.label}</p>
+                              <p className="text-xs text-foreground/65 mt-0.5">{item.description}</p>
                             </TooltipContent>
                           </Tooltip>
                         );
@@ -352,7 +352,7 @@ function AdminSidebar() {
             })}
           </nav>
 
-          <div className="pt-6 border-t border-white/10">
+          <div className="pt-6 border-t border-foreground/10">
             <Button
               variant="ghost"
               className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-red-500/10"
@@ -441,7 +441,7 @@ export function AdminLayout({ children, title = "Admin" }: { children: React.Rea
   ];
 
   return (
-    <div className="min-h-screen bg-background text-white">
+    <div className="min-h-screen bg-background text-foreground-strong">
       <Helmet><title>{title} — Admin</title></Helmet>
       <AdminSidebar />
       <main className="md:ml-64 p-8 pt-20 md:pt-8">{children}</main>
@@ -477,8 +477,8 @@ export default function Dashboard() {
       <div className="space-y-8">
         <header className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-white">Dashboard</h1>
-            <p className="text-gray-400 mt-2">
+            <h1 className="text-3xl font-bold text-foreground-strong">Dashboard</h1>
+            <p className="text-foreground/65 mt-2">
               Bem-vindo ao painel administrativo do seu portfólio.
             </p>
           </div>
@@ -511,14 +511,14 @@ export default function Dashboard() {
           ].map((stat, index) => (
             <div
               key={index}
-              className="bg-card border border-white/10 rounded-xl p-6 flex items-center space-x-4"
+              className="bg-card border border-foreground/10 rounded-xl p-6 flex items-center space-x-4"
             >
               <div className={cn("p-4 rounded-lg", stat.bg)}>
                 <stat.icon className={cn("w-8 h-8", stat.color)} />
               </div>
               <div>
-                <p className="text-gray-400 text-sm">{stat.title}</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-foreground/65 text-sm">{stat.title}</p>
+                <p className="text-2xl font-bold text-foreground-strong">
                   {isLoading ? "..." : stat.count}
                 </p>
               </div>
@@ -526,12 +526,12 @@ export default function Dashboard() {
           ))}
         </div>
 
-        <div className="bg-card border border-white/10 rounded-xl p-6">
-          <h2 className="text-xl font-bold text-white mb-4">Atalhos Rápidos</h2>
+        <div className="bg-card border border-foreground/10 rounded-xl p-6">
+          <h2 className="text-xl font-bold text-foreground-strong mb-4">Atalhos Rápidos</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Button
               variant="outline"
-              className="w-full h-24 flex flex-col items-center justify-center gap-2 border-white/10 hover:bg-white/5 hover:border-neon-purple/50"
+              className="w-full h-24 flex flex-col items-center justify-center gap-2 border-foreground/10 hover:bg-foreground/5 hover:border-neon-purple/50"
               onClick={() => setIsProjectOpen(true)}
             >
               <FolderKanban className="w-6 h-6 text-neon-purple" />
@@ -540,7 +540,7 @@ export default function Dashboard() {
 
             <Button
               variant="outline"
-              className="w-full h-24 flex flex-col items-center justify-center gap-2 border-white/10 hover:bg-white/5 hover:border-neon-purple/50"
+              className="w-full h-24 flex flex-col items-center justify-center gap-2 border-foreground/10 hover:bg-foreground/5 hover:border-neon-purple/50"
               onClick={() => setIsProposalOpen(true)}
             >
               <FileSignature className="w-6 h-6 text-neon-purple" />
@@ -549,7 +549,7 @@ export default function Dashboard() {
 
             <Button
               variant="outline"
-              className="w-full h-24 flex flex-col items-center justify-center gap-2 border-white/10 hover:bg-white/5 hover:border-neon-purple/50"
+              className="w-full h-24 flex flex-col items-center justify-center gap-2 border-foreground/10 hover:bg-foreground/5 hover:border-neon-purple/50"
               onClick={() => setIsExperienceOpen(true)}
             >
               <Briefcase className="w-6 h-6 text-neon-purple" />
@@ -561,7 +561,7 @@ export default function Dashboard() {
               trigger={
                 <Button
                   variant="outline"
-                  className="w-full h-24 flex flex-col items-center justify-center gap-2 border-white/10 hover:bg-white/5 hover:border-neon-purple/50"
+                  className="w-full h-24 flex flex-col items-center justify-center gap-2 border-foreground/10 hover:bg-foreground/5 hover:border-neon-purple/50"
                 >
                   <ImageIcon className="w-6 h-6 text-neon-purple" />
                   Galeria de Imagens

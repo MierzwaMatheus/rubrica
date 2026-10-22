@@ -42,8 +42,8 @@ export default function Playground() {
         <div className="space-y-8">
           <header className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-white">Dashboard</h1>
-              <p className="text-gray-400 mt-2">
+              <h1 className="text-3xl font-bold text-foreground-strong">Dashboard</h1>
+              <p className="text-foreground/65 mt-2">
                 Bem-vindo ao painel administrativo — modo demonstração.
               </p>
             </div>
@@ -57,15 +57,15 @@ export default function Playground() {
             {stats.map((stat, i) => {
               const card = (
                 <div className={cn(
-                  "bg-card border border-white/10 rounded-xl p-6 flex items-center space-x-4 transition-colors",
-                  !stat.disabled && "hover:border-white/20 cursor-pointer"
+                  "bg-card border border-foreground/10 rounded-xl p-6 flex items-center space-x-4 transition-colors",
+                  !stat.disabled && "hover:border-foreground/20 cursor-pointer"
                 )}>
                   <div className={cn("p-4 rounded-lg", stat.bg)}>
                     <stat.icon className={cn("w-8 h-8", stat.color)} />
                   </div>
                   <div>
-                    <p className="text-gray-400 text-sm">{stat.title}</p>
-                    <p className="text-2xl font-bold text-white">{stat.count}</p>
+                    <p className="text-foreground/65 text-sm">{stat.title}</p>
+                    <p className="text-2xl font-bold text-foreground-strong">{stat.count}</p>
                   </div>
                 </div>
               );
@@ -76,14 +76,14 @@ export default function Playground() {
           </div>
 
           {/* Quick shortcuts — mirrors admin "Atalhos Rápidos" */}
-          <div className="bg-card border border-white/10 rounded-xl p-6">
-            <h2 className="text-xl font-bold text-white mb-4">Atalhos Rápidos</h2>
+          <div className="bg-card border border-foreground/10 rounded-xl p-6">
+            <h2 className="text-xl font-bold text-foreground-strong mb-4">Atalhos Rápidos</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {shortcuts.map((s, i) => (
                 <Link key={i} href={s.href}>
                   <Button
                     variant="outline"
-                    className="w-full h-24 flex flex-col items-center justify-center gap-2 border-white/10 hover:bg-white/5 hover:border-neon-purple/50"
+                    className="w-full h-24 flex flex-col items-center justify-center gap-2 border-foreground/10 hover:bg-foreground/5 hover:border-neon-purple/50"
                   >
                     <s.icon className="w-6 h-6 text-neon-purple" />
                     {s.label}

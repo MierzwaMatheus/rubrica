@@ -37,18 +37,18 @@ function SortableDailyRoutineCard({ item, onEdit, onDelete, onRestore, t }: { it
 
   return (
     <div ref={setNodeRef} style={style}>
-      <Card className={`bg-card group ${isDeleted ? 'opacity-60 border-red-500/30' : 'border-white/10'}`}>
+      <Card className={`bg-card group ${isDeleted ? 'opacity-60 border-red-500/30' : 'border-foreground/10'}`}>
         <CardContent className="pt-6 space-y-4">
-          <div className="relative aspect-video rounded-lg overflow-hidden border border-white/10">
+          <div className="relative aspect-video rounded-lg overflow-hidden border border-foreground/10">
             {item.image?.url && (
               <img src={item.image.url} alt={item.description} className="w-full h-full object-cover" />
             )}
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
+            <h3 className="text-lg font-semibold text-foreground-strong mb-2 flex items-center gap-2">
               {!isDeleted && (
                 <div {...attributes} {...listeners} className="cursor-move">
-                  <GripVertical className="w-4 h-4 text-gray-500 hover:text-white" />
+                  <GripVertical className="w-4 h-4 text-foreground/42 hover:text-foreground-strong" />
                 </div>
               )}
               {item.descriptionTranslations?.ptBR || item.description}
@@ -59,14 +59,14 @@ function SortableDailyRoutineCard({ item, onEdit, onDelete, onRestore, t }: { it
               </div>
             )}
             {!isDeleted && (
-              <p className="text-gray-400 text-xs">
+              <p className="text-foreground/65 text-xs">
                 {t('admin.about.spanSize')}: {item.spanSize}
               </p>
             )}
           </div>
           <div className="flex justify-end gap-2 pt-2 opacity-0 group-hover:opacity-100 transition-opacity">
             {!isDeleted && (
-              <Button variant="ghost" size="sm" onClick={() => onEdit(item)} className="text-white hover:text-neon-purple">
+              <Button variant="ghost" size="sm" onClick={() => onEdit(item)} className="text-foreground-strong hover:text-neon-purple">
                 <Pencil className="w-4 h-4 mr-2" /> {t('common.edit')}
               </Button>
             )}
@@ -97,13 +97,13 @@ function SortableFaqCard({ item, onEdit, onDelete, onRestore, t }: { item: any, 
 
   return (
     <div ref={setNodeRef} style={style}>
-      <Card className={`bg-card group ${isDeleted ? 'opacity-60 border-red-500/30' : 'border-white/10'}`}>
+      <Card className={`bg-card group ${isDeleted ? 'opacity-60 border-red-500/30' : 'border-foreground/10'}`}>
         <CardContent className="pt-6 space-y-4">
           <div>
-            <h3 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
+            <h3 className="text-lg font-semibold text-foreground-strong mb-2 flex items-center gap-2">
               {!isDeleted && (
                 <div {...attributes} {...listeners} className="cursor-move">
-                  <GripVertical className="w-4 h-4 text-gray-500 hover:text-white" />
+                  <GripVertical className="w-4 h-4 text-foreground/42 hover:text-foreground-strong" />
                 </div>
               )}
               {item.questionTranslations?.ptBR || item.question}
@@ -113,13 +113,13 @@ function SortableFaqCard({ item, onEdit, onDelete, onRestore, t }: { item: any, 
                 <ShieldAlert className="w-3 h-3" />Deletado
               </div>
             )}
-            <p className="text-gray-400 text-sm leading-relaxed">
+            <p className="text-foreground/65 text-sm leading-relaxed">
               {item.answerTranslations?.ptBR || item.answer}
             </p>
           </div>
           <div className="flex justify-end gap-2 pt-2 opacity-0 group-hover:opacity-100 transition-opacity">
             {!isDeleted && (
-              <Button variant="ghost" size="sm" onClick={() => onEdit(item)} className="text-white hover:text-neon-purple">
+              <Button variant="ghost" size="sm" onClick={() => onEdit(item)} className="text-foreground-strong hover:text-neon-purple">
                 <Pencil className="w-4 h-4 mr-2" /> {t('common.edit')}
               </Button>
             )}
@@ -355,18 +355,18 @@ export default function AdminAbout() {
     <AdminLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-white">{t('admin.about.title')}</h1>
+          <h1 className="text-3xl font-bold text-foreground-strong">{t('admin.about.title')}</h1>
         </div>
 
         <Tabs defaultValue="dailyRoutine" className="w-full">
-          <TabsList className="bg-white/5 border border-white/10 w-full grid grid-cols-2">
+          <TabsList className="bg-foreground/5 border border-foreground/10 w-full grid grid-cols-2">
             <TabsTrigger value="dailyRoutine">{t('admin.about.dailyRoutine')}</TabsTrigger>
             <TabsTrigger value="faq">{t('admin.about.faq')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="dailyRoutine" className="space-y-6 mt-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-white">{t('admin.about.dailyRoutine')}</h2>
+              <h2 className="text-xl font-semibold text-foreground-strong">{t('admin.about.dailyRoutine')}</h2>
               <div className="flex gap-2 items-center">
                 {isRoot && (
                   <button
@@ -374,7 +374,7 @@ export default function AdminAbout() {
                     className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm border transition-colors ${
                       includeDeleted
                         ? 'border-red-500/50 bg-red-500/10 text-red-400'
-                        : 'border-white/10 bg-white/5 text-gray-400 hover:text-white'
+                        : 'border-foreground/10 bg-foreground/5 text-foreground/65 hover:text-foreground-strong'
                     }`}
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
@@ -387,9 +387,9 @@ export default function AdminAbout() {
               </div>
             </div>
 
-            <Card className="bg-card border-white/10">
+            <Card className="bg-card border-foreground/10">
               <CardHeader>
-                <CardTitle className="text-white text-lg">Preview do Layout</CardTitle>
+                <CardTitle className="text-foreground-strong text-lg">Preview do Layout</CardTitle>
               </CardHeader>
               <CardContent>
                 <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={(e) => handleDragEnd(e, 'dailyRoutine')}>
@@ -420,7 +420,7 @@ export default function AdminAbout() {
 
           <TabsContent value="faq" className="space-y-6 mt-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-white">{t('admin.about.faq')}</h2>
+              <h2 className="text-xl font-semibold text-foreground-strong">{t('admin.about.faq')}</h2>
               <div className="flex gap-2 items-center">
                 {isRoot && (
                   <button
@@ -428,7 +428,7 @@ export default function AdminAbout() {
                     className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm border transition-colors ${
                       includeDeleted
                         ? 'border-red-500/50 bg-red-500/10 text-red-400'
-                        : 'border-white/10 bg-white/5 text-gray-400 hover:text-white'
+                        : 'border-foreground/10 bg-foreground/5 text-foreground/65 hover:text-foreground-strong'
                     }`}
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
@@ -461,12 +461,12 @@ export default function AdminAbout() {
         </Tabs>
 
         <Dialog open={!!activeModal} onOpenChange={() => handleCloseModal()}>
-          <DialogContent className="bg-background border-white/10 max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="bg-background border-foreground/10 max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-white">
+              <DialogTitle className="text-foreground-strong">
                 {editingItem ? t('common.edit') : t('common.add')} {activeModal === "dailyRoutine" ? t('admin.about.dailyRoutine') : t('admin.about.faq')}
               </DialogTitle>
-              <DialogDescription className="text-gray-400">
+              <DialogDescription className="text-foreground/65">
                 {activeModal === "dailyRoutine"
                   ? t('admin.about.editDailyRoutine')
                   : t('admin.about.editFaq')}
@@ -476,10 +476,10 @@ export default function AdminAbout() {
               {activeModal === "dailyRoutine" && (
                 <>
                   <div className="space-y-2">
-                    <Label className="text-white">{t('admin.about.imageUrl')}</Label>
+                    <Label className="text-foreground-strong">{t('admin.about.imageUrl')}</Label>
                     <div className="flex items-center gap-4">
                       {displayImageUrl && (
-                        <div className="w-32 h-32 rounded-lg overflow-hidden border border-white/10">
+                        <div className="w-32 h-32 rounded-lg overflow-hidden border border-foreground/10">
                           <img src={displayImageUrl} alt="Preview" className="w-full h-full object-cover" />
                         </div>
                       )}
@@ -490,7 +490,7 @@ export default function AdminAbout() {
                           setSelectedImageUrl("");
                         }}
                         trigger={
-                          <Button type="button" variant="outline" className="border-white/10 hover:bg-white/5 text-white">
+                          <Button type="button" variant="outline" className="border-foreground/10 hover:bg-foreground/5 text-foreground-strong">
                             <ImageIcon className="w-4 h-4 mr-2" />
                             {displayImageUrl ? t('admin.home.changeImage') : t('admin.home.selectImage')}
                           </Button>
@@ -500,20 +500,20 @@ export default function AdminAbout() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-white">{t('admin.about.description')}</Label>
+                    <Label className="text-foreground-strong">{t('admin.about.description')}</Label>
                     <Textarea
                       name="description"
                       defaultValue={editingItem?.descriptionTranslations?.ptBR || editingItem?.description}
-                      className="bg-white/5 border-white/10 text-white min-h-[100px]"
+                      className="bg-foreground/5 border-foreground/10 text-foreground-strong min-h-[100px]"
                       required
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label className="text-white">{t('admin.about.spanSize')}</Label>
+                      <Label className="text-foreground-strong">{t('admin.about.spanSize')}</Label>
                       <Select value={spanSize} onValueChange={(v) => setSpanSize(v as SpanSize)}>
-                        <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                        <SelectTrigger className="bg-foreground/5 border-foreground/10 text-foreground-strong">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -531,21 +531,21 @@ export default function AdminAbout() {
               {activeModal === "faq" && (
                 <>
                   <div className="space-y-2">
-                    <Label className="text-white">{t('admin.about.question')}</Label>
+                    <Label className="text-foreground-strong">{t('admin.about.question')}</Label>
                     <Input
                       name="question"
                       defaultValue={editingItem?.questionTranslations?.ptBR || editingItem?.question}
-                      className="bg-white/5 border-white/10 text-white"
+                      className="bg-foreground/5 border-foreground/10 text-foreground-strong"
                       required
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-white">{t('admin.about.answer')}</Label>
+                    <Label className="text-foreground-strong">{t('admin.about.answer')}</Label>
                     <Textarea
                       name="answer"
                       defaultValue={editingItem?.answerTranslations?.ptBR || editingItem?.answer}
-                      className="bg-white/5 border-white/10 text-white min-h-[150px]"
+                      className="bg-foreground/5 border-foreground/10 text-foreground-strong min-h-[150px]"
                       required
                     />
                   </div>
@@ -553,7 +553,7 @@ export default function AdminAbout() {
               )}
 
               <div className="flex justify-end gap-2 pt-4">
-                <Button type="button" variant="ghost" onClick={handleCloseModal} className="text-gray-400">{t('common.cancel')}</Button>
+                <Button type="button" variant="ghost" onClick={handleCloseModal} className="text-foreground/65">{t('common.cancel')}</Button>
                 <Button type="submit" disabled={isTranslating} className="bg-neon-purple hover:bg-neon-purple/90 text-white">{isTranslating ? 'Traduzindo...' : t('common.save')}</Button>
               </div>
             </form>

@@ -50,14 +50,14 @@ export function ProjectTagsInput({ selectedTags, onChange }: ProjectTagsInputPro
         <div className="space-y-2">
             <div className="flex flex-wrap gap-2 mb-2">
                 {selectedTags.map((tag) => (
-                    <Badge key={tag} variant="secondary" className="bg-white/5 text-gray-300 border-white/10 flex items-center gap-1">
+                    <Badge key={tag} variant="secondary" className="bg-foreground/5 text-foreground/90 border-foreground/10 flex items-center gap-1">
                         {tag}
                         <button
                             type="button"
                             onClick={() => handleRemove(tag)}
                             className="ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                         >
-                            <X className="h-3 w-3 text-gray-400 hover:text-white" />
+                            <X className="h-3 w-3 text-foreground/65 hover:text-foreground-strong" />
                             <span className="sr-only">Remove {tag}</span>
                         </button>
                     </Badge>
@@ -69,15 +69,15 @@ export function ProjectTagsInput({ selectedTags, onChange }: ProjectTagsInputPro
                         variant="outline"
                         role="combobox"
                         aria-expanded={open}
-                        className="w-full justify-between bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:text-white"
+                        className="w-full justify-between bg-foreground/5 border-foreground/10 text-foreground/90 hover:bg-foreground/10 hover:text-foreground-strong"
                     >
                         Selecionar tags...
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-full p-0 bg-background border-white/10">
-                    <Command className="bg-background text-gray-300">
-                        <CommandInput placeholder="Buscar tag..." className="text-white" />
+                <PopoverContent className="w-full p-0 bg-background border-foreground/10">
+                    <Command className="bg-background text-foreground/90">
+                        <CommandInput placeholder="Buscar tag..." className="text-foreground-strong" />
                         <CommandList>
                             <CommandEmpty>Nenhuma tag encontrada.</CommandEmpty>
                             <CommandGroup className="max-h-60 overflow-auto">
@@ -86,7 +86,7 @@ export function ProjectTagsInput({ selectedTags, onChange }: ProjectTagsInputPro
                                         key={tag}
                                         value={tag}
                                         onSelect={() => handleSelect(tag)}
-                                        className="text-gray-300 hover:bg-white/10 hover:text-white aria-selected:bg-white/10 aria-selected:text-white cursor-pointer"
+                                        className="text-foreground/90 hover:bg-foreground/10 hover:text-foreground-strong aria-selected:bg-foreground/10 aria-selected:text-foreground-strong cursor-pointer"
                                     >
                                         <Check
                                             className={cn(

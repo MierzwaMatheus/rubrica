@@ -265,7 +265,7 @@ export default function Portfolio() {
                       color: "var(--text)",
                     }}
                   >
-                    $ view --details
+                    $ open --demo
                   </a>
                 )}
                 {p.github_link && (
@@ -282,7 +282,7 @@ export default function Portfolio() {
                       textDecoration: "none",
                     }}
                   >
-                    $ contact
+                    $ open --source
                   </a>
                 )}
               </div>

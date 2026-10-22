@@ -54,7 +54,7 @@ function ContrastBadge({ hex, bg, testId }: ContrastBadgeProps) {
   return (
     <span
       data-testid={testId}
-      className={`text-white text-xs px-2 py-0.5 rounded font-mono ${colorMap[level]}`}
+      className={`text-foreground-strong text-xs px-2 py-0.5 rounded font-mono ${colorMap[level]}`}
     >
       {labelMap[level]} ({ratio.toFixed(1)}:1)
     </span>
@@ -74,7 +74,7 @@ type ColorPickerProps = {
 function ColorPickerField({ label, testIdSuffix, value, hexInput, onNativeChange, onHexChange, bg }: ColorPickerProps) {
   return (
     <div className="space-y-2 flex-1 min-w-0">
-      <Label className="text-white text-sm">{label}</Label>
+      <Label className="text-foreground-strong text-sm">{label}</Label>
       <div className="flex items-center gap-2 flex-wrap">
         <input
           type="color"
@@ -88,7 +88,7 @@ function ColorPickerField({ label, testIdSuffix, value, hexInput, onNativeChange
           value={hexInput}
           onChange={(e) => onHexChange(e.target.value)}
           placeholder="#000000"
-          className="bg-white/5 border-white/10 text-white w-28"
+          className="bg-foreground/5 border-foreground/10 text-foreground-strong w-28"
           maxLength={7}
         />
         {bg && (
@@ -213,7 +213,7 @@ export default function AdminSiteConfig() {
   if (rawConfig === undefined) {
     return (
       <AdminLayout>
-        <div className="p-6 text-white/60">Carregando configurações...</div>
+        <div className="p-6 text-foreground-strong/60">Carregando configurações...</div>
       </AdminLayout>
     );
   }
@@ -221,11 +221,11 @@ export default function AdminSiteConfig() {
   return (
     <AdminLayout>
     <div className="p-6 space-y-8 max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold text-white">Site & Aparência</h1>
+      <h1 className="text-2xl font-bold text-foreground-strong">Site & Aparência</h1>
 
-      <Card className="bg-white/5 border-white/10">
+      <Card className="bg-foreground/5 border-foreground/10">
         <CardHeader>
-          <CardTitle className="text-white">Aparência</CardTitle>
+          <CardTitle className="text-foreground-strong">Aparência</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
@@ -267,9 +267,9 @@ export default function AdminSiteConfig() {
           </div>
 
           <div className="space-y-2">
-            <Label className="text-white">Fonte principal</Label>
+            <Label className="text-foreground-strong">Fonte principal</Label>
             <Select value={fontSans} onValueChange={setFontSans}>
-              <SelectTrigger data-testid="select-font-sans" className="bg-white/5 border-white/10 text-white">
+              <SelectTrigger data-testid="select-font-sans" className="bg-foreground/5 border-foreground/10 text-foreground-strong">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -281,9 +281,9 @@ export default function AdminSiteConfig() {
           </div>
 
           <div className="space-y-2">
-            <Label className="text-white">Fonte mono</Label>
+            <Label className="text-foreground-strong">Fonte mono</Label>
             <Select value={fontMono} onValueChange={setFontMono}>
-              <SelectTrigger data-testid="select-font-mono" className="bg-white/5 border-white/10 text-white">
+              <SelectTrigger data-testid="select-font-mono" className="bg-foreground/5 border-foreground/10 text-foreground-strong">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -305,15 +305,15 @@ export default function AdminSiteConfig() {
         </CardContent>
       </Card>
 
-      <Card className="bg-white/5 border-white/10">
+      <Card className="bg-foreground/5 border-foreground/10">
         <CardHeader>
-          <CardTitle className="text-white">SEO & Identidade</CardTitle>
+          <CardTitle className="text-foreground-strong">SEO & Identidade</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
-            <Label className="text-white">Imagem Open Graph</Label>
+            <Label className="text-foreground-strong">Imagem Open Graph</Label>
             {ogImageUrl && (
-              <img src={ogImageUrl} alt="OG Image preview" className="w-40 h-24 object-cover rounded border border-white/10" />
+              <img src={ogImageUrl} alt="OG Image preview" className="w-40 h-24 object-cover rounded border border-foreground/10" />
             )}
             <div className="flex items-center gap-3">
               <Button
@@ -323,7 +323,7 @@ export default function AdminSiteConfig() {
                 size="sm"
                 disabled={isUploadingOg}
                 onClick={() => ogFileInputRef.current?.click()}
-                className="border-white/20 text-white/80"
+                className="border-foreground/20 text-foreground-strong/80"
               >
                 <Upload className="w-4 h-4 mr-2" />
                 {isUploadingOg ? "Enviando..." : "Fazer upload"}
@@ -359,39 +359,39 @@ export default function AdminSiteConfig() {
           </div>
 
           <div className="space-y-2">
-            <Label className="text-white">Título padrão do site</Label>
+            <Label className="text-foreground-strong">Título padrão do site</Label>
             <Input
               data-testid="input-site-title"
               value={siteTitle}
               onChange={(e) => setSiteTitle(e.target.value)}
-              className="bg-white/5 border-white/10 text-white"
+              className="bg-foreground/5 border-foreground/10 text-foreground-strong"
             />
           </div>
 
           <div className="space-y-2">
-            <Label className="text-white">Descrição padrão</Label>
+            <Label className="text-foreground-strong">Descrição padrão</Label>
             <Textarea
               data-testid="textarea-site-description"
               value={siteDescription}
               onChange={(e) => setSiteDescription(e.target.value)}
-              className="bg-white/5 border-white/10 text-white"
+              className="bg-foreground/5 border-foreground/10 text-foreground-strong"
               rows={3}
             />
           </div>
 
           <div className="space-y-2">
-            <Label className="text-white">Twitter/X handle (sem @)</Label>
+            <Label className="text-foreground-strong">Twitter/X handle (sem @)</Label>
             <Input
               data-testid="input-twitter-handle"
               value={twitterHandle}
               onChange={(e) => setTwitterHandle(e.target.value)}
               placeholder="usuario"
-              className="bg-white/5 border-white/10 text-white"
+              className="bg-foreground/5 border-foreground/10 text-foreground-strong"
             />
           </div>
 
           <div className="space-y-2">
-            <Label className="text-white">Keywords</Label>
+            <Label className="text-foreground-strong">Keywords</Label>
             <div className="flex flex-wrap gap-2 mb-2">
               {keywords.map((kw) => (
                 <Badge key={kw} variant="secondary" className="flex items-center gap-1">
@@ -420,27 +420,27 @@ export default function AdminSiteConfig() {
                 }
               }}
               placeholder="Digite e pressione Enter"
-              className="bg-white/5 border-white/10 text-white"
+              className="bg-foreground/5 border-foreground/10 text-foreground-strong"
             />
           </div>
 
           <div className="space-y-2">
-            <Label className="text-white">Título da página Home (SEO)</Label>
+            <Label className="text-foreground-strong">Título da página Home (SEO)</Label>
             <Input
               data-testid="input-seo-home-title"
               value={seoHomeTitle}
               onChange={(e) => setSeoHomeTitle(e.target.value)}
-              className="bg-white/5 border-white/10 text-white"
+              className="bg-foreground/5 border-foreground/10 text-foreground-strong"
             />
           </div>
 
           <div className="space-y-2">
-            <Label className="text-white">Descrição da página Home (SEO)</Label>
+            <Label className="text-foreground-strong">Descrição da página Home (SEO)</Label>
             <Textarea
               data-testid="textarea-seo-home-description"
               value={seoHomeDescription}
               onChange={(e) => setSeoHomeDescription(e.target.value)}
-              className="bg-white/5 border-white/10 text-white"
+              className="bg-foreground/5 border-foreground/10 text-foreground-strong"
               rows={3}
             />
           </div>

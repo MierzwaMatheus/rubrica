@@ -50,9 +50,9 @@ export function ResumeExperienceDialog({ open, onOpenChange, onSave }: ResumeExp
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="bg-background border-white/10 max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="bg-background border-foreground/10 max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                    <DialogTitle className="text-white">Adicionar Experiência</DialogTitle>
+                    <DialogTitle className="text-foreground-strong">Adicionar Experiência</DialogTitle>
                     <VisuallyHidden>
                         <h2>Formulário de experiência</h2>
                     </VisuallyHidden>
@@ -60,20 +60,20 @@ export function ResumeExperienceDialog({ open, onOpenChange, onSave }: ResumeExp
                 <form onSubmit={handleSave} className="space-y-4 mt-4">
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label className="text-white">Cargo</Label>
-                            <Input name="role" className="bg-white/5 border-white/10 text-white" required />
+                            <Label className="text-foreground-strong">Cargo</Label>
+                            <Input name="role" className="bg-foreground/5 border-foreground/10 text-foreground-strong" required />
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-white">Empresa</Label>
-                            <Input name="company" className="bg-white/5 border-white/10 text-white" required />
+                            <Label className="text-foreground-strong">Empresa</Label>
+                            <Input name="company" className="bg-foreground/5 border-foreground/10 text-foreground-strong" required />
                         </div>
                     </div>
                     <div className="space-y-2">
-                        <Label className="text-white">Período</Label>
-                        <Input name="period" className="bg-white/5 border-white/10 text-white" required />
+                        <Label className="text-foreground-strong">Período</Label>
+                        <Input name="period" className="bg-foreground/5 border-foreground/10 text-foreground-strong" required />
                     </div>
                     <div className="space-y-2">
-                        <Label className="text-white">Descrição</Label>
+                        <Label className="text-foreground-strong">Descrição</Label>
                         <RichTextEditor
                             content={description}
                             onChange={setDescription}
@@ -81,7 +81,7 @@ export function ResumeExperienceDialog({ open, onOpenChange, onSave }: ResumeExp
                     </div>
 
                     <div className="flex justify-end gap-2 pt-4">
-                        <Button type="button" variant="ghost" onClick={() => onOpenChange(false)} className="text-gray-400">Cancelar</Button>
+                        <Button type="button" variant="ghost" onClick={() => onOpenChange(false)} className="text-foreground/65">Cancelar</Button>
                         <Button type="submit" className="bg-neon-purple hover:bg-neon-purple/90 text-white">Salvar</Button>
                     </div>
                 </form>

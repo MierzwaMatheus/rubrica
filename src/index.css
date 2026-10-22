@@ -13,6 +13,7 @@
      funcionam porque o Tailwind v4 usa color-mix() */
   --color-background: var(--bg);
   --color-foreground: var(--text);
+  --color-foreground-strong: var(--text-strong);
 
   --color-card: var(--surface);
   --color-card-foreground: var(--text);
@@ -74,6 +75,8 @@
   --subtle: color-mix(in srgb, var(--text) 1.4%, var(--bg));
   --line: color-mix(in srgb, var(--text) 8.5%, var(--bg));
   --text-muted: color-mix(in srgb, var(--text) 68%, var(--bg));
+  /* Títulos: o texto empurrado para longe do meio-tom (branco no tema escuro, quase preto no claro) */
+  --text-strong: hsl(from var(--text) h s calc(l + (l - 50) * 0.25));
 
   /* Fixas: não fazem parte do contrato */
   --on-primary: #ffffff;

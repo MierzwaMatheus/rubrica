@@ -293,7 +293,7 @@ export default function CheckoutPage() {
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="text-center">
           <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-neon-purple" />
-          <p className="text-gray-400">Carregando checkout...</p>
+          <p className="text-foreground/65">Carregando checkout...</p>
         </div>
       </div>
     );
@@ -302,11 +302,11 @@ export default function CheckoutPage() {
   if (!checkout) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="w-full max-w-md bg-card border-white/10">
+        <Card className="w-full max-w-md bg-card border-foreground/10">
           <CardContent className="p-6 text-center">
             <AlertCircle className="w-12 h-12 mx-auto mb-4 text-red-400" />
-            <h2 className="text-xl font-bold text-white mb-2">Checkout não encontrado</h2>
-            <p className="text-gray-400">O link de checkout é inválido ou expirou.</p>
+            <h2 className="text-xl font-bold text-foreground-strong mb-2">Checkout não encontrado</h2>
+            <p className="text-foreground/65">O link de checkout é inválido ou expirou.</p>
           </CardContent>
         </Card>
       </div>
@@ -316,13 +316,13 @@ export default function CheckoutPage() {
   if (checkout.status === 'completed' || checkout.status === 'paid') {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="w-full max-w-md bg-card border-white/10">
+        <Card className="w-full max-w-md bg-card border-foreground/10">
           <CardContent className="p-6 text-center">
             <Check className="w-16 h-16 mx-auto mb-4 text-green-400" />
-            <h2 className="text-2xl font-bold text-white mb-2">Pagamento Realizado!</h2>
-            <p className="text-gray-400 mb-4">Obrigado pelo pagamento.</p>
-            <div className="bg-white/5 rounded-lg p-4 mb-4">
-              <p className="text-sm text-gray-400">Valor pago</p>
+            <h2 className="text-2xl font-bold text-foreground-strong mb-2">Pagamento Realizado!</h2>
+            <p className="text-foreground/65 mb-4">Obrigado pelo pagamento.</p>
+            <div className="bg-foreground/5 rounded-lg p-4 mb-4">
+              <p className="text-sm text-foreground/65">Valor pago</p>
               <p className="text-2xl font-bold text-neon-purple">{formatCurrency(checkout.value)}</p>
             </div>
           </CardContent>
@@ -334,11 +334,11 @@ export default function CheckoutPage() {
   if (checkout.status === 'expired') {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="w-full max-w-md bg-card border-white/10">
+        <Card className="w-full max-w-md bg-card border-foreground/10">
           <CardContent className="p-6 text-center">
             <AlertCircle className="w-12 h-12 mx-auto mb-4 text-red-400" />
-            <h2 className="text-xl font-bold text-white mb-2">Checkout Expirado</h2>
-            <p className="text-gray-400">Este link de checkout expirou.</p>
+            <h2 className="text-xl font-bold text-foreground-strong mb-2">Checkout Expirado</h2>
+            <p className="text-foreground/65">Este link de checkout expirou.</p>
           </CardContent>
         </Card>
       </div>
@@ -354,67 +354,67 @@ export default function CheckoutPage() {
           transition={{ duration: 0.5 }}
         >
           <div className="mb-8 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">Checkout</h1>
-            <p className="text-gray-400">Confirme seus dados e escolha o método de pagamento</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-foreground-strong mb-2">Checkout</h1>
+            <p className="text-foreground/65">Confirme seus dados e escolha o método de pagamento</p>
           </div>
 
           <div className="grid gap-6 md:grid-cols-2">
             <div className="space-y-6">
-              <Card className="bg-card border-white/10">
+              <Card className="bg-card border-foreground/10">
                 <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
+                  <CardTitle className="text-foreground-strong flex items-center gap-2">
                     <Check className="w-5 h-5 text-green-400" />
                     Dados do Cliente
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
-                    <p className="text-sm text-gray-400">Nome</p>
-                    <p className="text-white font-medium">{checkout.customerName}</p>
+                    <p className="text-sm text-foreground/65">Nome</p>
+                    <p className="text-foreground-strong font-medium">{checkout.customerName}</p>
                   </div>
                   {checkout.customerEmail && (
                     <div>
-                      <p className="text-sm text-gray-400">E-mail</p>
-                      <p className="text-white font-medium">{checkout.customerEmail}</p>
+                      <p className="text-sm text-foreground/65">E-mail</p>
+                      <p className="text-foreground-strong font-medium">{checkout.customerEmail}</p>
                     </div>
                   )}
                   <div>
-                    <p className="text-sm text-gray-400">CPF/CNPJ</p>
-                    <p className="text-white font-medium">{formatCpfCnpj(checkout.customerCpfCnpj)}</p>
+                    <p className="text-sm text-foreground/65">CPF/CNPJ</p>
+                    <p className="text-foreground-strong font-medium">{formatCpfCnpj(checkout.customerCpfCnpj)}</p>
                   </div>
                   {checkout.customerMobilePhone && (
                     <div>
-                      <p className="text-sm text-gray-400">Celular</p>
-                      <p className="text-white font-medium">{formatPhone(checkout.customerMobilePhone)}</p>
+                      <p className="text-sm text-foreground/65">Celular</p>
+                      <p className="text-foreground-strong font-medium">{formatPhone(checkout.customerMobilePhone)}</p>
                     </div>
                   )}
                   {checkout.customerCompany && (
                     <div>
-                      <p className="text-sm text-gray-400">Empresa</p>
-                      <p className="text-white font-medium">{checkout.customerCompany}</p>
+                      <p className="text-sm text-foreground/65">Empresa</p>
+                      <p className="text-foreground-strong font-medium">{checkout.customerCompany}</p>
                     </div>
                   )}
                 </CardContent>
               </Card>
 
-              <Card className="bg-card border-white/10">
+              <Card className="bg-card border-foreground/10">
                 <CardHeader>
-                  <CardTitle className="text-white">Detalhes do Pagamento</CardTitle>
+                  <CardTitle className="text-foreground-strong">Detalhes do Pagamento</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {checkout.description && (
                     <div>
-                      <p className="text-sm text-gray-400">Descrição</p>
-                      <p className="text-white font-medium">{checkout.description}</p>
+                      <p className="text-sm text-foreground/65">Descrição</p>
+                      <p className="text-foreground-strong font-medium">{checkout.description}</p>
                     </div>
                   )}
                   <div>
-                    <p className="text-sm text-gray-400">Valor</p>
+                    <p className="text-sm text-foreground/65">Valor</p>
                     <p className="text-2xl font-bold text-neon-purple">{formatCurrency(checkout.value)}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-400">Data de Vencimento</p>
-                    <p className="text-white font-medium">
+                    <p className="text-sm text-foreground/65">Data de Vencimento</p>
+                    <p className="text-foreground-strong font-medium">
                       {new Date(checkout.dueDate).toLocaleDateString('pt-BR')}
                     </p>
                   </div>
@@ -423,9 +423,9 @@ export default function CheckoutPage() {
             </div>
 
             <div className="space-y-6">
-              <Card className="bg-card border-white/10">
+              <Card className="bg-card border-foreground/10">
                 <CardHeader>
-                  <CardTitle className="text-white">Método de Pagamento</CardTitle>
+                  <CardTitle className="text-foreground-strong">Método de Pagamento</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <button
@@ -433,14 +433,14 @@ export default function CheckoutPage() {
                     className={`w-full p-4 rounded-lg border-2 transition-all ${
                       selectedPaymentMethod === 'pix'
                         ? 'border-neon-purple bg-neon-purple/10'
-                        : 'border-white/10 hover:border-white/20 bg-white/5'
+                        : 'border-foreground/10 hover:border-foreground/20 bg-foreground/5'
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <QrCode className={`w-6 h-6 ${selectedPaymentMethod === 'pix' ? 'text-neon-purple' : 'text-gray-400'}`} />
+                      <QrCode className={`w-6 h-6 ${selectedPaymentMethod === 'pix' ? 'text-neon-purple' : 'text-foreground/65'}`} />
                       <div className="text-left">
-                        <p className="text-white font-medium">PIX</p>
-                        <p className="text-sm text-gray-400">Pagamento instantâneo via QR Code</p>
+                        <p className="text-foreground-strong font-medium">PIX</p>
+                        <p className="text-sm text-foreground/65">Pagamento instantâneo via QR Code</p>
                       </div>
                     </div>
                   </button>
@@ -450,14 +450,14 @@ export default function CheckoutPage() {
                     className={`w-full p-4 rounded-lg border-2 transition-all ${
                       selectedPaymentMethod === 'boleto'
                         ? 'border-neon-purple bg-neon-purple/10'
-                        : 'border-white/10 hover:border-white/20 bg-white/5'
+                        : 'border-foreground/10 hover:border-foreground/20 bg-foreground/5'
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <FileText className={`w-6 h-6 ${selectedPaymentMethod === 'boleto' ? 'text-neon-purple' : 'text-gray-400'}`} />
+                      <FileText className={`w-6 h-6 ${selectedPaymentMethod === 'boleto' ? 'text-neon-purple' : 'text-foreground/65'}`} />
                       <div className="text-left">
-                        <p className="text-white font-medium">Boleto</p>
-                        <p className="text-sm text-gray-400">Pagamento em até 3 dias úteis</p>
+                        <p className="text-foreground-strong font-medium">Boleto</p>
+                        <p className="text-sm text-foreground/65">Pagamento em até 3 dias úteis</p>
                       </div>
                     </div>
                   </button>
@@ -467,14 +467,14 @@ export default function CheckoutPage() {
                     className={`w-full p-4 rounded-lg border-2 transition-all ${
                       selectedPaymentMethod === 'credit_card'
                         ? 'border-neon-purple bg-neon-purple/10'
-                        : 'border-white/10 hover:border-white/20 bg-white/5'
+                        : 'border-foreground/10 hover:border-foreground/20 bg-foreground/5'
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <CreditCard className={`w-6 h-6 ${selectedPaymentMethod === 'credit_card' ? 'text-neon-purple' : 'text-gray-400'}`} />
+                      <CreditCard className={`w-6 h-6 ${selectedPaymentMethod === 'credit_card' ? 'text-neon-purple' : 'text-foreground/65'}`} />
                       <div className="text-left">
-                        <p className="text-white font-medium">Cartão de Crédito</p>
-                        <p className="text-sm text-gray-400">Parcele em até 12x</p>
+                        <p className="text-foreground-strong font-medium">Cartão de Crédito</p>
+                        <p className="text-sm text-foreground/65">Parcele em até 12x</p>
                       </div>
                     </div>
                   </button>
@@ -487,9 +487,9 @@ export default function CheckoutPage() {
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
                 >
-                  <Card className="bg-card border-white/10">
+                  <Card className="bg-card border-foreground/10">
                     <CardHeader>
-                      <CardTitle className="text-white">Parcelamento</CardTitle>
+                      <CardTitle className="text-foreground-strong">Parcelamento</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2 max-h-64 overflow-y-auto">
@@ -500,12 +500,12 @@ export default function CheckoutPage() {
                             className={`w-full p-3 rounded-lg border-2 transition-all text-left ${
                               selectedInstallment?.count === option.count
                                 ? 'border-neon-purple bg-neon-purple/10'
-                                : 'border-white/10 hover:border-white/20 bg-white/5'
+                                : 'border-foreground/10 hover:border-foreground/20 bg-foreground/5'
                             }`}
                           >
                             <div className="flex items-center justify-between">
                               <div>
-                                <p className="text-white font-medium">
+                                <p className="text-foreground-strong font-medium">
                                   {option.count}x de {formatCurrency(option.value)}
                                 </p>
                                 {option.isInterestFree ? (
@@ -513,7 +513,7 @@ export default function CheckoutPage() {
                                     Sem juros
                                   </Badge>
                                 ) : (
-                                  <p className="text-sm text-gray-400 mt-1">
+                                  <p className="text-sm text-foreground/65 mt-1">
                                     Total: {formatCurrency(option.totalValue)}
                                     <span className="text-red-400 ml-2">
                                       (+{option.interestRate}% + R$ 0,49)
@@ -531,39 +531,39 @@ export default function CheckoutPage() {
                     </CardContent>
                   </Card>
 
-                  <Card className="bg-card border-white/10 mt-4">
+                  <Card className="bg-card border-foreground/10 mt-4">
                     <CardHeader>
-                      <CardTitle className="text-white">Dados do Cartão</CardTitle>
+                      <CardTitle className="text-foreground-strong">Dados do Cartão</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div>
-                        <Label className="text-white">Nome Impresso no Cartão</Label>
+                        <Label className="text-foreground-strong">Nome Impresso no Cartão</Label>
                         <Input
                           value={creditCard.holderName}
                           onChange={(e) => setCreditCard({ ...creditCard, holderName: e.target.value })}
                           placeholder="Como está no cartão"
-                          className="mt-1 bg-white/5 border-white/10 text-white"
+                          className="mt-1 bg-foreground/5 border-foreground/10 text-foreground-strong"
                         />
                       </div>
 
                       <div>
-                        <Label className="text-white">Número do Cartão</Label>
+                        <Label className="text-foreground-strong">Número do Cartão</Label>
                         <Input
                           value={formatCardNumber(creditCard.number)}
                           onChange={(e) => setCreditCard({ ...creditCard, number: e.target.value.replace(/\D/g, '') })}
                           placeholder="0000 0000 0000 0000"
                           maxLength={19}
-                          className="mt-1 bg-white/5 border-white/10 text-white"
+                          className="mt-1 bg-foreground/5 border-foreground/10 text-foreground-strong"
                         />
                       </div>
 
                       <div className="grid grid-cols-3 gap-4">
                         <div>
-                          <Label className="text-white">Mês</Label>
+                          <Label className="text-foreground-strong">Mês</Label>
                           <select
                             value={creditCard.expiryMonth}
                             onChange={(e) => setCreditCard({ ...creditCard, expiryMonth: e.target.value })}
-                            className="w-full mt-1 p-2 rounded bg-gray-800 border border-gray-600 text-white"
+                            className="w-full mt-1 p-2 rounded bg-foreground/10 border border-foreground/25 text-foreground-strong"
                           >
                             <option value="">Mês</option>
                             {Array.from({ length: 12 }, (_, i) => (
@@ -575,11 +575,11 @@ export default function CheckoutPage() {
                         </div>
 
                         <div>
-                          <Label className="text-white">Ano</Label>
+                          <Label className="text-foreground-strong">Ano</Label>
                           <select
                             value={creditCard.expiryYear}
                             onChange={(e) => setCreditCard({ ...creditCard, expiryYear: e.target.value })}
-                            className="w-full mt-1 p-2 rounded bg-gray-800 border border-gray-600 text-white"
+                            className="w-full mt-1 p-2 rounded bg-foreground/10 border border-foreground/25 text-foreground-strong"
                           >
                             <option value="">Ano</option>
                             {Array.from({ length: 20 }, (_, i) => {
@@ -594,95 +594,95 @@ export default function CheckoutPage() {
                         </div>
 
                         <div>
-                          <Label className="text-white">CVV</Label>
+                          <Label className="text-foreground-strong">CVV</Label>
                           <Input
                             value={creditCard.ccv}
                             onChange={(e) => setCreditCard({ ...creditCard, ccv: e.target.value.replace(/\D/g, '') })}
                             placeholder="123"
                             maxLength={3}
-                            className="mt-1 bg-white/5 border-white/10 text-white"
+                            className="mt-1 bg-foreground/5 border-foreground/10 text-foreground-strong"
                           />
                         </div>
                       </div>
                     </CardContent>
                   </Card>
 
-                  <Card className="bg-card border-white/10 mt-4">
+                  <Card className="bg-card border-foreground/10 mt-4">
                     <CardHeader>
-                      <CardTitle className="text-white">Dados do Titular</CardTitle>
+                      <CardTitle className="text-foreground-strong">Dados do Titular</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div>
-                        <Label className="text-white">Nome Completo</Label>
+                        <Label className="text-foreground-strong">Nome Completo</Label>
                         <Input
                           value={creditCardHolderInfo.name}
                           onChange={(e) => setCreditCardHolderInfo({ ...creditCardHolderInfo, name: e.target.value })}
                           placeholder="Nome do titular"
-                          className="mt-1 bg-white/5 border-white/10 text-white"
+                          className="mt-1 bg-foreground/5 border-foreground/10 text-foreground-strong"
                         />
                       </div>
 
                       <div>
-                        <Label className="text-white">Email</Label>
+                        <Label className="text-foreground-strong">Email</Label>
                         <Input
                           type="email"
                           value={creditCardHolderInfo.email}
                           onChange={(e) => setCreditCardHolderInfo({ ...creditCardHolderInfo, email: e.target.value })}
                           placeholder="email@exemplo.com"
-                          className="mt-1 bg-white/5 border-white/10 text-white"
+                          className="mt-1 bg-foreground/5 border-foreground/10 text-foreground-strong"
                         />
                       </div>
 
                       <div>
-                        <Label className="text-white">CPF/CNPJ</Label>
+                        <Label className="text-foreground-strong">CPF/CNPJ</Label>
                         <Input
                           value={formatCPF(creditCardHolderInfo.cpfCnpj)}
                           onChange={(e) => setCreditCardHolderInfo({ ...creditCardHolderInfo, cpfCnpj: e.target.value })}
                           placeholder="000.000.000-00"
                           maxLength={18}
-                          className="mt-1 bg-white/5 border-white/10 text-white"
+                          className="mt-1 bg-foreground/5 border-foreground/10 text-foreground-strong"
                         />
                       </div>
 
                       <div>
-                        <Label className="text-white">CEP</Label>
+                        <Label className="text-foreground-strong">CEP</Label>
                         <Input
                           value={formatPostalCode(creditCardHolderInfo.postalCode)}
                           onChange={(e) => setCreditCardHolderInfo({ ...creditCardHolderInfo, postalCode: e.target.value })}
                           placeholder="00000-000"
                           maxLength={9}
-                          className="mt-1 bg-white/5 border-white/10 text-white"
+                          className="mt-1 bg-foreground/5 border-foreground/10 text-foreground-strong"
                         />
                       </div>
 
                       <div>
-                        <Label className="text-white">Endereço e Número</Label>
+                        <Label className="text-foreground-strong">Endereço e Número</Label>
                         <Input
                           value={creditCardHolderInfo.addressNumber}
                           onChange={(e) => setCreditCardHolderInfo({ ...creditCardHolderInfo, addressNumber: e.target.value })}
                           placeholder="Rua Exemplo, 123"
-                          className="mt-1 bg-white/5 border-white/10 text-white"
+                          className="mt-1 bg-foreground/5 border-foreground/10 text-foreground-strong"
                         />
                       </div>
 
                       <div>
-                        <Label className="text-white">Complemento (opcional)</Label>
+                        <Label className="text-foreground-strong">Complemento (opcional)</Label>
                         <Input
                           value={creditCardHolderInfo.addressComplement}
                           onChange={(e) => setCreditCardHolderInfo({ ...creditCardHolderInfo, addressComplement: e.target.value })}
                           placeholder="Apto 101"
-                          className="mt-1 bg-white/5 border-white/10 text-white"
+                          className="mt-1 bg-foreground/5 border-foreground/10 text-foreground-strong"
                         />
                       </div>
 
                       <div>
-                        <Label className="text-white">Telefone</Label>
+                        <Label className="text-foreground-strong">Telefone</Label>
                         <Input
                           value={formatPhone(creditCardHolderInfo.phone)}
                           onChange={(e) => setCreditCardHolderInfo({ ...creditCardHolderInfo, phone: e.target.value })}
                           placeholder="(11) 99999-9999"
                           maxLength={15}
-                          className="mt-1 bg-white/5 border-white/10 text-white"
+                          className="mt-1 bg-foreground/5 border-foreground/10 text-foreground-strong"
                         />
                       </div>
                     </CardContent>
@@ -706,9 +706,9 @@ export default function CheckoutPage() {
 
       {pixData && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
-          <Card className="w-full max-w-md bg-card border-white/10">
+          <Card className="w-full max-w-md bg-card border-foreground/10">
             <CardHeader>
-              <CardTitle className="text-white text-center">QR Code PIX</CardTitle>
+              <CardTitle className="text-foreground-strong text-center">QR Code PIX</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {pixData.encodedImage && (
@@ -722,9 +722,9 @@ export default function CheckoutPage() {
               )}
 
               <div>
-                <p className="text-sm text-gray-400 mb-2">Pix Copia e Cola:</p>
-                <div className="bg-white/5 rounded-lg p-3">
-                  <p className="text-xs text-white break-all font-mono">
+                <p className="text-sm text-foreground/65 mb-2">Pix Copia e Cola:</p>
+                <div className="bg-foreground/5 rounded-lg p-3">
+                  <p className="text-xs text-foreground-strong break-all font-mono">
                     {pixData.payload}
                   </p>
                 </div>
@@ -746,7 +746,7 @@ export default function CheckoutPage() {
                     {formatTimeRemaining()}
                   </p>
                 )}
-                <p className="text-sm text-gray-400 mt-1">
+                <p className="text-sm text-foreground/65 mt-1">
                   Tempo restante para pagamento
                 </p>
               </div>
@@ -754,7 +754,7 @@ export default function CheckoutPage() {
               <Button
                 onClick={() => setPixData(null)}
                 variant="outline"
-                className="w-full border-white/10"
+                className="w-full border-foreground/10"
               >
                 Fechar
               </Button>
@@ -765,15 +765,15 @@ export default function CheckoutPage() {
 
       {boletoData && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
-          <Card className="w-full max-w-md bg-card border-white/10">
+          <Card className="w-full max-w-md bg-card border-foreground/10">
             <CardHeader>
-              <CardTitle className="text-white text-center">Boleto Bancário</CardTitle>
+              <CardTitle className="text-foreground-strong text-center">Boleto Bancário</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <p className="text-sm text-gray-400 mb-2">Código de Barras:</p>
-                <div className="bg-white/5 rounded-lg p-3">
-                  <p className="text-sm text-white break-all font-mono">
+                <p className="text-sm text-foreground/65 mb-2">Código de Barras:</p>
+                <div className="bg-foreground/5 rounded-lg p-3">
+                  <p className="text-sm text-foreground-strong break-all font-mono">
                     {boletoData.barCode}
                   </p>
                 </div>
@@ -792,7 +792,7 @@ export default function CheckoutPage() {
               <Button
                 onClick={() => setBoletoData(null)}
                 variant="outline"
-                className="w-full border-white/10"
+                className="w-full border-foreground/10"
               >
                 Fechar
               </Button>
@@ -803,41 +803,41 @@ export default function CheckoutPage() {
 
       {showConfirmDialog && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
-          <Card className="w-full max-w-md bg-card border-white/10">
+          <Card className="w-full max-w-md bg-card border-foreground/10">
             <CardHeader>
-              <CardTitle className="text-white">Confirmar Pagamento</CardTitle>
+              <CardTitle className="text-foreground-strong">Confirmar Pagamento</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {selectedPaymentMethod === 'pix' && (
-                <div className="bg-white/5 rounded-lg p-4">
-                  <p className="text-gray-400 mb-2">Método selecionado:</p>
-                  <p className="text-white font-medium flex items-center gap-2">
+                <div className="bg-foreground/5 rounded-lg p-4">
+                  <p className="text-foreground/65 mb-2">Método selecionado:</p>
+                  <p className="text-foreground-strong font-medium flex items-center gap-2">
                     <QrCode className="w-5 h-5 text-neon-purple" />
                     PIX
                   </p>
-                  <p className="text-sm text-gray-400 mt-2">
+                  <p className="text-sm text-foreground/65 mt-2">
                     O QR Code PIX será gerado após a confirmação.
                   </p>
                 </div>
               )}
 
               {selectedPaymentMethod === 'boleto' && (
-                <div className="bg-white/5 rounded-lg p-4">
-                  <p className="text-gray-400 mb-2">Método selecionado:</p>
-                  <p className="text-white font-medium flex items-center gap-2">
+                <div className="bg-foreground/5 rounded-lg p-4">
+                  <p className="text-foreground/65 mb-2">Método selecionado:</p>
+                  <p className="text-foreground-strong font-medium flex items-center gap-2">
                     <FileText className="w-5 h-5 text-neon-purple" />
                     Boleto
                   </p>
-                  <p className="text-sm text-gray-400 mt-2">
+                  <p className="text-sm text-foreground/65 mt-2">
                     O boleto será gerado após a confirmação.
                   </p>
                 </div>
               )}
 
               {selectedPaymentMethod === 'credit_card' && selectedInstallment && (
-                <div className="bg-white/5 rounded-lg p-4">
-                  <p className="text-gray-400 mb-2">Método selecionado:</p>
-                  <p className="text-white font-medium flex items-center gap-2 mb-2">
+                <div className="bg-foreground/5 rounded-lg p-4">
+                  <p className="text-foreground/65 mb-2">Método selecionado:</p>
+                  <p className="text-foreground-strong font-medium flex items-center gap-2 mb-2">
                     <CreditCard className="w-5 h-5 text-neon-purple" />
                     Cartão de Crédito
                   </p>
@@ -845,15 +845,15 @@ export default function CheckoutPage() {
                     {selectedInstallment.count}x de {formatCurrency(selectedInstallment.value)}
                   </p>
                   {!selectedInstallment.isInterestFree && (
-                    <p className="text-sm text-gray-400 mt-1">
+                    <p className="text-sm text-foreground/65 mt-1">
                       Total: {formatCurrency(selectedInstallment.totalValue)}
                     </p>
                   )}
                 </div>
               )}
 
-              <div className="bg-white/5 rounded-lg p-4">
-                <p className="text-gray-400 mb-1">Valor a pagar:</p>
+              <div className="bg-foreground/5 rounded-lg p-4">
+                <p className="text-foreground/65 mb-1">Valor a pagar:</p>
                 <p className="text-2xl font-bold text-neon-purple">
                   {formatCurrency(
                     selectedPaymentMethod === 'credit_card' && selectedInstallment
@@ -868,7 +868,7 @@ export default function CheckoutPage() {
                   variant="outline"
                   onClick={() => setShowConfirmDialog(false)}
                   disabled={isProcessing}
-                  className="flex-1 border-white/10"
+                  className="flex-1 border-foreground/10"
                 >
                   Voltar
                 </Button>

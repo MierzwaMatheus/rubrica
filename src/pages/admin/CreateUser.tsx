@@ -112,16 +112,16 @@ export default function CreateUser() {
                         <div className="p-3 rounded-lg bg-neon-purple/10 text-neon-purple">
                             <UserPlus className="w-6 h-6" />
                         </div>
-                        <h1 className="text-3xl font-bold text-white">Gerenciar Usuários</h1>
+                        <h1 className="text-3xl font-bold text-foreground-strong">Gerenciar Usuários</h1>
                     </div>
-                    <p className="text-gray-400">
+                    <p className="text-foreground/65">
                         Adicione novos usuários ou gerencie o acesso de usuários existentes.
                     </p>
                 </header>
 
                 <div className="grid gap-8 md:grid-cols-2">
-                    <div className="bg-card border border-white/10 rounded-xl p-6 h-fit">
-                        <h2 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
+                    <div className="bg-card border border-foreground/10 rounded-xl p-6 h-fit">
+                        <h2 className="text-xl font-semibold text-foreground-strong mb-6 flex items-center gap-2">
                             <UserPlus className="w-5 h-5 text-neon-purple" />
                             Novo Usuário
                         </h2>
@@ -132,9 +132,9 @@ export default function CreateUser() {
                                     name="name"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-white">Nome</FormLabel>
+                                            <FormLabel className="text-foreground-strong">Nome</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="Nome do usuário" {...field} className="bg-background/50 border-white/10 text-white" />
+                                                <Input placeholder="Nome do usuário" {...field} className="bg-background/50 border-foreground/10 text-foreground-strong" />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -146,9 +146,9 @@ export default function CreateUser() {
                                     name="email"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-white">Email</FormLabel>
+                                            <FormLabel className="text-foreground-strong">Email</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="email@exemplo.com" {...field} className="bg-background/50 border-white/10 text-white" />
+                                                <Input placeholder="email@exemplo.com" {...field} className="bg-background/50 border-foreground/10 text-foreground-strong" />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -160,10 +160,10 @@ export default function CreateUser() {
                                     name="role"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-white">Função</FormLabel>
+                                            <FormLabel className="text-foreground-strong">Função</FormLabel>
                                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                 <FormControl>
-                                                    <SelectTrigger className="bg-background/50 border-white/10 text-white">
+                                                    <SelectTrigger className="bg-background/50 border-foreground/10 text-foreground-strong">
                                                         <SelectValue placeholder="Selecione uma função" />
                                                     </SelectTrigger>
                                                 </FormControl>
@@ -181,7 +181,7 @@ export default function CreateUser() {
                                     )}
                                 />
 
-                                <p className="text-xs text-gray-500">
+                                <p className="text-xs text-foreground/42">
                                     Uma senha temporária será gerada automaticamente. Repasse-a ao novo usuário.
                                 </p>
 
@@ -199,8 +199,8 @@ export default function CreateUser() {
                         </Form>
                     </div>
 
-                    <div className="bg-card border border-white/10 rounded-xl p-6">
-                        <h2 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
+                    <div className="bg-card border border-foreground/10 rounded-xl p-6">
+                        <h2 className="text-xl font-semibold text-foreground-strong mb-6 flex items-center gap-2">
                             <Users className="w-5 h-5 text-neon-purple" />
                             Usuários Ativos
                         </h2>
@@ -210,36 +210,36 @@ export default function CreateUser() {
                                 <Loader2 className="w-8 h-8 animate-spin text-neon-purple" />
                             </div>
                         ) : (
-                            <div className="rounded-md border border-white/10">
+                            <div className="rounded-md border border-foreground/10">
                                 <Table>
                                     <TableHeader>
-                                        <TableRow className="border-white/10 hover:bg-white/5">
-                                            <TableHead className="text-gray-400">Nome</TableHead>
-                                            <TableHead className="text-gray-400">Função</TableHead>
-                                            <TableHead className="text-gray-400">Data</TableHead>
-                                            <TableHead className="text-gray-400 w-[50px]"></TableHead>
+                                        <TableRow className="border-foreground/10 hover:bg-foreground/5">
+                                            <TableHead className="text-foreground/65">Nome</TableHead>
+                                            <TableHead className="text-foreground/65">Função</TableHead>
+                                            <TableHead className="text-foreground/65">Data</TableHead>
+                                            <TableHead className="text-foreground/65 w-[50px]"></TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
                                         {users.length === 0 ? (
                                             <TableRow>
-                                                <TableCell colSpan={4} className="text-center text-gray-400 py-8">
+                                                <TableCell colSpan={4} className="text-center text-foreground/65 py-8">
                                                     Nenhum usuário encontrado
                                                 </TableCell>
                                             </TableRow>
                                         ) : (
                                             users.map((user: any) => (
-                                                <TableRow key={user._id} className="border-white/10 hover:bg-white/5">
-                                                    <TableCell className="font-medium text-white">
+                                                <TableRow key={user._id} className="border-foreground/10 hover:bg-foreground/5">
+                                                    <TableCell className="font-medium text-foreground-strong">
                                                         <div>{user.name ?? user.email}</div>
-                                                        <div className="text-xs text-gray-400">{user.email}</div>
+                                                        <div className="text-xs text-foreground/65">{user.email}</div>
                                                     </TableCell>
                                                     <TableCell>
                                                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-neon-purple/10 text-neon-purple border border-neon-purple/20">
                                                             {user.role ?? '—'}
                                                         </span>
                                                     </TableCell>
-                                                    <TableCell className="text-gray-400 text-sm">
+                                                    <TableCell className="text-foreground/65 text-sm">
                                                         {user._creationTime ? format(new Date(user._creationTime), "dd/MM/yyyy", { locale: ptBR }) : '-'}
                                                     </TableCell>
                                                     <TableCell>
@@ -264,22 +264,22 @@ export default function CreateUser() {
             </div>
 
             <Dialog open={!!tempPassword} onOpenChange={(open) => { if (!open) setTempPassword(null); }}>
-                <DialogContent className="bg-card border border-white/10 text-white">
+                <DialogContent className="bg-card border border-foreground/10 text-foreground-strong">
                     <DialogHeader>
-                        <DialogTitle className="text-white">Usuário criado com sucesso</DialogTitle>
-                        <DialogDescription className="text-gray-400">
+                        <DialogTitle className="text-foreground-strong">Usuário criado com sucesso</DialogTitle>
+                        <DialogDescription className="text-foreground/65">
                             Repasse a senha temporária abaixo ao novo usuário. Ela não será exibida novamente.
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4">
                         <div className="flex items-center gap-2">
-                            <code className="flex-1 bg-background/60 border border-white/10 rounded-md px-4 py-3 font-mono text-lg tracking-widest text-neon-purple">
+                            <code className="flex-1 bg-background/60 border border-foreground/10 rounded-md px-4 py-3 font-mono text-lg tracking-widest text-neon-purple">
                                 {tempPassword}
                             </code>
                             <Button
                                 variant="outline"
                                 size="icon"
-                                className="border-white/10 text-white hover:bg-white/10 shrink-0"
+                                className="border-foreground/10 text-foreground-strong hover:bg-foreground/10 shrink-0"
                                 onClick={handleCopy}
                             >
                                 {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}

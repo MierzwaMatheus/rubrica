@@ -34,7 +34,7 @@ const STATUS_COLORS: Record<Status, string> = {
   contacted: "bg-blue-900/30 text-blue-400 border-blue-800",
   in_progress: "bg-purple-900/30 text-purple-400 border-purple-800",
   closed: "bg-green-900/30 text-green-400 border-green-800",
-  archived: "bg-gray-900/30 text-gray-400 border-gray-800",
+  archived: "bg-gray-900/30 text-foreground/65 border-gray-800",
 };
 
 const TYPE_LABELS: Record<FlowType, string> = {
@@ -139,8 +139,8 @@ export default function AdminContactRequests() {
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-white">Contatos</h1>
-            <p className="text-sm text-gray-400 mt-1">Solicitações recebidas pelo wizard de contato</p>
+            <h1 className="text-2xl font-bold text-foreground-strong">Contatos</h1>
+            <p className="text-sm text-foreground/65 mt-1">Solicitações recebidas pelo wizard de contato</p>
           </div>
           <div className="flex items-center gap-4">
             {/* Kill switch */}
@@ -160,7 +160,7 @@ export default function AdminContactRequests() {
             </div>
           <div className="flex gap-2">
             <Select value={statusFilter ?? "all"} onValueChange={(v) => setStatusFilter(v === "all" ? undefined : v)}>
-              <SelectTrigger className="w-36 bg-white/5 border-white/10 text-white text-xs">
+              <SelectTrigger className="w-36 bg-foreground/5 border-foreground/10 text-foreground-strong text-xs">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
@@ -171,7 +171,7 @@ export default function AdminContactRequests() {
               </SelectContent>
             </Select>
             <Select value={typeFilter ?? "all"} onValueChange={(v) => setTypeFilter(v === "all" ? undefined : v)}>
-              <SelectTrigger className="w-36 bg-white/5 border-white/10 text-white text-xs">
+              <SelectTrigger className="w-36 bg-foreground/5 border-foreground/10 text-foreground-strong text-xs">
                 <SelectValue placeholder="Tipo" />
               </SelectTrigger>
               <SelectContent>
@@ -185,51 +185,51 @@ export default function AdminContactRequests() {
           </div>
         </div>
 
-        <div className="rounded-md border border-white/10 overflow-hidden">
+        <div className="rounded-md border border-foreground/10 overflow-hidden">
           <Table>
             <TableHeader>
-              <TableRow className="border-white/10 hover:bg-transparent">
-                <TableHead className="text-gray-400 text-xs">Data</TableHead>
-                <TableHead className="text-gray-400 text-xs">Tipo</TableHead>
-                <TableHead className="text-gray-400 text-xs">Nome</TableHead>
-                <TableHead className="text-gray-400 text-xs hidden sm:table-cell">Email</TableHead>
-                <TableHead className="text-gray-400 text-xs hidden md:table-cell">Origem</TableHead>
-                <TableHead className="text-gray-400 text-xs">Status</TableHead>
+              <TableRow className="border-foreground/10 hover:bg-transparent">
+                <TableHead className="text-foreground/65 text-xs">Data</TableHead>
+                <TableHead className="text-foreground/65 text-xs">Tipo</TableHead>
+                <TableHead className="text-foreground/65 text-xs">Nome</TableHead>
+                <TableHead className="text-foreground/65 text-xs hidden sm:table-cell">Email</TableHead>
+                <TableHead className="text-foreground/65 text-xs hidden md:table-cell">Origem</TableHead>
+                <TableHead className="text-foreground/65 text-xs">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {requests === undefined && (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-gray-500 py-8">Carregando...</TableCell>
+                  <TableCell colSpan={6} className="text-center text-foreground/42 py-8">Carregando...</TableCell>
                 </TableRow>
               )}
               {requests?.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-gray-500 py-8">Nenhuma solicitação encontrada</TableCell>
+                  <TableCell colSpan={6} className="text-center text-foreground/42 py-8">Nenhuma solicitação encontrada</TableCell>
                 </TableRow>
               )}
               {requests?.map((req) => (
                 <TableRow
                   key={req._id}
-                  className="border-white/5 hover:bg-white/5 cursor-pointer"
+                  className="border-foreground/5 hover:bg-foreground/5 cursor-pointer"
                   onClick={() => { setNote(req.adminNotes ?? ""); handleOpen(req._id); }}
                 >
-                  <TableCell className="text-xs text-gray-400 whitespace-nowrap">
+                  <TableCell className="text-xs text-foreground/65 whitespace-nowrap">
                     {format(new Date(req.createdAt), "dd/MM/yy HH:mm", { locale: ptBR })}
                   </TableCell>
-                  <TableCell className="text-xs text-white">
+                  <TableCell className="text-xs text-foreground-strong">
                     {TYPE_LABELS[req.type as FlowType] ?? req.type}
                   </TableCell>
-                  <TableCell className="text-xs text-white font-medium">
+                  <TableCell className="text-xs text-foreground-strong font-medium">
                     {req.contactInfo.name}
                     {req.status === "new" && (
                       <span className="ml-2 inline-block h-2 w-2 rounded-full bg-red-500" />
                     )}
                   </TableCell>
-                  <TableCell className="text-xs text-gray-400 hidden sm:table-cell">
+                  <TableCell className="text-xs text-foreground/65 hidden sm:table-cell">
                     {req.contactInfo.email}
                   </TableCell>
-                  <TableCell className="text-xs text-gray-500 hidden md:table-cell">
+                  <TableCell className="text-xs text-foreground/42 hidden md:table-cell">
                     {req.sourceContext ?? "—"}
                   </TableCell>
                   <TableCell>
@@ -246,14 +246,14 @@ export default function AdminContactRequests() {
 
       {/* Detail Sheet */}
       <Sheet open={!!selectedId} onOpenChange={(open) => { if (!open) setSelectedId(null); }}>
-        <SheetContent className="w-full sm:max-w-lg bg-background border-l border-white/10 overflow-y-auto p-6">
+        <SheetContent className="w-full sm:max-w-lg bg-background border-l border-foreground/10 overflow-y-auto p-6">
           {selected && (
             <>
               <SheetHeader className="mb-6">
-                <SheetTitle className="text-white font-mono text-sm">
+                <SheetTitle className="text-foreground-strong font-mono text-sm">
                   {TYPE_LABELS[selected.type as FlowType] ?? selected.type}
                 </SheetTitle>
-                <p className="text-xs text-gray-400">
+                <p className="text-xs text-foreground/65">
                   {format(new Date(selected.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
                 </p>
               </SheetHeader>
@@ -263,11 +263,11 @@ export default function AdminContactRequests() {
                 <section>
                   <h3 className="text-xs font-mono text-neon-lime uppercase tracking-wider mb-3">Contato</h3>
                   <div className="space-y-1.5 text-sm">
-                    <div><span className="text-gray-500">Nome: </span><span className="text-white">{selected.contactInfo.name}</span></div>
-                    <div><span className="text-gray-500">Email: </span><a href={`mailto:${selected.contactInfo.email}`} className="text-neon-lime hover:underline">{selected.contactInfo.email}</a></div>
-                    {selected.contactInfo.phone && <div><span className="text-gray-500">Telefone: </span><span className="text-white">{selected.contactInfo.phone}</span></div>}
-                    {selected.contactInfo.linkedin && <div><span className="text-gray-500">LinkedIn: </span><a href={selected.contactInfo.linkedin.startsWith("http") ? selected.contactInfo.linkedin : `https://${selected.contactInfo.linkedin}`} target="_blank" rel="noopener noreferrer" className="text-neon-lime hover:underline">{selected.contactInfo.linkedin}</a></div>}
-                    {selected.contactInfo.company && <div><span className="text-gray-500">Empresa: </span><span className="text-white">{selected.contactInfo.company}</span></div>}
+                    <div><span className="text-foreground/42">Nome: </span><span className="text-foreground-strong">{selected.contactInfo.name}</span></div>
+                    <div><span className="text-foreground/42">Email: </span><a href={`mailto:${selected.contactInfo.email}`} className="text-neon-lime hover:underline">{selected.contactInfo.email}</a></div>
+                    {selected.contactInfo.phone && <div><span className="text-foreground/42">Telefone: </span><span className="text-foreground-strong">{selected.contactInfo.phone}</span></div>}
+                    {selected.contactInfo.linkedin && <div><span className="text-foreground/42">LinkedIn: </span><a href={selected.contactInfo.linkedin.startsWith("http") ? selected.contactInfo.linkedin : `https://${selected.contactInfo.linkedin}`} target="_blank" rel="noopener noreferrer" className="text-neon-lime hover:underline">{selected.contactInfo.linkedin}</a></div>}
+                    {selected.contactInfo.company && <div><span className="text-foreground/42">Empresa: </span><span className="text-foreground-strong">{selected.contactInfo.company}</span></div>}
                   </div>
                 </section>
 
@@ -277,8 +277,8 @@ export default function AdminContactRequests() {
                   <div className="space-y-2 font-mono text-xs">
                     {Object.entries(selected.answers as Record<string, string> ?? {}).map(([k, v]) => (
                       <div key={k} className="flex gap-2">
-                        <span className="text-gray-500 shrink-0">{ANSWER_KEYS[selected.type as FlowType]?.[k] ?? k}:</span>
-                        <span className="text-white">{resolveValue(k, v)}</span>
+                        <span className="text-foreground/42 shrink-0">{ANSWER_KEYS[selected.type as FlowType]?.[k] ?? k}:</span>
+                        <span className="text-foreground-strong">{resolveValue(k, v)}</span>
                       </div>
                     ))}
                   </div>
@@ -288,7 +288,7 @@ export default function AdminContactRequests() {
                 {selected.sourceContext && (
                   <section>
                     <h3 className="text-xs font-mono text-neon-lime uppercase tracking-wider mb-2">Origem</h3>
-                    <span className="text-sm text-gray-300 font-mono">{selected.sourceContext}</span>
+                    <span className="text-sm text-foreground/90 font-mono">{selected.sourceContext}</span>
                   </section>
                 )}
 
@@ -296,7 +296,7 @@ export default function AdminContactRequests() {
                 <section>
                   <h3 className="text-xs font-mono text-neon-lime uppercase tracking-wider mb-3">Status</h3>
                   <Select value={selected.status} onValueChange={handleStatusChange}>
-                    <SelectTrigger className="bg-white/5 border-white/10 text-white text-xs">
+                    <SelectTrigger className="bg-foreground/5 border-foreground/10 text-foreground-strong text-xs">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -315,7 +315,7 @@ export default function AdminContactRequests() {
                     onChange={(e) => setNote(e.target.value)}
                     placeholder="Adicione uma nota..."
                     rows={4}
-                    className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 text-sm resize-none"
+                    className="bg-foreground/5 border-foreground/10 text-foreground-strong placeholder:text-foreground/25 text-sm resize-none"
                   />
                   <Button
                     size="sm"

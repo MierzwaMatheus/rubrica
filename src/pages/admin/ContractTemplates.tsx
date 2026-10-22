@@ -151,8 +151,8 @@ export default function ContractTemplates() {
       <div className="pt-20 md:pt-8 px-4 md:px-8 max-w-5xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-white">Templates de Contrato</h1>
-            <p className="text-gray-400 text-sm mt-1">
+            <h1 className="text-2xl font-bold text-foreground-strong">Templates de Contrato</h1>
+            <p className="text-foreground/65 text-sm mt-1">
               Gerencie os templates usados na geração de contratos PDF
             </p>
           </div>
@@ -166,12 +166,12 @@ export default function ContractTemplates() {
         </div>
 
         {isLoading ? (
-          <div className="flex items-center justify-center py-16 text-gray-400">
+          <div className="flex items-center justify-center py-16 text-foreground/65">
             <Loader2 className="w-6 h-6 animate-spin mr-2" />
             Carregando templates...
           </div>
         ) : templates.length === 0 ? (
-          <div className="text-center py-16 text-gray-400">
+          <div className="text-center py-16 text-foreground/65">
             <p className="mb-4">Nenhum template cadastrado.</p>
             <Button variant="outline" onClick={openCreate}>
               <Plus className="w-4 h-4 mr-2" />
@@ -179,26 +179,26 @@ export default function ContractTemplates() {
             </Button>
           </div>
         ) : (
-          <div className="rounded-md border border-white/10 overflow-hidden">
+          <div className="rounded-md border border-foreground/10 overflow-hidden">
             <Table>
-              <TableHeader className="bg-white/5">
-                <TableRow className="border-white/10 hover:bg-white/5">
-                  <TableHead className="text-gray-300">Nome</TableHead>
-                  <TableHead className="text-gray-300">Descrição</TableHead>
-                  <TableHead className="text-gray-300 w-28">Status</TableHead>
-                  <TableHead className="text-gray-300 text-right w-48">Ações</TableHead>
+              <TableHeader className="bg-foreground/5">
+                <TableRow className="border-foreground/10 hover:bg-foreground/5">
+                  <TableHead className="text-foreground/90">Nome</TableHead>
+                  <TableHead className="text-foreground/90">Descrição</TableHead>
+                  <TableHead className="text-foreground/90 w-28">Status</TableHead>
+                  <TableHead className="text-foreground/90 text-right w-48">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {templates.map((template) => (
                   <TableRow
                     key={template._id}
-                    className="border-white/10 hover:bg-white/5"
+                    className="border-foreground/10 hover:bg-foreground/5"
                   >
-                    <TableCell className="font-medium text-white">
+                    <TableCell className="font-medium text-foreground-strong">
                       {template.name}
                     </TableCell>
-                    <TableCell className="text-gray-400 max-w-xs truncate">
+                    <TableCell className="text-foreground/65 max-w-xs truncate">
                       {template.description ?? "—"}
                     </TableCell>
                     <TableCell>
@@ -215,7 +215,7 @@ export default function ContractTemplates() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-8 text-xs text-gray-400 hover:text-white hover:bg-white/10"
+                            className="h-8 text-xs text-foreground/65 hover:text-foreground-strong hover:bg-foreground/10"
                             onClick={() => handleSetDefault(template)}
                           >
                             <Star className="w-3 h-3 mr-1" />
@@ -225,7 +225,7 @@ export default function ContractTemplates() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 text-gray-400 hover:text-white hover:bg-white/10"
+                          className="h-8 w-8 text-foreground/65 hover:text-foreground-strong hover:bg-foreground/10"
                           onClick={() => openEdit(template)}
                         >
                           <Pencil className="h-4 w-4" />
@@ -250,8 +250,8 @@ export default function ContractTemplates() {
 
       {/* Modal de criar/editar */}
       <Dialog open={modalOpen} onOpenChange={(open) => { if (!open) closeModal(); }}>
-        <DialogContent className="bg-card border-white/10 max-w-[92vw] xl:max-w-6xl w-full h-[90vh] flex flex-col text-white p-0 overflow-hidden">
-          <DialogHeader className="px-6 pt-6 pb-4 border-b border-white/10 shrink-0">
+        <DialogContent className="bg-card border-foreground/10 max-w-[92vw] xl:max-w-6xl w-full h-[90vh] flex flex-col text-foreground-strong p-0 overflow-hidden">
+          <DialogHeader className="px-6 pt-6 pb-4 border-b border-foreground/10 shrink-0">
             <DialogTitle className="text-xl font-bold">
               {isEditing ? "Editar Template" : "Novo Template"}
             </DialogTitle>
@@ -262,7 +262,7 @@ export default function ContractTemplates() {
 
           <div className="space-y-4 py-4 px-6 shrink-0">
             <div className="space-y-2">
-              <Label htmlFor="template-name" className="text-gray-300">
+              <Label htmlFor="template-name" className="text-foreground/90">
                 Nome <span className="text-red-400">*</span>
               </Label>
               <Input
@@ -270,20 +270,20 @@ export default function ContractTemplates() {
                 value={form.name}
                 onChange={(e) => setForm(f => ({ ...f, name: e.target.value }))}
                 placeholder="Ex: Contrato Padrão de Prestação de Serviços"
-                className="bg-white/5 border-white/10 text-white placeholder:text-gray-500"
+                className="bg-foreground/5 border-foreground/10 text-foreground-strong placeholder:text-foreground/42"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="template-description" className="text-gray-300">
-                Descrição <span className="text-gray-500 font-normal text-xs">(opcional)</span>
+              <Label htmlFor="template-description" className="text-foreground/90">
+                Descrição <span className="text-foreground/42 font-normal text-xs">(opcional)</span>
               </Label>
               <Input
                 id="template-description"
                 value={form.description}
                 onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
                 placeholder="Breve descrição do uso deste template"
-                className="bg-white/5 border-white/10 text-white placeholder:text-gray-500"
+                className="bg-foreground/5 border-foreground/10 text-foreground-strong placeholder:text-foreground/42"
               />
             </div>
           </div>
@@ -296,7 +296,7 @@ export default function ContractTemplates() {
             />
           </div>
 
-          <div className="border-t border-white/10 px-6 py-4 mt-auto flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 gap-2 bg-card">
+          <div className="border-t border-foreground/10 px-6 py-4 mt-auto flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 gap-2 bg-card">
             <Button variant="ghost" onClick={closeModal} disabled={isSaving}>
               Cancelar
             </Button>

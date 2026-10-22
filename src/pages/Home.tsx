@@ -91,15 +91,15 @@ export default function Home() {
               <AvailabilityBadge label={availability.label} />
             )}
 
-            <div className="inline-flex items-center px-4 py-1.5 mb-6 bg-white/5 border border-white/10 rounded-full backdrop-blur-sm">
+            <div className="inline-flex items-center px-4 py-1.5 mb-6 bg-foreground/5 border border-foreground/10 rounded-full backdrop-blur-sm">
               <Terminal className="w-3 h-3 text-neon-purple mr-2" />
               <p className="text-sm font-medium text-neon-purple font-mono">
-                <span className="text-white mr-2">$</span>
+                <span className="text-foreground-strong mr-2">$</span>
                 {t("home.greeting")}
               </p>
             </div>
 
-            <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-white leading-tight tracking-tight mb-4">
+            <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-foreground-strong leading-tight tracking-tight mb-4">
               <span className="text-neon-purple">{t("home.title")}</span> <br />
               <span className="relative inline-block">
                 {ownerFirstName}
@@ -107,10 +107,10 @@ export default function Home() {
               </span>
             </h1>
 
-            <div className="inline-flex items-center mt-6 px-4 py-1.5 mb-6 bg-white/5 border border-white/10 rounded-full backdrop-blur-sm">
+            <div className="inline-flex items-center mt-6 px-4 py-1.5 mb-6 bg-foreground/5 border border-foreground/10 rounded-full backdrop-blur-sm">
               <Terminal className="w-3 h-3 text-neon-purple mr-2" />
               <p className="text-sm font-medium text-neon-purple font-mono">
-                <span className="text-white mr-2">$</span>
+                <span className="text-foreground-strong mr-2">$</span>
                 cat role.txt
               </p>
             </div>
@@ -119,7 +119,7 @@ export default function Home() {
               {displayContactRole}
             </h2>
 
-            <p className="max-w-2xl mt-8 text-gray-300 text-lg leading-relaxed border-l-2 border-neon-purple/50 pl-6">
+            <p className="max-w-2xl mt-8 text-foreground/90 text-lg leading-relaxed border-l-2 border-neon-purple/50 pl-6">
               {t("home.hero.description")}
             </p>
           </div>
@@ -129,12 +129,12 @@ export default function Home() {
               (tech: { name: string; color: string }) => (
                 <div
                   key={tech.name}
-                  className="flex items-center px-5 py-2.5 rounded-lg bg-white/5 border border-white/10 hover:border-white/20 transition-colors group cursor-default"
+                  className="flex items-center px-5 py-2.5 rounded-lg bg-foreground/5 border border-foreground/10 hover:border-foreground/20 transition-colors group cursor-default"
                 >
                   <span
                     className={`inline-block w-2 h-2 rounded-full ${tech.color} mr-3 shadow-[0_0_8px_rgba(255,255,255,0.3)] group-hover:scale-125 transition-transform`}
                   ></span>
-                  <span className="text-sm font-medium text-gray-200">
+                  <span className="text-sm font-medium text-foreground">
                     {tech.name}
                   </span>
                 </div>
@@ -145,18 +145,18 @@ export default function Home() {
 
         {/* About Section */}
         <motion.section variants={item}>
-          <h2 className="text-2xl font-bold text-white mb-8 flex items-center font-mono">
+          <h2 className="text-2xl font-bold text-foreground-strong mb-8 flex items-center font-mono">
             <span className="text-neon-purple mr-2">/*</span>{" "}
             {t("home.about.title")}{" "}
             <span className="text-neon-purple ml-2">*/</span>
           </h2>
 
-          <div className="rounded-xl border border-white/10 bg-card/50 backdrop-blur-sm p-8 relative overflow-hidden group">
+          <div className="rounded-xl border border-foreground/10 bg-card/50 backdrop-blur-sm p-8 relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
               <Code className="w-24 h-24 text-neon-purple" />
             </div>
 
-            <div className="relative z-10 space-y-6 text-gray-300 leading-relaxed text-lg">
+            <div className="relative z-10 space-y-6 text-foreground/90 leading-relaxed text-lg">
               {isLoading ? (
                 <p className="whitespace-pre-wrap text-neon-lime font-mono">
                   {matrixAboutText}
@@ -184,9 +184,9 @@ export default function Home() {
               return (
                 <div
                   key={skill.id || idx}
-                  className={`bg-gradient-to-br from-[#1e1e1e] to-[#121212] p-8 rounded-xl border border-white/5 hover:border-neon-purple/30 transition-all duration-300 group hover:-translate-y-1 ${shouldSpanFull ? "md:col-span-2" : ""}`}
+                  className={`bg-gradient-to-br from-foreground/5 to-background p-8 rounded-xl border border-foreground/5 hover:border-neon-purple/30 transition-all duration-300 group hover:-translate-y-1 ${shouldSpanFull ? "md:col-span-2" : ""}`}
                 >
-                  <div className="mb-4 p-3 bg-white/5 rounded-lg w-fit group-hover:bg-neon-purple/10 transition-colors">
+                  <div className="mb-4 p-3 bg-foreground/5 rounded-lg w-fit group-hover:bg-neon-purple/10 transition-colors">
                     <Icon className="w-6 h-6 text-neon-lime" />
                   </div>
                   {isLoading ? (
@@ -203,10 +203,10 @@ export default function Home() {
                     </>
                   ) : (
                     <>
-                      <h3 className="font-bold text-lg text-neon-lime mb-3 group-hover:text-white transition-colors">
+                      <h3 className="font-bold text-lg text-neon-lime mb-3 group-hover:text-foreground-strong transition-colors">
                         {skill.title}
                       </h3>
-                      <p className="text-sm text-gray-400 leading-relaxed">
+                      <p className="text-sm text-foreground/65 leading-relaxed">
                         {skill.description}
                       </p>
                     </>
@@ -219,7 +219,7 @@ export default function Home() {
 
         {/* Testimonials */}
         <motion.section variants={item}>
-          <h3 className="text-xl font-bold text-white mb-8 flex items-center">
+          <h3 className="text-xl font-bold text-foreground-strong mb-8 flex items-center">
             <MessageSquare className="w-5 h-5 text-neon-purple mr-3" />
             {t("home.testimonials.title")}
           </h3>
@@ -228,11 +228,11 @@ export default function Home() {
             {testimonials.map((testimonial, idx) => (
               <div
                 key={testimonial.id || idx}
-                className="bg-gradient-to-br from-[#1e1e1e] to-[#121212] p-6 rounded-xl border border-white/5 relative"
+                className="bg-gradient-to-br from-foreground/5 to-background p-6 rounded-xl border border-foreground/5 relative"
               >
-                <Quote className="absolute top-6 right-6 w-8 h-8 text-white/5" />
+                <Quote className="absolute top-6 right-6 w-8 h-8 text-foreground-strong/5" />
                 <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 rounded-full overflow-hidden border border-white/10 mr-4">
+                  <div className="w-12 h-12 rounded-full overflow-hidden border border-foreground/10 mr-4">
                     <img
                       src={testimonial.image_url}
                       alt={testimonial.name}
@@ -240,7 +240,7 @@ export default function Home() {
                     />
                   </div>
                   <div>
-                    <p className="font-semibold text-white">
+                    <p className="font-semibold text-foreground-strong">
                       {testimonial.name}
                     </p>
                     <p className="text-xs text-neon-purple">
@@ -253,7 +253,7 @@ export default function Home() {
                     {matrixTestimonialText}
                   </p>
                 ) : (
-                  <p className="text-gray-400 text-sm italic leading-relaxed">
+                  <p className="text-foreground/65 text-sm italic leading-relaxed">
                     "{testimonial.text}"
                   </p>
                 )}
@@ -265,7 +265,7 @@ export default function Home() {
             <div className="text-center mt-8 flex flex-col items-center gap-3">
               <Link
                 href="/depoimentos"
-                className="text-sm text-gray-500 hover:text-gray-300 transition-colors underline underline-offset-4"
+                className="text-sm text-foreground/42 hover:text-foreground/90 transition-colors underline underline-offset-4"
               >
                 Ver todos os depoimentos →
               </Link>

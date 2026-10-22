@@ -34,7 +34,7 @@ export default function PaymentSuccessPage() {
   if (isLoading) {
     return (
       <div className="min-h-screenflex items-center justify-center">
-        <div className="text-white text-xl">Carregando...</div>
+        <div className="text-foreground-strong text-xl">Carregando...</div>
       </div>
     );
   }
@@ -51,7 +51,7 @@ export default function PaymentSuccessPage() {
         transition={{ duration: 0.5 }}
         className="w-full max-w-2xl"
       >
-        <Card className="bg-card border-white/10">
+        <Card className="bg-card border-foreground/10">
           <CardHeader className="text-center pb-8">
             <motion.div
               initial={{ scale: 0 }}
@@ -63,19 +63,19 @@ export default function PaymentSuccessPage() {
                 <Check className="w-16 h-16 text-green-500" />
               </div>
             </motion.div>
-            <CardTitle className="text-3xl text-white">Pagamento Realizado com Sucesso!</CardTitle>
-            <p className="text-gray-400 mt-2">Obrigado pela sua compra</p>
+            <CardTitle className="text-3xl text-foreground-strong">Pagamento Realizado com Sucesso!</CardTitle>
+            <p className="text-foreground/65 mt-2">Obrigado pela sua compra</p>
           </CardHeader>
 
           <CardContent className="space-y-6">
-            <div className="bg-white/5 rounded-lg p-6 space-y-4">
+            <div className="bg-foreground/5 rounded-lg p-6 space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-gray-400">Descrição:</span>
-                <span className="text-white font-medium">{checkout.description || 'Pagamento'}</span>
+                <span className="text-foreground/65">Descrição:</span>
+                <span className="text-foreground-strong font-medium">{checkout.description || 'Pagamento'}</span>
               </div>
 
               <div className="flex justify-between items-center">
-                <span className="text-gray-400">Valor Total:</span>
+                <span className="text-foreground/65">Valor Total:</span>
                 <span className="text-2xl font-bold text-neon-purple">
                   {formatCurrency(((checkout as any).totalValue as number | undefined) ?? checkout.value ?? 0)}
                 </span>
@@ -83,8 +83,8 @@ export default function PaymentSuccessPage() {
 
               {(checkout as any).paymentMethod && (
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Método de Pagamento:</span>
-                  <span className="text-white font-medium capitalize">
+                  <span className="text-foreground/65">Método de Pagamento:</span>
+                  <span className="text-foreground-strong font-medium capitalize">
                     {(checkout as any).paymentMethod === 'pix' ? 'PIX' :
                      (checkout as any).paymentMethod === 'boleto' ? 'Boleto' :
                      (checkout as any).paymentMethod === 'credit_card' ? 'Cartão de Crédito' :
@@ -95,8 +95,8 @@ export default function PaymentSuccessPage() {
 
               {(checkout as any).installmentCount && (checkout as any).installmentCount > 1 && (
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Parcelamento:</span>
-                  <span className="text-white font-medium">
+                  <span className="text-foreground/65">Parcelamento:</span>
+                  <span className="text-foreground-strong font-medium">
                     {(checkout as any).installmentCount}x de {formatCurrency((checkout as any).installmentValue || 0)}
                   </span>
                 </div>
@@ -104,8 +104,8 @@ export default function PaymentSuccessPage() {
 
               {checkout.dueDate && (
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Data:</span>
-                  <span className="text-white font-medium">
+                  <span className="text-foreground/65">Data:</span>
+                  <span className="text-foreground-strong font-medium">
                     {new Date(checkout.dueDate).toLocaleDateString('pt-BR')}
                   </span>
                 </div>

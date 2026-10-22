@@ -60,6 +60,7 @@ function NavItems({ location }: { location: string }) {
 export function Masthead() {
   const [location] = useLocation();
   const { contactInfo } = useSidebar(sidebarRepository);
+  const { isEnabled } = usePlugins();
 
   const siteName = contactInfo?.name ?? "";
   const spaced = siteName.toUpperCase().split("").join(" ");
@@ -102,7 +103,7 @@ export function Masthead() {
               <SheetTitle>Navegação</SheetTitle>
             </VisuallyHidden>
             <nav className="flex flex-col gap-1 pb-4">
-              {NAV_ITEMS_KEYS.map((item) => (
+              {NAV_ITEMS_KEYS.filter((item) => !item.pluginId || isEnabled(item.pluginId)).map((item) => (
                 <Link key={item.key} href={item.href}>
                   <a className="block text-sm font-mono tracking-widest uppercase py-3 border-b border-[var(--text)]/10 text-[var(--text)]/80 hover:text-[var(--text)] transition-colors">
                     {NAV_LABELS[item.key] ?? item.key}

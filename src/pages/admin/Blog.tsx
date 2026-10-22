@@ -257,8 +257,8 @@ export default function AdminBlog() {
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-white">Blog</h1>
-            <p className="text-gray-400">Gerencie seus artigos e publicações</p>
+            <h1 className="text-3xl font-bold text-foreground-strong">Blog</h1>
+            <p className="text-foreground/65">Gerencie seus artigos e publicações</p>
           </div>
           <div className="flex gap-2 items-center">
             {isRoot && (
@@ -267,7 +267,7 @@ export default function AdminBlog() {
                 className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm border transition-colors ${
                   includeDeleted
                     ? 'border-red-500/50 bg-red-500/10 text-red-400'
-                    : 'border-white/10 bg-white/5 text-gray-400 hover:text-white'
+                    : 'border-foreground/10 bg-foreground/5 text-foreground/65 hover:text-foreground-strong'
                 }`}
               >
                 <RotateCcw className="w-3.5 h-3.5" />
@@ -282,9 +282,9 @@ export default function AdminBlog() {
         </div>
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="bg-background border-white/10 max-w-4xl max-h-[90vh] flex flex-col overflow-hidden p-0">
+          <DialogContent className="bg-background border-foreground/10 max-w-4xl max-h-[90vh] flex flex-col overflow-hidden p-0">
             <DialogHeader className="px-6 pt-6 pb-4 shrink-0">
-              <DialogTitle className="text-white">
+              <DialogTitle className="text-foreground-strong">
                 {editingPost ? "Editar Artigo" : "Novo Artigo"}
               </DialogTitle>
               <VisuallyHidden>
@@ -297,23 +297,23 @@ export default function AdminBlog() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="title" className="text-white">Título</Label>
-                        <Input name="title" id="title" defaultValue={editingPost ? getPostField(editingPost, 'title') : ''} className="bg-white/5 border-white/10 text-white" style={{ wordBreak: 'break-all', overflowWrap: 'break-word' }} required />
+                        <Label htmlFor="title" className="text-foreground-strong">Título</Label>
+                        <Input name="title" id="title" defaultValue={editingPost ? getPostField(editingPost, 'title') : ''} className="bg-foreground/5 border-foreground/10 text-foreground-strong" style={{ wordBreak: 'break-all', overflowWrap: 'break-word' }} required />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="subtitle" className="text-white">Subtítulo</Label>
-                        <Input name="subtitle" id="subtitle" defaultValue={editingPost ? getPostField(editingPost, 'subtitle') : ''} className="bg-white/5 border-white/10 text-white" style={{ wordBreak: 'break-all', overflowWrap: 'break-word' }} />
+                        <Label htmlFor="subtitle" className="text-foreground-strong">Subtítulo</Label>
+                        <Input name="subtitle" id="subtitle" defaultValue={editingPost ? getPostField(editingPost, 'subtitle') : ''} className="bg-foreground/5 border-foreground/10 text-foreground-strong" style={{ wordBreak: 'break-all', overflowWrap: 'break-word' }} />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="tags" className="text-white">Tags (separadas por vírgula)</Label>
-                        <Input name="tags" id="tags" defaultValue={editingPost?.tags?.join(", ")} className="bg-white/5 border-white/10 text-white" style={{ wordBreak: 'break-all', overflowWrap: 'break-word' }} />
+                        <Label htmlFor="tags" className="text-foreground-strong">Tags (separadas por vírgula)</Label>
+                        <Input name="tags" id="tags" defaultValue={editingPost?.tags?.join(", ")} className="bg-foreground/5 border-foreground/10 text-foreground-strong" style={{ wordBreak: 'break-all', overflowWrap: 'break-word' }} />
                       </div>
                     </div>
 
                     <div className="space-y-4">
                       <div className="space-y-2">
-                        <Label className="text-white">Imagem de Destaque</Label>
-                        <div className="border border-white/10 rounded-lg p-4 bg-white/5 flex flex-col items-center justify-center min-h-[200px] relative overflow-hidden">
+                        <Label className="text-foreground-strong">Imagem de Destaque</Label>
+                        <div className="border border-foreground/10 rounded-lg p-4 bg-foreground/5 flex flex-col items-center justify-center min-h-[200px] relative overflow-hidden">
                           {coverImageUrl ? (
                             <>
                               <img src={coverImageUrl} alt="Preview" className="max-h-[180px] rounded object-cover w-full" />
@@ -336,7 +336,7 @@ export default function AdminBlog() {
                             checked={isFeatured}
                             onCheckedChange={setIsFeatured}
                           />
-                          <Label htmlFor="featured" className="text-white">Destacar Post</Label>
+                          <Label htmlFor="featured" className="text-foreground-strong">Destacar Post</Label>
                         </div>
                         <div className="flex items-center space-x-2">
                           <Switch
@@ -344,33 +344,33 @@ export default function AdminBlog() {
                             checked={isPublished}
                             onCheckedChange={setIsPublished}
                           />
-                          <Label htmlFor="status" className="text-white">Publicado</Label>
+                          <Label htmlFor="status" className="text-foreground-strong">Publicado</Label>
                         </div>
                       </div>
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-white">Conteúdo</Label>
+                    <Label className="text-foreground-strong">Conteúdo</Label>
                     <RichTextEditor content={content} onChange={setContent} />
                   </div>
                 </div>
               </div>
 
-              <div className="flex justify-end gap-2 pt-4 pb-6 px-6 border-t border-white/10 shrink-0 mt-auto">
-                <Button type="button" variant="ghost" onClick={() => setIsDialogOpen(false)} className="text-gray-400">Cancelar</Button>
+              <div className="flex justify-end gap-2 pt-4 pb-6 px-6 border-t border-foreground/10 shrink-0 mt-auto">
+                <Button type="button" variant="ghost" onClick={() => setIsDialogOpen(false)} className="text-foreground/65">Cancelar</Button>
                 <Button type="submit" disabled={isTranslating} className="bg-neon-purple hover:bg-neon-purple/90 text-white">{isTranslating ? 'Traduzindo...' : 'Salvar Artigo'}</Button>
               </div>
             </form>
           </DialogContent>
         </Dialog>
 
-        <div className="flex gap-4 items-center bg-card border border-white/10 p-4 rounded-lg">
+        <div className="flex gap-4 items-center bg-card border border-foreground/10 p-4 rounded-lg">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-            <Input placeholder="Buscar artigos..." className="pl-10 bg-white/5 border-white/10 text-white" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground/42" />
+            <Input placeholder="Buscar artigos..." className="pl-10 bg-foreground/5 border-foreground/10 text-foreground-strong" />
           </div>
-          <Button variant="outline" className="border-white/10 text-gray-300">
+          <Button variant="outline" className="border-foreground/10 text-foreground/90">
             <Filter className="w-4 h-4 mr-2" />
             Filtros
           </Button>
@@ -378,9 +378,9 @@ export default function AdminBlog() {
 
         <div className="space-y-4">
           {isLoading ? (
-            <div className="text-center text-gray-400 py-10">Carregando posts...</div>
+            <div className="text-center text-foreground/65 py-10">Carregando posts...</div>
           ) : posts.length === 0 ? (
-            <div className="text-center text-gray-400 py-10">Nenhum post encontrado.</div>
+            <div className="text-center text-foreground/65 py-10">Nenhum post encontrado.</div>
           ) : (
             posts.map((post) => {
               const imageSrc = post.image?.url || post.imageUrl || "https://via.placeholder.com/300x200";
@@ -389,17 +389,17 @@ export default function AdminBlog() {
                 : '';
               const isDeleted = !!(post as any).deletedAt;
               return (
-                <Card key={post._id} className={`bg-card hover:border-neon-purple/30 transition-colors ${isDeleted ? 'opacity-60 border-red-500/30' : 'border-white/10'}`}>
+                <Card key={post._id} className={`bg-card hover:border-neon-purple/30 transition-colors ${isDeleted ? 'opacity-60 border-red-500/30' : 'border-foreground/10'}`}>
                   <div className="flex flex-col md:flex-row gap-4 p-4">
                     <img src={imageSrc} alt={post.title} className="w-full md:w-48 h-32 object-cover rounded-lg" />
                     <div className="flex-1 space-y-2">
                       <div className="flex justify-between items-start">
                         <div>
-                          <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                          <h3 className="text-xl font-bold text-foreground-strong flex items-center gap-2">
                             {post.title}
                             {post.featured && <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />}
                           </h3>
-                          <p className="text-gray-400 text-sm">{post.subtitle}</p>
+                          <p className="text-foreground/65 text-sm">{post.subtitle}</p>
                           {isDeleted && (
                             <div className="flex items-center gap-1.5 text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded px-2 py-0.5 w-fit mt-1">
                               <ShieldAlert className="w-3 h-3" />
@@ -417,7 +417,7 @@ export default function AdminBlog() {
                                       size="icon"
                                       variant="ghost"
                                       onClick={() => toggleFeatured(post)}
-                                      className={post.featured ? "text-yellow-400" : "text-gray-500"}
+                                      className={post.featured ? "text-yellow-400" : "text-foreground/42"}
                                     >
                                       <Star className={`w-4 h-4 ${post.featured ? "fill-yellow-400" : ""}`} />
                                     </Button>
@@ -435,7 +435,7 @@ export default function AdminBlog() {
                                       size="icon"
                                       variant="ghost"
                                       onClick={() => toggleStatus(post)}
-                                      className={post.status === "published" ? "text-green-400" : "text-gray-500"}
+                                      className={post.status === "published" ? "text-green-400" : "text-foreground/42"}
                                     >
                                       {post.status === "published" ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                                     </Button>
@@ -469,13 +469,13 @@ export default function AdminBlog() {
 
                       <div className="flex flex-wrap gap-2 mt-2">
                         {post.tags?.map((tag: string) => (
-                          <Badge key={tag} variant="secondary" className="bg-white/5 text-gray-300 border-white/10">{tag}</Badge>
+                          <Badge key={tag} variant="secondary" className="bg-foreground/5 text-foreground/90 border-foreground/10">{tag}</Badge>
                         ))}
                       </div>
 
-                      <div className="flex items-center gap-4 text-sm text-gray-500 mt-auto pt-2">
+                      <div className="flex items-center gap-4 text-sm text-foreground/42 mt-auto pt-2">
                         <span>{publishedDate}</span>
-                        <span className={`flex items-center gap-1 ${post.status === "published" ? "text-green-400" : "text-gray-500"}`}>
+                        <span className={`flex items-center gap-1 ${post.status === "published" ? "text-green-400" : "text-foreground/42"}`}>
                           {post.status === "published" ? "Publicado" : "Rascunho"}
                         </span>
                       </div>

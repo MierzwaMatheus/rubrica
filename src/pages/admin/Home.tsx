@@ -192,26 +192,26 @@ export default function AdminHome() {
     <AdminLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-white">Edição da Página Inicial</h1>
+          <h1 className="text-3xl font-bold text-foreground-strong">Edição da Página Inicial</h1>
         </div>
 
         <Tabs defaultValue="about" className="w-full">
-          <TabsList className="bg-white/5 border border-white/10 w-full grid grid-cols-2">
+          <TabsList className="bg-foreground/5 border border-foreground/10 w-full grid grid-cols-2">
             <TabsTrigger value="about">Sobre Mim</TabsTrigger>
             <TabsTrigger value="availability">Disponibilidade</TabsTrigger>
           </TabsList>
 
           <TabsContent value="about" className="space-y-8 mt-6">
-            <Card className="bg-card border-white/10">
+            <Card className="bg-card border-foreground/10">
               <CardHeader>
-                <CardTitle className="text-white">Sobre Mim</CardTitle>
-                <p className="text-gray-400 text-sm">Edite o texto de apresentação principal</p>
+                <CardTitle className="text-foreground-strong">Sobre Mim</CardTitle>
+                <p className="text-foreground/65 text-sm">Edite o texto de apresentação principal</p>
               </CardHeader>
               <CardContent className="space-y-4">
                 <Textarea
                   value={aboutText}
                   onChange={(e) => setAboutText(e.target.value)}
-                  className="bg-white/5 border-white/10 text-white min-h-[150px]"
+                  className="bg-foreground/5 border-foreground/10 text-foreground-strong min-h-[150px]"
                 />
                 <div className="flex justify-end">
                   <Button onClick={handleSaveAbout} disabled={isTranslating} className="bg-neon-purple hover:bg-neon-purple/90 text-white">
@@ -223,7 +223,7 @@ export default function AdminHome() {
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-white">O que eu faço</h2>
+                <h2 className="text-xl font-semibold text-foreground-strong">O que eu faço</h2>
                 <div className="flex gap-2 items-center">
                   {isRoot && (
                     <button
@@ -231,7 +231,7 @@ export default function AdminHome() {
                       className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm border transition-colors ${
                         includeDeleted
                           ? 'border-red-500/50 bg-red-500/10 text-red-400'
-                          : 'border-white/10 bg-white/5 text-gray-400 hover:text-white'
+                          : 'border-foreground/10 bg-foreground/5 text-foreground/65 hover:text-foreground-strong'
                       }`}
                     >
                       <RotateCcw className="w-3.5 h-3.5" />
@@ -248,9 +248,9 @@ export default function AdminHome() {
                 {(services as any[]).map(item => {
                   const isDeleted = !!item.deletedAt;
                   return (
-                    <Card key={item._id} className={`bg-card group ${isDeleted ? 'opacity-60 border-red-500/30' : 'border-white/10'}`}>
+                    <Card key={item._id} className={`bg-card group ${isDeleted ? 'opacity-60 border-red-500/30' : 'border-foreground/10'}`}>
                       <CardContent className="pt-6 space-y-4">
-                        <h3 className="text-lg font-semibold text-white">
+                        <h3 className="text-lg font-semibold text-foreground-strong">
                           {item.titleTranslations?.ptBR || item.title}
                         </h3>
                         {isDeleted && (
@@ -259,12 +259,12 @@ export default function AdminHome() {
                             Deletado
                           </div>
                         )}
-                        <p className="text-gray-400 text-sm leading-relaxed">
+                        <p className="text-foreground/65 text-sm leading-relaxed">
                           {item.descriptionTranslations?.ptBR || item.description}
                         </p>
                         <div className="flex justify-end gap-2 pt-2 opacity-0 group-hover:opacity-100 transition-opacity">
                           {!isDeleted && (
-                            <Button variant="ghost" size="sm" onClick={() => handleOpenModal("service", item)} className="text-white hover:text-neon-purple">
+                            <Button variant="ghost" size="sm" onClick={() => handleOpenModal("service", item)} className="text-foreground-strong hover:text-neon-purple">
                               <Pencil className="w-4 h-4 mr-2" /> Editar
                             </Button>
                           )}
@@ -287,21 +287,21 @@ export default function AdminHome() {
           </TabsContent>
 
           <TabsContent value="availability" className="space-y-6 mt-6">
-            <Card className="bg-card border-white/10">
+            <Card className="bg-card border-foreground/10">
               <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
+                <CardTitle className="text-foreground-strong flex items-center gap-2">
                   <Briefcase className="w-5 h-5 text-neon-lime" />
                   Badge de Disponibilidade
                 </CardTitle>
-                <p className="text-gray-400 text-sm">
+                <p className="text-foreground/65 text-sm">
                   Controla o badge exibido na home indicando disponibilidade para novos projetos
                 </p>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10">
+                <div className="flex items-center justify-between p-4 bg-foreground/5 rounded-lg border border-foreground/10">
                   <div>
-                    <p className="text-white font-medium">Status de disponibilidade</p>
-                    <p className="text-gray-400 text-sm mt-1">
+                    <p className="text-foreground-strong font-medium">Status de disponibilidade</p>
+                    <p className="text-foreground/65 text-sm mt-1">
                       {availabilityEnabled
                         ? "Badge visível na home (disponível)"
                         : "Badge oculto na home (indisponível)"}
@@ -315,21 +315,21 @@ export default function AdminHome() {
 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label className="text-white">Mensagem (Português)</Label>
+                    <Label className="text-foreground-strong">Mensagem (Português)</Label>
                     <Input
                       value={availabilityLabelPT}
                       onChange={(e) => setAvailabilityLabelPT(e.target.value)}
                       placeholder="disponível para novos projetos"
-                      className="bg-white/5 border-white/10 text-white"
+                      className="bg-foreground/5 border-foreground/10 text-foreground-strong"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-white">Mensagem (English)</Label>
+                    <Label className="text-foreground-strong">Mensagem (English)</Label>
                     <Input
                       value={availabilityLabelEN}
                       onChange={(e) => setAvailabilityLabelEN(e.target.value)}
                       placeholder="available for new projects"
-                      className="bg-white/5 border-white/10 text-white"
+                      className="bg-foreground/5 border-foreground/10 text-foreground-strong"
                     />
                   </div>
                 </div>
@@ -360,9 +360,9 @@ export default function AdminHome() {
         </Tabs>
 
         <Dialog open={!!activeModal} onOpenChange={() => handleCloseModal()}>
-          <DialogContent className="bg-background border-white/10 max-w-2xl">
+          <DialogContent className="bg-background border-foreground/10 max-w-2xl">
             <DialogHeader>
-              <DialogTitle className="text-white">
+              <DialogTitle className="text-foreground-strong">
                 {editingItem ? "Editar" : "Adicionar"} Serviço
               </DialogTitle>
               <VisuallyHidden>
@@ -371,23 +371,23 @@ export default function AdminHome() {
             </DialogHeader>
             <form onSubmit={handleSave} className="space-y-4 mt-4">
               <div className="space-y-2">
-                <Label className="text-white">Título</Label>
+                <Label className="text-foreground-strong">Título</Label>
                 <Input
                   name="title"
                   defaultValue={editingItem?.titleTranslations?.ptBR || editingItem?.title}
-                  className="bg-white/5 border-white/10 text-white"
+                  className="bg-foreground/5 border-foreground/10 text-foreground-strong"
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-white">Descrição</Label>
+                <Label className="text-foreground-strong">Descrição</Label>
                 <Textarea
                   name="description"
                   defaultValue={editingItem?.descriptionTranslations?.ptBR || editingItem?.description}
-                  className="bg-white/5 border-white/10 text-white min-h-[100px]"
+                  className="bg-foreground/5 border-foreground/10 text-foreground-strong min-h-[100px]"
                 />
               </div>
               <div className="flex justify-end gap-2 pt-4">
-                <Button type="button" variant="ghost" onClick={handleCloseModal} className="text-gray-400">Cancelar</Button>
+                <Button type="button" variant="ghost" onClick={handleCloseModal} className="text-foreground/65">Cancelar</Button>
                 <Button type="submit" disabled={isTranslating} className="bg-neon-purple hover:bg-neon-purple/90 text-white">{isTranslating ? 'Traduzindo...' : 'Salvar'}</Button>
               </div>
             </form>

@@ -133,7 +133,7 @@ export default function ContactWizardDemo() {
                     </TableCell>
                   </TableRow>
                 ) : submissions.map(s => (
-                  <TableRow key={s.id} className="cursor-pointer hover:bg-white/5" onClick={() => setSelectedId(s.id)}>
+                  <TableRow key={s.id} className="cursor-pointer hover:bg-foreground/5" onClick={() => setSelectedId(s.id)}>
                     <TableCell className="font-medium">{s.contactInfo.name}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">{s.contactInfo.email}</TableCell>
                     <TableCell>

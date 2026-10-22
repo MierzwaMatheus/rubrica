@@ -54,7 +54,7 @@ export function ChangePasswordModal() {
     return (
         <Dialog open={true}>
             <DialogContent
-                className="bg-card border border-white/10 text-white [&>button]:hidden"
+                className="bg-card border border-foreground/10 text-foreground-strong [&>button]:hidden"
                 onPointerDownOutside={(e) => e.preventDefault()}
                 onEscapeKeyDown={(e) => e.preventDefault()}
             >
@@ -64,15 +64,15 @@ export function ChangePasswordModal() {
                             <KeyRound className="h-6 w-6 text-neon-purple" />
                         </div>
                     </div>
-                    <DialogTitle className="text-white text-center">Redefina sua senha</DialogTitle>
-                    <DialogDescription className="text-gray-400 text-center">
+                    <DialogTitle className="text-foreground-strong text-center">Redefina sua senha</DialogTitle>
+                    <DialogDescription className="text-foreground/65 text-center">
                         Por segurança, você precisa criar uma nova senha antes de continuar.
                     </DialogDescription>
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit} className="space-y-4 mt-2">
                     <div className="space-y-2">
-                        <Label htmlFor="new-password" className="text-white">Nova senha</Label>
+                        <Label htmlFor="new-password" className="text-foreground-strong">Nova senha</Label>
                         <div className="relative">
                             <Input
                                 id="new-password"
@@ -80,13 +80,13 @@ export function ChangePasswordModal() {
                                 value={newPassword}
                                 onChange={(e) => setNewPassword(e.target.value)}
                                 placeholder="Mínimo 8 caracteres"
-                                className="bg-background/50 border-white/10 text-white pr-10"
+                                className="bg-background/50 border-foreground/10 text-foreground-strong pr-10"
                                 disabled={isLoading}
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/65 hover:text-foreground-strong"
                             >
                                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                             </button>
@@ -94,14 +94,14 @@ export function ChangePasswordModal() {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="confirm-password" className="text-white">Confirmar nova senha</Label>
+                        <Label htmlFor="confirm-password" className="text-foreground-strong">Confirmar nova senha</Label>
                         <Input
                             id="confirm-password"
                             type={showPassword ? "text" : "password"}
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             placeholder="Repita a nova senha"
-                            className="bg-background/50 border-white/10 text-white"
+                            className="bg-background/50 border-foreground/10 text-foreground-strong"
                             disabled={isLoading}
                         />
                     </div>

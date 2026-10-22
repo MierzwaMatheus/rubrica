@@ -394,7 +394,7 @@ export default function AiCvDemo() {
                     onDragLeave={() => setIsDragging(false)}
                     onDrop={e => { e.preventDefault(); setIsDragging(false); const f = e.dataTransfer.files[0]; if (f) readFile(f); }}
                     onClick={() => fileInputRef.current?.click()}
-                    className={`flex items-center justify-center gap-2 h-16 rounded-lg border-2 border-dashed cursor-pointer transition-colors ${isDragging ? "border-neon-purple bg-neon-purple/10" : "border-white/20 hover:border-white/40 hover:bg-white/5"}`}
+                    className={`flex items-center justify-center gap-2 h-16 rounded-lg border-2 border-dashed cursor-pointer transition-colors ${isDragging ? "border-neon-purple bg-neon-purple/10" : "border-foreground/20 hover:border-foreground/40 hover:bg-foreground/5"}`}
                   >
                     <Upload className="h-4 w-4 text-muted-foreground/60" />
                     <span className="text-xs text-muted-foreground">Arraste ou <span className="text-neon-purple">clique para selecionar</span></span>

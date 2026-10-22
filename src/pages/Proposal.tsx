@@ -177,22 +177,22 @@ export default function Proposal() {
   };
 
   if (isLoading) {
-    return <div className="min-h-screen bg-background text-white flex items-center justify-center">Carregando proposta...</div>;
+    return <div className="min-h-screen bg-background text-foreground-strong flex items-center justify-center">Carregando proposta...</div>;
   }
 
   if (!rawProposal) {
-    return <div className="min-h-screen bg-background text-white flex items-center justify-center">Proposta não encontrada.</div>;
+    return <div className="min-h-screen bg-background text-foreground-strong flex items-center justify-center">Proposta não encontrada.</div>;
   }
 
   if (showPasswordForm) {
     return (
-      <div className="min-h-screen bg-background text-white flex items-center justify-center p-4">
-        <Card className="bg-card/50 backdrop-blur-sm border-white/10 max-w-md w-full">
+      <div className="min-h-screen bg-background text-foreground-strong flex items-center justify-center p-4">
+        <Card className="bg-card/50 backdrop-blur-sm border-foreground/10 max-w-md w-full">
           <CardContent className="p-8">
             <div className="text-center mb-6">
               <Lock className="w-12 h-12 text-neon-purple mx-auto mb-4" />
               <h1 className="text-2xl font-bold mb-2">Acesso Protegido</h1>
-              <p className="text-gray-400">Esta proposta está protegida por senha. Informe a senha para continuar.</p>
+              <p className="text-foreground/65">Esta proposta está protegida por senha. Informe a senha para continuar.</p>
             </div>
             <form onSubmit={handlePasswordSubmit} className="space-y-4">
               <div>
@@ -218,10 +218,10 @@ export default function Proposal() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-white font-sans selection:bg-neon-purple selection:text-white overflow-x-hidden">
+    <div className="min-h-screen bg-background text-foreground-strong font-sans selection:bg-neon-purple selection:text-white overflow-x-hidden">
       <div className="fixed inset-0 z-0 pointer-events-none no-print">
         <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-neon-purple/20 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-neon-green/10 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-neon-lime/10 rounded-full blur-[120px]" />
         <div className="absolute top-[40%] left-[20%] w-[300px] h-[300px] bg-blue-500/10 rounded-full blur-[100px]" />
       </div>
 
@@ -281,31 +281,31 @@ export default function Proposal() {
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-gray-400">
               {rawProposal.title || `Projeto para ${rawProposal.clientName}`}
             </h1>
-            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-              Preparado especialmente para <span className="text-white font-semibold">{rawProposal.clientName}</span>
+            <p className="text-xl text-foreground/65 max-w-2xl mx-auto">
+              Preparado especialmente para <span className="text-foreground-strong font-semibold">{rawProposal.clientName}</span>
             </p>
 
-            <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-500 mt-4">
-              <div className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full border border-white/10">
+            <div className="flex flex-wrap justify-center gap-4 text-sm text-foreground/42 mt-4">
+              <div className="flex items-center gap-2 bg-foreground/5 px-4 py-2 rounded-full border border-foreground/10">
                 <Calendar className="w-4 h-4 text-neon-purple" />
                 <span>Criado em: {new Date(rawProposal.createdAt).toLocaleDateString('pt-BR')}</span>
               </div>
-              <div className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full border border-white/10">
-                <Clock className={`w-4 h-4 ${isExpired ? "text-red-500" : "text-neon-green"}`} />
+              <div className="flex items-center gap-2 bg-foreground/5 px-4 py-2 rounded-full border border-foreground/10">
+                <Clock className={`w-4 h-4 ${isExpired ? "text-red-500" : "text-neon-lime"}`} />
                 <span className={isExpired ? "text-red-400" : ""}>Válido até: {calculateValidUntil(rawProposal.createdAt)}</span>
               </div>
             </div>
           </motion.header>
 
           <motion.section variants={itemVariants}>
-            <Card className="bg-card/50 backdrop-blur-sm border-white/10 overflow-hidden relative group">
+            <Card className="bg-card/50 backdrop-blur-sm border-foreground/10 overflow-hidden relative group">
               <div className="absolute inset-0 bg-gradient-to-r from-neon-purple/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <CardContent className="p-8 md:p-10 space-y-4">
-                <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+                <h2 className="text-2xl font-bold text-foreground-strong flex items-center gap-3">
                   <span className="w-1 h-8 bg-neon-purple rounded-full" />
                   Apresentação
                 </h2>
-                <div className="text-lg text-gray-300 leading-relaxed space-y-4 whitespace-pre-line">
+                <div className="text-lg text-foreground/90 leading-relaxed space-y-4 whitespace-pre-line">
                   {contactInfo?.proposalIntro || (
                     <>
                       <p>Olá, tudo bem?</p>
@@ -323,14 +323,14 @@ export default function Proposal() {
           </motion.section>
 
           <motion.section variants={itemVariants}>
-            <Card className="bg-card/50 backdrop-blur-sm border-white/10 overflow-hidden relative group">
+            <Card className="bg-card/50 backdrop-blur-sm border-foreground/10 overflow-hidden relative group">
               <div className="absolute inset-0 bg-gradient-to-r from-neon-purple/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <CardContent className="p-8 md:p-10 space-y-4">
-                <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+                <h2 className="text-2xl font-bold text-foreground-strong flex items-center gap-3">
                   <span className="w-1 h-8 bg-neon-purple rounded-full" />
                   Objetivo do Projeto
                 </h2>
-                <p className="text-lg text-gray-300 leading-relaxed">
+                <p className="text-lg text-foreground/90 leading-relaxed">
                   {rawProposal.objective}
                 </p>
               </CardContent>
@@ -339,17 +339,17 @@ export default function Proposal() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <motion.section variants={itemVariants}>
-              <Card className="h-full bg-card/50 backdrop-blur-sm border-white/10 hover:border-neon-purple/30 transition-colors duration-300">
+              <Card className="h-full bg-card/50 backdrop-blur-sm border-foreground/10 hover:border-neon-purple/30 transition-colors duration-300">
                 <CardContent className="p-8 space-y-6">
-                  <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+                  <h2 className="text-2xl font-bold text-foreground-strong flex items-center gap-3">
                     <CheckCircle2 className="w-6 h-6 text-neon-purple" />
                     Escopo dos Serviços
                   </h2>
                   <ul className="space-y-4">
                     {rawProposal.scope?.map((item: string, index: number) => (
-                      <li key={index} className="flex items-start gap-3 text-gray-300 group">
+                      <li key={index} className="flex items-start gap-3 text-foreground/90 group">
                         <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-neon-purple group-hover:scale-150 transition-transform" />
-                        <span className="group-hover:text-white transition-colors w-[95%]">{item}</span>
+                        <span className="group-hover:text-foreground-strong transition-colors w-[95%]">{item}</span>
                       </li>
                     ))}
                   </ul>
@@ -358,9 +358,9 @@ export default function Proposal() {
             </motion.section>
 
             <motion.section variants={itemVariants}>
-              <Card className="h-full bg-card/50 backdrop-blur-sm border-white/10 hover:border-neon-green/30 transition-colors duration-300">
+              <Card className="h-full bg-card/50 backdrop-blur-sm border-foreground/10 hover:border-neon-lime/30 transition-colors duration-300">
                 <CardContent className="p-8 space-y-6">
-                  <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+                  <h2 className="text-2xl font-bold text-foreground-strong flex items-center gap-3">
                     <Clock className="w-6 h-6 text-neon-lime" />
                     Cronograma Estimado
                   </h2>
@@ -377,15 +377,15 @@ export default function Proposal() {
                         >
                           <div className="flex items-start gap-4">
                             <div className="relative shrink-0">
-                              <div className="absolute left-[-18px] top-1.5 w-3 h-3 rounded-full bg-border border border-neon-green/40 group-hover:border-neon-green transition-all duration-300 flex items-center justify-center">
+                              <div className="absolute left-[-18px] top-1.5 w-3 h-3 rounded-full bg-border border border-neon-lime/40 group-hover:border-neon-lime transition-all duration-300 flex items-center justify-center">
                                 <div className="w-1.5 h-1.5 rounded-full bg-neon-lime/50 group-hover:bg-neon-lime group-hover:scale-125 transition-all duration-300" />
                               </div>
                             </div>
                             <div className="flex-1 pt-0.5 space-y-1">
-                              <h4 className="text-white font-semibold text-base group-hover:text-neon-green transition-colors duration-300">
+                              <h4 className="text-foreground-strong font-semibold text-base group-hover:text-neon-lime transition-colors duration-300">
                                 {item.step}
                               </h4>
-                              <p className="text-sm text-gray-400 font-light">{item.period}</p>
+                              <p className="text-sm text-foreground/65 font-light">{item.period}</p>
                             </div>
                           </div>
                         </motion.div>
@@ -393,8 +393,8 @@ export default function Proposal() {
                     </div>
                   </div>
                   {rawProposal.deliveryDate && (
-                    <div className="mt-4 pt-4 border-t border-white/10">
-                      <p className="text-sm text-gray-400">Entrega prevista: <span className="text-white">{new Date(rawProposal.deliveryDate).toLocaleDateString('pt-BR')}</span></p>
+                    <div className="mt-4 pt-4 border-t border-foreground/10">
+                      <p className="text-sm text-foreground/65">Entrega prevista: <span className="text-foreground-strong">{new Date(rawProposal.deliveryDate).toLocaleDateString('pt-BR')}</span></p>
                     </div>
                   )}
                 </CardContent>
@@ -403,35 +403,35 @@ export default function Proposal() {
           </div>
 
           <motion.section variants={itemVariants}>
-            <Card className="bg-gradient-to-br from-card to-black border-white/10 overflow-hidden relative">
+            <Card className="bg-gradient-to-br from-card to-black border-foreground/10 overflow-hidden relative">
               <div className="absolute top-0 right-0 w-64 h-64 bg-neon-purple/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2" />
               <CardContent className="p-8 md:p-12">
                 <div className="flex flex-col md:flex-row items-center justify-between gap-8">
                   <div className="space-y-4 text-center md:text-left">
-                    <h2 className="text-3xl font-bold text-white">Investimento Total</h2>
-                    <p className="text-gray-400 max-w-md">
+                    <h2 className="text-3xl font-bold text-foreground-strong">Investimento Total</h2>
+                    <p className="text-foreground/65 max-w-md">
                       Um investimento estratégico para elevar o nível do seu negócio e alcançar novos resultados.
                     </p>
                   </div>
                   <div className="text-center">
-                    <div className="text-5xl md:text-6xl font-bold text-white tracking-tighter mb-2">
+                    <div className="text-5xl md:text-6xl font-bold text-foreground-strong tracking-tighter mb-2">
                       {formatCurrency(rawProposal.investmentValue)}
                     </div>
-                    <Badge className="bg-neon-green/10 text-neon-green hover:bg-neon-green/20 border-neon-green/20">
+                    <Badge className="bg-neon-lime/10 text-neon-lime hover:bg-neon-lime/20 border-neon-lime/20">
                       Pagamento Facilitado
                     </Badge>
                   </div>
                 </div>
 
-                <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-white/10 pt-8">
+                <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-foreground/10 pt-8">
                   <div>
-                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                    <h3 className="text-lg font-semibold text-foreground-strong mb-4 flex items-center gap-2">
                       <DollarSign className="w-5 h-5 text-neon-purple" />
                       Formas de Pagamento
                     </h3>
                     <ul className="space-y-2">
                       {generatePaymentMethods(rawProposal.investmentValue).map((method: string, idx: number) => (
-                        <li key={idx} className="text-gray-400 flex items-center gap-2">
+                        <li key={idx} className="text-foreground/65 flex items-center gap-2">
                           <div className="w-1 h-1 bg-gray-500 rounded-full" />
                           {method}
                         </li>
@@ -439,13 +439,13 @@ export default function Proposal() {
                     </ul>
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                    <h3 className="text-lg font-semibold text-foreground-strong mb-4 flex items-center gap-2">
                       <CheckCircle2 className="w-5 h-5 text-neon-purple" />
                       Condições Gerais
                     </h3>
                     <ul className="space-y-2">
                       {rawProposal.conditions?.map((condition: string, idx: number) => (
-                        <li key={idx} className="text-gray-400 flex items-center gap-2">
+                        <li key={idx} className="text-foreground/65 flex items-center gap-2">
                           <div className="w-1 h-1 bg-gray-500 rounded-full" />
                           {condition}
                         </li>
@@ -458,19 +458,19 @@ export default function Proposal() {
           </motion.section>
 
           <motion.section variants={itemVariants}>
-            <Card className="bg-card/50 backdrop-blur-sm border-white/10 overflow-hidden relative group">
+            <Card className="bg-card/50 backdrop-blur-sm border-foreground/10 overflow-hidden relative group">
               <div className="absolute inset-0 bg-gradient-to-r from-neon-purple/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
               <CardContent className="p-8 md:p-10 relative z-10">
                 <Collapsible open={isRescisionOpen} onOpenChange={setIsRescisionOpen}>
                   <CollapsibleTrigger className="w-full flex items-center justify-between text-left hover:opacity-80 transition-opacity cursor-pointer outline-none relative z-10">
-                    <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+                    <h2 className="text-2xl font-bold text-foreground-strong flex items-center gap-3">
                       <span className="w-1 h-8 bg-neon-purple rounded-full" />
                       Política de Rescisão
                     </h2>
-                    <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 shrink-0 ${isRescisionOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-5 h-5 text-foreground/65 transition-transform duration-200 shrink-0 ${isRescisionOpen ? 'rotate-180' : ''}`} />
                   </CollapsibleTrigger>
                   <CollapsibleContent className="mt-4">
-                    <div className="prose prose-invert prose-headings:text-white prose-p:text-gray-300 prose-strong:text-white prose-ul:text-gray-300 prose-li:text-gray-300 prose-hr:border-white/10 max-w-none">
+                    <div className="prose prose-invert prose-headings:text-foreground-strong prose-p:text-foreground/90 prose-strong:text-foreground-strong prose-ul:text-foreground/90 prose-li:text-foreground/90 prose-hr:border-foreground/10 max-w-none">
                       <ReactMarkdown>
                         {rawProposal.rescissionPolicy || DEFAULT_RESCISION_POLICY}
                       </ReactMarkdown>
@@ -512,11 +512,11 @@ export default function Proposal() {
             </motion.div>
           )}
 
-          <motion.footer variants={itemVariants} className="text-center border-t border-white/10 pt-8 pb-4">
-            <p className="text-gray-500 text-sm">
+          <motion.footer variants={itemVariants} className="text-center border-t border-foreground/10 pt-8 pb-4">
+            <p className="text-foreground/42 text-sm">
               © {new Date().getFullYear()} {authorName || siteConfig.site_name}. Todos os direitos reservados.
             </p>
-            <p className="text-gray-600 text-xs mt-2">
+            <p className="text-foreground/25 text-xs mt-2">
               Esta proposta é confidencial e destinada apenas ao cliente especificado.
             </p>
           </motion.footer>

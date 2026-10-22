@@ -156,8 +156,8 @@ function AvatarUploader() {
 
   return (
     <div>
-      <Label className="text-gray-300 text-sm mb-1.5 block">
-        Foto de perfil <span className="text-gray-500 text-xs">(opcional)</span>
+      <Label className="text-foreground/90 text-sm mb-1.5 block">
+        Foto de perfil <span className="text-foreground/42 text-xs">(opcional)</span>
       </Label>
 
       {state.avatarPreviewUrl ? (
@@ -165,17 +165,17 @@ function AvatarUploader() {
           <img
             src={state.avatarPreviewUrl}
             alt="Avatar"
-            className="w-14 h-14 rounded-full object-cover border border-white/20"
+            className="w-14 h-14 rounded-full object-cover border border-foreground/20"
           />
           <div className="flex gap-2">
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="text-xs text-gray-400 hover:text-white underline underline-offset-2"
+              className="text-xs text-foreground/65 hover:text-foreground-strong underline underline-offset-2"
             >
               Trocar foto
             </button>
-            <span className="text-gray-600">·</span>
+            <span className="text-foreground/25">·</span>
             <button
               type="button"
               onClick={() => dispatch({ type: "CLEAR_AVATAR" })}
@@ -189,7 +189,7 @@ function AvatarUploader() {
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg border border-white/10 bg-white/3 hover:bg-white/5 hover:border-white/20 transition-colors text-sm text-gray-400 hover:text-white"
+          className="flex items-center gap-2 px-3 py-2 rounded-lg border border-foreground/10 bg-foreground/3 hover:bg-foreground/5 hover:border-foreground/20 transition-colors text-sm text-foreground/65 hover:text-foreground-strong"
         >
           <Camera className="w-4 h-4" />
           Escolher foto
@@ -210,8 +210,8 @@ function AvatarUploader() {
 
       {showCrop && rawSrc && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4">
-          <div className="bg-[#1a1a1a] rounded-2xl border border-white/10 p-5 space-y-4 w-full max-w-sm">
-            <p className="text-white font-semibold text-sm">Ajustar foto</p>
+          <div className="bg-muted rounded-2xl border border-foreground/10 p-5 space-y-4 w-full max-w-sm">
+            <p className="text-foreground-strong font-semibold text-sm">Ajustar foto</p>
             <div className="overflow-hidden rounded-lg">
               <ReactCrop
                 crop={crop}
@@ -230,7 +230,7 @@ function AvatarUploader() {
               </ReactCrop>
             </div>
             <div className="flex gap-2 justify-end">
-              <Button variant="ghost" size="sm" onClick={cancelCrop} className="text-gray-400">
+              <Button variant="ghost" size="sm" onClick={cancelCrop} className="text-foreground/65">
                 Cancelar
               </Button>
               <Button
@@ -262,10 +262,10 @@ function MediaChoiceStep() {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-xl font-bold text-white mb-2">
+        <h2 className="text-xl font-bold text-foreground-strong mb-2">
           Como você prefere deixar seu depoimento?
         </h2>
-        <p className="text-gray-400 text-sm">
+        <p className="text-foreground/65 text-sm">
           Sua opinião é muito importante para mim
         </p>
       </div>
@@ -283,17 +283,17 @@ function MediaChoiceStep() {
           </div>
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="font-semibold text-white">Vídeo</span>
+              <span className="font-semibold text-foreground-strong">Vídeo</span>
               <span className="text-xs bg-neon-purple/20 text-neon-purple px-2 py-0.5 rounded-full font-medium">
                 Recomendado ⭐
               </span>
             </div>
-            <p className="text-sm text-gray-400 leading-relaxed">
+            <p className="text-sm text-foreground/65 leading-relaxed">
               Vídeos têm muito mais impacto e ajudam a transmitir autenticidade.
               Leva menos de 2 minutos e faz uma diferença enorme para quem está
               considerando me contratar!
             </p>
-            <p className="text-xs text-gray-500 mt-2">MP4, MOV ou WebM · máx. {MAX_VIDEO_MB} MB</p>
+            <p className="text-xs text-foreground/42 mt-2">MP4, MOV ou WebM · máx. {MAX_VIDEO_MB} MB</p>
           </div>
         </button>
 
@@ -301,15 +301,15 @@ function MediaChoiceStep() {
           onClick={() => choose("text")}
           className={cn(
             "flex items-start gap-4 p-5 rounded-xl border-2 text-left transition-all",
-            "border-white/10 bg-white/3 hover:bg-white/5 hover:border-white/20 group",
+            "border-foreground/10 bg-foreground/3 hover:bg-foreground/5 hover:border-foreground/20 group",
           )}
         >
-          <div className="mt-0.5 flex-shrink-0 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/15 transition-colors">
-            <FileText className="w-5 h-5 text-gray-300" />
+          <div className="mt-0.5 flex-shrink-0 w-10 h-10 rounded-full bg-foreground/10 flex items-center justify-center group-hover:bg-foreground/15 transition-colors">
+            <FileText className="w-5 h-5 text-foreground/90" />
           </div>
           <div>
-            <span className="font-semibold text-white">Texto escrito</span>
-            <p className="text-sm text-gray-400 leading-relaxed mt-1">
+            <span className="font-semibold text-foreground-strong">Texto escrito</span>
+            <p className="text-sm text-foreground/65 leading-relaxed mt-1">
               Prefiro escrever minha experiência em palavras.
             </p>
           </div>
@@ -331,10 +331,10 @@ function TextInputStep() {
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="text-xl font-bold text-white mb-1">
+        <h2 className="text-xl font-bold text-foreground-strong mb-1">
           Conte sua experiência
         </h2>
-        <p className="text-gray-400 text-sm">Seja autêntico — isso faz toda a diferença</p>
+        <p className="text-foreground/65 text-sm">Seja autêntico — isso faz toda a diferença</p>
       </div>
 
       <div>
@@ -342,10 +342,10 @@ function TextInputStep() {
           value={state.text}
           onChange={(e) => dispatch({ type: "SET_TEXT", payload: e.target.value })}
           placeholder="Descreva como foi trabalhar comigo, o que gostou, os resultados que obteve..."
-          className="min-h-[160px] bg-[#1a1a1a] border-white/10 text-white placeholder:text-gray-600 resize-none"
+          className="min-h-[160px] bg-muted border-foreground/10 text-foreground-strong placeholder:text-foreground/25 resize-none"
           maxLength={MAX_CHARS}
         />
-        <div className={cn("text-xs mt-1 text-right", len < MIN_CHARS ? "text-gray-500" : "text-neon-lime")}>
+        <div className={cn("text-xs mt-1 text-right", len < MIN_CHARS ? "text-foreground/42" : "text-neon-lime")}>
           {len}/{MAX_CHARS} {len < MIN_CHARS && `(mín. ${MIN_CHARS})`}
         </div>
       </div>
@@ -354,7 +354,7 @@ function TextInputStep() {
         <Button
           variant="ghost"
           onClick={() => dispatch({ type: "PREV_STEP" })}
-          className="text-gray-400 hover:text-white"
+          className="text-foreground/65 hover:text-foreground-strong"
         >
           <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
         </Button>
@@ -439,20 +439,20 @@ function VideoUploadStep() {
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="text-xl font-bold text-white mb-1">Envie seu vídeo</h2>
-        <p className="text-gray-400 text-sm">MP4, MOV ou WebM · máx. {MAX_VIDEO_MB} MB</p>
+        <h2 className="text-xl font-bold text-foreground-strong mb-1">Envie seu vídeo</h2>
+        <p className="text-foreground/65 text-sm">MP4, MOV ou WebM · máx. {MAX_VIDEO_MB} MB</p>
       </div>
 
       {!state.videoStorageId ? (
         <div
           onClick={() => fileInputRef.current?.click()}
-          className="border-2 border-dashed border-white/20 rounded-xl p-10 flex flex-col items-center gap-3 cursor-pointer hover:border-neon-purple/50 hover:bg-neon-purple/5 transition-all"
+          className="border-2 border-dashed border-foreground/20 rounded-xl p-10 flex flex-col items-center gap-3 cursor-pointer hover:border-neon-purple/50 hover:bg-neon-purple/5 transition-all"
         >
           {uploading ? (
             <>
               <Loader2 className="w-8 h-8 text-neon-purple animate-spin" />
-              <p className="text-sm text-gray-400">{progress}% enviado...</p>
-              <div className="w-full bg-white/10 rounded-full h-1.5 mt-1">
+              <p className="text-sm text-foreground/65">{progress}% enviado...</p>
+              <div className="w-full bg-foreground/10 rounded-full h-1.5 mt-1">
                 <div
                   className="bg-neon-purple h-1.5 rounded-full transition-all"
                   style={{ width: `${progress}%` }}
@@ -461,9 +461,9 @@ function VideoUploadStep() {
             </>
           ) : (
             <>
-              <Upload className="w-8 h-8 text-gray-500" />
-              <p className="text-sm text-white font-medium">Clique para selecionar o vídeo</p>
-              <p className="text-xs text-gray-500">ou arraste e solte aqui</p>
+              <Upload className="w-8 h-8 text-foreground/42" />
+              <p className="text-sm text-foreground-strong font-medium">Clique para selecionar o vídeo</p>
+              <p className="text-xs text-foreground/42">ou arraste e solte aqui</p>
             </>
           )}
         </div>
@@ -471,8 +471,8 @@ function VideoUploadStep() {
         <div className="flex items-center gap-3 p-4 bg-neon-lime/10 border border-neon-lime/30 rounded-xl">
           <Check className="w-5 h-5 text-neon-lime flex-shrink-0" />
           <div className="flex-1 min-w-0">
-            <p className="text-sm text-white font-medium truncate">{state.videoFileName}</p>
-            <p className="text-xs text-gray-400">
+            <p className="text-sm text-foreground-strong font-medium truncate">{state.videoFileName}</p>
+            <p className="text-xs text-foreground/65">
               {state.videoFileSize ? `${(state.videoFileSize / (1024 * 1024)).toFixed(1)} MB` : ""}
             </p>
           </div>
@@ -480,7 +480,7 @@ function VideoUploadStep() {
             onClick={() =>
               dispatch({ type: "SET_VIDEO", payload: { storageId: "", fileSize: 0, fileName: "" } })
             }
-            className="text-gray-500 hover:text-white"
+            className="text-foreground/42 hover:text-foreground-strong"
           >
             <X className="w-4 h-4" />
           </button>
@@ -499,7 +499,7 @@ function VideoUploadStep() {
         <Button
           variant="ghost"
           onClick={() => dispatch({ type: "PREV_STEP" })}
-          className="text-gray-400 hover:text-white"
+          className="text-foreground/65 hover:text-foreground-strong"
         >
           <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
         </Button>
@@ -530,49 +530,49 @@ function PersonalInfoStep() {
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="text-xl font-bold text-white mb-1">Seus dados</h2>
-        <p className="text-gray-400 text-sm">
+        <h2 className="text-xl font-bold text-foreground-strong mb-1">Seus dados</h2>
+        <p className="text-foreground/65 text-sm">
           O e-mail não será exibido publicamente
         </p>
       </div>
 
       <div className="space-y-4">
         <div>
-          <Label className="text-gray-300 text-sm mb-1.5 block">
+          <Label className="text-foreground/90 text-sm mb-1.5 block">
             Nome completo <span className="text-neon-purple">*</span>
           </Label>
           <Input
             value={info.name}
             onChange={(e) => update("name", e.target.value)}
             placeholder="Seu nome"
-            className="bg-[#1a1a1a] border-white/10 text-white placeholder:text-gray-600"
+            className="bg-muted border-foreground/10 text-foreground-strong placeholder:text-foreground/25"
           />
         </div>
 
         <div>
-          <Label className="text-gray-300 text-sm mb-1.5 block">
+          <Label className="text-foreground/90 text-sm mb-1.5 block">
             Cargo / Função <span className="text-neon-purple">*</span>
           </Label>
           <Input
             value={info.role}
             onChange={(e) => update("role", e.target.value)}
             placeholder="Ex: CEO, Desenvolvedor, Designer..."
-            className="bg-[#1a1a1a] border-white/10 text-white placeholder:text-gray-600"
+            className="bg-muted border-foreground/10 text-foreground-strong placeholder:text-foreground/25"
           />
         </div>
 
         <div>
-          <Label className="text-gray-300 text-sm mb-1.5 block">Empresa (opcional)</Label>
+          <Label className="text-foreground/90 text-sm mb-1.5 block">Empresa (opcional)</Label>
           <Input
             value={info.company}
             onChange={(e) => update("company", e.target.value)}
             placeholder="Nome da empresa"
-            className="bg-[#1a1a1a] border-white/10 text-white placeholder:text-gray-600"
+            className="bg-muted border-foreground/10 text-foreground-strong placeholder:text-foreground/25"
           />
         </div>
 
         <div>
-          <Label className="text-gray-300 text-sm mb-1.5 block">
+          <Label className="text-foreground/90 text-sm mb-1.5 block">
             E-mail <span className="text-neon-purple">*</span>
           </Label>
           <Input
@@ -580,7 +580,7 @@ function PersonalInfoStep() {
             value={info.email}
             onChange={(e) => update("email", e.target.value)}
             placeholder="seu@email.com"
-            className="bg-[#1a1a1a] border-white/10 text-white placeholder:text-gray-600"
+            className="bg-muted border-foreground/10 text-foreground-strong placeholder:text-foreground/25"
           />
         </div>
 
@@ -591,7 +591,7 @@ function PersonalInfoStep() {
         <Button
           variant="ghost"
           onClick={() => dispatch({ type: "PREV_STEP" })}
-          className="text-gray-400 hover:text-white"
+          className="text-foreground/65 hover:text-foreground-strong"
         >
           <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
         </Button>
@@ -668,8 +668,8 @@ function SummaryStep({ onClose }: { onClose: () => void }) {
         <div className="w-16 h-16 rounded-full bg-neon-lime/20 flex items-center justify-center">
           <Check className="w-8 h-8 text-neon-lime" />
         </div>
-        <h2 className="text-xl font-bold text-white">Obrigado pelo depoimento!</h2>
-        <p className="text-gray-400 text-sm max-w-xs">
+        <h2 className="text-xl font-bold text-foreground-strong">Obrigado pelo depoimento!</h2>
+        <p className="text-foreground/65 text-sm max-w-xs">
           Recebi seu depoimento e vou revisá-lo em breve. Após aprovação, ele poderá aparecer no meu portfólio.
         </p>
         <Button onClick={onClose} className="mt-4 bg-neon-lime text-black hover:bg-neon-lime/90 font-semibold">
@@ -682,32 +682,32 @@ function SummaryStep({ onClose }: { onClose: () => void }) {
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="text-xl font-bold text-white mb-1">Revisar e enviar</h2>
-        <p className="text-gray-400 text-sm">Confira os dados antes de enviar</p>
+        <h2 className="text-xl font-bold text-foreground-strong mb-1">Revisar e enviar</h2>
+        <p className="text-foreground/65 text-sm">Confira os dados antes de enviar</p>
       </div>
 
-      <div className="space-y-3 bg-[#1a1a1a] rounded-xl p-4 border border-white/5">
+      <div className="space-y-3 bg-muted rounded-xl p-4 border border-foreground/5">
         <div className="flex items-center gap-3">
           {state.avatarPreviewUrl ? (
-            <img src={state.avatarPreviewUrl} alt={info.name} className="w-10 h-10 rounded-full object-cover border border-white/10" />
+            <img src={state.avatarPreviewUrl} alt={info.name} className="w-10 h-10 rounded-full object-cover border border-foreground/10" />
           ) : (
             <div className="w-10 h-10 rounded-full bg-neon-purple/20 flex items-center justify-center text-neon-purple font-bold text-sm flex-shrink-0">
               {info.name.charAt(0).toUpperCase()}
             </div>
           )}
           <div>
-            <p className="font-semibold text-white">{info.name}</p>
+            <p className="font-semibold text-foreground-strong">{info.name}</p>
             <p className="text-xs text-neon-purple">
               {info.role}{info.company ? ` · ${info.company}` : ""}
             </p>
           </div>
         </div>
 
-        <div className="border-t border-white/5 pt-3">
+        <div className="border-t border-foreground/5 pt-3">
           {state.mediaType === "text" ? (
-            <p className="text-sm text-gray-300 italic leading-relaxed">"{state.text}"</p>
+            <p className="text-sm text-foreground/90 italic leading-relaxed">"{state.text}"</p>
           ) : (
-            <div className="flex items-center gap-2 text-sm text-gray-300">
+            <div className="flex items-center gap-2 text-sm text-foreground/90">
               <Video className="w-4 h-4 text-neon-purple" />
               <span>Vídeo: {state.videoFileName}</span>
             </div>
@@ -726,7 +726,7 @@ function SummaryStep({ onClose }: { onClose: () => void }) {
           variant="ghost"
           onClick={() => dispatch({ type: "PREV_STEP" })}
           disabled={state.isSubmitting}
-          className="text-gray-400 hover:text-white"
+          className="text-foreground/65 hover:text-foreground-strong"
         >
           <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
         </Button>
@@ -780,7 +780,7 @@ function WizardContent({ onClose }: { onClose: () => void }) {
   return (
     <div className="space-y-5">
       {!state.isSuccess && (
-        <div className="w-full bg-white/5 rounded-full h-1">
+        <div className="w-full bg-foreground/5 rounded-full h-1">
           <motion.div
             className="bg-neon-purple h-1 rounded-full"
             animate={{ width: `${progressPercent}%` }}
@@ -820,9 +820,9 @@ export function TestimonialWizard({ open, onClose }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && handleClose()}>
-      <DialogContent className="bg-[#121212] border-white/10 max-w-lg w-full">
+      <DialogContent className="bg-[#121212] border-foreground/10 max-w-lg w-full">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-white">
+          <DialogTitle className="flex items-center gap-2 text-foreground-strong">
             <Star className="w-5 h-5 text-neon-purple" />
             Deixar um depoimento
           </DialogTitle>

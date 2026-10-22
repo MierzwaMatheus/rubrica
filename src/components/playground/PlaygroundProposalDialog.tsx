@@ -140,7 +140,7 @@ export function PlaygroundProposalDialog({ open, onOpenChange, proposal, existin
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-card border-white/10 max-w-2xl w-full max-h-[85vh] overflow-y-scroll text-white">
+      <DialogContent className="bg-card border-foreground/10 max-w-2xl w-full max-h-[85vh] overflow-y-scroll text-foreground-strong">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">{proposal ? "Editar Proposta" : "Nova Proposta"}</DialogTitle>
           <VisuallyHidden><h2>Formulário de {proposal ? "edição" : "criação"} de proposta</h2></VisuallyHidden>
@@ -193,7 +193,7 @@ export function PlaygroundProposalDialog({ open, onOpenChange, proposal, existin
             </div>
             <ul className="space-y-1">
               {scopeItems.map((item, i) => (
-                <li key={i} className="flex items-center justify-between bg-white/5 p-2 rounded text-sm">
+                <li key={i} className="flex items-center justify-between bg-foreground/5 p-2 rounded text-sm">
                   <span>{item}</span>
                   <button type="button" onClick={() => setScopeItems(p => p.filter((_, j) => j !== i))} className="text-red-400 hover:text-red-300"><X className="w-4 h-4" /></button>
                 </li>
@@ -210,7 +210,7 @@ export function PlaygroundProposalDialog({ open, onOpenChange, proposal, existin
             </div>
             <ul className="space-y-1">
               {timelineItems.map((item, i) => (
-                <li key={i} className="flex items-center justify-between bg-white/5 p-2 rounded text-sm">
+                <li key={i} className="flex items-center justify-between bg-foreground/5 p-2 rounded text-sm">
                   <span>{item.step} — {item.period}</span>
                   <button type="button" onClick={() => setTimelineItems(p => p.filter((_, j) => j !== i))} className="text-red-400 hover:text-red-300"><X className="w-4 h-4" /></button>
                 </li>
@@ -225,7 +225,7 @@ export function PlaygroundProposalDialog({ open, onOpenChange, proposal, existin
           <div>
             <Label className="block text-sm mb-1">Valor do Projeto</Label>
             <div className="relative">
-              <span className="absolute left-3 top-2.5 text-gray-400 text-sm">R$</span>
+              <span className="absolute left-3 top-2.5 text-foreground/65 text-sm">R$</span>
               <Input className="bg-background border-input pl-8" placeholder="0,00" value={investmentValue} onChange={e => setInvestmentValue(e.target.value)} />
             </div>
           </div>
@@ -235,7 +235,7 @@ export function PlaygroundProposalDialog({ open, onOpenChange, proposal, existin
             <div className="flex flex-col gap-2">
               {conditions.map((c, i) => (
                 <div key={i} className="flex items-start gap-2">
-                  <input type="checkbox" checked={c.checked} onChange={e => { const next = [...conditions]; next[i].checked = e.target.checked; setConditions(next); }} className="mt-1 rounded border-gray-300" />
+                  <input type="checkbox" checked={c.checked} onChange={e => { const next = [...conditions]; next[i].checked = e.target.checked; setConditions(next); }} className="mt-1 rounded border-foreground/80" />
                   <Textarea value={c.text} onChange={e => { const next = [...conditions]; next[i].text = e.target.value; setConditions(next); }} className="bg-background border-input min-h-[60px] text-sm" rows={2} />
                 </div>
               ))}

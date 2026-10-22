@@ -85,7 +85,7 @@ export default function PlaygroundProposalAcceptView() {
 
   if (!rawProposal) {
     return (
-      <div className="min-h-screen bg-background text-white flex items-center justify-center flex-col gap-4">
+      <div className="min-h-screen bg-background text-foreground-strong flex items-center justify-center flex-col gap-4">
         <AlertTriangle className="w-16 h-16 text-red-500" />
         <h1 className="text-2xl font-bold">Proposta não encontrada</h1>
         <Button onClick={() => setLocation("/playground/proposal")}>Voltar</Button>
@@ -95,10 +95,10 @@ export default function PlaygroundProposalAcceptView() {
 
   if (rawProposal.isAccepted) {
     return (
-      <div className="min-h-screen bg-background text-white flex items-center justify-center flex-col gap-4 p-4">
+      <div className="min-h-screen bg-background text-foreground-strong flex items-center justify-center flex-col gap-4 p-4">
         <CheckCircle2 className="w-16 h-16 text-green-500" />
         <h1 className="text-2xl font-bold">Proposta já aceita</h1>
-        <p className="text-gray-400">Esta proposta já foi aceita eletronicamente.</p>
+        <p className="text-foreground/65">Esta proposta já foi aceita eletronicamente.</p>
         <Button onClick={() => setLocation(`/playground/proposal/${slug}`)}>Ver Proposta</Button>
       </div>
     );
@@ -107,14 +107,14 @@ export default function PlaygroundProposalAcceptView() {
   return (
     <>
       <Helmet><title>Aceite — {rawProposal.title || rawProposal.clientName} — Playground</title></Helmet>
-      <div className="min-h-screen bg-background text-white font-sans">
+      <div className="min-h-screen bg-background text-foreground-strong font-sans">
         <div className="bg-yellow-500/10 border-b border-yellow-500/20 text-yellow-400 text-xs text-center py-2 font-medium">
           Modo Demonstração — Fluxo real de aceite rodando com dados do playground
         </div>
 
         <div className="fixed inset-0 z-0 pointer-events-none">
           <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-neon-purple/20 rounded-full blur-[120px]" />
-          <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-neon-green/10 rounded-full blur-[120px]" />
+          <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-neon-lime/10 rounded-full blur-[120px]" />
         </div>
 
         <div className="relative z-10 max-w-5xl mx-auto px-6 py-12 md:py-20">
@@ -131,8 +131,8 @@ export default function PlaygroundProposalAcceptView() {
                 <Scale className="w-6 h-6" />
                 <h1 className="text-3xl font-bold">Aceite Eletrônico de Proposta</h1>
               </div>
-              <p className="text-xl text-gray-400">
-                Proposta: <span className="text-white font-semibold">{rawProposal.title || `Projeto para ${rawProposal.clientName}`}</span>
+              <p className="text-xl text-foreground/65">
+                Proposta: <span className="text-foreground-strong font-semibold">{rawProposal.title || `Projeto para ${rawProposal.clientName}`}</span>
               </p>
             </div>
 
@@ -142,13 +142,13 @@ export default function PlaygroundProposalAcceptView() {
                   <FileText className="w-6 h-6 text-neon-purple mt-1 shrink-0" />
                   <div>
                     <h2 className="text-lg font-bold mb-2">Cláusula de Aceite Eletrônico</h2>
-                    <p className="text-gray-300 leading-relaxed">Esta proposta, quando aceita eletronicamente, constitui contrato válido entre as partes, nos termos do Código Civil Brasileiro.</p>
+                    <p className="text-foreground/90 leading-relaxed">Esta proposta, quando aceita eletronicamente, constitui contrato válido entre as partes, nos termos do Código Civil Brasileiro.</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-card/50 backdrop-blur-sm border-white/10">
+            <Card className="bg-card/50 backdrop-blur-sm border-foreground/10">
               <CardContent className="p-6 space-y-6">
                 <h2 className="text-xl font-bold flex items-center gap-2">
                   <CheckCircle2 className="w-5 h-5 text-neon-purple" />
@@ -179,26 +179,26 @@ export default function PlaygroundProposalAcceptView() {
               </CardContent>
             </Card>
 
-            <Card className="bg-card/50 backdrop-blur-sm border-white/10">
+            <Card className="bg-card/50 backdrop-blur-sm border-foreground/10">
               <CardContent className="p-6 space-y-4">
                 <h2 className="text-xl font-bold">Resumo da Proposta</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  <div><span className="text-gray-400">Cliente:</span><span className="ml-2 text-white">{rawProposal.clientName}</span></div>
-                  <div><span className="text-gray-400">Valor Total:</span><span className="ml-2 text-white font-bold">{formatCurrency(rawProposal.investmentValue)}</span></div>
-                  <div className="md:col-span-2"><span className="text-gray-400">Objetivo:</span><p className="mt-1 text-white">{rawProposal.objective}</p></div>
+                  <div><span className="text-foreground/65">Cliente:</span><span className="ml-2 text-foreground-strong">{rawProposal.clientName}</span></div>
+                  <div><span className="text-foreground/65">Valor Total:</span><span className="ml-2 text-foreground-strong font-bold">{formatCurrency(rawProposal.investmentValue)}</span></div>
+                  <div className="md:col-span-2"><span className="text-foreground/65">Objetivo:</span><p className="mt-1 text-foreground-strong">{rawProposal.objective}</p></div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-card/50 backdrop-blur-sm border-white/10">
+            <Card className="bg-card/50 backdrop-blur-sm border-foreground/10">
               <CardContent className="p-6">
                 <Collapsible open={isRescisionOpen} onOpenChange={setIsRescisionOpen}>
                   <CollapsibleTrigger className="w-full flex items-center justify-between text-left hover:opacity-80 transition-opacity cursor-pointer outline-none">
                     <h2 className="text-xl font-bold">Política de Rescisão</h2>
-                    <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 shrink-0 ${isRescisionOpen ? "rotate-180" : ""}`} />
+                    <ChevronDown className={`w-5 h-5 text-foreground/65 transition-transform duration-200 shrink-0 ${isRescisionOpen ? "rotate-180" : ""}`} />
                   </CollapsibleTrigger>
                   <CollapsibleContent className="mt-4">
-                    <div className="prose prose-invert prose-headings:text-white prose-p:text-gray-300 prose-strong:text-white prose-ul:text-gray-300 prose-li:text-gray-300 prose-hr:border-white/10 max-w-none">
+                    <div className="prose prose-invert prose-headings:text-foreground-strong prose-p:text-foreground/90 prose-strong:text-foreground-strong prose-ul:text-foreground/90 prose-li:text-foreground/90 prose-hr:border-foreground/10 max-w-none">
                       <ReactMarkdown>{rawProposal.rescissionPolicy || DEFAULT_RESCISION_POLICY}</ReactMarkdown>
                     </div>
                   </CollapsibleContent>
@@ -206,14 +206,14 @@ export default function PlaygroundProposalAcceptView() {
               </CardContent>
             </Card>
 
-            <Card className="bg-card/50 backdrop-blur-sm border-white/10">
+            <Card className="bg-card/50 backdrop-blur-sm border-foreground/10">
               <CardContent className="p-6">
                 <h2 className="text-lg font-bold mb-2">Foro</h2>
-                <p className="text-gray-300">Fica eleito o foro da comarca de Itapevi – SP para dirimir quaisquer controvérsias oriundas deste contrato, com renúncia a qualquer outro, por mais privilegiado que seja.</p>
+                <p className="text-foreground/90">Fica eleito o foro da comarca de Itapevi – SP para dirimir quaisquer controvérsias oriundas deste contrato, com renúncia a qualquer outro, por mais privilegiado que seja.</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-card/50 backdrop-blur-sm border-white/10">
+            <Card className="bg-card/50 backdrop-blur-sm border-foreground/10">
               <CardContent className="p-6">
                 <div className="flex items-start gap-3">
                   <Checkbox id="consent" checked={hasConsent} onCheckedChange={checked => setHasConsent(checked === true)} className="mt-1" />
@@ -229,7 +229,7 @@ export default function PlaygroundProposalAcceptView() {
               </Button>
             </div>
 
-            <div className="text-center text-sm text-gray-500">
+            <div className="text-center text-sm text-foreground/42">
               <p>Ao clicar em "Ler Contrato", você poderá visualizar o contrato completo. A proposta só será aceita quando você assinar digitalmente no final do contrato.</p>
             </div>
           </motion.div>

@@ -105,11 +105,15 @@ describe("applyLayout", () => {
     expect(await fs.exists("/project/src/components/Footer.tsx")).toBe(false);
   });
 
-  it("layout swiss copia Layout.tsx e Sidebar.tsx para src/components/", async () => {
+  it("layout swiss copia Layout.tsx, Sidebar.tsx e SwissShared.tsx para src/components/", async () => {
     const vol = Volume.fromJSON({});
-    vol.mkdirSync("/templates/layouts/swiss", { recursive: true });
+    vol.mkdirSync("/templates/layouts/swiss/pages", { recursive: true });
     vol.writeFileSync("/templates/layouts/swiss/Layout.tsx", "// swiss Layout");
     vol.writeFileSync("/templates/layouts/swiss/Sidebar.tsx", "// swiss Sidebar");
+    vol.writeFileSync("/templates/layouts/swiss/SwissShared.tsx", "// swiss Shared");
+    for (const page of ["Home", "Resume", "Portfolio", "About", "Blog"]) {
+      vol.writeFileSync(`/templates/layouts/swiss/pages/${page}.tsx`, `// swiss ${page}`);
+    }
     vol.mkdirSync("/project/src/components", { recursive: true });
     const fs = makeFsModule(vol);
 
@@ -117,8 +121,30 @@ describe("applyLayout", () => {
 
     const layout = vol.readFileSync("/project/src/components/Layout.tsx", "utf-8") as string;
     const sidebar = vol.readFileSync("/project/src/components/Sidebar.tsx", "utf-8") as string;
+    const shared = vol.readFileSync("/project/src/components/SwissShared.tsx", "utf-8") as string;
     expect(layout).toContain("swiss Layout");
     expect(sidebar).toContain("swiss Sidebar");
+    expect(shared).toContain("swiss Shared");
+  });
+
+  it("layout swiss copia as 5 páginas para src/pages/", async () => {
+    const vol = Volume.fromJSON({});
+    vol.mkdirSync("/templates/layouts/swiss/pages", { recursive: true });
+    vol.writeFileSync("/templates/layouts/swiss/Layout.tsx", "// swiss Layout");
+    vol.writeFileSync("/templates/layouts/swiss/Sidebar.tsx", "// swiss Sidebar");
+    vol.writeFileSync("/templates/layouts/swiss/SwissShared.tsx", "// swiss Shared");
+    for (const page of ["Home", "Resume", "Portfolio", "About", "Blog"]) {
+      vol.writeFileSync(`/templates/layouts/swiss/pages/${page}.tsx`, `// swiss ${page}`);
+    }
+    vol.mkdirSync("/project/src/components", { recursive: true });
+    const fs = makeFsModule(vol);
+
+    await applyLayout("swiss" as Parameters<typeof applyLayout>[0], { projectDir: PROJECT_DIR, templatesDir: TEMPLATES_DIR }, fs);
+
+    for (const page of ["Home", "Resume", "Portfolio", "About", "Blog"]) {
+      const content = vol.readFileSync(`/project/src/pages/${page}.tsx`, "utf-8") as string;
+      expect(content).toContain(`swiss ${page}`);
+    }
   });
 
   it("layout bento copia Layout.tsx e FloatingDock.tsx para src/components/", async () => {

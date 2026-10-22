@@ -23,8 +23,9 @@ const LAYOUT_FILES: Record<Layout, { copy: string[]; remove: string[]; pages?: s
     pages: ["Home.tsx", "Resume.tsx", "Portfolio.tsx", "About.tsx", "Blog.tsx"],
   },
   swiss: {
-    copy: ["Layout.tsx", "Sidebar.tsx"],
+    copy: ["Layout.tsx", "Sidebar.tsx", "SwissShared.tsx"],
     remove: ["Navbar.tsx", "Footer.tsx"],
+    pages: ["Home.tsx", "Resume.tsx", "Portfolio.tsx", "About.tsx", "Blog.tsx"],
   },
   bento: {
     copy: ["Layout.tsx", "FloatingDock.tsx"],

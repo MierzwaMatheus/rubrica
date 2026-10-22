@@ -119,7 +119,7 @@ export default function Portfolio() {
               fontSize: 11.5,
             }}
           >
-            {filters.map((f) => (
+            {filters.map((f, i) => (
               <span
                 key={f}
                 onClick={() => setActiveFilter(f)}

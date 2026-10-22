@@ -252,11 +252,15 @@ export async function runSetup(deps: RunSetupDeps = {}): Promise<void> {
   try {
     execFileSync(
       "npx",
-      ["convex", "run", "seed:seedAll", "--data", JSON.stringify({ enabledPlugins })],
+      ["convex", "run", "seed:seedAll", JSON.stringify({ enabledPlugins })],
       { stdio: "pipe" }
     );
-  } catch {
-    // não crítico — admin pode rodar seedAll manualmente depois
+  } catch (err: unknown) {
+    const output =
+      (err as { stdout?: Buffer }).stdout?.toString() ||
+      (err as { stderr?: Buffer }).stderr?.toString() ||
+      (err as Error).message;
+    log.warn(`seedAll falhou: ${output.trim() || "erro desconhecido"} — rode 'npx convex run seed:seedAll \"{...}\"' manualmente depois.`);
   }
 
   // Seed de identidade no Convex (siteConfig + contactInfo) a partir do rubrica.json

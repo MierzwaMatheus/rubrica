@@ -1,5 +1,5 @@
 import { v } from 'convex/values';
-import { mutation, query } from './_generated/server';
+import { internalMutation, mutation, query } from './_generated/server';
 import { requireRole } from './auth';
 import { markPendingChanges } from './publishStatus';
 import { logAudit } from './audit';
@@ -109,5 +109,26 @@ export const restore = mutation({
     await restoreDoc(ctx, 'aboutDailyRoutine', args.id);
     await markPendingChanges(ctx);
     await logAudit(ctx, { eventType: 'admin.restore', actorType: 'user', actorId: userId, targetType: 'aboutDailyRoutine', targetId: args.id, metadata: { label: existing?.description }, success: true });
+  },
+});
+
+const ABOUT_DAILY_ROUTINE_SEED_VALUES = [
+  { description: 'Manhã: leitura técnica e revisão de PRs', spanSize: '1x1' as const, displayOrder: 0 },
+  { description: 'Tarde: desenvolvimento e pair programming', spanSize: '1x1' as const, displayOrder: 1 },
+  { description: 'Noite: projetos pessoais e estudo', spanSize: '1x1' as const, displayOrder: 2 },
+];
+
+export const seed = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const existing = await ctx.db.query('aboutDailyRoutine').collect();
+    if (existing.length >= ABOUT_DAILY_ROUTINE_SEED_VALUES.length) return;
+
+    const now = Date.now();
+    const remaining = ABOUT_DAILY_ROUTINE_SEED_VALUES.length - existing.length;
+    for (let i = 0; i < remaining; i += 1) {
+      const item = ABOUT_DAILY_ROUTINE_SEED_VALUES[i];
+      await ctx.db.insert('aboutDailyRoutine', { ...item, createdAt: now });
+    }
   },
 });

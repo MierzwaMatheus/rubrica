@@ -725,7 +725,7 @@ describe("runSetup — Ciclo 9: siteTexts seed", () => {
     };
   }
 
-  it("chama convex run seed:seedAll com --data contendo enabledPlugins derivados de plugins ativos", async () => {
+  it("chama convex run seed:seedAll com payload JSON contendo enabledPlugins derivados de plugins ativos", async () => {
     vi.mocked(textPrompt)
       .mockResolvedValueOnce("https://meusite.com")
       .mockResolvedValueOnce("admin@teste.com")
@@ -746,9 +746,8 @@ describe("runSetup — Ciclo 9: siteTexts seed", () => {
     const seedAllCall = fileCalls.find((c) => c[1].includes("seed:seedAll"));
     expect(seedAllCall).toBeDefined();
     const args = seedAllCall![1];
-    expect(args).toContain("--data");
-    const dataIdx = args.indexOf("--data");
-    const payload = JSON.parse(args[dataIdx + 1]);
+    // O último argumento é o JSON payload (sem flag --data, que não existe em `npx convex run`).
+    const payload = JSON.parse(args[args.length - 1]);
     expect(payload.enabledPlugins).toEqual(
       expect.arrayContaining(["blog", "proposals", "i18n"])
     );
@@ -794,13 +793,12 @@ describe("runSetup — Ciclo 9: siteTexts seed", () => {
     const seedAllCall = fileCalls.find((c) => c[1].includes("seed:seedAll"));
     expect(seedAllCall).toBeDefined();
     const args = seedAllCall![1];
-    const dataIdx = args.indexOf("--data");
-    const payload = JSON.parse(args[dataIdx + 1]);
+    const payload = JSON.parse(args[args.length - 1]);
     expect(payload.enabledPlugins).toEqual(["blog", "i18n"]);
     expect(payload.enabledPlugins).not.toContain("proposals");
   });
 
-  it("chamada seed:seedAll tem estrutura exata: convex run seed:seedAll --data {enabledPlugins} (ordem importa)", async () => {
+  it("chamada seed:seedAll tem estrutura exata: convex run seed:seedAll {payload JSON} (sem flag --data, ordem importa)", async () => {
     vi.mocked(textPrompt)
       .mockResolvedValueOnce("https://meusite.com")
       .mockResolvedValueOnce("admin@teste.com")
@@ -821,14 +819,14 @@ describe("runSetup — Ciclo 9: siteTexts seed", () => {
     const runIdx = args.indexOf("run");
     const convexIdx = args.indexOf("convex");
     const seedAllIdx = args.indexOf("seed:seedAll");
-    const dataFlagIdx = args.indexOf("--data");
-    // executable deve ser "npx" (Stryker mutante seed.ts:254 - baixa severidade, mas trivial de testar)
     expect(executable).toBe("npx");
-    // args deve ser ["convex", "run", "seed:seedAll", "--data", JSON.stringify({...})]
+    // args deve ser ["convex", "run", "seed:seedAll", JSON.stringify({enabledPlugins})]
     expect(convexIdx).toBe(0);
     expect(runIdx).toBe(1);
     expect(seedAllIdx).toBe(2);
-    expect(dataFlagIdx).toBe(3);
-    expect(args[dataFlagIdx + 1]).toMatch(/^\{.*"enabledPlugins".*\}$/);
+    expect(args).toHaveLength(4); // convex, run, seed:seedAll, payload
+    expect(args[3]).toMatch(/^\{.*"enabledPlugins".*\}$/);
+    // Não pode ter --data (não existe em npx convex run).
+    expect(args).not.toContain("--data");
   });
 });

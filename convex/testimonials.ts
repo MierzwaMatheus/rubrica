@@ -5,6 +5,27 @@ import { markPendingChanges } from './publishStatus';
 import { logAudit } from './audit';
 import { softDeleteDoc, restoreDoc } from './lib/softDelete';
 
+const TESTIMONIALS_SEED_VALUES = [
+  {
+    name: 'Carlos Mendes',
+    slug: 'carlos-mendes',
+    role: 'CEO, Agência Digital X',
+    text: 'A Ana entregou o projeto dentro do prazo com qualidade acima do esperado. Recomendo sem reservas.',
+  },
+  {
+    name: 'Patrícia Lima',
+    slug: 'patricia-lima',
+    role: 'Product Owner, Fintech Y',
+    text: 'Comunicação excelente durante todo o projeto. Sempre proativa em reportar impedimentos e propor soluções.',
+  },
+  {
+    name: 'Ricardo Alves',
+    slug: 'ricardo-alves',
+    role: 'CTO, SaaS Z',
+    text: 'Expertise técnica impressionante. O código entregue era limpo, bem estruturado e fácil de manter.',
+  },
+];
+
 export const list = query({
   args: { onlyHome: v.optional(v.boolean()), includeDeleted: v.optional(v.boolean()) },
   handler: async (ctx, { onlyHome, includeDeleted }) => {
@@ -237,5 +258,30 @@ export const unpublish = mutation({
     });
 
     await markPendingChanges(ctx);
+  },
+});
+
+export const seed = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const existing = await ctx.db.query('testimonials').collect();
+    if (existing.length >= TESTIMONIALS_SEED_VALUES.length) return;
+
+    const now = Date.now();
+    const remaining = TESTIMONIALS_SEED_VALUES.length - existing.length;
+    for (let i = 0; i < remaining; i += 1) {
+      const item = TESTIMONIALS_SEED_VALUES[i];
+      await ctx.db.insert('testimonials', {
+        name: item.name,
+        role: item.role,
+        roleTranslations: { ptBR: item.role },
+        imageUrl: `https://picsum.photos/seed/${item.slug}/256/256`,
+        text: item.text,
+        textTranslations: { ptBR: item.text },
+        orderIndex: i,
+        showOnHome: true,
+        createdAt: now,
+      });
+    }
   },
 });

@@ -775,4 +775,29 @@ describe("2.12 — arquivos de layout são TypeScript sintaticamente válidos", 
     const content = readFileSync(filePath, "utf-8");
     expect(content).toMatch(/toLocaleDateString/);
   });
+
+  it("layout magazine — pages não usam imports relativos quebrados (../X quando X vai para src/components/)", () => {
+    // O applyLayout copia Layout.tsx e Masthead.tsx para src/components/, mas as
+    // pages do magazine ficam em src/pages/. Imports relativos como "../Masthead"
+    // resolveriam para src/Masthead (não existe) e quebrariam o build.
+    const pages = ["Home", "About", "Portfolio", "Blog", "Resume"];
+    for (const page of pages) {
+      const filePath = resolve(TEMPLATES_DIR, `magazine/pages/${page}.tsx`);
+      const content = readFileSync(filePath, "utf-8");
+      expect(content, `${page}.tsx não deve importar de "../Masthead"`).not.toMatch(
+        /from\s+["']\.\.\/Masthead["']/,
+      );
+    }
+  });
+
+  it("layout brutalist — Navbar.tsx não usa caminho excessivo para convex/pluginRegistry", () => {
+    // O applyLayout copia Navbar.tsx para src/components/Navbar.tsx. O caminho
+    // correto para `convex/pluginRegistry` (na raiz do projeto) é `../../convex/pluginRegistry`.
+    // `../../../convex/pluginRegistry` sairia da raiz e quebraria a resolução.
+    const filePath = resolve(TEMPLATES_DIR, "brutalist/Navbar.tsx");
+    const content = readFileSync(filePath, "utf-8");
+    expect(content, "Navbar.tsx não deve ter ../../../convex/pluginRegistry").not.toMatch(
+      /from\s+["']\.\.\/\.\.\/\.\.\/convex\/pluginRegistry["']/,
+    );
+  });
 });

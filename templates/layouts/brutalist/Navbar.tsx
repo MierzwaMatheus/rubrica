@@ -1,6 +1,6 @@
 import { Link, useRoute } from "wouter";
 import { usePlugin } from "@/contexts/PluginsContext";
-import type { PluginId } from "../../../convex/pluginRegistry";
+import type { PluginId } from "../../convex/pluginRegistry";
 
 const NAV_ITEMS: Array<{ href: string; label: string; pluginId: PluginId | null }> = [
   { href: "/", label: "início", pluginId: null },

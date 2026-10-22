@@ -120,7 +120,7 @@ export default function Home() {
           </div>
 
           <div className="flex flex-wrap gap-4 mt-10">
-            {(tValue("home.hero.technologies") || []).map(
+            {(Array.isArray(tValue("home.hero.technologies")) ? tValue("home.hero.technologies") : []).map(
               (tech: { name: string; color: string }) => (
                 <div
                   key={tech.name}

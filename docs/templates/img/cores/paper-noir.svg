@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="320" viewBox="0 0 600 320">
+<rect width="600" height="320" rx="16" fill="#ffffff"/>
+<text x="24" y="40" font-family='Inter,Helvetica,Arial,sans-serif' font-size="20" font-weight="800" fill="#111">Paper Noir</text>
+<text x="576" y="40" text-anchor="end" font-family='Inter,Helvetica,Arial,sans-serif' font-size="13" fill="#666">paper-noir · tema claro</text>
+<g transform="translate(24,64)">
+  <rect width="126" height="92" rx="10" fill="#f0eee9" stroke="#00000022"/>
+  <text x="12" y="26" font-family='Inter,Helvetica,Arial,sans-serif' font-size="13" font-weight="700" fill="#111111">--bg</text>
+  <text x="12" y="46" font-family='Inter,Helvetica,Arial,sans-serif' font-size="12" fill="#111111" opacity="0.85">fundo</text>
+  <text x="12" y="78" font-family="ui-monospace,Menlo,monospace" font-size="13" fill="#111111">#f0eee9</text>
+</g>
+<g transform="translate(162,64)">
+  <rect width="126" height="92" rx="10" fill="#0a0a0a" stroke="#00000022"/>
+  <text x="12" y="26" font-family='Inter,Helvetica,Arial,sans-serif' font-size="13" font-weight="700" fill="#ffffff">--text</text>
+  <text x="12" y="46" font-family='Inter,Helvetica,Arial,sans-serif' font-size="12" fill="#ffffff" opacity="0.85">texto</text>
+  <text x="12" y="78" font-family="ui-monospace,Menlo,monospace" font-size="13" fill="#ffffff">#0a0a0a</text>
+</g>
+<g transform="translate(300,64)">
+  <rect width="126" height="92" rx="10" fill="#ef4444" stroke="#00000022"/>
+  <text x="12" y="26" font-family='Inter,Helvetica,Arial,sans-serif' font-size="13" font-weight="700" fill="#ffffff">--primary</text>
+  <text x="12" y="46" font-family='Inter,Helvetica,Arial,sans-serif' font-size="12" fill="#ffffff" opacity="0.85">primária</text>
+  <text x="12" y="78" font-family="ui-monospace,Menlo,monospace" font-size="13" fill="#ffffff">#ef4444</text>
+</g>
+<g transform="translate(438,64)">
+  <rect width="126" height="92" rx="10" fill="#3b82f6" stroke="#00000022"/>
+  <text x="12" y="26" font-family='Inter,Helvetica,Arial,sans-serif' font-size="13" font-weight="700" fill="#ffffff">--accent</text>
+  <text x="12" y="46" font-family='Inter,Helvetica,Arial,sans-serif' font-size="12" fill="#ffffff" opacity="0.85">destaque</text>
+  <text x="12" y="78" font-family="ui-monospace,Menlo,monospace" font-size="13" fill="#ffffff">#3b82f6</text>
+</g>
+<g transform="translate(24,176)">
+  <rect width="552" height="120" rx="12" fill="#f0eee9" stroke="#00000022"/>
+  <text x="20" y="40" font-family='Inter,Helvetica,Arial,sans-serif' font-size="22" font-weight="800" fill="#0a0a0a">Olá, eu sou a <tspan fill="#ef4444">Alex</tspan>.</text>
+  <text x="20" y="64" font-family='Inter,Helvetica,Arial,sans-serif' font-size="13" fill="#0a0a0a" opacity="0.7">Texto secundário derivado de --text sobre --bg.</text>
+  <rect x="20" y="80" width="118" height="28" rx="6" fill="#ef4444"/>
+  <text x="79" y="99" text-anchor="middle" font-family='Inter,Helvetica,Arial,sans-serif' font-size="13" font-weight="700" fill="#ffffff">Ver projetos</text>
+  <rect x="150" y="80" width="96" height="28" rx="14" fill="none" stroke="#3b82f6" stroke-width="2"/>
+  <text x="198" y="99" text-anchor="middle" font-family='Inter,Helvetica,Arial,sans-serif' font-size="12" font-weight="700" fill="#3b82f6">destaque</text>
+  <rect x="404" y="20" width="128" height="88" rx="10" fill="#0a0a0a" opacity="0.08"/>
+  <rect x="418" y="36" width="64" height="8" rx="4" fill="#ef4444"/>
+  <rect x="418" y="54" width="96" height="6" rx="3" fill="#0a0a0a" opacity="0.5"/>
+  <rect x="418" y="68" width="80" height="6" rx="3" fill="#0a0a0a" opacity="0.5"/>
+  <rect x="418" y="86" width="40" height="8" rx="4" fill="#3b82f6"/>
+</g>
+</svg>

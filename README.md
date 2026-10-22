@@ -55,6 +55,20 @@ A base técnica é coletiva. A identidade é sua.
 
 <br />
 
+## Templates e paletas
+
+Ao criar o projeto, você escolhe um de **5 layouts** e uma de **4 paletas de cores** — qualquer combinação funciona.
+
+| [Cyberpunk](./docs/templates/cyberpunk.md) | [Brutalism Terminal](./docs/templates/brutalist.md) | [Swiss Grid](./docs/templates/swiss.md) | [Bento](./docs/templates/bento.md) | [Magazine](./docs/templates/magazine.md) |
+|---|---|---|---|---|
+| <img src="docs/templates/img/cyberpunk/home.jpg" width="180" /> | <img src="docs/templates/img/brutalist/home.jpg" width="180" /> | <img src="docs/templates/img/swiss/home.jpg" width="180" /> | <img src="docs/templates/img/bento/home.jpg" width="180" /> | <img src="docs/templates/img/magazine/home.jpg" width="180" /> |
+| Terminal neon com sidebar | Sessão de terminal em monospace | Cartaz suíço em 12 colunas | Mosaico de cartões com dock | Revista impressa |
+
+- [**Guia dos templates**](./docs/templates/README.md): conceito de cada layout e o que cada página tem de exclusivo, com capturas.
+- [**Esquemas de cores**](./docs/templates/cores.md): as 4 paletas, o contrato de 4 cores (`--bg`, `--text`, `--primary`, `--accent`) e a página inicial de cada layout em cada paleta.
+
+<br />
+
 ## Como funciona
 
 Rubrica tem três camadas: o frontend que o mundo vê, o backend que guarda tudo, e os serviços externos que você liga só se precisar.
@@ -236,7 +250,8 @@ Logado em `/admin`, tudo é gerenciado por interface. Você não toca no código
 
 Esta é a etapa **mais importante** depois do deploy técnico. Identidade visual é o que vai te diferenciar. Onde mexer:
 
-- `src/index.css` — variáveis de cor, tema dark/light, paleta _(o default vem com neon purple `#a855f7` + neon lime — **mude isso**)_
+- **Cores** — o tema inteiro sai de 4 variáveis (`--bg`, `--text`, `--primary`, `--accent`) no `:root` de `src/index.css`, ou pelo admin em **Site & Aparência**. Veja as paletas prontas e as regras em [Esquemas de cores](./docs/templates/cores.md).
+- **Layout** — troque com `rubrica config`; veja os 5 no [guia dos templates](./docs/templates/README.md)
 - `src/components/Layout.tsx` — estrutura visual da página
 - `src/pages/Home.tsx` — hero, copy, ordem das seções, animações
 - `public/favicon.ico` — troque pelo seu logo
@@ -332,8 +347,10 @@ rubrica/
 │   ├── contexts/        # AuthContext, ThemeContext, PluginsContext
 │   └── index.css        # ← Personalize cores e tema aqui
 ├── scripts/             # Build-time: RSS, sitemap, fetch de dados estáticos
-├── public/              # Assets estáticos (favicon, dados gerados)
+├── templates/           # Layouts que o CLI aplica (veja docs/templates)
+├── public/              # Assets estáticos (favicon, dados de exemplo/gerados)
 ├── docs/features.md     # Referência técnica completa
+├── docs/templates/      # Guia dos layouts e das paletas, com capturas
 ├── .env.example         # Template de variáveis de ambiente
 └── vercel.json          # Build command, rewrites SPA, security headers
 ```

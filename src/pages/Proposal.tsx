@@ -17,6 +17,7 @@ import ReactMarkdown from "react-markdown";
 import { ContractModal } from "@/components/ContractModal";
 import { generatePaymentMethods } from "@/utils/contractGenerator";
 import { printContractPDF } from "@/utils/contractPDF";
+import { useSiteConfig } from "@/hooks/useSiteConfig";
 
 // Build a snake_case adapter so existing utils (contractGenerator, ContractModal) still work
 function toLegacyProposal(p: any) {
@@ -42,6 +43,8 @@ export default function Proposal() {
   const { id } = useParams(); // This is the slug
   const slug = id ?? "";
   const [, setLocation] = useLocation();
+  const siteConfig = useSiteConfig();
+  const authorName = siteConfig.author_name;
   const [isVisible, setIsVisible] = useState(false);
   const [password, setPassword] = useState("");
   const [sessionToken, setSessionToken] = useState<string | null>(null);
@@ -305,13 +308,10 @@ export default function Proposal() {
                 <div className="text-lg text-gray-300 leading-relaxed space-y-4">
                   <p>Olá, tudo bem?</p>
                   <p>
-                  Antes de tudo, agradeço o interesse! Sou Matheus Mierzwa, Arquiteto de Soluções Digitais e Tech Lead Frontend com mais de 4 anos de experiência transformando desafios complexos em ecossistemas digitais robustos.
+                  Antes de tudo, agradeço o interesse!{authorName && ` Sou ${authorName}.`}
                   </p>
                   <p>
-                  Minha expertise vai além de código. Desenho arquiteturas escaláveis,lidero equipes técnicas, defino padrões de excelência e conduzo decisões estratégicas que impactam produtos inteiros. Especializado em React, TypeScript, infraestrutura moderna e integração inteligente de IA.
-                  </p>
-                  <p>
-                  Meu objetivo é simples: transformar sua visão em uma solução que seja simultaneamente elegante, escalável e inteligente. Vamos onversar sobre como isso pode funcionar no seu projeto?
+                  Meu objetivo é simples: transformar sua visão em uma solução que seja simultaneamente elegante, escalável e inteligente. Vamos conversar sobre como isso pode funcionar no seu projeto?
                   </p>
                 </div>
               </CardContent>
@@ -510,7 +510,7 @@ export default function Proposal() {
 
           <motion.footer variants={itemVariants} className="text-center border-t border-white/10 pt-8 pb-4">
             <p className="text-gray-500 text-sm">
-              © 2025 Matheus Mierzwa. Todos os direitos reservados.
+              © {new Date().getFullYear()} {authorName || siteConfig.site_name}. Todos os direitos reservados.
             </p>
             <p className="text-gray-600 text-xs mt-2">
               Esta proposta é confidencial e destinada apenas ao cliente especificado.

@@ -794,7 +794,7 @@ export default function PaymentLinks() {
                   id="customer-name"
                   value={customerForm.name}
                   onChange={(e) => setCustomerForm({ ...customerForm, name: e.target.value })}
-                  placeholder="Ex: Matheus Mierzwa"
+                  placeholder="Ex: Seu nome"
                   className="mt-1 bg-white/5 border-white/10"
                 />
               </div>

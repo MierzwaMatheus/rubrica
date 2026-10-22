@@ -16,6 +16,7 @@ import {
 import { useTranslation } from "@/i18n/hooks/useTranslation";
 import { useI18n } from "@/i18n/context/I18nContext";
 import { useHome } from "@/hooks/useHome";
+import { useSiteConfig } from "@/hooks/useSiteConfig";
 import { homeRepository } from "@/repositories/instances";
 import { useMatrixText } from "@/hooks/useMatrixText";
 import { AvailabilityBadge } from "@/components/AvailabilityBadge";
@@ -26,6 +27,7 @@ import { Link } from "wouter";
 export default function Home() {
   const { t, tValue } = useTranslation();
   const { isLoading: i18nLoading } = useI18n();
+  const siteConfig = useSiteConfig();
   const { contactRole, aboutText, services, testimonials, availability, isLoading } =
     useHome(homeRepository);
   const [wizardOpen, setWizardOpen] = useState(false);
@@ -69,8 +71,8 @@ export default function Home() {
   return (
     <>
       <SEO
-        title="Desenvolvedor Front-end Sênior &amp; Tech Lead React"
-        description="Transformo desafios complexos em ecossistemas digitais robustos. Especialista em React, TypeScript e arquitetura de sistemas. Confira meus projetos e artigos."
+        title={siteConfig.seo_home_title || siteConfig.site_title}
+        description={siteConfig.seo_home_description || undefined}
         url="/"
       />
       <motion.div

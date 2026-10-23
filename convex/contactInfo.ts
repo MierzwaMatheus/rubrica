@@ -39,50 +39,64 @@ export const seed = internalMutation({
   },
 });
 
+const contactInfoArgs = {
+  name: v.optional(v.string()),
+  role: v.optional(v.string()),
+  roleTranslations: v.optional(
+    v.object({ 'ptBR': v.string(), 'enUS': v.optional(v.string()) }),
+  ),
+  email: v.optional(v.string()),
+  showEmail: v.optional(v.boolean()),
+  phone: v.optional(v.string()),
+  showPhone: v.optional(v.boolean()),
+  birthDate: v.optional(v.string()),
+  showBirthDate: v.optional(v.boolean()),
+  location: v.optional(v.string()),
+  showLocation: v.optional(v.boolean()),
+  avatarUrl: v.optional(v.string()),
+  avatarStorageId: v.optional(v.id('_storage')),
+  linkedinUrl: v.optional(v.string()),
+  githubUrl: v.optional(v.string()),
+  behanceUrl: v.optional(v.string()),
+  proposalIntro: v.optional(v.string()),
+  proposalAiContext: v.optional(v.string()),
+};
+
+async function upsertContactInfo(ctx: any, args: Record<string, unknown>) {
+  const existing = await ctx.db.query('contactInfo').first();
+  const now = Date.now();
+
+  if (existing) {
+    await ctx.db.patch(existing._id, { ...args, updatedAt: now });
+  } else {
+    await ctx.db.insert('contactInfo', {
+      name: args.name ?? '',
+      role: args.role ?? '',
+      email: args.email ?? '',
+      showEmail: args.showEmail ?? true,
+      showPhone: args.showPhone ?? false,
+      showBirthDate: args.showBirthDate ?? false,
+      showLocation: args.showLocation ?? false,
+      ...args,
+      createdAt: now,
+    });
+  }
+  await markPendingChanges(ctx);
+}
+
 export const update = mutation({
-  args: {
-    name: v.optional(v.string()),
-    role: v.optional(v.string()),
-    roleTranslations: v.optional(
-      v.object({ 'ptBR': v.string(), 'enUS': v.optional(v.string()) }),
-    ),
-    email: v.optional(v.string()),
-    showEmail: v.optional(v.boolean()),
-    phone: v.optional(v.string()),
-    showPhone: v.optional(v.boolean()),
-    birthDate: v.optional(v.string()),
-    showBirthDate: v.optional(v.boolean()),
-    location: v.optional(v.string()),
-    showLocation: v.optional(v.boolean()),
-    avatarUrl: v.optional(v.string()),
-    avatarStorageId: v.optional(v.id('_storage')),
-    linkedinUrl: v.optional(v.string()),
-    githubUrl: v.optional(v.string()),
-    behanceUrl: v.optional(v.string()),
-    proposalIntro: v.optional(v.string()),
-    proposalAiContext: v.optional(v.string()),
-  },
+  args: contactInfoArgs,
   handler: async (ctx, args) => {
     const { userId } = await requireRole(ctx, ['root', 'admin']);
-    const existing = await ctx.db.query('contactInfo').first();
-    const now = Date.now();
-
-    if (existing) {
-      await ctx.db.patch(existing._id, { ...args, updatedAt: now });
-    } else {
-      await ctx.db.insert('contactInfo', {
-        name: args.name ?? '',
-        role: args.role ?? '',
-        email: args.email ?? '',
-        showEmail: args.showEmail ?? true,
-        showPhone: args.showPhone ?? false,
-        showBirthDate: args.showBirthDate ?? false,
-        showLocation: args.showLocation ?? false,
-        ...args,
-        createdAt: now,
-      });
-    }
-    await markPendingChanges(ctx);
+    await upsertContactInfo(ctx, args);
     await logAudit(ctx, { eventType: 'admin.update', actorType: 'user', actorId: userId, targetType: 'contactInfo', success: true });
+  },
+});
+
+// Usada pelo setup da CLI (`npx convex run`), que roda sem usuário logado.
+export const updateInternal = internalMutation({
+  args: contactInfoArgs,
+  handler: async (ctx, args) => {
+    await upsertContactInfo(ctx, args);
   },
 });

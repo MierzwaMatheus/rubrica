@@ -119,3 +119,7 @@ public/sitemap.xml
 src/data/
 /public/rss.xml
 /cli/rubrica layouts
+
+# Claude Code: só os arquivos locais de cada pessoa (skills e settings.json do projeto ficam versionados)
+.claude/settings.local.json
+.claude/*.lock

@@ -1,8 +1,9 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { internalMutation, mutation, query } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { requireRole } from "./auth";
 import { logAudit } from "./audit";
+import { markPendingChanges } from "./publishStatus";
 import type { Id } from "./_generated/dataModel";
 
 export const PUBLIC_KEYS = [
@@ -68,20 +69,36 @@ export const getPublic = query({
   },
 });
 
+const batchItems = v.array(v.object({ key: v.string(), value: v.any() }));
+
+async function upsertBatch(ctx: any, items: Array<{ key: string; value: unknown }>) {
+  for (const { key, value } of items) {
+    await upsertKey(ctx, key, value);
+  }
+}
+
 export const setBatch = mutation({
-  args: { items: v.array(v.object({ key: v.string(), value: v.any() })) },
+  args: { items: batchItems },
   handler: async (ctx, { items }) => {
-    for (const { key, value } of items) {
-      const existing = await ctx.db
-        .query("siteConfig")
-        .withIndex("by_key", (q) => q.eq("key", key))
-        .unique();
-      if (existing) {
-        await ctx.db.patch(existing._id, { value, updatedAt: Date.now() });
-      } else {
-        await ctx.db.insert("siteConfig", { key, value, createdAt: Date.now() });
-      }
-    }
+    const { userId } = await requireRole(ctx, ["root", "admin"]);
+    await upsertBatch(ctx, items);
+    await markPendingChanges(ctx);
+    await logAudit(ctx, {
+      eventType: "siteConfig.setBatch",
+      actorType: "user",
+      actorId: userId,
+      targetType: "siteConfig",
+      metadata: { keys: items.map((i) => i.key) },
+      success: true,
+    });
+  },
+});
+
+// Usada pelo setup da CLI (`npx convex run`), que roda sem usuário logado.
+export const setBatchInternal = internalMutation({
+  args: { items: batchItems },
+  handler: async (ctx, { items }) => {
+    await upsertBatch(ctx, items);
   },
 });
 
@@ -89,15 +106,8 @@ export const set = mutation({
   args: { key: v.string(), value: v.any() },
   handler: async (ctx, { key, value }) => {
     const { userId } = await requireRole(ctx, ["root", "admin"]);
-    const existing = await ctx.db
-      .query("siteConfig")
-      .withIndex("by_key", (q) => q.eq("key", key))
-      .unique();
-    if (existing) {
-      await ctx.db.patch(existing._id, { value, updatedAt: Date.now() });
-    } else {
-      await ctx.db.insert("siteConfig", { key, value, createdAt: Date.now() });
-    }
+    await upsertKey(ctx, key, value);
+    await markPendingChanges(ctx);
     await logAudit(ctx, {
       eventType: "siteConfig.set",
       actorType: "user",
@@ -128,5 +138,6 @@ export const setOgImage = mutation({
     const url = await ctx.storage.getUrl(storageId as Id<"_storage">);
     await upsertKey(ctx, "og_image_storage_id", storageId);
     await upsertKey(ctx, "og_image_url", url ?? "");
+    await markPendingChanges(ctx);
   },
 });

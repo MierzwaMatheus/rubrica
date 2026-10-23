@@ -102,9 +102,8 @@ export const seed = internalMutation({
         .query('homeContent')
         .withIndex('by_key', (q) => q.eq('key', key))
         .unique();
-      if (existing) {
-        await ctx.db.patch(existing._id, { value, updatedAt: now });
-      } else {
+      // Só cria o que falta: rodar o setup de novo não apaga a home personalizada.
+      if (!existing) {
         await ctx.db.insert('homeContent', { key, value, createdAt: now });
       }
     }

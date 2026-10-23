@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { seed } from "../../convex/contactInfo";
+import { seed, updateInternal } from "../../convex/contactInfo";
 import { createMockCtx, type MockCtx } from "../_helpers/convexCtx";
 
 const handler = (fn: any) => fn._handler ?? fn;
@@ -97,5 +97,32 @@ describe("convex/contactInfo · seed", () => {
     expect(docs.length).toBe(1);
     expect(docs[0].name).toBe("Existing User");
     expect(docs[0].email).toBe("existing@test.com");
+  });
+});
+describe("convex/contactInfo · updateInternal (setup da CLI via convex run)", () => {
+  let ctx: MockCtx;
+  beforeEach(() => {
+    ctx = createMockCtx();
+  });
+
+  it("cria o registro sem usuário logado quando não existe", async () => {
+    await handler(updateInternal)(ctx, { name: "Maria", email: "maria@x.com", showEmail: false });
+    const docs = ctx.db._all("contactInfo");
+    expect(docs).toHaveLength(1);
+    expect(docs[0].name).toBe("Maria");
+    expect(docs[0].email).toBe("maria@x.com");
+    expect(docs[0].showEmail).toBe(false);
+  });
+
+  it("atualiza o registro existente sem duplicar e preserva os outros campos", async () => {
+    ctx.db._seed("contactInfo", [
+      { name: "Antigo", role: "Dev", email: "a@x.com", showEmail: true, location: "SP", createdAt: 1 },
+    ]);
+    await handler(updateInternal)(ctx, { name: "Novo", email: "n@x.com", showEmail: false });
+    const docs = ctx.db._all("contactInfo");
+    expect(docs).toHaveLength(1);
+    expect(docs[0].name).toBe("Novo");
+    expect(docs[0].role).toBe("Dev");
+    expect(docs[0].location).toBe("SP");
   });
 });

@@ -239,3 +239,44 @@ describe("convex/siteTexts · translateAllMissing", () => {
     expect(ctx.runMutation).toHaveBeenCalledTimes(2);
   });
 });
+
+describe("convex/siteTexts · update marca publicação pendente", () => {
+  it("depois de editar um texto, o site fica com mudanças pendentes", async () => {
+    const ctx = createMockCtx();
+    asRole(ctx, "admin");
+    ctx.db._seed("siteTexts", [{ key: "home.title", page: "home", ptBR: "Olá", updatedAt: 1 }]);
+    await handler(update)(ctx, { key: "home.title", ptBR: "Oi", enUS: "Hi" });
+    expect(ctx.db._all("deployStatus")[0]?.pendingChanges).toBe(true);
+  });
+});
+
+describe("convex/siteTexts · seed preserva textos personalizados", () => {
+  it("não sobrescreve um texto que já existe (rodar o setup de novo não apaga a personalização)", async () => {
+    const ctx = createMockCtx();
+    ctx.db._seed("siteTexts", [
+      { key: "home.greeting", page: "home", ptBR: "Oi, pessoal", enUS: "Hey, folks", updatedAt: 1 },
+    ]);
+    await handler(seed)(ctx, {});
+    const docs = ctx.db._all("siteTexts").filter((d: any) => d.key === "home.greeting");
+    expect(docs).toHaveLength(1);
+    expect(docs[0].ptBR).toBe("Oi, pessoal");
+    expect(docs[0].enUS).toBe("Hey, folks");
+  });
+
+  it("preenche só o inglês que faltava, sem mexer no português", async () => {
+    const ctx = createMockCtx();
+    ctx.db._seed("siteTexts", [{ key: "home.greeting", page: "home", ptBR: "Oi, pessoal", updatedAt: 1 }]);
+    await handler(seed)(ctx, {});
+    const doc = ctx.db._all("siteTexts").find((d: any) => d.key === "home.greeting");
+    expect(doc.ptBR).toBe("Oi, pessoal");
+    expect(typeof doc.enUS).toBe("string");
+    expect(doc.enUS.length).toBeGreaterThan(0);
+  });
+
+  it("cria as chaves novas que ainda não existem", async () => {
+    const ctx = createMockCtx();
+    ctx.db._seed("siteTexts", [{ key: "home.greeting", page: "home", ptBR: "Oi", enUS: "Hi", updatedAt: 1 }]);
+    await handler(seed)(ctx, {});
+    expect(ctx.db._all("siteTexts").length).toBe(261);
+  });
+});

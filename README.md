@@ -246,6 +246,18 @@ Logado em `/admin`, tudo é gerenciado por interface. Você não toca no código
 | `/admin/testimonials` | Depoimentos (curados ou recebidos via wizard público) |
 | `/admin/plugins` | **Liga/desliga features** (blog, propostas, pagamentos, etc.) |
 
+#### Ou pelo seu agente de IA
+
+O repositório já vem com a skill **`rubrica`** para Claude Code, Codex e OpenCode. Com ela, o agente lê e altera o conteúdo do site por você: textos fixos (em pt-BR e en-US), identidade, SEO, cores, perfil, home, posts, imagens, contatos, plugins e a publicação.
+
+- Abra o agente na pasta do projeto e peça em linguagem comum, por exemplo: "troque o título da home e traduza para o inglês" ou "escreva um post sobre X e deixe em rascunho". No Claude Code, também dá para chamar com `/rubrica`.
+- No primeiro uso, faça o login num terminal seu (a senha nunca passa pelo agente):
+  ```bash
+  python3 .agents/skills/rubrica/scripts/rubrica.py login --email voce@exemplo.com
+  ```
+- A skill usa o Convex do `VITE_CONVEX_URL` do `.env.local`. Para mexer em outro (ex.: produção), defina `RUBRICA_CONVEX_URL`.
+- Onde ela mora: `.agents/skills/rubrica/` (lido pelo Codex e pelo OpenCode) e o atalho `.claude/skills/rubrica` (lido pelo Claude Code). Requer Python 3.8+.
+
 ### 8 · Personalize o visual _(não pule)_
 
 Esta é a etapa **mais importante** depois do deploy técnico. Identidade visual é o que vai te diferenciar. Onde mexer:

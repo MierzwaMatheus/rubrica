@@ -2,15 +2,9 @@ import { v } from "convex/values";
 import { action, internalMutation, internalQuery, mutation, query } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { requireRole } from "./auth";
+import { markPendingChanges } from "./publishStatus";
 import { ptBR } from "../src/i18n/translations/pt-BR";
 import { enUS } from "../src/i18n/translations/en-US";
-
-function flattenTranslations(
-  obj: Record<string, unknown>,
-  prefix = ""
-): Array<{ key: string; page: string; ptBR: string; enUS?: string }> {
-  return [];
-}
 
 function buildEntries(): Array<{ key: string; page: string; ptBR: string; enUS?: string }> {
   const flatten = (
@@ -61,8 +55,12 @@ export const seed = internalMutation({
         .query("siteTexts")
         .withIndex("by_key", (q) => q.eq("key", entry.key))
         .unique();
+      // Só cria chaves novas e completa o inglês que faltava: rodar o setup de
+      // novo não apaga os textos personalizados.
       if (existing) {
-        await ctx.db.patch(existing._id, { ptBR: entry.ptBR, enUS: entry.enUS, updatedAt: now });
+        if (!existing.enUS && entry.enUS) {
+          await ctx.db.patch(existing._id, { enUS: entry.enUS, updatedAt: now });
+        }
       } else {
         await ctx.db.insert("siteTexts", { ...entry, updatedAt: now });
       }
@@ -80,6 +78,7 @@ export const update = mutation({
       .unique();
     if (!doc) throw new Error(`siteTexts key not found: ${key}`);
     await ctx.db.patch(doc._id, { ptBR, enUS, updatedAt: Date.now() });
+    await markPendingChanges(ctx);
   },
 });
 

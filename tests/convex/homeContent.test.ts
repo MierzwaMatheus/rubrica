@@ -104,7 +104,7 @@ describe("convex/homeContent · seed", () => {
     }
   });
 
-  it("é idempotente: re-rodar atualiza valores sem duplicar chaves", async () => {
+  it("é idempotente: re-rodar não duplica chaves nem muda valores", async () => {
     await handler(seed)(ctx, {});
     const initialCount = ctx.db._all("homeContent").length;
     const heroTitleBefore = ctx.db._all("homeContent").find((d) => d.key === "hero_title")!.value;
@@ -116,16 +116,21 @@ describe("convex/homeContent · seed", () => {
     expect(finalCount).toBe(initialCount);
     expect(heroTitleAfter).toBe(heroTitleBefore);
   });
-
-  it("atualiza valor existente quando re-executado (sobrescreve)", async () => {
-    ctx.db._seed("homeContent", [
-      { key: "hero_title", value: "Valor Antigo", createdAt: 1 },
-    ]);
+});
+describe("convex/homeContent · seed preserva o que já foi personalizado", () => {
+  it("não sobrescreve um bloco que já existe (rodar o setup de novo não apaga a home)", async () => {
+    const ctx = createMockCtx();
+    ctx.db._seed("homeContent", [{ key: "hero_title", value: "Olá, sou Maria", createdAt: 1 }]);
     await handler(seed)(ctx, {});
-    const doc = ctx.db._all("homeContent").find((d) => d.key === "hero_title")!;
-    expect(doc.value).not.toBe("Valor Antigo");
-    expect(typeof doc.value).toBe("string");
-    expect(doc.value.length).toBeGreaterThan(0);
-    expect(doc.updatedAt).toBeGreaterThan(1);
+    const docs = ctx.db._all("homeContent").filter((d: any) => d.key === "hero_title");
+    expect(docs).toHaveLength(1);
+    expect(docs[0].value).toBe("Olá, sou Maria");
+  });
+
+  it("cria os blocos que ainda faltam", async () => {
+    const ctx = createMockCtx();
+    ctx.db._seed("homeContent", [{ key: "hero_title", value: "Olá, sou Maria", createdAt: 1 }]);
+    await handler(seed)(ctx, {});
+    expect(ctx.db._all("homeContent").length).toBe(EXPECTED_KEYS.length);
   });
 });

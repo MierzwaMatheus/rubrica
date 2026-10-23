@@ -21,7 +21,7 @@ vi.mock("@convex-dev/auth/providers/Password", () => ({
   Password: () => ({}),
 }));
 
-import { getPublic, getByKey, set, setBatch, getAll, setOgImage, PUBLIC_KEYS } from "../../convex/siteConfig";
+import { getPublic, getByKey, set, setBatch, setBatchInternal, getAll, setOgImage, PUBLIC_KEYS } from "../../convex/siteConfig";
 import { createMockCtx, type MockCtx } from "../_helpers/convexCtx";
 
 const handler = (fn: any) => fn._handler ?? fn;
@@ -141,7 +141,23 @@ describe("convex/siteConfig · setBatch", () => {
     getAuthUserId.mockResolvedValue(null);
   });
 
-  it("insere múltiplas chaves em lote", async () => {
+  it("recusa chamada sem login e não grava nada", async () => {
+    await expect(
+      handler(setBatch)(ctx, { items: [{ key: "site_title", value: "Invadido" }] })
+    ).rejects.toThrow("Unauthorized");
+    expect(ctx.db._all("siteConfig")).toHaveLength(0);
+  });
+
+  it("recusa papel content-editor e não grava nada", async () => {
+    asRole(ctx, "content-editor");
+    await expect(
+      handler(setBatch)(ctx, { items: [{ key: "site_title", value: "X" }] })
+    ).rejects.toThrow("Forbidden");
+    expect(ctx.db._all("siteConfig")).toHaveLength(0);
+  });
+
+  it("insere múltiplas chaves em lote (admin)", async () => {
+    asRole(ctx, "admin");
     await handler(setBatch)(ctx, {
       items: [
         { key: "site_title", value: "T" },
@@ -151,7 +167,14 @@ describe("convex/siteConfig · setBatch", () => {
     expect(ctx.db._all("siteConfig")).toHaveLength(2);
   });
 
+  it("aceita papel root", async () => {
+    asRole(ctx, "root");
+    await handler(setBatch)(ctx, { items: [{ key: "lang", value: "pt-BR" }] });
+    expect(ctx.db._all("siteConfig")).toHaveLength(1);
+  });
+
   it("chamado duas vezes não duplica registros (idempotente)", async () => {
+    asRole(ctx, "admin");
     const items = [{ key: "site_title", value: "T" }];
     await handler(setBatch)(ctx, { items });
     await handler(setBatch)(ctx, { items });
@@ -159,8 +182,44 @@ describe("convex/siteConfig · setBatch", () => {
   });
 
   it("atualiza valor quando chave já existe", async () => {
+    asRole(ctx, "admin");
     ctx.db._seed("siteConfig", [{ key: "lang", value: "en-US", createdAt: 1 }]);
     await handler(setBatch)(ctx, { items: [{ key: "lang", value: "pt-BR" }] });
+    const docs = ctx.db._all("siteConfig").filter((d) => d.key === "lang");
+    expect(docs).toHaveLength(1);
+    expect(docs[0].value).toBe("pt-BR");
+  });
+
+  it("registra auditoria com as chaves alteradas", async () => {
+    asRole(ctx, "admin");
+    await handler(setBatch)(ctx, { items: [{ key: "site_title", value: "T" }, { key: "lang", value: "pt-BR" }] });
+    const logs = ctx.db._all("auditLog");
+    expect(logs).toHaveLength(1);
+    expect(logs[0].eventType).toBe("siteConfig.setBatch");
+    expect(logs[0].metadata).toEqual({ keys: ["site_title", "lang"] });
+  });
+});
+
+describe("convex/siteConfig · setBatchInternal (setup da CLI via convex run)", () => {
+  let ctx: MockCtx;
+  beforeEach(() => {
+    ctx = createMockCtx();
+    getAuthUserId.mockResolvedValue(null);
+  });
+
+  it("grava sem usuário logado (só roda com a chave de deploy)", async () => {
+    await handler(setBatchInternal)(ctx, {
+      items: [
+        { key: "site_title", value: "T" },
+        { key: "lang", value: "pt-BR" },
+      ],
+    });
+    expect(ctx.db._all("siteConfig")).toHaveLength(2);
+  });
+
+  it("atualiza chave existente sem duplicar", async () => {
+    ctx.db._seed("siteConfig", [{ key: "lang", value: "en-US", createdAt: 1 }]);
+    await handler(setBatchInternal)(ctx, { items: [{ key: "lang", value: "pt-BR" }] });
     const docs = ctx.db._all("siteConfig").filter((d) => d.key === "lang");
     expect(docs).toHaveLength(1);
     expect(docs[0].value).toBe("pt-BR");
@@ -245,5 +304,29 @@ describe("convex/siteConfig · setOgImage", () => {
     const docs = ctx.db._all("siteConfig");
     const urlDoc = docs.find((d) => d.key === "og_image_url");
     expect(urlDoc?.value).toBe("https://exemplo.com/og.jpg");
+  });
+});
+
+describe("convex/siteConfig · escritas marcam publicação pendente", () => {
+  let ctx: MockCtx;
+  beforeEach(() => {
+    ctx = createMockCtx();
+    asRole(ctx, "admin");
+    (ctx.storage as any).getUrl = vi.fn().mockResolvedValue("https://exemplo.com/og.jpg");
+  });
+
+  it("set", async () => {
+    await handler(set)(ctx, { key: "site_title", value: "T" });
+    expect(ctx.db._all("deployStatus")[0]?.pendingChanges).toBe(true);
+  });
+
+  it("setBatch", async () => {
+    await handler(setBatch)(ctx, { items: [{ key: "site_title", value: "T" }] });
+    expect(ctx.db._all("deployStatus")[0]?.pendingChanges).toBe(true);
+  });
+
+  it("setOgImage", async () => {
+    await handler(setOgImage)(ctx, { storageId: "s1" });
+    expect(ctx.db._all("deployStatus")[0]?.pendingChanges).toBe(true);
   });
 });

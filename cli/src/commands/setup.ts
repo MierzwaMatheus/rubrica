@@ -269,7 +269,7 @@ export async function runSetup(deps: RunSetupDeps = {}): Promise<void> {
     try {
       execFileSync(
         "npx",
-        ["convex", "run", "siteConfig:setBatch", JSON.stringify({
+        ["convex", "run", "siteConfig:setBatchInternal", JSON.stringify({
           items: [
             { key: "site_title", value: identity.siteName },
             { key: "site_name", value: identity.siteName },
@@ -291,7 +291,7 @@ export async function runSetup(deps: RunSetupDeps = {}): Promise<void> {
       try {
         execFileSync(
           "npx",
-          ["convex", "run", "contactInfo:update", JSON.stringify({
+          ["convex", "run", "contactInfo:updateInternal", JSON.stringify({
             name: identity.authorName,
             email: identity.authorEmail || "",
             showEmail: false,
@@ -371,7 +371,7 @@ export async function runSetup(deps: RunSetupDeps = {}): Promise<void> {
       try {
         execFileSync(
           "npx",
-          ["convex", "run", "contactInfo:update", JSON.stringify({ proposalAiContext: aiContext })],
+          ["convex", "run", "contactInfo:updateInternal", JSON.stringify({ proposalAiContext: aiContext })],
           { stdio: "pipe" }
         );
       } catch {

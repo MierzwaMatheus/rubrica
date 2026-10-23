@@ -21,7 +21,7 @@ vi.mock("@convex-dev/auth/providers/Password", () => ({
   Password: () => ({}),
 }));
 
-import { getPublic, getAll, set, setBatch } from "../../convex/siteConfig";
+import { getPublic, getAll, set, setBatchInternal } from "../../convex/siteConfig";
 import { seedSiteConfig } from "../../convex/seed";
 import { createMockCtx, type MockCtx } from "../_helpers/convexCtx";
 
@@ -33,7 +33,7 @@ function asRole(ctx: MockCtx, role: string, userId = "u1") {
   getAuthUserId.mockResolvedValue(userId);
 }
 
-describe("integração: setBatch → getAll (deduplicação)", () => {
+describe("integração: setBatchInternal → getAll (deduplicação)", () => {
   let ctx: MockCtx;
 
   beforeEach(() => {
@@ -41,7 +41,7 @@ describe("integração: setBatch → getAll (deduplicação)", () => {
     getAuthUserId.mockResolvedValue(null);
   });
 
-  it("getAll retorna exatamente 5 registros após setBatch com 5 chaves", async () => {
+  it("getAll retorna exatamente 5 registros após setBatchInternal com 5 chaves", async () => {
     const items = [
       { key: "site_title", value: "T" },
       { key: "site_description", value: "D" },
@@ -49,15 +49,15 @@ describe("integração: setBatch → getAll (deduplicação)", () => {
       { key: "lang", value: "pt-BR" },
       { key: "twitter_handle", value: "usuario" },
     ];
-    await handler(setBatch)(ctx, { items });
-    await handler(setBatch)(ctx, { items });
+    await handler(setBatchInternal)(ctx, { items });
+    await handler(setBatchInternal)(ctx, { items });
 
     asRole(ctx, "admin");
     const result = await handler(getAll)(ctx, {});
     expect(result).toHaveLength(5);
   });
 
-  it("getAll retorna os valores corretos após setBatch duplo", async () => {
+  it("getAll retorna os valores corretos após setBatchInternal duplo", async () => {
     const items = [
       { key: "site_title", value: "Meu Portfolio" },
       { key: "lang", value: "en-US" },
@@ -65,8 +65,8 @@ describe("integração: setBatch → getAll (deduplicação)", () => {
       { key: "theme_font_sans", value: "Inter" },
       { key: "theme_font_mono", value: "JetBrains Mono" },
     ];
-    await handler(setBatch)(ctx, { items });
-    await handler(setBatch)(ctx, { items });
+    await handler(setBatchInternal)(ctx, { items });
+    await handler(setBatchInternal)(ctx, { items });
 
     asRole(ctx, "root");
     const result = await handler(getAll)(ctx, {});
@@ -86,7 +86,7 @@ describe("integração: set → getPublic (atualização em tempo real)", () => 
   });
 
   it("getPublic retorna novo valor após set atualizar site_title", async () => {
-    await handler(setBatch)(ctx, { items: [{ key: "site_title", value: "Titulo Original" }] });
+    await handler(setBatchInternal)(ctx, { items: [{ key: "site_title", value: "Titulo Original" }] });
 
     const before = await handler(getPublic)(ctx, {});
     expect(before.find((r: any) => r.key === "site_title")?.value).toBe("Titulo Original");

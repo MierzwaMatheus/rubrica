@@ -830,3 +830,56 @@ describe("runSetup — Ciclo 9: siteTexts seed", () => {
     expect(args).not.toContain("--data");
   });
 });
+
+describe("runSetup — identidade usa funções internas do Convex", () => {
+  // `npx convex run` roda sem usuário logado: as mutations públicas exigem papel
+  // de admin e falhariam. O setup precisa chamar as versões internas.
+  function makeIdentitySetup() {
+    const state = {
+      ...BASE_STATE,
+      plugins: {},
+      identity: { siteName: "Meu Site", siteUrl: "https://meusite.com", authorName: "Maria", authorEmail: "maria@x.com" },
+    };
+    const vol = Volume.fromJSON({
+      "/project/rubrica.json": JSON.stringify(state),
+      "/project/.env.local": VALID_ENV,
+    });
+    return {
+      cwd: "/project",
+      fs: makeFsModule(vol),
+      detectProject: vi.fn().mockResolvedValue("/project/rubrica.json"),
+      generateJwtKeys: vi.fn().mockResolvedValue({
+        JWT_PRIVATE_KEY: "-----BEGIN PRIVATE KEY-----\ntest\n-----END PRIVATE KEY-----",
+        JWKS: JSON.stringify({ keys: [{ use: "sig", kty: "RSA" }] }),
+      }),
+      readState: vi.fn().mockResolvedValue(state),
+      randomBytes: vi.fn().mockReturnValue(Buffer.alloc(32, 0)),
+      execFileSync: vi.fn().mockReturnValue(Buffer.from("")),
+    };
+  }
+
+  async function runWithIdentity() {
+    vi.mocked(textPrompt)
+      .mockResolvedValueOnce("https://meusite.com")
+      .mockResolvedValueOnce("admin@teste.com")
+      .mockResolvedValue("");
+    vi.mocked(passwordPrompt)
+      .mockResolvedValueOnce("minhaSenha123456")
+      .mockResolvedValueOnce("minhaSenha123456");
+    const deps = makeIdentitySetup();
+    await runSetup(deps);
+    return fileSyncArgs(deps.execFileSync as ReturnType<typeof vi.fn>);
+  }
+
+  it("grava a identidade com siteConfig:setBatchInternal, não com o setBatch público", async () => {
+    const calls = await runWithIdentity();
+    expect(calls.some((c) => c.includes("siteConfig:setBatchInternal"))).toBe(true);
+    expect(calls.some((c) => / siteConfig:setBatch /.test(` ${c} `))).toBe(false);
+  });
+
+  it("grava o contato com contactInfo:updateInternal, não com o update público", async () => {
+    const calls = await runWithIdentity();
+    expect(calls.some((c) => c.includes("contactInfo:updateInternal"))).toBe(true);
+    expect(calls.some((c) => / contactInfo:update /.test(` ${c} `))).toBe(false);
+  });
+});

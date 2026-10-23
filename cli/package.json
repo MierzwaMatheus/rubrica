@@ -4,8 +4,8 @@
   "description": "CLI para criar e configurar projetos Rubrica — portfólio profissional com React + Convex",
   "type": "module",
   "bin": {
-    "create-rubrica": "./dist/index.js",
-    "rubrica": "./dist/index.js"
+    "create-rubrica": "dist/index.js",
+    "rubrica": "dist/index.js"
   },
   "files": [
     "dist/index.js",
@@ -24,7 +24,7 @@
   "homepage": "https://github.com/MierzwaMatheus/rubrica",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MierzwaMatheus/rubrica.git",
+    "url": "git+https://github.com/MierzwaMatheus/rubrica.git",
     "directory": "cli"
   },
   "engines": {

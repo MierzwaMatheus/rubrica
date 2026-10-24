@@ -19,10 +19,13 @@ export function Layout({ children, className }: LayoutProps) {
   return (
     <div className="rb-mobile min-h-screen bg-[var(--bg)] text-[var(--text)] flex flex-col font-sans">
       <MobileLayoutStyles />
-      <SwissNav />
-      <main className={cn("flex-1 w-full", shared && "max-w-6xl mx-auto px-4 md:px-8 py-8", className)}>
-        {children}
-      </main>
+      {/* A folha para de esticar em 1600px e, além disso, ganha bordas laterais no mesmo traço das linhas do layout. */}
+      <div className="flex-1 flex flex-col w-full max-w-[1600px] mx-auto min-[1601px]:border-x min-[1601px]:border-[var(--text)]">
+        <SwissNav />
+        <main className={cn("flex-1 w-full", shared && "max-w-6xl mx-auto px-4 md:px-8 py-8", className)}>
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

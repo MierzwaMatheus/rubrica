@@ -25,6 +25,10 @@ export interface RecipeIdentity {
   authorEmail?: string;
   twitterHandle?: string;
   lang?: string;
+  /** Aparece abaixo do nome no site; o setup grava no contato. */
+  profession?: string;
+  /** Separadas por vírgula; entram no contexto que a IA usa nas propostas. */
+  specialties?: string;
 }
 
 export interface Recipe {
@@ -59,6 +63,8 @@ const IDENTITY_KEYS = {
   authorEmail: "e",
   twitterHandle: "x",
   lang: "lg",
+  profession: "pf",
+  specialties: "es",
 } as const;
 const LANGS = ["pt-BR", "en-US"];
 
@@ -169,7 +175,7 @@ export function sanitizeRecipe(input: Record<string, unknown>): { recipe: Recipe
   if (rawId && typeof rawId === "object" && !Array.isArray(rawId)) {
     const id = rawId as Record<string, unknown>;
     const identity: RecipeIdentity = {};
-    for (const key of ["authorName", "siteName", "siteDescription"] as const) {
+    for (const key of ["authorName", "siteName", "siteDescription", "profession", "specialties"] as const) {
       if (str(id[key]) && id[key].trim()) identity[key] = id[key].trim();
     }
     if (str(id.siteUrl) && id.siteUrl.trim()) {
@@ -234,5 +240,6 @@ export function recipeSummary(recipe: Recipe): string[] {
   const site = [id.siteName, id.siteUrl].filter(Boolean).join(" — ");
   if (site) lines.push(`Site: ${site}`);
   if (id.authorEmail) lines.push(`E-mail: ${id.authorEmail}`);
+  if (id.profession) lines.push(`Profissão: ${id.profession}${id.specialties ? ` (${id.specialties})` : ""}`);
   return lines;
 }

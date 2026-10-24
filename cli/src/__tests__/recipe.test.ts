@@ -27,6 +27,8 @@ const FULL: Recipe = {
     authorEmail: "ana@anasouza.com.br",
     twitterHandle: "anasouza",
     lang: "pt-BR",
+    profession: "Designer de produto",
+    specialties: "UX, Ilustração",
   },
 };
 
@@ -73,8 +75,19 @@ describe("encodeRecipe / decodeRecipe", () => {
     expect(decodeRecipe(encodeRecipe(r)).recipe).toEqual(r);
   });
 
-  it("usa chaves curtas: a receita completa cabe em menos de 450 caracteres", () => {
-    expect(encodeRecipe(FULL).length).toBeLessThan(450);
+  it("usa chaves curtas: a receita completa cabe em menos de 520 caracteres", () => {
+    expect(encodeRecipe(FULL).length).toBeLessThan(520);
+  });
+
+  it("as chaves curtas são um contrato: um código antigo continua lendo igual", () => {
+    // Gerado com a versão 1. Se este teste quebrar, uma chave foi renomeada.
+    const old = Buffer.from(
+      JSON.stringify({ v: 1, l: "zine", s: "riso", m: "dark", a: false, t: "paper", f: "Fraunces", fm: "", p: ["blog"], i: { n: "Ana", sn: "Site", u: "https://a.dev", d: "Frase", e: "a@a.dev", x: "ana", lg: "en-US", pf: "Designer", es: "UX" } })
+    ).toString("base64url");
+    expect(decodeRecipe(old).recipe).toEqual({
+      layout: "zine", scheme: "riso", colorMode: "dark", colorModeToggle: false, texture: "paper", fontSans: "Fraunces", fontMono: "", plugins: ["blog"],
+      identity: { authorName: "Ana", siteName: "Site", siteUrl: "https://a.dev", siteDescription: "Frase", authorEmail: "a@a.dev", twitterHandle: "ana", lang: "en-US", profession: "Designer", specialties: "UX" },
+    });
   });
 
   it("grava a versão atual", () => {
@@ -168,6 +181,12 @@ describe("sanitizeRecipe", () => {
     expect(sanitizeRecipe({ plugins: [] }).recipe).toEqual({ plugins: [] });
   });
 
+  it("profissão e especialidades saem sem espaços nas pontas", () => {
+    expect(sanitizeRecipe({ identity: { profession: "  Fotógrafa ", specialties: " Retrato " } }).recipe).toEqual({
+      identity: { profession: "Fotógrafa", specialties: "Retrato" },
+    });
+  });
+
   it("campos de identidade vazios são ignorados", () => {
     expect(sanitizeRecipe({ identity: { authorName: "  ", siteName: "" } }).recipe).toEqual({});
   });
@@ -207,12 +226,14 @@ describe("recipeSummary", () => {
       "Nome: Ana Souza",
       "Site: Ana Souza Design — https://anasouza.com.br",
       "E-mail: ana@anasouza.com.br",
+      "Profissão: Designer de produto (UX, Ilustração)",
     ]);
   });
 
   it("receita parcial só lista o que tem", () => {
     expect(recipeSummary({ layout: "zine" })).toEqual(["Layout: Zine"]);
     expect(recipeSummary({ colorModeToggle: true })).toEqual(["Cores: com botão para alternar"]);
+    expect(recipeSummary({ identity: { profession: "Fotógrafa" } })).toEqual(["Profissão: Fotógrafa"]);
   });
 
   it("modo escuro sem botão, automático, sem textura, sem mono e sem plugins", () => {

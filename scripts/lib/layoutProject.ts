@@ -4,8 +4,8 @@
  * build dos previews do site público (site/scripts/build-previews.ts).
  */
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, rmSync, symlinkSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { cpSync, existsSync, mkdirSync, rmSync, symlinkSync } from "node:fs";
+import { join, relative, resolve, sep } from "node:path";
 import { applyLayout } from "../../cli/src/transforms/applyLayout";
 import { applyTheme } from "../../cli/src/transforms/applyTheme";
 import { applyAppearance } from "../../cli/src/transforms/applyAppearance";
@@ -18,6 +18,11 @@ export const ROOT = resolve(import.meta.dirname, "..", "..");
  * Endereço fictício do Convex: no build de produção os dados vêm de public/data, mas o app
  * cria o cliente do Convex ao iniciar e quebra sem endereço nenhum.
  */
+/** O que não vai para o projeto temporário: dependências, artefatos e o que o create apaga. */
+const SKIP_TOP_LEVEL = new Set([
+  ".git", "dist", "reports", ".playwright-mcp", "cli", "templates", "docs", "site", ".stryker-tmp", ".env.local",
+]);
+
 export const PREVIEW_CONVEX_URL = "https://preview-layout.convex.cloud";
 
 export interface LayoutProjectOptions {
@@ -39,13 +44,14 @@ export async function prepareLayoutProject(o: LayoutProjectOptions): Promise<voi
   const { layout, dir } = o;
   rmSync(dir, { recursive: true, force: true });
   mkdirSync(dir, { recursive: true });
-  execFileSync("rsync", [
-    "-a",
-    "--exclude=node_modules", "--exclude=.git", "--exclude=dist", "--exclude=reports",
-    "--exclude=.playwright-mcp", "--exclude=cli", "--exclude=templates", "--exclude=docs",
-    "--exclude=site", "--exclude=.stryker-tmp", "--exclude=.env.local",
-    `${ROOT}/`, `${dir}/`,
-  ]);
+  // Cópia em Node puro (a imagem de build da Vercel não tem rsync).
+  cpSync(ROOT, dir, {
+    recursive: true,
+    filter: (src) => {
+      const parts = relative(ROOT, src).split(sep);
+      return !parts.includes("node_modules") && !SKIP_TOP_LEVEL.has(parts[0]);
+    },
+  });
   symlinkSync(join(ROOT, "node_modules"), join(dir, "node_modules"));
 
   await applyLayout(layout.id, { projectDir: dir, templatesDir: join(ROOT, "templates") }, fsMod);

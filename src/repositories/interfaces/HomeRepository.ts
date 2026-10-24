@@ -1,3 +1,6 @@
+import type { HomeMetric } from "@/utils/homeMetrics";
+import type { WorkPrinciple } from "@/utils/aboutContent";
+
 export interface ContactInfo {
   name?: string;
   role: string;
@@ -28,6 +31,7 @@ export interface Testimonial {
   image_url: string;
   role_translations?: Record<string, string>;
   text_translations?: Record<string, string>;
+  category?: string;
 }
 
 export interface AvailabilityData {
@@ -42,5 +46,8 @@ export interface HomeRepository {
   getTestimonials(): Promise<Testimonial[]>;
   getAvailability(): Promise<AvailabilityData | null>;
   getContactWizardEnabled(): Promise<boolean>;
+  /** Princípios de trabalho (homeContent `work_principles`), exibidos em Sobre. */
+  getWorkPrinciples(): Promise<WorkPrinciple[]>;
+  getHomeMetrics(): Promise<HomeMetric[]>;
 }
 

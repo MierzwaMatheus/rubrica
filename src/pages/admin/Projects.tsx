@@ -127,15 +127,31 @@ interface Project {
     problem: string;
     solution: string;
     results: string;
+    role?: string;
+    context?: string;
+    decisions?: string;
+    learnings?: string;
     metrics: CaseStudyMetric[];
     testimonial?: { text: string; author: string; role?: string };
   };
   caseStudyTranslations?: {
-    ptBR?: { problem: string; solution: string; results: string };
-    enUS?: { problem: string; solution: string; results: string };
+    ptBR?: CaseStudyTextFields;
+    enUS?: CaseStudyTextFields;
   };
+  category?: string;
+  categoryTranslations?: { ptBR: string; enUS?: string };
   orderIndex: number;
 }
+
+type CaseStudyTextFields = {
+  problem: string;
+  solution: string;
+  results: string;
+  role?: string;
+  context?: string;
+  decisions?: string;
+  learnings?: string;
+};
 
 // Sortable Project Card Component
 function SortableProjectCard({
@@ -291,6 +307,12 @@ export default function AdminProjects() {
   const [caseStudyProblem, setCaseStudyProblem] = useState('');
   const [caseStudySolution, setCaseStudySolution] = useState('');
   const [caseStudyResults, setCaseStudyResults] = useState('');
+  // Campos novos do case (opcionais) e categoria do projeto
+  const [caseStudyRole, setCaseStudyRole] = useState('');
+  const [caseStudyContext, setCaseStudyContext] = useState('');
+  const [caseStudyDecisions, setCaseStudyDecisions] = useState('');
+  const [caseStudyLearnings, setCaseStudyLearnings] = useState('');
+  const [category, setCategory] = useState('');
   const [metrics, setMetrics] = useState<CaseStudyMetric[]>([]);
   const [testimonialEnabled, setTestimonialEnabled] = useState(false);
   const [testimonialText, setTestimonialText] = useState('');
@@ -329,6 +351,11 @@ export default function AdminProjects() {
       setCaseStudyProblem(csT?.problem ?? cs?.problem ?? '');
       setCaseStudySolution(csT?.solution ?? cs?.solution ?? '');
       setCaseStudyResults(csT?.results ?? cs?.results ?? '');
+      setCaseStudyRole(csT?.role ?? cs?.role ?? '');
+      setCaseStudyContext(csT?.context ?? cs?.context ?? '');
+      setCaseStudyDecisions(csT?.decisions ?? cs?.decisions ?? '');
+      setCaseStudyLearnings(csT?.learnings ?? cs?.learnings ?? '');
+      setCategory(project.categoryTranslations?.ptBR ?? project.category ?? '');
       setMetrics(cs?.metrics ?? []);
       setTestimonialEnabled(!!cs?.testimonial);
       setTestimonialText(cs?.testimonial?.text ?? '');
@@ -341,6 +368,11 @@ export default function AdminProjects() {
       setCaseStudyProblem('');
       setCaseStudySolution('');
       setCaseStudyResults('');
+      setCaseStudyRole('');
+      setCaseStudyContext('');
+      setCaseStudyDecisions('');
+      setCaseStudyLearnings('');
+      setCategory('');
       setMetrics([]);
       setTestimonialEnabled(false);
       setTestimonialText('');
@@ -368,6 +400,11 @@ export default function AdminProjects() {
       if (caseStudyProblem) allFields.caseStudyProblem = caseStudyProblem;
       if (caseStudySolution) allFields.caseStudySolution = caseStudySolution;
       if (caseStudyResults) allFields.caseStudyResults = caseStudyResults;
+      if (caseStudyRole) allFields.caseStudyRole = caseStudyRole;
+      if (caseStudyContext) allFields.caseStudyContext = caseStudyContext;
+      if (caseStudyDecisions) allFields.caseStudyDecisions = caseStudyDecisions;
+      if (caseStudyLearnings) allFields.caseStudyLearnings = caseStudyLearnings;
+      if (category) allFields.category = category;
 
       const existingTranslations = {
         title: editingProject?.titleTranslations,
@@ -393,13 +430,24 @@ export default function AdminProjects() {
         caseStudyProblem: partialTranslated.caseStudyProblem ?? editingProject?.caseStudyTranslations?.enUS?.problem ?? caseStudyProblem,
         caseStudySolution: partialTranslated.caseStudySolution ?? editingProject?.caseStudyTranslations?.enUS?.solution ?? caseStudySolution,
         caseStudyResults: partialTranslated.caseStudyResults ?? editingProject?.caseStudyTranslations?.enUS?.results ?? caseStudyResults,
+        caseStudyRole: partialTranslated.caseStudyRole ?? editingProject?.caseStudyTranslations?.enUS?.role ?? caseStudyRole,
+        caseStudyContext: partialTranslated.caseStudyContext ?? editingProject?.caseStudyTranslations?.enUS?.context ?? caseStudyContext,
+        caseStudyDecisions: partialTranslated.caseStudyDecisions ?? editingProject?.caseStudyTranslations?.enUS?.decisions ?? caseStudyDecisions,
+        caseStudyLearnings: partialTranslated.caseStudyLearnings ?? editingProject?.caseStudyTranslations?.enUS?.learnings ?? caseStudyLearnings,
+        category: partialTranslated.category ?? editingProject?.categoryTranslations?.enUS ?? category,
       };
+      // Campo vazio vira undefined para não gravar string vazia
+      const opt = (value: string) => (value.trim() ? value : undefined);
 
       const hasCaseStudy = !!(caseStudyProblem || caseStudySolution || caseStudyResults);
       const caseStudyData = hasCaseStudy ? {
         problem: caseStudyProblem,
         solution: caseStudySolution,
         results: caseStudyResults,
+        role: opt(caseStudyRole),
+        context: opt(caseStudyContext),
+        decisions: opt(caseStudyDecisions),
+        learnings: opt(caseStudyLearnings),
         metrics,
         testimonial: testimonialEnabled && testimonialText && testimonialAuthor
           ? { text: testimonialText, author: testimonialAuthor, role: testimonialRole || undefined }
@@ -423,9 +471,21 @@ export default function AdminProjects() {
         slug: slug || undefined,
         caseStudy: caseStudyData,
         caseStudyTranslations: hasCaseStudy ? {
-          ptBR: { problem: caseStudyProblem, solution: caseStudySolution, results: caseStudyResults },
-          enUS: { problem: translated.caseStudyProblem, solution: translated.caseStudySolution, results: translated.caseStudyResults },
+          ptBR: {
+            problem: caseStudyProblem, solution: caseStudySolution, results: caseStudyResults,
+            role: opt(caseStudyRole), context: opt(caseStudyContext),
+            decisions: opt(caseStudyDecisions), learnings: opt(caseStudyLearnings),
+          },
+          enUS: {
+            problem: translated.caseStudyProblem, solution: translated.caseStudySolution, results: translated.caseStudyResults,
+            role: caseStudyRole.trim() ? translated.caseStudyRole : undefined,
+            context: caseStudyContext.trim() ? translated.caseStudyContext : undefined,
+            decisions: caseStudyDecisions.trim() ? translated.caseStudyDecisions : undefined,
+            learnings: caseStudyLearnings.trim() ? translated.caseStudyLearnings : undefined,
+          },
         } : undefined,
+        category: opt(category),
+        categoryTranslations: category.trim() ? { ptBR: category, enUS: translated.category } : undefined,
       };
 
       if (editingProject) {
@@ -549,9 +609,16 @@ export default function AdminProjects() {
         githubLink: data.githubLink || undefined,
         slug: data.slug,
         caseStudy: data.caseStudy && (data.caseStudy.problem || data.caseStudy.solution || data.caseStudy.results)
-          ? { problem: data.caseStudy.problem ?? '', solution: data.caseStudy.solution ?? '', results: data.caseStudy.results ?? '', metrics: Array.isArray(data.caseStudy.metrics) ? data.caseStudy.metrics : [], testimonial: data.caseStudy.testimonial ?? undefined }
+          ? {
+              problem: data.caseStudy.problem ?? '', solution: data.caseStudy.solution ?? '', results: data.caseStudy.results ?? '',
+              role: data.caseStudy.role || undefined, context: data.caseStudy.context || undefined,
+              decisions: data.caseStudy.decisions || undefined, learnings: data.caseStudy.learnings || undefined,
+              metrics: Array.isArray(data.caseStudy.metrics) ? data.caseStudy.metrics : [], testimonial: data.caseStudy.testimonial ?? undefined,
+            }
           : undefined,
         caseStudyTranslations: data.caseStudyTranslations ?? undefined,
+        category: data.category || undefined,
+        categoryTranslations: data.categoryTranslations ?? undefined,
         orderIndex: maxOrder + 1,
       });
       toast.success(`Projeto "${data.title}" importado com sucesso!`);
@@ -693,6 +760,18 @@ export default function AdminProjects() {
               </div>
 
               <div className="space-y-2">
+                <Label htmlFor="category" className="text-foreground-strong">Categoria</Label>
+                <Input
+                  id="category"
+                  value={category}
+                  onChange={e => setCategory(e.target.value)}
+                  placeholder="Ex.: IA aplicada, Plataformas, Marca e design"
+                  className="bg-foreground/5 border-foreground/10 text-foreground-strong"
+                />
+                <p className="text-xs text-foreground/42">Usada nos filtros do portfólio. Projetos com o mesmo texto ficam no mesmo filtro.</p>
+              </div>
+
+              <div className="space-y-2">
                 <Label className="text-foreground-strong">Tags</Label>
                 <ProjectTagsInput selectedTags={selectedTags} onChange={setSelectedTags} />
               </div>
@@ -715,6 +794,24 @@ export default function AdminProjects() {
                   </AccordionTrigger>
                   <AccordionContent className="space-y-4 pt-2">
                     <div className="space-y-2">
+                      <Label className="text-foreground-strong">Meu papel (opcional)</Label>
+                      <Textarea
+                        value={caseStudyRole}
+                        onChange={e => setCaseStudyRole(e.target.value)}
+                        placeholder="Cargo, tamanho do time e o que ficou sob sua responsabilidade..."
+                        className="bg-foreground/5 border-foreground/10 text-foreground-strong h-20"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-foreground-strong">Antes (opcional)</Label>
+                      <Textarea
+                        value={caseStudyContext}
+                        onChange={e => setCaseStudyContext(e.target.value)}
+                        placeholder="Como era antes: o estado inicial, com números se tiver..."
+                        className="bg-foreground/5 border-foreground/10 text-foreground-strong h-20"
+                      />
+                    </div>
+                    <div className="space-y-2">
                       <Label className="text-foreground-strong">O Problema</Label>
                       <Textarea
                         value={caseStudyProblem}
@@ -733,11 +830,29 @@ export default function AdminProjects() {
                       />
                     </div>
                     <div className="space-y-2">
+                      <Label className="text-foreground-strong">Decisões e trade-offs (opcional)</Label>
+                      <Textarea
+                        value={caseStudyDecisions}
+                        onChange={e => setCaseStudyDecisions(e.target.value)}
+                        placeholder="O que você escolheu, o que descartou e por quê..."
+                        className="bg-foreground/5 border-foreground/10 text-foreground-strong h-24"
+                      />
+                    </div>
+                    <div className="space-y-2">
                       <Label className="text-foreground-strong">Os Resultados</Label>
                       <Textarea
                         value={caseStudyResults}
                         onChange={e => setCaseStudyResults(e.target.value)}
                         placeholder="Impacto, métricas, feedback obtido..."
+                        className="bg-foreground/5 border-foreground/10 text-foreground-strong h-20"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-foreground-strong">Aprendizados (opcional)</Label>
+                      <Textarea
+                        value={caseStudyLearnings}
+                        onChange={e => setCaseStudyLearnings(e.target.value)}
+                        placeholder="O que você levaria para o próximo projeto..."
                         className="bg-foreground/5 border-foreground/10 text-foreground-strong h-20"
                       />
                     </div>

@@ -6,33 +6,10 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { HelmetProvider } from "react-helmet-async";
 import Home from "./pages/Home";
-import Login from "./pages/Login";
-import Dashboard from "./pages/admin/Dashboard";
-import AdminProjects from "./pages/admin/Projects";
-import AdminBlog from "./pages/admin/Blog";
-import AdminResume from "./pages/admin/Resume";
-import AdminHome from "./pages/admin/Home";
-import AdminContact from "./pages/admin/Contact";
-import AdminProposals from "./pages/admin/Proposals";
-import AdminCreateUser from "./pages/admin/CreateUser";
-import AdminPaymentLinks from "./pages/admin/PaymentLinks";
-import AdminAbout from "./pages/admin/About";
-import AdminAiResumes from "./pages/admin/AiResumes";
-import AdminLogs from "./pages/admin/Logs";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeApplier } from "./components/ThemeApplier";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { I18nProvider } from "./i18n/context/I18nContext";
-import Resume from "./pages/Resume";
-import Portfolio from "./pages/Portfolio";
-import Blog from "./pages/Blog";
-import BlogPost from "./pages/BlogPost";
-import ProjectCaseStudy from "./pages/ProjectCaseStudy";
-import Proposal from "./pages/Proposal";
-import ProposalAccept from "./pages/ProposalAccept";
-import About from "./pages/About";
-import Checkout from "./pages/Checkout";
-import PaymentSuccess from "./pages/PaymentSuccess";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { Layout } from "./components/Layout";
@@ -42,32 +19,58 @@ import { ConvexClientProvider, convex } from "./providers/ConvexClientProvider";
 import { ConvexTranslationService } from "./i18n/implementations/ConvexTranslationService";
 import { Terminal } from "./components/Terminal";
 import { AnimatePresence } from "framer-motion";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { sidebarRepository } from "@/repositories/instances";
+import { PageSkeleton } from "./components/PageSkeleton";
 import { ContactWizardProvider } from "./contexts/ContactWizardContext";
 import { ContactWizardModal } from "./components/ContactWizardModal";
-import AdminContactRequests from "./pages/admin/ContactRequests";
-import AdminPlugins from "./pages/admin/Plugins";
-import AdminSiteConfig from "./pages/admin/SiteConfig";
-import AdminTestimonials from "./pages/admin/Testimonials";
-import AdminLgpdErasure from "./pages/admin/LgpdErasure";
-import AdminContractTemplates from "./pages/admin/ContractTemplates";
-import AdminTextos from "./pages/admin/Textos";
-import TestimonialsPage from "./pages/Testimonials";
 import { PluginsProvider } from "./contexts/PluginsContext";
 import { PluginRoute } from "./components/PluginRoute";
 import { ChangePasswordModal } from "./components/ChangePasswordModal";
-import Playground from "./pages/Playground";
-import ContactWizardDemo from "./pages/playground/ContactWizardDemo";
-import ProposalDemo from "./pages/playground/ProposalDemo";
-import PlaygroundProposalView from "./pages/playground/ProposalView";
-import PlaygroundProposalAcceptView from "./pages/playground/ProposalAcceptView";
-import BlogPostDemo from "./pages/playground/BlogPostDemo";
-import BlogPreview from "./pages/playground/BlogPreview";
-import BlogPostPreview from "./pages/playground/BlogPostPreview";
-import PaymentLinkDemo from "./pages/playground/PaymentLinkDemo";
-import AiCvDemo from "./pages/playground/AiCvDemo";
+
+// Páginas carregadas sob demanda: o visitante baixa só a página que abriu.
+const Login = lazy(() => import("./pages/Login"));
+const Dashboard = lazy(() => import("./pages/admin/Dashboard"));
+const AdminProjects = lazy(() => import("./pages/admin/Projects"));
+const AdminBlog = lazy(() => import("./pages/admin/Blog"));
+const AdminResume = lazy(() => import("./pages/admin/Resume"));
+const AdminHome = lazy(() => import("./pages/admin/Home"));
+const AdminContact = lazy(() => import("./pages/admin/Contact"));
+const AdminProposals = lazy(() => import("./pages/admin/Proposals"));
+const AdminCreateUser = lazy(() => import("./pages/admin/CreateUser"));
+const AdminPaymentLinks = lazy(() => import("./pages/admin/PaymentLinks"));
+const AdminAbout = lazy(() => import("./pages/admin/About"));
+const AdminAiResumes = lazy(() => import("./pages/admin/AiResumes"));
+const AdminLogs = lazy(() => import("./pages/admin/Logs"));
+const Resume = lazy(() => import("./pages/Resume"));
+const Portfolio = lazy(() => import("./pages/Portfolio"));
+const Blog = lazy(() => import("./pages/Blog"));
+const BlogPost = lazy(() => import("./pages/BlogPost"));
+const ProjectCaseStudy = lazy(() => import("./pages/ProjectCaseStudy"));
+const Proposal = lazy(() => import("./pages/Proposal"));
+const ProposalAccept = lazy(() => import("./pages/ProposalAccept"));
+const About = lazy(() => import("./pages/About"));
+const Checkout = lazy(() => import("./pages/Checkout"));
+const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
+const AdminContactRequests = lazy(() => import("./pages/admin/ContactRequests"));
+const AdminPlugins = lazy(() => import("./pages/admin/Plugins"));
+const AdminTestimonials = lazy(() => import("./pages/admin/Testimonials"));
+const AdminLgpdErasure = lazy(() => import("./pages/admin/LgpdErasure"));
+const TestimonialsPage = lazy(() => import("./pages/Testimonials"));
+const AdminSiteConfig = lazy(() => import("./pages/admin/SiteConfig"));
+const AdminContractTemplates = lazy(() => import("./pages/admin/ContractTemplates"));
+const AdminTextos = lazy(() => import("./pages/admin/Textos"));
+const Playground = lazy(() => import("./pages/Playground"));
+const ContactWizardDemo = lazy(() => import("./pages/playground/ContactWizardDemo"));
+const ProposalDemo = lazy(() => import("./pages/playground/ProposalDemo"));
+const PlaygroundProposalView = lazy(() => import("./pages/playground/ProposalView"));
+const PlaygroundProposalAcceptView = lazy(() => import("./pages/playground/ProposalAcceptView"));
+const BlogPostDemo = lazy(() => import("./pages/playground/BlogPostDemo"));
+const BlogPreview = lazy(() => import("./pages/playground/BlogPreview"));
+const BlogPostPreview = lazy(() => import("./pages/playground/BlogPostPreview"));
+const PaymentLinkDemo = lazy(() => import("./pages/playground/PaymentLinkDemo"));
+const AiCvDemo = lazy(() => import("./pages/playground/AiCvDemo"));
 
 const translationService = new ConvexTranslationService(convex);
 
@@ -78,6 +81,7 @@ function Router() {
 
   if (isPlaygroundRoute) {
     return (
+      <Suspense fallback={<PageSkeleton />}>
       <Switch>
         <Route path="/playground">
           <PluginRoute pluginId="playground"><Playground /></PluginRoute>
@@ -110,6 +114,7 @@ function Router() {
           <PluginRoute pluginId="playground"><AiCvDemo /></PluginRoute>
         </Route>
       </Switch>
+      </Suspense>
     );
   }
 
@@ -117,6 +122,7 @@ function Router() {
     return (
       <>
       <ChangePasswordModal />
+      <Suspense fallback={<PageSkeleton />}>
       <Switch>
         <Route path="/admin/dashboard">
           <ProtectedRoute
@@ -233,12 +239,14 @@ function Router() {
           />
         </Route>
       </Switch>
+      </Suspense>
       </>
     );
   }
 
   return (
     <Layout>
+      <Suspense fallback={<PageSkeleton />}>
       <Switch>
         <Route path={"/"}>
           <PublicRoute>
@@ -326,6 +334,7 @@ function Router() {
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />
       </Switch>
+      </Suspense>
     </Layout>
   );
 }
@@ -356,6 +365,11 @@ function AppContent() {
       linkedinUrl: sidebarContact.linkedin_url,
     };
   }, [sidebarContact]);
+
+  // Troca de página sempre começa do topo (ex.: "próximo case").
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {

@@ -1,9 +1,22 @@
+import { useState } from "react";
+import { Download } from "lucide-react";
 import { useResume } from "@/hooks/useResume";
-import { resumeRepository } from "@/repositories/instances";
+import { useHome } from "@/hooks/useHome";
+import { useHomeMetrics } from "@/hooks/useHomeMetrics";
+import { useDownloadCV } from "@/hooks/useDownloadCV";
+import { useTranslation } from "@/i18n/hooks/useTranslation";
+import { splitParagraphs } from "@/utils/aboutContent";
+import { groupSkills, splitExperiences } from "@/utils/resumeContent";
+import { resumeRepository, homeRepository } from "@/repositories/instances";
 import { SwissShell, SwissGridLines } from "@/components/SwissShared";
 
 export default function SwissResume() {
+  const { t } = useTranslation();
   const { getItemsByType, isLoading } = useResume(resumeRepository);
+  const { aboutText } = useHome(homeRepository);
+  const { metrics } = useHomeMetrics(homeRepository);
+  const { downloadCV, canDownload } = useDownloadCV();
+  const [showOlder, setShowOlder] = useState(false);
 
   if (isLoading) return null;
 
@@ -14,6 +27,18 @@ export default function SwissResume() {
   const languages = getItemsByType("language");
   const softSkills = getItemsByType("soft_skill");
   const volunteering = getItemsByType("volunteer");
+  const summary = splitParagraphs(aboutText ?? "")[0] ?? "";
+  const { recent, older } = splitExperiences(experience);
+  const visibleExperience = showOlder ? experience : recent;
+  const skillGroups = groupSkills(skills, t("resume.stack"));
+  const stats =
+    metrics.length > 0
+      ? metrics.map((m) => ({ n: m.value, label: m.label }))
+      : [
+          { n: String(experience.length), label: "cargos" },
+          { n: String(skills.length), label: "skills" },
+          { n: String(courses.length), label: "certs" },
+        ];
 
   return (
     <SwissShell page="Currículo" idx={2}>
@@ -77,8 +102,37 @@ export default function SwissResume() {
               alignSelf: "end",
             }}
           >
-            {experience.length} cargos, {skills.length} habilidades e {courses.length}{" "}
-            certificações.
+            {summary ? (
+              <p style={{ margin: 0 }}>{summary}</p>
+            ) : (
+              <p style={{ margin: 0 }}>
+                {experience.length} cargos, {skills.length} habilidades e {courses.length} certificações.
+              </p>
+            )}
+            <button
+              type="button"
+              onClick={downloadCV}
+              disabled={!canDownload}
+              data-umami-event="resume-download-cv"
+              style={{
+                marginTop: 16,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                padding: "12px 16px",
+                background: "var(--text)",
+                color: "var(--bg)",
+                border: "2px solid var(--text)",
+                fontSize: 11,
+                fontWeight: 800,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                cursor: canDownload ? "pointer" : "not-allowed",
+                opacity: canDownload ? 1 : 0.5,
+              }}
+            >
+              <Download size={14} strokeWidth={3} /> {t("resume.downloadCV")}
+            </button>
           </div>
         </div>
       </div>
@@ -87,27 +141,25 @@ export default function SwissResume() {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
+          gridTemplateColumns: `repeat(${stats.length}, 1fr)`,
           borderBottom: "2px solid var(--text)",
         }}
       >
-        {[
-          { n: String(experience.length), label: "cargos", tint: "var(--primary)" as string | null },
-          { n: String(skills.length), label: "skills", tint: "var(--accent)" as string | null },
-          { n: String(courses.length), label: "certs", tint: null },
-        ].map((s, i) => (
+        {stats.map((s, i) => {
+          const tint = i === 0 ? "var(--primary)" : i === 1 ? "var(--accent)" : null;
+          return (
           <div
             key={i}
             style={{
               padding: "24px 18px",
-              borderRight: i < 2 ? "1px solid var(--text)" : "none",
-              background: s.tint ?? "transparent",
-              color: s.tint ? "var(--bg)" : "var(--text)",
+              borderRight: i < stats.length - 1 ? "1px solid var(--text)" : "none",
+              background: tint ?? "transparent",
+              color: tint ? "var(--bg)" : "var(--text)",
             }}
           >
             <div
               style={{
-                fontSize: 60,
+                fontSize: metrics.length > 0 ? 44 : 60,
                 fontWeight: 900,
                 lineHeight: 0.85,
                 letterSpacing: "-0.04em",
@@ -127,7 +179,8 @@ export default function SwissResume() {
               {s.label}
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Experience */}
@@ -143,7 +196,7 @@ export default function SwissResume() {
         >
           .04 — Experiência Profissional
         </div>
-        {experience.map((exp, i) => {
+        {visibleExperience.map((exp, i) => {
           const c = exp.translatedContent as {
             role?: string;
             company?: string;
@@ -160,7 +213,7 @@ export default function SwissResume() {
                 padding: "24px 0",
                 borderTop: "1px solid var(--text)",
                 borderBottom:
-                  i === experience.length - 1 ? "1px solid var(--text)" : "none",
+                  i === visibleExperience.length - 1 ? "1px solid var(--text)" : "none",
               }}
             >
               <div>
@@ -209,6 +262,26 @@ export default function SwissResume() {
             </div>
           );
         })}
+        {older.length > 0 && (
+          <button
+            type="button"
+            onClick={() => setShowOlder((v) => !v)}
+            style={{
+              marginTop: 16,
+              background: "transparent",
+              color: "var(--text)",
+              border: "1px solid var(--text)",
+              padding: "10px 14px",
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              cursor: "pointer",
+            }}
+          >
+            {showOlder ? t("resume.hideOlder") : `${t("resume.showOlder")} (${older.length})`}
+          </button>
+        )}
       </div>
 
       {/* Skills */}
@@ -240,66 +313,39 @@ export default function SwissResume() {
               lineHeight: 1,
             }}
           >
-            {skills.length} ferramentas, ordenadas por afinidade.
+            {skills.length} ferramentas, organizadas por área.
           </h3>
         </div>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(6, 1fr)",
-            gap: 4,
-          }}
-        >
-          {[...skills]
-            .sort((a, b) => {
-              const la = (a.translatedContent as { level?: number })?.level ?? 0;
-              const lb = (b.translatedContent as { level?: number })?.level ?? 0;
-              return lb - la;
-            })
-            .map((s) => {
-              const sc = s.translatedContent as { name?: string; level?: number };
-              const level = sc.level ?? 0;
-              return (
-                <div
-                  key={s.id}
-                  style={{
-                    padding: "10px 12px",
-                    background:
-                      level >= 90
-                        ? "var(--primary)"
-                        : level >= 80
-                        ? "var(--text)"
-                        : "transparent",
-                    color: level >= 80 ? "var(--bg)" : "var(--text)",
-                    border:
-                      level < 80
-                        ? "1px solid color-mix(in oklab, var(--text) 30%, transparent)"
-                        : "none",
-                    opacity: level >= 80 ? 1 : 0.85,
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: 12,
-                      fontWeight: 700,
-                      letterSpacing: "-0.01em",
-                    }}
-                  >
-                    {sc.name}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 10,
-                      fontWeight: 500,
-                      opacity: 0.7,
-                      marginTop: 2,
-                    }}
-                  >
-                    {level}/100
-                  </div>
-                </div>
-              );
-            })}
+        <div style={{ display: "grid", gap: 20 }}>
+          {skillGroups.map((g, gi) => (
+            <div key={g.name} style={{ display: "grid", gridTemplateColumns: "1fr 3fr", gap: 24, borderTop: "1px solid var(--text)", paddingTop: 14 }}>
+              <div style={{ fontSize: 13, fontWeight: 900, letterSpacing: "-0.01em", textTransform: "uppercase" }}>
+                <span style={{ color: "var(--primary)", marginRight: 8 }}>{String(gi + 1).padStart(2, "0")}</span>
+                {g.name}
+              </div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                {g.items.map((s, i) => {
+                  const sc = s.translatedContent as { name?: string };
+                  const strong = gi === 0 && i === 0;
+                  return (
+                    <span
+                      key={s.id}
+                      style={{
+                        padding: "8px 12px",
+                        fontSize: 12,
+                        fontWeight: 700,
+                        background: strong ? "var(--primary)" : "transparent",
+                        color: strong ? "var(--bg)" : "var(--text)",
+                        border: strong ? "1px solid var(--primary)" : "1px solid color-mix(in oklab, var(--text) 30%, transparent)",
+                      }}
+                    >
+                      {sc.name}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 

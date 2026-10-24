@@ -10,18 +10,21 @@ const TESTIMONIALS_SEED_VALUES = [
     name: 'Carlos Mendes',
     slug: 'carlos-mendes',
     role: 'CEO, Agência Digital X',
+    category: 'Clientes',
     text: 'A Ana entregou o projeto dentro do prazo com qualidade acima do esperado. Recomendo sem reservas.',
   },
   {
     name: 'Patrícia Lima',
     slug: 'patricia-lima',
     role: 'Product Owner, Fintech Y',
+    category: 'Times de produto',
     text: 'Comunicação excelente durante todo o projeto. Sempre proativa em reportar impedimentos e propor soluções.',
   },
   {
     name: 'Ricardo Alves',
     slug: 'ricardo-alves',
     role: 'CTO, SaaS Z',
+    category: 'Times de produto',
     text: 'Expertise técnica impressionante. O código entregue era limpo, bem estruturado e fácil de manter.',
   },
 ];
@@ -71,6 +74,7 @@ export const create = mutation({
       v.object({ 'ptBR': v.string(), 'enUS': v.optional(v.string()) }),
     ),
     orderIndex: v.optional(v.number()),
+    category: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const { userId } = await requireRole(ctx, ['root', 'admin', 'content-editor']);
@@ -104,6 +108,7 @@ export const update = mutation({
       v.object({ 'ptBR': v.string(), 'enUS': v.optional(v.string()) }),
     ),
     orderIndex: v.optional(v.number()),
+    category: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     await requireRole(ctx, ['root', 'admin', 'content-editor']);
@@ -133,6 +138,7 @@ export const createWithAvatar = mutation({
     textTranslations: v.optional(v.object({ ptBR: v.string(), enUS: v.optional(v.string()) })),
     avatarStorageId: v.optional(v.id('_storage')),
     avatarFileSize: v.optional(v.number()),
+    category: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const { userId } = await requireRole(ctx, ['root', 'admin', 'content-editor']);
@@ -168,6 +174,7 @@ export const createWithAvatar = mutation({
       textTranslations: args.textTranslations,
       imageId: imageId as any,
       showOnHome: false,
+      ...(args.category?.trim() ? { category: args.category.trim() } : {}),
       createdAt: now,
     });
 
@@ -278,6 +285,7 @@ export const seed = internalMutation({
         imageUrl: `https://picsum.photos/seed/${item.slug}/256/256`,
         text: item.text,
         textTranslations: { ptBR: item.text },
+        category: item.category,
         orderIndex: i,
         showOnHome: true,
         createdAt: now,

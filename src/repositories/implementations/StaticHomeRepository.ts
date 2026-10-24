@@ -1,3 +1,4 @@
+import { parseHomeMetrics, type HomeMetric } from "@/utils/homeMetrics";
 import {
   HomeRepository,
   ContactInfo,
@@ -12,6 +13,7 @@ import {
   mapTestimonial,
   mapTranslations,
 } from "../mappers/convexMappers";
+import { parseWorkPrinciples, type WorkPrinciple } from "@/utils/aboutContent";
 
 export class StaticHomeRepository implements HomeRepository {
   async getContactInfo(): Promise<ContactInfo | null> {
@@ -90,6 +92,28 @@ export class StaticHomeRepository implements HomeRepository {
       return data.contact_wizard_enabled !== false;
     } catch {
       return true;
+    }
+  }
+
+  async getWorkPrinciples(): Promise<WorkPrinciple[]> {
+    try {
+      const response = await fetch("/data/home.json");
+      if (!response.ok) return [];
+      const data = await response.json();
+      return parseWorkPrinciples(data?.work_principles);
+    } catch {
+      return [];
+    }
+  }
+
+  async getHomeMetrics(): Promise<HomeMetric[]> {
+    try {
+      const response = await fetch("/data/home.json");
+      if (!response.ok) return [];
+      const data = await response.json();
+      return parseHomeMetrics(data?.home_metrics);
+    } catch {
+      return [];
     }
   }
 }

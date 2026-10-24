@@ -1,6 +1,13 @@
+import { useState } from "react";
 import { useResume } from "@/hooks/useResume";
-import { resumeRepository } from "@/repositories/instances";
-import { Award, Heart, Languages } from "lucide-react";
+import { useHome } from "@/hooks/useHome";
+import { useHomeMetrics } from "@/hooks/useHomeMetrics";
+import { useDownloadCV } from "@/hooks/useDownloadCV";
+import { useTranslation } from "@/i18n/hooks/useTranslation";
+import { resumeRepository, homeRepository } from "@/repositories/instances";
+import { splitParagraphs } from "@/utils/aboutContent";
+import { groupSkills, splitExperiences } from "@/utils/resumeContent";
+import { Award, Download, Heart, Languages } from "lucide-react";
 
 function BentoCard({
   children,
@@ -38,7 +45,13 @@ function BentoCard({
 }
 
 export default function BentoResume() {
+  const { t } = useTranslation();
   const { getItemsByType } = useResume(resumeRepository);
+  const { aboutText } = useHome(homeRepository);
+  const { metrics } = useHomeMetrics(homeRepository);
+  const { downloadCV, canDownload } = useDownloadCV();
+  const [showOlder, setShowOlder] = useState(false);
+  const summary = splitParagraphs(aboutText ?? "")[0] ?? "";
 
   const experiences = getItemsByType("experience");
   const skills = getItemsByType("skill");
@@ -47,6 +60,9 @@ export default function BentoResume() {
   const education = getItemsByType("education");
   const certs = getItemsByType("certification");
   const volunteering = getItemsByType("volunteering");
+  const skillGroups = groupSkills(skills, t("resume.stack"));
+  const { recent, older } = splitExperiences(experiences, 3);
+  const visibleExperiences = showOlder ? experiences : recent;
 
   const gap = 14;
 
@@ -69,7 +85,7 @@ export default function BentoResume() {
           marginBottom: gap,
         }}
       >
-        <BentoCard span={5} padding={28}>
+        <BentoCard span={6} padding={28}>
           <div
             style={{
               fontFamily: "var(--font-mono)",
@@ -93,13 +109,38 @@ export default function BentoResume() {
           >
             Trajetória
           </h1>
-          <p style={{ fontSize: 13, lineHeight: 1.5, opacity: 0.7, margin: "12px 0 0" }}>
-            {experiences.length} cargos, {skills.length} habilidades,{" "}
-            {certs.length} certificações.
-          </p>
+          {summary && (
+            <p style={{ fontSize: 13.5, lineHeight: 1.55, opacity: 0.8, margin: "14px 0 0", maxWidth: 560 }}>
+              {summary}
+            </p>
+          )}
+          <div style={{ marginTop: "auto", paddingTop: 18 }}>
+            <button
+              type="button"
+              onClick={downloadCV}
+              disabled={!canDownload}
+              data-umami-event="resume-download-cv"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                padding: "10px 16px",
+                borderRadius: 14,
+                background: "var(--primary)",
+                color: "var(--bg)",
+                fontWeight: 700,
+                fontSize: 13,
+                border: "none",
+                cursor: canDownload ? "pointer" : "default",
+                opacity: canDownload ? 1 : 0.5,
+              }}
+            >
+              <Download size={15} /> {t("resume.downloadCV")}
+            </button>
+          </div>
         </BentoCard>
         <BentoCard
-          span={3}
+          span={2}
           padding={22}
           tint="var(--primary)"
           style={{ color: "var(--bg)" }}
@@ -130,6 +171,25 @@ export default function BentoResume() {
         </BentoCard>
       </div>
 
+      {/* Números de prova (os mesmos da home) */}
+      {metrics.length > 0 && (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: `repeat(${metrics.length}, 1fr)`,
+            gap,
+            marginBottom: gap,
+          }}
+        >
+          {metrics.map((m) => (
+            <BentoCard key={m.label} padding={20}>
+              <div style={{ fontSize: 30, fontWeight: 700, letterSpacing: "-0.03em", lineHeight: 1 }}>{m.value}</div>
+              <div style={{ fontSize: 12, lineHeight: 1.4, marginTop: 8, opacity: 0.72 }}>{m.label}</div>
+            </BentoCard>
+          ))}
+        </div>
+      )}
+
       {/* Experience cards */}
       {experiences.length > 0 && (
         <div
@@ -140,7 +200,7 @@ export default function BentoResume() {
             marginBottom: gap,
           }}
         >
-          {experiences.map((exp, idx) => {
+          {visibleExperiences.map((exp, idx) => {
             const c = exp.translatedContent as {
               role?: string;
               company?: string;
@@ -221,6 +281,27 @@ export default function BentoResume() {
         </div>
       )}
 
+      {older.length > 0 && (
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: gap }}>
+          <button
+            type="button"
+            onClick={() => setShowOlder((v) => !v)}
+            style={{
+              padding: "8px 16px",
+              borderRadius: 999,
+              border: "1px solid color-mix(in srgb, var(--text) 20%, transparent)",
+              background: "transparent",
+              color: "var(--text)",
+              fontSize: 12.5,
+              fontWeight: 500,
+              cursor: "pointer",
+            }}
+          >
+            {showOlder ? t("resume.hideOlder") : `${t("resume.showOlder")} (${older.length})`}
+          </button>
+        </div>
+      )}
+
       {/* Skills + soft skills + languages */}
       <div
         style={{
@@ -248,47 +329,46 @@ export default function BentoResume() {
                   opacity: 0.55,
                 }}
               >
-                {skills.length} ferramentas
+                {skillGroups.length} {skillGroups.length === 1 ? "grupo" : "grupos"}
               </span>
             </div>
-            <div
-              style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6 }}
-            >
-              {skills.map((s) => {
-                const c = s.translatedContent as { name?: string; level?: number };
-                const level = c.level ?? 0;
-                return (
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              {skillGroups.map((group, gi) => (
+                <div key={group.name}>
                   <div
-                    key={s.id}
                     style={{
-                      padding: "6px 10px",
-                      borderRadius: 10,
-                      background:
-                        level >= 85
-                          ? "var(--primary)"
-                          : "color-mix(in srgb, var(--text) 20%, transparent)",
-                      color: level >= 85 ? "var(--bg)" : "var(--text)",
-                      fontSize: 11,
-                      fontWeight: 500,
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      opacity: level >= 85 ? 1 : level >= 60 ? 0.85 : 0.55,
+                      fontFamily: "var(--font-mono)",
+                      fontSize: 10.5,
+                      letterSpacing: "0.14em",
+                      textTransform: "uppercase",
+                      opacity: 0.55,
+                      marginBottom: 8,
                     }}
                   >
-                    <span>{c.name}</span>
-                    <span
-                      style={{
-                        fontFamily: "var(--font-mono)",
-                        fontSize: 10,
-                        opacity: 0.7,
-                      }}
-                    >
-                      {level}
-                    </span>
+                    {group.name}
                   </div>
-                );
-              })}
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                    {group.items.map((s) => {
+                      const c = s.translatedContent as { name?: string };
+                      return (
+                        <span
+                          key={s.id}
+                          style={{
+                            padding: "6px 11px",
+                            borderRadius: 10,
+                            background: gi === 0 ? "var(--primary)" : "color-mix(in srgb, var(--text) 20%, transparent)",
+                            color: gi === 0 ? "var(--bg)" : "var(--text)",
+                            fontSize: 11.5,
+                            fontWeight: 500,
+                          }}
+                        >
+                          {c.name}
+                        </span>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
             </div>
           </BentoCard>
         )}
@@ -300,8 +380,8 @@ export default function BentoResume() {
               </h3>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                 {softSkills.map((s) => {
-                  const c = s.translatedContent as { name?: string } | string;
-                  const name = typeof c === "string" ? c : c?.name ?? "";
+                  const c = s.translatedContent as { name?: string; text?: string } | string;
+                  const name = typeof c === "string" ? c : c?.name ?? c?.text ?? "";
                   return (
                     <span
                       key={s.id}

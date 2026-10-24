@@ -78,7 +78,8 @@
         "enUS": "Careful work from start to finish. The redesign halved our support questions."
       },
       "imageUrl": "",
-      "orderIndex": 0
+      "orderIndex": 0,
+      "category": "Produto e tecnologia"
     },
     {
       "_creationTime": 1768435200006,
@@ -92,7 +93,8 @@
         "enUS": "Delivered a design system the whole team adopted without friction."
       },
       "imageUrl": "",
-      "orderIndex": 1
+      "orderIndex": 1,
+      "category": "Produto e tecnologia"
     },
     {
       "_creationTime": 1768435200007,
@@ -106,7 +108,8 @@
         "enUS": "Understood the business before drawing the first screen. It made all the difference."
       },
       "imageUrl": "",
-      "orderIndex": 2
+      "orderIndex": 2,
+      "category": "Clientes"
     },
     {
       "_creationTime": 1768435200008,
@@ -120,7 +123,8 @@
         "enUS": "Clear communication and deadlines met. We would work together again."
       },
       "imageUrl": "",
-      "orderIndex": 3
+      "orderIndex": 3,
+      "category": "Produto e tecnologia"
     }
   ],
   "faq": [

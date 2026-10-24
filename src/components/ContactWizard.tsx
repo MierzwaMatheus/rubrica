@@ -1,6 +1,7 @@
 import { useReducer, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import { trackEvent } from "@/lib/analytics";
 import { useTranslation } from "@/i18n/hooks/useTranslation";
 import { FlowType } from "@/contexts/ContactWizardContext";
 import { cn } from "@/lib/utils";
@@ -485,6 +486,8 @@ export function ContactWizard({
           const data = await res.json().catch(() => ({}));
           throw new Error((data as { error?: string }).error ?? 'ERROR');
         }
+        // conversão: o formulário chegou ao servidor
+        trackEvent("contato-enviado", { flow: state.flow, origem: sourceContext ?? "desconhecida" });
       }
       dispatch({ type: "SUBMIT_SUCCESS" });
     } catch (err: unknown) {

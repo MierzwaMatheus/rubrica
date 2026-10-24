@@ -1,6 +1,7 @@
 import { defineSchema, defineTable } from 'convex/server';
 import { v } from 'convex/values';
 import { authTables } from '@convex-dev/auth/server';
+import { caseStudyValidator, caseStudyTranslationsValidator } from './lib/caseStudy';
 
 // ─── i18n helpers ────────────────────────────────────────────────────────────
 const i18nString = v.optional(
@@ -26,9 +27,14 @@ const timelineItem = v.object({
 const resumeItemVariants = v.union(
   v.object({
     type: v.literal('skill'),
-    content: v.object({ name: v.string(), level: v.string() }),
+    // group agrupa a stack no currículo ("IA", "Front-end", "Infra")
+    content: v.object({ name: v.string(), level: v.string(), group: v.optional(v.string()) }),
+    // mesmo formato das outras variantes: o admin grava { ptBR, enUS }
     contentTranslations: v.optional(
-      v.object({ name: v.optional(v.string()), level: v.optional(v.string()) }),
+      v.object({
+        'ptBR': v.optional(v.object({ name: v.optional(v.string()), level: v.optional(v.string()), group: v.optional(v.string()) })),
+        'enUS': v.optional(v.object({ name: v.optional(v.string()), level: v.optional(v.string()), group: v.optional(v.string()) })),
+      }),
     ),
     orderIndex: v.number(),
     createdAt: v.number(),
@@ -161,25 +167,10 @@ export default defineSchema({
     demoLink: v.optional(v.string()),
     githubLink: v.optional(v.string()),
     slug: v.optional(v.string()),
-    caseStudy: v.optional(v.object({
-      problem: v.string(),
-      solution: v.string(),
-      results: v.string(),
-      metrics: v.array(v.object({
-        label: v.string(),
-        value: v.string(),
-        icon: v.optional(v.string()),
-      })),
-      testimonial: v.optional(v.object({
-        text: v.string(),
-        author: v.string(),
-        role: v.optional(v.string()),
-      })),
-    })),
-    caseStudyTranslations: v.optional(v.object({
-      ptBR: v.optional(v.object({ problem: v.string(), solution: v.string(), results: v.string() })),
-      enUS: v.optional(v.object({ problem: v.string(), solution: v.string(), results: v.string() })),
-    })),
+    caseStudy: v.optional(caseStudyValidator),
+    caseStudyTranslations: v.optional(caseStudyTranslationsValidator),
+    category: v.optional(v.string()),
+    categoryTranslations: i18nString,
     orderIndex: v.number(),
     createdAt: v.number(),
     updatedAt: v.optional(v.number()),
@@ -252,6 +243,8 @@ export default defineSchema({
     textTranslations: i18nString,
     orderIndex: v.optional(v.number()),
     showOnHome: v.optional(v.boolean()),
+    // frente do trabalho ("Tecnologia", "Marca e design"), para agrupar na página de depoimentos
+    category: v.optional(v.string()),
     createdAt: v.number(),
     deletedAt: v.optional(v.number()),
     deletedBy: v.optional(v.id('users')),

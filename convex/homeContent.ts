@@ -7,6 +7,8 @@ import { logAudit } from './audit';
 const PUBLIC_HOME_KEYS = new Set([
   'about_text', 'availability_status', 'contact_wizard_enabled',
   'hero_title', 'hero_subtitle', 'about_short', 'hero_tags',
+  'work_principles', // princípios de trabalho (página Sobre)
+  'home_metrics',    // números de prova no topo da home e do currículo
 ]);
 
 const HOME_SEED_VALUES: Record<string, unknown> = {
@@ -31,6 +33,28 @@ const HOME_SEED_VALUES: Record<string, unknown> = {
     },
   },
   contact_wizard_enabled: true,
+  // números de prova: aparecem no topo da home e do currículo (até 4)
+  home_metrics: [
+    { value: '8+', label: 'anos de experiência', labelTranslations: { ptBR: 'anos de experiência', enUS: 'years of experience' } },
+    { value: '30+', label: 'produtos entregues', labelTranslations: { ptBR: 'produtos entregues', enUS: 'products shipped' } },
+    { value: '1.200+', label: 'agendamentos por mês no maior case', labelTranslations: { ptBR: 'agendamentos por mês no maior case', enUS: 'bookings a month in the top case' } },
+    { value: '−65%', label: 'de no-show para um cliente', labelTranslations: { ptBR: 'de no-show para um cliente', enUS: 'fewer no-shows for a client' } },
+  ],
+  // metodologia de trabalho: abre a página Sobre, antes do conteúdo pessoal
+  work_principles: [
+    { title: 'Entender antes de construir', description: 'Todo projeto começa com o problema escrito, quem usa e como vamos medir o resultado.',
+      titleTranslations: { ptBR: 'Entender antes de construir', enUS: 'Understand before building' },
+      descriptionTranslations: { ptBR: 'Todo projeto começa com o problema escrito, quem usa e como vamos medir o resultado.', enUS: 'Every project starts with the problem written down, who uses it and how we will measure the result.' } },
+    { title: 'Entregas pequenas e frequentes', description: 'Versões curtas, validadas com quem usa, em vez de uma grande entrega no fim.',
+      titleTranslations: { ptBR: 'Entregas pequenas e frequentes', enUS: 'Small, frequent releases' },
+      descriptionTranslations: { ptBR: 'Versões curtas, validadas com quem usa, em vez de uma grande entrega no fim.', enUS: 'Short versions validated with users, instead of one big release at the end.' } },
+    { title: 'Qualidade desde o início', description: 'Testes, acessibilidade e performance fazem parte da tarefa, não de uma fase depois.',
+      titleTranslations: { ptBR: 'Qualidade desde o início', enUS: 'Quality from day one' },
+      descriptionTranslations: { ptBR: 'Testes, acessibilidade e performance fazem parte da tarefa, não de uma fase depois.', enUS: 'Tests, accessibility and performance are part of the task, not a later phase.' } },
+    { title: 'Fácil de manter', description: 'Código legível e documentado: o projeto continua saudável depois da entrega.',
+      titleTranslations: { ptBR: 'Fácil de manter', enUS: 'Easy to maintain' },
+      descriptionTranslations: { ptBR: 'Código legível e documentado: o projeto continua saudável depois da entrega.', enUS: 'Readable, documented code: the project stays healthy after handover.' } },
+  ],
 };
 
 export const getByKey = query({

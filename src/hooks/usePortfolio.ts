@@ -81,7 +81,16 @@ function applyLocale(project: Project, locale: string): Project {
           problem: caseStudyT?.problem ?? project.case_study.problem,
           solution: caseStudyT?.solution ?? project.case_study.solution,
           results: caseStudyT?.results ?? project.case_study.results,
+          role: caseStudyT?.role || project.case_study.role,
+          context: caseStudyT?.context || project.case_study.context,
+          decisions: caseStudyT?.decisions || project.case_study.decisions,
+          learnings: caseStudyT?.learnings || project.case_study.learnings,
         }
       : undefined,
+    category:
+      project.category_translations?.[locale] ||
+      project.category_translations?.["pt-BR"] ||
+      project.category ||
+      undefined,
   };
 }

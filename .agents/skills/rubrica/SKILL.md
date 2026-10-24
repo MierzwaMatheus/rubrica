@@ -4,7 +4,8 @@ description: >-
   Lê e altera o conteúdo de um site feito com o Rubrica direto pelo terminal,
   falando com o Convex do projeto com o login de um usuário do admin: textos
   fixos do site (botões, títulos, rótulos, em pt-BR e en-US), identidade, SEO,
-  cores e fontes, perfil e redes, blocos da home, posts do blog (criar em
+  cores e fontes, perfil e redes, blocos da home (números de destaque,
+  princípios de trabalho), cases dos projetos, posts do blog (criar em
   rascunho, editar, publicar), imagens, projetos, currículo, serviços, FAQ,
   depoimentos, pedidos de contato, propostas, modelos de contrato, plugins e a
   publicação do site. Use quando a pessoa quiser personalizar ou mudar algo do
@@ -65,6 +66,18 @@ São os textos de interface: títulos de seção, botões, menus, rótulos do fo
 ## Perfil e home
 - `$RB perfil` / `$RB perfil-editar --json '{"location": "Lisboa", "linkedinUrl": "..."}'`. Mudou `role` (cargo), mande `roleTranslations: {"ptBR", "enUS"}` junto. Campos `show*` (ex.: `showPhone`) escondem ou mostram o dado no site.
 - `$RB listar home` mostra os blocos da home. Para mudar: `$RB home-definir <chave> --valor '<json>'` (texto vai entre aspas: `--valor '"Olá, sou Ana"'`). Blocos com tradução usam `{"ptBR": "...", "enUS": "..."}`, como `about_text`. Leia o valor atual (`$RB ler home <chave>`) e mantenha o mesmo formato.
+
+## Home, cases e currículo: o que aparece onde
+As páginas são montadas para converter visitante em contato. Estes campos decidem o que aparece (em todos os layouts):
+- **Números do topo** (home e começo do currículo): bloco `home_metrics`, até 4 itens `[{ "value": "8+", "label": "anos de experiência", "labelTranslations": {"ptBR": "...", "enUS": "..."} }]`. Use `$RB home-definir home_metrics --valor '<json>'` (a lista inteira é substituída). Prefira resultados ("1.200 agendamentos/mês") a quantidades ("300 commits"). Lista vazia esconde a faixa.
+- **Princípios de trabalho** (seção "Como eu trabalho", que abre a página Sobre): bloco `work_principles`, `[{ "title", "description", "titleTranslations": {ptBR, enUS}, "descriptionTranslations": {ptBR, enUS} }]`, com `home-definir`.
+- **Cases em destaque na home:** os 3 primeiros projetos (menor `orderIndex`) que têm `slug` **e** `caseStudy`. Para mudar o destaque, mude o `orderIndex` (`projects:update` ou `projects:reorder`).
+- **Métrica do cartão:** a **primeira** de `caseStudy.metrics` aparece no cartão da home e do portfólio. Ponha primeiro um resultado.
+- **Categoria do projeto** (`category` + `categoryTranslations: {ptBR, enUS}`): vira o filtro do Portfólio. Texto curto. Sem categorias, o filtro some.
+- **Seções extras do case**, todas opcionais e só exibidas quando preenchidas, em `caseStudy` e em `caseStudyTranslations.ptBR/enUS`: `role` ("Meu papel"), `context` ("Antes", o estado inicial medido), `decisions` ("Decisões e trade-offs"), `learnings` ("Aprendizados"). Não invente fatos: o que a pessoa não contou fica vazio.
+- No `projects:update`, `caseStudy` é substituído **inteiro** (problem, solution, results e metrics são obrigatórios): leia o projeto e mande o objeto completo. O mesmo vale para `caseStudyTranslations`.
+- **Grupo da habilidade** (`resumeItems`, tipo `skill`): `content.group` ("Design", "Front-end"…) agrupa a stack no currículo; sem grupo, vai para "Stack". O nível (`level`) não aparece mais nas páginas. Tradução: `contentTranslations: { ptBR: {name, level, group}, enUS: {...} }`.
+- **Categoria do depoimento** (`category`): agrupa a página de depoimentos.
 
 ## Blog
 O corpo do post é **HTML**. Use só `h2 h3 p ul ol li strong em a code pre blockquote img`, sem `<html>`/`<body>`/estilos inline.

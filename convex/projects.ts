@@ -5,6 +5,7 @@ import { markPendingChanges } from './publishStatus';
 import { logAudit } from './audit';
 import { requirePlugin, isPluginEnabled } from './plugins';
 import { softDeleteDoc, restoreDoc } from './lib/softDelete';
+import { caseStudyValidator, caseStudyTranslationsValidator, categoryTranslationsValidator } from './lib/caseStudy';
 
 export const list = query({
   args: { tag: v.optional(v.string()), includeDeleted: v.optional(v.boolean()) },
@@ -141,17 +142,10 @@ export const create = mutation({
     demoLink: v.optional(v.string()),
     githubLink: v.optional(v.string()),
     slug: v.optional(v.string()),
-    caseStudy: v.optional(v.object({
-      problem: v.string(),
-      solution: v.string(),
-      results: v.string(),
-      metrics: v.array(v.object({ label: v.string(), value: v.string(), icon: v.optional(v.string()) })),
-      testimonial: v.optional(v.object({ text: v.string(), author: v.string(), role: v.optional(v.string()) })),
-    })),
-    caseStudyTranslations: v.optional(v.object({
-      ptBR: v.optional(v.object({ problem: v.string(), solution: v.string(), results: v.string() })),
-      enUS: v.optional(v.object({ problem: v.string(), solution: v.string(), results: v.string() })),
-    })),
+    caseStudy: v.optional(caseStudyValidator),
+    caseStudyTranslations: v.optional(caseStudyTranslationsValidator),
+    category: v.optional(v.string()),
+    categoryTranslations: v.optional(categoryTranslationsValidator),
     orderIndex: v.number(),
   },
   handler: async (ctx, args) => {
@@ -186,17 +180,10 @@ export const update = mutation({
     demoLink: v.optional(v.string()),
     githubLink: v.optional(v.string()),
     slug: v.optional(v.string()),
-    caseStudy: v.optional(v.object({
-      problem: v.string(),
-      solution: v.string(),
-      results: v.string(),
-      metrics: v.array(v.object({ label: v.string(), value: v.string(), icon: v.optional(v.string()) })),
-      testimonial: v.optional(v.object({ text: v.string(), author: v.string(), role: v.optional(v.string()) })),
-    })),
-    caseStudyTranslations: v.optional(v.object({
-      ptBR: v.optional(v.object({ problem: v.string(), solution: v.string(), results: v.string() })),
-      enUS: v.optional(v.object({ problem: v.string(), solution: v.string(), results: v.string() })),
-    })),
+    caseStudy: v.optional(caseStudyValidator),
+    caseStudyTranslations: v.optional(caseStudyTranslationsValidator),
+    category: v.optional(v.string()),
+    categoryTranslations: v.optional(categoryTranslationsValidator),
     orderIndex: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
@@ -278,7 +265,13 @@ const PROJECTS_SEED_VALUES = [
     orderIndex: 0,
     demoLink: 'https://agendamento-demo.example.com',
     githubLink: 'https://github.com/example/agendamento-online',
+    category: 'Produtos web',
+    categoryTranslations: { ptBR: 'Produtos web', enUS: 'Web products' },
     caseStudy: {
+      role: 'Desenvolvedora full-stack e responsável técnica, num time de 3 pessoas (design, produto e eu).',
+      context: 'Cada profissional gastava cerca de 5 horas por semana confirmando horários por mensagem, e 1 em cada 4 consultas virava no-show.',
+      decisions: 'Escolhemos confirmação automática por e-mail e WhatsApp em vez de um app nativo: o cliente final não precisa instalar nada. Descartamos pagamento antecipado na primeira versão para não travar a adoção.',
+      learnings: 'Medir o no-show antes de começar foi o que permitiu provar o resultado. Lembretes simples funcionaram melhor do que regras complexas de reagendamento.',
       problem: 'Profissionais autônomos perdiam clientes por gerenciar agenda manualmente em planilhas.',
       solution: 'Plataforma web com agendamento em tempo real, confirmação automática e gestão centralizada de profissionais.',
       results: 'Reduziu em 70% o tempo gasto em administração de agenda e aumentou o faturamento médio em 25%.',
@@ -317,7 +310,13 @@ const PROJECTS_SEED_VALUES = [
     orderIndex: 1,
     demoLink: 'https://financas-demo.example.com',
     githubLink: 'https://github.com/example/financas-pessoais',
+    category: 'Apps mobile',
+    categoryTranslations: { ptBR: 'Apps mobile', enUS: 'Mobile apps' },
     caseStudy: {
+      role: 'Desenvolvedora mobile principal, do protótipo à publicação nas lojas.',
+      context: 'Em testes com o protótipo, só 1 em cada 4 pessoas continuava usando um app de finanças depois de um mês.',
+      decisions: 'Categorização automática por SMS e e-mail no lugar do cadastro manual. Descartamos sincronização com bancos na primeira versão por custo e prazo.',
+      learnings: 'Menos telas e menos campos aumentaram a retenção mais do que qualquer recurso novo.',
       problem: 'Usuários abandonavam apps de finanças por complexidade excessiva e cadastro manual de cada transação.',
       solution: 'App mobile com categorização automática via SMS/email e visualização simples em cards mensais.',
       results: '85% dos usuários ativos após 30 dias (média do mercado: 25%).',

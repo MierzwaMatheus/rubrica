@@ -1,6 +1,10 @@
 import { useState } from "react";
+import { Link } from "wouter";
 import { usePortfolio } from "@/hooks/usePortfolio";
+import { useTranslation } from "@/i18n/hooks/useTranslation";
 import { portfolioRepository } from "@/repositories/instances";
+import type { Project } from "@/repositories/interfaces/PortfolioRepository";
+import { filterByCategory, hasCaseStudy, listCategories } from "@/utils/portfolioContent";
 import { ArrowUpRight } from "lucide-react";
 
 function BentoCard({
@@ -36,17 +40,56 @@ function BentoCard({
   );
 }
 
+/** Primeira métrica do case, em destaque no cartão. */
+function CardMetric({ project, size = 20 }: { project: Project; size?: number }) {
+  const metric = project.case_study?.metrics?.[0];
+  if (!metric) return null;
+  return (
+    <div style={{ display: "flex", alignItems: "baseline", gap: 8, margin: "0 0 12px" }}>
+      <span style={{ fontSize: size, fontWeight: 700, color: "var(--primary)" }}>{metric.value}</span>
+      <span style={{ fontSize: 11.5, opacity: 0.7 }}>{metric.label}</span>
+    </div>
+  );
+}
+
+/** Uma ação por cartão: o case quando existe, senão o link do projeto. */
+function CardAction({ project, label }: { project: Project; label: string }) {
+  const style: React.CSSProperties = {
+    marginTop: "auto",
+    paddingTop: 12,
+    fontFamily: "var(--font-mono)",
+    fontSize: 12,
+    color: "var(--primary)",
+    textDecoration: "none",
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 6,
+  };
+  if (hasCaseStudy(project)) {
+    return (
+      <Link to={`/portfolio/${project.slug}`} data-umami-event="portfolio-case" data-umami-event-case={project.slug} style={style}>
+        {label} →
+      </Link>
+    );
+  }
+  if (project.demo_link) {
+    return (
+      <a href={project.demo_link} target="_blank" rel="noreferrer" style={style}>
+        ver projeto <ArrowUpRight size={13} />
+      </a>
+    );
+  }
+  return null;
+}
+
 export default function BentoPortfolio() {
+  const { t } = useTranslation();
   const { projects } = usePortfolio(portfolioRepository);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
 
-  const allTags = Array.from(
-    new Set(projects.flatMap((p) => p.tags ?? []))
-  ).slice(0, 18);
-
-  const filtered = activeFilter
-    ? projects.filter((p) => p.tags?.includes(activeFilter))
-    : projects;
+  const categories = listCategories(projects);
+  const filtered = filterByCategory(projects, activeFilter);
+  const caseLabel = t("portfolio.viewCase");
 
   const gap = 14;
   const featured = filtered[0];
@@ -72,7 +115,7 @@ export default function BentoPortfolio() {
           marginBottom: gap,
         }}
       >
-        <BentoCard span={6} padding={28}>
+        <BentoCard span={categories.length > 0 ? 6 : 12} padding={28}>
           <div
             style={{
               fontFamily: "var(--font-mono)",
@@ -100,6 +143,7 @@ export default function BentoPortfolio() {
             Uma seleção dos meus trabalhos recentes — {projects.length} projetos.
           </p>
         </BentoCard>
+        {categories.length > 0 && (
         <BentoCard span={6} padding={22}>
           <div
             style={{
@@ -130,7 +174,7 @@ export default function BentoPortfolio() {
             >
               Todos
             </span>
-            {allTags.map((f) => (
+            {categories.map((f) => (
               <span
                 key={f}
                 onClick={() => setActiveFilter(f === activeFilter ? null : f)}
@@ -152,6 +196,7 @@ export default function BentoPortfolio() {
             ))}
           </div>
         </BentoCard>
+        )}
       </div>
 
       {/* Project grid — asymmetric bento */}
@@ -229,10 +274,11 @@ export default function BentoPortfolio() {
                 >
                   {featured.description}
                 </p>
+                <CardMetric project={featured} size={26} />
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                  {(featured.tags ?? []).map((t) => (
+                  {(featured.tags ?? []).map((tag) => (
                     <span
-                      key={t}
+                      key={tag}
                       style={{
                         padding: "4px 10px",
                         borderRadius: 8,
@@ -240,9 +286,12 @@ export default function BentoPortfolio() {
                         fontSize: 10.5,
                       }}
                     >
-                      {t}
+                      {tag}
                     </span>
                   ))}
+                </div>
+                <div style={{ display: "flex" }}>
+                  <CardAction project={featured} label={caseLabel} />
                 </div>
               </div>
             </BentoCard>
@@ -270,7 +319,7 @@ export default function BentoPortfolio() {
                   <span style={{ fontSize: 32, opacity: 0.2 }}>{p.title[0]}</span>
                 )}
               </div>
-              <div style={{ padding: 18 }}>
+              <div style={{ padding: 18, display: "flex", flexDirection: "column", flex: 1 }}>
                 <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>{p.title}</h3>
                 <p
                   style={{
@@ -284,10 +333,11 @@ export default function BentoPortfolio() {
                     ? p.description.slice(0, 110) + "…"
                     : p.description}
                 </p>
+                <CardMetric project={p} />
                 <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
-                  {(p.tags ?? []).slice(0, 3).map((t) => (
+                  {(p.tags ?? []).slice(0, 3).map((tag) => (
                     <span
-                      key={t}
+                      key={tag}
                       style={{
                         padding: "2px 8px",
                         borderRadius: 6,
@@ -295,10 +345,11 @@ export default function BentoPortfolio() {
                         fontSize: 10,
                       }}
                     >
-                      {t}
+                      {tag}
                     </span>
                   ))}
                 </div>
+                <CardAction project={p} label={caseLabel} />
               </div>
             </BentoCard>
           ))}
@@ -345,10 +396,11 @@ export default function BentoPortfolio() {
                   ? p.description.slice(0, 120) + "…"
                   : p.description}
               </p>
+              <CardMetric project={p} />
               <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
-                {(p.tags ?? []).slice(0, 3).map((t) => (
+                {(p.tags ?? []).slice(0, 3).map((tag) => (
                   <span
-                    key={t}
+                    key={tag}
                     style={{
                       padding: "2px 8px",
                       borderRadius: 6,
@@ -356,10 +408,11 @@ export default function BentoPortfolio() {
                       fontSize: 10,
                     }}
                   >
-                    {t}
+                    {tag}
                   </span>
                 ))}
               </div>
+              <CardAction project={p} label={caseLabel} />
             </BentoCard>
           ))}
         </div>

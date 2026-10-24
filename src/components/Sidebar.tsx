@@ -29,13 +29,10 @@ import { useContactWizard } from "@/contexts/ContactWizardContext";
 import { usePlugins } from "@/contexts/PluginsContext";
 import { useHome } from "@/hooks/useHome";
 import { MessageSquare } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
 import { useSidebar } from "@/hooks/useSidebar";
-import { useResume } from "@/hooks/useResume";
-import { usePortfolio } from "@/hooks/usePortfolio";
-import { sidebarRepository, resumeRepository, portfolioRepository, homeRepository } from "@/repositories/instances";
+import { sidebarRepository } from "@/repositories/instances";
 import type { SidebarContactInfo } from "@/repositories/interfaces/SidebarRepository";
-import { generateCV } from "@/utils/cvPDF";
+import { useDownloadCV } from "@/hooks/useDownloadCV";
 
 import type { PluginId } from "../../convex/pluginRegistry";
 
@@ -73,13 +70,7 @@ export function Sidebar() {
   const wizardEnabled = isEnabled('contact-wizard');
   const [location] = useLocation();
   const { contactInfo, isLoading } = useSidebar(sidebarRepository);
-  const { items: resumeItems } = useResume(resumeRepository);
-  const { projects } = usePortfolio(portfolioRepository);
-  const { data: aboutData } = useQuery({
-    queryKey: ["home", "about"],
-    queryFn: () => homeRepository.getAboutData(),
-    staleTime: Infinity,
-  });
+  const { downloadCV, canDownload } = useDownloadCV();
 
 const NAV_ITEMS = NAV_ITEMS_KEYS
     .filter(item => !item.pluginId || isEnabled(item.pluginId))
@@ -92,22 +83,16 @@ const NAV_ITEMS = NAV_ITEMS_KEYS
     setLocale(checked ? 'en-US' : 'pt-BR');
   };
 
-  const handleDownloadCV = () => {
-    if (!contactInfo) return;
-    const cvLocale = locale === "en-US" ? "en-US" : "pt-BR";
-    const summary = aboutData?.value?.[cvLocale] ?? aboutData?.value?.["pt-BR"] ?? "";
-    generateCV(contactInfo, resumeItems, projects, cvLocale, summary);
-  };
 
   const SidebarContent = () => {
     return (
       <div className="flex flex-col h-full bg-background border-r border-foreground/10 w-full overflow-y-auto">
         {/* Profile Section */}
-        <div className="flex flex-col items-center pt-8 pb-6 px-6">
+        <div className="flex flex-col items-center pt-5 pb-6 px-6">
           {isLoading ? (
-            <Skeleton className="h-28 w-28 rounded-full mb-4" />
+            <Skeleton className="h-20 w-20 rounded-full mb-4" />
           ) : (
-            <div className="relative h-28 w-28 rounded-full mb-4 overflow-hidden border-2 border-neon-purple group cursor-pointer">
+            <div className="relative h-20 w-20 rounded-full mb-4 overflow-hidden border-2 border-neon-purple group cursor-pointer">
               <div className="absolute inset-0 bg-gradient-to-br from-neon-purple to-neon-lime opacity-30 group-hover:opacity-50 transition-opacity duration-500"></div>
               {contactInfo?.avatar_url ? (
                 <img
@@ -305,6 +290,7 @@ const NAV_ITEMS = NAV_ITEMS_KEYS
           {wizardEnabled && (
             <Button
               onClick={() => openWizard({ sourceContext: "sidebar" })}
+              data-umami-event="sidebar-fale-comigo"
               className="w-full bg-neon-purple/20 hover:bg-neon-purple/30 border border-neon-purple/50 text-neon-purple h-9 text-xs font-mono uppercase tracking-wider mb-2"
             >
               <MessageSquare className="mr-2 h-3 w-3" />
@@ -314,8 +300,9 @@ const NAV_ITEMS = NAV_ITEMS_KEYS
 
           <Button
             variant="outline"
-            onClick={handleDownloadCV}
-            disabled={!contactInfo}
+            onClick={downloadCV}
+            disabled={!canDownload}
+            data-umami-event="sidebar-baixar-cv"
             className="w-full border-neon-lime/50 text-neon-lime hover:bg-neon-lime/10 hover:text-neon-lime h-9 text-xs uppercase tracking-wider"
           >
             <FileText className="mr-2 h-3 w-3" />
@@ -333,7 +320,7 @@ const NAV_ITEMS = NAV_ITEMS_KEYS
   return (
     <>
       {/* Mobile Header */}
-      <div className="fixed top-0 left-0 right-0 h-16 bg-background/90 backdrop-blur-md border-b border-foreground/10 z-50 flex items-center justify-between px-4 lg:hidden">
+      <div className="fixed top-0 left-0 right-0 h-16 bg-background/90 backdrop-blur-md border-b border-foreground/10 z-50 flex items-center justify-between gap-3 px-4 lg:hidden">
         <div className="flex items-center">
           <div className="h-8 w-8 rounded-full overflow-hidden border border-neon-purple mr-3">
             {contactInfo?.avatar_url ? (
@@ -353,6 +340,18 @@ const NAV_ITEMS = NAV_ITEMS_KEYS
           </span>
         </div>
 
+        <div className="flex items-center gap-1">
+          {wizardEnabled && (
+            <Button
+              size="sm"
+              onClick={() => openWizard({ sourceContext: "mobile-header" })}
+              data-umami-event="mobile-header-fale-comigo"
+              className="bg-neon-purple text-foreground-strong hover:bg-neon-purple/90 h-8 px-3 text-xs font-semibold"
+            >
+              <MessageSquare className="mr-1.5 h-3.5 w-3.5" />
+              {t("contactWizard.trigger")}
+            </Button>
+          )}
         <Sheet>
           <SheetTrigger asChild>
             <Button
@@ -373,6 +372,7 @@ const NAV_ITEMS = NAV_ITEMS_KEYS
             <SidebarContent />
           </SheetContent>
         </Sheet>
+        </div>
       </div>
 
       {/* Desktop Sidebar */}

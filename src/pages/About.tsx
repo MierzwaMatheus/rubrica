@@ -14,13 +14,46 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/useMobile";
 import { useAbout } from "@/hooks/useAbout";
-import { aboutRepository } from "@/repositories/instances";
+import { aboutRepository, homeRepository } from "@/repositories/instances";
+import { useHome } from "@/hooks/useHome";
+import { useWorkPrinciples } from "@/hooks/useWorkPrinciples";
+import { highlightNumbers } from "@/utils/homeContent";
+import { splitParagraphs } from "@/utils/aboutContent";
+
+/** Parágrafo com os números de resultado em destaque, igual à home. */
+function HighlightedParagraph({ text, className }: { text: string; className?: string }) {
+  return (
+    <p className={className}>
+      {highlightNumbers(text).map((segment, i) =>
+        segment.highlight ? (
+          <strong key={i} className="text-foreground-strong font-semibold">
+            {segment.text}
+          </strong>
+        ) : (
+          <span key={i}>{segment.text}</span>
+        )
+      )}
+    </p>
+  );
+}
+
+/** Marcador em V, o chevron do símbolo da marca. */
+function ChevronMark() {
+  return (
+    <svg viewBox="0 0 28 20" className="w-7 h-5 mb-4" aria-hidden="true">
+      <path d="M0 0H8L14 6L20 0H28L14 14Z" fill="currentColor" className="text-neon-purple" />
+    </svg>
+  );
+}
 
 export default function About() {
   const { t } = useTranslation();
   const { isLoading: i18nLoading } = useI18n();
   const isMobile = useIsMobile();
   const { dailyRoutine, faq, isLoading } = useAbout(aboutRepository);
+  const { aboutText } = useHome(homeRepository);
+  const { principles } = useWorkPrinciples(homeRepository);
+  const professionalParagraphs = splitParagraphs(aboutText);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
   const getSpanClasses = (spanSize: string) => {
@@ -64,7 +97,52 @@ export default function About() {
         animate="show"
         className="space-y-16 pb-12"
       >
-        {/* Sobre Mim Section */}
+        {/* Resumo profissional: o mesmo texto do "Sobre mim" da home, editado no admin */}
+        {professionalParagraphs.length > 0 && (
+          <motion.section variants={item}>
+            <h2 className="text-2xl font-bold text-foreground-strong mb-8 flex items-center font-mono">
+              <span className="text-neon-purple mr-2">/*</span>{" "}
+              {t("about.professional.title")}{" "}
+              <span className="text-neon-purple ml-2">*/</span>
+            </h2>
+            <div className="rounded-xl border border-foreground/10 bg-card/50 backdrop-blur-sm p-8 max-w-4xl space-y-5 leading-relaxed">
+              {professionalParagraphs.map((paragraph, idx) => (
+                <HighlightedParagraph
+                  key={idx}
+                  text={paragraph}
+                  className={idx === 0 ? "text-lg text-foreground" : "text-base text-foreground/65"}
+                />
+              ))}
+            </div>
+          </motion.section>
+        )}
+
+        {/* Como eu trabalho: princípios editados no admin (homeContent work_principles) */}
+        {principles.length > 0 && (
+          <motion.section variants={item}>
+            <h2 className="text-2xl font-bold text-foreground-strong mb-8 flex items-center font-mono">
+              <span className="text-neon-purple mr-2">/*</span>{" "}
+              {t("about.principles.title")}{" "}
+              <span className="text-neon-purple ml-2">*/</span>
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {principles.map((principle, idx) => (
+                <div
+                  key={idx}
+                  className="bg-gradient-to-br from-foreground/5 to-background p-6 rounded-xl border border-foreground/5 hover:border-neon-purple/30 transition-colors"
+                >
+                  <ChevronMark />
+                  <h3 className="font-bold text-lg text-foreground-strong mb-2">{principle.title}</h3>
+                  {principle.description && (
+                    <p className="text-sm text-foreground/65 leading-relaxed">{principle.description}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </motion.section>
+        )}
+
+        {/* Fora do trabalho: lado pessoal, depois do profissional */}
         <motion.section variants={item}>
           <h2 className="text-2xl font-bold text-foreground-strong mb-8 flex items-center font-mono">
             <span className="text-neon-purple mr-2">/*</span>{" "}

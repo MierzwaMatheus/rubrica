@@ -2,20 +2,30 @@ import DOMPurify from "dompurify";
 import { PageSkeleton } from "@/components/PageSkeleton";
 import { useRoute } from "wouter";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, ArrowLeft } from "lucide-react";
+import { Calendar, Clock, ArrowLeft, ArrowRight, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { useI18n } from "@/i18n/context/I18nContext";
 import { useTranslation } from "@/i18n/hooks/useTranslation";
 import { useBlogPost } from "@/hooks/useBlog";
-import { blogRepository } from "@/repositories/instances";
+import { blogRepository, homeRepository, portfolioRepository, sidebarRepository } from "@/repositories/instances";
+import { useSidebar } from "@/hooks/useSidebar";
+import { useHome } from "@/hooks/useHome";
+import { usePortfolio } from "@/hooks/usePortfolio";
+import { useContactWizard } from "@/contexts/ContactWizardContext";
+import { findRelatedCase } from "@/utils/relatedCase";
 
 export default function BlogPost() {
     const { t } = useTranslation();
     const { isLoading: i18nLoading } = useI18n();
     const [match, params] = useRoute("/blog/:slug");
-    const { post, isLoading } = useBlogPost(blogRepository, params?.slug || '');
+    const slug = params?.slug || '';
+    const { post, isLoading } = useBlogPost(blogRepository, slug);
+    const { contactName, contactRole, contactWizardEnabled } = useHome(homeRepository);
+    const { contactInfo: sidebarContact } = useSidebar(sidebarRepository);
+    const { projects } = usePortfolio(portfolioRepository);
+    const { openWizard } = useContactWizard();
 
     if (isLoading || i18nLoading) {
         return <PageSkeleton />;
@@ -99,6 +109,74 @@ export default function BlogPost() {
                     className="blog-content"
                     dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }}
                 />
+
+                <PostFooter
+                    name={contactName}
+                    avatarUrl={sidebarContact?.avatar_url || undefined}
+                    role={contactRole}
+                    related={findRelatedCase(post.tags, projects)}
+                    showContact={contactWizardEnabled}
+                    onContact={() => openWizard({ sourceContext: `blog-${slug}` })}
+                    t={t}
+                />
             </motion.article>
+    );
+}
+
+interface PostFooterProps {
+    name: string;
+    avatarUrl?: string;
+    role: string;
+    related?: { slug?: string; title: string; description: string };
+    showContact: boolean;
+    onContact: () => void;
+    t: (key: string) => string;
+}
+
+/** Fim do post: quem escreveu, como falar comigo e o case que mostra isso na prática. */
+function PostFooter({ name, avatarUrl, role, related, showContact, onContact, t }: PostFooterProps) {
+    return (
+        <footer className="space-y-4 border-t border-foreground/10 pt-8">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-5 rounded-xl border border-foreground/10 bg-card/50 p-6">
+                {avatarUrl ? (
+                    <img src={avatarUrl} alt={name} className="h-12 w-12 shrink-0 rounded-full object-cover border border-foreground/10" />
+                ) : (
+                    <div className="h-12 w-12 shrink-0 rounded-full bg-neon-purple/20 flex items-center justify-center font-bold text-foreground-strong">
+                        {name?.[0]?.toUpperCase()}
+                    </div>
+                )}
+                <div className="flex-1">
+                    <p className="font-bold text-foreground-strong">{name}</p>
+                    {role && <p className="text-sm text-neon-lime">{role}</p>}
+                    <p className="text-sm text-foreground/65 mt-1">{t('blog.authorLine')}</p>
+                </div>
+                {showContact && (
+                    <button
+                        onClick={onContact}
+                        data-umami-event="blog-cta-contato"
+                        className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-neon-purple text-white font-semibold hover:bg-neon-purple/90 transition-colors"
+                    >
+                        <MessageSquare className="w-4 h-4" />
+                        {t('blog.authorCta')}
+                    </button>
+                )}
+            </div>
+
+            {related?.slug && (
+                <Link
+                    href={`/portfolio/${related.slug}`}
+                    data-umami-event="blog-case-relacionado"
+                    className="group block rounded-xl border border-foreground/5 bg-gradient-to-br from-foreground/5 to-background p-6 hover:border-neon-purple/40 transition-colors"
+                >
+                    <p className="text-xs font-mono uppercase tracking-wider text-neon-purple">{t('blog.relatedCase')}</p>
+                    <p className="mt-2 text-lg font-bold text-foreground-strong">{related.title}</p>
+                    <p className="mt-1 text-sm text-foreground/65 line-clamp-2">{related.description}</p>
+                    <span className="mt-4 inline-flex items-center gap-2 text-sm font-mono text-neon-lime">
+                        {t('blog.readCase')}
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    </span>
+                </Link>
+            )}
+        </footer>
     );
 }

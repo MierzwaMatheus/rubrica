@@ -67,6 +67,8 @@ export function mapProject(c: any): Project {
     slug: c.slug ?? undefined,
     case_study: c.caseStudy ?? c.case_study ?? undefined,
     case_study_translations: mapTranslationsObj(c.caseStudyTranslations ?? c.case_study_translations),
+    category: c.category ?? undefined,
+    category_translations: mapTranslations(c.categoryTranslations ?? c.category_translations),
   } as Project;
 }
 
@@ -152,6 +154,7 @@ export function mapTestimonial(c: any): Testimonial {
     image_url: c.imageUrl ?? c.image_url ?? c.image?.url ?? "",
     role_translations: mapTranslations(c.roleTranslations ?? c.role_translations),
     text_translations: mapTranslations(c.textTranslations ?? c.text_translations),
+    category: c.category || undefined,
   };
 }
 

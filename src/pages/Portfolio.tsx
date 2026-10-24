@@ -36,17 +36,14 @@ import { useTranslation } from "@/i18n/hooks/useTranslation";
 import { usePortfolio } from "@/hooks/usePortfolio";
 import { portfolioRepository } from "@/repositories/instances";
 import { Project } from "@/repositories/interfaces/PortfolioRepository";
-import { useContactWizard } from "@/contexts/ContactWizardContext";
-import { usePlugin } from "@/contexts/PluginsContext";
-import { MessageSquare } from "lucide-react";
+import { listCategories, filterByCategory, hasCaseStudy } from "@/utils/portfolioContent";
 
 export default function Portfolio() {
   const { t } = useTranslation();
   const { isLoading: i18nLoading } = useI18n();
   const { projects, isLoading } = usePortfolio(portfolioRepository);
-  const { openWizard } = useContactWizard();
-  const wizardEnabled = usePlugin('contact-wizard');
-  const [activeFilter, setActiveFilter] = useState(t("portfolio.all"));
+  // null = todas as categorias
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [expandedImage, setExpandedImage] = useState<{
     url: string;
@@ -92,32 +89,16 @@ export default function Portfolio() {
     };
   }, [expandedImage]);
 
-  // Extrai todas as tags únicas dos projetos e ordena alfabeticamente
-  const availableTags = useMemo(() => {
-    const allTags = projects.flatMap(p => p.tags || []);
-    const uniqueTags = Array.from(new Set(allTags));
-    return uniqueTags.sort();
-  }, [projects]);
+  // Filtros por categoria (definida no admin), não por tecnologia
+  const categories = useMemo(() => listCategories(projects), [projects]);
+  const filteredProjects = filterByCategory(projects, activeCategory);
 
-  // Cria a lista de filtros com "Todos" sempre primeiro
-  const filters = useMemo(() => {
-    return [t("portfolio.all"), ...availableTags];
-  }, [availableTags, t]);
-
-  const filteredProjects =
-    activeFilter === t("portfolio.all")
-      ? projects
-      : projects.filter(p => p.tags?.includes(activeFilter));
-
-  // Resetar filtro se a tag selecionada não existir mais
+  // Resetar filtro se a categoria selecionada não existir mais
   useEffect(() => {
-    if (
-      activeFilter !== t("portfolio.all") &&
-      !availableTags.includes(activeFilter)
-    ) {
-      setActiveFilter(t("portfolio.all"));
+    if (activeCategory && !categories.includes(activeCategory)) {
+      setActiveCategory(null);
     }
-  }, [activeFilter, availableTags, t]);
+  }, [activeCategory, categories]);
 
   if (isLoading || i18nLoading) {
     return <PageSkeleton />;
@@ -143,22 +124,22 @@ export default function Portfolio() {
         </header>
 
         {/* Filters */}
-        {filters.length > 1 && (
+        {categories.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-8">
-            {filters.map(filter => (
+            {[null, ...categories].map(category => (
               <button
-                key={filter}
-                onClick={() => setActiveFilter(filter)}
+                key={category ?? "__all"}
+                onClick={() => setActiveCategory(category)}
                 className={`
                   inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium transition-all duration-300
                   ${
-                    activeFilter === filter
+                    activeCategory === category
                       ? "bg-neon-purple text-white shadow-[0_0_10px_rgba(168,85,247,0.4)]"
                       : "bg-foreground/5 text-foreground/65 hover:bg-foreground/10 hover:text-foreground-strong border border-foreground/5"
                   }
                 `}
               >
-                {filter}
+                {category ?? t("portfolio.all")}
               </button>
             ))}
           </div>
@@ -221,23 +202,31 @@ export default function Portfolio() {
                     )}
                   </div>
 
-                  <div className="space-y-2">
-                    {project.slug && (
-                      <Link href={`/portfolio/${project.slug}`} className="block">
-                        <Button className="w-full bg-neon-purple/10 hover:bg-neon-purple text-neon-purple hover:text-white border border-neon-purple/30 transition-all duration-300">
-                          {t("portfolio.viewCaseStudy")}
+                  {project.case_study?.metrics?.[0] && (
+                    <p className="mb-5 flex items-baseline gap-2">
+                      <span className="text-xl font-bold text-neon-purple">
+                        {project.case_study.metrics[0].value}
+                      </span>
+                      <span className="text-xs text-foreground/65">
+                        {project.case_study.metrics[0].label}
+                      </span>
+                    </p>
+                  )}
+
+                  {/* Uma ação por cartão: o case quando existe, senão os detalhes */}
+                  <div className="mt-auto">
+                    {hasCaseStudy(project) ? (
+                      <Link
+                        href={`/portfolio/${project.slug}`}
+                        className="block"
+                        data-umami-event="portfolio-case"
+                        data-umami-event-case={project.slug}
+                      >
+                        <Button className="w-full bg-neon-purple/10 hover:bg-neon-purple text-neon-purple hover:text-foreground-strong border border-neon-purple/30 transition-all duration-300 font-mono">
+                          {t("portfolio.viewCase")}
                         </Button>
                       </Link>
-                    )}
-                    {wizardEnabled && (
-                      <Button
-                        onClick={() => openWizard({ flowType: "project", sourceContext: "portfolio" })}
-                        className="w-full bg-foreground/5 hover:bg-neon-purple/20 text-foreground/65 hover:text-neon-purple border border-foreground/10 hover:border-neon-purple/30 transition-all duration-300 text-xs"
-                      >
-                        <MessageSquare className="mr-2 h-3 w-3" />
-                        {t("contactWizard.trigger")}
-                      </Button>
-                    )}
+                    ) : (
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button
@@ -363,6 +352,7 @@ export default function Portfolio() {
                       </div>
                     </DialogContent>
                   </Dialog>
+                    )}
                   </div>
                 </div>
               </motion.div>

@@ -184,6 +184,27 @@ export function getLayout(id: string): LayoutSpec | undefined {
   return LAYOUTS.find((l) => l.id === id);
 }
 
+/** Aparência completa que o layout sugere: o que o modo rápido aplica sem perguntar. */
+export function recommendedAppearance(layoutId: string): {
+  theme: string;
+  colorMode: ColorMode;
+  colorModeToggle: boolean;
+  texture: Texture;
+  fontSans: string;
+  fontMono: string;
+} {
+  const layout = getLayout(layoutId);
+  if (!layout) throw new Error(`Layout desconhecido: "${layoutId}".`);
+  return {
+    theme: layout.recommended.scheme,
+    colorMode: layout.recommended.mode,
+    colorModeToggle: true,
+    texture: layout.recommended.texture,
+    fontSans: layout.fonts.sans[0],
+    fontMono: layout.fonts.mono,
+  };
+}
+
 export const COLOR_MODES: { value: ColorMode; label: string; hint: string }[] = [
   { value: "light", label: "Claro", hint: "fundo claro" },
   { value: "dark", label: "Escuro", hint: "fundo escuro" },

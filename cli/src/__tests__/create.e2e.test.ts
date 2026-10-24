@@ -142,16 +142,17 @@ const mockIdentityPrompt = vi.fn(async () => ({
   lang: "pt-BR",
 }));
 
-/** Ordem: layout → esquema → modo → (confirm alternância) → textura → fontes → gerenciador de pacotes */
+/** Ordem: layout → esquema → modo → (confirm alternância) → textura → fontes → plugins */
 function setupSelectPrompts(layout: string, theme = "editorial-cream") {
   vi.mocked(select)
+    .mockResolvedValueOnce("custom") // modo personalizado
     .mockResolvedValueOnce(layout)
     .mockResolvedValueOnce(theme)
     .mockResolvedValueOnce("light") // modo de cor
     .mockResolvedValueOnce("grain") // textura
     .mockResolvedValueOnce("Inter")
     .mockResolvedValueOnce("JetBrains Mono")
-    .mockResolvedValueOnce("none");
+    .mockResolvedValueOnce("custom"); // plugins um por um (multiselect)
   vi.mocked(confirm).mockResolvedValueOnce(true); // botão de alternar claro/escuro
 }
 
@@ -172,6 +173,7 @@ function makeRealDeps(vol: InstanceType<typeof Volume>): RealDeps {
     applyAppearance,
     writeState,
     identityPrompt: mockIdentityPrompt,
+    exec: vi.fn(async () => undefined),
   };
 }
 

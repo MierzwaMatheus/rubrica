@@ -64,23 +64,24 @@ function setupPrompts(opts: {
   fontSans?: string;
   fontMono?: string;
   plugins?: string[];
-  packageManager?: string;
 }) {
   const layout = opts.layout ?? "cyberpunk";
   const hasMono = !NO_MONO_LAYOUTS.has(layout);
-  // Ordem: layout → esquema → modo de cor → (confirm alternância) → textura → fonte principal → fonte mono
+  // Ordem (modo personalizado): modo → layout → esquema → modo de cor → (confirm alternância)
+  // → textura → fonte principal → fonte mono → pacote de plugins ("um por um" abre o multiselect)
   const mock = vi.mocked(select)
+    .mockResolvedValueOnce("custom")
     .mockResolvedValueOnce(layout)
     .mockResolvedValueOnce(opts.theme ?? "editorial-cream")
     .mockResolvedValueOnce(opts.colorMode ?? "dark")
     .mockResolvedValueOnce(opts.texture ?? "none")
     .mockResolvedValueOnce(opts.fontSans ?? "Inter");
-  // Primeiro confirm: botão de alternar claro/escuro (o do git init vem depois)
+  // Primeiro confirm: botão de alternar claro/escuro (o do painel admin vem no fim)
   vi.mocked(confirm).mockResolvedValueOnce(opts.colorModeToggle ?? false);
   if (hasMono) {
     mock.mockResolvedValueOnce(opts.fontMono ?? "JetBrains Mono");
   }
-  mock.mockResolvedValueOnce(opts.packageManager ?? "none");
+  mock.mockResolvedValueOnce("custom");
   vi.mocked(multiselect).mockResolvedValueOnce(opts.plugins ?? ["blog", "portfolio"]);
 }
 
@@ -135,6 +136,7 @@ function makeDefaultDeps(vol: InstanceType<typeof Volume>, extraDirs?: string[])
     applyRubricalConfig: mockApplyRubricalConfig as Deps["applyRubricalConfig"],
     applyAppearance: mockApplyAppearance as Deps["applyAppearance"],
     identityPrompt: mockIdentityPrompt as Deps["identityPrompt"],
+    exec: vi.fn(async () => undefined),
   };
 }
 
@@ -790,56 +792,31 @@ describe("create — package.json name", () => {
 // ---- Ciclo 10: git init e instalação de dependências ----------------------
 
 describe("create — git init e package install", () => {
-  async function callRunCreateWithExec(opts: {
-    confirmGit?: boolean;
-    packageManager?: string;
-  }) {
+  async function callRunCreateWithExec(userAgent: string) {
     vi.clearAllMocks();
-    setupPrompts({ packageManager: opts.packageManager ?? "pnpm" });
-    vi.mocked(confirm).mockResolvedValueOnce(opts.confirmGit ?? true);
-
+    setupPrompts({});
     const vol = Volume.fromJSON({});
     vol.mkdirSync("/projects", { recursive: true });
-
     const mockExec = vi.fn(async () => undefined);
-    const deps = {
-      ...makeDefaultDeps(vol),
-      exec: mockExec as Deps["exec"],
-    };
-
-    await runCreate("meu-portfolio", deps);
+    await runCreate("meu-portfolio", { ...makeDefaultDeps(vol), exec: mockExec as Deps["exec"], userAgent });
     return { mockExec };
   }
 
-  it("executa git init quando usuário confirma", async () => {
-    const { mockExec } = await callRunCreateWithExec({ confirmGit: true });
-    expect(mockExec).toHaveBeenCalledWith(
-      expect.stringContaining("git init"),
-      expect.stringContaining("meu-portfolio")
-    );
+  it("executa git init sem perguntar", async () => {
+    const { mockExec } = await callRunCreateWithExec("npm/10");
+    expect(mockExec).toHaveBeenCalledWith("git init", "/projects/meu-portfolio");
   });
 
-  it("não executa git init quando usuário recusa", async () => {
-    const { mockExec } = await callRunCreateWithExec({ confirmGit: false });
-    const gitCalls = vi.mocked(mockExec).mock.calls.filter(
-      (c) => String((c as unknown[])[0]).includes("git init")
-    );
-    expect(gitCalls).toHaveLength(0);
-  });
-
-  it("executa pnpm install quando selecionado", async () => {
-    const { mockExec } = await callRunCreateWithExec({ confirmGit: false, packageManager: "pnpm" });
-    expect(mockExec).toHaveBeenCalledWith(
-      expect.stringContaining("pnpm install"),
-      expect.stringContaining("meu-portfolio")
-    );
+  it("instala com o gerenciador que rodou o create", async () => {
+    const { mockExec } = await callRunCreateWithExec("pnpm/9");
+    expect(mockExec).toHaveBeenCalledWith("pnpm install", "/projects/meu-portfolio");
   });
 });
 
 // ---- Ciclo 11: next steps message ------------------------------------------
 
 describe("create — next steps message", () => {
-  it("exibe mensagem de next steps ao concluir", async () => {
+  it("sem configurar o painel agora, explica cd, setup e dev", async () => {
     const { outro } = await import("@clack/prompts");
     vi.clearAllMocks();
     setupPrompts({});
@@ -847,25 +824,11 @@ describe("create — next steps message", () => {
     const vol = Volume.fromJSON({});
     vol.mkdirSync("/projects", { recursive: true });
 
-    await runCreate("meu-portfolio", makeDefaultDeps(vol));
-
-    expect(vi.mocked(outro)).toHaveBeenCalledWith(
-      expect.stringMatching(/cd meu-portfolio/i)
-    );
-  });
-
-  it("menciona rubrica setup após npx convex dev nas instruções", async () => {
-    const { outro } = await import("@clack/prompts");
-    vi.clearAllMocks();
-    setupPrompts({});
-
-    const vol = Volume.fromJSON({});
-    vol.mkdirSync("/projects", { recursive: true });
-
-    await runCreate("meu-portfolio", makeDefaultDeps(vol));
+    await runCreate("meu-portfolio", { ...makeDefaultDeps(vol), userAgent: "pnpm/9" });
 
     const outroArg = vi.mocked(outro).mock.calls[0][0] as string;
-    expect(outroArg).toMatch(/npx convex dev/i);
-    expect(outroArg).toMatch(/rubrica setup/i);
+    expect(outroArg).toMatch(/cd meu-portfolio/);
+    expect(outroArg).toMatch(/npx create-rubrica setup/);
+    expect(outroArg).toMatch(/pnpm run dev/);
   });
 });

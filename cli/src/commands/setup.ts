@@ -174,22 +174,28 @@ export async function runSetup(deps: RunSetupDeps = {}): Promise<void> {
     }
   }
 
-  // 11. Payments
+  // 11. Payments (Asaas: PIX, boleto e cartão)
   if (plugins["payments"]) {
-    const stripeSecret = await text({
-      message: "STRIPE_WEBHOOK_SECRET (Enter para pular):",
+    const asaasKey = await text({
+      message: "ASAAS_API_KEY — chave da API do Asaas, sandbox ou produção (Enter para pular):",
       initialValue: "",
     });
-    if (!isCancel(stripeSecret) && stripeSecret && (stripeSecret as string).trim()) {
-      execFileSync("npx", ["convex", "env", "set", "--", "STRIPE_WEBHOOK_SECRET", stripeSecret as string], { stdio: "pipe" });
-    }
+    if (!isCancel(asaasKey) && asaasKey && (asaasKey as string).trim()) {
+      const key = (asaasKey as string).trim();
+      execFileSync("npx", ["convex", "env", "set", "--", "ASAAS_API_KEY", key], { stdio: "pipe" });
 
-    const asaasToken = await text({
-      message: "ASAAS_WEBHOOK_TOKEN (Enter para pular):",
-      initialValue: "",
-    });
-    if (!isCancel(asaasToken) && asaasToken && (asaasToken as string).trim()) {
-      execFileSync("npx", ["convex", "env", "set", "--", "ASAAS_WEBHOOK_TOKEN", asaasToken as string], { stdio: "pipe" });
+      // Token que o Asaas manda em cada webhook; o Convex recusa chamadas sem ele.
+      const webhookToken = randomBytes(32).toString("hex");
+      execFileSync("npx", ["convex", "env", "set", "--", "ASAAS_WEBHOOK_TOKEN", webhookToken], { stdio: "pipe" });
+
+      const env = key.startsWith("$aact_prod_") ? "produção" : "sandbox (testes)";
+      log.info(
+        `Asaas configurado em ${env}. Falta cadastrar o webhook no painel do Asaas\n` +
+        `(Integrações → Webhooks → Adicionar), com os eventos de cobrança ligados:\n\n` +
+        `  URL:   ${siteUrlDefault.replace(/\/+$/, "")}/webhooks/asaas\n` +
+        `  Token: ${webhookToken}\n\n` +
+        `Sem o webhook, os pagamentos nunca aparecem como pagos.`
+      );
     }
   }
 

@@ -1,21 +1,26 @@
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
-import { vitePluginManusRuntime } from "vite-plugin-manus-runtime";
 import path from "path";
+import { umamiScriptTag } from "./src/lib/umamiScript";
 
-export default defineConfig({
-  plugins: [
-    react(),
-    tailwindcss(),
-    vitePluginManusRuntime(),
-  ].filter(Boolean),
+/** Injeta o script do Umami só quando ele está configurado (ver src/lib/umamiScript.ts). */
+function umami(env: Record<string, string>): Plugin {
+  return {
+    name: "rubrica-umami",
+    transformIndexHtml(html) {
+      const tag = umamiScriptTag(env);
+      return tag ? html.replace("</body>", `  ${tag}\n  </body>`) : html;
+    },
+  };
+}
+
+export default defineConfig(({ mode }) => ({
+  plugins: [react(), tailwindcss(), umami(loadEnv(mode, process.cwd(), "VITE_"))],
 
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "src"),
-      "@shared": path.resolve(import.meta.dirname, "shared"),
-      "@assets": path.resolve(import.meta.dirname, "attached_assets"),
     },
   },
 
@@ -34,4 +39,4 @@ export default defineConfig({
       deny: ["**/.*"],
     },
   },
-});
+}));

@@ -50,7 +50,7 @@ export const PLUGIN_REGISTRY: PluginDefinition[] = [
   {
     id: 'payments',
     label: 'Pagamentos',
-    description: 'Links de pagamento via Asaas e Stripe',
+    description: 'Checkout com PIX, boleto e cartão via Asaas',
     defaultEnabled: true,
     tables: ['checkouts'],
     adminRoutes: ['/admin/payment-links'],

@@ -583,8 +583,8 @@ describe("create — applyPlugins", () => {
     const { mockApplyPlugins } = await callRunCreate({
       plugins: ["blog", "portfolio", "resume"],
     });
-    const call = vi.mocked(mockApplyPlugins).mock.calls[0];
-    const pluginsArg = call[0] as Record<string, boolean>;
+    const call = vi.mocked(mockApplyPlugins).mock.calls[0] as unknown as [Record<string, boolean>, string];
+    const pluginsArg = call[0];
     expect(pluginsArg["blog"]).toBe(true);
     expect(pluginsArg["portfolio"]).toBe(true);
     expect(pluginsArg["resume"]).toBe(true);
@@ -597,8 +597,8 @@ describe("create — applyPlugins", () => {
     const { mockApplyPlugins } = await callRunCreate({
       plugins: ["portfolio"],
     });
-    const call = vi.mocked(mockApplyPlugins).mock.calls[0];
-    const pluginsArg = call[0] as Record<string, boolean>;
+    const call = vi.mocked(mockApplyPlugins).mock.calls[0] as unknown as [Record<string, boolean>, string];
+    const pluginsArg = call[0];
     expect(pluginsArg["portfolio"]).toBe(true);
     expect(pluginsArg["blog"]).toBe(false);
   });
@@ -673,9 +673,9 @@ describe("create — writeState", () => {
       }),
       expect.anything()
     );
-    const call = vi.mocked(mockWriteState).mock.calls[0][1];
-    expect((call as Record<string, unknown>).radius).toBeUndefined();
-    expect((call as Record<string, unknown>).accentColor).toBeUndefined();
+    const call = (vi.mocked(mockWriteState).mock.calls[0] as unknown as [string, Record<string, unknown>])[1];
+    expect(call.radius).toBeUndefined();
+    expect(call.accentColor).toBeUndefined();
   });
 });
 
@@ -736,7 +736,7 @@ describe("create — git init e package install", () => {
   it("não executa git init quando usuário recusa", async () => {
     const { mockExec } = await callRunCreateWithExec({ confirmGit: false });
     const gitCalls = vi.mocked(mockExec).mock.calls.filter(
-      (c) => String(c[0]).includes("git init")
+      (c) => String((c as unknown[])[0]).includes("git init")
     );
     expect(gitCalls).toHaveLength(0);
   });
@@ -755,7 +755,6 @@ describe("create — git init e package install", () => {
 describe("create — next steps message", () => {
   it("exibe mensagem de next steps ao concluir", async () => {
     const { outro } = await import("@clack/prompts");
-    const { mockResolvedValue: _v, ..._ } = {};
     vi.clearAllMocks();
     setupPrompts({});
 

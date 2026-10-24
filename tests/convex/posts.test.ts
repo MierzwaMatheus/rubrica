@@ -295,10 +295,9 @@ describe("convex/posts · seed", () => {
     const after = Date.now();
     const docs = ctx.db._all("posts");
     const post1 = docs.find((d) => d.slug === "convex-como-backend-reativo-alem-do-crud")!;
-    // publishedAt de post 1 = now - 86_400_000, então deve ser MENOR que o before (now).
-    expect(post1.publishedAt).toBeLessThanOrEqual(before - 86_400_000);
-    // Mas não muito menor (within tolerance).
-    expect(post1.publishedAt).toBeGreaterThanOrEqual(after - 86_400_000 - 1000);
+    // publishedAt = now - 86_400_000, com o now lido durante o seed (entre before e after).
+    expect(post1.publishedAt).toBeGreaterThanOrEqual(before - 86_400_000);
+    expect(post1.publishedAt).toBeLessThanOrEqual(after - 86_400_000);
   });
 
   it("cada post tem imageUrl externa com picsum e slug determinístico", async () => {

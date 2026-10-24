@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { DeleteConfirmDialog } from "@/components/admin/DeleteConfirmDialog";
 import { AdminLayout } from "./Dashboard";
 import { Button } from "@/components/ui/button";
@@ -17,18 +17,41 @@ import { CreateCustomerUseCase } from "@/usecases/asaas/CreateCustomerUseCase";
 import { ListCustomersUseCase } from "@/usecases/asaas/ListCustomersUseCase";
 import { CreateChargeUseCase } from "@/usecases/asaas/CreateChargeUseCase";
 import { ListChargesUseCase } from "@/usecases/asaas/ListChargesUseCase";
-import { Customer, CreateCustomerInput, Charge, CreateChargeInput } from "@/types/asaas";
+import { Customer, CreateCustomerInput, Charge, CreateChargeInput, Invoice } from "@/types/asaas";
 import { CreateCheckoutInput } from "@/types/checkout";
-import { useQuery, useMutation } from "convex/react";
+import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Id } from "../../../convex/_generated/dataModel";
 
 export default function PaymentLinks() {
-  const asaasApi = new ConvexAsaasApi();
+  const listCustomersAction = useAction(api.asaas.listCustomers);
+  const createCustomerAction = useAction(api.asaas.adminCreateCustomer);
+  const deleteCustomerAction = useAction(api.asaas.adminDeleteCustomer);
+  const listChargesAction = useAction(api.asaas.listCharges);
+  const getChargeAction = useAction(api.asaas.getCharge);
+  const createChargeAction = useAction(api.asaas.adminCreateCharge);
+  const cancelChargeAction = useAction(api.asaas.cancelCharge);
+  const listInvoicesAction = useAction(api.asaas.listInvoices);
+  const asaasApi = useMemo(
+    () =>
+      new ConvexAsaasApi({
+        listCustomers: listCustomersAction,
+        createCustomer: createCustomerAction,
+        deleteCustomer: deleteCustomerAction,
+        listCharges: listChargesAction,
+        getCharge: getChargeAction,
+        createCharge: createChargeAction,
+        cancelCharge: cancelChargeAction,
+        listInvoices: listInvoicesAction,
+      }),
+    [listCustomersAction, createCustomerAction, deleteCustomerAction, listChargesAction, getChargeAction, createChargeAction, cancelChargeAction, listInvoicesAction],
+  );
   const createCustomerUseCase = new CreateCustomerUseCase(asaasApi);
   const listCustomersUseCase = new ListCustomersUseCase(asaasApi);
   const createChargeUseCase = new CreateChargeUseCase(asaasApi);
   const listChargesUseCase = new ListChargesUseCase(asaasApi);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [invoicesError, setInvoicesError] = useState<string | null>(null);
 
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [charges, setCharges] = useState<Charge[]>([]);
@@ -81,7 +104,19 @@ export default function PaymentLinks() {
   useEffect(() => {
     fetchCustomers();
     fetchCharges();
+    fetchInvoices();
   }, []);
+
+  const fetchInvoices = async () => {
+    try {
+      const response = await asaasApi.listInvoices(100);
+      setInvoices(response.data);
+      setInvoicesError(null);
+    } catch (error: any) {
+      console.error("Error fetching invoices:", error);
+      setInvoicesError(error?.message || "Erro ao carregar notas fiscais");
+    }
+  };
 
   const fetchCustomers = async () => {
     try {
@@ -226,9 +261,12 @@ export default function PaymentLinks() {
   const getCheckoutStatusBadge = (status: string) => {
     const statusMap: Record<string, { label: string; color: string }> = {
       pending: { label: 'Pendente', color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50' },
-      payment_selected: { label: 'Pagamento Selecionado', color: 'bg-blue-500/20 text-blue-400 border-blue-500/50' },
+      payment_selected: { label: 'Aguardando pagamento', color: 'bg-blue-500/20 text-blue-400 border-blue-500/50' },
       payment_confirmed: { label: 'Pagamento Confirmado', color: 'bg-purple-500/20 text-purple-400 border-purple-500/50' },
+      paid: { label: 'Pago', color: 'bg-green-500/20 text-green-400 border-green-500/50' },
       completed: { label: 'Concluído', color: 'bg-green-500/20 text-green-400 border-green-500/50' },
+      failed: { label: 'Falhou', color: 'bg-red-500/20 text-red-400 border-red-500/50' },
+      refunded: { label: 'Estornado', color: 'bg-orange-500/20 text-orange-400 border-orange-500/50' },
       expired: { label: 'Expirado', color: 'bg-red-500/20 text-red-400 border-red-500/50' },
       cancelled: { label: 'Cancelado', color: 'bg-gray-500/20 text-foreground/65 border-foreground/21' },
     };
@@ -256,6 +294,7 @@ export default function PaymentLinks() {
 
       await createCheckout({
         uniqueLink,
+        customerId: customer.id,
         customerName: customer.name,
         customerEmail: customer.email ?? "",
         customerCpfCnpj: customer.cpfCnpj ?? "",
@@ -265,7 +304,8 @@ export default function PaymentLinks() {
         value: checkoutForm.value,
         description: checkoutForm.description || undefined,
         dueDate: checkoutForm.due_date,
-        expiresAt: Date.now() + 24 * 60 * 60 * 1000,
+        // Sem expiresAt: vale o padrão de 30 dias. Um prazo curto cancelaria boletos
+        // pagos que ainda estão compensando.
       });
 
       const link = `${window.location.origin}/checkout/${uniqueLink}`;
@@ -284,11 +324,15 @@ export default function PaymentLinks() {
     }
   };
 
+  /** O link funciona como senha de acesso ao checkout: precisa ser imprevisível. */
   function generateUniqueLink(): string {
     const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let result = '';
-    for (let i = 0; i < 16; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    while (result.length < 20) {
+      for (const b of crypto.getRandomValues(new Uint8Array(32))) {
+        // 248 = maior múltiplo de 62 abaixo de 256: descarta o resto para não enviesar.
+        if (b < 248 && result.length < 20) result += chars[b % chars.length];
+      }
     }
     return result;
   }
@@ -544,10 +588,35 @@ export default function PaymentLinks() {
                 <CardDescription>Gerencie as notas fiscais emitidas no Asaas</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-12 text-foreground/65">
-                  <Receipt className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p>Funcionalidade de nota fiscal em desenvolvimento</p>
-                </div>
+                {invoicesError ? (
+                  <div className="text-center py-12 text-foreground/65">
+                    <Receipt className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p>{invoicesError}</p>
+                  </div>
+                ) : invoices.length === 0 ? (
+                  <div className="text-center py-12 text-foreground/65">
+                    <Receipt className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p>Nenhuma nota fiscal emitida. As notas são emitidas e configuradas no painel do Asaas.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {invoices.map((invoice) => (
+                      <div key={invoice.id} className="p-4 rounded-lg bg-foreground/5 border border-foreground/10 flex items-center justify-between gap-4">
+                        <div>
+                          <p className="text-foreground-strong font-medium">{invoice.customerName || getCustomerName(invoice.customer)}</p>
+                          <p className="text-sm text-foreground/65">
+                            {invoice.invoiceNumber ? `Nº ${invoice.invoiceNumber} · ` : ""}
+                            {invoice.description}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-foreground-strong font-medium">{formatCurrency(invoice.value)}</p>
+                          <Badge variant="outline">{invoice.statusDescription || invoice.status}</Badge>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

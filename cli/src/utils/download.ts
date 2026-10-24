@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { promisify } from "node:util";
 
 const execFileAsync = promisify(execFile);
-const GITHUB_REPO = "MierzwaMatheus/rubrica";
+export const GITHUB_REPO = "MierzwaMatheus/rubrica";
 
 /**
  * Retorna a tag da versão mais recente da release do GitHub.

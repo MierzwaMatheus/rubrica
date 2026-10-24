@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rubrica · Guia de marca</title>
+<style>
+  :root { --ink:#1A1A18; --terra:#C4664A; --cream:#F5F2EA; --line:#E4DFD3; --muted:#6B675E; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--cream); color:var(--ink); font:16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 980px; margin: 0 auto; padding: 56px 16px 96px; }
+  h1 { font: italic 600 56px/1.05 "Cormorant Garamond", Georgia, serif; margin: 0 0 8px; }
+  h2 { font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 64px 0 16px; padding-top: 24px; border-top: 1px solid var(--line); }
+  p.lead { font-size: 20px; max-width: 640px; }
+  .grid { display:grid; gap:16px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:20px; }
+  .tile { border-radius:12px; display:flex; align-items:center; justify-content:center; padding:28px; min-height:180px; border:1px solid var(--line); }
+  .tile img { max-width: 100%; max-height: 140px; }
+  .cap { font-size: 13px; color: var(--muted); margin-top: 8px; }
+  .swatch { height: 96px; border-radius: 10px; border:1px solid var(--line); }
+  table { width:100%; border-collapse: collapse; font-size: 14px; }
+  td, th { text-align:left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  code { background: #fff; border:1px solid var(--line); padding: 1px 6px; border-radius: 6px; font-size: 13px; }
+  ul.dont li { margin-bottom: 6px; }
+  .space { position:relative; display:inline-block; padding: 40px; outline: 1px dashed var(--terra); outline-offset: -1px; background:#fff; border-radius: 8px; }
+  .space img { display:block; width: 420px; max-width: 100%; }
+</style>
+</head>
+<body>
+<main>
+  <h1>rubrica</h1>
+  <p class="lead">Guia de uso do logo. O símbolo é um <em>r</em> caligráfico atravessado por um floreio em terracota: a rubrica, o traço que só você faz. <em>Rubrica</em> vem do latim “terra vermelha”, a tinta das iniciais nos manuscritos; por isso o floreio é terracota.</p>
+
+  <h2>1 · Versões</h2>
+  <div class="grid">
+    <div><div class="tile" style="background:var(--cream)"><img src="logo/svg/rubrica-horizontal-positivo.svg" alt=""></div><div class="cap"><b>Horizontal</b>: principal. Cabeçalho do site, README, documentos.</div></div>
+    <div><div class="tile" style="background:var(--cream)"><img src="logo/svg/rubrica-vertical-positivo.svg" alt=""></div><div class="cap"><b>Vertical</b>: capas, avatares grandes, espaços quadrados.</div></div>
+    <div><div class="tile" style="background:var(--cream)"><img src="logo/svg/rubrica-simbolo-positivo.svg" alt=""></div><div class="cap"><b>Símbolo</b>: quando o nome já aparece por perto.</div></div>
+    <div><div class="tile" style="background:var(--cream)"><img src="logo/svg/rubrica-simbolo-reduzido-positivo.svg" alt=""></div><div class="cap"><b>Símbolo reduzido</b>: fios engrossados para uso pequeno (64–160 px).</div></div>
+    <div><div class="tile" style="background:var(--cream)"><img src="logo/svg/rubrica-monograma-positivo.svg" alt=""></div><div class="cap"><b>Monograma</b>: só o <em>r</em>, para favicon e espaços mínimos.</div></div>
+    <div><div class="tile" style="background:var(--cream)"><img src="logo/svg/rubrica-nome-positivo.svg" alt=""></div><div class="cap"><b>Nome</b>: só o texto, sempre a partir do arquivo (não digitar).</div></div>
+  </div>
+
+  <h2>2 · Cores da marca</h2>
+  <div class="grid">
+    <div class="card"><div class="swatch" style="background:#1A1A18"></div><p><b>Tinta</b><br><code>#1A1A18</code><br>RGB 26 26 24<br>CMYK 0 0 8 90</p></div>
+    <div class="card"><div class="swatch" style="background:#C4664A"></div><p><b>Terracota</b><br><code>#C4664A</code><br>RGB 196 102 74<br>CMYK 0 48 62 23<br><span class="cap">Pantone: sugestão 7618 C, confirmar com a gráfica</span></p></div>
+    <div class="card"><div class="swatch" style="background:#F5F2EA"></div><p><b>Papel</b><br><code>#F5F2EA</code><br>RGB 245 242 234<br>CMYK 0 1 4 4</p></div>
+    <div class="card"><div class="swatch" style="background:#4D7C5F"></div><p><b>Sálvia</b> (apoio)<br><code>#4D7C5F</code><br>RGB 77 124 95<br>Só na interface, nunca no logo.</p></div>
+  </div>
+
+  <h2>3 · Positivo, negativo e uma cor</h2>
+  <div class="grid">
+    <div><div class="tile" style="background:var(--cream)"><img src="logo/svg/rubrica-simbolo-positivo.svg" alt=""></div><div class="cap"><b>Positivo</b>: tinta + terracota em fundo claro. Padrão.</div></div>
+    <div><div class="tile" style="background:var(--ink)"><img src="logo/svg/rubrica-simbolo-negativo.svg" alt=""></div><div class="cap"><b>Negativo</b>: papel + terracota em fundo escuro.</div></div>
+    <div><div class="tile" style="background:var(--terra)"><img src="logo/svg/rubrica-simbolo-creme.svg" alt=""></div><div class="cap"><b>Sobre terracota</b>: tudo em papel.</div></div>
+    <div><div class="tile" style="background:#fff"><img src="logo/svg/rubrica-simbolo-preto.svg" alt=""></div><div class="cap"><b>Preto</b>: impressão em uma cor, carimbo, fax.</div></div>
+    <div><div class="tile" style="background:#5a5a5a"><img src="logo/svg/rubrica-simbolo-branco.svg" alt=""></div><div class="cap"><b>Branco</b>: sobre fotos, em área calma da imagem.</div></div>
+    <div><div class="tile" style="background:var(--cream)"><img src="logo/svg/rubrica-simbolo-terracota.svg" alt=""></div><div class="cap"><b>Terracota</b>: uma cor sobre papel.</div></div>
+  </div>
+
+  <h2>4 · Área de proteção</h2>
+  <p>Deixe livre em volta do logo uma distância <b>x</b> igual à altura da gota do <em>r</em> (cerca de ¼ da altura do símbolo). A área cresce junto com o logo.</p>
+  <div class="space"><img src="logo/svg/rubrica-horizontal-positivo.svg" alt=""></div>
+
+  <h2>5 · Tamanhos mínimos</h2>
+  <table>
+    <tr><th>Versão</th><th>Tela</th><th>Impressão</th></tr>
+    <tr><td>Horizontal</td><td>200 px de largura</td><td>40 mm</td></tr>
+    <tr><td>Símbolo</td><td>160 px de largura</td><td>35 mm</td></tr>
+    <tr><td>Símbolo reduzido</td><td>64 a 160 px</td><td>15 a 35 mm</td></tr>
+    <tr><td>Monograma / favicon</td><td>abaixo de 64 px (até 16 px)</td><td>abaixo de 15 mm</td></tr>
+  </table>
+
+  <h2>6 · Ícones</h2>
+  <div class="grid">
+    <div><div class="tile" style="background:#fff"><img src="logo/svg/rubrica-favicon-terracota.svg" alt="" style="max-height:120px"></div><div class="cap"><b>Favicon</b>: monograma em papel no bloco terracota. Arquivos em <code>logo/web/</code>.</div></div>
+    <div><div class="tile" style="background:#fff"><img src="logo/svg/rubrica-icone-terracota.svg" alt="" style="max-height:120px"></div><div class="cap"><b>Ícone de app / avatar</b>: símbolo reduzido no bloco terracota.</div></div>
+    <div><div class="tile" style="background:#fff"><img src="logo/svg/rubrica-icone-tinta.svg" alt="" style="max-height:120px"></div><div class="cap"><b>Ícone escuro</b>: alternativa para fundos claros e tema escuro.</div></div>
+  </div>
+
+  <h2>7 · Tipografia do nome</h2>
+  <p>O nome usa <b>Cormorant Garamond Italic SemiBold</b> (licença SIL OFL, livre para uso em logo), convertido em contornos. Nos arquivos não há texto digitável: use sempre os SVGs.</p>
+
+  <h2>8 · Não faça</h2>
+  <ul class="dont">
+    <li>Não estique, achate, gire ou incline o logo.</li>
+    <li>Não troque as cores fora das combinações da seção 3. O floreio é sempre terracota ou a mesma cor do <em>r</em>.</li>
+    <li>Não separe o floreio do <em>r</em> nem mude a posição entre símbolo e nome.</li>
+    <li>Não adicione sombra, contorno, brilho ou degradê.</li>
+    <li>Não use o símbolo completo abaixo de 160 px: troque pelo reduzido ou pelo monograma.</li>
+    <li>Não aplique sobre fundos agitados sem um bloco de cor por trás.</li>
+  </ul>
+</main>
+</body>
+</html>

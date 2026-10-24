@@ -17,9 +17,11 @@ export type RubricaIdentity = {
   lang: string;
 };
 
+export type RubricaLayout = "cyberpunk" | "brutalist" | "swiss" | "bento" | "magazine";
+
 export type RubricaState = {
   version: string;
-  layout: "cyberpunk" | "brutalist" | "swiss" | "bento";
+  layout: RubricaLayout;
   theme: string;
   fontSans: string;
   fontMono: string;

@@ -3,7 +3,7 @@ import { useParams, useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check, Home } from "lucide-react";
+import { Check, Home, Loader2 } from "lucide-react";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 
@@ -33,7 +33,7 @@ export default function PaymentSuccessPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screenflex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-foreground-strong text-xl">Carregando...</div>
       </div>
     );
@@ -41,6 +41,46 @@ export default function PaymentSuccessPage() {
 
   if (!checkout) {
     return null;
+  }
+
+  // A confirmação vem do webhook do Asaas e pode levar alguns segundos depois do
+  // redirecionamento; a query é reativa e esta tela muda sozinha quando chegar.
+  if (checkout.status === 'expired' || checkout.status === 'failed' || checkout.status === 'refunded') {
+    const text =
+      checkout.status === 'refunded'
+        ? 'Este pagamento foi estornado.'
+        : checkout.status === 'expired'
+          ? 'Este link de pagamento expirou sem confirmação de pagamento.'
+          : 'O pagamento não foi concluído.';
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Card className="w-full max-w-md bg-card border-foreground/10">
+          <CardContent className="p-6 text-center space-y-3">
+            <h2 className="text-xl font-bold text-foreground-strong">Pagamento não confirmado</h2>
+            <p className="text-foreground/65">{text}</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (checkout.status !== 'paid') {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Card className="w-full max-w-md bg-card border-foreground/10">
+          <CardContent className="p-6 text-center space-y-3">
+            <Loader2 className="w-12 h-12 mx-auto animate-spin text-neon-purple" />
+            <h2 className="text-xl font-bold text-foreground-strong">Confirmando o pagamento</h2>
+            <p className="text-foreground/65">
+              Assim que o Asaas confirmar, esta página atualiza sozinha. Pagamentos com cartão costumam levar poucos segundos; boleto, até 3 dias úteis.
+            </p>
+            <Button variant="outline" className="border-foreground/10" onClick={() => navigate(`/checkout/${uniqueLink}`)}>
+              Voltar ao checkout
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   return (

@@ -1,5 +1,5 @@
 /**
- * Fetches data from Convex and generates static JSON files for the Astro build.
+ * Fetches data from Convex and generates the static JSON files in public/data used as fallback by the Vite build.
  * Run: pnpm tsx scripts/fetch-static-data.ts
  *
  * Requires CONVEX_DEPLOY_KEY and CONVEX_URL in environment.

@@ -53,12 +53,35 @@ describe("runCli — roteamento de comandos", () => {
     expect(vi.mocked(runUpdate)).toHaveBeenCalledOnce();
   });
 
-  it("exibe ajuda para comando desconhecido", async () => {
+  it("exibe ajuda sem argumentos ou com uma flag", async () => {
     const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
-    await runCli(["node", "rubrica", "foobar"], process.cwd());
-    expect(consoleSpy).toHaveBeenCalledWith(
-      expect.stringMatching(/setup/i)
-    );
+    await runCli(["node", "rubrica"], process.cwd());
+    await runCli(["node", "rubrica", "--help"], process.cwd());
+    expect(consoleSpy).toHaveBeenCalledTimes(2);
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringMatching(/setup/i));
+    expect(vi.mocked(runCreate)).not.toHaveBeenCalled();
     consoleSpy.mockRestore();
+  });
+
+  it("`create-rubrica <nome>` (formato do pnpm create) cria o projeto", async () => {
+    await runCli(["node", "create-rubrica", "meu-portfolio"], "/projetos");
+    expect(vi.mocked(runCreate)).toHaveBeenCalledWith("meu-portfolio", { projectsDir: "/projetos" });
+  });
+});
+
+describe("runCli — flags do update", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("repassa --dry-run, --from, --to e --yes", async () => {
+    await runCli(["node", "rubrica", "update", "--dry-run", "--from", "0.3.12", "--to", "v0.4.0", "--yes"], "/p");
+    expect(vi.mocked(runUpdate)).toHaveBeenCalledWith({
+      cwd: "/p",
+      options: { dryRun: true, from: "0.3.12", to: "v0.4.0", yes: true },
+    });
+  });
+
+  it("sem flags, chama o update sem opções", async () => {
+    await runCli(["node", "rubrica", "update"], "/p");
+    expect(vi.mocked(runUpdate)).toHaveBeenCalledWith({ cwd: "/p", options: {} });
   });
 });

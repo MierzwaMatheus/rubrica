@@ -42,7 +42,6 @@ import type * as services from "../services.js";
 import type * as siteConfig from "../siteConfig.js";
 import type * as siteTexts from "../siteTexts.js";
 import type * as stats from "../stats.js";
-import type * as stripe from "../stripe.js";
 import type * as telegram from "../telegram.js";
 import type * as testimonialSubmissions from "../testimonialSubmissions.js";
 import type * as testimonials from "../testimonials.js";
@@ -90,7 +89,6 @@ declare const fullApi: ApiFromModules<{
   siteConfig: typeof siteConfig;
   siteTexts: typeof siteTexts;
   stats: typeof stats;
-  stripe: typeof stripe;
   telegram: typeof telegram;
   testimonialSubmissions: typeof testimonialSubmissions;
   testimonials: typeof testimonials;

@@ -5,7 +5,7 @@ import { execFileSync } from "node:child_process";
 import { mkdtempSync, writeFileSync, rmSync, mkdirSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, dirname, basename } from "node:path";
-import { getLatestVersion, downloadRelease } from "../utils/download.js";
+import { getLatestVersion, downloadRelease, GITHUB_REPO } from "../utils/download.js";
 
 const GITHUB_API = "https://api.github.com";
 
@@ -39,7 +39,7 @@ function createMinimalTarball(): Buffer {
 describe("getLatestVersion", () => {
   it("retorna string semver a partir da GitHub API", async () => {
     server.use(
-      http.get(`${GITHUB_API}/repos/matheusmierzwa/rubrica/releases/latest`, () =>
+      http.get(`${GITHUB_API}/repos/${GITHUB_REPO}/releases/latest`, () =>
         HttpResponse.json({ tag_name: "v1.2.3" })
       )
     );
@@ -50,7 +50,7 @@ describe("getLatestVersion", () => {
 
   it("lança erro amigável quando GitHub API retorna 404", async () => {
     server.use(
-      http.get(`${GITHUB_API}/repos/matheusmierzwa/rubrica/releases/latest`, () =>
+      http.get(`${GITHUB_API}/repos/${GITHUB_REPO}/releases/latest`, () =>
         HttpResponse.json({ message: "Not Found" }, { status: 404 })
       )
     );
@@ -60,7 +60,7 @@ describe("getLatestVersion", () => {
 
   it("lança erro amigável quando há erro de rede", async () => {
     server.use(
-      http.get(`${GITHUB_API}/repos/matheusmierzwa/rubrica/releases/latest`, () =>
+      http.get(`${GITHUB_API}/repos/${GITHUB_REPO}/releases/latest`, () =>
         HttpResponse.error()
       )
     );
@@ -74,7 +74,7 @@ describe("downloadRelease", () => {
     const targetDir = mkdtempSync(join(tmpdir(), "rubrica-target-"));
     try {
       server.use(
-        http.get(`${GITHUB_API}/repos/matheusmierzwa/rubrica/tarball/v1.2.3`, () =>
+        http.get(`${GITHUB_API}/repos/${GITHUB_REPO}/tarball/v1.2.3`, () =>
           HttpResponse.error()
         )
       );
@@ -89,7 +89,7 @@ describe("downloadRelease", () => {
     const targetDir = mkdtempSync(join(tmpdir(), "rubrica-target-"));
     try {
       server.use(
-        http.get(`${GITHUB_API}/repos/matheusmierzwa/rubrica/tarball/v1.2.3`, () =>
+        http.get(`${GITHUB_API}/repos/${GITHUB_REPO}/tarball/v1.2.3`, () =>
           HttpResponse.json({ message: "Not Found" }, { status: 404 })
         )
       );
@@ -106,7 +106,7 @@ describe("downloadRelease", () => {
 
     try {
       server.use(
-        http.get(`${GITHUB_API}/repos/matheusmierzwa/rubrica/tarball/v1.2.3`, () =>
+        http.get(`${GITHUB_API}/repos/${GITHUB_REPO}/tarball/v1.2.3`, () =>
           new HttpResponse(tarball, {
             headers: { "Content-Type": "application/gzip" },
           })

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearch } from "wouter";
 import { DeleteConfirmDialog } from "@/components/admin/DeleteConfirmDialog";
 import { AdminLayout } from "./Dashboard";
 import { Button } from "@/components/ui/button";
@@ -89,7 +90,15 @@ export default function AdminProposals() {
   const permanentDeleteProposal = useMutation(api.proposals.permanentDelete);
   const restoreProposal = useMutation(api.proposals.restore);
 
+  const search = useSearch();
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Atalhos "Novo ..." do painel/command palette chegam com ?create=true (issue #56)
+  useEffect(() => {
+    if (search.includes("create=true")) {
+      setIsModalOpen(true);
+    }
+  }, [search]);
   const [isJsonImportModalOpen, setIsJsonImportModalOpen] = useState(false);
   const [editingProposal, setEditingProposal] = useState<any | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name?: string } | null>(null);

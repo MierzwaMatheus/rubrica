@@ -51,7 +51,7 @@ vi.mock("@clack/prompts", () => ({
   log: { warn: vi.fn(), info: vi.fn(), error: vi.fn() },
 }));
 
-import { cancel, password as passwordPrompt, text as textPrompt } from "@clack/prompts";
+import { cancel, log, password as passwordPrompt, text as textPrompt } from "@clack/prompts";
 
 // ---- Ciclo 1: leitura de .env.local e detectProject -------------------------
 
@@ -377,35 +377,36 @@ describe("runSetup — Ciclo 5: AI, Playground e Payments vars", () => {
     expect(calls.some((c) => c.includes("OPENROUTER_API_KEY"))).toBe(true);
   });
 
-  it("com payments:true, prompts de STRIPE_WEBHOOK_SECRET e ASAAS_WEBHOOK_TOKEN aparecem (skipáveis)", async () => {
-    const { text } = await import("@clack/prompts");
+  it("com payments:true e chave do Asaas, grava a chave, gera o token do webhook e mostra como cadastrar", async () => {
+    const { text, log } = await import("@clack/prompts");
     vi.mocked(text)
       .mockResolvedValueOnce("https://meusite.com") // SITE_URL
-      .mockResolvedValueOnce("whsec_abc")            // STRIPE_WEBHOOK_SECRET
-      .mockResolvedValueOnce("asaas_token")          // ASAAS_WEBHOOK_TOKEN
+      .mockResolvedValueOnce("$aact_hmlg_abc")       // ASAAS_API_KEY
       .mockResolvedValue("");                         // Vercel (skip)
 
     const deps = makeSetupWithPlugins({ payments: true });
     await runSetup(deps);
 
     const calls = fileSyncArgs(deps.execFileSync as ReturnType<typeof vi.fn>);
-    expect(calls.some((c) => c.includes("STRIPE_WEBHOOK_SECRET"))).toBe(true);
+    expect(calls.some((c) => c.includes("ASAAS_API_KEY") && c.includes("$aact_hmlg_abc"))).toBe(true);
     expect(calls.some((c) => c.includes("ASAAS_WEBHOOK_TOKEN"))).toBe(true);
+    expect(calls.some((c) => c.includes("STRIPE"))).toBe(false);
+    expect(log.info).toHaveBeenCalledWith(expect.stringContaining("/webhooks/asaas"));
+    expect(log.info).toHaveBeenCalledWith(expect.stringContaining("sandbox"));
   });
 
   it("vars opcionais puladas (vazias) não geram chamada execFileSync para convex env set", async () => {
     const { text } = await import("@clack/prompts");
     vi.mocked(text)
       .mockResolvedValueOnce("https://meusite.com") // SITE_URL
-      .mockResolvedValueOnce("")                     // STRIPE_WEBHOOK_SECRET (pulado)
-      .mockResolvedValueOnce("")                     // ASAAS_WEBHOOK_TOKEN (pulado)
+      .mockResolvedValueOnce("")                     // ASAAS_API_KEY (pulado)
       .mockResolvedValue("");                         // Vercel (skip)
 
     const deps = makeSetupWithPlugins({ payments: true });
     await runSetup(deps);
 
     const calls = fileSyncArgs(deps.execFileSync as ReturnType<typeof vi.fn>);
-    expect(calls.some((c) => c.includes("STRIPE_WEBHOOK_SECRET"))).toBe(false);
+    expect(calls.some((c) => c.includes("ASAAS_API_KEY"))).toBe(false);
     expect(calls.some((c) => c.includes("ASAAS_WEBHOOK_TOKEN"))).toBe(false);
   });
 });
@@ -622,7 +623,7 @@ describe("runSetup — Ciclo 8: setupAdmin execFileSync e outro()", () => {
     expect(argsStr).toContain("minhaSenha123456");
   });
 
-  it("quando execFileSync lança erro contendo 'Root user already exists', exibe mensagem amigável", async () => {
+  it("quando execFileSync lança erro contendo 'Root user already exists', avisa e segue com o seed", async () => {
     vi.mocked(textPrompt)
       .mockResolvedValueOnce("https://meusite.com") // SITE_URL
       .mockResolvedValueOnce("admin@teste.com")      // email
@@ -645,11 +646,9 @@ describe("runSetup — Ciclo 8: setupAdmin execFileSync e outro()", () => {
 
     await runSetup(deps);
 
-    expect(cancel).toHaveBeenCalledWith(
-      expect.stringMatching(/já configurado|Admin/i)
-    );
-    const cancelArg = vi.mocked(cancel).mock.calls.at(-1)?.[0] as string;
-    expect(cancelArg).not.toContain("Error:");
+    // Rodar o setup de novo é válido: o admin existente é mantido e o seed continua.
+    expect(log.warn).toHaveBeenCalledWith(expect.stringMatching(/já configurado/i));
+    expect(cancel).not.toHaveBeenCalled();
   });
 
   it("quando execFileSync lança erro genérico, exibe mensagem original ao usuário", async () => {

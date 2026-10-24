@@ -8,20 +8,20 @@
 
 ### 1.2 Product Description
 
-A professional full-stack portfolio platform that combines an elegant public-facing interface with a robust administrative panel. The platform enables management of projects, blog posts, resume information, commercial proposals, payment links, and site content through an intuitive admin interface.
+An open-source, full-stack portfolio template that combines a public site with an administrative panel. It manages projects and case studies, blog posts, resume, testimonials, commercial proposals with electronic acceptance, and site content/appearance through the admin. New projects are created and kept up to date with the `create-rubrica` CLI (`cli/`).
 
 ### 1.3 Target Audience
 
-- **Primary**: Potential clients and employers seeking to evaluate the developer
-- **Secondary**: Commercial proposal recipients needing to review and accept proposals electronically
-- **Tertiary**: Customers making payments via integrated checkout flows
+- **Primary**: Developers, designers and freelancers who create their own portfolio from the template
+- **Secondary**: Potential clients and employers visiting the published portfolio
+- **Tertiary**: Commercial proposal recipients who review and accept proposals electronically
 
 ### 1.4 Design Philosophy
 
-- **Cyberpunk Minimalist**: True Black background with neon purple (#a855f7) and neon lime (#10B981) accents
-- **Technical Typography**: JetBrains Mono for code elements, system-ui for body
-- **Console-inspired Micro-interactions**: Terminal-like feedback, blinking cursors, syntax highlighting
-- **Persistent Sidebar Navigation**: VS Code file-tree-inspired navigation
+- **Interchangeable layouts**: 5 layouts — `cyberpunk` (default), `brutalist`, `swiss`, `bento`, `magazine` — applied by the CLI from `templates/layouts/` (see `docs/templates/`)
+- **4-color theme contract**: every theme is defined only by `--bg`, `--text`, `--primary` and `--accent` in `src/index.css` (or in the admin, **Site & Appearance**); surfaces, borders and muted text are derived from them, so light and dark palettes both work. The CLI offers 4 palettes (Editorial Cream, Paper Noir, Midnight Blue, Solar Warm); the repository default is the original neon purple/lime look (see `docs/templates/cores.md`)
+- **Conversion-focused structure**: home metrics, featured case studies, work principles, case study sections, project/testimonial categories and resume skill groups (since v0.3.18)
+- **Console-inspired touches**: terminal overlay (toggled with the backtick key), monospace typography for code elements
 
 ---
 
@@ -31,171 +31,162 @@ A professional full-stack portfolio platform that combines an elegant public-fac
 
 | Technology           | Version  | Purpose                 |
 | -------------------- | -------- | ----------------------- |
-| React                | 19.2.1   | UI library              |
+| React                | 19.2     | UI library              |
 | TypeScript           | 5.6.3    | Type safety             |
-| Vite                 | 7.1.7    | Build tool & dev server |
-| Wouter               | 3.3.5    | Lightweight routing     |
-| Framer Motion        | 12.23.22 | Animations              |
-| TanStack React Query | 5.90.16  | Server state management |
+| Vite                 | 7.1      | Build tool & dev server |
+| Wouter               | 3.3      | Lightweight routing     |
+| Framer Motion        | 12.23    | Animations              |
+| TanStack React Query | 5.90     | Server state management |
 
 ### 2.2 Backend & Database
 
-| Technology      | Version | Purpose                                                   |
-| --------------- | ------- | --------------------------------------------------------- |
-| **Convex**      | Latest  | Serverless backend, real-time database                    |
-| **Convex Auth** | Latest  | Authentication (credentials, magic link, OAuth providers) |
+| Technology      | Version | Purpose                                      |
+| --------------- | ------- | -------------------------------------------- |
+| **Convex**      | 1.37    | Serverless backend, real-time database, file storage, cron jobs |
+| **Convex Auth** | 0.0.92  | Authentication (email/password)              |
 
 ### 2.3 Styling
 
 | Technology   | Version | Purpose                        |
 | ------------ | ------- | ------------------------------ |
-| Tailwind CSS | 4.1.14  | Utility-first CSS framework    |
+| Tailwind CSS | 4.1     | Utility-first CSS framework    |
 | Radix UI     | Various | Accessible headless components |
 | shadcn/ui    | —       | Pre-built component collection |
 | Lucide React | 0.453.0 | Icon library                   |
-| next-themes  | 0.4.6   | Theme management               |
 
-### 2.4 Payment Integrations
+### 2.4 AI
 
-| Provider | Purpose                                                |
-| -------- | ------------------------------------------------------ |
-| Stripe   | Payment links, products, pricing, installment support  |
-| Asaas    | PIX, Boleto, Credit Card payments, customer management |
+| Provider   | Purpose                                                                 |
+| ---------- | ----------------------------------------------------------------------- |
+| OpenRouter | Automatic content translation, AI resume pipeline, playground AI proxy |
 
-### 2.5 Forms & Validation
+### 2.5 Payment Integration (Asaas)
+
+| Provider | Role |
+| -------- | ---- |
+| Asaas    | PIX, boleto and credit card (up to 12 installments) through the Asaas API v3 (`convex/asaas.ts`, `convex/lib/asaasClient.ts`) |
+
+- Environment comes from the key prefix (`$aact_prod_` = production, otherwise sandbox); `ASAAS_ENV` overrides it.
+- Card data is never collected by the site: card charges redirect to the Asaas hosted payment page (`invoiceUrl`).
+- Installment totals are computed on the server (`convex/lib/installments.ts`), never trusted from the browser.
+- A checkout only becomes `paid` through the Asaas webhook (`/webhooks/asaas`, `asaas-access-token` header); refunds and chargebacks move it to `refunded`.
+- Charge generation is locked per checkout (no duplicate charges on concurrent clicks), capped at 8 charges per link, and errors reach the browser as `ConvexError` codes.
+
+### 2.6 Forms & Validation
 
 | Technology      | Version | Purpose               |
 | --------------- | ------- | --------------------- |
-| React Hook Form | 7.64.0  | Form state management |
-| Zod             | 4.1.12  | Schema validation     |
+| React Hook Form | 7.64    | Form state management |
+| Zod             | 4.1     | Schema validation     |
 
-### 2.6 Rich Text Editor
+### 2.7 Rich Text Editor
 
 | Technology | Version | Purpose                     |
 | ---------- | ------- | --------------------------- |
-| TipTap     | 3.13.0  | Extensible rich text editor |
+| TipTap     | 3.13    | Extensible rich text editor |
 
-### 2.7 Utilities
+### 2.8 Utilities
 
-| Technology           | Purpose                    |
-| -------------------- | -------------------------- |
-| Axios                | HTTP client                |
-| Recharts             | Charts & visualizations    |
-| Sonner               | Toast notifications        |
-| nanoid               | Unique ID generation       |
-| @dnd-kit             | Drag and drop              |
-| jsPDF                | Client-side PDF generation |
-| react-markdown       | Markdown rendering         |
-| Vaul                 | Drawer components          |
-| cmdk                 | Command palette            |
-| embla-carousel-react | Carousel component         |
+| Technology           | Purpose                                  |
+| -------------------- | ---------------------------------------- |
+| Recharts             | Charts & visualizations                  |
+| Sonner               | Toast notifications                      |
+| nanoid               | Unique ID generation                     |
+| @dnd-kit             | Drag and drop                            |
+| jsPDF                | Client-side PDF generation (CV, contract) |
+| signature_pad        | Handwritten signature capture            |
+| react-markdown       | Markdown rendering                       |
+| react-helmet-async   | Per-page SEO meta tags                   |
+| cmdk                 | Command palette (admin)                  |
+| embla-carousel-react | Carousel component                       |
 
-### 2.8 Analytics & Performance
+### 2.9 Analytics & Performance
 
-| Technology            | Purpose                |
-| --------------------- | ---------------------- |
-| Vercel Analytics      | User behavior tracking |
-| Vercel Speed Insights | Performance monitoring |
+| Technology            | Purpose                                                                    |
+| --------------------- | -------------------------------------------------------------------------- |
+| Vercel Analytics      | Page views                                                                 |
+| Vercel Speed Insights | Performance monitoring                                                     |
+| Umami (optional)      | Custom events (`src/lib/analytics.ts`, `data-umami-event` attributes); script injected at build time only when `VITE_UMAMI_SCRIPT_URL` + `VITE_UMAMI_WEBSITE_ID` are set (`src/lib/umamiScript.ts`); Umami Cloud is allowed in the CSP |
+
+### 2.10 Testing & CI
+
+| Technology     | Purpose                                                                 |
+| -------------- | ----------------------------------------------------------------------- |
+| Vitest         | Template test suite (`tests/app`, `tests/convex`) and CLI tests (`cli/src/__tests__`) |
+| Stryker        | Mutation testing (`npm run mutation:diff`)                              |
+| GitHub Actions | `.github/workflows/ci.yml`: typecheck + tests for the template, typecheck + tests + build for the CLI |
 
 ---
 
 ## 3. Convex Backend Architecture
 
-### 3.1 Database Schema (`schema.ts`)
+### 3.1 Database Schema (`convex/schema.ts`)
 
-All tables migrated from Supabase schema `app_portfolio` to Convex document collections.
+Most content tables use soft delete (`deletedAt`, `deletedBy`). Translatable fields use `*Translations` objects with `ptBR` / `enUS`.
 
-| Collection            | Purpose                        | Fields                                                                                                                                                                                                                                                                                                                             |
-| --------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `projects`            | Portfolio projects             | title, description, longDescription, tags, images, imagesOrder, links, demoUrl, sourceCodeUrl, displayOrder, createdAt                                                                                                                                                                                                             |
-| `posts`               | Blog posts                     | title, slug, content, tags, featured, status (draft\|published), readTime, createdAt, updatedAt                                                                                                                                                                                                                                    |
-| `resumeItems`         | Resume entries                 | category, title, organization, period, description, displayOrder, createdAt                                                                                                                                                                                                                                                        |
-| `proposals`           | Commercial proposals           | slug, title, projectDetails, pricing, timeline, scope, status (pending\|accepted\|expired), password, rescissionPolicy, version, isAccepted, acceptedAt, createdAt, updatedAt                                                                                                                                                      |
-| `proposalVersions`    | Proposal version history       | proposalId, version, content, createdAt                                                                                                                                                                                                                                                                                            |
-| `proposalSessions`    | Temporary access sessions      | proposalId, sessionToken, expiresAt, createdAt                                                                                                                                                                                                                                                                                     |
-| `proposalAcceptances` | Electronic acceptance records  | proposalId, proposalVersion, fullName, cpfCnpj, email, position, companyDeclaration, ip, userAgent, hash, acceptedAt                                                                                                                                                                                                               |
-| `services`            | Home page service cards        | title, titleTranslations, description, descriptionTranslations, displayOrder, createdAt                                                                                                                                                                                                                                            |
-| `testimonials`        | Client testimonials            | name, role, roleTranslations, imageUrl, text, textTranslations, displayOrder, createdAt                                                                                                                                                                                                                                            |
-| `homeContent`         | Home page content              | key (string), value (any), i18n (record of translations)                                                                                                                                                                                                                                                                           |
-| `contactInfo`         | Contact information            | key, value, visible, createdAt, updatedAt                                                                                                                                                                                                                                                                                          |
-| `users`               | User accounts (Convex Auth)    | email, name, emailVerified, createdAt                                                                                                                                                                                                                                                                                              |
-| `userRoles`           | User role assignments          | userId, role (root\|admin\|proposal-editor), createdAt                                                                                                                                                                                                                                                                             |
-| `checkouts`           | Checkout/payment sessions      | uniqueLink, customerId, customerName, customerEmail, customerCpfCnpj, customerMobilePhone, customerCompany, customerPhone, value, description, dueDate, billingType, status (pending\|payment_selected\|payment_confirmed\|paid), expiresAt, asaasChargeId, paymentMethod, pixQrCode, pixQrCodeImage, pixExpirationDate, createdAt |
-| `deployStatus`        | Deploy tracking                | pendingChanges, lastPublishedAt, lastCheckAt                                                                                                                                                                                                                                                                                       |
-| `aboutDailyRoutine`   | About page daily routine items | imageUrl, tags, description, spanSize (1x1\|2x1), displayOrder, createdAt                                                                                                                                                                                                                                                          |
-| `aboutFaq`            | About page FAQ items           | question, answer, displayOrder, createdAt                                                                                                                                                                                                                                                                                          |
+| Collection               | Purpose                              | Main fields |
+| ------------------------ | ------------------------------------ | ----------- |
+| `users` + Convex Auth tables | User accounts                    | (from `authTables`) |
+| `userRoles`              | Role assignments                     | userId, role (root\|admin\|content-editor\|blog-editor\|proposal-editor), mustChangePassword |
+| `projects`               | Portfolio projects / case studies    | title, description, longDescription, tags, imageIds, externalImageUrls, demoLink, githubLink, slug, caseStudy (problem, solution, results, role, context, decisions, learnings, metrics, testimonial), category, orderIndex |
+| `posts`                  | Blog posts                           | title, subtitle, slug, content, imageId, tags, featured, status (draft\|published), readTime, publishedAt |
+| `resumeItems`            | Resume entries (discriminated union) | type (experience\|education\|course\|skill\|soft_skill\|language\|volunteer), content (skills have an optional `group`), orderIndex |
+| `services`               | Home service cards                   | title, description, orderIndex |
+| `testimonials`           | Published testimonials               | name, role, imageId, text, showOnHome, category, orderIndex |
+| `testimonialSubmissions` | Testimonials sent by visitors        | name, role, company, email, type (text\|video), videoStorageId, status (pending\|approved\|rejected\|published) |
+| `homeContent`            | Key/value home content and plugin state | key, value (e.g. hero_title, about_text, home_metrics, work_principles, `plugin:<id>:enabled`) |
+| `aboutDailyRoutine`      | About page daily routine             | imageId, description, spanSize (1x1\|1x2\|2x1), displayOrder |
+| `aboutFaq`               | About page FAQ                       | question, answer, displayOrder |
+| `contactInfo`            | Owner/contact information            | name, role, email, phone, location, social URLs, show* visibility flags, avatar, proposalIntro |
+| `contactRequests`        | Contact wizard submissions           | type (project\|job\|networking\|feedback), status, answers, contactInfo, adminNotes |
+| `imageFolders` / `imageMetadata` | Media library on Convex Storage | folder tree; storageId, displayName, altText, tags, dimensions |
+| `proposals`              | Commercial proposals                 | clientName, slug, title, objective, scope, timeline, deliveryDate, investmentValue, paymentMethods, conditions, password, rescissionPolicy, version, isAccepted, expiresAt, templateId |
+| `proposalVersions`       | Proposal version history             | proposalId, version, contentSnapshot |
+| `proposalSessions`       | Temporary access sessions            | proposalId, token, isUsed, expiresAt |
+| `proposalAcceptances`    | Electronic acceptance records        | proposalVersion, clientName, clientDocument, clientEmail, clientRole, contentSnapshot, contentHash (SHA-256), ipAddress, userAgent, signatureStorageId, anonymizedAt |
+| `contractTemplates`      | Contract templates for proposals     | name, content, isDefault |
+| `checkouts`              | Checkout links                       | uniqueLink, customer data, customerId (Asaas), value, dueDate, status (pending\|payment_selected\|paid\|expired\|failed\|refunded; legacy payment_confirmed), paymentMethod, installments, totalValue, asaasChargeId, PIX QR code, boleto URL and line, invoiceUrl |
+| `aiGeneratedResumes`     | AI-generated CVs                     | jobDescription, locale, fitScore, strengths, weaknesses, cvData |
+| `siteConfig`             | Site & appearance settings           | key, value (theme colors, fonts, …) |
+| `siteTexts`              | Editable interface texts (i18n)      | key, page, ptBR, enUS |
+| `deployStatus`           | Publish tracking                     | pendingChanges, lastPublishedAt, lastTriggeredBy |
+| `auditLog`               | Admin audit trail                    | eventType, actorType, actorId, target, metadata, ipAddress, expiresAt |
+| `playgroundAuditLog`     | Playground usage events (24h)        | sessionId, eventType, expiresAt |
+| `rateLimitAttempts`      | Rate limiting                        | key, type, attemptCount, blockedUntil, expiresAt |
 
 ### 3.2 Convex Auth Configuration
 
-Convex Auth provides the authentication layer. Supports multiple providers:
-
-| Provider           | Use Case                                     |
-| ------------------ | -------------------------------------------- |
-| **Credentials**    | Email/password login (primary for admin)     |
-| **Magic Link**     | Passwordless email login for proposal access |
-| **OAuth (Google)** | Social login option                          |
-
-Auth is configured via `convex/auth.config.ts` using the Convex Auth API.
+- Single provider: **Password** (email/password). Public sign-up is disabled (`convex/auth.ts`).
+- The first root user is created through a setup screen, allowed only while the Convex env var `BOOTSTRAP_ALLOWED=true`.
+- Other users are created by root and must change their password on first login (`mustChangePassword`).
 
 ### 3.3 Convex Functions
 
-All server-side logic implemented as Convex queries and mutations:
+Server logic lives in one module per domain (`projects.ts`, `posts.ts`, `proposals.ts`, `checkouts.ts`, `users.ts`, `siteConfig.ts`, `siteTexts.ts`, `plugins.ts`, `images.ts`, `translation.ts`, `aiResumesAction.ts`, `telegram.ts`, `deploy.ts`, …) as queries, mutations and actions. Admin mutations check roles (`requireRole`), check the plugin state (`requirePlugin`), write to the audit log and mark pending changes for publishing.
 
-| Function Type | Description                                                                |
-| ------------- | -------------------------------------------------------------------------- |
-| **Queries**   | Read-only data fetching (projects, posts, proposals, stats)                |
-| **Mutations** | Write operations (CRUD, publish, accept proposal)                          |
-| **Actions**   | Side effects and external API calls (Stripe, Asaas, email, deploy webhook) |
+#### HTTP endpoints (`convex/http.ts`)
 
-#### Query Examples
+| Path                       | Purpose                                                      |
+| -------------------------- | ------------------------------------------------------------ |
+| `/api/contact/submit`      | Contact wizard submission (rate limited)                     |
+| `/api/testimonial/submit`  | Testimonial wizard submission (rate limited)                 |
+| `/api/proposal/session`    | Password check → temporary proposal session                  |
+| `/api/proposal/accept`     | Electronic proposal acceptance                               |
+| `/webhooks/asaas`          | Asaas webhook (access token) → `checkouts.markPaidByLink`    |
+| `/webhooks/vercel-deploy`  | Marks the site as published after a Vercel deploy            |
+| `/playground/ai-proxy`     | Rate-limited AI proxy for the playground                     |
 
-- `projects.list` — List all projects with optional tag filter
-- `projects.getById` — Get single project
-- `posts.list` — List published posts with search/pagination
-- `posts.getBySlug` — Get post by slug
-- `proposals.getPublic` — Get proposal for public viewing (with password check)
-- `proposals.checkSession` — Validate proposal access session
-- `stats.getDashboard` — Get dashboard counts
-- `asaas.listCustomers` — List Asaas customers
-- `stripe.listProducts` — List Stripe products
+#### Cron jobs (`convex/crons.ts`)
 
-#### Mutation Examples
+Expired proposal sessions, rate-limit entries and playground logs are cleaned daily; audit logs older than 2 years are removed weekly; IPs older than 90 days are anonymized daily; pending checkouts past their expiration date (30 days by default) are expired hourly, cancelling their PIX/card charge in Asaas (boleto charges are kept, since they may be clearing); `siteConfig` is seeded daily (idempotent).
 
-- `projects.create` — Create project
-- `projects.update` — Update project
-- `projects.delete` — Delete project
-- `projects.reorder` — Update project order (drag and drop)
-- `posts.create` — Create post
-- `posts.publish` — Publish post
-- `proposals.create` — Create proposal
-- `proposals.createVersion` — Create new version on edit
-- `proposals.accept` — Register electronic acceptance
-- `proposals.createSession` — Create temporary access session
-- `checkouts.create` — Create checkout session
-- `checkouts.updatePayment` — Update payment method
-- `checkouts.processPix` — Process PIX payment
-- `checkouts.processCreditCard` — Process credit card payment
-- `users.create` — Create user (root only)
-- `users.assignRole` — Assign role to user
-- `deploy.trigger` — Trigger Vercel deploy
+#### Telegram notifications
 
-#### Action Examples
-
-- `stripe.createProduct` — Create Stripe product
-- `stripe.createPrice` — Create Stripe price
-- `stripe.createPaymentLink` — Create Stripe payment link
-- `asaas.createCustomer` — Create Asaas customer
-- `asaas.createCharge` — Create Asaas charge (PIX/Boleto/Credit Card)
-- `email.sendProposalAccepted` — Send acceptance notification email
+Optional (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_ADMIN_CHAT_ID`): proposal accepted, checkout paid, new contact request, new testimonial submission.
 
 ### 3.4 Real-time Subscriptions
 
-Convex provides built-in real-time subscriptions. Admin pages use reactive queries to automatically reflect changes from other users:
-
-```typescript
-const projects = useQuery(projects.list);
-// Automatically updates when another admin edits a project
-```
+Admin pages use reactive Convex queries, so changes made by another admin show up automatically.
 
 ---
 
@@ -203,169 +194,65 @@ const projects = useQuery(projects.list);
 
 ### 4.1 Home Page (`/`)
 
-#### Hero Section
-
-- **whoami** greeting with typewriter effect
-- Personal introduction with name and title
-- Subtitle: "Tech Lead Frontend & Full-Stack Engineer"
-- Technology badges: React, TypeScript, Systems Architecture, DevOps & Infrastructure
-- Animated entrance with Framer Motion
-
-#### About Section
-
-- Editable personal bio text (managed via admin)
-- Supports i18n (pt-BR, en-US)
-- Content from `homeContent` collection with key `aboutText`
-
-#### Services Grid
-
-- Bento grid layout showcasing 4 core services:
-  1. Intelligent Digital Experiences
-  2. Performance & Frontend DevOps
-  3. Scalable Systems Architecture
-  4. Technical Leadership & Mentoring
-- Each service: title, description with i18n support
-- Editable via admin panel
-
-#### Client Testimonials
-
-- Carousel of client testimonials
-- Each: name, role, photo, text
-- Full i18n support
-- Managed via admin panel
-
----
+- Hero (title, subtitle, tags from `homeContent`) with proof metrics (`home_metrics`) and calls to action
+- Featured case studies
+- About section with highlighted numbers
+- Services grid
+- Testimonials (those marked `showOnHome`)
+- Closing section with two paths: "I have a project" / "I have a job opening"
 
 ### 4.2 About Page (`/sobre`)
 
-#### Personal Bio
+- Professional summary (same text as the home "About")
+- Work principles (`work_principles`)
+- Personal side, daily routine bento grid (`aboutDailyRoutine`) and FAQ accordion (`aboutFaq`)
 
-- Extended "About Me" section with personal narrative
-- Content managed via `homeContent` collection
-- i18n support
+### 4.3 Portfolio (`/portfolio`, `/portfolio/:slug`)
 
-#### Daily Routine Section
+- Project grid filtered by category
+- Project detail dialog with image carousel and full-screen viewer, demo and source links
+- Case study page per project: role, context, decisions, results, metrics, learnings, screenshots, testimonial, CTA and next case
 
-- Bento grid display of daily activities
-- Each item: imageUrl, tags, description, card size (1x1 or 2x1)
-- Customizable display order
-- Source: `aboutDailyRoutine` collection
+### 4.4 Resume (`/curriculo`)
 
-#### Personal FAQ
+Experience, education, courses, skills (grouped by `group`), soft skills, languages and volunteer work, in the order set in the admin. ATS-friendly CV PDF export.
 
-- Accordion-style expandable FAQ items
-- Each: question, answer
-- Source: `aboutFaq` collection
+### 4.5 Blog (`/blog`, `/blog/:slug`)
 
----
+- Published posts, featured posts, search and tag filter, read time
+- Post page rendering TipTap HTML with SEO meta tags
+- RSS feed and sitemap generated at build time
 
-### 4.3 Portfolio Page (`/portfolio`)
+### 4.6 Testimonials (`/depoimentos`)
 
-#### Project Grid
+- Testimonials grouped by category
+- Public testimonial wizard (text or video upload) going to a moderation queue (`testimonials-intake` sub-plugin)
 
-- Responsive grid with asymmetric card sizes
-- Tag-based filtering with "All" default
-- Projects: title, description, thumbnail, tags
-- Skeleton loading states
+### 4.7 Proposals (`/proposta/:id`, `/proposta/:slug/aceitar`)
 
-#### Project Detail Modal
+- Proposal view with 10-day expiration, status (accepted, pending, expired), optional password protection and session-based access
+- Expandable rescission policy (markdown)
+- Electronic acceptance: full name, CPF/CNPJ, email, role, declaration, handwritten signature (stored in Convex Storage), SHA-256 content hash, IP and User-Agent
+- Contract PDF generated from the contract template, with the signature
 
-- Full project details in dialog
-- Image carousel per project
-- Full-screen image viewer with navigation
-- Project links: source code, live demo
-- Extended description support
+### 4.8 Checkout (`/checkout/:uniqueLink`, `/payment-success/:uniqueLink`)
 
-#### Drag & Drop Ordering (Admin)
+- The customer picks PIX (QR code + copy-and-paste code, with the expiration returned by Asaas), boleto (digitable line + PDF) or credit card (installments, then redirect to the Asaas hosted page).
+- Switching methods (or installments) cancels the previous Asaas charge before creating a new one; picking the same method again reuses the existing charge.
+- The page is reactive: it moves to the success screen when the webhook marks the checkout as paid. `/payment-success` shows "confirming" until then.
 
-- Reorder via drag and drop
-- Order persists in `projects` collection
+### 4.9 Contact Wizard
 
----
+Step-by-step contact flow (project, job, networking, feedback) opened from the sidebar; rate limited by IP; lands in `/admin/contatos`.
 
-### 4.4 Resume Page (`/curriculo`)
+### 4.10 Playground (`/playground/*`)
 
-Structured resume display:
+Public demo area (contact wizard, proposal, blog, payment link, AI CV) using fake data; AI usage rate limited.
 
-- **Professional Experience**: organization, role, period, description
-- **Academic Education**: institution, degree, period
-- **Courses & Certifications**: name, institution, date
-- **Volunteer Work**: organization, role, period
-- **Skills**: technical skills
-- **Soft Skills**: interpersonal competencies
-- **Languages**: language name, proficiency level
+### 4.11 Sidebar & Terminal
 
-Customizable display order via `resumeItems` collection.
-
----
-
-### 4.5 Blog (`/blog`)
-
-#### Blog Listing
-
-- List of published posts
-- Featured posts section with highlight styling
-- Search functionality
-- Tag-based filtering
-- Pagination with "Load More"
-- Read time estimation
-
-#### Blog Post Detail (`/blog/:slug`)
-
-- Individual post rendering
-- Markdown/HTML via TipTap
-- Post metadata
-- SEO meta tags
-
----
-
-### 4.6 Proposals (`/proposta/:id`)
-
-#### Proposal Viewing
-
-- Commercial proposal with project details
-- Expiration validation (10-day window)
-- Visual status: approved, pending, expired
-- Optional password protection
-- Acceptance banner when accepted
-- Expandable rescission policy with markdown
-
-#### Proposal Acceptance (`/proposta/:slug/aceitar`)
-
-- Electronic acceptance page
-- Client data: full name, CPF/CNPJ, email, position
-- Power of attorney declaration (for legal entities)
-- SHA-256 hash for content integrity
-- IP and User-Agent recording
-- Acceptance timestamp
-- **PDF Contract Generation** with digital signature
-
-#### Session-Based Access
-
-- Temporary session in `proposalSessions`
-- Session validation via Convex query
-
----
-
-### 4.7 Checkout Flow (`/checkout/:uniqueLink`)
-
-- Customer information
-- Payment method: PIX, Boleto, Credit Card
-- PIX: QR Code display
-- Boleto: identification field display
-- Credit Card: form with installment options
-- Success page (`/payment-success/:uniqueLink`)
-
----
-
-### 4.8 Sidebar Navigation (Persistent)
-
-- VS Code-inspired file tree navigation
-- Navigation links: Home, About, Portfolio, Resume, Blog
-- Contact information
-- CV download link
-- Language switcher (Português / English)
-- Theme toggle (dark mode)
+- Persistent sidebar: navigation (items follow the enabled plugins), contact info, CV download, language switch (pt-BR / en-US)
+- Terminal overlay toggled with the backtick key on public pages
 
 ---
 
@@ -375,131 +262,73 @@ Customizable display order via `resumeItems` collection.
 
 #### Login (`/login`)
 
-- Convex Auth credentials provider (email/password)
-- Magic link option
-- OAuth (Google) option
-- Protected route enforcement
+- Email/password only (Convex Auth Password provider)
+- Forced password change on first login for users created by root
 
 #### Role-Based Access Control
 
-| Role              | Permissions                                     |
-| ----------------- | ----------------------------------------------- |
-| `root`            | Full system access including user creation      |
-| `admin`           | General admin access (all except user creation) |
-| `proposal-editor` | Proposal management only                        |
+| Role              | Access                                                        |
+| ----------------- | ------------------------------------------------------------- |
+| `root`            | Everything, including users, audit log and LGPD               |
+| `admin`           | All content, proposals, payments, plugins, site config        |
+| `content-editor`  | Projects, blog, resume, home, about, texts, testimonials      |
+| `blog-editor`     | Blog only                                                     |
+| `proposal-editor` | Proposals only                                                |
 
-Roles stored in `userRoles` collection.
-
-#### User Management (`/admin/users/`)
-
-- Root-only user creation
-- Role assignment
-- User listing via Convex query
-
----
+Roles are stored in `userRoles`. Per-route roles are listed in §10.2.
 
 ### 5.2 Dashboard (`/admin/dashboard`)
 
-- Statistics: projects, articles, proposals
-- Quick action shortcuts
-- Gallery/image picker access
+- Counts: projects, posts (published/draft), proposals (total/accepted/pending), checkouts (paid/pending)
+- Quick actions, command palette, publish status / "Publish" button
 
----
+### 5.3 Content Management
 
-### 5.3 Project Management (`/admin/projects`)
+- **Projects** (`/admin/projects`): CRUD, images from the media library, tags, category, case study fields and metrics, drag & drop ordering, automatic translation
+- **Blog** (`/admin/blog`): TipTap editor, tags, featured, draft/published, auto slug, cover image
+- **Resume** (`/admin/resume`): CRUD by type, skill groups, ordering
+- **Home** (`/admin/home`): hero, about text, metrics editor, services
+- **About** (`/admin/about`): work principles, daily routine, FAQ
+- **Testimonials** (`/admin/depoimentos`): CRUD, categories, "show on home", submissions moderation
+- **Contact** (`/admin/contact`): contact data, social links, visibility toggles
+- **Contact requests** (`/admin/contatos`): status, notes
+- **Texts** (`/admin/textos`): edit interface strings per language (`siteTexts`)
+- **Site & Appearance** (`/admin/site-config`): the 4 theme colors and fonts
 
-- CRUD via Convex mutations
-- Multiple image upload
-- Tag system
-- Drag & drop ordering
-- Preview
+### 5.4 Media Library
 
----
+Images are stored in Convex Storage, organized in folders (`imageFolders`, `imageMetadata`) and picked with `ImagePicker`. Content references images by ID.
 
-### 5.4 Blog Management (`/admin/blog`)
+### 5.5 Proposal Management (`/admin/proposals`, `/admin/contracts`)
 
-- CRUD via TipTap rich text editor
-- Tag system
-- Featured toggle
-- Draft/Published status
-- Auto-slug from title
+- CRUD with tabs: All / Accepted; accepted proposals are immutable
+- Password generation (8 random characters), rescission policy (markdown)
+- Automatic versioning on edit (non-accepted only) in `proposalVersions`
+- Contract templates (`contractTemplates`) and contract PDF download for accepted proposals
 
----
+### 5.6 Payments (`/admin/payment-links`)
 
-### 5.5 Resume Management (`/admin/resume`)
+- Asaas customers: list, create, delete. Asaas charges: list, create, cancel. Invoices (NFS-e): read-only list (issued and configured in Asaas).
+- Checkout links: created from an Asaas customer, with a cryptographically random link; soft delete/restore.
+- All admin actions require the `payments` plugin and `root`/`admin`, and writes go to the audit log.
 
-- CRUD by category via `resumeItems`
-- Customizable display order
+### 5.7 AI Resumes (`/admin/ai-resumes`)
 
----
+Three-step OpenRouter pipeline (job analysis → ATS fit score with strengths/weaknesses → ATS rewrite), saved in `aiGeneratedResumes`, exportable as PDF.
 
-### 5.6 Home Page Management (`/admin/home`)
+### 5.8 Plugins (`/admin/plugins`)
 
-- About text edit
-- Services CRUD (with i18n)
-- Testimonials CRUD (with i18n)
+Features can be turned on/off: `contact-wizard`, `proposals`, `payments`, `blog`, `portfolio`, `resume`, `about`, `ai-resumes`, `audit-log`, `media-manager`, `i18n`, `playground`, `testimonials` (with sub-plugin `testimonials-intake`), `contract-templates`. Disabled plugins are blocked in the backend and hidden in the UI. Public visitors see the change after the next deploy (`plugins.json`).
 
----
+### 5.9 Users, Audit and LGPD
 
-### 5.7 About Page Management (`/admin/about`)
+- **Users** (`/admin/users/new`): root-only creation with role assignment
+- **Audit log** (`/admin/logs`): all admin mutations; 2-year retention, IP anonymized after 90 days
+- **LGPD** (`/admin/lgpd`): root-only export and anonymization of a data subject's records
 
-- Daily routine CRUD (`aboutDailyRoutine`)
-- FAQ CRUD (`aboutFaq`)
+### 5.10 Publishing
 
----
-
-### 5.8 Contact Management (`/admin/contact`)
-
-- Contact information
-- Social media links
-- Visibility toggles
-
----
-
-### 5.9 Proposal Management (`/admin/proposals`)
-
-- CRUD with tabs: All / Accepted
-- **Accepted proposals are immutable**
-- Password generation (8 random characters)
-- Rescission policy (markdown)
-- **Automatic versioning** on edit (non-accepted only)
-- Version history in `proposalVersions`
-
----
-
-### 5.10 Payment Links Management (`/admin/payment-links`)
-
-#### Stripe Integration
-
-- Products, prices, payment links via Convex actions
-- One-time and recurring prices
-- Multiple currencies (BRL, USD)
-- Installment support (2x-12x)
-- UI with cards separated by Links, Products, Prices
-
----
-
-### 5.11 Asaas Integration
-
-- Customers, charges, invoices via Convex actions
-- PIX, Boleto, Credit Card support
-
----
-
-### 5.12 Checkout System
-
-- Creation via Convex mutation
-- Unique link (16 random characters)
-- Status tracking
-- Payment processing actions
-
----
-
-### 5.13 Deploy Trigger
-
-- Vercel webhook via Convex action
-- Authenticated, role-based, throttled
-- Deploy status in `deployStatus` collection
+Admin changes mark `deployStatus.pendingChanges`. The "Publish" button calls `deploy.trigger`, which (root/admin, throttled to 1 per minute) calls the Vercel deploy hook (`VERCEL_DEPLOY_HOOK_URL`).
 
 ---
 
@@ -510,21 +339,11 @@ Roles stored in `userRoles` collection.
 - **pt-BR** (Portuguese — Brazil) — Default
 - **en-US** (English — United States)
 
-### 6.2 Translation Coverage
+### 6.2 Implementation
 
-- Navigation labels
-- Page titles and subtitles
-- Form labels and placeholders
-- Button text
-- Status messages
-- Content sections (services, testimonials, about text)
-
-### 6.3 Implementation
-
-- React Context-based provider
-- Translation files by language
-- Repository pattern for access
-- `useTranslation` hook
+- React Context provider and `useTranslation` hook, with a repository pattern (`src/i18n/`)
+- Interface strings live in `src/i18n/translations/{pt-BR,en-US}.ts`; they can be edited in the admin (`siteTexts`) and are regenerated from Convex at build time by `npm run build:i18n`
+- Content fields store both languages (`*Translations`); the admin translates changed fields automatically via OpenRouter
 
 ---
 
@@ -532,25 +351,26 @@ Roles stored in `userRoles` collection.
 
 ### 7.1 Static JSON Files
 
-Located in `src/data/`:
-
-- `home.json`, `portfolio.json`, `blog.json`, `resume.json`, `about.json`, `sidebar.json`
+`public/data/` holds `home.json`, `portfolio.json`, `blog.json`, `resume.json`, `about.json`, `sidebar.json` (plus `contact.json` and `plugins.json` generated at build time). The committed files are sample data (`scripts/generate-sample-data.ts`) so the template renders without Convex; `scripts/fetch-static-data.ts` replaces them with real data in production builds.
 
 ### 7.2 Repository Pattern
 
 - Interface-based abstraction
-- Static repositories for fallback
-- Convex repositories for dynamic data
-- Instance management for injection
+- Static repositories for fallback, Convex repositories for live data
 
 ---
 
 ## 8. Scripts & Automation
 
-| Script                 | Description                                 |
-| ---------------------- | ------------------------------------------- |
-| `fetch-static-data.ts` | Fetch static data from Convex at build time |
-| `generate-rss-feed.ts` | Generate RSS feed from blog posts           |
+| Script                     | Description                                                   |
+| -------------------------- | ------------------------------------------------------------- |
+| `export-i18n.ts`           | Regenerate interface translations from `siteTexts` (`build:i18n`) |
+| `fetch-static-data.ts`     | Fetch static data from Convex at build time                   |
+| `generate-rss-feed.ts`     | Generate the RSS feed from blog posts                          |
+| `generate-sitemap.ts`      | Generate `sitemap.xml`                                         |
+| `generate-sample-data.ts`  | Generate the sample `public/data` files and images             |
+| `extract-key-manifest.ts`  | Build the i18n key manifest                                    |
+| `generate-cv-pdf.ts`       | Render the CV page to PDF                                      |
 
 ---
 
@@ -558,39 +378,33 @@ Located in `src/data/`:
 
 ### 9.1 Performance
 
-- Vite build optimization
+- Vite build, lazy loading and code splitting
+- Static data generated at build time
 - Vercel Speed Insights
-- Lazy loading and code splitting
-- Static data at build time
 
 ### 9.2 Security
 
-- Convex Auth authentication
-- Role-based access control (RBAC)
-- Password-protected proposals
-- Session-based access
-- SHA-256 hash integrity
-- Environment variable protection
+- Convex Auth with public sign-up disabled; RBAC on routes and in every admin function
+- Password-protected proposals with temporary sessions; SHA-256 content hash for accepted proposals
+- Rate limiting on proposal password/acceptance, contact and testimonial submissions, and the playground
+- Webhook verification (Asaas token, Vercel secret)
+- Sign-in limited to 5 failed attempts per account per hour (Convex Auth `signIn.maxFailedAttempsPerHour`)
+- Security headers and CSP in `vercel.json`
+- Audit log, soft delete, LGPD export/anonymization
 
 ### 9.3 Accessibility
 
-- Radix UI components
-- Semantic HTML
-- Keyboard navigation
+- Radix UI components, semantic HTML, keyboard navigation
 
 ### 9.4 SEO
 
-- React Helmet Async
-- Semantic page structure
-- Blog slug URLs
-- RSS feed
+- react-helmet-async per-page meta tags (Open Graph), slug URLs
+- RSS feed and sitemap
 
 ### 9.5 Reliability
 
-- Error Boundary
-- Graceful static fallback
-- Toast notifications
-- Comprehensive error handling
+- Error Boundary, graceful static fallback, toast notifications
+- Automated tests run in CI on every pull request
 
 ---
 
@@ -598,123 +412,141 @@ Located in `src/data/`:
 
 ### 10.1 Public Routes
 
-| Route                          | Description         |
-| ------------------------------ | ------------------- |
-| `/`                            | Home page           |
-| `/sobre`                       | About page          |
-| `/curriculo`                   | Resume page         |
-| `/portfolio`                   | Portfolio page      |
-| `/blog`                        | Blog listing        |
-| `/blog/:slug`                  | Blog post detail    |
-| `/proposta/:id`                | Proposal viewing    |
-| `/proposta/:slug/aceitar`      | Proposal acceptance |
-| `/checkout/:uniqueLink`        | Checkout page       |
-| `/payment-success/:uniqueLink` | Payment success     |
-| `/login`                       | Login page          |
-| `/404`                         | Not found page      |
+| Route                          | Description          | Plugin       |
+| ------------------------------ | -------------------- | ------------ |
+| `/`                            | Home page            | —            |
+| `/sobre`                       | About page           | about        |
+| `/curriculo`                   | Resume page          | resume       |
+| `/portfolio`                   | Portfolio page       | portfolio    |
+| `/portfolio/:slug`             | Case study           | portfolio    |
+| `/blog`                        | Blog listing         | blog         |
+| `/blog/:slug`                  | Blog post detail     | blog         |
+| `/depoimentos`                 | Testimonials         | testimonials |
+| `/proposta/:id`                | Proposal viewing     | proposals    |
+| `/proposta/:slug/aceitar`      | Proposal acceptance  | proposals    |
+| `/checkout/:uniqueLink`        | Checkout page        | payments     |
+| `/payment-success/:uniqueLink` | Payment success      | payments     |
+| `/playground/*`                | Demo area            | playground   |
+| `/login`                       | Login page           | —            |
+| `/404`                         | Not found page       | —            |
 
 ### 10.2 Admin Routes
 
-| Route                          | Description            | Required Role                |
-| ------------------------------ | ---------------------- | ---------------------------- |
-| `/admin` or `/admin/dashboard` | Dashboard              | root, admin                  |
-| `/admin/projects`              | Project management     | root, admin                  |
-| `/admin/blog`                  | Blog management        | root, admin                  |
-| `/admin/resume`                | Resume management      | root, admin                  |
-| `/admin/home`                  | Home page management   | root, admin                  |
-| `/admin/about`                 | About page management  | root, admin                  |
-| `/admin/contact`               | Contact management     | root, admin                  |
-| `/admin/proposals`             | Proposal management    | root, admin, proposal-editor |
-| `/admin/payment-links`         | Payment links (Stripe) | root, admin                  |
-| `/admin/users/`                | User management        | root                         |
+| Route                          | Description            | Required Role                                    |
+| ------------------------------ | ---------------------- | ------------------------------------------------ |
+| `/admin` or `/admin/dashboard` | Dashboard              | root, admin, content-editor, blog-editor         |
+| `/admin/projects`              | Projects               | root, admin, content-editor                      |
+| `/admin/blog`                  | Blog                   | root, admin, content-editor, blog-editor         |
+| `/admin/resume`                | Resume                 | root, admin, content-editor                      |
+| `/admin/home`                  | Home page              | root, admin, content-editor                      |
+| `/admin/about`                 | About page             | root, admin, content-editor                      |
+| `/admin/textos`                | Interface texts        | root, admin, content-editor                      |
+| `/admin/depoimentos`           | Testimonials           | root, admin, content-editor                      |
+| `/admin/contact`               | Contact info           | root, admin                                      |
+| `/admin/contatos`              | Contact requests       | root, admin                                      |
+| `/admin/proposals`             | Proposals              | root, admin, proposal-editor                     |
+| `/admin/contracts`             | Contract templates     | root, admin                                      |
+| `/admin/payment-links`         | Payments (experimental)| root, admin                                      |
+| `/admin/ai-resumes`            | AI resumes             | root, admin                                      |
+| `/admin/plugins`               | Plugins                | root, admin                                      |
+| `/admin/site-config`           | Site & appearance      | root, admin                                      |
+| `/admin/logs`                  | Audit log              | root                                             |
+| `/admin/lgpd`                  | LGPD data subjects     | root                                             |
+| `/admin/users/new`             | Create user            | root                                             |
 
 ---
 
-## 11. Convex vs Supabase — Key Differences
+## 11. Environment Variables
 
-| Aspect             | Supabase (Previous)     | Convex (Current)                            |
-| ------------------ | ----------------------- | ------------------------------------------- |
-| **Database**       | PostgreSQL with RLS     | Convex document store                       |
-| **Auth**           | Supabase Auth           | Convex Auth                                 |
-| **API**            | REST + RPC functions    | Queries/Mutations/Actions                   |
-| **Real-time**      | Realtime subscriptions  | Built-in reactive queries                   |
-| **Edge Functions** | Deno Edge Functions     | Convex Actions (TypeScript)                 |
-| **Storage**        | Built-in Storage bucket | External (Vercel Blob, Cloudflare R2, etc.) |
-| **Hosting**        | Supabase hosted         | Convex hosted                               |
-| **Deploy**         | Git-based               | Convex deployment                           |
-| **Schema**         | SQL migrations          | `schema.ts` TypeScript                      |
-| **RLS**            | Row Level Security      | Convex query permissions                    |
-
----
-
-## 12. Environment Variables
+Frontend / build (`.env` / Vercel):
 
 ```env
-# Convex
 VITE_CONVEX_URL=https://your-project.convex.cloud
-
-# Stripe (for payment links)
-STRIPE_SECRET_KEY=sk_live_...
-STRIPE_PUBLISHABLE_KEY=pk_live_...
-
-# Asaas (for payments)
-ASAAS_TOKEN=...
-ASAAS_BASE_URL=https://api.asaas.com/v3
-
-# Vercel (for deploy trigger)
-VERCEL_DEPLOY_HOOK_URL=https://api.vercel.com/...
-
-# App
-VITE_APP_URL=https://your-domain.com
-VITE_APP_ID=app_portfolio
+CONVEX_URL=https://your-project.convex.cloud   # build scripts
+CONVEX_DEPLOY_KEY=...                          # npx convex deploy during build
+SITE_URL=https://your-domain.com               # RSS + sitemap
+VITE_UMAMI_SCRIPT_URL=...                      # optional, Umami (e.g. https://cloud.umami.is/script.js)
+VITE_UMAMI_WEBSITE_ID=...                      # optional, Umami
 ```
+
+Convex (`npx convex env set`):
+
+```env
+BOOTSTRAP_ALLOWED=true          # only while creating the first root user
+OPENROUTER_API_KEY=...          # translation, AI resumes
+PLAYGROUND_KEY_PEPPER=...       # playground API key fingerprint
+TELEGRAM_BOT_TOKEN=...          # optional notifications
+TELEGRAM_ADMIN_CHAT_ID=...
+VERCEL_DEPLOY_HOOK_URL=...      # "Publish" button
+VERCEL_WEBHOOK_SECRET=...       # /webhooks/vercel-deploy
+ASAAS_API_KEY=...               # payments ($aact_hmlg_ sandbox / $aact_prod_ production)
+ASAAS_WEBHOOK_TOKEN=...         # token configured in the Asaas webhook
+ASAAS_ENV=...                   # optional: production | sandbox
+SITE_URL=...
+```
+
+See `.env.example` for the reference list.
 
 ---
 
-## 13. Build & Deployment
+## 12. Build & Deployment
 
-### 13.1 Build Process
+### 12.1 Build Process
 
 ```
-npm run dev = npx convex dev  (runs both Convex backend and Vite frontend)
-npm run build = convex run fetch-static-data → convex run generate-rss-feed → vite build
+npm run dev        = vite --host & npx convex dev
+npm run build:i18n = tsx scripts/export-i18n.ts
+npm run build      = npx convex deploy → fetch-static-data → generate-rss-feed → generate-sitemap → vite build
 ```
 
-### 13.2 Deployment
+On Vercel, `vercel.json` sets `buildCommand` to `npm run build:i18n && npm run build`.
+
+### 12.2 Deployment
 
 - **Platform**: Vercel (frontend) + Convex Cloud (backend)
-- **Configuration**: `vercel.json` with SPA rewrites
+- **Configuration**: `vercel.json` with SPA rewrites, security headers and CSP
+- Content changes reach the public site through a redeploy triggered by the admin "Publish" button (Vercel deploy hook). There is no scheduled rebuild.
 
-### 13.3 Scripts
+### 12.3 Scripts
 
-| Command                | Description                          |
-| ---------------------- | ------------------------------------ |
-| `npx convex dev`       | Development (Convex + Vite together) |
-| `npx convex deploy`    | Deploy Convex backend                |
-| `npm run build`        | Production build                     |
-| `npm run preview`      | Preview production build             |
-| `npm run check`        | TypeScript type check                |
-| `npm run format`       | Prettier formatting                  |
-| `npm run generate:rss` | Generate RSS feed                    |
+| Command                | Description                    |
+| ---------------------- | ------------------------------ |
+| `npm run dev`          | Vite + Convex dev              |
+| `npm run build`        | Production build               |
+| `npm run preview`      | Preview production build       |
+| `npm run check`        | TypeScript type check          |
+| `npm run format`       | Prettier formatting            |
+| `npm run generate:rss` | Generate RSS feed              |
+| `npm test`             | Run the Vitest suite           |
+| `npm run mutation:diff`| Mutation testing (Stryker)     |
 
----
+### 12.4 CLI (`create-rubrica`)
 
-## 14. Future Enhancements
-
-| Feature                                                 | Status  |
-| ------------------------------------------------------- | ------- |
-| Light mode / high contrast                              | Planned |
-| Analytics dashboard                                     | Planned |
-| Additional SEO optimizations                            | Planned |
-| Automated testing                                       | Planned |
-| PWA (Progressive Web App)                               | Planned |
-| Email notifications on proposal acceptance              | Planned |
-| Proposal acceptance statistics dashboard                | Planned |
-| Image storage integration (Vercel Blob / Cloudflare R2) | Planned |
+- `rubrica create <name>` — new project with a chosen layout and palette
+- `rubrica config` — reconfigure identity (name, URL, SEO, RSS), appearance (palette, font), layout and plugins
+- `rubrica setup` — sets the Convex env vars, creates the root user and seeds initial content
+- `rubrica update` — brings template updates into an existing project with a 3-way merge that preserves the user's customizations (see `docs/atualizacao.md`)
 
 ---
 
-## 15. License
+## 13. Future Enhancements
+
+| Feature                                    | Status |
+| ------------------------------------------ | ------ |
+| Light palettes / 4-color theme contract    | Done (Editorial Cream and Paper Noir are light palettes) |
+| High-contrast mode                         | Planned |
+| Analytics                                  | Partial — Vercel Analytics + optional Umami events; no in-app analytics dashboard |
+| Additional SEO optimizations               | Partial — per-page meta, RSS and sitemap done |
+| Automated testing                          | Done — Vitest suites for template and CLI, GitHub Actions CI |
+| PWA (Progressive Web App)                  | Planned |
+| Notifications on proposal acceptance       | Partial — Telegram done; email planned |
+| Proposal acceptance statistics dashboard   | Partial — dashboard shows total/accepted/pending counts |
+| Image storage                              | Done — media library on Convex Storage |
+| Payments (PIX, boleto, card)               | Done — Asaas API, hosted card page, webhook confirmation |
+
+---
+
+## 14. License
 
 **GNU General Public License v3.0**
 

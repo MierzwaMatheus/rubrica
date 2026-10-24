@@ -168,6 +168,7 @@ describe("runConfig — identidade", () => {
     const identityData = { siteName: "Novo Site", siteUrl: "https://novo.com", siteDescription: "desc", authorName: "Autor", authorEmail: "a@b.com", twitterHandle: "", lang: "pt-BR" as const };
     const identityPromptMock = vi.fn().mockResolvedValue(identityData);
     const applyRubricalConfigMock = vi.fn().mockResolvedValue(undefined);
+    const applyIndexHtmlMock = vi.fn().mockResolvedValue(undefined);
     const detectProjectMock = vi.fn().mockResolvedValue("/project/rubrica.json");
     const readStateMock = vi.fn().mockResolvedValue(state);
     const writeStateMock = vi.fn().mockResolvedValue(undefined);
@@ -179,13 +180,25 @@ describe("runConfig — identidade", () => {
       writeState: writeStateMock,
       identityPrompt: identityPromptMock,
       applyRubricalConfig: applyRubricalConfigMock,
+      applyIndexHtml: applyIndexHtmlMock,
       fs,
     });
 
     expect(identityPromptMock).toHaveBeenCalledTimes(1);
+    // SEO, RSS e imagem de compartilhamento derivam da identidade, como no create.
     expect(applyRubricalConfigMock).toHaveBeenCalledWith(
-      expect.objectContaining({ siteName: "Novo Site" }),
+      expect.objectContaining({ siteName: "Novo Site", seoHomeTitle: "Novo Site", rssTitle: "Novo Site", ogImageUrl: "https://novo.com/og.png" }),
       "/project",
+      expect.anything()
+    );
+    expect(applyIndexHtmlMock).toHaveBeenCalledWith(
+      expect.objectContaining({ siteName: "Novo Site", siteUrl: "https://novo.com", authorName: "Autor" }),
+      "/project/index.html",
+      expect.anything()
+    );
+    expect(writeStateMock).toHaveBeenCalledWith(
+      "/project",
+      expect.objectContaining({ identity: identityData }),
       expect.anything()
     );
   });
@@ -199,7 +212,8 @@ describe("runConfig — aparência", () => {
   });
 
   it("chama applyTheme, applyFont e applyIndexHtml quando Aparência selecionada", async () => {
-    const state = { version: "1.0.0", layout: "cyberpunk", theme: "cyberpunk", accentColor: null, fontSans: "Inter", fontMono: "JetBrains Mono", radius: "0.5rem", plugins: {} };
+    const identity = { siteName: "Ana Dev", siteUrl: "https://ana.dev", siteDescription: "d", authorName: "Ana", authorEmail: "a@a.dev", twitterHandle: "ana", lang: "pt-BR" };
+    const state = { version: "1.0.0", layout: "cyberpunk", theme: "cyberpunk", accentColor: null, fontSans: "Inter", fontMono: "JetBrains Mono", radius: "0.5rem", plugins: {}, identity };
     const vol = Volume.fromJSON({
       "/project/rubrica.json": JSON.stringify(state),
       "/project/src/index.css": ":root {}",
@@ -233,7 +247,33 @@ describe("runConfig — aparência", () => {
 
     expect(applyThemeMock).toHaveBeenCalledTimes(1);
     expect(applyFontMock).toHaveBeenCalledTimes(1);
-    expect(applyIndexHtmlMock).toHaveBeenCalledTimes(1);
+    // Troca só a fonte: as meta tags continuam com a identidade salva, não em branco.
+    expect(applyIndexHtmlMock).toHaveBeenCalledWith(
+      expect.objectContaining({ fontFamily: "Inter", siteName: "Ana Dev", siteUrl: "https://ana.dev", authorName: "Ana" }),
+      "/project/index.html",
+      expect.anything()
+    );
+  });
+
+  it("sem identidade salva, não regrava as meta tags do index.html", async () => {
+    const state = { version: "1.0.0", layout: "cyberpunk", theme: "cyberpunk", fontSans: "Inter", fontMono: "JetBrains Mono", plugins: {} };
+    const vol = Volume.fromJSON({ "/project/rubrica.json": JSON.stringify(state) });
+    vi.mocked(multiselect).mockResolvedValueOnce(["appearance"]);
+    vi.mocked(select).mockResolvedValueOnce("editorial-cream").mockResolvedValueOnce("Inter").mockResolvedValueOnce("JetBrains Mono");
+    const applyIndexHtmlMock = vi.fn().mockResolvedValue(undefined);
+
+    await runConfig({
+      cwd: "/project",
+      detectProject: vi.fn().mockResolvedValue("/project/rubrica.json"),
+      readState: vi.fn().mockResolvedValue(state),
+      writeState: vi.fn().mockResolvedValue(undefined),
+      applyTheme: vi.fn().mockResolvedValue(undefined),
+      applyFont: vi.fn().mockResolvedValue(undefined),
+      applyIndexHtml: applyIndexHtmlMock,
+      fs: makeFsModule(vol),
+    });
+
+    expect(applyIndexHtmlMock).not.toHaveBeenCalled();
   });
 
   it("usa valores atuais do estado como defaults nos prompts de aparência", async () => {
@@ -400,6 +440,7 @@ describe("runConfig — layout", () => {
       readState: readStateMock,
       writeState: writeStateMock,
       applyLayout: applyLayoutMock,
+      downloadRelease: vi.fn().mockResolvedValue(undefined),
       fs,
     });
 
@@ -430,6 +471,7 @@ describe("runConfig — layout", () => {
       readState: readStateMock,
       writeState: writeStateMock,
       applyLayout: applyLayoutMock,
+      downloadRelease: vi.fn().mockResolvedValue(undefined),
       fs,
     });
 
@@ -489,6 +531,7 @@ describe("runConfig — layout", () => {
       readState: readStateMock,
       writeState: writeStateMock,
       applyLayout: applyLayoutMock,
+      downloadRelease: vi.fn().mockResolvedValue(undefined),
       fs,
     });
 
@@ -597,6 +640,7 @@ describe("runConfig — persistência em rubrica.json", () => {
       readState: readStateMock,
       writeState: writeStateMock,
       applyLayout: applyLayoutMock,
+      downloadRelease: vi.fn().mockResolvedValue(undefined),
       fs,
     });
 
@@ -649,5 +693,62 @@ describe("runConfig — persistência em rubrica.json", () => {
       }),
       expect.anything()
     );
+  });
+});
+
+describe("runConfig — layout em projeto criado pelo CLI (sem templates/)", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("baixa os layouts da versão do projeto e aplica a partir deles", async () => {
+    const state = { version: "0.3.18", layout: "cyberpunk", theme: "editorial-cream", fontSans: "Inter", fontMono: "JetBrains Mono", plugins: {} };
+    const vol = Volume.fromJSON({ "/project/rubrica.json": JSON.stringify(state) });
+    vi.mocked(multiselect).mockResolvedValueOnce(["layout"]);
+    vi.mocked(select).mockResolvedValueOnce("magazine");
+    vi.mocked(confirm).mockResolvedValueOnce(true);
+    const downloadMock = vi.fn().mockResolvedValue(undefined);
+    const applyLayoutMock = vi.fn().mockResolvedValue(undefined);
+    const writeStateMock = vi.fn().mockResolvedValue(undefined);
+
+    await runConfig({
+      cwd: "/project",
+      detectProject: vi.fn().mockResolvedValue("/project/rubrica.json"),
+      readState: vi.fn().mockResolvedValue(state),
+      writeState: writeStateMock,
+      applyLayout: applyLayoutMock,
+      downloadRelease: downloadMock,
+      fs: makeFsModule(vol),
+    });
+
+    expect(downloadMock).toHaveBeenCalledWith(expect.any(String), "v0.3.18");
+    const tmpDir = downloadMock.mock.calls[0]![0] as string;
+    expect(applyLayoutMock).toHaveBeenCalledWith(
+      "magazine",
+      { projectDir: "/project", templatesDir: `${tmpDir}/templates` },
+      expect.anything()
+    );
+    expect(writeStateMock).toHaveBeenCalledWith("/project", expect.objectContaining({ layout: "magazine" }), expect.anything());
+  });
+
+  it("usa a pasta templates/ local quando ela existe", async () => {
+    const state = { version: "0.3.18", layout: "cyberpunk", theme: "editorial-cream", fontSans: "Inter", fontMono: "JetBrains Mono", plugins: {} };
+    const vol = Volume.fromJSON({ "/project/rubrica.json": JSON.stringify(state), "/project/templates/layouts/bento/Layout.tsx": "x" });
+    vi.mocked(multiselect).mockResolvedValueOnce(["layout"]);
+    vi.mocked(select).mockResolvedValueOnce("bento");
+    vi.mocked(confirm).mockResolvedValueOnce(true);
+    const downloadMock = vi.fn().mockResolvedValue(undefined);
+    const applyLayoutMock = vi.fn().mockResolvedValue(undefined);
+
+    await runConfig({
+      cwd: "/project",
+      detectProject: vi.fn().mockResolvedValue("/project/rubrica.json"),
+      readState: vi.fn().mockResolvedValue(state),
+      writeState: vi.fn().mockResolvedValue(undefined),
+      applyLayout: applyLayoutMock,
+      downloadRelease: downloadMock,
+      fs: makeFsModule(vol),
+    });
+
+    expect(downloadMock).not.toHaveBeenCalled();
+    expect(applyLayoutMock).toHaveBeenCalledWith("bento", { projectDir: "/project", templatesDir: "/project/templates" }, expect.anything());
   });
 });

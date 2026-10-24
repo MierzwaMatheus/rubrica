@@ -119,6 +119,10 @@ function makeE2eDownloadMock(vol: InstanceType<typeof Volume>) {
     vol.writeFileSync(`${projectDir}/templates/layouts/cyberpunk/Sidebar.tsx`, "// Sidebar");
     vol.writeFileSync(`${projectDir}/templates/layouts/brutalist/Layout.tsx`, "// brutalist Layout");
     vol.writeFileSync(`${projectDir}/templates/layouts/brutalist/Navbar.tsx`, "// brutalist Navbar");
+    vol.mkdirSync(`${projectDir}/templates/layouts/brutalist/pages`, { recursive: true });
+    for (const page of ["Home.tsx", "Resume.tsx", "Portfolio.tsx", "About.tsx", "Blog.tsx"]) {
+      vol.writeFileSync(`${projectDir}/templates/layouts/brutalist/pages/${page}`, `// brutalist ${page}`);
+    }
 
     vol.writeFileSync(`${projectDir}/src/index.css`, MINIMAL_CSS);
     vol.writeFileSync(`${projectDir}/index.html`, MINIMAL_HTML);

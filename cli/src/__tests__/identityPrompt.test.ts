@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { text, select, isCancel, cancel } from "@clack/prompts";
+import { identityPrompt } from "../prompts/identityPrompt.js";
 
 vi.mock("@clack/prompts", () => ({
   text: vi.fn(),
@@ -8,222 +9,197 @@ vi.mock("@clack/prompts", () => ({
   cancel: vi.fn(),
 }));
 
-function setupAllMocks(overrides: Record<string, unknown> = {}) {
-  const defaults: Record<string, unknown> = {
-    siteName: "Meu Portfolio",
-    siteUrl: "https://meusite.com",
-    siteDescription: "Descrição do site.",
+type Field = "authorName" | "siteName" | "siteUrl" | "siteDescription" | "authorEmail" | "twitterHandle";
+
+/** Cada pergunta é reconhecida pelo texto, não pela posição. */
+const QUESTION: Record<Field, RegExp> = {
+  authorName: /^Seu nome/,
+  siteName: /^Nome do site/,
+  siteUrl: /^Endereço do site/,
+  siteDescription: /o que você faz/,
+  authorEmail: /^Seu e-mail/,
+  twitterHandle: /X\/Twitter/,
+};
+
+interface TextOpts {
+  message: string;
+  initialValue?: string;
+  validate?: (v: string) => string | undefined;
+}
+
+function answer(overrides: Partial<Record<Field, string>> = {}, lang = "pt-BR") {
+  const answers: Record<Field, string> = {
     authorName: "João Silva",
+    siteName: "Portfólio do João",
+    siteUrl: "https://meusite.com",
+    siteDescription: "Desenvolvedor web.",
     authorEmail: "joao@meusite.com",
     twitterHandle: "joaosilva",
-    lang: "pt-BR",
     ...overrides,
   };
-
-  vi.mocked(isCancel).mockReturnValue(false);
-
-  const textOrder = [
-    "siteName",
-    "siteUrl",
-    "siteDescription",
-    "authorName",
-    "authorEmail",
-    "twitterHandle",
-  ];
-  let textCallIndex = 0;
-  vi.mocked(text).mockImplementation(async () => {
-    const key = textOrder[textCallIndex++];
-    return defaults[key] as string;
-  });
-
-  vi.mocked(select).mockResolvedValue(defaults["lang"] as string);
+  const asked: Array<{ field: Field } & TextOpts> = [];
+  vi.mocked(text).mockImplementation((async (opts: TextOpts) => {
+    const field = (Object.keys(QUESTION) as Field[]).find((f) => QUESTION[f].test(opts.message));
+    if (!field) throw new Error(`pergunta inesperada: ${opts.message}`);
+    asked.push({ field, ...opts });
+    return answers[field];
+  }) as never);
+  vi.mocked(select).mockResolvedValue(lang);
+  return {
+    order: () => asked.map((a) => a.field),
+    opts: (field: Field) => asked.find((a) => a.field === field)!,
+  };
 }
 
 describe("identityPrompt", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.resetModules();
-  });
-
-  // Ciclo 1 — siteName
-  it("retorna siteName informado pelo usuário", async () => {
-    setupAllMocks({ siteName: "Portfolio do João" });
-    const { identityPrompt } = await import("../prompts/identityPrompt.js");
-    const result = await identityPrompt();
-    expect(result.siteName).toBe("Portfolio do João");
-  });
-
-  // Ciclo 2 — siteUrl com validação
-  it("retorna siteUrl válida fornecida pelo usuário", async () => {
-    setupAllMocks({ siteUrl: "https://exemplo.com" });
-    const { identityPrompt } = await import("../prompts/identityPrompt.js");
-    const result = await identityPrompt();
-    expect(result.siteUrl).toBe("https://exemplo.com");
-  });
-
-  it("valida siteUrl: rejeita url sem protocolo http/https", async () => {
     vi.mocked(isCancel).mockReturnValue(false);
-    let capturedValidate: ((v: string) => string | undefined) | undefined;
-    const textOrder = [
+  });
+
+  it("pergunta o nome da pessoa antes do nome do site", async () => {
+    const prompts = answer();
+    await identityPrompt();
+    expect(prompts.order()).toEqual([
+      "authorName",
       "siteName",
       "siteUrl",
       "siteDescription",
-      "authorName",
       "authorEmail",
       "twitterHandle",
-    ];
-    let idx = 0;
-    vi.mocked(text).mockImplementation(async (opts: any) => {
-      const key = textOrder[idx++];
-      if (key === "siteUrl") capturedValidate = opts.validate;
-      return key === "siteName"
-        ? "Meu Site"
-        : key === "siteUrl"
-          ? "https://ok.com"
-          : key === "siteDescription"
-            ? "desc"
-            : key === "authorName"
-              ? "João"
-              : key === "authorEmail"
-                ? "j@j.com"
-                : "";
+    ]);
+  });
+
+  it("devolve o que a pessoa respondeu", async () => {
+    answer();
+    expect(await identityPrompt()).toEqual({
+      authorName: "João Silva",
+      siteName: "Portfólio do João",
+      siteUrl: "https://meusite.com",
+      siteDescription: "Desenvolvedor web.",
+      authorEmail: "joao@meusite.com",
+      twitterHandle: "joaosilva",
+      lang: "pt-BR",
     });
-    vi.mocked(select).mockResolvedValue("pt-BR");
-
-    const { identityPrompt } = await import("../prompts/identityPrompt.js");
-    await identityPrompt();
-
-    expect(capturedValidate).toBeDefined();
-    expect(capturedValidate!("semprotocolo.com")).toMatch(/http/);
-    expect(capturedValidate!("ftp://errado.com")).toMatch(/http/);
-    expect(capturedValidate!("http://valido.com")).toBeUndefined();
-    expect(capturedValidate!("https://valido.com")).toBeUndefined();
   });
 
-  // Ciclo 3 — siteDescription e authorName (texto livre)
-  it("retorna siteDescription informado pelo usuário", async () => {
-    setupAllMocks({ siteDescription: "Portfólio de desenvolvimento web." });
-    const { identityPrompt } = await import("../prompts/identityPrompt.js");
-    const result = await identityPrompt();
-    expect(result.siteDescription).toBe("Portfólio de desenvolvimento web.");
-  });
-
-  it("retorna authorName informado pelo usuário", async () => {
-    setupAllMocks({ authorName: "Maria Souza" });
-    const { identityPrompt } = await import("../prompts/identityPrompt.js");
-    const result = await identityPrompt();
-    expect(result.authorName).toBe("Maria Souza");
-  });
-
-  // Ciclo 4 — authorEmail com validação
-  it("retorna authorEmail válido fornecido pelo usuário", async () => {
-    setupAllMocks({ authorEmail: "maria@souza.com" });
-    const { identityPrompt } = await import("../prompts/identityPrompt.js");
-    const result = await identityPrompt();
-    expect(result.authorEmail).toBe("maria@souza.com");
-  });
-
-  it("valida authorEmail: rejeita email sem @ ou sem ponto", async () => {
-    vi.mocked(isCancel).mockReturnValue(false);
-    let capturedValidate: ((v: string) => string | undefined) | undefined;
-    const textOrder = [
-      "siteName",
-      "siteUrl",
-      "siteDescription",
-      "authorName",
-      "authorEmail",
-      "twitterHandle",
-    ];
-    let idx = 0;
-    vi.mocked(text).mockImplementation(async (opts: any) => {
-      const key = textOrder[idx++];
-      if (key === "authorEmail") capturedValidate = opts.validate;
-      return key === "siteName"
-        ? "Site"
-        : key === "siteUrl"
-          ? "https://ok.com"
-          : key === "siteDescription"
-            ? "desc"
-            : key === "authorName"
-              ? "Nome"
-              : key === "authorEmail"
-                ? "a@b.com"
-                : "";
+  it("completa a URL, limpa o e-mail e o @ do X, e tira espaços das pontas", async () => {
+    answer({
+      authorName: "  João Silva ",
+      siteName: " Site ",
+      siteUrl: "meusite.com/",
+      siteDescription: " Dev. ",
+      authorEmail: "  Joao@MeuSite.com ",
+      twitterHandle: "https://x.com/joaosilva",
     });
-    vi.mocked(select).mockResolvedValue("pt-BR");
+    const result = await identityPrompt();
+    expect(result).toMatchObject({
+      authorName: "João Silva",
+      siteName: "Site",
+      siteUrl: "https://meusite.com",
+      siteDescription: "Dev.",
+      authorEmail: "joao@meusite.com",
+      twitterHandle: "joaosilva",
+    });
+  });
 
-    const { identityPrompt } = await import("../prompts/identityPrompt.js");
+  it("a URL aceita endereço sem https:// e recusa o que não é endereço", async () => {
+    const prompts = answer();
     await identityPrompt();
-
-    expect(capturedValidate).toBeDefined();
-    expect(capturedValidate!("semArroba")).toMatch(/@/);
-    expect(capturedValidate!("a@semponto")).toMatch(/\./);
-    expect(capturedValidate!("a@b.com")).toBeUndefined();
+    const validate = prompts.opts("siteUrl").validate!;
+    expect(validate("meusite.com")).toBeUndefined();
+    expect(validate("meusite")).toMatch(/meusite\.com/);
   });
 
-  // Ciclo 5 — twitterHandle opcional
-  it("retorna string vazia quando twitterHandle não é fornecido", async () => {
-    setupAllMocks({ twitterHandle: "" });
-    const { identityPrompt } = await import("../prompts/identityPrompt.js");
-    const result = await identityPrompt();
-    expect(result.twitterHandle).toBe("");
+  it("o e-mail é validado", async () => {
+    const prompts = answer();
+    await identityPrompt();
+    const validate = prompts.opts("authorEmail").validate!;
+    expect(validate("joao@meusite.com")).toBeUndefined();
+    expect(validate("joao")).toMatch(/e-mail válido/);
   });
 
-  it("retorna twitterHandle fornecido pelo usuário", async () => {
-    setupAllMocks({ twitterHandle: "devjoao" });
-    const { identityPrompt } = await import("../prompts/identityPrompt.js");
-    const result = await identityPrompt();
-    expect(result.twitterHandle).toBe("devjoao");
+  it("o nome é obrigatório", async () => {
+    const prompts = answer();
+    await identityPrompt();
+    const validate = prompts.opts("authorName").validate!;
+    expect(validate("  ")).toMatch(/nome/i);
+    expect(validate("Ana")).toBeUndefined();
   });
 
-  // Ciclo 6 — lang como select
-  it("retorna lang selecionado pelo usuário", async () => {
-    setupAllMocks({ lang: "en-US" });
-    const { identityPrompt } = await import("../prompts/identityPrompt.js");
-    const result = await identityPrompt();
+  it("sem default, o nome do site sugere o nome da pessoa", async () => {
+    const prompts = answer({ authorName: "Ana Souza" });
+    await identityPrompt();
+    expect(prompts.opts("siteName").initialValue).toBe("Ana Souza");
+  });
+
+  it("nome do site apagado vira o nome da pessoa", async () => {
+    answer({ authorName: "Ana Souza", siteName: "  " });
+    expect((await identityPrompt()).siteName).toBe("Ana Souza");
+  });
+
+  it("os defaults viram o valor inicial de cada pergunta", async () => {
+    const prompts = answer();
+    await identityPrompt({
+      authorName: "Def Nome",
+      siteName: "Def Site",
+      siteUrl: "https://def.com",
+      siteDescription: "Def desc",
+      authorEmail: "def@def.com",
+      twitterHandle: "defhandle",
+    });
+    expect(prompts.opts("authorName").initialValue).toBe("Def Nome");
+    expect(prompts.opts("siteName").initialValue).toBe("Def Site");
+    expect(prompts.opts("siteUrl").initialValue).toBe("https://def.com");
+    expect(prompts.opts("siteDescription").initialValue).toBe("Def desc");
+    expect(prompts.opts("authorEmail").initialValue).toBe("def@def.com");
+    expect(prompts.opts("twitterHandle").initialValue).toBe("defhandle");
+  });
+
+  it("sem defaults, as perguntas começam vazias", async () => {
+    const prompts = answer();
+    await identityPrompt();
+    for (const f of ["authorName", "siteUrl", "siteDescription", "authorEmail", "twitterHandle"] as Field[]) {
+      expect(prompts.opts(f).initialValue).toBe("");
+    }
+  });
+
+  it("pergunta o idioma (pt-BR ou en-US), começando pelo default", async () => {
+    answer({}, "en-US");
+    const result = await identityPrompt({ lang: "en-US" });
     expect(result.lang).toBe("en-US");
-  });
-
-  it("oferece opções pt-BR e en-US para lang", async () => {
-    setupAllMocks();
-    const { identityPrompt } = await import("../prompts/identityPrompt.js");
-    await identityPrompt();
     expect(select).toHaveBeenCalledWith(
       expect.objectContaining({
-        options: expect.arrayContaining([
-          expect.objectContaining({ value: "pt-BR" }),
-          expect.objectContaining({ value: "en-US" }),
-        ]),
+        initialValue: "en-US",
+        options: [expect.objectContaining({ value: "pt-BR" }), expect.objectContaining({ value: "en-US" })],
       })
     );
   });
 
-  // Ciclo 7 — Suporte a defaults
-  it("usa defaults como initialValue nos prompts de texto", async () => {
-    setupAllMocks();
-    const { identityPrompt } = await import("../prompts/identityPrompt.js");
-    await identityPrompt({ siteName: "Site Default" });
-    expect(text).toHaveBeenCalledWith(
-      expect.objectContaining({ initialValue: "Site Default" })
-    );
+  it("sem default de idioma, o select começa em pt-BR", async () => {
+    answer();
+    await identityPrompt();
+    expect(select).toHaveBeenCalledWith(expect.objectContaining({ initialValue: "pt-BR" }));
   });
 
-  it("usa default de lang no select", async () => {
-    setupAllMocks();
-    const { identityPrompt } = await import("../prompts/identityPrompt.js");
-    await identityPrompt({ lang: "en-US" });
-    expect(select).toHaveBeenCalledWith(
-      expect.objectContaining({ initialValue: "en-US" })
-    );
+  it("com askLang: false não pergunta o idioma e usa o default (ou pt-BR)", async () => {
+    answer();
+    expect((await identityPrompt(undefined, { askLang: false })).lang).toBe("pt-BR");
+    expect((await identityPrompt({ lang: "en-US" }, { askLang: false })).lang).toBe("en-US");
+    expect(select).not.toHaveBeenCalled();
   });
 
-  // Ciclo 8 — Cancelamento
-  it("chama cancel e lança erro quando usuário cancela no primeiro campo", async () => {
-    vi.mocked(text).mockResolvedValueOnce(Symbol("cancel") as any);
+  it("cancelar em qualquer pergunta chama cancel e lança erro", async () => {
+    answer();
     vi.mocked(isCancel).mockReturnValueOnce(true);
-
-    const { identityPrompt } = await import("../prompts/identityPrompt.js");
     await expect(identityPrompt()).rejects.toThrow("cancelado");
     expect(cancel).toHaveBeenCalled();
+  });
+
+  it("cancelar no idioma também interrompe", async () => {
+    answer();
+    vi.mocked(isCancel).mockImplementation((v) => v === "CANCEL");
+    vi.mocked(select).mockResolvedValue("CANCEL");
+    await expect(identityPrompt()).rejects.toThrow("cancelado");
   });
 });

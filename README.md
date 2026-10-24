@@ -239,6 +239,8 @@ npx convex env remove BOOTSTRAP_ALLOWED
 
 > ⚠️ Se esquecer essa etapa, qualquer pessoa que descobrir o link consegue criar usuário root no seu sistema.
 
+> **Esqueceu a senha do painel ou ficou bloqueado?** Na pasta do projeto, rode `npx create-rubrica senha`. Ele troca a senha no site publicado ou no do seu computador e libera o login.
+
 ### 7 · Preencher o conteúdo no admin
 
 Logado em `/admin`, tudo é gerenciado por interface. Você não toca no código para mudar texto, imagem ou dado.

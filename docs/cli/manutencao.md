@@ -37,6 +37,13 @@ O site (`site/`) monta o comando `npx create-rubrica@latest <pasta> --receita <c
 - **Validação**: `sanitizeRecipe` confere cada campo contra `LAYOUTS`, `SCHEMES`, as fontes e `PLUGINS`. O que não existe vira aviso e o `create` pergunta. Layout, esquema, fonte ou plugin novo entra na receita sem mudar nada aqui: basta estar no registro.
 - **Campo novo na identidade**: acrescente a chave em `IDENTITY_KEYS`, a limpeza em `sanitizeRecipe` e o campo no formulário do site (`site/src/components/CreateYours.astro` e `site/src/lib/recipeForm.ts`).
 - **Opção legível nova** (`--algo`): `cli/src/args.ts`, e a tabela de opções do `cli/README.md`.
+- **Do site, o terminal só pede a senha.** O `create` chama o `setup` com `site` (profissão e especialidades da receita) e `newProject` (o nome da pasta). Com `site`, o `setup` não pergunta integrações, e-mail (se veio válido) nem profissão. Com `newProject` e sem `.env.local`, ele roda `convex dev --once --configure new --project <pasta> --dev-deployment cloud` e grava `convex.json` com `aiFiles.enabled: false`, o que tira as perguntas do Convex. Pergunta nova no `setup` precisa decidir o que acontece nesse modo; o padrão é não perguntar.
+
+## Senha do painel
+
+A regra de senha existe em dois lugares que precisam andar juntos: `assertStrongPassword` em `convex/users.ts` (painel e `users:resetPasswordInternal`) e `validatePassword` em `cli/src/utils/password.ts` (`setup` e `senha`). Mudou um, mude o outro, ou o CLI vai aceitar uma senha que o painel recusa.
+
+O `npx create-rubrica senha` chama a função **interna** `users:resetPasswordInternal`: só roda via `npx convex run` com acesso ao projeto. Ela também apaga o bloqueio de login (`authRateLimits`, identificado pelo `_id` da conta em `authAccounts`) e registra `auth.password_reset` no histórico.
 
 ## Novo layout
 

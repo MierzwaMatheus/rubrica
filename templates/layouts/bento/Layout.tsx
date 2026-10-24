@@ -26,7 +26,8 @@ export function Layout({ children, className }: LayoutProps) {
   return (
     <div className="rb-mobile min-h-screen bg-[var(--bg)] text-[var(--text)]" style={{ fontFamily: "var(--font-sans)", "--bento-on-accent": ON_ACCENT } as React.CSSProperties}>
       <MobileLayoutStyles />
-      <main className={cn("pb-28", shared && "max-w-6xl mx-auto px-4 md:px-8 pt-10", className)}>
+      {/* Em telas muito largas o grid para de esticar e fica centralizado. */}
+      <main className={cn("pb-28", shared ? "max-w-6xl mx-auto px-4 md:px-8 pt-10" : "max-w-[1600px] mx-auto", className)}>
         {children}
       </main>
       <FloatingDock />

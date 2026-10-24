@@ -276,6 +276,13 @@ describe("setup — reaproveita o que o create já perguntou", () => {
     expect(messages().join("\n")).not.toMatch(/padrão tech/);
   });
 
+  it("termina dizendo como colocar o site no ar", async () => {
+    const deps = makeDeps();
+    vi.mocked(text).mockResolvedValueOnce("ana@ana.dev");
+    await runSetup(deps);
+    expect(vi.mocked(outro).mock.calls[0][0]).toContain("npx create-rubrica publicar");
+  });
+
   it("termina mostrando o próximo passo que o create passou", async () => {
     const deps = makeDeps();
     vi.mocked(text).mockResolvedValueOnce("ana@ana.dev");

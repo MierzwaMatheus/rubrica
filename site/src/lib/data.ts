@@ -71,7 +71,7 @@ export const STEPS = [
     text: "Monte no combinador e copie o comando pronto em \"Crie o seu\", ou rode este e responda às perguntas. Ele instala tudo, conecta o banco de dados e cria o painel admin.",
   },
   { title: "Abra o site", code: "npm run dev", text: "Na pasta do projeto. O painel fica em /login, com o e-mail e a senha que você definiu." },
-  { title: "Publique", code: "npx create-rubrica update", text: "Edite tudo pelo painel e publique na Vercel com domínio próprio. O update traz as versões novas sem apagar o que você personalizou." },
+  { title: "Publique", code: "npx create-rubrica publicar", text: "Coloca o site no ar na Vercel (conta gratuita), com o banco de produção e o admin do site publicado. Depois, o update traz as versões novas sem apagar o que você personalizou." },
 ];
 
 export function layoutLabel(id: string): string {

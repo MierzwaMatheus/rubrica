@@ -2,6 +2,22 @@
 
 O que mudou em cada versão do Rubrica (template e CLI `create-rubrica`). Detalhes de cada uma nas [notas da release](https://github.com/MierzwaMatheus/rubrica/releases). Para atualizar um projeto existente, veja [Atualizando o seu Rubrica](./docs/atualizacao.md).
 
+## Próxima versão
+
+**`npx create-rubrica publicar`** coloca o site no ar na Vercel sem copiar nada à mão, e o template passa a funcionar quando publicado a partir de um projeto do CLI.
+
+**Vindo da 1.3:**
+- Atualize com `npx create-rubrica@latest update`. Ele traz a pasta `domain/` (sem ela o `npm run build` falha), o `public/color-mode.js` e o `build:i18n` corrigido.
+
+### Publicar
+- `npx create-rubrica publicar`: entra na Vercel (login pelo navegador), cria o projeto, prepara o banco de produção do Convex (chave, backend, chaves de login, integrações do Telegram e do OpenRouter, profissão), cria o admin do site publicado e os dados iniciais, grava as variáveis na Vercel e publica. Rodar de novo só publica.
+- O `setup` termina dizendo como colocar o site no ar.
+
+### Correções para o site publicado
+- Projetos criados pelo CLI falhavam no `npm run build`: a pasta `domain/`, usada pelo gerador de RSS, ficava fora do pacote da release.
+- O build da Vercel apagava as traduções do site quando o plugin de tradução estava desligado (o menu aparecia como `navigation.home`). Agora os textos do banco são mesclados sobre as traduções do repositório.
+- O script do modo claro/escuro era bloqueado pela política de segurança (CSP) do site publicado. Ele passou para `public/color-mode.js`.
+
 ## 1.3.0 — 2026-10-24
 
 Skills para o agente de IA escrever o conteúdo do site com método e com a voz do dono, e a entrevista de voz no site. Nada muda no site nem no painel de quem está na 1.2.

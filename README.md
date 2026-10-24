@@ -297,6 +297,8 @@ Teste com `pnpm dev` enquanto altera. Não suba sem dar a sua cara.
 
 ### 9 · Deploy no Vercel
 
+> **Projeto criado pelo CLI?** Rode `npx create-rubrica publicar` na pasta do projeto: ele cria o projeto na Vercel, prepara o banco de produção, cria o admin do site publicado e publica, sem copiar variável nenhuma. Os passos abaixo são o caminho manual (e o do fork).
+
 1. Em [vercel.com/new](https://vercel.com/new), importe o repositório forkado
 2. **Framework preset:** Vite
 3. **Build command:** já vem no `vercel.json` (`npm run build:i18n && npm run build`: exporta os textos do site, publica o Convex, gera dados estáticos, RSS e sitemap, e faz o build do Vite) — não mude

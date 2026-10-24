@@ -2,7 +2,13 @@
 
 O que mudou em cada versão do Rubrica (template e CLI `create-rubrica`). Detalhes de cada uma nas [notas da release](https://github.com/MierzwaMatheus/rubrica/releases). Para atualizar um projeto existente, veja [Atualizando o seu Rubrica](./docs/atualizacao.md).
 
-## Próxima versão
+## 1.3.0 — 2026-10-24
+
+Skills para o agente de IA escrever o conteúdo do site com método e com a voz do dono, e a entrevista de voz no site. Nada muda no site nem no painel de quem está na 1.2.
+
+**Vindo da 1.2:**
+- Atualize com `npx create-rubrica@latest update`. Ele traz as pastas `.agents/skills/rubrica-*` (e os atalhos em `.claude/skills/`) e a linha `.rubrica/` no `.gitignore`. Nada precisa ser publicado no Convex.
+- Na primeira vez que pedir ao agente um texto do site (apresentação, case, currículo, post), ele vai te mandar para a entrevista de voz em https://userubrica.vercel.app/voz. Leva uns 20 minutos.
 
 ### Skills de conteúdo
 - **Seis skills novas** para o agente de IA escrever o conteúdo do site com método e com a voz do dono: `rubrica-voz`, `rubrica-apresentacao`, `rubrica-case`, `rubrica-curriculo`, `rubrica-blog` e `rubrica-pilar`. As técnicas de apresentação, case e currículo vêm de pesquisa com fontes (que acompanham cada skill em `references/pesquisa.md`).

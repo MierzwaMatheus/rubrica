@@ -8,7 +8,7 @@ import { PLUGIN_PRESETS } from "../../../cli/src/plugins";
 import { normalizeUrl, validateUrl, normalizeEmail, validateEmail } from "../../../cli/src/utils/normalize";
 import { onChoice, type CombinatorChoice } from "./combinatorStore";
 
-const FIELDS = ["authorName", "siteName", "siteUrl", "siteDescription", "authorEmail", "twitterHandle"] as const;
+const FIELDS = ["authorName", "siteName", "siteUrl", "siteDescription", "authorEmail", "twitterHandle", "profession", "specialties"] as const;
 type Field = (typeof FIELDS)[number];
 
 export function initRecipeForm(): void {
@@ -46,7 +46,7 @@ export function initRecipeForm(): void {
     recipe.plugins = [...(PLUGIN_PRESETS.find((p) => p.id === preset)?.plugins ?? [])];
 
     const identity: NonNullable<Recipe["identity"]> = {};
-    for (const f of ["authorName", "siteName", "siteDescription", "twitterHandle"] as const) {
+    for (const f of ["authorName", "siteName", "siteDescription", "twitterHandle", "profession", "specialties"] as const) {
       if (value(f)) identity[f] = value(f);
     }
     const url = value("siteUrl");
@@ -74,7 +74,7 @@ export function initRecipeForm(): void {
     if (!recipe.identity?.authorEmail) left.push("o e-mail");
     missing!.textContent = left.length
       ? `O terminal vai perguntar ${left.join(", ").replace(/, ([^,]*)$/, " e $1")}. O resto já vai no comando.`
-      : "Está tudo no comando: o terminal só vai pedir a senha do painel.";
+      : "Está tudo no comando: no terminal, você só faz o login no banco de dados (pelo navegador) e escolhe a senha do painel.";
 
     form!.querySelectorAll<HTMLButtonElement>("[data-preset]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.preset === preset)));
   }

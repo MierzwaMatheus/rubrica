@@ -9,8 +9,8 @@ import { PLUGIN_PRESETS } from "../../../cli/src/plugins";
       <h2 class="display">Gostou? Leve para o seu computador.</h2>
       <p>
         O visual que você montou no combinador já vai junto. Preencha os seus dados e cole o comando num terminal: ele
-        baixa o Rubrica, instala tudo, conecta o banco de dados (login pelo navegador, conta gratuita) e cria o seu
-        painel. Só a senha do painel é pedida lá.
+        baixa o Rubrica, instala tudo, cria o banco de dados (com login pelo navegador, conta gratuita) e monta o seu
+        painel. No terminal, você só escolhe a senha do painel.
       </p>
     </div>
 
@@ -57,6 +57,16 @@ import { PLUGIN_PRESETS } from "../../../cli/src/plugins";
         <label>
           <span class="lbl">Perfil no X <i>opcional</i></span>
           <input name="twitterHandle" placeholder="@seuperfil" />
+        </label>
+        <label>
+          <span class="lbl">Profissão <i>opcional</i></span>
+          <input name="profession" placeholder="Fotógrafa, Designer UX, Advogada…" />
+          <small class="note">Aparece abaixo do seu nome no site.</small>
+        </label>
+        <label>
+          <span class="lbl">Especialidades <i>opcional</i></span>
+          <input name="specialties" placeholder="Retrato, Casamentos, Ensaios" />
+          <small class="note">Separadas por vírgula. A IA usa ao escrever as suas propostas.</small>
         </label>
       </div>
 

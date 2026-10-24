@@ -178,7 +178,7 @@ const navGroups: NavGroup[] = [
       {
         icon: CreditCard,
         label: "Pagamentos",
-        description: "Cobranças via Stripe ou Asaas (PIX/boleto)",
+        description: "Cobranças via Asaas (PIX, boleto e cartão)",
         path: "/admin/payment-links",
         roles: ["root", "admin"],
         pluginId: "payments",
@@ -393,10 +393,10 @@ export function AdminLayout({ children, title = "Admin" }: { children: React.Rea
 
   const siteTextsData = useQuery(api.siteTexts.getAll) as { key: string; ptBR: string; enUS?: string }[] | undefined;
   const contactInfoData = useQuery(api.contactInfo.get) as { proposalIntro?: string; proposalAiContext?: string } | undefined | null;
-  const posts = useQuery(api.posts.listAdmin) as { _id: string; title: string }[] | undefined;
-  const projects = useQuery(api.projects.list) as { _id: string; title: string }[] | undefined;
+  const posts = useQuery(api.posts.listAdmin, {}) as { _id: string; title: string }[] | undefined;
+  const projects = useQuery(api.projects.list, {}) as { _id: string; title: string }[] | undefined;
   const proposals = useQuery(api.proposals.listAdmin, { filter: "all" }) as { _id: string; title: string }[] | undefined;
-  const services = useQuery(api.services.list) as { _id: string; title: string }[] | undefined;
+  const services = useQuery(api.services.list, {}) as { _id: string; title: string }[] | undefined;
 
   const createActions = [
     { label: "Nova Proposta", description: "Criar nova proposta comercial", path: "/admin/proposals?create=true" },

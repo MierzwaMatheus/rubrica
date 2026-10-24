@@ -6,6 +6,21 @@ import { isPluginEnabled } from './plugins';
 
 const TWO_YEARS_MS = 2 * 365 * 24 * 60 * 60 * 1000;
 
+/** Para actions, que não têm acesso direto ao banco. */
+export const logFromAction = internalMutation({
+  args: {
+    eventType: v.string(),
+    actorId: v.optional(v.string()),
+    targetType: v.optional(v.string()),
+    targetId: v.optional(v.string()),
+    metadata: v.optional(v.any()),
+    success: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    await logAudit(ctx, { ...args, actorType: 'user' });
+  },
+});
+
 export async function logAudit(
   ctx: MutationCtx,
   event: {

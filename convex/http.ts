@@ -4,46 +4,10 @@ import { internal } from './_generated/api';
 import { auth } from './auth';
 import { aiProxy } from './playgroundAi';
 import { allowedOrigins } from './lib/siteUrl';
+import { timingSafeEqual } from './lib/security';
+import { handleAsaasWebhook } from './lib/asaasWebhook';
 
 const http = httpRouter();
-
-// Constant-time string comparison to prevent timing attacks
-function timingSafeEqual(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
-  const aBytes = new TextEncoder().encode(a);
-  const bBytes = new TextEncoder().encode(b);
-  let result = 0;
-  for (let i = 0; i < aBytes.length; i++) result |= aBytes[i] ^ bBytes[i];
-  return result === 0;
-}
-
-// Verify Stripe webhook signature (HMAC-SHA256)
-async function verifyStripeSignature(payload: string, header: string, secret: string): Promise<boolean> {
-  try {
-    const parts = Object.fromEntries(header.split(',').map((p) => p.split('=')));
-    const timestamp = parts['t'];
-    const v1 = parts['v1'];
-    if (!timestamp || !v1) return false;
-
-    // Reject replays older than 5 minutes; guard against NaN timestamp
-    const ts = Number(timestamp);
-    if (!Number.isFinite(ts) || Math.abs(Date.now() / 1000 - ts) > 300) return false;
-
-    const signedPayload = `${timestamp}.${payload}`;
-    const key = await crypto.subtle.importKey(
-      'raw',
-      new TextEncoder().encode(secret),
-      { name: 'HMAC', hash: 'SHA-256' },
-      false,
-      ['sign'],
-    );
-    const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(signedPayload));
-    const computed = Array.from(new Uint8Array(sig)).map((b) => b.toString(16).padStart(2, '0')).join('');
-    return timingSafeEqual(computed, v1);
-  } catch {
-    return false;
-  }
-}
 
 function corsHeaders(origin: string): Record<string, string> {
   return {
@@ -168,85 +132,31 @@ http.route({
 });
 
 http.route({
-  path: '/webhooks/stripe',
-  method: 'POST',
-  handler: httpAction(async (ctx, req) => {
-    const signature = req.headers.get('stripe-signature');
-    if (!signature) {
-      return new Response('Missing stripe-signature header', { status: 400 });
-    }
-
-    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-    if (!webhookSecret) {
-      return new Response('STRIPE_WEBHOOK_SECRET not configured', { status: 500 });
-    }
-
-    const body = await req.text();
-
-    // Verify Stripe webhook signature using HMAC-SHA256
-    const isValid = await verifyStripeSignature(body, signature, webhookSecret);
-    if (!isValid) {
-      return new Response('Invalid signature', { status: 401 });
-    }
-
-    let event: { type: string; data: { object: Record<string, unknown> } };
-    try {
-      event = JSON.parse(body);
-    } catch {
-      return new Response('Invalid JSON', { status: 400 });
-    }
-
-    if (event.type === 'checkout.session.completed' || event.type === 'payment_intent.succeeded') {
-      const session = event.data.object;
-      const externalRef = session['metadata'] as Record<string, string> | undefined;
-      const checkoutUniqueLink = externalRef?.['uniqueLink'];
-
-      if (checkoutUniqueLink) {
-        await ctx.runMutation(internal.checkouts.markPaidByLink, {
-          uniqueLink: checkoutUniqueLink,
-          gatewayData: JSON.stringify(session),
-        });
-      }
-    }
-
-    return new Response('ok', { status: 200 });
-  }),
-});
-
-http.route({
   path: '/webhooks/asaas',
   method: 'POST',
   handler: httpAction(async (ctx, req) => {
-    const asaasToken = process.env.ASAAS_WEBHOOK_TOKEN;
-    if (!asaasToken) return new Response('ASAAS_WEBHOOK_TOKEN not configured', { status: 500 });
-    const receivedToken = req.headers.get('asaas-access-token') ?? '';
-    if (!timingSafeEqual(receivedToken, asaasToken)) {
-      return new Response('Unauthorized', { status: 401 });
-    }
-
-    const body = await req.text();
-
-    let event: { event: string; payment?: Record<string, unknown> };
-    try {
-      event = JSON.parse(body);
-    } catch {
-      return new Response('Invalid JSON', { status: 400 });
-    }
-
-    if (event.event === 'PAYMENT_CONFIRMED' || event.event === 'PAYMENT_RECEIVED') {
-      const payment = event.payment;
-      const externalRef = payment?.['externalReference'] as string | undefined;
-
-      if (externalRef) {
+    const result = await handleAsaasWebhook({
+      expectedToken: process.env.ASAAS_WEBHOOK_TOKEN,
+      receivedToken: req.headers.get('asaas-access-token'),
+      body: await req.text(),
+      markPaid: async (payment) => {
         await ctx.runMutation(internal.checkouts.markPaidByLink, {
-          uniqueLink: externalRef,
-          asaasChargeId: payment?.['id'] as string | undefined,
-          gatewayData: JSON.stringify(payment),
+          uniqueLink: payment.uniqueLink,
+          paymentId: payment.paymentId,
+          installmentId: payment.installmentId,
+          value: payment.value,
         });
-      }
-    }
-
-    return new Response('ok', { status: 200 });
+      },
+      markRefunded: async (payment) => {
+        await ctx.runMutation(internal.checkouts.markRefundedByLink, {
+          uniqueLink: payment.uniqueLink,
+          paymentId: payment.paymentId,
+          installmentId: payment.installmentId,
+          event: payment.event,
+        });
+      },
+    });
+    return new Response(result.body, { status: result.status });
   }),
 });
 

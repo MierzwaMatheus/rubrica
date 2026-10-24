@@ -457,6 +457,7 @@ export default defineSchema({
       v.literal('paid'),
       v.literal('expired'),
       v.literal('failed'),
+      v.literal('refunded'),
     ),
     paymentMethod: v.optional(v.string()),
     installmentCount: v.optional(v.number()),
@@ -468,7 +469,21 @@ export default defineSchema({
     pixQrCodeImage: v.optional(v.string()),
     pixExpirationDate: v.optional(v.number()),
     bankSlipUrl: v.optional(v.string()),
+    /** Linha digitável do boleto. */
+    bankSlipLine: v.optional(v.string()),
+    /** Página de pagamento do Asaas (cartão). */
+    invoiceUrl: v.optional(v.string()),
     asaasChargeId: v.optional(v.string()),
+    /** Parcelamento no Asaas (cartão em 2x ou mais): cancelar remove todas as parcelas. */
+    asaasInstallmentId: v.optional(v.string()),
+    /** Trava contra duas gerações de cobrança ao mesmo tempo. */
+    paymentLockUntil: v.optional(v.number()),
+    /** Cobranças geradas por este link (limite contra abuso). */
+    chargeAttempts: v.optional(v.number()),
+    /** Cobrança e valor confirmados pelo webhook. */
+    paidChargeId: v.optional(v.string()),
+    paidValue: v.optional(v.number()),
+    refundedAt: v.optional(v.number()),
     externalReference: v.optional(v.string()),
     expiresAt: v.number(),
     completedAt: v.optional(v.number()),
@@ -480,6 +495,7 @@ export default defineSchema({
     .index('by_uniqueLink', ['uniqueLink'])
     .index('by_asaasChargeId', ['asaasChargeId'])
     .index('by_status', ['status'])
+    .index('by_status_and_expiresAt', ['status', 'expiresAt'])
     .index('by_customerEmail', ['customerEmail'])
     .index('by_expiresAt', ['expiresAt'])
     .index('by_deletedAt', ['deletedAt']),

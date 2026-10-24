@@ -238,7 +238,7 @@ export default function PaymentLinkDemo() {
                 )}
                 {previewCheckout.billingType === "CREDIT_CARD" && (
                   <div className="text-center">
-                    <Button onClick={() => toast.success("Pagamento simulado aprovado! No sistema real, seria processado via Asaas/Stripe.")}>Pagar com Cartão (simulado)</Button>
+                    <Button onClick={() => toast.success("Pagamento simulado aprovado! No sistema real, o cartão seria digitado na página segura do Asaas.")}>Pagar com Cartão (simulado)</Button>
                   </div>
                 )}
               </div>

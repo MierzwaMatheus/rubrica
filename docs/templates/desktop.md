@@ -65,8 +65,8 @@ Os botões imitam os do sistema antigo: borda grossa, cantos levemente arredonda
 
 ![Sobre](img/desktop/sobre.jpg)
 
-- **Sobre.txt** (em foco): o título e o resumo profissional em mono, com os números em destaque.
-- **Preferências do Sistema — Como eu trabalho**: os princípios de trabalho como painéis numerados (01, 02…).
+- **Preferências do Sistema — Como eu trabalho** (em foco): abre a página com o título e os princípios de trabalho como painéis numerados (01, 02…).
+- **Sobre.txt**: o resumo profissional em mono, com os números em destaque. Sem princípios cadastrados, é ele que abre a página, em foco e com o título.
 - **Pessoal.txt** (o texto "Fora do trabalho") e **Interesses** (os serviços da home em etiquetas), lado a lado.
 - **Fotos — Meu dia a dia**: as fotos com a legenda e as tags **sempre visíveis** abaixo de cada imagem (nada de texto por cima da foto).
 - **Ajuda — Perguntas frequentes**: o FAQ em itens recolhíveis (`<details>`), com o "?" que acende ao abrir.
@@ -86,5 +86,4 @@ Os botões imitam os do sistema antigo: borda grossa, cantos levemente arredonda
 - Projetos sem case e sem link de demo ou repositório ficam sem ação (o mesmo dos outros layouts).
 - A caixa de entrada da home mostra até 6 depoimentos; o resto fica em "Ver todos os depoimentos".
 - O tamanho das fotos do "dia a dia" (`span_size`) é ignorado: todas entram no mesmo grid.
-- A ordem do Sobre segue o conceito do layout (Sobre.txt primeiro e "Como eu trabalho" logo depois), não a dos layouts originais, que abrem pelos princípios.
 - O relógio usa a hora de quem visita e atualiza a cada 15 segundos.

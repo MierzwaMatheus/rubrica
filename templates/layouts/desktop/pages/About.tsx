@@ -25,35 +25,20 @@ export default function DesktopAbout() {
   const professional = splitParagraphs(aboutText);
   const personal = splitParagraphs(t("about.aboutMe.text"));
   const interests = services.map((s) => s.title).filter(Boolean);
+  const hasPrinciples = principles.length > 0;
 
   return (
     <>
       <SEO title={t("about.title")} description={t("about.seoDescription")} url="/sobre" />
       <WindowStack>
-        {/* Sobre.txt: resumo profissional */}
-        <Window title={copy.aboutFile} titleAs="div" active width={700}>
-          <div className="dk-pad dk-hero">
-            {contactName && <p className="dk-role">&gt; whoami → {contactName}</p>}
-            <h1>{t("about.title")}</h1>
-            {professional.length > 0 ? (
-              <div className="dk-txt">
-                <h2 className="dk-sr">{t("about.professional.title")}</h2>
-                {professional.map((p, i) => (
-                  <p key={i}>
-                    <Highlighted text={p} />
-                  </p>
-                ))}
-              </div>
-            ) : (
-              <p className="dk-desc">{t("about.subtitle")}</p>
-            )}
-          </div>
-        </Window>
-
-        {/* Como eu trabalho: painéis de Preferências do Sistema */}
-        {principles.length > 0 && (
-          <Window title={copy.preferences} titleAs="div" width={880} offset={120}>
-            <h2 className="dk-sr">{t("about.principles.title")}</h2>
+        {/* Como eu trabalho abre a página: painéis de Preferências do Sistema */}
+        {hasPrinciples && (
+          <Window title={copy.preferences} titleAs="div" active width={880}>
+            <div className="dk-pad dk-hero">
+              {contactName && <p className="dk-role">&gt; whoami → {contactName}</p>}
+              <h1>{t("about.title")}</h1>
+              <h2 className="dk-sr">{t("about.principles.title")}</h2>
+            </div>
             <ul className="dk-panels">
               {principles.map((principle, i) => (
                 <li key={`${principle.title}-${i}`} className="dk-panel">
@@ -69,6 +54,26 @@ export default function DesktopAbout() {
             </ul>
           </Window>
         )}
+
+        {/* Sobre.txt: resumo profissional (abre a página quando não há princípios) */}
+        <Window title={copy.aboutFile} titleAs="div" active={!hasPrinciples} width={700} offset={hasPrinciples ? 120 : undefined}>
+          <div className="dk-pad dk-hero">
+            {!hasPrinciples && contactName && <p className="dk-role">&gt; whoami → {contactName}</p>}
+            {!hasPrinciples && <h1>{t("about.title")}</h1>}
+            {professional.length > 0 ? (
+              <div className="dk-txt">
+                <h2 className={hasPrinciples ? undefined : "dk-sr"}>{t("about.professional.title")}</h2>
+                {professional.map((p, i) => (
+                  <p key={i}>
+                    <Highlighted text={p} />
+                  </p>
+                ))}
+              </div>
+            ) : (
+              <p className="dk-desc">{t("about.subtitle")}</p>
+            )}
+          </div>
+        </Window>
 
         {/* Fora do trabalho + interesses, lado a lado */}
         <WindowCluster>

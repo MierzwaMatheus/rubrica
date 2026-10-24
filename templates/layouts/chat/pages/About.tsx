@@ -25,20 +25,7 @@ export default function ChatAbout() {
       <h1 className="ct-sr">{t("about.title")}</h1>
       <DayChip />
 
-      {/* Quem é: o resumo profissional, um balão por parágrafo */}
-      {professional.length > 0 && (
-        <ChatSection title={t("about.professional.title")} ask={text.qWho}>
-          {professional.map((para, i) => (
-            <Bubble key={i}>
-              <p>
-                <Highlighted text={para} />
-              </p>
-            </Bubble>
-          ))}
-        </ChatSection>
-      )}
-
-      {/* Como eu trabalho: os princípios, numa resposta só */}
+      {/* Como eu trabalho abre a conversa: os princípios, numa resposta só */}
       {principles.length > 0 && (
         <ChatSection title={t("about.principles.title")} ask={text.qPrinciples}>
           <Bubble wide>
@@ -53,6 +40,19 @@ export default function ChatAbout() {
               ))}
             </ol>
           </Bubble>
+        </ChatSection>
+      )}
+
+      {/* Quem é: o resumo profissional, um balão por parágrafo */}
+      {professional.length > 0 && (
+        <ChatSection title={t("about.professional.title")} ask={text.qWho}>
+          {professional.map((para, i) => (
+            <Bubble key={i}>
+              <p>
+                <Highlighted text={para} />
+              </p>
+            </Bubble>
+          ))}
         </ChatSection>
       )}
 

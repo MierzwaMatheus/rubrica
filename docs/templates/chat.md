@@ -62,8 +62,8 @@ Todo o conteúdo aparece no carregamento: nada fica escondido atrás de animaç�
 
 ![Sobre](img/chat/sobre.jpg)
 
+- **"Como você trabalha?"** → abre a conversa com os princípios de trabalho numerados.
 - **"Quem é você?"** → o resumo profissional, um balão por parágrafo, com números em destaque.
-- **"Como você trabalha?"** → os princípios de trabalho numerados.
 - **"E fora do trabalho?"** → o texto pessoal, depois da parte profissional.
 - **"Como é o seu dia a dia?"** → as fotos do dia a dia numa galeria dentro do balão, com legenda.
 - **"No que você mais gosta de trabalhar?"** → os interesses (os serviços da Home) em chips.

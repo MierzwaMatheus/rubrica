@@ -14,6 +14,7 @@ import { applyPlugins as defaultApplyPlugins } from "../transforms/applyPlugins.
 import { getLatestVersion as defaultGetLatestVersion, downloadRelease as defaultDownloadRelease } from "../utils/download.js";
 import { indexHtmlInput, rubricaConfigInput } from "../transforms/identityInputs.js";
 import { applyAppearance as defaultApplyAppearance } from "../transforms/applyAppearance.js";
+import { SCHEME_START } from "../themes/schemes.js";
 import { layoutPrompt, schemePrompt, appearancePrompt, fontPrompts } from "../prompts/appearancePrompt.js";
 import { ALL_PLUGINS } from "./create.js";
 import { tmpdir } from "node:os";
@@ -136,6 +137,13 @@ export async function runConfig(deps: RunConfigDeps = {}): Promise<void> {
       fs as Parameters<typeof defaultApplyTheme>[2]
     );
     await applyAppearanceFn(appearance, htmlPath, fs as Parameters<typeof defaultApplyAppearance>[2]);
+    const css = await fs.readFile(cssPath, "utf-8").catch(() => "");
+    if (css && !css.includes(SCHEME_START)) {
+      log.warn(
+        "Este projeto é de uma versão sem modo claro/escuro: só as 4 cores principais do esquema foram aplicadas. " +
+          "Para ter os dois modos, a alternância e as texturas, atualize com `npx create-rubrica@latest update` e rode o config de novo."
+      );
+    }
     await applyFontFn(
       { fontSans, fontMono },
       { css: cssPath, html: htmlPath },
@@ -176,6 +184,15 @@ export async function runConfig(deps: RunConfigDeps = {}): Promise<void> {
         templatesDir = path.join(tmpDir, "templates");
       }
       try {
+        // Layouts novos não existem nas versões antigas do projeto (os templates vêm da release dele).
+        const layoutsDir = path.join(templatesDir, "layouts");
+        if ((await existsIn(fs, layoutsDir)) && !(await existsIn(fs, path.join(layoutsDir, newLayout)))) {
+          log.warn(
+            `O layout "${newLayout}" não existe na versão ${currentState.version} deste projeto. ` +
+              "Atualize o projeto com `npx create-rubrica@latest update` e rode o config de novo."
+          );
+          return;
+        }
         await applyLayoutFn(
           newLayout,
           { projectDir, templatesDir },

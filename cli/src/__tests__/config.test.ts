@@ -31,7 +31,7 @@ vi.mock("@clack/prompts", () => ({
   log: { warn: vi.fn(), info: vi.fn() },
 }));
 
-import { multiselect, select, text, confirm } from "@clack/prompts";
+import { multiselect, select, text, confirm, log } from "@clack/prompts";
 
 /**
  * Enfileira as respostas da seção Aparência, na ordem em que o config pergunta:
@@ -814,5 +814,62 @@ describe("runConfig — layout em projeto criado pelo CLI (sem templates/)", () 
 
     expect(downloadMock).not.toHaveBeenCalled();
     expect(applyLayoutMock).toHaveBeenCalledWith("bento", { projectDir: "/project", templatesDir: "/project/templates" }, expect.anything());
+  });
+});
+
+describe("runConfig — projeto de versão antiga", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("layout que não existe na versão do projeto: avisa para atualizar e não mexe em nada", async () => {
+    const state = { version: "1.0.0", layout: "cyberpunk", theme: "editorial-cream", fontSans: "Inter", fontMono: "JetBrains Mono", plugins: {} };
+    const vol = Volume.fromJSON({ "/project/rubrica.json": JSON.stringify(state), "/project/templates/layouts/bento/Layout.tsx": "x" });
+    vi.mocked(multiselect).mockResolvedValueOnce(["layout"]);
+    vi.mocked(select).mockResolvedValueOnce("zine");
+    vi.mocked(confirm).mockResolvedValueOnce(true);
+    const applyLayoutMock = vi.fn().mockResolvedValue(undefined);
+    const writeStateMock = vi.fn().mockResolvedValue(undefined);
+
+    await runConfig({
+      cwd: "/project",
+      detectProject: vi.fn().mockResolvedValue("/project/rubrica.json"),
+      readState: vi.fn().mockResolvedValue(state),
+      writeState: writeStateMock,
+      applyLayout: applyLayoutMock,
+      fs: makeFsModule(vol),
+    });
+
+    expect(applyLayoutMock).not.toHaveBeenCalled();
+    expect(writeStateMock).not.toHaveBeenCalled();
+    expect(vi.mocked(log.warn)).toHaveBeenCalledWith(expect.stringContaining("create-rubrica@latest update"));
+  });
+
+  it("aparência num index.css sem esquema completo: aplica as 4 cores e avisa para atualizar", async () => {
+    const state = { version: "1.0.0", layout: "bento", theme: "editorial-cream", fontSans: "Manrope", fontMono: "JetBrains Mono", plugins: {} };
+    const vol = Volume.fromJSON({
+      "/project/rubrica.json": JSON.stringify(state),
+      "/project/src/index.css": ":root {\n  --bg: #faf7f2;\n}\n",
+      "/project/index.html": "<html></html>",
+    });
+    vi.mocked(multiselect).mockResolvedValueOnce(["appearance"]);
+    vi.mocked(select)
+      .mockResolvedValueOnce("riso")
+      .mockResolvedValueOnce("light")
+      .mockResolvedValueOnce("paper")
+      .mockResolvedValueOnce("Manrope")
+      .mockResolvedValueOnce("JetBrains Mono");
+    vi.mocked(confirm).mockResolvedValueOnce(true);
+
+    await runConfig({
+      cwd: "/project",
+      detectProject: vi.fn().mockResolvedValue("/project/rubrica.json"),
+      readState: vi.fn().mockResolvedValue(state),
+      writeState: vi.fn().mockResolvedValue(undefined),
+      applyTheme: vi.fn().mockResolvedValue(undefined),
+      applyAppearance: vi.fn().mockResolvedValue(undefined),
+      applyFont: vi.fn().mockResolvedValue(undefined),
+      fs: makeFsModule(vol),
+    });
+
+    expect(vi.mocked(log.warn)).toHaveBeenCalledWith(expect.stringContaining("sem modo claro/escuro"));
   });
 });

@@ -93,6 +93,24 @@ Configura o backend Convex. Se o projeto ainda não estiver ligado ao Convex (se
 
 Depois gera as chaves de autenticação, grava o endereço do site que você informou no `create`, cria o usuário admin (o e-mail já vem preenchido) e popula os dados iniciais. As integrações são opcionais e só aparecem para os plugins ligados: o Telegram e a Vercel começam com uma pergunta de sim/não; OpenRouter e Asaas pedem a chave, e dá para pular com Enter. Com a chave do Asaas, ele também gera o token do webhook e mostra a URL e o token para cadastrar no painel do Asaas. Pode ser rodado de novo: o admin existente é mantido (sem pedir a senha de novo; para trocá-la, use o `senha`) e o seed só cria o que falta.
 
+### `publicar`
+
+```bash
+npx create-rubrica publicar
+```
+
+Coloca o site no ar na [Vercel](https://vercel.com) (conta gratuita), sem copiar nada à mão. Na primeira vez, depois de confirmar:
+
+1. entra na sua conta da Vercel (o login abre no navegador, se precisar);
+2. cria o projeto na Vercel com o nome da pasta e usa o endereço `<projeto>.vercel.app`;
+3. prepara o banco de produção no Convex: cria a chave de produção, envia o backend, gera as chaves de login e copia do ambiente do computador as integrações do Telegram e do OpenRouter, a profissão e o contexto da IA;
+4. cria o admin do site publicado (você escolhe a senha) e os dados iniciais;
+5. grava as variáveis na Vercel (`VITE_CONVEX_URL`, `CONVEX_URL`, `SITE_URL`, `CONVEX_DEPLOY_KEY`) e publica.
+
+Depois disso, rodar de novo só publica a versão atual do projeto. O que você cadastrou no painel do computador não vai junto: o site publicado começa com os dados de exemplo e é editado pelo painel dele. A chave de produção do Asaas e o webhook de pagamentos são configurados à parte. Domínio próprio: na Vercel, em Settings → Domains.
+
+Tem mais de uma conta da Vercel no computador? Escolha qual usar com `RUBRICA_VERCEL_GLOBAL_CONFIG=<pasta de config da conta> npx create-rubrica publicar` (é o `--global-config` do CLI da Vercel).
+
 ### `senha`
 
 ```bash

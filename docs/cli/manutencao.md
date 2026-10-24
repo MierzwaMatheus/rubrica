@@ -39,6 +39,24 @@ O site (`site/`) monta o comando `npx create-rubrica@latest <pasta> --receita <c
 - **Opção legível nova** (`--algo`): `cli/src/args.ts`, e a tabela de opções do `cli/README.md`.
 - **Do site, o terminal só pede a senha.** O `create` chama o `setup` com `site` (profissão e especialidades da receita) e `newProject` (o nome da pasta). Com `site`, o `setup` não pergunta integrações, e-mail (se veio válido) nem profissão. Com `newProject` e sem `.env.local`, ele roda `convex dev --once --configure new --project <pasta> --dev-deployment cloud` e grava `convex.json` com `aiFiles.enabled: false`, o que tira as perguntas do Convex. Pergunta nova no `setup` precisa decidir o que acontece nesse modo; o padrão é não perguntar.
 
+## Publicar (`npx create-rubrica publicar`)
+
+`cli/src/commands/publish.ts` usa só os CLIs oficiais, via `npx`: `npx --yes vercel@latest` (sem instalar nada no computador da pessoa) e o `convex` do projeto.
+
+- **Primeira vez** (sem `.vercel/project.json`): `vercel link --yes --project <nome do package.json>`, o domínio `.vercel.app` pela API (`vercel api /v9/projects/<id>/domains`, beta; sem ela, usa `<nome>.vercel.app`), `.vercelignore` com `.env*` (sem isso a Vercel enviaria o `.env.local`), chave de produção com `convex deployment token create rubrica-vercel --prod` (formato `prod:<deployment>|…`), `convex deploy` com essa chave, variáveis `--prod` no Convex, admin e dados iniciais com `convex run --prod`, variáveis na Vercel e `vercel deploy --prod --yes`.
+- **Depois:** só `vercel deploy --prod --yes`. O build da Vercel envia o backend com a `CONVEX_DEPLOY_KEY` gravada lá.
+- **Dados iniciais:** os mesmos do `setup`, em `cli/src/utils/seedPayloads.ts`. Mudou um, vale para os dois ambientes.
+- **Variável nova de integração** que deve valer igual em produção: acrescente em `COPIED_ENV`. Se for diferente por ambiente (como o Asaas), não copie; avise a pessoa.
+- **Várias contas da Vercel:** `RUBRICA_VERCEL_GLOBAL_CONFIG` vira `--global-config` em todas as chamadas da Vercel. É o que o teste ponta a ponta usa.
+
+### O que o build do site publicado exige do template
+
+Três problemas só apareceram ao publicar um projeto criado pelo CLI. Os testes abaixo, em `tests/`, impedem que voltem:
+
+- `tests/release-tarball.test.ts`: nada em `src/`, `scripts/` ou `convex/` pode importar de uma pasta com `export-ignore` no `.gitattributes`, porque ela não vai no tarball que o `create` baixa. A `domain/` estava fora e quebrava o `npm run build`.
+- `tests/csp.test.ts`: a CSP do `vercel.json` só aceita scripts de arquivo. O `index.html` não pode ter `<script>` embutido; o do modo de cor fica em `public/color-mode.js`.
+- `tests/app/exportI18n.test.ts`: o `build:i18n` mescla os textos do banco (`siteTexts`) sobre as traduções do repositório. Sem o plugin de tradução, o banco vem vazio e, antes, o build apagava as traduções.
+
 ## Senha do painel
 
 A regra de senha existe em dois lugares que precisam andar juntos: `assertStrongPassword` em `convex/users.ts` (painel e `users:resetPasswordInternal`) e `validatePassword` em `cli/src/utils/password.ts` (`setup` e `senha`). Mudou um, mude o outro, ou o CLI vai aceitar uma senha que o painel recusa.

@@ -91,7 +91,7 @@ export default function Blog() {
         // thoughts · essays · long-form
       </div>
       <h1
-        style={{ fontSize: 28, fontWeight: 700, margin: "4px 0 14px" }}
+        style={{ fontSize: "clamp(22px, 6.5vw, 28px)", overflowWrap: "anywhere", fontWeight: 700, margin: "4px 0 14px" }}
       >
         $ ls posts/ --sort=date
       </h1>
@@ -142,13 +142,13 @@ export default function Blog() {
                       }}
                     >
                       <span style={{ color: "var(--accent)" }}>#</span>{" "}
-                      {featured.published_at} ·{" "}
+                      {featured.published_at.slice(0, 10)} ·{" "}
                       <span style={{ color: "var(--accent)" }}>⏱</span>{" "}
                       {readingTime(featured.content)}
                     </div>
                     <h2
                       style={{
-                        fontSize: 32,
+                        fontSize: "clamp(22px, 7vw, 32px)",
                         fontWeight: 700,
                         margin: "0 0 8px",
                         letterSpacing: "-0.02em",
@@ -230,6 +230,7 @@ export default function Blog() {
       <div
         style={{
           display: "flex",
+          flexWrap: "wrap",
           gap: 8,
           fontSize: 12,
           alignItems: "center",
@@ -261,6 +262,7 @@ export default function Blog() {
             {["#", "data", "título", "tags", "tempo"].map((h, i) => (
               <th
                 key={h}
+                {...(i === 1 || i >= 3 ? { "data-m-hide": "" } : {})}
                 style={{
                   textAlign: i === 4 ? "right" : "left",
                   padding: "8px 10px",
@@ -297,8 +299,8 @@ export default function Blog() {
               >
                 {String(i + 1).padStart(2, "0")}
               </td>
-              <td style={{ padding: "10px 10px", opacity: 0.7 }}>
-                {p.published_at}
+              <td data-m-hide style={{ padding: "10px 10px", opacity: 0.7 }}>
+                {p.published_at.slice(0, 10)}
               </td>
               <td style={{ padding: "10px 10px" }}>
                 <div style={{ fontWeight: 700, fontSize: 13 }}>
@@ -313,7 +315,7 @@ export default function Blog() {
                   {p.subtitle}
                 </div>
               </td>
-              <td style={{ padding: "10px 10px", fontSize: 11 }}>
+              <td data-m-hide style={{ padding: "10px 10px", fontSize: 11 }}>
                 {p.tags.slice(0, 2).map((t, j) => (
                   <span key={t}>
                     <span style={{ color: "var(--accent)" }}>#</span>
@@ -326,6 +328,7 @@ export default function Blog() {
                 )}
               </td>
               <td
+                data-m-hide
                 style={{
                   padding: "10px 10px",
                   textAlign: "right",

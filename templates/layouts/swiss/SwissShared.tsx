@@ -147,7 +147,7 @@ export function SwissFooter() {
   const { contactInfo } = useSidebar(sidebarRepository);
 
   return (
-    <div
+    <div data-m-cols="2"
       style={{
         borderTop: "2px solid var(--text)",
         padding: "12px 18px",
@@ -171,7 +171,7 @@ export function SwissFooter() {
 
 export function SwissGridLines({ cols = 12, color }: { cols?: number; color?: string }) {
   return (
-    <div
+    <div data-m-keep
       style={{
         position: "absolute",
         inset: 0,

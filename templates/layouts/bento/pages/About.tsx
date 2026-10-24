@@ -263,7 +263,7 @@ export default function BentoAbout() {
           >
             Meu dia-a-dia
           </div>
-          <div
+          <div data-m-cols="2"
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(6, 1fr)",

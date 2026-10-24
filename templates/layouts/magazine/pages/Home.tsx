@@ -1,4 +1,5 @@
 import { Link } from "wouter";
+import { useIsMobile } from "@/hooks/useMobile";
 import { useHome } from "@/hooks/useHome";
 import { usePortfolio } from "@/hooks/usePortfolio";
 import { useHomeMetrics } from "@/hooks/useHomeMetrics";
@@ -12,6 +13,7 @@ const mono = { fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.2
 const sectionLabel = { ...mono, letterSpacing: "0.3em", textAlign: "center" as const, color: "var(--text)", opacity: 0.5 };
 
 export default function Home() {
+  const isMobile = useIsMobile();
   const { t } = useTranslation();
   const { contactRole, services, testimonials, contactWizardEnabled, isLoading } = useHome(homeRepository);
   const { projects } = usePortfolio(portfolioRepository);
@@ -22,10 +24,11 @@ export default function Home() {
 
   if (isLoading) return null;
 
-  const pad = 48;
+  // No celular: 24px de margem, compensando o padding do <main> (data-m-bleed).
+  const pad = isMobile ? 24 : 48;
 
   return (
-    <div style={{ background: "var(--bg)", color: "var(--text)", fontFamily: "var(--font-sans)", minHeight: "100%" }}>
+    <div data-m-bleed style={{ background: "var(--bg)", color: "var(--text)", fontFamily: "var(--font-sans)", minHeight: "100%" }}>
 
       {/* Capa: quem sou, o que entrego e os próximos passos */}
       <div style={{ padding: `${pad + 12}px ${pad}px ${pad}px`, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: pad, alignItems: "end" }}>
@@ -66,7 +69,7 @@ export default function Home() {
 
       {/* Números de prova logo abaixo da capa */}
       {metrics.length > 0 && (
-        <div style={{ margin: `0 ${pad}px`, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 1, background: "color-mix(in srgb, var(--text) 45%, transparent)", borderTop: "2px solid var(--text)", borderBottom: "0.5px solid var(--text)" }}>
+        <div data-m-cols="2" style={{ margin: `0 ${pad}px`, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 1, background: "color-mix(in srgb, var(--text) 45%, transparent)", borderTop: "2px solid var(--text)", borderBottom: "0.5px solid var(--text)" }}>
           {metrics.map((m) => (
             <div key={m.label} style={{ padding: "22px 20px 20px", background: "var(--bg)" }}>
               <div style={{ fontFamily: "var(--font-sans)", fontSize: 44, lineHeight: 1, fontWeight: 500, color: "var(--primary)", letterSpacing: "-0.02em" }}>{m.value}</div>
@@ -141,8 +144,8 @@ export default function Home() {
       </div>
 
       {testimonials[0] && (
-        <div style={{ padding: `${pad - 8}px ${pad + 40}px`, textAlign: "center" }}>
-          <div style={{ fontFamily: "var(--font-sans)", fontStyle: "italic", fontSize: 34, lineHeight: 1.3, color: "var(--text)" }}>
+        <div style={{ padding: `${pad - 8}px ${isMobile ? pad : pad + 40}px`, textAlign: "center" }}>
+          <div style={{ fontFamily: "var(--font-sans)", fontStyle: "italic", fontSize: "clamp(22px, 5.5vw, 34px)", lineHeight: 1.3, color: "var(--text)" }}>
             "{testimonials[0].text}"
           </div>
           <div style={{ ...mono, marginTop: 24, color: "var(--accent)" }}>

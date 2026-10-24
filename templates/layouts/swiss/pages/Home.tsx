@@ -195,7 +195,7 @@ export default function SwissHome() {
 
       {/* Metrics band: prova logo abaixo do topo (cai para a stack quando não há números) */}
       {metrics.length > 0 ? (
-        <div
+        <div data-m-cols="2"
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
@@ -507,7 +507,7 @@ export default function SwissHome() {
             >
               <div
                 style={{
-                  fontSize: 76,
+                  fontSize: "clamp(36px, 10.6vw, 76px)",
                   fontWeight: 900,
                   lineHeight: 0.5,
                   opacity: 0.4,

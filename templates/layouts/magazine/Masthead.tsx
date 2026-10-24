@@ -63,21 +63,28 @@ export function Masthead() {
   const { isEnabled } = usePlugins();
 
   const siteName = contactInfo?.name ?? "";
-  const spaced = siteName.toUpperCase().split("").join(" ");
+  // Letras espaçadas, mas cada palavra inteira: no celular a quebra cai entre palavras.
+  const words = siteName.toUpperCase().split(/\s+/).filter(Boolean);
 
   return (
     <header className="border-b border-[var(--text)]/20">
       {/* Metadata strip */}
-      <div className="flex justify-between items-center px-12 py-[18px] text-[10.5px] font-mono tracking-[0.22em] uppercase text-[var(--text)]/55 border-b border-[var(--text)]/20">
+      <div className="flex justify-between items-center px-6 md:px-12 py-[18px] text-[10.5px] font-mono tracking-[0.22em] uppercase text-[var(--text)]/55 border-b border-[var(--text)]/20">
         <span>Vol. 01 · No. 26</span>
         <span className="hidden sm:block">Portfolio Profissional</span>
         <span>Est. MMXX</span>
       </div>
 
       {/* Display title */}
-      <div className="px-12 pt-8 pb-3 text-center">
+      <div className="px-6 md:px-12 pt-8 pb-3 text-center">
         <div className="font-sans text-[clamp(3rem,8vw,5.25rem)] font-medium tracking-[0.04em] text-[var(--text)] leading-none">
-          {spaced || "PORTFOLIO"}
+          {words.length
+            ? words.map((w, i) => (
+                <span key={i} className="inline-block whitespace-nowrap mx-[0.25em]">
+                  {w.split("").join(" ")}
+                </span>
+              ))
+            : "PORTFOLIO"}
         </div>
       </div>
 

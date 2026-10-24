@@ -111,7 +111,7 @@ export default function About() {
         // professional · method · personal
       </div>
       <h1
-        style={{ fontSize: 28, fontWeight: 700, margin: "4px 0 14px" }}
+        style={{ fontSize: "clamp(22px, 6.5vw, 28px)", overflowWrap: "anywhere", fontWeight: 700, margin: "4px 0 14px" }}
       >
         $ cat about.txt
       </h1>

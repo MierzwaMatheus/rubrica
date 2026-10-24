@@ -23,6 +23,14 @@ O que mudou em cada versão do Rubrica (template e CLI `create-rubrica`). Detalh
 - Novas variáveis no Convex: `ASAAS_API_KEY` (sandbox ou produção, detectado pela chave) e, opcional, `ASAAS_ENV`. O `setup` pede a chave, gera o `ASAAS_WEBHOOK_TOKEN` e mostra como cadastrar o webhook.
 - **Removido:** a integração com o Stripe, que nunca funcionou (eram stubs sem uso na interface), o webhook `/webhooks/stripe` e a variável `STRIPE_WEBHOOK_SECRET`.
 
+### Layouts no celular
+- Swiss, Magazine, Brutalist e Bento corrigidos em telas de celular: grids que não empilhavam (conteúdo vazando para fora da tela), títulos gigantes cortados, nome quebrado no meio no cabeçalho do Magazine, margens excessivas, depoimentos e mosaicos espremidos, tabela do blog do Brutalist. Verificado em 390, 768 e 1280px nos 5 layouts.
+- Novo `src/components/MobileLayoutStyles.tsx`: no celular, grids montados com estilo inline viram uma coluna; exceções por atributo (`data-m-cols="2"`, `data-m-keep`, `data-m-hide`, `data-m-scroll`, `data-m-bleed`).
+- Cyberpunk: o topo das páginas não fica mais escondido atrás do cabeçalho fixo do celular.
+- Swiss e Bento: post, estudo de caso e depoimentos ganham margem lateral (antes encostavam na borda).
+- Datas dos posts formatadas no Bento e no Brutalist (apareciam como `2026-01-15T00:00:00.000Z`).
+- Posts de exemplo (seed e dados de demonstração) em HTML, como o editor grava; antes apareciam com `#` e `**` crus. Slug do case de exemplo corrigido para `lumen-saude`.
+
 ### Segurança e limpeza
 - Login: limite explícito de 5 senhas erradas por conta por hora.
 - Umami: o script só entra no site quando `VITE_UMAMI_SCRIPT_URL` e `VITE_UMAMI_WEBSITE_ID` estão definidas (antes carregava uma URL com o placeholder literal); Umami Cloud liberado no CSP. `VITE_ANALYTICS_ENDPOINT`/`VITE_ANALYTICS_WEBSITE_ID` continuam aceitas.

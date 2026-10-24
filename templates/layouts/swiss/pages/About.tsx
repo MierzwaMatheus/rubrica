@@ -77,7 +77,7 @@ export default function SwissAbout() {
           <h1
             style={{
               gridColumn: "span 10",
-              fontSize: 88,
+              fontSize: "clamp(42px, 12.2vw, 88px)",
               fontWeight: 900,
               letterSpacing: "-0.04em",
               margin: 0,
@@ -235,7 +235,7 @@ export default function SwissAbout() {
               {dailyRoutine.length} fotos do arquivo pessoal.
             </h3>
           </div>
-          <div
+          <div data-m-cols="2"
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(6, 1fr)",

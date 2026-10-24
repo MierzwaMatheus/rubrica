@@ -1,4 +1,5 @@
 import * as nodeFsPromises from "node:fs/promises";
+import { fontLinkTag } from "../themes/fonts.js";
 
 export interface FsModule {
   readFile: (path: string, encoding: string) => Promise<string>;
@@ -8,6 +9,8 @@ export interface FsModule {
 
 export interface IndexHtmlData {
   fontFamily: string;
+  /** Fonte mono, carregada no mesmo link do Google Fonts. */
+  fontMono?: string;
   themeColor: string;
   siteName: string;
   siteUrl: string;
@@ -15,9 +18,6 @@ export interface IndexHtmlData {
   authorName: string;
 }
 
-function fontToGoogleSlug(font: string): string {
-  return font.replace(/ /g, "+");
-}
 
 export async function applyIndexHtml(
   data: IndexHtmlData,
@@ -27,10 +27,9 @@ export async function applyIndexHtml(
   let html = await fsModule.readFile(htmlPath, "utf-8");
 
   // Replace Google Fonts link
-  const slug = fontToGoogleSlug(data.fontFamily);
   html = html.replace(
     /<link\s[^>]*fonts\.googleapis\.com\/css2[^>]*(?:\s*\/>|>[^<]*<\/link>)/s,
-    `<link\n      href="https://fonts.googleapis.com/css2?family=${slug}:wght@300;400;500;600;700&display=swap"\n      rel="stylesheet"\n    />`
+    () => fontLinkTag([data.fontFamily, data.fontMono ?? ""])
   );
 
   // theme-color

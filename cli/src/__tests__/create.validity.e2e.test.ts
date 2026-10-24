@@ -24,6 +24,7 @@ import { applyPlugins } from "../transforms/applyPlugins.js";
 import { applyRubricalConfig } from "../transforms/applyRubricalConfig.js";
 import { applyIndexHtml } from "../transforms/applyIndexHtml.js";
 import { writeState } from "../state/writeState.js";
+import { applyAppearance } from "../transforms/applyAppearance.js";
 
 // ---- mocks de @clack/prompts ------------------------------------------------
 
@@ -164,10 +165,13 @@ const mockIdentityPrompt = vi.fn(async () => ({
   lang: "pt-BR",
 }));
 
+/** Ordem: layout → esquema → modo → textura → fontes → gerenciador (o confirm da alternância fica no padrão) */
 function setupSelectPrompts(layout: string, theme = "editorial-cream") {
   vi.mocked(select)
     .mockResolvedValueOnce(layout)
     .mockResolvedValueOnce(theme)
+    .mockResolvedValueOnce("dark") // modo de cor
+    .mockResolvedValueOnce("none") // textura
     .mockResolvedValueOnce("Inter")
     .mockResolvedValueOnce("JetBrains Mono")
     .mockResolvedValueOnce("none");
@@ -190,6 +194,7 @@ function makeRealDeps(
     applyPlugins,
     applyIndexHtml,
     applyRubricalConfig,
+    applyAppearance,
     writeState,
     identityPrompt: mockIdentityPrompt,
   };

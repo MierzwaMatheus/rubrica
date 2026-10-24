@@ -1,4 +1,5 @@
 import * as nodeFsPromises from "node:fs/promises";
+import { fontLinkTag } from "../themes/fonts.js";
 
 export interface FsModule {
   readFile: (path: string, encoding: string) => Promise<string>;
@@ -6,14 +7,6 @@ export interface FsModule {
   mkdir: (path: string, options: { recursive: boolean }) => Promise<void>;
 }
 
-function fontToGoogleSlug(font: string): string {
-  return font.replace(/ /g, "+");
-}
-
-function buildFontLink(font: string): string {
-  const slug = fontToGoogleSlug(font);
-  return `<link\n      href="https://fonts.googleapis.com/css2?family=${slug}:wght@300;400;500;600;700&display=swap"\n      rel="stylesheet"\n    />`;
-}
 
 export async function applyFont(
   options: { fontSans: string; fontMono: string },
@@ -34,7 +27,7 @@ export async function applyFont(
   await fsModule.writeFile(paths.css, css);
 
   let html = await fsModule.readFile(paths.html, "utf-8");
-  const newLink = buildFontLink(fontSans);
+  const newLink = fontLinkTag([fontSans, fontMono]);
   // Replace existing Google Fonts link (multi-line) with new one
   html = html.replace(
     /<link\s[^>]*fonts\.googleapis\.com\/css2[^>]*(?:\s*\/>|>[^<]*<\/link>)/s,

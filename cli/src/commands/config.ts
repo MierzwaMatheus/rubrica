@@ -13,6 +13,8 @@ import { applyLayout as defaultApplyLayout } from "../transforms/applyLayout.js"
 import { applyPlugins as defaultApplyPlugins } from "../transforms/applyPlugins.js";
 import { getLatestVersion as defaultGetLatestVersion, downloadRelease as defaultDownloadRelease } from "../utils/download.js";
 import { indexHtmlInput, rubricaConfigInput } from "../transforms/identityInputs.js";
+import { applyAppearance as defaultApplyAppearance } from "../transforms/applyAppearance.js";
+import { layoutPrompt, schemePrompt, appearancePrompt, fontPrompts } from "../prompts/appearancePrompt.js";
 import { ALL_PLUGINS } from "./create.js";
 import { tmpdir } from "node:os";
 import type { RubricaLayout, RubricaState } from "../state/readState.js";
@@ -39,6 +41,7 @@ export interface RunConfigDeps {
   applyIndexHtml?: typeof defaultApplyIndexHtml;
   applyLayout?: typeof defaultApplyLayout;
   applyPlugins?: typeof defaultApplyPlugins;
+  applyAppearance?: typeof defaultApplyAppearance;
   downloadRelease?: typeof defaultDownloadRelease;
   getLatestVersion?: typeof defaultGetLatestVersion;
 }
@@ -69,6 +72,7 @@ export async function runConfig(deps: RunConfigDeps = {}): Promise<void> {
   const applyPluginsFn = deps.applyPlugins ?? defaultApplyPlugins;
   const downloadReleaseFn = deps.downloadRelease ?? defaultDownloadRelease;
   const getLatestVersionFn = deps.getLatestVersion ?? defaultGetLatestVersion;
+  const applyAppearanceFn = deps.applyAppearance ?? defaultApplyAppearance;
 
   // Ciclo 1: detectar projeto
   const rubricaJsonPath = await detectProjectFn(cwd, fs);
@@ -83,7 +87,7 @@ export async function runConfig(deps: RunConfigDeps = {}): Promise<void> {
     message: "O que deseja reconfigurar?",
     options: [
       { value: "identity", label: "Identidade (nome, URL, SEO, RSS)" },
-      { value: "appearance", label: "Aparência (tema, fonte)" },
+      { value: "appearance", label: "Aparência (esquema de cores, modo claro/escuro, textura, fontes)" },
       { value: "layout", label: "Layout" },
       { value: "plugins", label: "Plugins" },
     ],
@@ -106,7 +110,7 @@ export async function runConfig(deps: RunConfigDeps = {}): Promise<void> {
       fs as Parameters<typeof defaultApplyRubricalConfig>[2]
     );
     await applyIndexHtmlFn(
-      indexHtmlInput(identityData, currentState.fontSans),
+      indexHtmlInput(identityData, currentState.fontSans, currentState.fontMono),
       path.join(projectDir, "index.html"),
       fs as Parameters<typeof defaultApplyIndexHtml>[2]
     );
@@ -115,43 +119,13 @@ export async function runConfig(deps: RunConfigDeps = {}): Promise<void> {
 
   // Ciclo 5: aparência
   if (selected.includes("appearance")) {
-    const theme = await select({
-      message: "Tema visual",
-      initialValue: currentState.theme,
-      options: [
-        { value: "editorial-cream", label: "Editorial Cream", hint: "refinado e atemporal — blogs e portfólios literários" },
-        { value: "paper-noir", label: "Paper Noir", hint: "contraste máximo — identidade editorial forte" },
-        { value: "midnight-blue", label: "Midnight Blue", hint: "tech e premium — devs e designers noturnos" },
-        { value: "solar-warm", label: "Solar Warm", hint: "energia e criatividade — marcas pessoais vibrantes" },
-      ],
-    }) as string;
-
-    const fontSans = await select({
-      message: "Fonte principal",
-      initialValue: currentState.fontSans,
-      options: [
-        { value: "Inter", label: "Inter", hint: "neutra, legível, padrão de produtos digitais" },
-        { value: "Chakra Petch", label: "Chakra Petch", hint: "geométrica, tech, futurista" },
-        { value: "Playfair Display", label: "Playfair Display", hint: "elegante, editorial clássico" },
-        { value: "Space Grotesk", label: "Space Grotesk", hint: "moderna, startup" },
-        { value: "DM Sans", label: "DM Sans", hint: "limpa, amigável, versátil" },
-        { value: "Bodoni Moda", label: "Bodoni Moda", hint: "display serifado elegante, editorial clássico" },
-        { value: "IBM Plex Serif", label: "IBM Plex Serif", hint: "serifa técnica, confiança e rigor" },
-        { value: "Manrope", label: "Manrope", hint: "geométrica humanista, moderna e acolhedora" },
-        { value: "Archivo", label: "Archivo", hint: "grotesca utilitária, clareza e força tipográfica" },
-      ],
-    }) as string;
-
-    const fontMono = await select({
-      message: "Fonte mono",
-      initialValue: currentState.fontMono,
-      options: [
-        { value: "JetBrains Mono", label: "JetBrains Mono", hint: "dev-friendly, clara" },
-        { value: "Fira Code", label: "Fira Code", hint: "clássico, com ligatures" },
-        { value: "Space Mono", label: "Space Mono", hint: "retro digital" },
-        { value: "IBM Plex Mono", label: "IBM Plex Mono", hint: "corporativo-tech" },
-      ],
-    }) as string;
+    const theme = await schemePrompt(currentState.layout, currentState.theme);
+    const appearance = await appearancePrompt(currentState.layout, {
+      colorMode: currentState.colorMode,
+      colorModeToggle: currentState.colorModeToggle,
+      texture: currentState.texture,
+    });
+    const { fontSans, fontMono } = await fontPrompts(currentState.layout, currentState);
 
     const cssPath = path.join(projectDir, "src", "index.css");
     const htmlPath = path.join(projectDir, "index.html");
@@ -161,6 +135,7 @@ export async function runConfig(deps: RunConfigDeps = {}): Promise<void> {
       cssPath,
       fs as Parameters<typeof defaultApplyTheme>[2]
     );
+    await applyAppearanceFn(appearance, htmlPath, fs as Parameters<typeof defaultApplyAppearance>[2]);
     await applyFontFn(
       { fontSans, fontMono },
       { css: cssPath, html: htmlPath },
@@ -170,30 +145,21 @@ export async function runConfig(deps: RunConfigDeps = {}): Promise<void> {
     const identity = stateUpdate.identity ?? currentState.identity;
     if (identity) {
       await applyIndexHtmlFn(
-        indexHtmlInput(identity, fontSans),
+        indexHtmlInput(identity, fontSans, fontMono),
         htmlPath,
         fs as Parameters<typeof defaultApplyIndexHtml>[2]
       );
     }
 
     stateUpdate.theme = theme;
+    Object.assign(stateUpdate, appearance);
     stateUpdate.fontSans = fontSans;
     stateUpdate.fontMono = fontMono;
   }
 
   // Ciclo 6: layout
   if (selected.includes("layout")) {
-    const newLayout = await select({
-      message: "Layout",
-      initialValue: currentState.layout,
-      options: [
-        { value: "cyberpunk", label: "Cyberpunk", hint: "sidebar lateral com foto de perfil — dev, designer, freelancer" },
-        { value: "brutalist", label: "Brutalism Terminal", hint: "identidade hacker total — monospace, sem bordas arredondadas" },
-        { value: "swiss", label: "Swiss Grid", hint: "grid de 12 colunas, tipografia forte, design suíço rigoroso" },
-        { value: "bento", label: "Bento", hint: "grid assimétrico com floating dock — moderno, orientado a produto" },
-        { value: "magazine", label: "Magazine", hint: "editorial clássico · display serifado · grid assimétrico · áreas de respiro generosas" },
-      ],
-    }) as RubricaLayout;
+    const newLayout: RubricaLayout = await layoutPrompt(currentState.layout);
 
     const confirmed = await confirm({
       message: "⚠ Isso sobrescreve Layout.tsx e arquivos de navegação. Customizações manuais serão perdidas. Continuar?",

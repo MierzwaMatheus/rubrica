@@ -10,16 +10,10 @@ import { applyIndexHtml as defaultApplyIndexHtml } from "../transforms/applyInde
 import { applyRubricalConfig as defaultApplyRubricalConfig } from "../transforms/applyRubricalConfig.js";
 import { writeState as defaultWriteState } from "../state/writeState.js";
 import { indexHtmlInput, rubricaConfigInput } from "../transforms/identityInputs.js";
+import { applyAppearance as defaultApplyAppearance } from "../transforms/applyAppearance.js";
+import { layoutPrompt, schemePrompt, appearancePrompt, fontPrompts } from "../prompts/appearancePrompt.js";
 
 // ---- Tipos -----------------------------------------------------------------
-
-const TEMPLATE_FONTS: Record<string, { fontSans: string | string[]; fontMono: string }> = {
-  cyberpunk: { fontSans: "Chakra Petch", fontMono: "JetBrains Mono" },
-  magazine:  { fontSans: ["Bodoni Moda", "IBM Plex Serif"], fontMono: "JetBrains Mono" },
-  bento:     { fontSans: "Manrope",      fontMono: "JetBrains Mono" },
-  brutalist: { fontSans: "JetBrains Mono", fontMono: "JetBrains Mono" },
-  swiss:     { fontSans: "Archivo",      fontMono: "" },
-};
 
 export const ALL_PLUGINS = [
   "contact-wizard",
@@ -59,6 +53,7 @@ export interface RunCreateDeps {
   applyPlugins?: typeof defaultApplyPlugins;
   applyIndexHtml?: typeof defaultApplyIndexHtml;
   applyRubricalConfig?: typeof defaultApplyRubricalConfig;
+  applyAppearance?: typeof defaultApplyAppearance;
   writeState?: typeof defaultWriteState;
   exec?: (command: string, cwd: string) => Promise<void>;
   identityPrompt?: typeof defaultIdentityPrompt;
@@ -110,6 +105,7 @@ export async function runCreate(
   const applyIndexHtmlFn = deps.applyIndexHtml ?? defaultApplyIndexHtml;
   const applyRubricalConfigFn = deps.applyRubricalConfig ?? defaultApplyRubricalConfig;
   const writeStateFn = deps.writeState ?? defaultWriteState;
+  const applyAppearanceFn = deps.applyAppearance ?? defaultApplyAppearance;
   const execFn = deps.exec ?? (async (cmd: string, cwd: string) => {
     const { execSync } = await import("node:child_process");
     execSync(cmd, { cwd, stdio: "inherit" });
@@ -123,16 +119,7 @@ export async function runCreate(
   await download(projectDir, version);
 
   // Ciclo 3: prompt e apply de layout (antes de remover templates/)
-  const layout = await select({
-    message: "Layout",
-    options: [
-      { value: "cyberpunk", label: "Cyberpunk", hint: "sidebar lateral com foto de perfil — dev, designer, freelancer" },
-      { value: "brutalist", label: "Brutalism Terminal", hint: "identidade hacker total — monospace, sem bordas arredondadas" },
-      { value: "swiss", label: "Swiss Grid", hint: "grid de 12 colunas, tipografia forte, design suíço rigoroso" },
-      { value: "bento", label: "Bento", hint: "grid assimétrico com floating dock — moderno, orientado a produto" },
-      { value: "magazine", label: "Magazine", hint: "editorial clássico · display serifado · grid assimétrico · áreas de respiro generosas" },
-    ],
-  }) as "cyberpunk" | "brutalist" | "swiss" | "bento" | "magazine";
+  const layout = await layoutPrompt();
 
   await applyLayoutFn(
     layout,
@@ -141,15 +128,7 @@ export async function runCreate(
   );
 
   // Ciclo 4: prompt e apply de tema
-  const themeChoice = await select({
-    message: "Tema visual",
-    options: [
-      { value: "editorial-cream", label: "Editorial Cream", hint: "refinado e atemporal — blogs e portfólios literários" },
-      { value: "paper-noir", label: "Paper Noir", hint: "contraste máximo — identidade editorial forte" },
-      { value: "midnight-blue", label: "Midnight Blue", hint: "tech e premium — devs e designers noturnos" },
-      { value: "solar-warm", label: "Solar Warm", hint: "energia e criatividade — marcas pessoais vibrantes" },
-    ],
-  }) as string;
+  const themeChoice = await schemePrompt(layout);
 
   await applyThemeFn(
     { preset: themeChoice },
@@ -157,36 +136,16 @@ export async function runCreate(
     fs as Parameters<typeof defaultApplyTheme>[2]
   );
 
+  // Aparência: modo de cor, alternância e textura (atributos do <html>)
+  const appearance = await appearancePrompt(layout);
+  await applyAppearanceFn(
+    appearance,
+    `${projectDir}/index.html`,
+    fs as Parameters<typeof defaultApplyAppearance>[2]
+  );
+
   // Ciclo 5: prompts de fonte
-  const recommendedFonts = TEMPLATE_FONTS[layout] ?? { fontSans: "", fontMono: "" };
-  const recommendedSans = Array.isArray(recommendedFonts.fontSans)
-    ? recommendedFonts.fontSans
-    : [recommendedFonts.fontSans];
-
-  const fontSans = await select({
-    message: "Fonte principal",
-    options: [
-      { value: "Inter", label: "Inter", hint: "neutra, legível, padrão de produtos digitais" },
-      { value: "Chakra Petch", label: "Chakra Petch", hint: recommendedSans.includes("Chakra Petch") ? "recomendada" : "geométrica, tech, futurista" },
-      { value: "Playfair Display", label: "Playfair Display", hint: "elegante, editorial clássico" },
-      { value: "Space Grotesk", label: "Space Grotesk", hint: "moderna, startup" },
-      { value: "DM Sans", label: "DM Sans", hint: "limpa, amigável, versátil" },
-      { value: "Bodoni Moda", label: "Bodoni Moda", hint: recommendedSans.includes("Bodoni Moda") ? "recomendada" : "display serifado elegante, editorial clássico" },
-      { value: "IBM Plex Serif", label: "IBM Plex Serif", hint: recommendedSans.includes("IBM Plex Serif") ? "recomendada" : "serifa técnica, confiança e rigor" },
-      { value: "Manrope", label: "Manrope", hint: recommendedSans.includes("Manrope") ? "recomendada" : "geométrica humanista, moderna e acolhedora" },
-      { value: "Archivo", label: "Archivo", hint: recommendedSans.includes("Archivo") ? "recomendada" : "grotesca utilitária, clareza e força tipográfica" },
-    ],
-  }) as string;
-
-  const fontMono = recommendedFonts.fontMono === "" ? "" : await select({
-    message: "Fonte mono",
-    options: [
-      { value: "JetBrains Mono", label: "JetBrains Mono", hint: recommendedFonts.fontMono === "JetBrains Mono" ? "recomendada" : "dev-friendly, clara" },
-      { value: "Fira Code", label: "Fira Code", hint: "clássico, com ligatures" },
-      { value: "Space Mono", label: "Space Mono", hint: "retro digital" },
-      { value: "IBM Plex Mono", label: "IBM Plex Mono", hint: "corporativo-tech" },
-    ],
-  }) as string;
+  const { fontSans, fontMono } = await fontPrompts(layout);
 
   await applyFontFn(
     { fontSans, fontMono },
@@ -230,7 +189,7 @@ export async function runCreate(
   const identity = await doIdentityPrompt();
 
   await applyIndexHtmlFn(
-    indexHtmlInput(identity, fontSans),
+    indexHtmlInput(identity, fontSans, fontMono),
     `${projectDir}/index.html`,
     fs as Parameters<typeof defaultApplyIndexHtml>[2]
   );
@@ -256,6 +215,7 @@ export async function runCreate(
       version: version.replace(/^v/, ""),
       layout,
       theme: themeChoice,
+      ...appearance,
       fontSans,
       fontMono,
       plugins: pluginsRecord,

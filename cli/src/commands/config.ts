@@ -11,7 +11,11 @@ import { applyFont as defaultApplyFont } from "../transforms/applyFont.js";
 import { applyIndexHtml as defaultApplyIndexHtml } from "../transforms/applyIndexHtml.js";
 import { applyLayout as defaultApplyLayout } from "../transforms/applyLayout.js";
 import { applyPlugins as defaultApplyPlugins } from "../transforms/applyPlugins.js";
-import type { RubricaState } from "../state/readState.js";
+import { getLatestVersion as defaultGetLatestVersion, downloadRelease as defaultDownloadRelease } from "../utils/download.js";
+import { indexHtmlInput, rubricaConfigInput } from "../transforms/identityInputs.js";
+import { ALL_PLUGINS } from "./create.js";
+import { tmpdir } from "node:os";
+import type { RubricaLayout, RubricaState } from "../state/readState.js";
 
 // ---- Tipos ------------------------------------------------------------------
 
@@ -35,13 +39,18 @@ export interface RunConfigDeps {
   applyIndexHtml?: typeof defaultApplyIndexHtml;
   applyLayout?: typeof defaultApplyLayout;
   applyPlugins?: typeof defaultApplyPlugins;
+  downloadRelease?: typeof defaultDownloadRelease;
+  getLatestVersion?: typeof defaultGetLatestVersion;
 }
 
-const ALL_PLUGINS = [
-  "blog", "portfolio", "resume", "about", "proposals",
-  "payments", "ai-resumes", "i18n", "playground",
-  "testimonials", "testimonials-intake", "contact-wizard", "audit-log",
-] as const;
+async function existsIn(fs: { access: (p: string) => Promise<void> }, p: string): Promise<boolean> {
+  try {
+    await fs.access(p);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 // ---- Comando runConfig -------------------------------------------------------
 
@@ -58,6 +67,8 @@ export async function runConfig(deps: RunConfigDeps = {}): Promise<void> {
   const applyIndexHtmlFn = deps.applyIndexHtml ?? defaultApplyIndexHtml;
   const applyLayoutFn = deps.applyLayout ?? defaultApplyLayout;
   const applyPluginsFn = deps.applyPlugins ?? defaultApplyPlugins;
+  const downloadReleaseFn = deps.downloadRelease ?? defaultDownloadRelease;
+  const getLatestVersionFn = deps.getLatestVersion ?? defaultGetLatestVersion;
 
   // Ciclo 1: detectar projeto
   const rubricaJsonPath = await detectProjectFn(cwd, fs);
@@ -90,25 +101,16 @@ export async function runConfig(deps: RunConfigDeps = {}): Promise<void> {
   if (selected.includes("identity")) {
     const identityData = await doIdentityPrompt();
     await applyRubricalConfigFn(
-      {
-        siteName: identityData.siteName,
-        siteUrl: identityData.siteUrl,
-        siteDescription: identityData.siteDescription,
-        authorName: identityData.authorName,
-        authorEmail: identityData.authorEmail,
-        twitterHandle: identityData.twitterHandle,
-        lang: identityData.lang,
-        seoHomeTitle: "",
-        seoHomeDescription: "",
-        rssTitle: "",
-        rssDescription: "",
-        ogImageUrl: "",
-        fontSans: currentState.fontSans,
-        fontMono: currentState.fontMono,
-      },
+      rubricaConfigInput(identityData, currentState.fontSans, currentState.fontMono),
       projectDir,
       fs as Parameters<typeof defaultApplyRubricalConfig>[2]
     );
+    await applyIndexHtmlFn(
+      indexHtmlInput(identityData, currentState.fontSans),
+      path.join(projectDir, "index.html"),
+      fs as Parameters<typeof defaultApplyIndexHtml>[2]
+    );
+    stateUpdate.identity = identityData;
   }
 
   // Ciclo 5: aparência
@@ -164,11 +166,15 @@ export async function runConfig(deps: RunConfigDeps = {}): Promise<void> {
       { css: cssPath, html: htmlPath },
       fs as Parameters<typeof defaultApplyFont>[2]
     );
-    await applyIndexHtmlFn(
-      { fontFamily: fontSans, themeColor: "", siteName: "", siteUrl: "", twitterHandle: "", authorName: "" },
-      htmlPath,
-      fs as Parameters<typeof defaultApplyIndexHtml>[2]
-    );
+    // Só a fonte muda aqui; o resto das meta tags vem da identidade salva.
+    const identity = stateUpdate.identity ?? currentState.identity;
+    if (identity) {
+      await applyIndexHtmlFn(
+        indexHtmlInput(identity, fontSans),
+        htmlPath,
+        fs as Parameters<typeof defaultApplyIndexHtml>[2]
+      );
+    }
 
     stateUpdate.theme = theme;
     stateUpdate.fontSans = fontSans;
@@ -185,19 +191,33 @@ export async function runConfig(deps: RunConfigDeps = {}): Promise<void> {
         { value: "brutalist", label: "Brutalism Terminal", hint: "identidade hacker total — monospace, sem bordas arredondadas" },
         { value: "swiss", label: "Swiss Grid", hint: "grid de 12 colunas, tipografia forte, design suíço rigoroso" },
         { value: "bento", label: "Bento", hint: "grid assimétrico com floating dock — moderno, orientado a produto" },
+        { value: "magazine", label: "Magazine", hint: "editorial clássico · display serifado · grid assimétrico · áreas de respiro generosas" },
       ],
-    }) as "cyberpunk" | "brutalist" | "swiss" | "bento";
+    }) as RubricaLayout;
 
     const confirmed = await confirm({
       message: "⚠ Isso sobrescreve Layout.tsx e arquivos de navegação. Customizações manuais serão perdidas. Continuar?",
     });
 
     if (!isCancel(confirmed) && confirmed === true) {
-      await applyLayoutFn(
-        newLayout,
-        { projectDir, templatesDir: path.join(projectDir, "templates") },
-        fs as Parameters<typeof defaultApplyLayout>[2]
-      );
+      // O create apaga templates/ do projeto: os layouts vêm da release do projeto.
+      let templatesDir = path.join(projectDir, "templates");
+      let tmpDir: string | undefined;
+      if (!(await existsIn(fs, templatesDir))) {
+        tmpDir = await nodeFsPromises.mkdtemp(path.join(tmpdir(), "rubrica-config-"));
+        const version = currentState.version === "0.1.0" ? await getLatestVersionFn() : currentState.version;
+        await downloadReleaseFn(tmpDir, version.startsWith("v") ? version : `v${version}`);
+        templatesDir = path.join(tmpDir, "templates");
+      }
+      try {
+        await applyLayoutFn(
+          newLayout,
+          { projectDir, templatesDir },
+          { ...(fs as object), copyFile: nodeFsPromises.copyFile, unlink: nodeFsPromises.unlink, exists: (p: string) => existsIn(fs, p) } as unknown as Parameters<typeof defaultApplyLayout>[2]
+        );
+      } finally {
+        if (tmpDir) await nodeFsPromises.rm(tmpDir, { recursive: true, force: true });
+      }
       stateUpdate.layout = newLayout;
     }
   }

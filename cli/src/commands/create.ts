@@ -9,6 +9,7 @@ import { applyPlugins as defaultApplyPlugins } from "../transforms/applyPlugins.
 import { applyIndexHtml as defaultApplyIndexHtml } from "../transforms/applyIndexHtml.js";
 import { applyRubricalConfig as defaultApplyRubricalConfig } from "../transforms/applyRubricalConfig.js";
 import { writeState as defaultWriteState } from "../state/writeState.js";
+import { indexHtmlInput, rubricaConfigInput } from "../transforms/identityInputs.js";
 
 // ---- Tipos -----------------------------------------------------------------
 
@@ -20,7 +21,7 @@ const TEMPLATE_FONTS: Record<string, { fontSans: string | string[]; fontMono: st
   swiss:     { fontSans: "Archivo",      fontMono: "" },
 };
 
-const ALL_PLUGINS = [
+export const ALL_PLUGINS = [
   "contact-wizard",
   "proposals",
   "payments",
@@ -199,7 +200,7 @@ export async function runCreate(
     options: [
       { value: "contact-wizard", label: "Contact Wizard — formulário de contato multi-etapas", hint: "recomendado" },
       { value: "proposals", label: "Propostas — propostas comerciais com assinatura eletrônica", hint: "recomendado" },
-      { value: "payments", label: "Pagamentos — integração com Stripe/Asaas" },
+      { value: "payments", label: "Pagamentos — checkout com PIX, boleto e cartão via Asaas" },
       { value: "blog", label: "Blog — listagem e leitura de posts", hint: "recomendado" },
       { value: "portfolio", label: "Portfolio — galeria de projetos", hint: "recomendado" },
       { value: "resume", label: "Currículo — currículo interativo com download de PDF", hint: "recomendado" },
@@ -229,35 +230,13 @@ export async function runCreate(
   const identity = await doIdentityPrompt();
 
   await applyIndexHtmlFn(
-    {
-      fontFamily: fontSans,
-      themeColor: "",
-      siteName: identity.siteName,
-      siteUrl: identity.siteUrl,
-      twitterHandle: identity.twitterHandle,
-      authorName: identity.authorName,
-    },
+    indexHtmlInput(identity, fontSans),
     `${projectDir}/index.html`,
     fs as Parameters<typeof defaultApplyIndexHtml>[2]
   );
 
   await applyRubricalConfigFn(
-    {
-      siteName: identity.siteName,
-      siteUrl: identity.siteUrl,
-      siteDescription: identity.siteDescription,
-      authorName: identity.authorName,
-      authorEmail: identity.authorEmail,
-      twitterHandle: identity.twitterHandle,
-      lang: identity.lang,
-      seoHomeTitle: identity.siteName,
-      seoHomeDescription: identity.siteDescription,
-      rssTitle: identity.siteName,
-      rssDescription: identity.siteDescription,
-      ogImageUrl: `${identity.siteUrl}/og.png`,
-      fontSans,
-      fontMono,
-    },
+    rubricaConfigInput(identity, fontSans, fontMono),
     projectDir,
     fs as Parameters<typeof defaultApplyRubricalConfig>[2]
   );
@@ -273,7 +252,8 @@ export async function runCreate(
   await writeStateFn(
     projectDir,
     {
-      version: "0.1.0",
+      // Versão realmente baixada: o update usa como base para preservar as personalizações.
+      version: version.replace(/^v/, ""),
       layout,
       theme: themeChoice,
       fontSans,

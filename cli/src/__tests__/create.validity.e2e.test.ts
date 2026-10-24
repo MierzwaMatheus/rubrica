@@ -256,7 +256,8 @@ describe("2.12 — rubrica.config.ts sintaxe TypeScript", () => {
       ts.ScriptTarget.Latest,
       true
     );
-    const syntaxErrors = sourceFile.parseDiagnostics as ts.Diagnostic[] | undefined;
+    // parseDiagnostics é interno ao compilador e não aparece na tipagem pública.
+    const syntaxErrors = (sourceFile as unknown as { parseDiagnostics?: ts.Diagnostic[] }).parseDiagnostics;
     const errors = syntaxErrors?.filter(d => d.category === ts.DiagnosticCategory.Error) ?? [];
     expect(errors).toHaveLength(0);
 

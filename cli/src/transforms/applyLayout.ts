@@ -10,7 +10,7 @@ export interface LayoutFsModule {
   exists: (path: string) => Promise<boolean>;
 }
 
-type Layout = "cyberpunk" | "brutalist" | "swiss" | "bento" | "magazine";
+import type { RubricaLayout as Layout } from "../state/readState.js";
 
 const LAYOUT_FILES: Record<Layout, { copy: string[]; remove: string[]; pages?: string[] }> = {
   cyberpunk: {

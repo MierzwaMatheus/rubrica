@@ -1,451 +1,225 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { Volume } from "memfs";
-import { runUpdate } from "../commands/update.js";
-
-// ---- helpers ----------------------------------------------------------------
-
-function makeFsModule(vol: InstanceType<typeof Volume>) {
-  return {
-    access: (path: string) =>
-      vol.promises.access(path).then(() => undefined),
-    readFile: (path: string, encoding: string) =>
-      vol.promises.readFile(path, encoding as BufferEncoding) as Promise<string>,
-    writeFile: (path: string, data: string) =>
-      vol.promises.writeFile(path, data).then(() => undefined),
-    mkdir: (path: string, options: { recursive: boolean }) =>
-      vol.promises.mkdir(path, options).then(() => undefined),
-  };
-}
-
-const BASE_STATE = {
-  version: "1.0.0",
-  layout: "cyberpunk" as const,
-  theme: "cyberpunk",
-  accentColor: null,
-  fontSans: "Inter",
-  fontMono: "JetBrains Mono",
-  radius: "0.5rem",
-  plugins: { blog: true },
-};
-
-// ---- mocks de @clack/prompts ------------------------------------------------
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import * as fs from "node:fs/promises";
+import * as path from "node:path";
+import { tmpdir } from "node:os";
 
 vi.mock("@clack/prompts", () => ({
   intro: vi.fn(),
   outro: vi.fn(),
   confirm: vi.fn().mockResolvedValue(true),
+  text: vi.fn(),
   isCancel: vi.fn(() => false),
   cancel: vi.fn(),
+  spinner: vi.fn(() => ({ start: vi.fn(), stop: vi.fn() })),
   log: { warn: vi.fn(), info: vi.fn() },
 }));
 
-import { confirm, cancel, log } from "@clack/prompts";
+import { cancel, confirm, outro, text } from "@clack/prompts";
+import { runUpdate } from "../commands/update.js";
+import { buildPristine } from "../utils/pristine.js";
+import { NEW_SUFFIX } from "../utils/threeWayUpdate.js";
+import type { RubricaState } from "../state/readState.js";
+import { baseRelease, fakeDownload, readTree, writeTree, type ReleaseFiles } from "./helpers/releaseFixture.js";
 
-// ---- Ciclo 1: versão local igual à remota → nenhum arquivo modificado ------
+const STATE: RubricaState = {
+  version: "0.3.17",
+  layout: "brutalist",
+  theme: "midnight-blue",
+  fontSans: "Space Grotesk",
+  fontMono: "Fira Code",
+  plugins: { blog: true, portfolio: false },
+  identity: {
+    siteName: "Ana Dev",
+    siteUrl: "https://ana.dev",
+    siteDescription: "Portfólio da Ana",
+    authorName: "Ana",
+    authorEmail: "ana@ana.dev",
+    twitterHandle: "anadev",
+    lang: "pt-BR",
+  },
+};
 
-describe("runUpdate — versão já atualizada", () => {
-  beforeEach(() => vi.clearAllMocks());
+let root: string;
+let projectDir: string;
 
-  it("não chama nenhum transform quando versão local já é igual à remota", async () => {
-    const vol = Volume.fromJSON({
-      "/project/rubrica.json": JSON.stringify(BASE_STATE),
-    });
-    const fs = makeFsModule(vol);
-
-    const detectProjectMock = vi.fn().mockResolvedValue("/project/rubrica.json");
-    const readStateMock = vi.fn().mockResolvedValue(BASE_STATE);
-    const getLatestVersionMock = vi.fn().mockResolvedValue("1.0.0");
-    const downloadReleaseMock = vi.fn();
-    const applyLayoutMock = vi.fn();
-    const applyThemeMock = vi.fn();
-    const applyFontMock = vi.fn();
-    const applyPluginsMock = vi.fn();
-    const applyIndexHtmlMock = vi.fn();
-    const applyRubricalConfigMock = vi.fn();
-    const writeStateMock = vi.fn();
-
-    await runUpdate({
-      cwd: "/project",
-      fs,
-      detectProject: detectProjectMock,
-      readState: readStateMock,
-      getLatestVersion: getLatestVersionMock,
-      downloadRelease: downloadReleaseMock,
-      applyLayout: applyLayoutMock,
-      applyTheme: applyThemeMock,
-      applyFont: applyFontMock,
-      applyPlugins: applyPluginsMock,
-      applyIndexHtml: applyIndexHtmlMock,
-      applyRubricalConfig: applyRubricalConfigMock,
-      writeState: writeStateMock,
-    });
-
-    expect(downloadReleaseMock).not.toHaveBeenCalled();
-    expect(applyLayoutMock).not.toHaveBeenCalled();
-    expect(applyThemeMock).not.toHaveBeenCalled();
-    expect(applyFontMock).not.toHaveBeenCalled();
-    expect(applyPluginsMock).not.toHaveBeenCalled();
-    expect(applyIndexHtmlMock).not.toHaveBeenCalled();
-    expect(applyRubricalConfigMock).not.toHaveBeenCalled();
-    expect(writeStateMock).not.toHaveBeenCalled();
-  });
+beforeEach(async () => {
+  vi.clearAllMocks();
+  vi.mocked(confirm).mockResolvedValue(true);
+  root = await fs.mkdtemp(path.join(tmpdir(), "rubrica-update-test-"));
+  projectDir = path.join(root, "ana");
 });
 
-// ---- Ciclo 2: território do usuário nunca sobrescrito diretamente ----------
-
-describe("runUpdate — preservação do território do usuário", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(confirm).mockResolvedValue(true);
-  });
-
-  it("não chama fs.writeFile em arquivos de território do usuário diretamente", async () => {
-    const vol = Volume.fromJSON({
-      "/project/rubrica.json": JSON.stringify(BASE_STATE),
-    });
-    const fs = makeFsModule(vol);
-    const writeFileSpy = vi.spyOn(fs, "writeFile");
-
-    const detectProjectMock = vi.fn().mockResolvedValue("/project/rubrica.json");
-    const readStateMock = vi.fn().mockResolvedValue(BASE_STATE);
-    const getLatestVersionMock = vi.fn().mockResolvedValue("1.1.0");
-    const downloadReleaseMock = vi.fn().mockResolvedValue(undefined);
-    const applyLayoutMock = vi.fn().mockResolvedValue(undefined);
-    const applyThemeMock = vi.fn().mockResolvedValue(undefined);
-    const applyFontMock = vi.fn().mockResolvedValue(undefined);
-    const applyPluginsMock = vi.fn().mockResolvedValue(undefined);
-    const applyIndexHtmlMock = vi.fn().mockResolvedValue(undefined);
-    const applyRubricalConfigMock = vi.fn().mockResolvedValue(undefined);
-    const writeStateMock = vi.fn().mockResolvedValue(undefined);
-
-    await runUpdate({
-      cwd: "/project",
-      fs,
-      detectProject: detectProjectMock,
-      readState: readStateMock,
-      getLatestVersion: getLatestVersionMock,
-      downloadRelease: downloadReleaseMock,
-      applyLayout: applyLayoutMock,
-      applyTheme: applyThemeMock,
-      applyFont: applyFontMock,
-      applyPlugins: applyPluginsMock,
-      applyIndexHtml: applyIndexHtmlMock,
-      applyRubricalConfig: applyRubricalConfigMock,
-      writeState: writeStateMock,
-    });
-
-    const userTerritory = [
-      "rubrica.config.ts",
-      "rubrica.json",
-      ".env",
-      ".env.local",
-    ];
-
-    for (const [callPath] of writeFileSpy.mock.calls) {
-      for (const file of userTerritory) {
-        expect(callPath).not.toMatch(new RegExp(`${file.replace(".", "\\.")}$`));
-      }
-    }
-  });
+afterEach(async () => {
+  await fs.rm(root, { recursive: true, force: true });
 });
 
-// ---- Ciclo 3: applyRubricalConfig re-aplicado após update ------------------
+/** Projeto como o create deixaria na versão `from`, com o rubrica.json. */
+async function createProject(releases: Record<string, ReleaseFiles>, state: RubricaState = STATE) {
+  await buildPristine({
+    dir: projectDir,
+    version: state.version,
+    state,
+    packageName: "ana",
+    download: fakeDownload(releases),
+  });
+  await fs.writeFile(path.join(projectDir, "rubrica.json"), JSON.stringify(state, null, 2));
+}
 
-describe("runUpdate — re-aplicação de applyRubricalConfig", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(confirm).mockResolvedValue(true);
+async function edit(file: string, fn: (s: string) => string) {
+  const abs = path.join(projectDir, file);
+  await fs.writeFile(abs, fn(await fs.readFile(abs, "utf-8")));
+}
+
+function update(releases: Record<string, ReleaseFiles>, options = {}) {
+  return runUpdate({
+    cwd: projectDir,
+    options,
+    getLatestVersion: async () => "v0.4.0",
+    downloadRelease: fakeDownload(releases),
+    checkRequiredEnv: async () => [],
+  });
+}
+
+/** Release nova: muda o CSS (regra nova no fim), uma página e o schema. */
+function nextRelease(): ReleaseFiles {
+  const r = baseRelease();
+  r["src/index.css"] = `${r["src/index.css"]}\n.badge {\n  font-weight: 600;\n}\n`;
+  r["templates/layouts/brutalist/pages/Resume.tsx"] = "export default function Resume() {\n  return <main>Resume v2</main>;\n}\n";
+  r["templates/layouts/brutalist/pages/Home.tsx"] = String(r["templates/layouts/brutalist/pages/Home.tsx"]).replace("</main>", " v2</main>");
+  r["convex/schema.ts"] = "export const schema = 2;\n";
+  r["src/novo.ts"] = "export const novo = true;\n";
+  return r;
+}
+
+describe("rubrica update", () => {
+  it("preserva cores e CSS personalizados e ainda traz o CSS novo do Rubrica", async () => {
+    const releases = { "0.3.17": baseRelease(), "0.4.0": nextRelease() };
+    await createProject(releases);
+    await edit("src/index.css", (css) => css.replace(/--primary: [^;]+;/, "--primary: #ff00aa;").replace("padding: 4px;", "padding: 12px 20px;"));
+
+    await update(releases);
+
+    const css = await fs.readFile(path.join(projectDir, "src/index.css"), "utf-8");
+    expect(css).toContain("--primary: #ff00aa;");
+    expect(css).toContain("padding: 12px 20px;");
+    expect(css).toContain(".badge");
+    // Escolhas do create continuam aplicadas
+    expect(css).toContain('--font-sans: "Space Grotesk"');
+    expect(css).toContain("--bg: #0a1224"); // midnight-blue
   });
 
-  it("chama applyRubricalConfig após baixar nova versão", async () => {
-    const vol = Volume.fromJSON({
-      "/project/rubrica.json": JSON.stringify(BASE_STATE),
-    });
-    const fs = makeFsModule(vol);
+  it("página do layout personalizada fica intacta; as não personalizadas são atualizadas", async () => {
+    const releases = { "0.3.17": baseRelease(), "0.4.0": nextRelease() };
+    await createProject(releases);
+    await edit("src/pages/Home.tsx", () => "export default function Home() {\n  return <main>Minha home</main>;\n}\n");
 
-    const detectProjectMock = vi.fn().mockResolvedValue("/project/rubrica.json");
-    const readStateMock = vi.fn().mockResolvedValue(BASE_STATE);
-    const getLatestVersionMock = vi.fn().mockResolvedValue("1.1.0");
-    const downloadReleaseMock = vi.fn().mockResolvedValue(undefined);
-    const applyLayoutMock = vi.fn().mockResolvedValue(undefined);
-    const applyThemeMock = vi.fn().mockResolvedValue(undefined);
-    const applyFontMock = vi.fn().mockResolvedValue(undefined);
-    const applyPluginsMock = vi.fn().mockResolvedValue(undefined);
-    const applyIndexHtmlMock = vi.fn().mockResolvedValue(undefined);
-    const applyRubricalConfigMock = vi.fn().mockResolvedValue(undefined);
-    const writeStateMock = vi.fn().mockResolvedValue(undefined);
+    await update(releases);
 
-    await runUpdate({
-      cwd: "/project",
-      fs,
-      detectProject: detectProjectMock,
-      readState: readStateMock,
-      getLatestVersion: getLatestVersionMock,
-      downloadRelease: downloadReleaseMock,
-      applyLayout: applyLayoutMock,
-      applyTheme: applyThemeMock,
-      applyFont: applyFontMock,
-      applyPlugins: applyPluginsMock,
-      applyIndexHtml: applyIndexHtmlMock,
-      applyRubricalConfig: applyRubricalConfigMock,
-      writeState: writeStateMock,
-    });
-
-    expect(downloadReleaseMock).toHaveBeenCalled();
-    expect(applyRubricalConfigMock).toHaveBeenCalled();
-  });
-});
-
-// ---- Ciclo 4: applyLayout re-aplicado após update --------------------------
-
-describe("runUpdate — re-aplicação de applyLayout", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(confirm).mockResolvedValue(true);
+    const files = await readTree(projectDir);
+    expect(files["src/pages/Home.tsx"]).toContain("Minha home");
+    expect(files[`src/pages/Home.tsx${NEW_SUFFIX}`]).toContain("v2");
+    expect(files["src/pages/Resume.tsx"]).toContain("Resume v2");
+    expect(files["convex/schema.ts"]).toBe("export const schema = 2;\n");
+    expect(files["src/novo.ts"]).toBeDefined();
   });
 
-  it("chama applyLayout com o layout do rubrica.json após update", async () => {
-    const stateCyberpunk = { ...BASE_STATE, layout: "cyberpunk" as const };
-    const vol = Volume.fromJSON({
-      "/project/rubrica.json": JSON.stringify(stateCyberpunk),
-    });
-    const fs = makeFsModule(vol);
+  it("não apaga a identidade do rubrica.config.ts nem o nome do package.json", async () => {
+    const releases = { "0.3.17": baseRelease(), "0.4.0": nextRelease() };
+    await createProject(releases);
 
-    const detectProjectMock = vi.fn().mockResolvedValue("/project/rubrica.json");
-    const readStateMock = vi.fn().mockResolvedValue(stateCyberpunk);
-    const getLatestVersionMock = vi.fn().mockResolvedValue("1.1.0");
-    const downloadReleaseMock = vi.fn().mockResolvedValue(undefined);
-    const applyLayoutMock = vi.fn().mockResolvedValue(undefined);
-    const applyThemeMock = vi.fn().mockResolvedValue(undefined);
-    const applyFontMock = vi.fn().mockResolvedValue(undefined);
-    const applyPluginsMock = vi.fn().mockResolvedValue(undefined);
-    const applyIndexHtmlMock = vi.fn().mockResolvedValue(undefined);
-    const applyRubricalConfigMock = vi.fn().mockResolvedValue(undefined);
-    const writeStateMock = vi.fn().mockResolvedValue(undefined);
+    await update(releases);
 
-    await runUpdate({
-      cwd: "/project",
-      fs,
-      detectProject: detectProjectMock,
-      readState: readStateMock,
-      getLatestVersion: getLatestVersionMock,
-      downloadRelease: downloadReleaseMock,
-      applyLayout: applyLayoutMock,
-      applyTheme: applyThemeMock,
-      applyFont: applyFontMock,
-      applyPlugins: applyPluginsMock,
-      applyIndexHtml: applyIndexHtmlMock,
-      applyRubricalConfig: applyRubricalConfigMock,
-      writeState: writeStateMock,
-    });
-
-    expect(applyLayoutMock).toHaveBeenCalled();
-    const [layoutArg] = applyLayoutMock.mock.calls[0];
-    expect(layoutArg).toBe("cyberpunk");
-  });
-});
-
-// ---- Ciclo 5: versão major exige confirmação explícita ---------------------
-
-describe("runUpdate — atualização major exige confirmação", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
+    const files = await readTree(projectDir);
+    expect(files["rubrica.config.ts"]).toContain('"Ana Dev"');
+    expect(files["rubrica.config.ts"]).toContain('"https://ana.dev"');
+    expect(JSON.parse(files["package.json"]!).name).toBe("ana");
   });
 
-  it("chama confirm com mensagem contendo 'major' quando major muda", async () => {
-    const vol = Volume.fromJSON({
-      "/project/rubrica.json": JSON.stringify(BASE_STATE),
-    });
-    const fs = makeFsModule(vol);
+  it("não deixa templates/ nem cli/ no projeto", async () => {
+    const releases = { "0.3.17": baseRelease(), "0.4.0": nextRelease() };
+    await createProject(releases);
 
-    vi.mocked(confirm).mockResolvedValue(true);
+    await update(releases);
 
-    const detectProjectMock = vi.fn().mockResolvedValue("/project/rubrica.json");
-    const readStateMock = vi.fn().mockResolvedValue(BASE_STATE);
-    const getLatestVersionMock = vi.fn().mockResolvedValue("2.0.0");
-    const downloadReleaseMock = vi.fn().mockResolvedValue(undefined);
-    const applyLayoutMock = vi.fn().mockResolvedValue(undefined);
-    const applyThemeMock = vi.fn().mockResolvedValue(undefined);
-    const applyFontMock = vi.fn().mockResolvedValue(undefined);
-    const applyPluginsMock = vi.fn().mockResolvedValue(undefined);
-    const applyIndexHtmlMock = vi.fn().mockResolvedValue(undefined);
-    const applyRubricalConfigMock = vi.fn().mockResolvedValue(undefined);
-    const writeStateMock = vi.fn().mockResolvedValue(undefined);
-
-    await runUpdate({
-      cwd: "/project",
-      fs,
-      detectProject: detectProjectMock,
-      readState: readStateMock,
-      getLatestVersion: getLatestVersionMock,
-      downloadRelease: downloadReleaseMock,
-      applyLayout: applyLayoutMock,
-      applyTheme: applyThemeMock,
-      applyFont: applyFontMock,
-      applyPlugins: applyPluginsMock,
-      applyIndexHtml: applyIndexHtmlMock,
-      applyRubricalConfig: applyRubricalConfigMock,
-      writeState: writeStateMock,
-    });
-
-    const confirmCalls = vi.mocked(confirm).mock.calls;
-    const hasMajorConfirm = confirmCalls.some(([opts]) =>
-      typeof opts === "object" && opts !== null &&
-      "message" in opts &&
-      /major/i.test(String((opts as { message: string }).message))
-    );
-    expect(hasMajorConfirm).toBe(true);
-  });
-});
-
-// ---- Ciclo 5 (integração): checkRequiredEnv integrado no update.ts ---------
-
-describe("runUpdate — exibe vars faltantes via checkRequiredEnv", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(confirm).mockResolvedValue(true);
+    const files = Object.keys(await readTree(projectDir));
+    expect(files.some((f) => f.startsWith("templates/") || f.startsWith("cli/"))).toBe(false);
   });
 
-  it("exibe OPENROUTER_API_KEY no output quando faltante no .env após update", async () => {
-    const vol = Volume.fromJSON({
-      "/project/rubrica.json": JSON.stringify(BASE_STATE),
-    });
-    const fs = makeFsModule(vol);
+  it("grava a versão nova no rubrica.json", async () => {
+    const releases = { "0.3.17": baseRelease(), "0.4.0": nextRelease() };
+    await createProject(releases);
 
-    const detectProjectMock = vi.fn().mockResolvedValue("/project/rubrica.json");
-    const readStateMock = vi.fn().mockResolvedValue(BASE_STATE);
-    const getLatestVersionMock = vi.fn().mockResolvedValue("1.1.0");
-    const downloadReleaseMock = vi.fn().mockResolvedValue(undefined);
-    const applyLayoutMock = vi.fn().mockResolvedValue(undefined);
-    const applyThemeMock = vi.fn().mockResolvedValue(undefined);
-    const applyFontMock = vi.fn().mockResolvedValue(undefined);
-    const applyPluginsMock = vi.fn().mockResolvedValue(undefined);
-    const applyIndexHtmlMock = vi.fn().mockResolvedValue(undefined);
-    const applyRubricalConfigMock = vi.fn().mockResolvedValue(undefined);
-    const writeStateMock = vi.fn().mockResolvedValue(undefined);
-    const checkRequiredEnvMock = vi.fn().mockResolvedValue([
-      { name: "OPENROUTER_API_KEY", description: "Chave OpenRouter" },
-    ]);
+    await update(releases);
 
-    await runUpdate({
-      cwd: "/project",
-      fs,
-      detectProject: detectProjectMock,
-      readState: readStateMock,
-      getLatestVersion: getLatestVersionMock,
-      downloadRelease: downloadReleaseMock,
-      applyLayout: applyLayoutMock,
-      applyTheme: applyThemeMock,
-      applyFont: applyFontMock,
-      applyPlugins: applyPluginsMock,
-      applyIndexHtml: applyIndexHtmlMock,
-      applyRubricalConfig: applyRubricalConfigMock,
-      writeState: writeStateMock,
-      checkRequiredEnv: checkRequiredEnvMock,
-    });
-
-    const warnCalls = vi.mocked(log.warn).mock.calls;
-    const hasApiKey = warnCalls.some(([msg]) =>
-      typeof msg === "string" && msg.includes("OPENROUTER_API_KEY")
-    );
-    expect(hasApiKey).toBe(true);
+    const state = JSON.parse(await fs.readFile(path.join(projectDir, "rubrica.json"), "utf-8"));
+    expect(state.version).toBe("0.4.0");
+    expect(state.identity.siteName).toBe("Ana Dev");
   });
 
-  it("não exibe aviso de vars faltantes quando required-env.json está vazio", async () => {
-    const vol = Volume.fromJSON({
-      "/project/rubrica.json": JSON.stringify(BASE_STATE),
-    });
-    const fs = makeFsModule(vol);
+  it("--dry-run não grava nada", async () => {
+    const releases = { "0.3.17": baseRelease(), "0.4.0": nextRelease() };
+    await createProject(releases);
+    const before = await readTree(projectDir);
 
-    const detectProjectMock = vi.fn().mockResolvedValue("/project/rubrica.json");
-    const readStateMock = vi.fn().mockResolvedValue(BASE_STATE);
-    const getLatestVersionMock = vi.fn().mockResolvedValue("1.1.0");
-    const downloadReleaseMock = vi.fn().mockResolvedValue(undefined);
-    const applyLayoutMock = vi.fn().mockResolvedValue(undefined);
-    const applyThemeMock = vi.fn().mockResolvedValue(undefined);
-    const applyFontMock = vi.fn().mockResolvedValue(undefined);
-    const applyPluginsMock = vi.fn().mockResolvedValue(undefined);
-    const applyIndexHtmlMock = vi.fn().mockResolvedValue(undefined);
-    const applyRubricalConfigMock = vi.fn().mockResolvedValue(undefined);
-    const writeStateMock = vi.fn().mockResolvedValue(undefined);
-    const checkRequiredEnvMock = vi.fn().mockResolvedValue([]);
+    await update(releases, { dryRun: true });
 
-    await runUpdate({
-      cwd: "/project",
-      fs,
-      detectProject: detectProjectMock,
-      readState: readStateMock,
-      getLatestVersion: getLatestVersionMock,
-      downloadRelease: downloadReleaseMock,
-      applyLayout: applyLayoutMock,
-      applyTheme: applyThemeMock,
-      applyFont: applyFontMock,
-      applyPlugins: applyPluginsMock,
-      applyIndexHtml: applyIndexHtmlMock,
-      applyRubricalConfig: applyRubricalConfigMock,
-      writeState: writeStateMock,
-      checkRequiredEnv: checkRequiredEnvMock,
-    });
-
-    const warnCalls = vi.mocked(log.warn).mock.calls;
-    const hasEnvWarning = warnCalls.some(([msg]) =>
-      typeof msg === "string" && msg.toLowerCase().includes("variáveis")
-    );
-    expect(hasEnvWarning).toBe(false);
-  });
-});
-
-// ---- Ciclo 6: versão major cancelada → nenhum arquivo alterado -------------
-
-describe("runUpdate — cancelamento de atualização major", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
+    expect(await readTree(projectDir)).toEqual(before);
   });
 
-  it("não chama nenhum transform quando major é cancelado", async () => {
-    const vol = Volume.fromJSON({
-      "/project/rubrica.json": JSON.stringify(BASE_STATE),
-    });
-    const fs = makeFsModule(vol);
+  it("não grava nada se o usuário recusar o plano", async () => {
+    const releases = { "0.3.17": baseRelease(), "0.4.0": nextRelease() };
+    await createProject(releases);
+    const before = await readTree(projectDir);
+    vi.mocked(confirm).mockResolvedValueOnce(false);
 
-    vi.mocked(confirm).mockResolvedValue(false);
+    await update(releases);
 
-    const detectProjectMock = vi.fn().mockResolvedValue("/project/rubrica.json");
-    const readStateMock = vi.fn().mockResolvedValue(BASE_STATE);
-    const getLatestVersionMock = vi.fn().mockResolvedValue("2.0.0");
-    const downloadReleaseMock = vi.fn();
-    const applyLayoutMock = vi.fn();
-    const applyThemeMock = vi.fn();
-    const applyFontMock = vi.fn();
-    const applyPluginsMock = vi.fn();
-    const applyIndexHtmlMock = vi.fn();
-    const applyRubricalConfigMock = vi.fn();
-    const writeStateMock = vi.fn();
+    expect(await readTree(projectDir)).toEqual(before);
+  });
 
-    await runUpdate({
-      cwd: "/project",
-      fs,
-      detectProject: detectProjectMock,
-      readState: readStateMock,
-      getLatestVersion: getLatestVersionMock,
-      downloadRelease: downloadReleaseMock,
-      applyLayout: applyLayoutMock,
-      applyTheme: applyThemeMock,
-      applyFont: applyFontMock,
-      applyPlugins: applyPluginsMock,
-      applyIndexHtml: applyIndexHtmlMock,
-      applyRubricalConfig: applyRubricalConfigMock,
-      writeState: writeStateMock,
-    });
+  it("não faz nada quando já está na versão mais recente", async () => {
+    const releases = { "0.4.0": nextRelease() };
+    await createProject(releases, { ...STATE, version: "0.4.0" });
 
-    expect(downloadReleaseMock).not.toHaveBeenCalled();
-    expect(applyLayoutMock).not.toHaveBeenCalled();
-    expect(applyThemeMock).not.toHaveBeenCalled();
-    expect(applyFontMock).not.toHaveBeenCalled();
-    expect(applyPluginsMock).not.toHaveBeenCalled();
-    expect(applyIndexHtmlMock).not.toHaveBeenCalled();
-    expect(applyRubricalConfigMock).not.toHaveBeenCalled();
-    expect(writeStateMock).not.toHaveBeenCalled();
-    expect(vi.mocked(cancel)).toHaveBeenCalled();
+    await update(releases);
+
+    expect(outro).toHaveBeenCalledWith(expect.stringContaining("versão mais recente"));
+  });
+
+  it("com o 0.1.0 gravado por CLIs antigos, pergunta a versão de origem", async () => {
+    const releases = { "0.3.17": baseRelease(), "0.4.0": nextRelease() };
+    await createProject(releases);
+    await fs.writeFile(path.join(projectDir, "rubrica.json"), JSON.stringify({ ...STATE, version: "0.1.0" }));
+    vi.mocked(text).mockResolvedValueOnce("0.3.17");
+
+    await update(releases);
+
+    expect(text).toHaveBeenCalled();
+    const css = await fs.readFile(path.join(projectDir, "src/index.css"), "utf-8");
+    expect(css).toContain(".badge");
+  });
+
+  it("com 0.1.0 e --yes, pede o --from em vez de adivinhar", async () => {
+    const releases = { "0.3.17": baseRelease(), "0.4.0": nextRelease() };
+    await createProject(releases);
+    await fs.writeFile(path.join(projectDir, "rubrica.json"), JSON.stringify({ ...STATE, version: "0.1.0" }));
+    const before = await readTree(projectDir);
+
+    await update(releases, { yes: true });
+
+    expect(cancel).toHaveBeenCalledWith(expect.stringContaining("--from"));
+    expect(await readTree(projectDir)).toEqual(before);
+  });
+
+  it("--from sobrepõe a versão do rubrica.json", async () => {
+    const releases = { "0.3.17": baseRelease(), "0.4.0": nextRelease() };
+    await createProject(releases);
+    await fs.writeFile(path.join(projectDir, "rubrica.json"), JSON.stringify({ ...STATE, version: "0.1.0" }));
+
+    await update(releases, { from: "v0.3.17", yes: true });
+
+    expect(text).not.toHaveBeenCalled();
+    const state = JSON.parse(await fs.readFile(path.join(projectDir, "rubrica.json"), "utf-8"));
+    expect(state.version).toBe("0.4.0");
   });
 });

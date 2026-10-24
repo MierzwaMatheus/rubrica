@@ -1,10 +1,10 @@
 # create-rubrica
 
-CLI para criar e configurar projetos [Rubrica](https://github.com/MierzwaMatheus/rubrica) — sistema de portfólio profissional com React + Convex.
+CLI para criar, configurar e atualizar projetos [Rubrica](https://github.com/MierzwaMatheus/rubrica), o template de portfólio profissional com React + Convex.
 
-## Instalação
+Precisa de Node 20+ e do `git` instalado.
 
-Não é necessário instalar globalmente. Use diretamente via `pnpm create` ou `npx`:
+## Criar um projeto
 
 ```bash
 pnpm create rubrica meu-portfolio
@@ -12,74 +12,84 @@ pnpm create rubrica meu-portfolio
 npx create-rubrica meu-portfolio
 ```
 
-## Comandos
+O assistente baixa a versão mais recente do template e pergunta:
 
-### `pnpm create rubrica <nome-do-projeto>`
+- **Layout**: Cyberpunk, Brutalism Terminal, Swiss Grid, Bento ou Magazine ([guia dos layouts](https://github.com/MierzwaMatheus/rubrica/blob/main/docs/templates/README.md))
+- **Paleta**: Editorial Cream, Paper Noir, Midnight Blue ou Solar Warm ([esquemas de cores](https://github.com/MierzwaMatheus/rubrica/blob/main/docs/templates/cores.md))
+- **Fontes**: principal e mono (o layout sugere uma combinação)
+- **Plugins**: blog, portfólio, currículo, propostas, depoimentos, IA etc.
+- **Identidade**: nome do site, URL, descrição, autor, e-mail, handle do X, idioma
+- **Git e dependências**: inicializar o repositório e instalar com pnpm ou npm
 
-Cria um novo projeto Rubrica a partir do template mais recente. O assistente interativo coleta:
+Arquivos que saem com as suas escolhas:
 
-- **Identidade** — nome do site, URL, descrição, autor, email, Twitter/X handle, idioma
-- **Visual** — layout (sidebar / topbar / centered), tema (cyberpunk / minimal / editorial / forest / personalizado), fonte principal, fonte mono, border radius
-- **Funcionalidades** — plugins ativos (blog, portfólio, currículo, etc.)
-- **Setup** — inicializar git, instalar dependências
+| Arquivo | O que tem |
+|---|---|
+| `rubrica.json` | Estado do CLI: versão de origem, layout, paleta, fontes, plugins e identidade. Versione junto com o projeto: o `update` depende dele. |
+| `rubrica.config.ts` | Identidade, SEO e RSS usados no build |
+| `src/index.css` | As 4 cores da paleta e as fontes |
+| `index.html` | Meta tags e fonte do Google Fonts |
+| `src/components/`, `src/pages/` | Arquivos do layout escolhido |
+| `convex/pluginRegistry.ts` | Plugins ligados por padrão |
 
-Ao final, os arquivos gerados incluem:
-- `rubrica.config.ts` — identidade e aparência em build-time
-- `rubrica.json` — estado da CLI (versionado)
-- `src/components/Layout.tsx` e arquivos de navegação do layout escolhido
-- `src/index.css` — tema CSS aplicado
-- `convex/pluginRegistry.ts` — plugins configurados
-
-### `rubrica config`
-
-Reconfigura um projeto Rubrica existente. Execute dentro do diretório do projeto:
-
-```bash
-rubrica config
-```
-
-Permite reconfigurar:
-- **Identidade** — atualiza `rubrica.config.ts` com novos dados
-- **Aparência** — altera tema, fontes e radius; atualiza CSS e `rubrica.json`
-- **Layout** — troca o shell de navegação (⚠ sobrescreve customizações manuais)
-- **Plugins** — ativa ou desativa plugins no `convex/pluginRegistry.ts`
-
-### `rubrica update`
-
-Atualiza um projeto Rubrica para a versão mais recente do template (Fase 3 — em desenvolvimento).
-
-## Estrutura gerada
-
-```
-meu-portfolio/
-├── rubrica.config.ts        ← identidade e aparência (editável)
-├── rubrica.json             ← estado da CLI (versionado)
-├── src/
-│   ├── components/
-│   │   ├── Layout.tsx       ← shell do layout escolhido
-│   │   └── Sidebar.tsx      ← ou Navbar.tsx / Footer.tsx
-│   └── index.css            ← tema CSS
-├── convex/
-│   └── pluginRegistry.ts    ← plugins configurados
-└── index.html               ← meta tags preenchidas
-```
-
-## Pós-instalação
-
-Após `pnpm create rubrica`:
+Depois de criar:
 
 ```bash
 cd meu-portfolio
-
-# 1. Suba o backend Convex (deixe rodando)
-npx convex dev
-
-# 2. Em outro terminal, inicie o frontend
-pnpm dev
-
-# 3. Acesse http://localhost:3000 e crie seu usuário root em /login
-#    (com BOOTSTRAP_ALLOWED=true no Convex Dashboard)
+npx convex dev                 # deixe rodando: cria o backend e o .env.local
+npx create-rubrica setup       # em outro terminal: variáveis, admin e dados iniciais
+pnpm dev                       # http://localhost:3000
 ```
+
+## Comandos
+
+Rode dentro da pasta do projeto (ou de qualquer subpasta).
+
+### `setup`
+
+```bash
+npx create-rubrica setup
+```
+
+Configura o backend Convex: gera as chaves de autenticação, define `SITE_URL` e as variáveis dos plugins que você ligou (Telegram, OpenRouter, Asaas, Vercel; todas opcionais), cria o usuário root e popula os dados iniciais. Com a chave do Asaas, também gera o token do webhook e mostra a URL e o token para cadastrar no painel do Asaas. Pode ser rodado de novo: o admin existente é mantido e o seed só cria o que falta.
+
+### `config`
+
+```bash
+npx create-rubrica config
+```
+
+Muda as escolhas feitas no `create`:
+
+- **Identidade**: atualiza `rubrica.config.ts`, as meta tags do `index.html` e o `rubrica.json`
+- **Aparência**: paleta e fontes
+- **Layout**: troca o layout (⚠ sobrescreve os arquivos do layout; personalizações neles se perdem)
+- **Plugins**: quais vêm ligados por padrão
+
+### `update`
+
+```bash
+npx create-rubrica@latest update --dry-run   # mostra o que mudaria
+npx create-rubrica@latest update             # aplica
+```
+
+Atualiza o projeto para a versão mais recente **sem desfazer as suas personalizações**. O CLI compara, arquivo por arquivo, a versão de onde o projeto saiu, a versão nova e o seu projeto:
+
+- arquivo que você não mexeu recebe a versão nova;
+- arquivo que você mexeu e o Rubrica não mudou fica como está;
+- quando os dois mudaram partes diferentes, as mudanças são mescladas;
+- quando os dois mudaram o mesmo trecho, o seu arquivo fica intacto e a versão nova é salva ao lado, em `<arquivo>.rubrica-new`.
+
+`.env*`, `rubrica.json` e os dados gerados no build (`public/data/`, RSS, sitemap) nunca são tocados.
+
+| Opção | Para que serve |
+|---|---|
+| `--dry-run` | Só mostra o plano |
+| `--to <versão>` | Atualiza para uma versão específica |
+| `--from <versão>` | Versão com que o projeto foi criado (projetos criados até a v0.3.18 gravavam sempre `0.1.0`) |
+| `--yes` | Aplica sem perguntar |
+
+Guia completo: [Atualizando o seu Rubrica](https://github.com/MierzwaMatheus/rubrica/blob/main/docs/atualizacao.md).
 
 ## Licença
 

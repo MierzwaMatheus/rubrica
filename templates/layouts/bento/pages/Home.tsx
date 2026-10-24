@@ -78,6 +78,8 @@ export default function BentoHome() {
           .bento-hero-row { grid-template-columns: 1fr !important; }
           .bento-hero-row > * { grid-column: auto !important; grid-row: auto !important; }
           .bento-hero-title { font-size: 38px !important; }
+          .bento-testimonials { grid-template-columns: 1fr !important; }
+          .bento-testimonials > * { grid-column: auto !important; }
         }
       `}</style>
 
@@ -274,7 +276,7 @@ export default function BentoHome() {
 
       {/* Números de prova — logo abaixo do hero */}
       {metrics.length > 0 && (
-        <div
+        <div data-m-cols="2"
           style={{
             display: "grid",
             gridTemplateColumns: `repeat(${metrics.length}, 1fr)`,
@@ -447,6 +449,7 @@ export default function BentoHome() {
       {/* Testimonials */}
       {testimonials.length > 0 && (
         <div
+          className="bento-testimonials"
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(12, 1fr)",

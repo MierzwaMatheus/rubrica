@@ -173,7 +173,7 @@ export default function BentoResume() {
 
       {/* Números de prova (os mesmos da home) */}
       {metrics.length > 0 && (
-        <div
+        <div data-m-cols="2"
           style={{
             display: "grid",
             gridTemplateColumns: `repeat(${metrics.length}, 1fr)`,

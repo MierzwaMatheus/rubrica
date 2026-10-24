@@ -101,7 +101,7 @@ export default function Portfolio() {
       </div>
       <h1
         style={{
-          fontSize: 28,
+          fontSize: "clamp(22px, 6.5vw, 28px)", overflowWrap: "anywhere",
           fontWeight: 700,
           margin: "4px 0 14px",
         }}
@@ -162,7 +162,7 @@ export default function Portfolio() {
           lineHeight: 1.85,
           margin: 0,
           whiteSpace: "pre",
-          overflow: "hidden",
+          overflowX: "auto",
           border: "1px solid var(--text)",
           padding: 14,
         }}

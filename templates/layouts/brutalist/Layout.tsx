@@ -1,5 +1,6 @@
 import { Navbar } from "./Navbar";
 import { cn } from "@/lib/utils";
+import { MobileLayoutStyles } from "@/components/MobileLayoutStyles";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -10,8 +11,9 @@ export function Layout({ children, className }: LayoutProps) {
   return (
     <div
       style={{ fontFamily: "var(--font-mono, monospace)" }}
-      className="min-h-screen bg-[var(--bg)] text-[var(--text)] flex flex-col"
+      className="rb-mobile min-h-screen bg-[var(--bg)] text-[var(--text)] flex flex-col"
     >
+      <MobileLayoutStyles />
       <Navbar />
       <main className={cn("flex-1 w-full", className)}>
         <div className="max-w-[1200px] mx-auto px-7 py-6">{children}</div>

@@ -1,4 +1,5 @@
 import DOMPurify from "dompurify";
+import { useIsMobile } from "@/hooks/useMobile";
 import { useResume } from "@/hooks/useResume";
 import { useHome } from "@/hooks/useHome";
 import { useHomeMetrics } from "@/hooks/useHomeMetrics";
@@ -9,6 +10,7 @@ import { splitParagraphs } from "@/utils/aboutContent";
 import { groupSkills } from "@/utils/resumeContent";
 
 export default function Resume() {
+  const isMobile = useIsMobile();
   const { t } = useTranslation();
   const { getItemsByType, isLoading } = useResume(resumeRepository);
   const { aboutText } = useHome(homeRepository);
@@ -23,11 +25,12 @@ export default function Resume() {
   const certs = [...getItemsByType("cert"), ...getItemsByType("course")];
   const volunteering = getItemsByType("volunteer");
   const softSkills = getItemsByType("soft_skill");
-  const pad = 48;
+  // No celular: 24px de margem, compensando o padding do <main> (data-m-bleed).
+  const pad = isMobile ? 24 : 48;
   return (
-    <div style={{ background: "var(--bg)", color: "var(--text)", fontFamily: "var(--font-sans)", minHeight: "100%" }}>
+    <div data-m-bleed style={{ background: "var(--bg)", color: "var(--text)", fontFamily: "var(--font-sans)", minHeight: "100%" }}>
       <div style={{ padding: `${pad}px ${pad}px ${pad - 12}px`, textAlign: "center" }}>
-        <h1 style={{ fontFamily: "var(--font-sans)", fontSize: 96, fontWeight: 500, letterSpacing: "-0.02em", margin: 0, lineHeight: 0.95 }}>
+        <h1 style={{ fontFamily: "var(--font-sans)", fontSize: "clamp(46px, 13.3vw, 96px)", fontWeight: 500, letterSpacing: "-0.02em", margin: 0, lineHeight: 0.95 }}>
           <em style={{ color: "var(--primary)" }}>Curriculum</em> Vitæ
         </h1>
       </div>
@@ -51,7 +54,7 @@ export default function Resume() {
           </button>
         </div>
         {metrics.length > 0 && (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderTop: "0.5px solid var(--text)" }}>
+          <div data-m-keep style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderTop: "0.5px solid var(--text)" }}>
             {metrics.map((m) => (
               <div key={m.label} style={{ padding: "18px 0 16px", borderBottom: "0.5px solid var(--text)" }}>
                 <div style={{ fontFamily: "var(--font-sans)", fontSize: 38, lineHeight: 1, fontWeight: 500, color: "var(--primary)" }}>{m.value}</div>

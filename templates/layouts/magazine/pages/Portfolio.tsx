@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useIsMobile } from "@/hooks/useMobile";
 import { Link } from "wouter";
 import { usePortfolio } from "@/hooks/usePortfolio";
 import { useTranslation } from "@/i18n/hooks/useTranslation";
@@ -8,17 +9,19 @@ import { filterByCategory, hasCaseStudy, listCategories } from "@/utils/portfoli
 const mono = { fontFamily: "var(--font-mono)", textTransform: "uppercase" as const };
 
 export default function Portfolio() {
+  const isMobile = useIsMobile();
   const { t } = useTranslation();
   const { projects, isLoading } = usePortfolio(portfolioRepository);
   const [category, setCategory] = useState<string | null>(null);
   if (isLoading) return null;
-  const pad = 48;
+  // No celular: 24px de margem, compensando o padding do <main> (data-m-bleed).
+  const pad = isMobile ? 24 : 48;
   const categories = listCategories(projects);
   const visible = filterByCategory(projects, category);
   const filters: Array<{ label: string; value: string | null }> = [{ label: t("portfolio.all"), value: null }, ...categories.map((c) => ({ label: c, value: c }))];
 
   return (
-    <div style={{ background: "var(--bg)", color: "var(--text)", fontFamily: "var(--font-sans)", minHeight: "100%" }}>
+    <div data-m-bleed style={{ background: "var(--bg)", color: "var(--text)", fontFamily: "var(--font-sans)", minHeight: "100%" }}>
       <div style={{ padding: `${pad}px ${pad}px ${pad - 12}px`, textAlign: "center" }}>
         <h1 style={{ fontFamily: "var(--font-sans)", fontSize: "clamp(56px, 8vw, 96px)", fontWeight: 500, letterSpacing: "-0.02em", margin: 0, lineHeight: 0.95 }}><em style={{ color: "var(--primary)" }}>Obras</em> Selecionadas</h1>
         <p style={{ fontFamily: "var(--font-sans)", fontStyle: "italic", fontSize: 19, opacity: 0.7, marginTop: 14 }}>{projects.length} projetos · Curadoria pessoal</p>

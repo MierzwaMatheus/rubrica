@@ -75,7 +75,7 @@ export default function SwissResume() {
           <h1
             style={{
               gridColumn: "span 7",
-              fontSize: 92,
+              fontSize: "clamp(44px, 12.8vw, 92px)",
               fontWeight: 900,
               letterSpacing: "-0.05em",
               margin: 0,
@@ -138,7 +138,7 @@ export default function SwissResume() {
       </div>
 
       {/* Stats band */}
-      <div
+      <div data-m-cols="2"
         style={{
           display: "grid",
           gridTemplateColumns: `repeat(${stats.length}, 1fr)`,

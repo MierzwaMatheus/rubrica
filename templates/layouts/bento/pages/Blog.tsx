@@ -185,7 +185,7 @@ export default function BentoBlog() {
                   opacity: 0.85,
                 }}
               >
-                {featured.published_at && <span>{featured.published_at}</span>}
+                {featured.published_at && <span>{new Date(featured.published_at).toLocaleDateString("pt-BR")}</span>}
               </div>
               <div style={{ marginTop: "auto", paddingTop: 24 }}>
                 <Link
@@ -222,7 +222,7 @@ export default function BentoBlog() {
 
       {/* Post grid — varied bento sizes */}
       {remaining.length > 0 && (
-        <div
+        <div data-m-cols="2"
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(6, 1fr)",
@@ -249,7 +249,7 @@ export default function BentoBlog() {
                     letterSpacing: "0.1em",
                   }}
                 >
-                  {p.published_at}
+                  {p.published_at && new Date(p.published_at).toLocaleDateString("pt-BR")}
                 </div>
                 <h3
                   style={{

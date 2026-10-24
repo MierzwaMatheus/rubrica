@@ -45,7 +45,7 @@ export default function SwissBlog() {
             </div>
             <h1
               style={{
-                fontSize: 96,
+                fontSize: "clamp(46px, 13.3vw, 96px)",
                 fontWeight: 900,
                 letterSpacing: "-0.05em",
                 margin: 0,

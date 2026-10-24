@@ -111,7 +111,7 @@ export default function Resume() {
       </div>
       <h1
         style={{
-          fontSize: 28,
+          fontSize: "clamp(22px, 6.5vw, 28px)", overflowWrap: "anywhere",
           fontWeight: 700,
           margin: "4px 0 14px",
           letterSpacing: "-0.01em",
@@ -130,7 +130,7 @@ export default function Resume() {
         }
       />
       {metrics.length > 0 && (
-        <div
+        <div data-m-cols="2"
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",

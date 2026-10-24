@@ -1,4 +1,5 @@
 import { useAbout } from "@/hooks/useAbout";
+import { useIsMobile } from "@/hooks/useMobile";
 import { useHome } from "@/hooks/useHome";
 import { useWorkPrinciples } from "@/hooks/useWorkPrinciples";
 import { useTranslation } from "@/i18n/hooks/useTranslation";
@@ -20,17 +21,19 @@ function Highlighted({ text }: { text: string }) {
 }
 
 export default function About() {
+  const isMobile = useIsMobile();
   const { t } = useTranslation();
   const { dailyRoutine, faq, isLoading } = useAbout(aboutRepository);
   const { aboutText } = useHome(homeRepository);
   const { principles } = useWorkPrinciples(homeRepository);
   if (isLoading) return null;
-  const pad = 48;
+  // No celular: 24px de margem, compensando o padding do <main> (data-m-bleed).
+  const pad = isMobile ? 24 : 48;
   const professional = splitParagraphs(aboutText ?? "");
   const personal = splitParagraphs(t("about.aboutMe.text"));
 
   return (
-    <div style={{ background: "var(--bg)", color: "var(--text)", fontFamily: "var(--font-sans)", minHeight: "100%" }}>
+    <div data-m-bleed style={{ background: "var(--bg)", color: "var(--text)", fontFamily: "var(--font-sans)", minHeight: "100%" }}>
       <div style={{ padding: `${pad}px ${pad}px ${pad - 12}px`, textAlign: "center" }}>
         <div style={{ ...label, color: "var(--primary)", marginBottom: 16 }}>↘ Perfil</div>
         <h1 style={{ fontFamily: "var(--font-sans)", fontSize: "clamp(52px, 8vw, 92px)", fontWeight: 500, letterSpacing: "-0.02em", margin: 0, lineHeight: 0.95 }}>
@@ -44,7 +47,7 @@ export default function About() {
           <div style={{ ...label, marginBottom: 24 }}>§ I · {t("about.professional.title")}</div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 40 }}>
             <p style={{ fontFamily: "var(--font-sans)", fontSize: 24, lineHeight: 1.4, margin: 0 }}>
-              <span style={{ fontSize: 80, lineHeight: 0.82, float: "left", marginRight: 12, marginTop: 6, color: "var(--primary)" }}>{professional[0].charAt(0)}</span>
+              <span style={{ fontSize: "clamp(38px, 11.1vw, 80px)", lineHeight: 0.82, float: "left", marginRight: 12, marginTop: 6, color: "var(--primary)" }}>{professional[0].charAt(0)}</span>
               <Highlighted text={professional[0].slice(1)} />
             </p>
             {professional.length > 1 && (

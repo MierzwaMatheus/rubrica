@@ -119,7 +119,8 @@ function AsciiBanner({ name }: { name: string }) {
       style={{
         margin: 0,
         color: "var(--primary)",
-        fontSize: 13,
+        // Encolhe no celular para o nome inteiro caber na largura da tela.
+        fontSize: "clamp(4px, 1.75vw, 13px)",
         fontWeight: 700,
         lineHeight: 1.05,
         fontFamily: "var(--font-mono)",
@@ -220,7 +221,7 @@ export default function Home() {
       {metrics.length > 0 && (
         <>
           <AsciiRule label="stats" />
-          <div
+          <div data-m-cols="2"
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",

@@ -23,6 +23,12 @@ export const PUBLIC_KEYS = [
   "theme_foreground",
   "theme_primary",
   "theme_accent",
+  // Cores do modo escuro (as 4 acima são do claro) e a marca de que os dois são separados.
+  "theme_dark_background",
+  "theme_dark_foreground",
+  "theme_dark_primary",
+  "theme_dark_accent",
+  "theme_colors_per_mode",
   "theme_accent_color",
   "theme_accent_hsl",
   "theme_font_sans",

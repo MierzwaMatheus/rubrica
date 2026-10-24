@@ -110,7 +110,7 @@ export function ChangePasswordModal() {
 
                     <Button
                         type="submit"
-                        className="w-full bg-neon-purple hover:bg-neon-purple/90 text-white"
+                        className="w-full bg-neon-purple hover:bg-neon-purple/90 text-primary-foreground"
                         disabled={isLoading}
                     >
                         {isLoading ? (

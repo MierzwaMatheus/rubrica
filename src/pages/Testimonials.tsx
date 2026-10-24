@@ -134,7 +134,7 @@ export default function TestimonialsPage() {
                           key={testimonial._id}
                           className={`bg-gradient-to-br ${gradient} border border-foreground/5 rounded-xl p-6 relative overflow-hidden break-inside-avoid mb-5`}
                         >
-                          <Quote className="absolute top-5 right-5 w-8 h-8 text-white/[0.04]" />
+                          <Quote className="absolute top-5 right-5 w-8 h-8 text-foreground-strong/[0.04]" />
                           <div className="flex items-center mb-4">
                             {testimonial.imageUrl ? (
                               <img

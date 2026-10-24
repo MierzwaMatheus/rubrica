@@ -218,11 +218,11 @@ export default function Proposal() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground-strong font-sans selection:bg-neon-purple selection:text-white overflow-x-hidden">
+    <div className="min-h-screen bg-background text-foreground-strong font-sans selection:bg-neon-purple selection:text-primary-foreground overflow-x-hidden">
       <div className="fixed inset-0 z-0 pointer-events-none no-print">
         <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-neon-purple/20 rounded-full blur-[120px]" />
         <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-neon-lime/10 rounded-full blur-[120px]" />
-        <div className="absolute top-[40%] left-[20%] w-[300px] h-[300px] bg-blue-500/10 rounded-full blur-[100px]" />
+        <div className="absolute top-[40%] left-[20%] w-[300px] h-[300px] bg-accent-2/10 rounded-full blur-[100px]" />
       </div>
 
       <div className="relative z-10 max-w-5xl mx-auto px-6 py-12 md:py-20">
@@ -230,7 +230,7 @@ export default function Proposal() {
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-green-500/10 border border-green-500/20 text-green-400 p-4 rounded-lg mb-8"
+            className="bg-green-500/10 border border-green-500/20 text-green-700 dark:text-green-400 p-4 rounded-lg mb-8"
           >
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center gap-3">
@@ -238,17 +238,17 @@ export default function Proposal() {
                 <div>
                   <p className="font-medium">Esta proposta foi aceita eletronicamente</p>
                   {acceptanceData ? (
-                    <p className="text-sm text-green-300/80">
+                    <p className="text-sm text-green-700/80 dark:text-green-300/80">
                       Aceita em {new Date(acceptanceData.accepted_at).toLocaleString('pt-BR')} por {acceptanceData.client_name}
                     </p>
                   ) : (
-                    <p className="text-sm text-green-300/80">Carregando informações do aceite...</p>
+                    <p className="text-sm text-green-700/80 dark:text-green-300/80">Carregando informações do aceite...</p>
                   )}
                 </div>
               </div>
               <Button
                 onClick={handleDownloadPDF}
-                className="bg-green-500 hover:bg-green-600 text-white"
+                className="bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white"
                 disabled={!acceptanceData}
               >
                 <FileText className="w-4 h-4 mr-2" />
@@ -261,7 +261,7 @@ export default function Proposal() {
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-lg mb-8 flex items-center gap-3"
+            className="bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 p-4 rounded-lg mb-8 flex items-center gap-3"
           >
             <AlertTriangle className="w-5 h-5" />
             <p className="font-medium">Atenção: Esta proposta expirou em {calculateValidUntil(rawProposal.createdAt)}.</p>
@@ -278,7 +278,7 @@ export default function Proposal() {
             <Badge variant="outline" className="border-neon-purple text-neon-purple px-4 py-1 text-sm uppercase tracking-widest">
               Proposta Comercial
             </Badge>
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-gray-400">
+            <h1 className="text-4xl md:text-6xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground-strong via-foreground-strong/90 to-foreground/65">
               {rawProposal.title || `Projeto para ${rawProposal.clientName}`}
             </h1>
             <p className="text-xl text-foreground/65 max-w-2xl mx-auto">
@@ -292,7 +292,7 @@ export default function Proposal() {
               </div>
               <div className="flex items-center gap-2 bg-foreground/5 px-4 py-2 rounded-full border border-foreground/10">
                 <Clock className={`w-4 h-4 ${isExpired ? "text-red-500" : "text-neon-lime"}`} />
-                <span className={isExpired ? "text-red-400" : ""}>Válido até: {calculateValidUntil(rawProposal.createdAt)}</span>
+                <span className={isExpired ? "text-red-600 dark:text-red-400" : ""}>Válido até: {calculateValidUntil(rawProposal.createdAt)}</span>
               </div>
             </div>
           </motion.header>
@@ -403,7 +403,7 @@ export default function Proposal() {
           </div>
 
           <motion.section variants={itemVariants}>
-            <Card className="bg-gradient-to-br from-card to-black border-foreground/10 overflow-hidden relative">
+            <Card className="bg-gradient-to-br from-card to-background border-foreground/10 overflow-hidden relative">
               <div className="absolute top-0 right-0 w-64 h-64 bg-neon-purple/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2" />
               <CardContent className="p-8 md:p-12">
                 <div className="flex flex-col md:flex-row items-center justify-between gap-8">
@@ -432,7 +432,7 @@ export default function Proposal() {
                     <ul className="space-y-2">
                       {generatePaymentMethods(rawProposal.investmentValue).map((method: string, idx: number) => (
                         <li key={idx} className="text-foreground/65 flex items-center gap-2">
-                          <div className="w-1 h-1 bg-gray-500 rounded-full" />
+                          <div className="w-1 h-1 bg-muted-foreground rounded-full" />
                           {method}
                         </li>
                       ))}
@@ -446,7 +446,7 @@ export default function Proposal() {
                     <ul className="space-y-2">
                       {rawProposal.conditions?.map((condition: string, idx: number) => (
                         <li key={idx} className="text-foreground/65 flex items-center gap-2">
-                          <div className="w-1 h-1 bg-gray-500 rounded-full" />
+                          <div className="w-1 h-1 bg-muted-foreground rounded-full" />
                           {condition}
                         </li>
                       ))}
@@ -470,7 +470,7 @@ export default function Proposal() {
                     <ChevronDown className={`w-5 h-5 text-foreground/65 transition-transform duration-200 shrink-0 ${isRescisionOpen ? 'rotate-180' : ''}`} />
                   </CollapsibleTrigger>
                   <CollapsibleContent className="mt-4">
-                    <div className="prose prose-invert prose-headings:text-foreground-strong prose-p:text-foreground/90 prose-strong:text-foreground-strong prose-ul:text-foreground/90 prose-li:text-foreground/90 prose-hr:border-foreground/10 max-w-none">
+                    <div className="prose dark:prose-invert prose-headings:text-foreground-strong prose-p:text-foreground/90 prose-strong:text-foreground-strong prose-ul:text-foreground/90 prose-li:text-foreground/90 prose-hr:border-foreground/10 max-w-none">
                       <ReactMarkdown>
                         {rawProposal.rescissionPolicy || DEFAULT_RESCISION_POLICY}
                       </ReactMarkdown>
@@ -485,7 +485,7 @@ export default function Proposal() {
             <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4 pb-12">
               <Button
                 size="lg"
-                className="bg-neon-purple hover:bg-neon-purple/90 text-white h-14 px-8 w-full sm:w-auto"
+                className="bg-neon-purple hover:bg-neon-purple/90 text-primary-foreground h-14 px-8 w-full sm:w-auto"
                 onClick={() => {
                   if (sessionToken) {
                     sessionStorage.setItem(`proposal_session_slug_${slug}`, sessionToken);
@@ -503,7 +503,7 @@ export default function Proposal() {
             <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4 pb-12">
               <Button
                 size="lg"
-                className="bg-neon-purple hover:bg-neon-purple/90 text-white h-14 px-8 w-full sm:w-auto"
+                className="bg-neon-purple hover:bg-neon-purple/90 text-primary-foreground h-14 px-8 w-full sm:w-auto"
                 onClick={() => setShowContractModal(true)}
               >
                 <FileText className="mr-2 w-5 h-5" />

@@ -34,7 +34,13 @@ function useGlitch(text: string, active: boolean) {
   return display;
 }
 
-const LINE_COLORS = ["text-red-400", "text-foreground/42", "text-foreground/25", "text-yellow-500/70"];
+// Vermelho e amarelo mais escuros no claro para manter contraste sobre fundo claro
+const LINE_COLORS = [
+  "text-red-600 dark:text-red-400",
+  "text-foreground/42",
+  "text-foreground/25",
+  "text-yellow-700 dark:text-yellow-500/70",
+];
 const LINE_DELAYS = [0.4, 0.9, 1.4, 1.9];
 
 export default function NotFound() {
@@ -56,7 +62,7 @@ export default function NotFound() {
         className="pointer-events-none absolute inset-0 opacity-[0.035]"
         style={{
           backgroundImage:
-            "linear-gradient(rgba(168,85,247,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(168,85,247,0.8) 1px, transparent 1px)",
+            "linear-gradient(color-mix(in srgb, var(--primary) 80%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--primary) 80%, transparent) 1px, transparent 1px)",
           backgroundSize: "48px 48px",
         }}
       />
@@ -95,14 +101,14 @@ export default function NotFound() {
           <span
             className="font-mono text-[9rem] font-black leading-none tracking-tighter text-foreground-strong/5 select-none"
             aria-hidden
-            style={{ WebkitTextStroke: "1px rgba(168,85,247,0.15)" }}
+            style={{ WebkitTextStroke: "1px color-mix(in srgb, var(--primary) 15%, transparent)" }}
           >
             {label}
           </span>
           <span
             className="absolute inset-0 font-mono text-[9rem] font-black leading-none tracking-tighter"
             style={{
-              background: "linear-gradient(135deg, #a855f7 0%, #a3e635 100%)",
+              background: "linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
@@ -113,7 +119,7 @@ export default function NotFound() {
           </span>
           <span
             className="absolute inset-0 font-mono text-[9rem] font-black leading-none tracking-tighter text-foreground-strong/90"
-            style={{ WebkitTextStroke: "1px rgba(255,255,255,0.06)" }}
+            style={{ WebkitTextStroke: "1px color-mix(in srgb, var(--text-strong) 6%, transparent)" }}
           >
             {label}
           </span>

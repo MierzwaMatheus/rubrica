@@ -62,9 +62,9 @@ const narrativeSections = [
   {
     key: "problem" as const,
     icon: AlertTriangle,
-    iconColor: "text-red-400",
-    borderColor: "border-red-400/30",
-    bgColor: "bg-red-400/5",
+    iconColor: "text-red-600 dark:text-red-400",
+    borderColor: "border-red-600/30 dark:border-red-400/30",
+    bgColor: "bg-red-600/5 dark:bg-red-400/5",
     labelKey: "portfolio.problem",
   },
   {
@@ -86,9 +86,9 @@ const narrativeSections = [
   {
     key: "results" as const,
     icon: TrendingUp,
-    iconColor: "text-green-400",
-    borderColor: "border-green-400/30",
-    bgColor: "bg-green-400/5",
+    iconColor: "text-green-700 dark:text-green-400",
+    borderColor: "border-green-700/30 dark:border-green-400/30",
+    bgColor: "bg-green-700/5 dark:bg-green-400/5",
     labelKey: "portfolio.results",
   },
 ];
@@ -179,7 +179,7 @@ export default function ProjectCaseStudy() {
               {t("portfolio.noImage")}
             </div>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/50 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
             <h1 className="text-3xl md:text-5xl font-bold text-foreground-strong mb-3">{project.title}</h1>
             <div className="flex flex-wrap gap-2 mb-4">
@@ -196,7 +196,7 @@ export default function ProjectCaseStudy() {
             <div className="flex gap-3">
               {project.demo_link && (
                 <a href={project.demo_link} target="_blank" rel="noopener noreferrer">
-                  <Button size="sm" className="bg-neon-purple hover:bg-neon-purple/80 text-white">
+                  <Button size="sm" className="bg-neon-purple hover:bg-neon-purple/80 text-primary-foreground">
                     <ExternalLink className="mr-2 h-4 w-4" />
                     {t("portfolio.liveDemo")}
                   </Button>
@@ -300,7 +300,7 @@ export default function ProjectCaseStudy() {
                       />
                       <button
                         onClick={() => setExpandedImage({ url: img, index: idx, images: project.images })}
-                        className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                        className="absolute inset-0 bg-background/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
                         aria-label={t("portfolio.expandImage")}
                       >
                         <div className="bg-background/80 backdrop-blur-sm p-3 rounded-full border border-foreground/20 hover:border-neon-purple transition-colors">
@@ -311,8 +311,8 @@ export default function ProjectCaseStudy() {
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              <CarouselPrevious className="left-2 bg-background/50 border-foreground/10 text-foreground-strong hover:bg-neon-purple hover:border-neon-purple" />
-              <CarouselNext className="right-2 bg-background/50 border-foreground/10 text-foreground-strong hover:bg-neon-purple hover:border-neon-purple" />
+              <CarouselPrevious className="left-2 bg-background/50 border-foreground/10 text-foreground-strong hover:bg-neon-purple hover:border-neon-purple hover:text-primary-foreground" />
+              <CarouselNext className="right-2 bg-background/50 border-foreground/10 text-foreground-strong hover:bg-neon-purple hover:border-neon-purple hover:text-primary-foreground" />
             </Carousel>
           </div>
         )}
@@ -346,7 +346,7 @@ export default function ProjectCaseStudy() {
                   onClick={() => openWizard({ flowType: "project", sourceContext: `case-${params?.slug ?? ""}` })}
                   data-umami-event="case-cta-projeto"
                   data-umami-event-case={params?.slug}
-                  className="bg-neon-purple hover:bg-neon-purple/80 text-foreground-strong font-semibold"
+                  className="bg-neon-purple hover:bg-neon-purple/80 text-primary-foreground font-semibold"
                 >
                   <MessageSquare className="mr-2 h-4 w-4" />
                   {t("portfolio.ctaProject")}
@@ -374,7 +374,7 @@ export default function ProjectCaseStudy() {
           <Dialog open onOpenChange={() => setExpandedImage(null)}>
             <DialogContent
               showCloseButton={false}
-              className="!fixed !inset-2 !max-w-none !w-auto !h-auto !translate-x-0 !translate-y-0 !top-0 !left-0 bg-black/97 border-foreground/10 p-0 flex flex-col"
+              className="!fixed !inset-2 !max-w-none !w-auto !h-auto !translate-x-0 !translate-y-0 !top-0 !left-0 bg-background/97 border-border p-0 flex flex-col"
             >
               <VisuallyHidden>
                 <span>{t("portfolio.expandImage")}</span>
@@ -409,7 +409,7 @@ export default function ProjectCaseStudy() {
                         const prev = expandedImage.index > 0 ? expandedImage.index - 1 : expandedImage.images.length - 1;
                         setExpandedImage({ ...expandedImage, index: prev, url: expandedImage.images[prev] });
                       }}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white p-3 rounded-full transition-colors"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-background/60 hover:bg-background/80 text-foreground-strong p-3 rounded-full transition-colors"
                       aria-label={t("portfolio.previousImage")}
                     >
                       <ChevronLeft className="w-6 h-6" />
@@ -419,7 +419,7 @@ export default function ProjectCaseStudy() {
                         const next = expandedImage.index < expandedImage.images.length - 1 ? expandedImage.index + 1 : 0;
                         setExpandedImage({ ...expandedImage, index: next, url: expandedImage.images[next] });
                       }}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white p-3 rounded-full transition-colors"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-background/60 hover:bg-background/80 text-foreground-strong p-3 rounded-full transition-colors"
                       aria-label={t("portfolio.nextImage")}
                     >
                       <ChevronRight className="w-6 h-6" />

@@ -100,7 +100,7 @@ export default function PaymentSuccessPage() {
               className="flex justify-center mb-6"
             >
               <div className="w-24 h-24 bg-green-500/20 rounded-full flex items-center justify-center">
-                <Check className="w-16 h-16 text-green-500" />
+                <Check className="w-16 h-16 text-green-600 dark:text-green-500" />
               </div>
             </motion.div>
             <CardTitle className="text-3xl text-foreground-strong">Pagamento Realizado com Sucesso!</CardTitle>
@@ -156,7 +156,7 @@ export default function PaymentSuccessPage() {
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Button
                 onClick={() => navigate('/')}
-                className="flex-1 bg-neon-purple hover:bg-neon-purple/90 text-white font-medium py-6"
+                className="flex-1 bg-neon-purple hover:bg-neon-purple/90 text-primary-foreground font-medium py-6"
               >
                 <Home className="w-5 h-5 mr-2" />
                 Voltar ao Início

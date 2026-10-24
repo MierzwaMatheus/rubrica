@@ -1,215 +1,241 @@
 # Referência técnica — Portfolio
 
-> Este arquivo é a **referência técnica completa** do sistema: schema do banco, lista exaustiva de features, rotas, plugins, design system e histórico de mudanças.
+> Este arquivo é a **referência técnica completa** do sistema: schema do banco, lista exaustiva de features, rotas, plugins, design system e integrações.
 >
-> Se você caiu aqui procurando como **publicar seu próprio portfólio**, volte para o [README.md](../README.md) na raiz do repositório — ele tem o passo-a-passo de deploy.
+> Se você caiu aqui procurando como **publicar seu próprio portfólio**, volte para o [README.md](../README.md) na raiz do repositório — ele tem o passo-a-passo de deploy. Para trazer atualizações do template para um projeto existente, veja [atualizacao.md](./atualizacao.md).
 
-Portfólio pessoal profissional desenvolvido com React, TypeScript e Convex. Uma plataforma completa para exibir projetos, blog, currículo e propostas comerciais com painel administrativo integrado, geração de PDF com IA e tradução automática.
+Portfólio profissional open source desenvolvido com React, TypeScript e Convex. Uma plataforma completa para exibir projetos (com estudos de caso), blog, currículo, depoimentos e propostas comerciais, com painel administrativo integrado, geração de PDF, IA e tradução automática.
 
 ## 📋 Índice
 
-- [Sobre o Projeto](#sobre-o-projeto)
-- [Tecnologias](#tecnologias)
-- [Funcionalidades](#funcionalidades)
-- [Estrutura do Projeto](#estrutura-do-projeto)
-- [Instalação](#instalação)
-- [Configuração](#configuração)
-- [Scripts Disponíveis](#scripts-disponíveis)
-- [Páginas e Rotas](#páginas-e-rotas)
-- [Sistema de Autenticação](#sistema-de-autenticação)
-- [Componentes Principais](#componentes-principais)
+- [Sobre o Projeto](#-sobre-o-projeto)
+- [Tecnologias](#-tecnologias)
+- [Funcionalidades](#-funcionalidades)
+- [Estrutura do Projeto](#-estrutura-do-projeto)
+- [Instalação](#-instalação)
+- [Configuração](#️-configuração)
+- [Scripts Disponíveis](#-scripts-disponíveis)
+- [Páginas e Rotas](#-páginas-e-rotas)
+- [Sistema de Autenticação](#-sistema-de-autenticação)
+- [Componentes Principais](#-componentes-principais)
 
 ## 🎯 Sobre o Projeto
 
-Este é um portfólio profissional full-stack que combina uma interface pública elegante com um painel administrativo robusto. O projeto permite gerenciar projetos, posts de blog, informações de currículo, propostas comerciais e conteúdo do site através de uma interface administrativa intuitiva, com recursos avançados de IA para geração e reescrita de currículos e tradução automática de conteúdo.
+Este é um portfólio profissional full-stack que combina uma interface pública com um painel administrativo. O projeto permite gerenciar projetos, posts de blog, currículo, depoimentos, propostas comerciais e o conteúdo e a aparência do site pelo admin, com IA para geração e reescrita de currículos e tradução automática de conteúdo. Projetos novos são criados e atualizados pela CLI `create-rubrica` (pasta `cli/`).
 
 ### Características Principais
 
-- **Design Moderno**: Interface com tema dark, animações suaves e design responsivo
-- **CMS Integrado**: Sistema completo de gerenciamento de conteúdo
-- **Multi-role**: Sistema de autenticação com diferentes níveis de permissão
-- **SEO Friendly**: Estrutura otimizada para mecanismos de busca
-- **Performance**: Construído com Vite para build rápido e otimizado
-- **IA Integrada**: Tradução automática, geração de currículo com ATS scoring e reescrita via OpenRouter
-- **Auditoria Completa**: Log de todas as mutações administrativas
-- **Notificações Telegram**: Alertas em tempo real para o admin via bot Telegram
+- **5 layouts e 4 paletas**: `cyberpunk` (padrão), `brutalist`, `swiss`, `bento` e `magazine`, combináveis com qualquer paleta (claras ou escuras) — veja [templates](./templates/README.md) e [cores](./templates/cores.md)
+- **Estrutura focada em conversão**: números de prova, cases em destaque, princípios de trabalho, seções de case study, categorias de projetos e depoimentos, grupos de habilidades
+- **CMS Integrado**: gerenciamento completo de conteúdo, textos da interface e aparência
+- **Multi-role**: autenticação com diferentes níveis de permissão
+- **Sistema de plugins**: cada funcionalidade pode ser ligada ou desligada
+- **SEO Friendly**: meta tags por página, RSS e sitemap
+- **IA Integrada**: tradução automática, geração de currículo com ATS scoring e reescrita via OpenRouter
+- **Auditoria Completa**: log de todas as mutações administrativas
+- **Notificações Telegram**: alertas para o admin via bot Telegram
+- **Testes automatizados**: suíte Vitest do template e da CLI, rodando no CI (GitHub Actions)
 
 ## 🛠 Tecnologias
 
 ### Frontend
 
-- **React 19.2.1** - Biblioteca JavaScript para construção de interfaces
-- **TypeScript 5.6.3** - Superset do JavaScript com tipagem estática
-- **Vite 7.1.7** - Build tool e dev server
-- **Wouter 3.3.5** - Roteamento leve para React
-- **Framer Motion 12.23.22** - Biblioteca de animações
+- **React 19.2** - Biblioteca JavaScript para construção de interfaces
+- **TypeScript 5.6** - Superset do JavaScript com tipagem estática
+- **Vite 7.1** - Build tool e dev server
+- **Wouter 3.3** - Roteamento leve para React
+- **Framer Motion 12.23** - Biblioteca de animações
 
 ### Estilização
 
-- **Tailwind CSS 4.1.14** - Framework CSS utility-first
-- **Radix UI** - Componentes acessíveis e sem estilo
-- **Lucide React** - Ícones modernos
-- **next-themes** - Gerenciamento de temas
+- **Tailwind CSS 4.1** - Framework CSS utility-first
+- **Radix UI / shadcn/ui** - Componentes acessíveis
+- **Lucide React** - Ícones
+- **Contrato de 4 cores** (`--bg`, `--text`, `--primary`, `--accent`) — veja [Design System](#-design-system)
 
 ### Backend e Banco de Dados
 
 - **Convex** - Backend as a Service reativo
-  - Autenticação customizada
+  - Convex Auth (email e senha)
   - Banco de dados de documentos em tempo real
-  - Storage para imagens e arquivos (incluindo assinaturas)
-  - Actions para lógica server-side
+  - Storage para imagens, vídeos e assinaturas
+  - Actions, HTTP endpoints e cron jobs
   - Queries e mutations tipadas
 
 ### Inteligência Artificial
 
 - **OpenRouter** - Gateway para múltiplos modelos de IA
-  - **Tradução automática**: Tradução de conteúdo administrativo para múltiplos idiomas
+  - **Tradução automática** de conteúdo administrativo (pt-BR → en-US)
   - **Geração de currículo (pipeline 3 etapas)**:
-    - Gemini: Análise da descrição da vaga
-    - GPT-5.4: Scoring de fit (ATS score) com forças e fraquezas
-    - Claude Sonnet: Reescrita do CV para compatibilidade ATS
-- **date-fns** - Manipulação de datas
+    - Gemini: análise da descrição da vaga
+    - GPT-5.4: scoring de fit (ATS score) com forças e fraquezas
+    - Claude Sonnet: reescrita do CV para compatibilidade ATS
+  - **Proxy de IA do playground** (com rate limiting)
 
 ### Pagamentos
 
-- **Stripe** - Plataforma de pagamentos
-  - Payment Links API
-  - Produtos e Preços
-  - Suporte a parcelamento
-  - Integração via Edge Function (legada)
+- **Asaas** (API v3) - PIX, boleto e cartão em até 12x (`convex/asaas.ts`, `convex/lib/asaasClient.ts`). O cartão é digitado na página segura do Asaas; o site nunca recebe os dados do cartão.
 
 ### Formulários e Validação
 
-- **React Hook Form 7.64.0** - Gerenciamento de formulários
-- **Zod 4.1.12** - Validação de schemas
-- **@hookform/resolvers 5.2.2** - Resolvers para React Hook Form
+- **React Hook Form 7.64** - Gerenciamento de formulários
+- **Zod 4.1** - Validação de schemas
+- **@hookform/resolvers** - Resolvers para React Hook Form
 
 ### Editor de Texto Rico
 
-- **TipTap 3.13.0** - Editor de texto rico extensível
-- **@tiptap/starter-kit** - Kit inicial do TipTap
+- **TipTap 3.13** - Editor de texto rico extensível
 
 ### Utilitários
 
-- **Axios 1.12.0** - Cliente HTTP
-- **Recharts 2.15.2** - Gráficos e visualizações
-- **Sonner 2.0.7** - Sistema de notificações toast
-- **nanoid 5.1.5** - Geração de IDs únicos
+- **Recharts** - Gráficos e visualizações
+- **Sonner** - Notificações toast
+- **nanoid** - Geração de IDs únicos
 - **@dnd-kit** - Drag and drop para ordenação de itens
 - **jsPDF** - Geração de PDFs no cliente (CV ATS, contratos)
-- **react-markdown** - Renderização de conteúdo markdown
+- **react-markdown** - Renderização de markdown
+- **react-helmet-async** - Meta tags por página
 - **signature_pad** - Captura de assinatura manuscrita via canvas
+- **date-fns** - Manipulação de datas
+
+### Analytics
+
+- **Vercel Analytics** e **Vercel Speed Insights**
+- **Umami** (opcional) - eventos customizados via `src/lib/analytics.ts` e atributos `data-umami-event`; o script só entra no build com `VITE_UMAMI_SCRIPT_URL` e `VITE_UMAMI_WEBSITE_ID` (Umami Cloud já liberado no CSP)
+
+### Testes
+
+- **Vitest** - Testes do template (`tests/app`, `tests/convex`) e da CLI (`cli/src/__tests__`)
+- **Stryker** - Testes de mutação
+- **GitHub Actions** - `.github/workflows/ci.yml` roda typecheck e testes do template e typecheck, testes e build da CLI
 
 ## ✨ Funcionalidades
 
 ### Área Pública
 
 #### 🏠 Página Inicial (`/`)
-- Seção hero com apresentação pessoal
-- Sobre mim (conteúdo gerenciável)
-- Grid de serviços/habilidades
-- Depoimentos de clientes
-- Design responsivo e animações
+- Hero (título, subtítulo e tags editáveis) com números de prova e chamadas para ação
+- Cases em destaque
+- Sobre mim com números em destaque
+- Grid de serviços
+- Depoimentos marcados para a home
+- Fechamento com dois caminhos: "tenho um projeto" e "tenho uma vaga"
+
+#### 👤 Sobre (`/sobre`)
+- Resumo profissional (mesmo texto do "Sobre mim" da home)
+- Princípios de trabalho
+- Rotina diária em grid bento e FAQ
 
 #### 💼 Portfólio (`/portfolio`)
-- Grid de projetos com filtros por tags
-- Modal detalhado para cada projeto
-- Carrossel de imagens por projeto
-- Visualizador de imagens em tela cheia
+- Grid de projetos com filtros por categoria
+- Modal detalhado com carrossel de imagens e visualizador em tela cheia
 - Links para demo e código-fonte
-- Ordenação customizável via drag and drop
+- **Estudo de caso** por projeto (`/portfolio/:slug`): meu papel, contexto, decisões, resultados, métricas, aprendizados, screenshots, depoimento, CTA e próximo case
 
 #### 📄 Currículo (`/curriculo`)
 - Exibição estruturada de:
-  - Resumo profissional
   - Experiências profissionais
   - Formação acadêmica
-  - Habilidades técnicas
+  - Cursos e certificações
+  - Habilidades técnicas (agrupadas por grupo)
+  - Soft skills
   - Idiomas
-  - Certificações
-  - Interesses pessoais
+  - Voluntariado
 - Ordenação configurável via admin
+- Download do CV em PDF otimizado para ATS
 
 #### 📝 Blog (`/blog`)
 - Lista de posts publicados
 - Posts em destaque
-- Sistema de busca
-- Filtros por tags
-- Paginação
+- Busca e filtros por tags
 - Visualização individual de posts (`/blog/:slug`)
-- Renderização de conteúdo markdown/HTML
+- RSS e sitemap gerados no build
+
+#### ⭐ Depoimentos (`/depoimentos`)
+- Depoimentos agrupados por categoria
+- Wizard público de envio (texto ou vídeo), quando o sub-plugin `testimonials-intake` está ativo
 
 #### 💼 Propostas (`/proposta/:id`)
 - Visualização de propostas comerciais
 - Sistema de validação de expiração (10 dias)
 - **Sistema de proteção por senha** (opcional)
-- **Aceite eletrônico de propostas** (`/proposta/:id/aceitar`)
+- **Aceite eletrônico de propostas** (`/proposta/:slug/aceitar`)
 - **Captura de assinatura manuscrita** via canvas (mouse ou touch)
 - **Armazenamento de assinatura** no Convex Storage
-- **Geração de PDF do contrato** com assinatura digital
+- **Geração de PDF do contrato** a partir do modelo de contrato, com a assinatura
 - Status visual (aprovada, pendente, expirada)
 - **Banner de aceite** quando proposta foi aceita
 - **Política de rescisão** expansível com renderização markdown
-- Informações detalhadas do projeto
 - **Sistema de sessões** para acesso seguro
 
-#### 💻 Terminal (`/terminal`)
-- Interface de navegação estilo terminal
-- Acesso ao conteúdo do portfólio via comandos
+#### 💳 Checkout (`/checkout/:uniqueLink`)
+- **PIX**: QR code e copia-e-cola gerados pelo Asaas, com a validade informada por ele
+- **Boleto**: linha digitável e PDF
+- **Cartão**: escolha das parcelas (valor calculado no servidor) e redirecionamento para a página de pagamento do Asaas
+- Trocar de forma de pagamento cancela a cobrança anterior (no cartão parcelado, todas as parcelas); escolher a mesma de novo reaproveita a existente. Boleto já gerado não pode ser trocado, porque pode estar compensando
+- Proteções: trava contra dois cliques simultâneos, no máximo 8 cobranças por link, parcela mínima de R$ 5, QR code PIX vencido regenerável
+- Erros chegam ao cliente com a mensagem certa (`ConvexError` com código)
+- A página é reativa: vai sozinha para o sucesso quando o webhook confirma. `/payment-success/:uniqueLink` mostra "confirmando" até lá
+
+#### 💻 Terminal
+- Interface estilo terminal aberta com a tecla <code>`</code> (crase) nas páginas públicas
+- Navegação pelo portfólio via comandos
 
 ### Área Administrativa
 
 #### 🔐 Autenticação
-- Login via Convex (queries customizadas)
+- Login com email e senha (Convex Auth); cadastro público desabilitado
 - Sistema de roles e permissões:
   - `root` - Acesso completo
   - `admin` - Acesso administrativo geral
-  - `proposal-editor` - Editor de propostas
+  - `content-editor` - Conteúdo (projetos, blog, currículo, home, sobre, textos, depoimentos)
+  - `blog-editor` - Apenas blog
+  - `proposal-editor` - Apenas propostas
 - Proteção de rotas baseada em roles
 
 #### 📊 Dashboard (`/admin/dashboard`)
-- Estatísticas gerais (projetos, artigos, propostas)
-- Atalhos rápidos para criação de conteúdo
-- Acesso rápido à galeria de imagens
+- Estatísticas (projetos, posts publicados/rascunhos, propostas totais/aceitas/pendentes, checkouts pagos/pendentes)
+- Atalhos rápidos e paleta de comandos
+- Status de publicação e botão "Publicar" (dispara o deploy na Vercel)
 
 #### 📁 Gerenciamento de Projetos (`/admin/projects`)
 - CRUD completo de projetos
-- Upload múltiplo de imagens (armazenadas por ID no Convex Storage)
-- Sistema de tags
+- Imagens da biblioteca de mídia (referenciadas por ID no Convex Storage)
+- Tags, categoria e slug
+- Campos de estudo de caso e métricas
 - Ordenação via drag and drop
-- Preview de projetos
-- Campos: título, descrição, descrição longa, tags, imagens, links
 - **Tradução automática** via OpenRouter (apenas campos alterados)
 
 #### ✍️ Gerenciamento de Blog (`/admin/blog`)
-- CRUD de posts
-- Editor de texto rico (TipTap)
-- Sistema de tags
-- Posts em destaque
-- Status (rascunho/publicado)
-- Slug automático
+- CRUD de posts com editor TipTap
+- Tags, destaque, status (rascunho/publicado), slug automático, imagem de capa
 - **Tradução automática** via OpenRouter
 
 #### 👤 Gerenciamento de Currículo (`/admin/resume`)
-- CRUD de itens do currículo por categoria
-- Tipos: experiência, educação, habilidades, idiomas, certificações, interesses
+- CRUD por tipo: experiência, educação, cursos, habilidades (com grupo), soft skills, idiomas, voluntariado
 - Ordenação customizável
 - **Tradução automática** via OpenRouter
+
+#### 🏡 Home e Sobre (`/admin/home`, `/admin/about`)
+- Hero, texto "Sobre mim", editor de números de prova, serviços
+- Princípios de trabalho, rotina diária e FAQ
+- **Tradução automática** via OpenRouter
+
+#### ⭐ Depoimentos (`/admin/depoimentos`)
+- CRUD, categorias e opção "mostrar na home"
+- Fila de submissões enviadas pelo wizard (aprovar, rejeitar, publicar)
 
 #### 📋 Gerenciamento de Propostas (`/admin/proposals`)
 - CRUD de propostas comerciais
 - **Sistema de abas**: Todas / Aceitas
-- **Proteção de propostas aceitas**: Não podem ser editadas ou excluídas
+- **Proteção de propostas aceitas**: não podem ser editadas ou excluídas
 - **Download de contrato** para propostas aceitas (regenera PDF com assinatura)
-- Geração automática de slugs
-- Validação de expiração
-- Status de aprovação
-- **Sistema de senha opcional** para acesso às propostas
-- **Geração de senha aleatória** (8 caracteres A-Z, a-z, 0-9)
-- **Botão de copiar senha** para área de transferência
+- **Senha opcional** com geração aleatória (8 caracteres A-Z, a-z, 0-9) e botão de copiar
 - **Política de rescisão** editável com valor padrão
-- **Versionamento automático**: Cria versão ao editar proposta não aceita
-- Campos detalhados do projeto
+- **Versionamento automático**: cria versão ao editar proposta não aceita
+
+#### 📜 Modelos de Contrato (`/admin/contracts`)
+- Modelos de contrato usados nas propostas, com um modelo padrão
 
 #### 🤖 Currículos com IA (`/admin/ai-resumes`)
 - **Pipeline de 3 modelos via OpenRouter**:
@@ -217,48 +243,38 @@ Este é um portfólio profissional full-stack que combina uma interface pública
   2. GPT-5.4 pontua o fit do CV (ATS score) com forças e fraquezas
   3. Claude Sonnet reescreve o CV para compatibilidade ATS
 - Input de descrição de vaga e seleção de locale
-- Exibição do ATS score com badge visual
-- Breakdown de forças e fraquezas do candidato
-- Export do CV reescrito em PDF (via utilitário cvPDF)
-- Saída sempre em português brasileiro
+- Exibição do ATS score e breakdown de forças e fraquezas
+- Export do CV reescrito em PDF (via `cvPDF`)
 - Regras rígidas: sem pronomes pessoais, sem travessões, sem jargões de IA
 
-#### 📄 Gerador de CV PDF (`/curriculo` com export)
-- Geração de CV em PDF otimizado para ATS
-- Resumo profissional como primeira seção
-- Ordem ATS recomendada: Resumo, Habilidades, Soft Skills, Experiência, Educação, Cursos, Projetos, Idiomas, Voluntariado
+#### 📄 Gerador de CV PDF
+- CV em PDF otimizado para ATS, com resumo profissional como primeira seção
 - Cargo antes da empresa nas entradas de experiência/educação
-- Tipografia ATS: margens 25mm, headings maiúsculos, texto 10.5pt, bullets disc
-- Margem e espaçamento otimizados para leitura por sistemas ATS
+- Tipografia ATS: margens 25mm, headings maiúsculos, texto 10.5pt
 
-#### 🏡 Gerenciamento de Home (`/admin/home`)
-- Edição de conteúdo da página inicial
-- Gerenciamento de serviços
-- Gerenciamento de depoimentos
-- **Tradução automática** via OpenRouter
+#### 📧 Contato (`/admin/contact`, `/admin/contatos`)
+- Informações de contato, redes sociais e visibilidade de cada dado
+- Solicitações recebidas pelo wizard de contato (status e notas internas)
 
-#### 📧 Gerenciamento de Contato (`/admin/contact`)
-- Edição de informações de contato
-- Links de redes sociais
-- Configuração de visibilidade de dados
+#### 🎨 Site e Aparência (`/admin/site-config`) e Textos (`/admin/textos`)
+- As 4 cores do tema e as fontes
+- Textos da interface em pt-BR e en-US (tabela `siteTexts`)
 
-#### 💳 Links de Pagamento (`/admin/payment-links`)
-- **Gerenciamento completo de pagamentos via Stripe**
-- CRUD de produtos no Stripe
-- CRUD de preços (únicos e recorrentes)
-- Criação de links de pagamento compartilháveis
-- **Suporte a parcelamento** (com ou sem juros)
-- Exclusão de produtos, preços e links
-- Visualização de valores formatados
-- Cópia rápida de links para área de transferência
+#### 💳 Pagamentos (`/admin/payment-links`)
+- Clientes do Asaas (listar, criar, excluir), cobranças (listar, criar, cancelar) e notas fiscais (só leitura; emitidas e configuradas no Asaas)
+- Criação do link de checkout a partir de um cliente, com link aleatório criptograficamente seguro
+- Exige o plugin `payments` e papel root/admin; as escritas vão para o log de auditoria
+
+#### 🧩 Plugins (`/admin/plugins`)
+- Liga e desliga funcionalidades (veja [Sistema de Plugins](#-sistema-de-plugins))
 
 #### 👥 Usuários (`/admin/users/new`)
 - Criação de novos usuários (apenas root)
 - Atribuição de roles
 
-#### 📝 Logs de Auditoria (`/admin/audit`)
+#### 📝 Logs de Auditoria (`/admin/logs`)
 - Log completo de todas as mutações administrativas
-- Labels descritivos para cada tipo de ação
+- Abas de sistema, playground e itens excluídos (com restauração)
 - Rastreabilidade por usuário, data e operação
 
 ### Componentes Administrativos
@@ -266,133 +282,81 @@ Este é um portfólio profissional full-stack que combina uma interface pública
 - **ProjectDialog**: Modal para criar/editar projetos
 - **ProposalDialog**: Modal para criar/editar propostas
 - **ResumeExperienceDialog**: Modal para experiências do currículo
-- **ImagePicker**: Seletor de imagens com upload para Convex Storage (por ID)
+- **ImagePicker**: Seletor de imagens com pastas e upload para o Convex Storage (por ID)
 - **RichTextEditor**: Editor de texto rico baseado em TipTap
 - **ProjectTagsInput**: Input para gerenciamento de tags
-- **DownloadContractButton**: Download de contrato PDF para propostas aceitas
+- **HomeMetricsEditor** / **WorkPrinciplesEditor**: números de prova e princípios de trabalho
+- **TemplateEditor**: editor de modelos de contrato
+- **PublishStatus**: status de publicação e botão "Publicar"
+- **CommandPalette**: paleta de comandos do admin
 
 ## 📁 Estrutura do Projeto
 
 ```
-portfolio/
-├── public/
-│   ├── archives/          # Arquivos estáticos (CV, etc)
-│   └── favicon.ico
+rubrica/
+├── cli/                   # CLI create-rubrica (create, config, setup, update)
 ├── convex/
 │   ├── schema.ts          # Schema do banco de dados Convex
-│   ├── auth.ts            # Autenticação Convex
-│   ├── auditLogs.ts       # Mutations/queries de auditoria
-│   ├── aiResumes.ts       # Action de geração de CV com IA
-│   ├── proposals.ts       # Proposals + assinaturas no storage
-│   └── ...                # Demais queries e mutations
+│   ├── auth.ts            # Convex Auth + helpers de role
+│   ├── http.ts            # Endpoints HTTP e webhooks
+│   ├── crons.ts           # Tarefas agendadas
+│   ├── pluginRegistry.ts  # Definição dos plugins
+│   ├── lib/               # Validadores compartilhados (case study…)
+│   └── ...                # Queries, mutations e actions por domínio
+├── docs/                  # Documentação (templates, cores, atualização)
+├── public/
+│   ├── data/              # JSON estático (exemplo no repo, real no build)
+│   └── samples/           # Imagens de exemplo
+├── scripts/               # Build: i18n, dados estáticos, RSS, sitemap
 ├── src/
-│   ├── components/
-│   │   ├── admin/         # Componentes administrativos
-│   │   │   ├── ImagePicker.tsx
-│   │   │   ├── ProjectDialog.tsx
-│   │   │   ├── ProjectTagsInput.tsx
-│   │   │   ├── ProposalDialog.tsx
-│   │   │   ├── ResumeExperienceDialog.tsx
-│   │   │   ├── RichTextEditor.tsx
-│   │   │   └── DownloadContractButton.tsx
-│   │   ├── ui/            # Componentes UI do shadcn/ui
-│   │   ├── ErrorBoundary.tsx
-│   │   ├── Layout.tsx
-│   │   ├── ManusDialog.tsx
-│   │   ├── Map.tsx
-│   │   ├── PageSkeleton.tsx
-│   │   ├── ProtectedRoute.tsx
-│   │   └── Sidebar.tsx
-│   ├── contexts/
-│   │   ├── AuthContext.tsx    # Contexto de autenticação
-│   │   └── ThemeContext.tsx   # Contexto de tema
+│   ├── components/        # Componentes (admin/, ui/, playground/, Layout, Sidebar…)
+│   ├── constants/         # Política de rescisão padrão, prompts
+│   ├── contexts/          # Auth, Theme, Plugins, wizards
 │   ├── hooks/
-│   │   ├── useComposition.ts
-│   │   ├── useMobile.tsx
-│   │   └── usePersistFn.ts
-│   ├── lib/
-│   │   ├── convex.ts          # Cliente Convex
-│   │   └── utils.ts           # Funções utilitárias
-│   ├── pages/
-│   │   ├── admin/             # Páginas administrativas
-│   │   │   ├── Blog.tsx
-│   │   │   ├── Contact.tsx
-│   │   │   ├── CreateUser.tsx
-│   │   │   ├── Dashboard.tsx
-│   │   │   ├── Home.tsx
-│   │   │   ├── Projects.tsx
-│   │   │   ├── Proposals.tsx
-│   │   │   ├── PaymentLinks.tsx
-│   │   │   ├── Resume.tsx
-│   │   │   ├── AiResumes.tsx
-│   │   │   └── AuditLogs.tsx
-│   │   ├── Blog.tsx
-│   │   ├── BlogPost.tsx
-│   │   ├── Home.tsx
-│   │   ├── Login.tsx
-│   │   ├── NotFound.tsx
-│   │   ├── Portfolio.tsx
-│   │   ├── Proposal.tsx
-│   │   ├── ProposalAccept.tsx
-│   │   ├── Resume.tsx
-│   │   └── Terminal.tsx
-│   ├── utils/
-│   │   ├── contractPDF.ts     # Geração de PDF de contratos
-│   │   └── cvPDF.ts           # Geração de CV PDF otimizado para ATS
-│   ├── App.tsx                # Componente raiz e rotas
-│   ├── main.tsx               # Entry point
-│   ├── constants/
-│   │   └── rescisionPolicy.ts  # Política de rescisão padrão
-│   ├── const.ts               # Constantes
-│   └── index.css              # Estilos globais
-├── package.json
-├── tsconfig.json
-├── vite.config.ts
-├── vercel.json                # Configuração Vercel
-└── README.md
+│   ├── i18n/              # Provider, repositórios e traduções (pt-BR, en-US)
+│   ├── lib/               # analytics, utils, contraste de cores
+│   ├── pages/             # Páginas públicas, admin/ e playground/
+│   ├── repositories/ services/ usecases/
+│   ├── utils/             # contractPDF, cvPDF, conteúdo das páginas…
+│   ├── App.tsx            # Componente raiz e rotas
+│   └── index.css          # Tema (contrato de 4 cores)
+├── templates/             # Layouts e temas que a CLI aplica
+├── tests/                 # Testes Vitest (app e convex)
+├── rubrica.config.ts      # Identidade, SEO, RSS e fontes
+├── vercel.json            # Build, rewrites e headers de segurança
+└── package.json
 ```
 
 ## 🚀 Instalação
 
+O caminho recomendado é criar o projeto pela CLI (`npx create-rubrica <nome>`) e seguir o [README.md](../README.md). Para rodar o repositório diretamente:
+
 ### Pré-requisitos
 
-- Node.js 18+ e npm/pnpm
+- Node.js 20+ e npm/pnpm
 - Conta no Convex
-- Conta no OpenRouter (para IA)
-- Variáveis de ambiente configuradas
+- Conta no OpenRouter (opcional, para IA)
 
 ### Passos
 
-1. Clone o repositório:
+1. Clone o repositório e instale as dependências:
 ```bash
 git clone <repository-url>
-cd portfolio
-```
-
-2. Instale as dependências:
-```bash
+cd rubrica
 pnpm install
 ```
 
-3. Configure as variáveis de ambiente (crie um arquivo `.env`):
+2. Configure o `.env` (veja `.env.example`):
 ```env
 VITE_CONVEX_URL=sua_url_do_convex
-VITE_APP_ID=id_do_app
+CONVEX_URL=sua_url_do_convex
+CONVEX_DEPLOY_KEY=sua_deploy_key
+SITE_URL=https://seusite.com
 ```
 
-4. Configure as variáveis de ambiente no Convex Dashboard:
-```
-OPENROUTER_API_KEY=sua_chave_openrouter
-TELEGRAM_BOT_TOKEN=token_do_bot
-TELEGRAM_ADMIN_CHAT_ID=seu_chat_id
-```
+3. Configure as variáveis no Convex (`npx convex env set CHAVE valor`) — veja [Configuração](#️-configuração).
 
-5. Execute o Convex em modo desenvolvimento:
-```bash
-pnpm convex dev
-```
-
-6. Execute o servidor de desenvolvimento:
+4. Rode o ambiente de desenvolvimento (Vite + Convex):
 ```bash
 pnpm dev
 ```
@@ -401,54 +365,65 @@ pnpm dev
 
 ### Convex
 
-O projeto utiliza Convex como backend reativo. Certifique-se de configurar:
-
-1. **Deploy do schema** com as collections:
-   - `projects` - Projetos do portfólio
+1. **Schema** (`convex/schema.ts`) com as collections:
+   - `users` e tabelas do Convex Auth
+   - `userRoles` - Roles dos usuários (root, admin, content-editor, blog-editor, proposal-editor) e flag de troca de senha
+   - `projects` - Projetos do portfólio (com `caseStudy`, `category`, `slug`)
    - `posts` - Posts do blog
-   - `resumeItems` - Itens do currículo (por categoria)
+   - `resumeItems` - Itens do currículo (por tipo; habilidades com `group`)
+   - `services` - Serviços da página inicial
+   - `testimonials` - Depoimentos publicados (com `category` e `showOnHome`)
+   - `testimonialSubmissions` - Depoimentos enviados via wizard (pendentes de aprovação)
+   - `homeContent` - Conteúdo chave-valor (hero, sobre, `home_metrics`, `work_principles`, estado dos plugins)
+   - `aboutDailyRoutine` - Itens da rotina diária (seção Sobre)
+   - `aboutFaq` - FAQ da seção Sobre
+   - `contactInfo` - Informações de contato e redes sociais
+   - `contactRequests` - Solicitações de contato recebidas via wizard
+   - `imageFolders` - Pastas da biblioteca de mídia
+   - `imageMetadata` - Metadados das imagens do Convex Storage
    - `proposals` - Propostas comerciais
    - `proposalVersions` - Versões históricas das propostas
    - `proposalSessions` - Sessões temporárias de acesso via senha
    - `proposalAcceptances` - Registros de aceites eletrônicos (com `signatureStorageId`)
-   - `services` - Serviços/habilidades da página inicial
-   - `testimonials` - Depoimentos curados pelo admin
-   - `testimonialSubmissions` - Depoimentos enviados por clientes via wizard (pendentes de aprovação)
-   - `homeContent` - Conteúdo chave-valor (inclui estado dos plugins)
-   - `contactInfo` - Informações de contato e redes sociais
-   - `contactRequests` - Solicitações de contato recebidas via wizard
-   - `userRoles` - Roles dos usuários (root, admin, content-editor, blog-editor, proposal-editor)
+   - `contractTemplates` - Modelos de contrato
+   - `checkouts` - Sessões de checkout (experimental)
    - `aiGeneratedResumes` - CVs gerados por IA
-   - `auditLogs` - Logs de auditoria administrativa
-   - `checkouts` - Sessões de checkout (Asaas/Stripe)
-   - `rateLimits` - Controle de rate limiting por IP/fingerprint
-   - `imageFolders` - Pastas do gerenciador de mídia
-   - `images` - Metadados de imagens do Convex Storage
-   - `playgroundLogs` - Eventos de uso da área de demonstrações (expiram em 24h)
-   - `aboutDailyRoutines` - Itens da rotina diária (seção Sobre)
-   - `aboutFaqs` - FAQ da seção Sobre
+   - `siteConfig` - Cores do tema, fontes e demais configurações do site
+   - `siteTexts` - Textos da interface em pt-BR e en-US
+   - `deployStatus` - Alterações pendentes de publicação
+   - `auditLog` - Log de auditoria administrativa
+   - `playgroundAuditLog` - Eventos de uso do playground (expiram em 24h)
+   - `rateLimitAttempts` - Controle de rate limiting
 
-2. **Convex Storage** para upload de imagens e assinaturas
+2. **Convex Storage** para imagens, vídeos de depoimentos e assinaturas
 
-3. **Autenticação** configurada via Convex Auth
+3. **Autenticação** via Convex Auth (provider Password). O primeiro usuário root é criado com `BOOTSTRAP_ALLOWED=true` no Convex — remova a variável depois. A CLI (`rubrica setup`) faz isso por você.
+
+### Variáveis de ambiente do Convex
+
+| Variável | Uso |
+|---|---|
+| `BOOTSTRAP_ALLOWED` | Libera a criação do primeiro root (só no setup inicial) |
+| `SITE_URL` | URL pública do site |
+| `OPENROUTER_API_KEY` | Tradução e currículos com IA |
+| `PLAYGROUND_KEY_PEPPER` | Fingerprint de API keys no playground |
+| `TELEGRAM_BOT_TOKEN` / `TELEGRAM_ADMIN_CHAT_ID` | Notificações (opcional) |
+| `VERCEL_DEPLOY_HOOK_URL` | Botão "Publicar" do admin |
+| `VERCEL_WEBHOOK_SECRET` | Webhook `/webhooks/vercel-deploy` |
+| `ASAAS_API_KEY` | Chave da API do Asaas (`$aact_hmlg_` sandbox, `$aact_prod_` produção) |
+| `ASAAS_WEBHOOK_TOKEN` | Token do webhook `/webhooks/asaas` (o mesmo cadastrado no Asaas) |
+| `ASAAS_ENV` | Opcional: força `production` ou `sandbox` |
 
 ### OpenRouter (IA)
 
-Para utilizar as funcionalidades de IA:
-
-1. **Criar conta no OpenRouter**: Acesse [openrouter.ai](https://openrouter.ai) e crie sua conta
-
-2. **Obter a chave de API**
-
-3. **Configurar no Convex Dashboard**:
-   - Acesse **Settings** → **Environment Variables**
-   - Adicione: `OPENROUTER_API_KEY=sua_chave`
+1. Crie uma conta em [openrouter.ai](https://openrouter.ai) e gere a chave de API
+2. Configure no Convex: `OPENROUTER_API_KEY=sua_chave`
 
 #### Modelos utilizados
 
 | Funcionalidade | Modelo |
 |---|---|
-| Tradução de conteúdo | Configurável via OpenRouter |
+| Tradução de conteúdo | Lista de modelos com fallback em `convex/translation.ts` |
 | Análise de vaga (CV IA) | Gemini |
 | ATS Scoring | GPT-5.4 |
 | Reescrita ATS do CV | Claude Sonnet |
@@ -457,74 +432,61 @@ Para utilizar as funcionalidades de IA:
 
 O sistema envia notificações automáticas via bot Telegram para o admin nos seguintes eventos:
 
-| Evento | Gatilho | Conteúdo da mensagem |
-|--------|---------|----------------------|
-| ✅ Proposta aceita | Cliente aceita eletronicamente uma proposta | Nome, email, slug da proposta e valor do investimento |
-| 💰 Pagamento confirmado | Webhook Stripe (`checkout.session.completed`) ou Asaas (`PAYMENT_CONFIRMED` / `PAYMENT_RECEIVED`) confirma o pagamento | Nome do cliente, email, valor e link único do checkout |
+| Evento | Gatilho |
+|--------|---------|
+| ✅ Proposta aceita | Cliente aceita eletronicamente uma proposta (`proposals`) |
+| 💰 Pagamento confirmado | Webhook do Asaas (`PAYMENT_CONFIRMED` / `PAYMENT_RECEIVED`) → `checkouts:markPaidByLink` |
+| 📨 Nova solicitação de contato | Envio do wizard de contato |
+| ⭐ Novo depoimento | Envio do wizard de depoimentos |
 
-As notificações são disparadas via `internalAction` (`convex/telegram.ts`) de forma assíncrona (fire-and-forget via `ctx.scheduler.runAfter`), portanto uma falha na entrega não afeta o fluxo principal.
+Proposta aceita e pagamento confirmado usam a `internalAction` `convex/telegram.ts`, agendada via `ctx.scheduler.runAfter` (fire-and-forget); contato e depoimento chamam a API do Telegram nos próprios módulos. Uma falha na entrega não afeta o fluxo principal.
 
 #### Configuração
 
-1. **Criar o bot**: Fale com [@BotFather](https://t.me/BotFather) no Telegram e use `/newbot` para obter o `TELEGRAM_BOT_TOKEN`
-
-2. **Obter o chat ID**: Envie qualquer mensagem para o bot e acesse:
-   ```
-   https://api.telegram.org/bot<TOKEN>/getUpdates
-   ```
-   O campo `message.chat.id` é o seu `TELEGRAM_ADMIN_CHAT_ID`
-
-3. **Ativar o bot**: Envie `/start` para o bot antes do primeiro uso (obrigatório para o Telegram permitir o envio)
-
-4. **Configurar no Convex Dashboard** (Settings → Environment Variables):
-   - `TELEGRAM_BOT_TOKEN`
-   - `TELEGRAM_ADMIN_CHAT_ID`
+1. **Criar o bot**: fale com [@BotFather](https://t.me/BotFather) e use `/newbot` para obter o `TELEGRAM_BOT_TOKEN`
+2. **Obter o chat ID**: envie uma mensagem para o bot e acesse `https://api.telegram.org/bot<TOKEN>/getUpdates` — o campo `message.chat.id` é o `TELEGRAM_ADMIN_CHAT_ID`
+3. **Ativar o bot**: envie `/start` para o bot antes do primeiro uso
+4. **Configurar no Convex**: `TELEGRAM_BOT_TOKEN` e `TELEGRAM_ADMIN_CHAT_ID`
 
 > As variáveis são opcionais: se não configuradas, as notificações são silenciosamente ignoradas.
 
-### Stripe (Links de Pagamento)
+### Pagamentos (Asaas)
 
-Para utilizar a funcionalidade de Links de Pagamento, você precisa:
-
-1. **Criar uma conta no Stripe**
-
-2. **Obter a chave secreta** (começa com `sk_`)
-
-3. **Configurar variável de ambiente no Supabase** (Edge Function legada):
-   - Nome: `STRIPE_SECRET_KEY`
-
-4. **Deploy da Edge Function**:
-```bash
-supabase functions deploy stripe-api
-```
+1. **Chave**: no Asaas (comece pelo [sandbox](https://sandbox.asaas.com)), **Integrações → Chave de API**. Grave como `ASAAS_API_KEY`; o ambiente sai do prefixo da chave.
+2. **Webhook**: em **Integrações → Webhooks**, URL `https://<deployment>.convex.site/webhooks/asaas`, eventos de cobrança ligados e um token, gravado como `ASAAS_WEBHOOK_TOKEN`. O `create-rubrica setup` gera o token e mostra a URL.
+3. **Fluxo**: o checkout cria cliente e cobrança no Asaas; o status vira `payment_selected` (aguardando). Só o webhook marca como `paid`, e aí chega a notificação no Telegram (com aviso se a cobrança paga não for a atual, se o link estava apagado/vencido ou se o valor veio menor). Estorno e chargeback marcam como `refunded`.
+4. **Vencimento do link**: checkouts vencidos expiram de hora em hora e a cobrança de PIX/cartão é cancelada no Asaas. A de boleto fica, porque pode ter sido paga e ainda estar compensando.
 
 ### Vercel (Deploy)
 
-O projeto está configurado para deploy na Vercel com:
-- Rewrites para SPA (Single Page Application)
-- Build automático via Vite
-- `convex deploy` executado antes do `vite build`
+O `vercel.json` configura:
+- Rewrites para SPA
+- Headers de segurança e Content-Security-Policy
+- Build command:
 
 ```json
-// vercel.json - build command
-"buildCommand": "pnpm convex deploy && pnpm vite build"
+"buildCommand": "npm run build:i18n && npm run build"
 ```
+
+`build:i18n` regera as traduções da interface a partir do Convex; `build` roda `npx convex deploy`, busca os dados estáticos, gera RSS e sitemap e faz o `vite build`. O site público só muda com um novo deploy, disparado pelo botão "Publicar" do admin (deploy hook da Vercel) — não há rebuild agendado.
 
 ## 📜 Scripts Disponíveis
 
 ```bash
 # Desenvolvimento
-pnpm dev             # Inicia servidor de desenvolvimento na porta 3000
-pnpm convex dev      # Inicia Convex em modo desenvolvimento
+pnpm dev             # Vite (porta 3000) + Convex dev
 
 # Build
-pnpm build           # Deploy Convex + build de produção
+pnpm build:i18n      # Regera src/i18n/translations a partir do Convex
+pnpm build           # convex deploy + dados estáticos + RSS + sitemap + vite build
 
 # Preview
 pnpm preview         # Preview do build de produção
 
 # Verificação
 pnpm check           # Verifica tipos TypeScript
+pnpm test            # Roda a suíte Vitest
+pnpm mutation:diff   # Testes de mutação (Stryker)
 
 # Formatação
 pnpm format          # Formata código com Prettier
@@ -535,100 +497,109 @@ pnpm format          # Formata código com Prettier
 ### Rotas Públicas
 
 - `/` - Página inicial
+- `/sobre` - Sobre
 - `/portfolio` - Portfólio de projetos
+- `/portfolio/:slug` - Estudo de caso
 - `/curriculo` - Currículo
 - `/blog` - Lista de posts
 - `/blog/:slug` - Post individual
+- `/depoimentos` - Depoimentos
 - `/proposta/:id` - Visualização de proposta
-- `/proposta/:id/aceitar` - Página de aceite eletrônico da proposta
-- `/terminal` - Interface de navegação estilo terminal
+- `/proposta/:slug/aceitar` - Aceite eletrônico da proposta
+- `/checkout/:uniqueLink` e `/payment-success/:uniqueLink` - Checkout (experimental)
+- `/playground` e sub-rotas - Área de demonstração
+- `/login` - Página de login
 
 ### Rotas Administrativas
 
 Todas as rotas administrativas são protegidas e requerem autenticação:
 
-- `/login` - Página de login
-- `/admin` ou `/admin/dashboard` - Dashboard (root, admin)
-- `/admin/projects` - Gerenciamento de projetos (root, admin)
-- `/admin/blog` - Gerenciamento de blog (root, admin)
-- `/admin/resume` - Gerenciamento de currículo (root, admin)
-- `/admin/proposals` - Gerenciamento de propostas (root, admin, proposal-editor)
-- `/admin/home` - Gerenciamento da home (root, admin)
-- `/admin/contact` - Gerenciamento de contato (root, admin)
-- `/admin/payment-links` - Links de pagamento Stripe (root, admin)
-- `/admin/ai-resumes` - Gerador de currículo com IA (root, admin)
+- `/admin` ou `/admin/dashboard` - Dashboard (root, admin, content-editor, blog-editor)
+- `/admin/projects` - Projetos (root, admin, content-editor)
+- `/admin/blog` - Blog (root, admin, content-editor, blog-editor)
+- `/admin/resume` - Currículo (root, admin, content-editor)
+- `/admin/home` - Home (root, admin, content-editor)
+- `/admin/about` - Sobre (root, admin, content-editor)
+- `/admin/textos` - Textos da interface (root, admin, content-editor)
+- `/admin/depoimentos` - Depoimentos (root, admin, content-editor)
+- `/admin/contact` - Informações de contato (root, admin)
+- `/admin/contatos` - Solicitações de contato (root, admin)
+- `/admin/proposals` - Propostas (root, admin, proposal-editor)
+- `/admin/contracts` - Modelos de contrato (root, admin)
+- `/admin/payment-links` - Pagamentos, experimental (root, admin)
+- `/admin/ai-resumes` - Currículos com IA (root, admin)
+- `/admin/plugins` - Plugins (root, admin)
+- `/admin/site-config` - Site e aparência (root, admin)
 - `/admin/logs` - Logs de auditoria (root)
-- `/admin/lgpd` - Gestão de titulares LGPD — exportação e anonimização (apenas root)
-- `/admin/users/new` - Criar usuário (apenas root)
+- `/admin/lgpd` - Gestão de titulares LGPD — exportação e anonimização (root)
+- `/admin/users/new` - Criar usuário (root)
 
 ## 🔒 Sistema de Autenticação
 
-O sistema utiliza Convex Auth com um sistema customizado de roles:
+O sistema utiliza Convex Auth (provider Password, sem cadastro público) com um sistema customizado de roles.
 
 ### Roles Disponíveis
 
-- **root**: Acesso total ao sistema
-- **admin**: Acesso administrativo geral (exceto criação de usuários)
-- **proposal-editor**: Acesso apenas ao gerenciamento de propostas
+- **root**: acesso total ao sistema
+- **admin**: acesso administrativo geral (exceto usuários, logs e LGPD)
+- **content-editor**: conteúdo do site
+- **blog-editor**: apenas blog
+- **proposal-editor**: apenas propostas
 
 ### Permissões
 
-As permissões são verificadas através da collection `userAppRoles` no Convex, que armazena as relações entre usuários e roles. O contexto `AuthContext` gerencia o estado de autenticação via queries Convex e verifica permissões através do método `checkRole()`.
+As roles ficam na collection `userRoles`. No backend, cada função administrativa verifica a role (`requireRole`); no frontend, `ProtectedRoute` recebe `allowedRoles` e o `AuthContext` expõe o estado de autenticação.
 
 ## 🎨 Componentes Principais
 
 ### Layout Components
 
-- **Layout**: Layout principal com sidebar para páginas públicas
-- **AdminLayout**: Layout com sidebar administrativa
-- **Sidebar**: Sidebar pública com navegação e informações de contato
-- **PageSkeleton**: Skeleton loader para estados de carregamento
-
-### UI Components (shadcn/ui)
-
-O projeto utiliza componentes do shadcn/ui, uma coleção de componentes React reutilizáveis baseados em Radix UI:
-
-- Button, Card, Dialog, Input, Select, Textarea
-- Badge, Avatar, Tabs, Accordion
-- Carousel, Chart, Calendar
-- E muitos outros componentes de UI
+- **Layout**: layout principal das páginas públicas (substituído pelo layout escolhido na CLI)
+- **AdminLayout**: layout com sidebar administrativa
+- **Sidebar**: sidebar pública com navegação, contato, download do CV e seletor de idioma
+- **PageSkeleton**: skeleton loader para estados de carregamento
 
 ### Feature Components
 
-- **ProtectedRoute**: Componente de rota protegida que verifica autenticação e roles
-- **ErrorBoundary**: Tratamento de erros React
-- **ImagePicker**: Upload e seleção de imagens do Convex Storage (por ID)
-- **RichTextEditor**: Editor de texto rico para conteúdo
-- **DownloadContractButton**: Download de PDF do contrato para propostas aceitas
+- **ProtectedRoute** / **PluginRoute**: rota protegida por role / por plugin
+- **ErrorBoundary**: tratamento de erros React
+- **ContactWizard** / **TestimonialWizard**: wizards públicos
+- **ThemeApplier**: aplica as cores e fontes salvas no admin
+- **Terminal**: interface estilo terminal
+- **SEO**: meta tags por página
 
 ## 🎨 Design System
 
-### Cores Principais
+### Cores: contrato de 4 cores
 
-- **Neon Purple**: Cor primária (#a855f7)
-- **Neon Lime**: Cor secundária para destaques
-- **Dark Background**: Fundo escuro (#0f0f0f, #121212)
-- **Card Background**: Fundo de cards (#1e1e1e)
+Todo tema é definido por 4 variáveis em `src/index.css` (ou pelo admin em **Site e Aparência**):
+
+- **`--bg`**: fundo
+- **`--text`**: texto
+- **`--primary`**: cor primária (identidade)
+- **`--accent`**: cor de destaque
+
+Superfícies, bordas e textos secundários são derivados dessas 4 cores, então paletas claras e escuras funcionam igualmente. A CLI oferece 4 paletas — Editorial Cream e Paper Noir (claras), Midnight Blue e Solar Warm (escuras); o padrão do repositório é o visual neon original (roxo e verde-limão). Detalhes em [cores.md](./templates/cores.md).
+
+### Layouts
+
+`cyberpunk` (padrão), `brutalist`, `swiss`, `bento` e `magazine`, em `templates/layouts/`, aplicados pela CLI (`rubrica create` / `rubrica config`). Veja o [guia dos templates](./templates/README.md).
 
 ### Tipografia
 
-- Fontes do sistema (system-ui)
-- Fontes mono para elementos de código
+- Fontes sans e mono configuráveis (`rubrica.config.ts`, CLI ou admin); padrão Inter e JetBrains Mono
 
 ### Animações
 
-- Transições suaves com Framer Motion
+- Transições com Framer Motion
 - Hover effects nos elementos interativos
-- Animações de entrada/saída nas páginas
 
 ## 📝 Notas de Desenvolvimento
 
-- O projeto utiliza TypeScript em modo strict
-- Path aliases configurados (`@/` para `src/`)
-- Vite para build rápido e HMR
-- Tailwind CSS com configuração customizada
-- Sistema de temas preparado (dark mode implementado)
+- TypeScript em modo strict
+- Path alias `@/` para `src/`
 - Imagens armazenadas por ID no Convex Storage (não por URL)
+- Templates de layout só podem usar as 4 cores do contrato — verificado por `tests/app/colorContract.test.ts`
 
 ## 🧩 Sistema de Plugins
 
@@ -647,9 +618,10 @@ O estado dos plugins é armazenado na tabela `homeContent` com chaves `plugin:<i
 
 | Plugin | Rotas admin | Rotas públicas | minRole | Sub-plugin de |
 |--------|-------------|----------------|---------|---------------|
-| `contact-wizard` | `/admin/contatos`, `/admin/contact` | — | admin | — |
+| `contact-wizard` | `/admin/contatos` | — | admin | — |
 | `proposals` | `/admin/proposals` | `/proposta/:id`, `/proposta/:slug/aceitar` | admin | — |
-| `payments` | `/admin/payment-links` | `/checkout/:link`, `/payment-success/:link` | admin | — |
+| `contract-templates` | `/admin/contracts` | — | admin | — |
+| `payments` (experimental) | `/admin/payment-links` | `/checkout/:link`, `/payment-success/:link` | admin | — |
 | `blog` | `/admin/blog` | `/blog`, `/blog/:slug` | admin | — |
 | `portfolio` | `/admin/projects` | `/portfolio`, `/portfolio/:slug` | admin | — |
 | `resume` | `/admin/resume` | `/curriculo` | admin | — |
@@ -666,13 +638,13 @@ O estado dos plugins é armazenado na tabela `homeContent` com chaves `plugin:<i
 
 Alguns plugins têm funcionalidades opcionais que podem ser controladas de forma independente. Esses são chamados de **sub-plugins** — eles ficam aninhados abaixo do plugin pai na interface de gerenciamento e só fazem sentido quando o pai está ativo.
 
-O sub-plugin `testimonials-intake` é o exemplo atual: controla exclusivamente o **formulário público de envio de depoimentos** (wizard de submissão, upload de vídeo, fila de moderação). Ele pode ser desativado enquanto o plugin `testimonials` permanece ativo, o que mantém a exibição pública de depoimentos mas remove o canal de envio por visitantes. Útil quando o admin quer pausar novos envios sem tirar os depoimentos já publicados do ar.
+O sub-plugin `testimonials-intake` é o exemplo atual: controla exclusivamente o **formulário público de envio de depoimentos** (wizard de submissão, upload de vídeo, fila de moderação). Ele pode ser desativado enquanto o plugin `testimonials` permanece ativo, o que mantém a exibição pública de depoimentos mas remove o canal de envio por visitantes.
 
 Para criar um sub-plugin, basta adicionar `parentId: 'id-do-pai'` na definição do plugin em `convex/pluginRegistry.ts`.
 
 ### Gerenciamento
 
-Acesse `/admin/plugins` para ativar ou desativar plugins via interface. A mudança só entra em vigor para visitantes públicos após um novo deploy (que regenera `plugins.json`). No admin, a mudança é imediata.
+Acesse `/admin/plugins` (ou `rubrica config` → Plugins) para ativar ou desativar plugins. A mudança só entra em vigor para visitantes públicos após um novo deploy (que regenera `plugins.json`). No admin, a mudança é imediata.
 
 ### Adicionando um novo plugin
 
@@ -683,147 +655,97 @@ Acesse `/admin/plugins` para ativar ou desativar plugins via interface. A mudan�
 
 ---
 
-## 🆕 Funcionalidades Recentes
+## 🆕 Funcionalidades em Detalhe
 
-### Migração Supabase → Convex
+### Portfólio focado em conversão (v0.3.18)
 
-O backend foi migrado completamente de Supabase para **Convex**:
+Campos opcionais e aditivos (projetos antigos continuam válidos):
 
-- Banco de dados de documentos reativo em tempo real
-- Storage de arquivos unificado (imagens e assinaturas)
-- Actions server-side para lógica de IA e integrações
-- Autenticação convertida para queries Convex
-- Imagens migradas para referência por ID em vez de URL
+- **Números de prova** (`homeContent` `home_metrics`): no topo da home e do currículo
+- **Princípios de trabalho** (`homeContent` `work_principles`): página Sobre
+- **Seções do case study** (`projects.caseStudy`): `role`, `context`, `decisions`, `learnings`, além de `problem`, `solution`, `results`, `metrics` e `testimonial`
+- **Categorias** de projetos (filtros do portfólio) e de depoimentos (agrupamento em `/depoimentos`)
+- **Grupos de habilidades** (`resumeItems` do tipo `skill`, campo `group`)
 
 ### Interface Terminal
 
-- Nova rota `/terminal` com interface estilo terminal
+- Aberta com a tecla <code>`</code> em qualquer página pública
 - Navegação pelo portfólio via comandos de texto
 
 ### Logs de Auditoria
 
 - Todas as mutações administrativas geram registros de auditoria
-- Labels descritivos para cada tipo de operação
 - Página `/admin/logs` para visualização e rastreabilidade
 - Retenção de 2 anos com anonimização de IP após 90 dias
 
-### Notificações Telegram
-
-- Bot Telegram envia alertas em tempo real para o admin
-- **Proposta aceita**: disparado na mutation `proposals:accept`
-- **Pagamento confirmado**: disparado na mutation interna `checkouts:markPaidByLink`, chamada pelos webhooks do Stripe e Asaas
-- Implementado como `internalAction` fire-and-forget (`convex/telegram.ts`)
-
 ### Tradução Automática com IA
 
-O sistema implementa **tradução automática** de conteúdo via OpenRouter:
-
-- Integrada em todas as páginas administrativas (projetos, blog, currículo, home)
+- Integrada nas páginas administrativas de conteúdo (projetos, blog, currículo, home, sobre)
 - Envia **apenas os campos modificados** para tradução (otimização de tokens)
-- Suporte a múltiplos locales/idiomas
-- Função `getChangedTranslatableFields` identifica quais campos foram alterados
+- Textos fixos da interface ficam em `siteTexts`, editáveis em `/admin/textos` e exportados para `src/i18n/translations` no build (`build:i18n`)
 
 ### Gerador de Currículo com IA (Pipeline 3 Etapas)
-
-Pipeline completo de reescrita de CV para ATS via OpenRouter:
 
 1. **Gemini** — analisa a descrição da vaga e extrai requisitos
 2. **GPT-5.4** — pontua o fit do CV (0–100), identifica forças e fraquezas
 3. **Claude Sonnet** — reescreve o CV completo para compatibilidade ATS
 
-Regras rígidas de saída: sem pronomes pessoais, sem travessões, sem jargões de IA ("leveraged", "spearheaded", etc.), sempre em português brasileiro.
-
 CVs gerados são armazenados na collection `aiGeneratedResumes` com score, análise e dados completos para regeneração de PDF.
 
-### Gerador de CV PDF Otimizado para ATS
+### Aceite Eletrônico de Propostas
 
-- Ordem de seções otimizada para sistemas ATS
-- Resumo profissional como primeira seção (após contato)
-- Cargo exibido antes da empresa em experiências/educação
-- Tipografia configurada: margens 25mm, headings 12pt maiúsculos, corpo 10.5pt
-
-### Assinatura Manuscrita em Propostas
-
-- Canvas interativo para captura de assinatura com mouse ou touch
-- Assinatura armazenada como PNG no **Convex Storage** (`signatureStorageId`)
-- Botão "Download Contrato" na área admin regenera o PDF com a assinatura armazenada
-- `sessionId` agora opcional em `proposalAcceptances` para suportar aceites diretos
-
-### Sistema de Links de Pagamento com Stripe
-
-Integração completa com Stripe para gerenciamento de pagamentos via links compartilháveis (ver configuração Stripe acima).
-
-### Sistema de Aceite Eletrônico de Propostas
-
-Sistema completo de aceite com validade jurídica:
-
-- **Captura de assinatura manuscrita** via canvas
-- **Evidências técnicas**: Hash SHA-256, IP, User-Agent, versão da proposta
-- **PDF do contrato** com assinatura, cláusulas obrigatórias e foro
-- **Imutabilidade**: Propostas aceitas são bloqueadas para edição/exclusão
+- **Captura de assinatura manuscrita** via canvas, armazenada como PNG no Convex Storage (`signatureStorageId`)
+- **Evidências técnicas**: hash SHA-256, IP, User-Agent, versão da proposta
+- **PDF do contrato** gerado a partir do modelo de contrato, com assinatura
+- **Imutabilidade**: propostas aceitas são bloqueadas para edição/exclusão
 - **Versionamento automático** ao editar propostas não aceitas
 
 ### Gerenciamento de Usuários
 
-O sistema de usuários vai além da criação básica. Na primeira vez que o projeto é acessado sem nenhum usuário root cadastrado, o sistema exibe automaticamente uma tela de setup inicial para criar a conta root — não é possível acessar o admin sem isso. A partir daí, apenas o root pode criar novos usuários (`/admin/users/new`), que são criados com email e senha e um role pré-definido. Todo usuário criado pelo admin recebe uma flag de **troca de senha obrigatória no primeiro login**: o sistema bloqueia o acesso até que a troca seja realizada, evitando que credenciais temporárias fiquem ativas.
-
-Os roles disponíveis são: `root` (acesso total), `admin` (acesso geral), `content-editor`, `blog-editor` e `proposal-editor`.
+Na primeira vez que o projeto é acessado sem nenhum usuário root, o sistema exibe uma tela de setup inicial para criar a conta root — permitida apenas enquanto `BOOTSTRAP_ALLOWED=true` estiver definido no Convex (a CLI `rubrica setup` cria o root por linha de comando). A partir daí, apenas o root cria novos usuários (`/admin/users/new`), com email, senha e role. Todo usuário criado pelo admin recebe uma flag de **troca de senha obrigatória no primeiro login**.
 
 ---
 
 ### Wizard de Contato
 
-O portfólio tem um fluxo de contato adaptativo acessível pela sidebar pública. Em vez de um formulário simples, é um wizard em etapas que coleta nome, objetivo, orçamento e prazo antes de enviar. O envio tem **rate limiting por IP** para evitar spam. Cada solicitação recebida aparece no painel admin em `/admin/contatos`, onde o admin pode marcar como lida, atualizar o status (pendente / em andamento / concluída) e adicionar notas internas. Uma notificação Telegram é disparada automaticamente ao receber uma nova solicitação.
+Fluxo de contato em etapas acessível pela sidebar pública, com tipos de contato (projeto, vaga, networking, feedback). O envio tem **rate limiting por IP**. As solicitações aparecem em `/admin/contatos`, onde o admin atualiza o status e adiciona notas internas. Uma notificação Telegram é disparada a cada nova solicitação.
 
 ---
 
 ### Wizard de Depoimentos
 
-Clientes podem enviar depoimentos de forma autônoma via wizard público, sem precisar de login. O wizard aceita depoimento em texto ou em vídeo (upload direto para o Convex Storage). Há uma cota diária de uploads de vídeo para evitar abuso. Cada envio vai para uma fila de aprovação em `/admin/testimonials` (aba "Submissões"), onde o admin pode aprovar, rejeitar ou aprovar e publicar diretamente. Quando publicado, o depoimento passa a aparecer na área pública. Uma notificação Telegram é disparada a cada nova submissão.
-
----
-
-### Seção Sobre (`/sobre`)
-
-A seção Sobre é completamente gerenciável via admin (`/admin/about`). Além do texto de apresentação, o admin pode gerenciar dois blocos de conteúdo adicionais:
-- **Rotina diária**: lista de atividades e hábitos do dia a dia, exibida na página pública
-- **FAQ**: perguntas e respostas frequentes sobre o trabalho, também exibidas publicamente
+Clientes podem enviar depoimentos via wizard público, sem login, em texto ou vídeo (upload para o Convex Storage, até 20 MB por vídeo e cota diária total de 100 MB). Cada envio vai para a fila de aprovação em `/admin/depoimentos`, onde o admin pode aprovar, rejeitar ou publicar. Uma notificação Telegram é disparada a cada nova submissão.
 
 ---
 
 ### Gerenciador de Mídia
 
-Todas as imagens usadas no sistema ficam centralizadas no Convex Storage. O gerenciador de mídia permite organizar as imagens em **pastas com hierarquia**, fazer upload via interface e reutilizar imagens já enviadas em qualquer parte do sistema (projetos, depoimentos, etc.) pelo seletor `ImagePicker`. As imagens são referenciadas por ID — nunca por URL direta — o que garante que o Storage Convex permaneça como fonte única de verdade.
-
----
-
-### Checkout com Asaas (Boleto/PIX)
-
-Além do Stripe, o sistema tem integração com o **Asaas** para geração de cobranças via boleto bancário e PIX. O fluxo funciona assim: o admin cria um checkout com valor e dados do cliente; o sistema cria o cliente no Asaas (ou reutiliza se já existir) e gera a cobrança. O cliente acessa o link de checkout em `/checkout/:link`, vê os dados da cobrança e acompanha o status. Quando o pagamento é confirmado pelo webhook do Asaas, o sistema marca o checkout como pago automaticamente e dispara uma notificação Telegram ao admin.
+As imagens ficam no Convex Storage, organizadas em **pastas com hierarquia** (`imageFolders`, `imageMetadata`). O `ImagePicker` permite fazer upload e reutilizar imagens em qualquer parte do sistema. As imagens são referenciadas por ID — nunca por URL direta.
 
 ---
 
 ### Área de Playground (`/playground`)
 
-O Playground é uma área pública de demonstração onde visitantes podem experimentar funcionalidades do sistema sem precisar criar conta. Cada demo é isolada e usa dados fictícios. O uso de IA no playground é controlado por rate limiting por IP para limitar custos. Os eventos de uso são registrados anonimamente e expiram em 24h.
+Área pública de demonstração (wizard de contato, proposta, blog, link de pagamento, CV com IA) com dados fictícios. O uso de IA é controlado por rate limiting. Os eventos de uso são registrados anonimamente e expiram em 24h.
 
 ---
 
-### Soft Delete em Todo o Sistema
+### Soft Delete
 
-Nenhum dado é apagado permanentemente por padrão. Todas as entidades gerenciáveis (projetos, posts, propostas, depoimentos, itens de currículo, serviços, imagens, checkouts, etc.) usam **soft delete**: ao excluir, o registro é marcado como deletado e some das listagens, mas permanece no banco. O admin pode visualizar os itens deletados na página de auditoria e restaurá-los se necessário. A exclusão permanente é uma ação separada, explícita, com confirmação.
+As entidades gerenciáveis (projetos, posts, propostas, depoimentos, itens de currículo, serviços, checkouts, etc.) usam **soft delete**: ao excluir, o registro é marcado com `deletedAt` e some das listagens, mas permanece no banco. O admin vê os itens excluídos na aba "Excluídos" de `/admin/logs` e pode restaurá-los. A exclusão permanente é uma ação separada, com confirmação.
 
 ---
 
 ### Tarefas Automáticas de Manutenção
 
-O sistema executa rotinas automáticas via cron jobs do Convex para manter o banco limpo:
+Cron jobs do Convex (`convex/crons.ts`):
 - Sessões expiradas de propostas são removidas diariamente
 - Entradas de rate limiting expiradas são limpas diariamente
 - Logs de auditoria com mais de 2 anos são removidos semanalmente
-- IPs nos logs de auditoria com mais de 90 dias são anonimizados diariamente (conformidade com LGPD)
-- Checkouts pendentes há mais de 24h são expirados a cada hora
+- IPs nos logs de auditoria com mais de 90 dias são anonimizados diariamente (LGPD)
+- Checkouts pendentes com prazo vencido (30 dias por padrão) são expirados a cada hora
 - Logs de uso do playground são limpos diariamente
+- `siteConfig` é populado com os valores de `rubrica.config.ts` (idempotente, diário)
 
 ---
 
@@ -857,20 +779,22 @@ O botão **Anonimizar tudo** exibe um diálogo de confirmação e, após aprova�
 
 ### Setup Inicial com Seed
 
-Ao criar um novo ambiente, o admin pode executar o seed para popular o banco com dados iniciais de exemplo (informações de contato, serviços e conteúdo da home), acelerando a configuração inicial do portfólio.
+`rubrica setup` configura as variáveis do Convex, cria o usuário root (`seed:setupAdmin`) e popula o banco com conteúdo inicial (`seed:seedAll`: configurações do site, modelo de contrato padrão e textos da interface, conforme os plugins ativos).
 
 ---
 
 ## 🔄 Próximas Melhorias
 
-- [ ] Internacionalização (i18n)
-- [ ] Modo claro/alto contraste
-- [ ] Analytics integrado
-- [ ] Otimizações de SEO adicionais
-- [ ] Testes automatizados
+- [x] Internacionalização (pt-BR e en-US)
+- [x] Paletas claras (contrato de 4 cores)
+- [ ] Modo alto contraste
+- [x] Analytics (Vercel Analytics e Umami opcional) — falta um painel de analytics dentro do admin
+- [ ] Otimizações de SEO adicionais (meta tags, RSS e sitemap já existem)
+- [x] Testes automatizados (Vitest + CI no GitHub Actions)
 - [ ] PWA (Progressive Web App)
 - [ ] Notificações por e-mail ao aceitar proposta (Telegram já implementado)
-- [ ] Dashboard de estatísticas de aceites
+- [ ] Dashboard de estatísticas de aceites (hoje o dashboard mostra só as contagens)
+- [x] Pagamentos reais com Asaas (PIX, boleto e cartão)
 
 ## 📄 Licença
 

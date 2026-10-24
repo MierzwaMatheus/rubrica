@@ -1,0 +1,103 @@
+# Changelog
+
+O que mudou em cada versão do Rubrica (template e CLI `create-rubrica`). Detalhes de cada uma nas [notas da release](https://github.com/MierzwaMatheus/rubrica/releases). Para atualizar um projeto existente, veja [Atualizando o seu Rubrica](./docs/atualizacao.md).
+
+## Não lançado
+
+### Atualizar sem perder personalizações
+- `create-rubrica update` foi reescrito. Antes, ele extraía a versão nova por cima do projeto (perdendo qualquer arquivo editado à mão) e zerava a identidade do `rubrica.config.ts`. Agora ele mescla, arquivo por arquivo, as mudanças do Rubrica com as suas; quando os dois mexeram no mesmo trecho, o seu arquivo fica intacto e a versão nova vai para `<arquivo>.rubrica-new`. Novas opções: `--dry-run`, `--from`, `--to`, `--yes`.
+- O `create` passa a gravar no `rubrica.json` a versão realmente baixada (antes gravava sempre `0.1.0`). Projetos antigos informam a versão de origem com `--from` ou respondendo à pergunta do `update`.
+
+### Pagamentos de verdade (Asaas)
+- O checkout passa a criar cobranças reais no Asaas: **PIX** (QR code e copia-e-cola), **boleto** (linha digitável e PDF) e **cartão em até 12x**, pela página segura do Asaas. O site nunca recebe dados de cartão.
+- **Correção grave:** o pagamento com cartão era marcado como confirmado sem nenhuma cobrança. Agora o checkout só vira pago quando o webhook do Asaas confirma.
+- O valor com juros do parcelamento é calculado no servidor; antes vinha do navegador e podia ser alterado.
+- Trocar de forma de pagamento cancela a cobrança anterior (antes ficavam duas cobranças abertas), inclusive todas as parcelas de um parcelamento. Links vencidos ou apagados cancelam a cobrança de PIX/cartão.
+- Boleto já gerado não pode ser trocado por outra forma: ele pode ter sido pago e ainda estar compensando.
+- Proteções contra pagamento em dobro e abuso: trava contra dois cliques simultâneos, limite de cobranças por link e QR code PIX vencido regenerável.
+- Estornos e chargebacks do Asaas marcam o checkout como estornado e avisam no Telegram; pagamento de cobrança diferente da atual, em link apagado ou com valor menor também gera aviso.
+- Mensagens de erro do pagamento chegam ao cliente em produção (antes viravam "Server Error").
+- Checkout com valor mínimo de R$ 5, no máximo 2 casas decimais e vencimento válido; parcelas abaixo de R$ 5 não são oferecidas; a forma de pagamento restrita no checkout é respeitada.
+- Admin de pagamentos funcionando: clientes, cobranças e notas fiscais do Asaas, com auditoria. Links de checkout gerados com aleatoriedade criptográfica.
+- A página de checkout não quebra mais ao abrir (tentava formatar CPF e telefone que o servidor esconde de propósito). `/payment-success` mostra "confirmando" até o pagamento ser confirmado.
+- Novas variáveis no Convex: `ASAAS_API_KEY` (sandbox ou produção, detectado pela chave) e, opcional, `ASAAS_ENV`. O `setup` pede a chave, gera o `ASAAS_WEBHOOK_TOKEN` e mostra como cadastrar o webhook.
+- **Removido:** a integração com o Stripe, que nunca funcionou (eram stubs sem uso na interface), o webhook `/webhooks/stripe` e a variável `STRIPE_WEBHOOK_SECRET`.
+
+### Segurança e limpeza
+- Login: limite explícito de 5 senhas erradas por conta por hora.
+- Umami: o script só entra no site quando `VITE_UMAMI_SCRIPT_URL` e `VITE_UMAMI_WEBSITE_ID` estão definidas (antes carregava uma URL com o placeholder literal); Umami Cloud liberado no CSP. `VITE_ANALYTICS_ENDPOINT`/`VITE_ANALYTICS_WEBSITE_ID` continuam aceitas.
+- `.env.example` reescrito com as variáveis que o código realmente lê.
+- Removidos restos de um setup antigo: `vite-plugin-manus-runtime`, `ManusDialog`, `Map.tsx` (Google Maps sem uso), aliases `@shared`/`@assets` e caminhos de monorepo nos scripts.
+
+### Correções
+- `npx create-rubrica <nome>` e `pnpm create rubrica <nome>` voltam a criar o projeto (antes só mostravam a lista de comandos).
+- `config`, identidade: não zera mais SEO, RSS e imagem de compartilhamento, atualiza as meta tags do `index.html` e salva a identidade no `rubrica.json`.
+- `config`, aparência: trocar paleta ou fonte não apaga mais as meta tags do `index.html`.
+- `config`, layout: funciona em projetos criados pelo CLI (baixa os layouts da versão do projeto) e inclui o layout Magazine.
+- Build na Vercel: o script `build:i18n`, chamado pelo `vercel.json`, tinha sumido do `package.json`. Removido o cron diário para `/api/cron-deploy`, rota que não existe.
+- A release volta a incluir `scripts/` e `vercel.json`: sem eles, `pnpm build` falhava em projetos criados pelo CLI.
+- Atalhos "Nova proposta" e "Novo projeto" do dashboard voltam a abrir o formulário de criação.
+- Textos das páginas de login, depoimentos, home, blog e sobre voltam a vir das traduções (i18n) em vez de fixos no código.
+
+### Qualidade
+- CI no GitHub Actions: tipos, testes e build do template e do CLI em toda PR.
+- Testes e typecheck do template e do CLI passando (eram 21 + 8 testes falhando e 9 + 4 erros de tipo).
+
+## 0.3.18 — 2026-10-24
+- Estrutura de portfólio focada em conversão em todos os layouts: métricas, cases em destaque, princípios de trabalho, seções do case (papel, antes, decisões, aprendizados), filtros por categoria, depoimentos por categoria, skills agrupadas, download do CV no topo do currículo e eventos Umami nos CTAs. Todos os campos novos são opcionais.
+
+## 0.3.17 — 2026-10-23
+- **Segurança:** `siteConfig:setBatch` passa a exigir papel `root` ou `admin`.
+- Seeds não apagam mais textos e home personalizados.
+- Publicar depois de editar textos ou configuração volta a funcionar.
+- O nome do site e o contato informados no CLI passam a ser gravados no Convex.
+- Nova skill `rubrica` para agentes de IA (Claude Code, Codex, OpenCode).
+- Sistema de 4 cores em todos os layouts, inclusive paletas claras; guias de templates e de cores.
+
+## 0.3.16 — 2026-08-08
+- Sidebar não cobre mais parte do conteúdo no desktop.
+
+## 0.3.15 — 2026-08-08
+- Instalações sem o plugin i18n não mostram mais chaves (`home.title`) no lugar dos textos.
+
+## 0.3.14 — 2026-08-08
+- Home não quebra mais quando a lista de tecnologias vem num formato inesperado.
+
+## 0.3.13 — 2026-08-08
+- Sidebar sem `<a>` aninhado (erro de hydration).
+
+## 0.3.12 — 2026-08-08
+- `setup` volta a aplicar os seeds (o comando falhava em silêncio e as tabelas ficavam vazias).
+
+## 0.3.11 — 2026-08-08
+- Layout Magazine não repete mais o Masthead três vezes.
+
+## 0.3.10 — 2026-08-08
+- Import quebrado na Navbar do Brutalist; páginas e componentes que faltavam no template.
+
+## 0.3.9 — 2026-08-08
+- Import do Masthead corrigido no layout Magazine.
+
+## 0.3.8 — 2026-05-25
+- Conflito de variáveis CSS de tema corrigido.
+
+## 0.3.7 — 2026-05-25
+- ASCII art do nome e aplicação das cores `--bg`/`--text` vindas do Convex.
+
+## 0.3.6 — 2026-05-25
+- `vite.config` gerado não referencia mais `isDev`.
+
+## 0.3.5 — 2026-05-25
+- Correções no Brutalist (cores, navegação, identidade no CLI, ASCII art) e console limpo.
+
+## 0.3.4 — 2026-05-25
+- Contrato CSS de 4 cores (`--bg`, `--text`, `--primary`, `--accent`) e 2 fontes em todos os templates.
+
+## 0.3.0 — 2026-05-24
+- Páginas completas (Home, Currículo, Portfólio, Sobre, Blog) para Brutalist, Swiss, Magazine e Bento.
+
+## 0.2.0 – 0.2.4 — 2026-05-22 a 2026-05-23
+- Comando `setup`: chaves JWT, `SITE_URL`, variáveis por plugin, usuário root e seeds. Correções na gravação da `JWT_PRIVATE_KEY`.
+
+## 0.1.0 — 2026-05-22
+- Primeira release.

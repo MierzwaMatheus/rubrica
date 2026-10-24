@@ -113,5 +113,5 @@ O site é gerado no build da Vercel. Depois de mudanças de conteúdo:
 ## Limites
 - **Bloqueado** (código 2): `permanentDelete`, `requestErasure` (LGPD) e `bootstrapRootUser`. Use o painel admin.
 - `remove` é exclusão reversível (vai para a lixeira; `--lixeira` mostra). `restore` exige papel root.
-- Não mexa em usuários e papéis (`users:*`), checkouts, pagamentos (Stripe/Asaas) nem `proposals:resetPassword` sem pedido explícito e confirmação: mexem com acesso e dinheiro.
+- Não mexa em usuários e papéis (`users:*`), checkouts, pagamentos (Asaas) nem `proposals:resetPassword` sem pedido explícito e confirmação: mexem com acesso e dinheiro.
 - Esta skill é para **conteúdo**. Layout, componentes e estilos são código do repositório.

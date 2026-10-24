@@ -17,6 +17,7 @@ Um sistema completo de portfólio profissional — pronto para você forkar, per
 [![Stack](https://img.shields.io/badge/React%20%2B%20Convex-1A1A18?style=flat-square)](https://convex.dev)
 [![Deploy](https://img.shields.io/badge/deploy-Vercel-C4664A?style=flat-square)](https://vercel.com)
 [![TypeScript](https://img.shields.io/badge/TypeScript-99%25-4D7C5F?style=flat-square)](https://www.typescriptlang.org)
+[![CI](https://github.com/MierzwaMatheus/rubrica/actions/workflows/ci.yml/badge.svg)](https://github.com/MierzwaMatheus/rubrica/actions/workflows/ci.yml)
 
 </div>
 
@@ -50,7 +51,7 @@ A base técnica é coletiva. A identidade é sua.
 | ⚙️ | **Admin** | CRUD de tudo via interface — sem tocar no código |
 | 🧩 | **Plugins** | Liga e desliga features que você não quer expor |
 | 🤖 | **IA** _(opcional)_ | Tradução automática e geração de CV otimizado para vagas |
-| 💳 | **Pagamentos** _(opcional)_ | Stripe e Asaas (PIX/boleto) |
+| 💳 | **Pagamentos** _(opcional)_ | Link de checkout com PIX, boleto e cartão em até 12x via Asaas. O cartão é digitado na página segura do Asaas, nunca no seu site |
 | 🔔 | **Notificações** _(opcional)_ | Telegram quando alguém aceita uma proposta ou paga |
 
 <br />
@@ -89,7 +90,7 @@ flowchart TB
 
     subgraph externos["🔌 Serviços externos — opcionais"]
         ia["OpenRouter<br/>IA · tradução"]
-        pay["Stripe · Asaas<br/>pagamentos"]
+        pay["Asaas<br/>PIX · boleto · cartão"]
         tg["Telegram<br/>notificações"]
     end
 
@@ -120,7 +121,7 @@ Antes de começar, você vai precisar de:
 - Conta no **[GitHub](https://github.com)** — para fork e deploy contínuo
 - Conta no **[Convex](https://convex.dev)** _(gratuita)_ — backend, banco e storage
 - Conta no **[Vercel](https://vercel.com)** _(gratuita)_ — hospedagem do frontend
-- _(Opcional)_ Contas no **[OpenRouter](https://openrouter.ai)**, **[Stripe](https://stripe.com)**, **[Asaas](https://asaas.com)** ou **[Telegram BotFather](https://t.me/BotFather)** — só se for usar as features opcionais
+- _(Opcional)_ Contas no **[OpenRouter](https://openrouter.ai)**, **[Asaas](https://asaas.com)** ou **[Telegram BotFather](https://t.me/BotFather)** — só se for usar as features opcionais
 
 <br />
 
@@ -156,6 +157,8 @@ cd rubrica
 pnpm install
 ```
 
+> **Prefere um assistente?** `npx create-rubrica meu-portfolio` baixa a versão mais recente, pergunta layout, paleta, fontes, plugins e identidade, e já deixa o projeto pronto para `npx create-rubrica setup` e para atualizações automáticas. Veja o [README do CLI](./cli/README.md). Os passos 2 a 10 valem para os dois caminhos.
+
 ### 2 · Provisionar o Convex
 
 O Convex é o backend completo — banco, storage de imagens, autenticação e funções server-side.
@@ -189,8 +192,10 @@ Essas ficam **no servidor Convex**, não no `.env` local. Setam-se via CLI:
 npx convex env set NOME_DA_VAR valor
 ```
 
-**Obrigatória para o sistema rodar:**
+**Obrigatórias para o sistema rodar** (o `npx create-rubrica setup` configura todas):
 
+- `JWT_PRIVATE_KEY` e `JWKS` — chaves do login
+- `SITE_URL` — URL pública do site
 - `BOOTSTRAP_ALLOWED=true` — habilita criar o primeiro usuário (você remove depois)
 
 **Obrigatória se usar o plugin `playground`:**
@@ -202,11 +207,11 @@ npx convex env set NOME_DA_VAR valor
 | Variável | Habilita |
 |---|---|
 | `OPENROUTER_API_KEY` | Tradução automática + geração de CV com IA |
-| `STRIPE_WEBHOOK_SECRET` | Pagamentos via Stripe |
-| `ASAAS_WEBHOOK_TOKEN` | Pagamentos via Asaas (PIX/boleto) |
+| `ASAAS_API_KEY` | Pagamentos via Asaas (sandbox ou produção, detectado pela chave) |
+| `ASAAS_WEBHOOK_TOKEN` | Confirmação dos pagamentos (o mesmo token cadastrado no webhook do Asaas) |
 | `TELEGRAM_BOT_TOKEN` | Notificações no Telegram |
 | `TELEGRAM_ADMIN_CHAT_ID` | Chat onde as notificações chegam |
-| `IMPORT_SECRET` | Endpoint HTTP de importação CSV |
+| `VERCEL_DEPLOY_HOOK_URL` | Botão "Publicar" do admin |
 | `VERCEL_WEBHOOK_SECRET` | Webhook de notificação de deploy |
 
 ### 5 · Rodar em desenvolvimento
@@ -263,7 +268,7 @@ O repositório já vem com a skill **`rubrica`** para Claude Code, Codex e OpenC
 Esta é a etapa **mais importante** depois do deploy técnico. Identidade visual é o que vai te diferenciar. Onde mexer:
 
 - **Cores** — o tema inteiro sai de 4 variáveis (`--bg`, `--text`, `--primary`, `--accent`) no `:root` de `src/index.css`, ou pelo admin em **Site & Aparência**. Veja as paletas prontas e as regras em [Esquemas de cores](./docs/templates/cores.md).
-- **Layout** — troque com `rubrica config`; veja os 5 no [guia dos templates](./docs/templates/README.md)
+- **Layout** — veja os 5 no [guia dos templates](./docs/templates/README.md). Em projeto criado pelo CLI, troque com `npx create-rubrica config`; no fork, copie os arquivos de `templates/layouts/<layout>/` para `src/components/` e `src/pages/`
 - `src/components/Layout.tsx` — estrutura visual da página
 - `src/pages/Home.tsx` — hero, copy, ordem das seções, animações
 - `public/favicon.ico` — troque pelo seu logo
@@ -276,7 +281,7 @@ Teste com `pnpm dev` enquanto altera. Não suba sem dar a sua cara.
 
 1. Em [vercel.com/new](https://vercel.com/new), importe o repositório forkado
 2. **Framework preset:** Vite
-3. **Build command:** já vem no `vercel.json` (`pnpm convex deploy && pnpm vite build`) — não mude
+3. **Build command:** já vem no `vercel.json` (`npm run build:i18n && npm run build`: exporta os textos do site, publica o Convex, gera dados estáticos, RSS e sitemap, e faz o build do Vite) — não mude
 4. **Output directory:** `dist`
 5. **Adicione as env vars** (Settings → Environment Variables): `VITE_CONVEX_URL`, `CONVEX_URL`, `CONVEX_DEPLOY_KEY` _(sem essa, o build falha)_ e `SITE_URL`
 6. Clique em **Deploy**
@@ -294,6 +299,21 @@ A partir daqui, todo `git push` na branch principal dispara um deploy automátic
 5. O SSL é emitido automaticamente pela Vercel via Let's Encrypt
 6. **Atualize a `SITE_URL`** no Vercel para a URL final
 7. Force um redeploy para regenerar `sitemap.xml` e `rss.xml`
+
+<br />
+
+## Atualizando para versões novas
+
+Atualizar não desfaz o que você personalizou. Em projeto criado pelo CLI:
+
+```bash
+npx create-rubrica@latest update --dry-run   # mostra o que mudaria
+npx create-rubrica@latest update             # aplica
+```
+
+O CLI mescla, arquivo por arquivo, as mudanças do Rubrica com as suas. Quando os dois mexeram no mesmo trecho, o seu arquivo fica intacto e a versão nova é salva ao lado, como `<arquivo>.rubrica-new`. No fork, `git fetch upstream --tags && git merge vX.Y.Z` faz o mesmo. Conteúdo e configurações do admin ficam no banco e nunca são tocados.
+
+Guia completo: [Atualizando o seu Rubrica](./docs/atualizacao.md). O que mudou em cada versão: [CHANGELOG](./CHANGELOG.md).
 
 <br />
 
@@ -325,13 +345,23 @@ sequenceDiagram
 
 | Feature | Plugin (`/admin/plugins`) | Env vars | Conta externa |
 |---|---|---|---|
-| Pagamentos via Stripe | `payments` | `STRIPE_WEBHOOK_SECRET` | Stripe |
-| Pagamentos PIX/Boleto | `payments` | `ASAAS_WEBHOOK_TOKEN` | Asaas |
+| Pagamentos (PIX, boleto e cartão) | `payments` | `ASAAS_API_KEY` + `ASAAS_WEBHOOK_TOKEN` | Asaas |
 | Geração de CV com IA | `ai-resumes` | `OPENROUTER_API_KEY` | OpenRouter |
 | Tradução automática (i18n) | `i18n` | `OPENROUTER_API_KEY` | OpenRouter |
 | Notificações Telegram | _(built-in)_ | `TELEGRAM_BOT_TOKEN` + `TELEGRAM_ADMIN_CHAT_ID` | BotFather |
 
 > **Quer só o básico?** Se você quer apenas home + projetos + currículo, desative blog, propostas, pagamentos, IA e playground em `/admin/plugins`. As rotas somem da sidebar e do roteador.
+
+### Configurando os pagamentos (Asaas)
+
+1. Crie uma conta no [sandbox do Asaas](https://sandbox.asaas.com) para testar e gere a chave em **Integrações → Chave de API**.
+2. Rode `npx create-rubrica setup` e informe a chave. O setup grava `ASAAS_API_KEY`, gera o `ASAAS_WEBHOOK_TOKEN` e mostra a URL e o token do webhook. Sem o CLI: `npx convex env set ASAAS_API_KEY ...` e `npx convex env set ASAAS_WEBHOOK_TOKEN <token aleatório>`.
+3. No Asaas, em **Integrações → Webhooks**, cadastre a URL `https://<seu-deployment>.convex.site/webhooks/asaas` com o mesmo token e os eventos de cobrança ligados. Sem o webhook, nenhum pagamento aparece como pago.
+4. Para o cliente voltar ao seu site depois de pagar com cartão, cadastre o domínio do site no Asaas em **Minha Conta → Informações**. Sem isso, o pagamento funciona, mas o cliente fica na página do Asaas.
+5. Em `/admin/payment-links`, cadastre o cliente, gere o link de checkout e mande para ele. O cliente escolhe PIX, boleto ou cartão. O cartão abre a página segura do Asaas.
+6. Funcionou no sandbox? Troque para a chave de produção (`$aact_prod_...`) e cadastre o webhook também na conta de produção.
+
+O checkout só vira **pago** quando o Asaas confirma pelo webhook. Você recebe a notificação no Telegram, se estiver configurado.
 
 <br />
 
@@ -339,7 +369,8 @@ sequenceDiagram
 
 ```bash
 pnpm dev          # dev local + convex em watch (porta 3000)
-pnpm build        # convex deploy + RSS + sitemap + vite build
+pnpm build        # convex deploy + dados estáticos + RSS + sitemap + vite build
+pnpm build:i18n   # exporta os textos do site (Convex) para src/i18n/translations
 pnpm preview      # preview do build de produção
 pnpm check        # type-check (tsc --noEmit)
 pnpm format       # prettier
@@ -363,6 +394,9 @@ rubrica/
 ├── public/              # Assets estáticos (favicon, dados de exemplo/gerados)
 ├── docs/features.md     # Referência técnica completa
 ├── docs/templates/      # Guia dos layouts e das paletas, com capturas
+├── docs/atualizacao.md  # Como atualizar sem perder personalizações
+├── cli/                 # create-rubrica: create, setup, config e update
+├── .github/workflows/   # CI: tipos e testes do template e do CLI
 ├── .env.example         # Template de variáveis de ambiente
 └── vercel.json          # Build command, rewrites SPA, security headers
 ```
@@ -379,6 +413,8 @@ rubrica/
 | Login não funciona / bootstrap não aparece | `BOOTSTRAP_ALLOWED` removido antes de criar o primeiro usuário — sete de novo, crie e remova |
 | Plugin desativado ainda aparece em produção | Falta um redeploy para regenerar `public/data/plugins.json` |
 | Notificações Telegram não chegam | Você ainda não enviou `/start` para o seu bot |
+| Cliente pagou e o checkout não vira "pago" | Webhook do Asaas não cadastrado, com token diferente do `ASAAS_WEBHOOK_TOKEN` ou cadastrado na conta errada (sandbox × produção) |
+| "Pagamentos não configurados" no checkout | Falta `ASAAS_API_KEY` no Convex |
 | Imagens quebradas após deploy | IDs do Convex Storage são por deployment; ao migrar dev → prod, reupload é necessário |
 
 <br />

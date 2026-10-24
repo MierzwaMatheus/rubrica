@@ -2,6 +2,18 @@
 
 O que mudou em cada versão do Rubrica (template e CLI `create-rubrica`). Detalhes de cada uma nas [notas da release](https://github.com/MierzwaMatheus/rubrica/releases). Para atualizar um projeto existente, veja [Atualizando o seu Rubrica](./docs/atualizacao.md).
 
+## 1.4.1 — 2026-10-24
+
+Layouts ajustados para telas largas (monitores de 1920px para cima). Nada muda em telas de até 1600px.
+
+**Vindo da 1.4:**
+- Atualize com `npx create-rubrica@latest update`. Não precisa de versão nova do CLI nem de publicar nada no Convex. Se o site já está publicado, publique de novo depois de atualizar.
+
+### Telas largas
+- **Jardim Digital:** o conteúdo ficava colado na barra lateral, com um espaço vazio enorme à direita. Agora a coluna fica centralizada.
+- **Bento:** o grid parava só na borda da tela, e os cards ficavam enormes. Agora para em 1600px e fica centralizado.
+- **Suíço:** menu e conteúdo param juntos em 1600px e, acima disso, ganham bordas laterais no traço do layout, como uma folha centralizada.
+
 ## 1.4.0 — 2026-10-24
 
 `npx create-rubrica publicar` coloca o site no ar na Vercel sem copiar nada à mão, e o template passa a funcionar quando publicado a partir de um projeto do CLI.

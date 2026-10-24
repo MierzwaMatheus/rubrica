@@ -8,6 +8,7 @@ import { generateJwtKeys as defaultGenerateJwtKeys } from "../utils/generateJwtK
 import { readState as defaultReadState } from "../state/readState.js";
 import { normalizeUrl, validateUrl, normalizeEmail, validateEmail } from "../utils/normalize.js";
 import { validatePassword } from "../utils/password.js";
+import { seedPayloads } from "../utils/seedPayloads.js";
 
 // ---- Tipos ------------------------------------------------------------------
 
@@ -290,16 +291,10 @@ export async function runSetup(deps: RunSetupDeps = {}): Promise<void> {
     }
   }
 
-  // Seed orquestrado: seedSiteConfig + (proposals → seedDefaultTemplate) + (i18n → siteTexts:seed)
-  const enabledPlugins = Object.entries(plugins)
-    .filter(([, on]) => on)
-    .map(([id]) => id);
+  // Dados iniciais (os mesmos que o publicar grava na produção).
+  const seeds = seedPayloads(identity, plugins, siteUrl);
   try {
-    execFileSync(
-      "npx",
-      ["convex", "run", "seed:seedAll", JSON.stringify({ enabledPlugins })],
-      { stdio: "pipe", cwd }
-    );
+    execFileSync("npx", ["convex", "run", "seed:seedAll", JSON.stringify(seeds.seedAll)], { stdio: "pipe", cwd });
   } catch (err: unknown) {
     const output =
       (err as { stdout?: Buffer }).stdout?.toString() ||
@@ -307,44 +302,19 @@ export async function runSetup(deps: RunSetupDeps = {}): Promise<void> {
       (err as Error).message;
     log.warn(`seedAll falhou: ${output.trim() || "erro desconhecido"} — rode 'npx convex run seed:seedAll \"{...}\"' manualmente depois.`);
   }
-
-  // Seed de identidade no Convex (siteConfig + contactInfo) a partir do rubrica.json
-  if (identity.siteName) {
+  // Identidade no Convex (siteConfig + contactInfo). Não crítico: tudo é editável no painel.
+  if (seeds.siteConfig) {
     try {
-      execFileSync(
-        "npx",
-        ["convex", "run", "siteConfig:setBatchInternal", JSON.stringify({
-          items: [
-            { key: "site_title", value: identity.siteName },
-            { key: "site_name", value: identity.siteName },
-            { key: "site_url", value: siteUrl },
-            { key: "site_description", value: identity.siteDescription || "" },
-            { key: "author_name", value: identity.authorName || "" },
-            { key: "author_email", value: identity.authorEmail || "" },
-            { key: "twitter_handle", value: identity.twitterHandle || "" },
-            { key: "lang", value: identity.lang || "pt-BR" },
-          ],
-        })],
-        { stdio: "pipe", cwd }
-      );
+      execFileSync("npx", ["convex", "run", "siteConfig:setBatchInternal", JSON.stringify(seeds.siteConfig)], { stdio: "pipe", cwd });
     } catch {
-      // não crítico — configurável pelo admin
+      // não crítico
     }
-
-    if (identity.authorName) {
-      try {
-        execFileSync(
-          "npx",
-          ["convex", "run", "contactInfo:updateInternal", JSON.stringify({
-            name: identity.authorName,
-            email: identity.authorEmail || "",
-            showEmail: false,
-          })],
-          { stdio: "pipe", cwd }
-        );
-      } catch {
-        // não crítico
-      }
+  }
+  if (seeds.contact) {
+    try {
+      execFileSync("npx", ["convex", "run", "contactInfo:updateInternal", JSON.stringify(seeds.contact)], { stdio: "pipe", cwd });
+    } catch {
+      // não crítico
     }
   }
 
@@ -403,6 +373,6 @@ export async function runSetup(deps: RunSetupDeps = {}): Promise<void> {
   }
 
   outro(
-    `Pronto!\n\n  Admin: ${adminEmail || "o mesmo de antes"}\n  O painel fica em /login\n\n  Para abrir o site:\n  ${deps.nextStep ?? "pnpm dev"}`
+    `Pronto!\n\n  Admin: ${adminEmail || "o mesmo de antes"}\n  O painel fica em /login\n\n  Para abrir o site:\n  ${deps.nextStep ?? "pnpm dev"}\n\n  Para colocar no ar (Vercel):\n  npx create-rubrica publicar`
   );
 }

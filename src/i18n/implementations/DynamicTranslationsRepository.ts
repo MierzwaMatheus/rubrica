@@ -21,8 +21,6 @@ export function buildNestedFromRecords(
 }
 
 export class DynamicTranslationsRepository implements TranslationsRepository {
-  private nested: Record<string, any>;
-
   constructor(records: SiteTextRecord[], locale?: string) {
     // Build both locales lazily on access, but pre-build pt-BR and en-US
     this._records = records;
@@ -55,7 +53,7 @@ export class DynamicTranslationsRepository implements TranslationsRepository {
     return node;
   }
 
-  getAllStaticTranslations(locale: string): Record<string, string> {
+  getAllStaticTranslations(locale: string): Record<string, unknown> {
     return this.getTree(locale);
   }
 }

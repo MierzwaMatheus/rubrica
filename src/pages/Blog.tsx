@@ -326,7 +326,7 @@ export default function Blog() {
             <PopoverContent className="w-80 bg-background/95 border-foreground/10 backdrop-blur-sm">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-semibold text-foreground-strong">Filtrar por tags</h4>
+                  <h4 className="font-semibold text-foreground-strong">{t("blog.filterByTags")}</h4>
                   {selectedTags.length > 0 && (
                     <Button
                       variant="ghost"

@@ -164,12 +164,33 @@ describe("mapBlogPost", () => {
 });
 
 describe("mapContactInfo", () => {
+  // b80ccdc ampliou ContactInfo com nome/email/telefone (usados no contrato da proposta)
+  const emptyContact = {
+    name: "",
+    role: "",
+    role_translations: undefined,
+    email: "",
+    show_email: false,
+    phone: "",
+    show_phone: false,
+  };
+
   it("maps role and translations with defaults", () => {
-    expect(mapContactInfo({ role: "Dev" })).toEqual({
-      role: "Dev",
-      role_translations: undefined,
+    expect(mapContactInfo({ role: "Dev" })).toEqual({ ...emptyContact, role: "Dev" });
+    expect(mapContactInfo(null)).toEqual(emptyContact);
+  });
+
+  it("maps name, email and phone with both casings", () => {
+    expect(
+      mapContactInfo({ name: "Ana", email: "a@b.com", showEmail: true, phone: "123", show_phone: true }),
+    ).toEqual({
+      ...emptyContact,
+      name: "Ana",
+      email: "a@b.com",
+      show_email: true,
+      phone: "123",
+      show_phone: true,
     });
-    expect(mapContactInfo(null)).toEqual({ role: "", role_translations: undefined });
   });
 
   it("maps translations with both casings", () => {

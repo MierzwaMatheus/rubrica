@@ -126,7 +126,7 @@ describe("integração: seedSiteConfig → getPublic", () => {
     const keys = result.map((r: any) => r.key);
     expect(keys).toContain("site_title");
     expect(keys).toContain("site_url");
-    expect(keys).toContain("theme_accent_color");
+    expect(keys).toContain("rss_title");
     expect(keys).toContain("lang");
     expect(keys).toContain("theme_font_sans");
     expect(keys).toContain("theme_font_mono");

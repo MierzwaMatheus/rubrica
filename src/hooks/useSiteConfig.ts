@@ -44,8 +44,9 @@ function buildFallback(): SiteConfig {
     theme_background: "#09090b",
     theme_foreground: "#fafafa",
     theme_primary: "#6366f1",
-    theme_accent: rubricalConfig.accentColor,
-    theme_accent_color: rubricalConfig.accentColor,
+    // accentColor saiu do rubrica.config (819a9e9): as cores vêm do admin (/admin/site-config)
+    theme_accent: "#6366f1",
+    theme_accent_color: "#6366f1",
     theme_accent_hsl: "",
     theme_font_sans: rubricalConfig.fontSans,
     theme_font_mono: rubricalConfig.fontMono,

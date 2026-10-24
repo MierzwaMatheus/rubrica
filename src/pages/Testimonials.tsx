@@ -48,7 +48,7 @@ function SkeletonCard() {
 }
 
 export default function TestimonialsPage() {
-  const { locale } = useI18n();
+  const { locale, t } = useI18n();
   const testimonials = useQuery(api.testimonials.list, {});
   const testimonialsIntakeEnabled = usePlugin("testimonials-intake");
   const [wizardOpen, setWizardOpen] = useState(false);
@@ -67,7 +67,7 @@ export default function TestimonialsPage() {
   return (
     <>
       <SEO
-        title="Depoimentos"
+        title={t("testimonials.title")}
         description="Veja o que clientes e colegas dizem sobre o meu trabalho."
         url="/depoimentos"
       />
@@ -81,10 +81,10 @@ export default function TestimonialsPage() {
         <motion.section variants={item}>
           <h2 className="text-2xl font-bold text-foreground-strong mb-3 flex items-center">
             <MessageSquare className="w-5 h-5 text-neon-purple mr-3" />
-            Depoimentos
+            {t("testimonials.title")}
           </h2>
           <p className="text-foreground/65 text-sm">
-            Experiências de clientes e colaboradores que trabalharam comigo.
+            {t("testimonials.subtitle")}
             {!isLoading && resolved.length > 0 && (
               <span className="ml-2 text-foreground/25">
                 ({resolved.length}{" "}
@@ -107,7 +107,7 @@ export default function TestimonialsPage() {
               <div className="w-14 h-14 rounded-xl bg-foreground/5 border border-foreground/10 flex items-center justify-center mb-4">
                 <MessageSquare className="w-6 h-6 text-foreground/25" />
               </div>
-              <p className="text-foreground/42 text-sm">Nenhum depoimento publicado ainda.</p>
+              <p className="text-foreground/42 text-sm">{t("testimonials.empty")}</p>
             </div>
           ) : (
             <div className="space-y-10">
@@ -173,7 +173,7 @@ export default function TestimonialsPage() {
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-neon-purple/40 bg-neon-purple/5 text-neon-purple hover:bg-neon-purple/10 hover:border-neon-purple transition-all text-sm font-medium"
             >
               <Star className="w-4 h-4" />
-              Deixar meu depoimento
+              {t("testimonials.leaveTestimonial")}
             </button>
           </motion.section>
         )}

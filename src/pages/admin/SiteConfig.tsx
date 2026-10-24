@@ -12,6 +12,7 @@ import { api } from "../../../convex/_generated/api";
 import { toast } from "sonner";
 import { AdminLayout } from "./Dashboard";
 import { contrastRatio, wcagLevel } from "@/lib/colorContrast";
+import { adminColors, schemeColors, COLOR_KEYS, PER_MODE_FLAG, type ColorMode, type ContractColor } from "@/lib/themeColors";
 
 const FONT_SANS_OPTIONS = [
   { value: "Inter", label: "Inter" },
@@ -32,16 +33,25 @@ function isValidHex(hex: string): boolean {
   return /^#[0-9a-fA-F]{6}$/.test(hex);
 }
 
-/** Cor atual de uma variável do contrato (src/index.css) em hex, para o <input type="color">. */
-function activeThemeHex(cssVar: string, fallback: string): string {
-  const probe = document.createElement("span");
-  probe.style.color = `var(${cssVar})`;
-  document.body.appendChild(probe);
-  const rgb = getComputedStyle(probe).color.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)/);
-  probe.remove();
-  if (!rgb) return fallback;
-  return "#" + rgb.slice(1, 4).map((n) => Number(n).toString(16).padStart(2, "0")).join("");
-}
+const COLOR_ROLES: { role: ContractColor; label: string; suffix: string }[] = [
+  { role: "bg", label: "Fundo", suffix: "bg" },
+  { role: "text", label: "Texto", suffix: "fg" },
+  { role: "primary", label: "Primária", suffix: "primary" },
+  { role: "accent", label: "Destaque", suffix: "accent" },
+];
+
+const MODES: { mode: ColorMode; title: string; prefix: string }[] = [
+  { mode: "light", title: "Modo claro", prefix: "" },
+  { mode: "dark", title: "Modo escuro", prefix: "dark-" },
+];
+
+/** Quando nem o esquema nem o admin têm a cor (ex.: CSS ainda carregando). */
+const FALLBACK: Record<ColorMode, Record<ContractColor, string>> = {
+  light: { bg: "#ffffff", text: "#111111", primary: "#6366f1", accent: "#f59e0b" },
+  dark: { bg: "#09090b", text: "#fafafa", primary: "#6366f1", accent: "#f59e0b" },
+};
+
+type ModeColorState = Record<ColorMode, Record<ContractColor, string>>;
 
 type ContrastBadgeProps = { hex: string; bg: string; testId: string };
 
@@ -108,14 +118,11 @@ function ColorPickerField({ label, testIdSuffix, value, hexInput, onNativeChange
 
 export default function AdminSiteConfig() {
   const rawConfig = useQuery(api.siteConfig.getPublic);
-  const [bgColor, setBgColor] = useState("#09090b");
-  const [bgHex, setBgHex] = useState("#09090b");
-  const [fgColor, setFgColor] = useState("#fafafa");
-  const [fgHex, setFgHex] = useState("#fafafa");
-  const [primaryColor, setPrimaryColor] = useState("#6366f1");
-  const [primaryHex, setPrimaryHex] = useState("#6366f1");
-  const [accentColor, setAccentColor] = useState("#f59e0b");
-  const [accentHex, setAccentHex] = useState("#f59e0b");
+  // Cor válida usada no seletor e texto digitado no campo hex, por modo e papel.
+  const [colors, setColors] = useState<ModeColorState>(FALLBACK);
+  const [hexInputs, setHexInputs] = useState<ModeColorState>(FALLBACK);
+  // As cores do esquema do projeto (index.css), para saber o que foi personalizado.
+  const [scheme, setScheme] = useState<ModeColorState>(FALLBACK);
   const [fontSans, setFontSans] = useState("Inter");
   const [fontMono, setFontMono] = useState("JetBrains Mono");
   const [siteTitle, setSiteTitle] = useState("");
@@ -131,15 +138,18 @@ export default function AdminSiteConfig() {
   useEffect(() => {
     if (rawConfig !== undefined && !initialized) {
       const cfg = Object.fromEntries(rawConfig.map((d) => [d.key, d.value]));
-      // Sem cor salva, parte do tema ativo: salvar uma cor não pode trocar as outras três.
-      const bg = (cfg.theme_background as string) || activeThemeHex("--bg", "#09090b");
-      setBgColor(bg); setBgHex(bg);
-      const fg = (cfg.theme_foreground as string) || activeThemeHex("--text", "#fafafa");
-      setFgColor(fg); setFgHex(fg);
-      const primary = (cfg.theme_primary as string) || activeThemeHex("--primary", "#6366f1");
-      setPrimaryColor(primary); setPrimaryHex(primary);
-      const accent = (cfg.theme_accent as string) || activeThemeHex("--accent", "#f59e0b");
-      setAccentColor(accent); setAccentHex(accent);
+      // Sem cor salva, cada modo parte do esquema do projeto: salvar não pode trocar as outras cores.
+      const fromCss = schemeColors();
+      const saved = adminColors(new Map(Object.entries(cfg)), isValidHex);
+      const base = {} as ModeColorState;
+      const initial = {} as ModeColorState;
+      for (const { mode } of MODES) {
+        base[mode] = { ...FALLBACK[mode], ...fromCss[mode] };
+        initial[mode] = { ...base[mode], ...saved[mode] };
+      }
+      setScheme(base);
+      setColors(initial);
+      setHexInputs(initial);
       setFontSans((cfg.theme_font_sans as string) || "Inter");
       setFontMono((cfg.theme_font_mono as string) || "JetBrains Mono");
       setSiteTitle((cfg.site_title as string) || "");
@@ -166,10 +176,14 @@ export default function AdminSiteConfig() {
     try {
       await setBatch({
         items: [
-          { key: "theme_background", value: bgColor },
-          { key: "theme_foreground", value: fgColor },
-          { key: "theme_primary", value: primaryColor },
-          { key: "theme_accent", value: accentColor },
+          // Igual ao esquema → vazio ("use a do esquema"); assim trocar de esquema pelo CLI continua valendo.
+          ...MODES.flatMap(({ mode }) =>
+            COLOR_ROLES.map(({ role }) => ({
+              key: COLOR_KEYS[mode][role],
+              value: colors[mode][role].toLowerCase() === scheme[mode][role].toLowerCase() ? "" : colors[mode][role],
+            }))
+          ),
+          { key: PER_MODE_FLAG, value: true },
           { key: "theme_font_sans", value: fontSans },
           { key: "theme_font_mono", value: fontMono },
         ],
@@ -203,11 +217,14 @@ export default function AdminSiteConfig() {
     }
   };
 
-  function makeHexHandler(setter: (v: string) => void, colorSetter: (v: string) => void) {
-    return (value: string) => {
-      setter(value);
-      if (isValidHex(value)) colorSetter(value);
-    };
+  function setColor(mode: ColorMode, role: ContractColor, value: string) {
+    setHexInputs((prev) => ({ ...prev, [mode]: { ...prev[mode], [role]: value } }));
+    if (isValidHex(value)) setColors((prev) => ({ ...prev, [mode]: { ...prev[mode], [role]: value } }));
+  }
+
+  function resetToScheme() {
+    setColors(scheme);
+    setHexInputs(scheme);
   }
 
   if (rawConfig === undefined) {
@@ -228,43 +245,32 @@ export default function AdminSiteConfig() {
           <CardTitle className="text-foreground-strong">Aparência</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
-            <ColorPickerField
-              label="Fundo"
-              testIdSuffix="bg"
-              value={bgColor}
-              hexInput={bgHex}
-              onNativeChange={(v) => { setBgColor(v); setBgHex(v); }}
-              onHexChange={makeHexHandler(setBgHex, setBgColor)}
-            />
-            <ColorPickerField
-              label="Texto"
-              testIdSuffix="fg"
-              value={fgColor}
-              hexInput={fgHex}
-              onNativeChange={(v) => { setFgColor(v); setFgHex(v); }}
-              onHexChange={makeHexHandler(setFgHex, setFgColor)}
-              bg={bgColor}
-            />
-            <ColorPickerField
-              label="Primária"
-              testIdSuffix="primary"
-              value={primaryColor}
-              hexInput={primaryHex}
-              onNativeChange={(v) => { setPrimaryColor(v); setPrimaryHex(v); }}
-              onHexChange={makeHexHandler(setPrimaryHex, setPrimaryColor)}
-              bg={bgColor}
-            />
-            <ColorPickerField
-              label="Destaque"
-              testIdSuffix="accent"
-              value={accentColor}
-              hexInput={accentHex}
-              onNativeChange={(v) => { setAccentColor(v); setAccentHex(v); }}
-              onHexChange={makeHexHandler(setAccentHex, setAccentColor)}
-              bg={bgColor}
-            />
-          </div>
+          <p className="text-sm text-muted-foreground">
+            Cada modo tem as suas cores. Elas começam iguais às do esquema do projeto (escolhido no CLI) e só o que
+            você mudar fica salvo aqui.
+          </p>
+          {MODES.map(({ mode, title, prefix }) => (
+            <section key={mode} className="space-y-3" data-testid={`colors-${mode}`}>
+              <h3 className="text-sm font-semibold text-foreground-strong">{title}</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {COLOR_ROLES.map(({ role, label, suffix }) => (
+                  <ColorPickerField
+                    key={role}
+                    label={label}
+                    testIdSuffix={`${prefix}${suffix}`}
+                    value={colors[mode][role]}
+                    hexInput={hexInputs[mode][role]}
+                    onNativeChange={(v) => setColor(mode, role, v)}
+                    onHexChange={(v) => setColor(mode, role, v)}
+                    bg={role === "bg" ? undefined : colors[mode].bg}
+                  />
+                ))}
+              </div>
+            </section>
+          ))}
+          <Button type="button" variant="outline" size="sm" data-testid="btn-reset-colors" onClick={resetToScheme}>
+            Usar as cores do esquema
+          </Button>
 
           <div className="space-y-2">
             <Label className="text-foreground-strong">Fonte principal</Label>

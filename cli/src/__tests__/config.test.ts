@@ -33,6 +33,27 @@ vi.mock("@clack/prompts", () => ({
 
 import { multiselect, select, text, confirm } from "@clack/prompts";
 
+/**
+ * Enfileira as respostas da seção Aparência, na ordem em que o config pergunta:
+ * esquema → modo de cor → (confirm alternância) → textura → fonte principal → fonte mono.
+ */
+function mockAppearancePrompts(opts: {
+  theme: string;
+  fontSans: string;
+  fontMono?: string;
+  colorMode?: string;
+  colorModeToggle?: boolean;
+  texture?: string;
+}) {
+  const chain = vi.mocked(select)
+    .mockResolvedValueOnce(opts.theme)
+    .mockResolvedValueOnce(opts.colorMode ?? "dark")
+    .mockResolvedValueOnce(opts.texture ?? "none")
+    .mockResolvedValueOnce(opts.fontSans);
+  if (opts.fontMono !== undefined) chain.mockResolvedValueOnce(opts.fontMono);
+  vi.mocked(confirm).mockResolvedValueOnce(opts.colorModeToggle ?? false);
+}
+
 // ---- Ciclo 1: Estrutura básica + erro fora de projeto Rubrica ---------------
 
 describe("runConfig — detecção de projeto", () => {
@@ -222,12 +243,17 @@ describe("runConfig — aparência", () => {
     const fs = makeFsModule(vol);
 
     vi.mocked(multiselect).mockResolvedValueOnce(["appearance"]);
-    vi.mocked(select)
-      .mockResolvedValueOnce("editorial-cream") // tema
-      .mockResolvedValueOnce("Inter")           // fontSans
-      .mockResolvedValueOnce("JetBrains Mono"); // fontMono
+    mockAppearancePrompts({
+      theme: "editorial-cream",
+      colorMode: "light",
+      colorModeToggle: true,
+      texture: "paper",
+      fontSans: "Inter",
+      fontMono: "JetBrains Mono",
+    });
 
     const applyThemeMock = vi.fn().mockResolvedValue(undefined);
+    const applyAppearanceMock = vi.fn().mockResolvedValue(undefined);
     const applyFontMock = vi.fn().mockResolvedValue(undefined);
     const applyIndexHtmlMock = vi.fn().mockResolvedValue(undefined);
     const detectProjectMock = vi.fn().mockResolvedValue("/project/rubrica.json");
@@ -241,15 +267,21 @@ describe("runConfig — aparência", () => {
       writeState: writeStateMock,
       applyTheme: applyThemeMock,
       applyFont: applyFontMock,
+      applyAppearance: applyAppearanceMock,
       applyIndexHtml: applyIndexHtmlMock,
       fs,
     });
 
-    expect(applyThemeMock).toHaveBeenCalledTimes(1);
+    expect(applyThemeMock).toHaveBeenCalledWith({ preset: "editorial-cream" }, "/project/src/index.css", expect.anything());
+    expect(applyAppearanceMock).toHaveBeenCalledWith(
+      { colorMode: "light", colorModeToggle: true, texture: "paper" },
+      "/project/index.html",
+      expect.anything()
+    );
     expect(applyFontMock).toHaveBeenCalledTimes(1);
     // Troca só a fonte: as meta tags continuam com a identidade salva, não em branco.
     expect(applyIndexHtmlMock).toHaveBeenCalledWith(
-      expect.objectContaining({ fontFamily: "Inter", siteName: "Ana Dev", siteUrl: "https://ana.dev", authorName: "Ana" }),
+      expect.objectContaining({ fontFamily: "Inter", fontMono: "JetBrains Mono", siteName: "Ana Dev", siteUrl: "https://ana.dev", authorName: "Ana" }),
       "/project/index.html",
       expect.anything()
     );
@@ -259,7 +291,7 @@ describe("runConfig — aparência", () => {
     const state = { version: "1.0.0", layout: "cyberpunk", theme: "cyberpunk", fontSans: "Inter", fontMono: "JetBrains Mono", plugins: {} };
     const vol = Volume.fromJSON({ "/project/rubrica.json": JSON.stringify(state) });
     vi.mocked(multiselect).mockResolvedValueOnce(["appearance"]);
-    vi.mocked(select).mockResolvedValueOnce("editorial-cream").mockResolvedValueOnce("Inter").mockResolvedValueOnce("JetBrains Mono");
+    mockAppearancePrompts({ theme: "editorial-cream", fontSans: "Inter", fontMono: "JetBrains Mono" });
     const applyIndexHtmlMock = vi.fn().mockResolvedValue(undefined);
 
     await runConfig({
@@ -269,6 +301,7 @@ describe("runConfig — aparência", () => {
       writeState: vi.fn().mockResolvedValue(undefined),
       applyTheme: vi.fn().mockResolvedValue(undefined),
       applyFont: vi.fn().mockResolvedValue(undefined),
+      applyAppearance: vi.fn().mockResolvedValue(undefined),
       applyIndexHtml: applyIndexHtmlMock,
       fs: makeFsModule(vol),
     });
@@ -286,10 +319,7 @@ describe("runConfig — aparência", () => {
     const fs = makeFsModule(vol);
 
     vi.mocked(multiselect).mockResolvedValueOnce(["appearance"]);
-    vi.mocked(select)
-      .mockResolvedValueOnce("editorial-cream")
-      .mockResolvedValueOnce("Playfair Display")
-      .mockResolvedValueOnce("Fira Code");
+    mockAppearancePrompts({ theme: "editorial-cream", fontSans: "Playfair Display", fontMono: "Fira Code" });
 
     const applyThemeMock = vi.fn().mockResolvedValue(undefined);
     const applyFontMock = vi.fn().mockResolvedValue(undefined);
@@ -305,6 +335,7 @@ describe("runConfig — aparência", () => {
       writeState: writeStateMock,
       applyTheme: applyThemeMock,
       applyFont: applyFontMock,
+      applyAppearance: vi.fn().mockResolvedValue(undefined),
       applyIndexHtml: applyIndexHtmlMock,
       fs,
     });
@@ -329,6 +360,7 @@ describe("runConfig — novas fontes e hints descritivos", () => {
       writeState: vi.fn().mockResolvedValue(undefined),
       applyTheme: vi.fn().mockResolvedValue(undefined),
       applyFont: vi.fn().mockResolvedValue(undefined),
+      applyAppearance: vi.fn().mockResolvedValue(undefined),
       applyIndexHtml: vi.fn().mockResolvedValue(undefined),
     };
   }
@@ -339,10 +371,7 @@ describe("runConfig — novas fontes e hints descritivos", () => {
     const deps = makeConfigDeps(vol);
 
     vi.mocked(multiselect).mockResolvedValueOnce(["appearance"]);
-    vi.mocked(select)
-      .mockResolvedValueOnce("editorial-cream")
-      .mockResolvedValueOnce("Bodoni Moda")
-      .mockResolvedValueOnce("JetBrains Mono");
+    mockAppearancePrompts({ theme: "editorial-cream", fontSans: "Bodoni Moda", fontMono: "JetBrains Mono" });
 
     await runConfig(deps);
 
@@ -361,21 +390,18 @@ describe("runConfig — novas fontes e hints descritivos", () => {
     );
   });
 
-  it("select de tema no config tem hints descritivos", async () => {
+  it("select de esquema de cores no config tem hints descritivos", async () => {
     vi.clearAllMocks();
     const vol = Volume.fromJSON({ "/project/rubrica.json": "{}", "/project/src/index.css": "", "/project/index.html": "" });
     const deps = makeConfigDeps(vol);
 
     vi.mocked(multiselect).mockResolvedValueOnce(["appearance"]);
-    vi.mocked(select)
-      .mockResolvedValueOnce("editorial-cream")
-      .mockResolvedValueOnce("Inter")
-      .mockResolvedValueOnce("JetBrains Mono");
+    mockAppearancePrompts({ theme: "editorial-cream", fontSans: "Inter", fontMono: "JetBrains Mono" });
 
     await runConfig(deps);
 
     const themeCall = vi.mocked(select).mock.calls.find(
-      (args) => (args[0] as { message?: string }).message === "Tema visual"
+      (args) => (args[0] as { message?: string }).message === "Esquema de cores"
     );
     expect(themeCall?.[0]).toEqual(
       expect.objectContaining({
@@ -393,10 +419,7 @@ describe("runConfig — novas fontes e hints descritivos", () => {
     const deps = makeConfigDeps(vol);
 
     vi.mocked(multiselect).mockResolvedValueOnce(["appearance"]);
-    vi.mocked(select)
-      .mockResolvedValueOnce("editorial-cream")
-      .mockResolvedValueOnce("Inter")
-      .mockResolvedValueOnce("JetBrains Mono");
+    mockAppearancePrompts({ theme: "editorial-cream", fontSans: "Inter", fontMono: "JetBrains Mono" });
 
     await runConfig(deps);
 
@@ -409,6 +432,39 @@ describe("runConfig — novas fontes e hints descritivos", () => {
           expect.objectContaining({ value: "JetBrains Mono", hint: expect.any(String) }),
         ]),
       })
+    );
+  });
+});
+
+describe("runConfig — aparência em layout sem fonte mono", () => {
+  it("não pergunta a fonte mono quando o layout atual é swiss e grava fontMono vazio", async () => {
+    vi.clearAllMocks();
+    const state = { version: "1.0.0", layout: "swiss", theme: "paper-noir", fontSans: "Archivo", fontMono: "", plugins: {} };
+    const vol = Volume.fromJSON({ "/project/rubrica.json": JSON.stringify(state) });
+    vi.mocked(multiselect).mockResolvedValueOnce(["appearance"]);
+    mockAppearancePrompts({ theme: "paper-noir", fontSans: "Archivo" });
+    const writeStateMock = vi.fn().mockResolvedValue(undefined);
+
+    await runConfig({
+      cwd: "/project",
+      fs: makeFsModule(vol),
+      detectProject: vi.fn().mockResolvedValue("/project/rubrica.json"),
+      readState: vi.fn().mockResolvedValue(state),
+      writeState: writeStateMock,
+      applyTheme: vi.fn().mockResolvedValue(undefined),
+      applyFont: vi.fn().mockResolvedValue(undefined),
+      applyAppearance: vi.fn().mockResolvedValue(undefined),
+      applyIndexHtml: vi.fn().mockResolvedValue(undefined),
+    });
+
+    const monoCall = vi.mocked(select).mock.calls.find(
+      (args) => (args[0] as { message?: string }).message === "Fonte mono"
+    );
+    expect(monoCall).toBeUndefined();
+    expect(writeStateMock).toHaveBeenCalledWith(
+      "/project",
+      expect.objectContaining({ fontSans: "Archivo", fontMono: "" }),
+      expect.anything()
     );
   });
 });
@@ -661,10 +717,14 @@ describe("runConfig — persistência em rubrica.json", () => {
     const fs = makeFsModule(vol);
 
     vi.mocked(multiselect).mockResolvedValueOnce(["appearance"]);
-    vi.mocked(select)
-      .mockResolvedValueOnce("midnight-blue")
-      .mockResolvedValueOnce("DM Sans")
-      .mockResolvedValueOnce("IBM Plex Mono");
+    mockAppearancePrompts({
+      theme: "midnight-blue",
+      colorMode: "system",
+      colorModeToggle: true,
+      texture: "grain",
+      fontSans: "DM Sans",
+      fontMono: "IBM Plex Mono",
+    });
 
     const applyThemeMock = vi.fn().mockResolvedValue(undefined);
     const applyFontMock = vi.fn().mockResolvedValue(undefined);
@@ -680,6 +740,7 @@ describe("runConfig — persistência em rubrica.json", () => {
       writeState: writeStateMock,
       applyTheme: applyThemeMock,
       applyFont: applyFontMock,
+      applyAppearance: vi.fn().mockResolvedValue(undefined),
       applyIndexHtml: applyIndexHtmlMock,
       fs,
     });
@@ -688,6 +749,9 @@ describe("runConfig — persistência em rubrica.json", () => {
       "/project",
       expect.objectContaining({
         theme: "midnight-blue",
+        colorMode: "system",
+        colorModeToggle: true,
+        texture: "grain",
         fontSans: "DM Sans",
         fontMono: "IBM Plex Mono",
       }),

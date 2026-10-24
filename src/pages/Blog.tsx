@@ -155,7 +155,7 @@ export default function Blog() {
             {featuredPosts.length === 1 ? (
               <Link href={`/blog/${featuredPosts[0].slug}`}>
                 <div className="relative rounded-2xl overflow-hidden group cursor-pointer border border-foreground/5 shadow-2xl h-[400px]">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent z-10"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent z-10"></div>
                   {featuredPosts[0].image ? (
                   <img
                     src={featuredPosts[0].image}
@@ -207,7 +207,7 @@ export default function Blog() {
                         </span>
                       </div>
 
-                      <Button className="bg-neon-purple hover:bg-neon-purple/90 text-white">
+                      <Button className="bg-neon-purple hover:bg-neon-purple/90 text-primary-foreground">
                         {t("blog.readNow")}
                       </Button>
                     </div>
@@ -224,7 +224,7 @@ export default function Blog() {
                     >
                       <Link href={`/blog/${post.slug}`}>
                         <div className="relative rounded-2xl overflow-hidden group cursor-pointer border border-foreground/5 shadow-2xl h-[400px]">
-                          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent z-10"></div>
+                          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent z-10"></div>
                           {post.image ? (
                           <img
                             src={post.image}
@@ -276,7 +276,7 @@ export default function Blog() {
                                 </span>
                               </div>
 
-                              <Button className="bg-neon-purple hover:bg-neon-purple/90 text-white">
+                              <Button className="bg-neon-purple hover:bg-neon-purple/90 text-primary-foreground">
                                 {t("blog.readNow")}
                               </Button>
                             </div>
@@ -317,7 +317,7 @@ export default function Blog() {
                 <Filter className="mr-2 h-4 w-4" />
                 {t("blog.filterByTags")}
                 {selectedTags.length > 0 && (
-                  <Badge className="ml-2 bg-neon-purple text-white border-none">
+                  <Badge className="ml-2 bg-neon-purple text-primary-foreground border-none">
                     {selectedTags.length}
                   </Badge>
                 )}
@@ -381,7 +381,7 @@ export default function Blog() {
                 <Link key={post.id} href={`/blog/${post.slug}`}>
                   <div className="group rounded-xl bg-card border border-foreground/5 overflow-hidden hover:border-neon-purple/30 transition-all duration-300 flex flex-col h-full cursor-pointer">
                     <div className="relative h-48 overflow-hidden">
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10"></div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent z-10"></div>
                       {post.image ? (
                       <img
                         src={post.image}

@@ -163,7 +163,7 @@ export default function BentoResume() {
           span={2}
           padding={20}
           tint="var(--accent)"
-          style={{ color: "var(--text)" }}
+          style={{ color: "var(--bento-on-accent)" }}
         >
           <Languages size={18} />
           <div style={{ fontSize: 30, fontWeight: 700, marginTop: 8 }}>{languages.length}</div>

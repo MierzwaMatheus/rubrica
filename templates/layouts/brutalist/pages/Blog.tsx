@@ -287,7 +287,7 @@ export default function Blog() {
                 background:
                   i % 2 === 1
                     ? "transparent"
-                    : "rgba(127,127,127,0.04)",
+                    : "color-mix(in srgb, var(--text) 4%, transparent)",
               }}
             >
               <td

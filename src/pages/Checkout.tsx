@@ -144,7 +144,7 @@ export default function CheckoutPage() {
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="w-full max-w-md bg-card border-foreground/10">
           <CardContent className="p-6 text-center">
-            <AlertCircle className="w-12 h-12 mx-auto mb-4 text-red-400" />
+            <AlertCircle className="w-12 h-12 mx-auto mb-4 text-red-600 dark:text-red-400" />
             <h2 className="text-xl font-bold text-foreground-strong mb-2">Checkout não encontrado</h2>
             <p className="text-foreground/65">O link de checkout é inválido ou expirou.</p>
           </CardContent>
@@ -158,7 +158,7 @@ export default function CheckoutPage() {
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="w-full max-w-md bg-card border-foreground/10">
           <CardContent className="p-6 text-center">
-            <Check className="w-16 h-16 mx-auto mb-4 text-green-400" />
+            <Check className="w-16 h-16 mx-auto mb-4 text-green-700 dark:text-green-400" />
             <h2 className="text-2xl font-bold text-foreground-strong mb-2">
               {checkout.status === "refunded" ? "Pagamento Estornado" : "Pagamento Realizado!"}
             </h2>
@@ -180,7 +180,7 @@ export default function CheckoutPage() {
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="w-full max-w-md bg-card border-foreground/10">
           <CardContent className="p-6 text-center">
-            <AlertCircle className="w-12 h-12 mx-auto mb-4 text-red-400" />
+            <AlertCircle className="w-12 h-12 mx-auto mb-4 text-red-600 dark:text-red-400" />
             <h2 className="text-xl font-bold text-foreground-strong mb-2">Checkout Expirado</h2>
             <p className="text-foreground/65">Este link de checkout expirou.</p>
           </CardContent>
@@ -230,7 +230,7 @@ export default function CheckoutPage() {
               <Card className="bg-card border-foreground/10">
                 <CardHeader>
                   <CardTitle className="text-foreground-strong flex items-center gap-2">
-                    <Check className="w-5 h-5 text-green-400" />
+                    <Check className="w-5 h-5 text-green-700 dark:text-green-400" />
                     Dados do Cliente
                   </CardTitle>
                 </CardHeader>
@@ -317,13 +317,13 @@ export default function CheckoutPage() {
                                   {option.count}x de {formatCurrency(option.value)}
                                 </p>
                                 {option.isInterestFree ? (
-                                  <Badge variant="outline" className="border-green-500/50 text-green-400 mt-1">
+                                  <Badge variant="outline" className="border-green-500/50 text-green-700 dark:text-green-400 mt-1">
                                     Sem juros
                                   </Badge>
                                 ) : (
                                   <p className="text-sm text-foreground/65 mt-1">
                                     Total: {formatCurrency(option.totalValue)}
-                                    <span className="text-red-400 ml-2">
+                                    <span className="text-red-600 dark:text-red-400 ml-2">
                                       (+{option.interestRate}% + R$ 0,49)
                                     </span>
                                   </p>
@@ -348,7 +348,7 @@ export default function CheckoutPage() {
                 <Button
                   onClick={() => setShowConfirmDialog(true)}
                   disabled={selectedPaymentMethod === "credit_card" && !selectedInstallment}
-                  className="w-full bg-neon-purple hover:bg-neon-purple/90 text-white font-medium py-6 text-lg"
+                  className="w-full bg-neon-purple hover:bg-neon-purple/90 text-primary-foreground font-medium py-6 text-lg"
                 >
                   Continuar para Pagamento
                 </Button>
@@ -359,7 +359,7 @@ export default function CheckoutPage() {
       </div>
 
       {pixData && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-background/80 flex items-center justify-center p-4 z-50">
           <Card className="w-full max-w-md bg-card border-foreground/10">
             <CardHeader>
               <CardTitle className="text-foreground-strong text-center">QR Code PIX</CardTitle>
@@ -421,7 +421,7 @@ export default function CheckoutPage() {
       )}
 
       {boletoData && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-background/80 flex items-center justify-center p-4 z-50">
           <Card className="w-full max-w-md bg-card border-foreground/10">
             <CardHeader>
               <CardTitle className="text-foreground-strong text-center">Boleto Bancário</CardTitle>
@@ -465,7 +465,7 @@ export default function CheckoutPage() {
       )}
 
       {showConfirmDialog && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-background/80 flex items-center justify-center p-4 z-50">
           <Card className="w-full max-w-md bg-card border-foreground/10">
             <CardHeader>
               <CardTitle className="text-foreground-strong">Confirmar Pagamento</CardTitle>

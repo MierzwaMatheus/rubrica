@@ -209,7 +209,7 @@ export default function About() {
                       alt={routineItem.description || ""}
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/40 to-transparent" />
                   </div>
 
                   {/* Tags */}
@@ -217,7 +217,7 @@ export default function About() {
                     {routineItem.tags?.map((tag: string, idx: number) => (
                       <Badge
                         key={idx}
-                        className="bg-neon-purple/80 text-white border-none text-xs backdrop-blur-sm"
+                        className="bg-neon-purple/80 text-primary-foreground border-none text-xs backdrop-blur-sm"
                       >
                         {tag}
                       </Badge>
@@ -227,7 +227,7 @@ export default function About() {
                   {/* Overlay com descrição */}
                   <div
                     className={cn(
-                      "absolute inset-0 bg-black/90 backdrop-blur-sm transition-all duration-300 z-20",
+                      "absolute inset-0 bg-background/90 backdrop-blur-sm transition-all duration-300 z-20",
                       "flex items-center justify-center p-6",
                       hoveredItem === routineItem.id
                         ? "opacity-100 pointer-events-auto"

@@ -26,9 +26,10 @@ export function rubricaConfigInput(identity: RubricaIdentity, fontSans: string, 
   };
 }
 
-export function indexHtmlInput(identity: RubricaIdentity, fontSans: string): IndexHtmlData {
+export function indexHtmlInput(identity: RubricaIdentity, fontSans: string, fontMono = ""): IndexHtmlData {
   return {
     fontFamily: fontSans,
+    fontMono,
     themeColor: "",
     siteName: identity.siteName,
     siteUrl: identity.siteUrl,

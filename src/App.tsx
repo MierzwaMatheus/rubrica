@@ -408,7 +408,7 @@ function App() {
             <ThemeApplier />
             <AuthProvider>
               <I18nProvider translationService={translationService}>
-                <ThemeProvider defaultTheme="dark">
+                <ThemeProvider>
                   <TooltipProvider>
                     <Toaster />
                     <PluginsProvider>

@@ -56,9 +56,9 @@ São os textos de interface: títulos de seção, botões, menus, rótulos do fo
 - O site lê esses textos ao vivo: a mudança aparece sem publicar.
 
 ## Identidade, SEO, cores e fontes
-- `$RB config`: todas as chaves, as 4 cores do tema e o contraste texto/fundo.
+- `$RB config`: todas as chaves, as cores salvas de cada modo e o contraste texto/fundo de cada um.
 - `$RB config-definir --item site_title="..." --item seo_home_description="..."` ou `--arquivo config.json` (`{chave: valor}`). Só aceita as chaves públicas do projeto (`PUBLIC_KEYS` em `convex/siteConfig.ts`).
-- **Cores:** o tema é definido por 4 cores, `theme_background`, `theme_foreground` (texto), `theme_primary` e `theme_accent`, em hex. Mude as 4 juntas pensando no conjunto; o script recusa texto/fundo com contraste abaixo de 4.5:1 (WCAG AA). Veja `docs/templates/cores.md` para as paletas prontas. As cores valem na hora.
+- **Cores:** o site tem um esquema de cores (escolhido no CLI) com modo claro e escuro. Pelo admin dá para trocar as 4 cores principais de cada modo, em hex: `theme_background`, `theme_foreground` (texto), `theme_primary` e `theme_accent` são as do **modo claro**; `theme_dark_background`, `theme_dark_foreground`, `theme_dark_primary` e `theme_dark_accent` são as do **escuro**. Valor vazio (`""`) volta para a cor do esquema. Mexer numa cor do escuro liga `theme_colors_per_mode` sozinho; sem essa marca (projetos antigos), as 4 `theme_*` valem nos dois modos. Mude as 4 de um modo juntas pensando no conjunto; o script recusa texto/fundo com contraste abaixo de 4.5:1 (WCAG AA) em qualquer modo. Veja `docs/templates/cores.md` para os esquemas. As cores valem na hora.
 - Fontes: `theme_font_sans` e `theme_font_mono` (nomes do Google Fonts).
 - Imagem de compartilhamento (redes sociais): `$RB og-imagem arquivo.png --alt "..."` (ideal 1200×630).
 - Título, descrição, SEO e RSS entram no HTML no próximo `publicar-site`.

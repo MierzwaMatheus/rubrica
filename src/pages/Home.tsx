@@ -125,7 +125,7 @@ export default function Home() {
               <a
                 href="#cases"
                 data-umami-event="home-hero-ver-cases"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-neon-purple text-foreground-strong font-semibold hover:bg-neon-purple/90 transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-neon-purple text-primary-foreground font-semibold hover:bg-neon-purple/90 transition-colors"
               >
                 <FolderOpen className="w-4 h-4" />
                 {t("home.hero.ctaCases")}
@@ -186,7 +186,7 @@ export default function Home() {
                     data-umami-event-case={project.slug}
                     className="group flex flex-col rounded-xl overflow-hidden border border-foreground/5 bg-gradient-to-br from-foreground/5 to-background hover:border-neon-purple/40 transition-all duration-300 hover:-translate-y-1"
                   >
-                    <div className="aspect-[16/9] overflow-hidden bg-black/40">
+                    <div className="aspect-[16/9] overflow-hidden bg-foreground/10">
                       {project.images?.[0] && (
                         <img
                           src={project.images[0]}
@@ -390,7 +390,7 @@ export default function Home() {
                 <button
                   onClick={() => openWizard({ flowType: "project", sourceContext: "home-cta" })}
                   data-umami-event="home-cta-projeto"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-neon-purple text-foreground-strong font-semibold hover:bg-neon-purple/90 transition-colors"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-neon-purple text-primary-foreground font-semibold hover:bg-neon-purple/90 transition-colors"
                 >
                   <MessageSquare className="w-4 h-4" />
                   {t("home.cta.project")}

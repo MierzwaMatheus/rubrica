@@ -273,3 +273,42 @@ describe("SiteConfig — Ciclo 3: fontes", () => {
     expect(screen.getByText("Inter")).toBeInTheDocument();
   });
 });
+
+describe("SiteConfig — cores por modo", () => {
+  it("mostra um bloco de cores para o modo claro e outro para o escuro", () => {
+    render(<AdminSiteConfig />);
+    expect(screen.getByTestId("colors-light")).toBeInTheDocument();
+    expect(screen.getByTestId("colors-dark")).toBeInTheDocument();
+    expect(screen.getByTestId("color-picker-dark-bg-native")).toBeInTheDocument();
+  });
+
+  it("dados antigos (sem cores por modo) aparecem nos dois modos", () => {
+    render(<AdminSiteConfig />);
+    expect((screen.getByTestId("color-picker-dark-bg-hex") as HTMLInputElement).value).toBe("#09090b");
+  });
+
+  it("salvar grava as chaves dos dois modos e marca as cores como separadas", async () => {
+    const { useMutation: mockUseMutation } = await import("convex/react");
+    const mockSetBatch = vi.fn().mockResolvedValue(undefined);
+    vi.mocked(mockUseMutation).mockImplementation((fn: any) => {
+      if (fn === "siteConfig:setBatch") return mockSetBatch;
+      return vi.fn();
+    });
+    const { fireEvent } = await import("@testing-library/react");
+    render(<AdminSiteConfig />);
+    fireEvent.click(screen.getByTestId("btn-save-aparencia"));
+    await new Promise((r) => setTimeout(r, 0));
+    expect(mockSetBatch).toHaveBeenCalled();
+    const keys = mockSetBatch.mock.calls[0][0].items.map((i: { key: string }) => i.key);
+    expect(keys).toEqual(expect.arrayContaining([
+      "theme_dark_background", "theme_dark_foreground", "theme_dark_primary", "theme_dark_accent", "theme_colors_per_mode",
+    ]));
+    const flag = mockSetBatch.mock.calls[0][0].items.find((i: { key: string }) => i.key === "theme_colors_per_mode");
+    expect(flag.value).toBe(true);
+  });
+
+  it("tem o botão para voltar às cores do esquema", () => {
+    render(<AdminSiteConfig />);
+    expect(screen.getByTestId("btn-reset-colors")).toHaveTextContent("Usar as cores do esquema");
+  });
+});

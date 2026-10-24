@@ -17,7 +17,8 @@ export type RubricaIdentity = {
   lang: string;
 };
 
-export type RubricaLayout = "cyberpunk" | "brutalist" | "swiss" | "bento" | "magazine";
+/** Id de um layout do registro (cli/src/layouts.ts). */
+export type RubricaLayout = string;
 
 export type RubricaState = {
   version: string;
@@ -25,6 +26,10 @@ export type RubricaState = {
   theme: string;
   fontSans: string;
   fontMono: string;
+  /** Aparência (modo de cor e textura). Projetos antigos não têm: vale o padrão escuro, sem textura. */
+  colorMode?: "light" | "dark" | "system";
+  colorModeToggle?: boolean;
+  texture?: "none" | "grain" | "paper" | "scanlines";
   plugins: Record<string, boolean>;
   identity?: RubricaIdentity;
   [key: string]: unknown;

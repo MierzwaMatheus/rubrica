@@ -17,7 +17,7 @@ A composição é **assimétrica** (`1.4fr 1fr`, `1.2fr 1fr`, `180px 1fr`) e usa
 
 ## Estrutura global
 
-- **Masthead** em três faixas: metadados da edição; o **nome em caixa alta e espaçado** como título da revista; e a navegação centralizada, com o item ativo sublinhado na primária.
+- **Masthead** em três faixas: metadados da edição (com o ícone de modo claro/escuro antes de "Est. MMXX", também no celular; o menu do celular repete o botão com texto); o **nome em caixa alta e espaçado** como título da revista; e a navegação centralizada, com o item ativo sublinhado na primária.
 - Itens de plugins desligados somem da navegação (no desktop e no menu mobile, que abre de cima).
 - O conteúdo fica numa coluna de até 1200px.
 
@@ -72,4 +72,5 @@ A composição é **assimétrica** (`1.4fr 1fr`, `1.2fr 1fr`, `180px 1fr`) e usa
 ## Limitações conhecidas
 
 - As seções de Início, Currículo, Portfólio e Sobre se reorganizam no celular, mas os espaçamentos laterais continuam fixos em 48px.
+- Funciona nos dois modos sem ajuste: tudo é tinta (`--text`) sobre papel (`--bg`). No escuro, a textura de papel fica bem mais discreta.
 - Os posts do Blog ainda aparecem com blocos de placeholder, e os itens do sumário ainda não têm link.

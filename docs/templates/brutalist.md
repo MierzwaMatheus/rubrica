@@ -17,7 +17,7 @@ As cores seguem um código fixo: a **primária** pinta comandos, rótulos e dest
 
 ## Estrutura global
 
-- **Barra de janela**: `[●][○][○]  rubrica:~/portfolio` à esquerda e `tty1 · 80x40` à direita.
+- **Barra de janela**: `[●][○][○]  rubrica:~/portfolio` à esquerda; à direita, o botão de modo claro/escuro ("modo escuro"/"modo claro"; no celular só o ícone, e só com a alternância ligada) e `tty1 · 80x40` (escondido no celular).
 - **Abas como scripts**: `início.sh`, `currículo.sh`, `portfólio.sh`, `sobre-mim.sh`, `blog.sh`. A aba ativa fica invertida e ganha o marcador `▶`; abas de plugins desligados somem.
 - **Rodapé** de status: `UTF-8 · LF · monospace` e `v1.0.0 · MIT`.
 - No celular, as abas rolam na horizontal.

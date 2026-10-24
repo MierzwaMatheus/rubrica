@@ -181,12 +181,12 @@ export function ContractModal({
             <Card className="bg-yellow-500/10 border-yellow-500/30">
               <CardContent className="p-4">
                 <div className="flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-yellow-500 mt-0.5 shrink-0" />
+                  <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-500 mt-0.5 shrink-0" />
                   <div className="space-y-2 text-sm">
-                    <p className="font-semibold text-yellow-400">
+                    <p className="font-semibold text-yellow-700 dark:text-yellow-400">
                       Leia o contrato com atenção antes de assinar
                     </p>
-                    <p className="text-yellow-300/80">
+                    <p className="text-yellow-800/80 dark:text-yellow-300/80">
                       O botão para finalizar e assinar digitalmente encontra-se no final do documento.
                       Recomendamos a leitura completa e atenção especial a todas as cláusulas.
                       Em caso de dúvidas, entre em contato antes de prosseguir.
@@ -199,7 +199,7 @@ export function ContractModal({
 
           <div
             ref={contentRef}
-            className="prose prose-invert prose-headings:text-foreground-strong prose-p:text-foreground/90 prose-strong:text-foreground-strong prose-ul:text-foreground/90 prose-li:text-foreground/90 prose-hr:border-foreground/10 max-w-none prose-p:leading-relaxed prose-p:mb-6 prose-h2:mt-10 prose-h2:mb-5 prose-h3:mt-8 prose-h3:mb-4 prose-ul:my-6 prose-ol:my-6 prose-ul:pl-6 prose-ol:pl-6 prose-li:mb-3 prose-blockquote:border-l-4 prose-blockquote:border-neon-purple prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-foreground/65"
+            className="prose dark:prose-invert prose-headings:text-foreground-strong prose-p:text-foreground/90 prose-strong:text-foreground-strong prose-ul:text-foreground/90 prose-li:text-foreground/90 prose-hr:border-foreground/10 max-w-none prose-p:leading-relaxed prose-p:mb-6 prose-h2:mt-10 prose-h2:mb-5 prose-h3:mt-8 prose-h3:mb-4 prose-ul:my-6 prose-ol:my-6 prose-ul:pl-6 prose-ol:pl-6 prose-li:mb-3 prose-blockquote:border-l-4 prose-blockquote:border-neon-purple prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-foreground/65"
           >
             {resolvedContent ? (
               <ReactMarkdown components={markdownComponents}>{normalizeMarkdown(resolvedContent)}</ReactMarkdown>
@@ -234,7 +234,8 @@ export function ContractModal({
                   />
                   {isSignatureEmpty && (
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <span className="text-foreground/65 text-sm select-none">Assine aqui</span>
+                      {/* A área de assinatura é sempre branca (vira papel no PDF), então o texto usa cinza fixo */}
+                      <span className="text-neutral-500 text-sm select-none">Assine aqui</span>
                     </div>
                   )}
                 </div>
@@ -274,7 +275,7 @@ export function ContractModal({
                 </div>
 
                 {isSignatureEmpty && (
-                  <p className="text-sm text-yellow-400 flex items-center gap-1.5">
+                  <p className="text-sm text-yellow-700 dark:text-yellow-400 flex items-center gap-1.5">
                     <AlertCircle className="w-4 h-4 shrink-0" />
                     Desenhe sua assinatura acima para continuar.
                   </p>
@@ -284,12 +285,12 @@ export function ContractModal({
                   <Button
                     onClick={handleSign}
                     disabled={isSigning || isSignatureEmpty}
-                    className="w-full bg-neon-purple hover:bg-neon-purple/90 text-white h-12 text-lg disabled:opacity-50"
+                    className="w-full bg-neon-purple hover:bg-neon-purple/90 text-primary-foreground h-12 text-lg disabled:opacity-50"
                     size="lg"
                   >
                     {isSigning ? (
                       <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-foreground mr-2" />
                         Processando assinatura...
                       </>
                     ) : (

@@ -56,17 +56,20 @@ A base técnica é coletiva. A identidade é sua.
 
 <br />
 
-## Templates e paletas
+## Templates e esquemas de cores
 
-Ao criar o projeto, você escolhe um de **5 layouts** e uma de **4 paletas de cores** — qualquer combinação funciona.
+Ao criar o projeto, você escolhe um de **13 layouts** e um de **15 esquemas de cores**, cada um com modo claro e escuro (ou automático, seguindo o sistema de quem visita), e uma textura opcional. Qualquer combinação funciona.
 
 | [Cyberpunk](./docs/templates/cyberpunk.md) | [Brutalism Terminal](./docs/templates/brutalist.md) | [Swiss Grid](./docs/templates/swiss.md) | [Bento](./docs/templates/bento.md) | [Magazine](./docs/templates/magazine.md) |
 |---|---|---|---|---|
 | <img src="docs/templates/img/cyberpunk/home.jpg" width="180" /> | <img src="docs/templates/img/brutalist/home.jpg" width="180" /> | <img src="docs/templates/img/swiss/home.jpg" width="180" /> | <img src="docs/templates/img/bento/home.jpg" width="180" /> | <img src="docs/templates/img/magazine/home.jpg" width="180" /> |
-| Terminal neon com sidebar | Sessão de terminal em monospace | Cartaz suíço em 12 colunas | Mosaico de cartões com dock | Revista impressa |
+| [**Desktop Retrô**](./docs/templates/desktop.md) | [**Índice**](./docs/templates/index.md) | [**Monografia**](./docs/templates/monograph.md) | [**Zine**](./docs/templates/zine.md) | |
+| <img src="docs/templates/img/desktop/home.jpg" width="180" /> | <img src="docs/templates/img/index/home.jpg" width="180" /> | <img src="docs/templates/img/monograph/home.jpg" width="180" /> | <img src="docs/templates/img/zine/home.jpg" width="180" /> | |
+| [**Blueprint**](./docs/templates/blueprint.md) | [**Jardim Digital**](./docs/templates/garden.md) | [**Conversa**](./docs/templates/chat.md) | [**Pôster Cinético**](./docs/templates/poster.md) | |
+| <img src="docs/templates/img/blueprint/home.jpg" width="180" /> | <img src="docs/templates/img/garden/home.jpg" width="180" /> | <img src="docs/templates/img/chat/home.jpg" width="180" /> | <img src="docs/templates/img/poster/home.jpg" width="180" /> | |
 
 - [**Guia dos templates**](./docs/templates/README.md): conceito de cada layout e o que cada página tem de exclusivo, com capturas.
-- [**Esquemas de cores**](./docs/templates/cores.md): as 4 paletas, o contrato de 4 cores (`--bg`, `--text`, `--primary`, `--accent`) e a página inicial de cada layout em cada paleta.
+- [**Esquemas de cores**](./docs/templates/cores.md): os 15 esquemas nos dois modos, os 11 papéis de cor, o modo claro/escuro com alternância e as texturas.
 
 <br />
 
@@ -157,7 +160,7 @@ cd rubrica
 pnpm install
 ```
 
-> **Prefere um assistente?** `npx create-rubrica meu-portfolio` baixa a versão mais recente, pergunta layout, paleta, fontes, plugins e identidade, e já deixa o projeto pronto para `npx create-rubrica setup` e para atualizações automáticas. Veja o [README do CLI](./cli/README.md). Os passos 2 a 10 valem para os dois caminhos.
+> **Prefere um assistente?** `npx create-rubrica meu-portfolio` baixa a versão mais recente, pergunta layout, esquema de cores, modo claro/escuro, textura, fontes, plugins e identidade, e já deixa o projeto pronto para `npx create-rubrica setup` e para atualizações automáticas. Veja o [README do CLI](./cli/README.md). Os passos 2 a 10 valem para os dois caminhos.
 
 ### 2 · Provisionar o Convex
 
@@ -267,8 +270,8 @@ O repositório já vem com a skill **`rubrica`** para Claude Code, Codex e OpenC
 
 Esta é a etapa **mais importante** depois do deploy técnico. Identidade visual é o que vai te diferenciar. Onde mexer:
 
-- **Cores** — o tema inteiro sai de 4 variáveis (`--bg`, `--text`, `--primary`, `--accent`) no `:root` de `src/index.css`, ou pelo admin em **Site & Aparência**. Veja as paletas prontas e as regras em [Esquemas de cores](./docs/templates/cores.md).
-- **Layout** — veja os 5 no [guia dos templates](./docs/templates/README.md). Em projeto criado pelo CLI, troque com `npx create-rubrica config`; no fork, copie os arquivos de `templates/layouts/<layout>/` para `src/components/` e `src/pages/`
+- **Cores** — o esquema fica em `src/index.css` (modo claro em `:root`, escuro em `.dark`) e é trocado com `npx create-rubrica config` → Aparência; as 4 cores principais também podem ser trocadas pelo admin em **Site & Aparência**. Veja os esquemas e as regras em [Esquemas de cores](./docs/templates/cores.md).
+- **Layout** — veja os 13 no [guia dos templates](./docs/templates/README.md). Em projeto criado pelo CLI, troque com `npx create-rubrica config`; no fork, copie os arquivos de `templates/layouts/<layout>/` para `src/components/` e `src/pages/`
 - `src/components/Layout.tsx` — estrutura visual da página
 - `src/pages/Home.tsx` — hero, copy, ordem das seções, animações
 - `public/favicon.ico` — troque pelo seu logo

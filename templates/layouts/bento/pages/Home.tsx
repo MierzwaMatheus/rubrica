@@ -258,7 +258,7 @@ export default function BentoHome() {
             span={2}
             padding={18}
             tint="var(--accent)"
-            style={{ color: "var(--text)" }}
+            style={{ color: "var(--bento-on-accent)" }}
           >
             <Mail size={18} />
             <div style={{ fontSize: 10.5, marginTop: 8, opacity: 0.75 }}>contato</div>

@@ -316,7 +316,7 @@ export default function ProposalAccept() {
                   <ChevronDown className={`w-5 h-5 text-foreground/65 transition-transform duration-200 shrink-0 ${isRescisionOpen ? 'rotate-180' : ''}`} />
                 </CollapsibleTrigger>
                 <CollapsibleContent className="mt-4">
-                  <div className="prose prose-invert prose-headings:text-foreground-strong prose-p:text-foreground/90 prose-strong:text-foreground-strong prose-ul:text-foreground/90 prose-li:text-foreground/90 prose-hr:border-foreground/10 max-w-none">
+                  <div className="prose dark:prose-invert prose-headings:text-foreground-strong prose-p:text-foreground/90 prose-strong:text-foreground-strong prose-ul:text-foreground/90 prose-li:text-foreground/90 prose-hr:border-foreground/10 max-w-none">
                     <ReactMarkdown>
                       {rawProposal.rescissionPolicy || DEFAULT_RESCISION_POLICY}
                     </ReactMarkdown>
@@ -354,7 +354,7 @@ export default function ProposalAccept() {
           <div className="flex justify-center">
             <Button
               size="lg"
-              className="bg-neon-purple hover:bg-neon-purple/90 text-white px-12 py-6 text-lg"
+              className="bg-neon-purple hover:bg-neon-purple/90 text-primary-foreground px-12 py-6 text-lg"
               onClick={handleOpenContract}
               disabled={!hasConsent}
             >

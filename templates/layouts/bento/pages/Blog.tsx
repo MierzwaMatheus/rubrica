@@ -114,7 +114,7 @@ export default function BentoBlog() {
                 padding: "8px 12px",
                 borderRadius: 10,
                 background: "var(--accent)",
-                color: "var(--text)",
+                color: "var(--bento-on-accent)",
                 display: "flex",
                 alignItems: "center",
                 gap: 6,

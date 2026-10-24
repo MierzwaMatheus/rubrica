@@ -14,8 +14,8 @@
       "enUS": "O que muda quando o time passa a tratar tokens como produto"
     },
     "contentTranslations": {
-      "ptBR": "# Design system não é biblioteca de componentes\n\nO que muda quando o time passa a tratar tokens como produto.\n\nEste é um post de exemplo do Rubrica. Edite ou remova pelo painel admin.",
-      "enUS": "# Design system não é biblioteca de componentes\n\nO que muda quando o time passa a tratar tokens como produto.\n\nEste é um post de exemplo do Rubrica. Edite ou remova pelo painel admin."
+      "ptBR": "<p>O que muda quando o time passa a tratar tokens como produto.</p>\n<p>Este é um post de exemplo do Rubrica. Edite ou remova pelo painel admin.</p>",
+      "enUS": "<p>O que muda quando o time passa a tratar tokens como produto.</p>\n<p>Este é um post de exemplo do Rubrica. Edite ou remova pelo painel admin.</p>"
     },
     "slug": "design-system-nao-e-biblioteca-de-componentes",
     "tags": [
@@ -44,8 +44,8 @@
       "enUS": "Um roteiro enxuto para tirar dúvidas antes de desenhar"
     },
     "contentTranslations": {
-      "ptBR": "# Pesquisa com usuários em uma semana\n\nUm roteiro enxuto para tirar dúvidas antes de desenhar.\n\nEste é um post de exemplo do Rubrica. Edite ou remova pelo painel admin.",
-      "enUS": "# Pesquisa com usuários em uma semana\n\nUm roteiro enxuto para tirar dúvidas antes de desenhar.\n\nEste é um post de exemplo do Rubrica. Edite ou remova pelo painel admin."
+      "ptBR": "<p>Um roteiro enxuto para tirar dúvidas antes de desenhar.</p>\n<p>Este é um post de exemplo do Rubrica. Edite ou remova pelo painel admin.</p>",
+      "enUS": "<p>Um roteiro enxuto para tirar dúvidas antes de desenhar.</p>\n<p>Este é um post de exemplo do Rubrica. Edite ou remova pelo painel admin.</p>"
     },
     "slug": "pesquisa-com-usuarios-em-uma-semana",
     "tags": [
@@ -74,8 +74,8 @@
       "enUS": "Decisões baratas no início que evitam retrabalho depois"
     },
     "contentTranslations": {
-      "ptBR": "# Acessibilidade começa no briefing\n\nDecisões baratas no início que evitam retrabalho depois.\n\nEste é um post de exemplo do Rubrica. Edite ou remova pelo painel admin.",
-      "enUS": "# Acessibilidade começa no briefing\n\nDecisões baratas no início que evitam retrabalho depois.\n\nEste é um post de exemplo do Rubrica. Edite ou remova pelo painel admin."
+      "ptBR": "<p>Decisões baratas no início que evitam retrabalho depois.</p>\n<p>Este é um post de exemplo do Rubrica. Edite ou remova pelo painel admin.</p>",
+      "enUS": "<p>Decisões baratas no início que evitam retrabalho depois.</p>\n<p>Este é um post de exemplo do Rubrica. Edite ou remova pelo painel admin.</p>"
     },
     "slug": "acessibilidade-comeca-no-briefing",
     "tags": [
@@ -104,8 +104,8 @@
       "enUS": "Quando o movimento ajuda a pessoa a entender a interface"
     },
     "contentTranslations": {
-      "ptBR": "# Animações que explicam, não enfeitam\n\nQuando o movimento ajuda a pessoa a entender a interface.\n\nEste é um post de exemplo do Rubrica. Edite ou remova pelo painel admin.",
-      "enUS": "# Animações que explicam, não enfeitam\n\nQuando o movimento ajuda a pessoa a entender a interface.\n\nEste é um post de exemplo do Rubrica. Edite ou remova pelo painel admin."
+      "ptBR": "<p>Quando o movimento ajuda a pessoa a entender a interface.</p>\n<p>Este é um post de exemplo do Rubrica. Edite ou remova pelo painel admin.</p>",
+      "enUS": "<p>Quando o movimento ajuda a pessoa a entender a interface.</p>\n<p>Este é um post de exemplo do Rubrica. Edite ou remova pelo painel admin.</p>"
     },
     "slug": "animacoes-que-explicam-nao-enfeitam",
     "tags": [
@@ -134,8 +134,8 @@
       "enUS": "Estrutura, métricas e o que deixar de fora"
     },
     "contentTranslations": {
-      "ptBR": "# Como escrevo estudos de caso\n\nEstrutura, métricas e o que deixar de fora.\n\nEste é um post de exemplo do Rubrica. Edite ou remova pelo painel admin.",
-      "enUS": "# Como escrevo estudos de caso\n\nEstrutura, métricas e o que deixar de fora.\n\nEste é um post de exemplo do Rubrica. Edite ou remova pelo painel admin."
+      "ptBR": "<p>Estrutura, métricas e o que deixar de fora.</p>\n<p>Este é um post de exemplo do Rubrica. Edite ou remova pelo painel admin.</p>",
+      "enUS": "<p>Estrutura, métricas e o que deixar de fora.</p>\n<p>Este é um post de exemplo do Rubrica. Edite ou remova pelo painel admin.</p>"
     },
     "slug": "como-escrevo-estudos-de-caso",
     "tags": [
@@ -164,8 +164,8 @@
       "enUS": "Handoff com tokens, specs e conversa"
     },
     "contentTranslations": {
-      "ptBR": "# Do Figma ao código sem perder detalhes\n\nHandoff com tokens, specs e conversa.\n\nEste é um post de exemplo do Rubrica. Edite ou remova pelo painel admin.",
-      "enUS": "# Do Figma ao código sem perder detalhes\n\nHandoff com tokens, specs e conversa.\n\nEste é um post de exemplo do Rubrica. Edite ou remova pelo painel admin."
+      "ptBR": "<p>Handoff com tokens, specs e conversa.</p>\n<p>Este é um post de exemplo do Rubrica. Edite ou remova pelo painel admin.</p>",
+      "enUS": "<p>Handoff com tokens, specs e conversa.</p>\n<p>Este é um post de exemplo do Rubrica. Edite ou remova pelo painel admin.</p>"
     },
     "slug": "do-figma-ao-codigo-sem-perder-detalhes",
     "tags": [

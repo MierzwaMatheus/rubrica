@@ -159,7 +159,8 @@ function blog() {
   ] as const;
   return posts.map(([title, subtitle, tags, featured], i) => {
     const imageUrl = writeImage(`blog-${i + 1}.svg`, i + 3, 1200, 800);
-    const body = `# ${title}\n\n${subtitle}.\n\nEste é um post de exemplo do Rubrica. Edite ou remova pelo painel admin.`;
+    // HTML, como o editor do admin grava (o título já aparece no topo da página).
+    const body = `<p>${subtitle}.</p>\n<p>Este é um post de exemplo do Rubrica. Edite ou remova pelo painel admin.</p>`;
     return {
       ...meta(), title, titleTranslations: tr(title, title), subtitle, subtitleTranslations: tr(subtitle, subtitle),
       contentTranslations: tr(body, body), slug: title.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),

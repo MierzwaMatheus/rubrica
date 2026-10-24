@@ -269,31 +269,18 @@ const POSTS_SEED_VALUES = [
     title: 'Convex como backend reativo: além do CRUD',
     titleTranslations: { ptBR: 'Convex como backend reativo: além do CRUD' },
     slug: 'convex-como-backend-reativo-alem-do-crud',
-    content: `# Convex como backend reativo: além do CRUD
-
-A maioria dos backends que conhecemos segue o mesmo ritual: você monta rotas REST, conecta um ORM, escreve queries SQL e torce para que o front-end faça cache direito. Funciona, mas tem um custo cognitivo enorme — e a reatividade quase nunca é o ponto forte. Foi exatamente isso que me levou a experimentar o [Convex](https://www.convex.dev/) em um projeto pessoal, e o resultado foi surpreendente.
-
-## O que muda quando o backend é reativo
-
-Com Convex, **funções são o backend inteiro**. Você declara funções \`query\` e \`mutation\` em TypeScript, e elas são executadas no servidor com tipos gerados automaticamente. O grande diferencial é que toda \`query\` é **reativa por padrão**: o cliente recebe atualizações em tempo real sempre que os dados lidos pela query mudam, sem precisar montar um WebSocket manualmente ou configurar subscriptions.
-
-Em outras palavras, você escreve \`ctx.db.query('posts').order('desc')\` e o front-end recebe o resultado automaticamente, refletindo inserções, updates e deletes em milissegundos. Para painéis administrativos, listas compartilhadas e dashboards, isso elimina camadas inteiras de complexidade.
-
-## Schema declarativo e geração de tipos
-
-O schema é definido em \`convex/schema.ts\` usando validadores do \`convex/values\`. A partir daí, o Convex gera um cliente TypeScript com tipos precisos para cada tabela e cada função — incluindo IDs tipados por tabela. O resultado: se você tentar passar um \`Id<'posts'>\` onde o parâmetro espera \`Id<'users'>\`, o TypeScript reclama antes mesmo de você rodar o código.
-
-## Mutations tipadas e side-effects garantidos
-
-Mutations são transacionais e executam **exatamente uma vez**. Side-effects (envio de e-mail, postagem em webhook, atualização de cache) ficam em \`internalAction\` ou \`crons.ts\`, isolados do caminho de leitura. Isso força uma disciplina saudável: leitura rápida no \`query\`, escrita consistente no \`mutation\`, trabalho pesado em actions.
-
-## Onde o CRUD básico fica pequeno
-
-Para o CRUD clássico — listar, criar, atualizar, deletar — o boilerplate é mínimo. Em meia hora você tem um painel com auth, validação, paginação e reatividade ponta a ponta. O esforço de configuração que normalmente toma dias some, e sobra tempo para pensar no domínio.
-
-## Limites e quando não usar
-
-Convex não é bala de prata. Para consultas analíticas pesadas sobre milhões de linhas, um data warehouse ainda ganha. Para integrações complexas com sistemas legados, REST tradicional pode ser mais simples. Mas para o **noventa por cento dos produtos internos, MVPs e painéis administrativos**, a proposta de valor é imbatível: você escreve menos, seu código fica mais legível e a reatividade é cortesia da casa.`,
+    content: `<p>A maioria dos backends que conhecemos segue o mesmo ritual: você monta rotas REST, conecta um ORM, escreve queries SQL e torce para que o front-end faça cache direito. Funciona, mas tem um custo cognitivo enorme — e a reatividade quase nunca é o ponto forte. Foi exatamente isso que me levou a experimentar o <a href="https://www.convex.dev/">Convex</a> em um projeto pessoal, e o resultado foi surpreendente.</p>
+<h2>O que muda quando o backend é reativo</h2>
+<p>Com Convex, <strong>funções são o backend inteiro</strong>. Você declara funções <code>query</code> e <code>mutation</code> em TypeScript, e elas são executadas no servidor com tipos gerados automaticamente. O grande diferencial é que toda <code>query</code> é <strong>reativa por padrão</strong>: o cliente recebe atualizações em tempo real sempre que os dados lidos pela query mudam, sem precisar montar um WebSocket manualmente ou configurar subscriptions.</p>
+<p>Em outras palavras, você escreve <code>ctx.db.query('posts').order('desc')</code> e o front-end recebe o resultado automaticamente, refletindo inserções, updates e deletes em milissegundos. Para painéis administrativos, listas compartilhadas e dashboards, isso elimina camadas inteiras de complexidade.</p>
+<h2>Schema declarativo e geração de tipos</h2>
+<p>O schema é definido em <code>convex/schema.ts</code> usando validadores do <code>convex/values</code>. A partir daí, o Convex gera um cliente TypeScript com tipos precisos para cada tabela e cada função — incluindo IDs tipados por tabela. O resultado: se você tentar passar um <code>Id&lt;'posts'&gt;</code> onde o parâmetro espera <code>Id&lt;'users'&gt;</code>, o TypeScript reclama antes mesmo de você rodar o código.</p>
+<h2>Mutations tipadas e side-effects garantidos</h2>
+<p>Mutations são transacionais e executam <strong>exatamente uma vez</strong>. Side-effects (envio de e-mail, postagem em webhook, atualização de cache) ficam em <code>internalAction</code> ou <code>crons.ts</code>, isolados do caminho de leitura. Isso força uma disciplina saudável: leitura rápida no <code>query</code>, escrita consistente no <code>mutation</code>, trabalho pesado em actions.</p>
+<h2>Onde o CRUD básico fica pequeno</h2>
+<p>Para o CRUD clássico — listar, criar, atualizar, deletar — o boilerplate é mínimo. Em meia hora você tem um painel com auth, validação, paginação e reatividade ponta a ponta. O esforço de configuração que normalmente toma dias some, e sobra tempo para pensar no domínio.</p>
+<h2>Limites e quando não usar</h2>
+<p>Convex não é bala de prata. Para consultas analíticas pesadas sobre milhões de linhas, um data warehouse ainda ganha. Para integrações complexas com sistemas legados, REST tradicional pode ser mais simples. Mas para o <strong>noventa por cento dos produtos internos, MVPs e painéis administrativos</strong>, a proposta de valor é imbatível: você escreve menos, seu código fica mais legível e a reatividade é cortesia da casa.</p>`,
     contentTranslations: {
       ptBR: `# Convex como backend reativo: além do CRUD
 
@@ -333,39 +320,25 @@ Convex não é bala de prata. Para consultas analíticas pesadas sobre milhões 
       ptBR: 'Transição de carreira para tecnologia: o que aprendi em 12 meses',
     },
     slug: 'transicao-de-carreira-para-tecnologia-o-que-aprendi-em-12-meses',
-    content: `# Transição de carreira para tecnologia: o que aprendi em 12 meses
-
-Há pouco mais de um ano eu trabalhava numa área completamente diferente. Hoje escrevo código profissionalmente. Esse post não é uma história de superação hiperbólica — é uma lista honesta do que funcionou, do que não funcionou e do que eu faria diferente se tivesse que começar do zero.
-
-## O ponto de partida
-
-Eu não era programador, mas sempre fui curioso. Meu trabalho anterior tinha alguma exposição a dados e planilhas avançadas, então o atrito inicial com lógica foi menor do que eu esperava. Mas a **falta de repertório técnico** era evidente: eu não sabia o que era um terminal, não tinha noção de como a web funcionava por baixo, e Git parecia coisa de filme.
-
-## Os primeiros três meses
-
-Decidi tratar isso como um curso universitário paralelo: das 6h às 8h da manhã eu estudava fundamentos, à noite e nos fins de semana eu praticava. O conteúdo era gratuito e abundantíssimo — MDN, freeCodeCamp, documentação do Node e do React. A parte mais difícil foi **não pular etapas**: entender de verdade como funciona o protocolo HTTP antes de partir para um framework.
-
-Construí um diário de estudos. Cada conceito novo virava uma anotação com três blocos: o que é, por que existe e um exemplo meu. Forçar a escrever me obrigava a explicar, e explicar é a melhor forma de aprender.
-
-## O momento em que tudo mudou
-
-Por volta do quarto mês, comecei a contribuir em projetos open source pequenos. Achei bugs em bibliotecas conhecidas, mandei PRs de correções triviais. A sensação de ver meu código mergeado foi um combustível absurdo. Mas o salto real veio quando comecei a fazer **projetos completos com usuários reais** — nem que fossem amigos e família.
-
-Projeto sem usuário é exercício. Com usuário, é engenharia.
-
-## O que me subestimaram os tutoriais
-
-- **Soft skills importam tanto quanto código**. Comunicação assíncrona, capacidade de receber feedback e organizar tarefas em equipe são diferenciais reais em entrevistas.
-- **Currículo não contrata**. Portfolio contrata. Ter dois ou três projetos sólidos, com README honesto e deploy público, vale mais que uma lista infinita de cursos.
-- **A comunidade é generosa**. Participei de grupos locais, mentorias coletivas e canais no Discord. Pedir ajuda com humility e contexto rende muito mais do que esperar alguém descobrir seu talento.
-
-## O que eu faria diferente
-
-Começaria por um projeto real desde o primeiro mês, mesmo que fosse horrível. Teria investido mais tempo em aprender **a ler código de outras pessoas**, não só a escrever o meu. E teria começado a contribuir em open source antes — o medo de "não estar pronto" foi meu maior inimigo.
-
-## Conclusão
-
-Transição de carreira não é mágica. É trabalho deliberado, rotina consistente e exposição a problemas reais. Se você está começando, saiba: o caminho existe, mas ele é construído um commit por vez.`,
+    content: `<p>Há pouco mais de um ano eu trabalhava numa área completamente diferente. Hoje escrevo código profissionalmente. Esse post não é uma história de superação hiperbólica — é uma lista honesta do que funcionou, do que não funcionou e do que eu faria diferente se tivesse que começar do zero.</p>
+<h2>O ponto de partida</h2>
+<p>Eu não era programador, mas sempre fui curioso. Meu trabalho anterior tinha alguma exposição a dados e planilhas avançadas, então o atrito inicial com lógica foi menor do que eu esperava. Mas a <strong>falta de repertório técnico</strong> era evidente: eu não sabia o que era um terminal, não tinha noção de como a web funcionava por baixo, e Git parecia coisa de filme.</p>
+<h2>Os primeiros três meses</h2>
+<p>Decidi tratar isso como um curso universitário paralelo: das 6h às 8h da manhã eu estudava fundamentos, à noite e nos fins de semana eu praticava. O conteúdo era gratuito e abundantíssimo — MDN, freeCodeCamp, documentação do Node e do React. A parte mais difícil foi <strong>não pular etapas</strong>: entender de verdade como funciona o protocolo HTTP antes de partir para um framework.</p>
+<p>Construí um diário de estudos. Cada conceito novo virava uma anotação com três blocos: o que é, por que existe e um exemplo meu. Forçar a escrever me obrigava a explicar, e explicar é a melhor forma de aprender.</p>
+<h2>O momento em que tudo mudou</h2>
+<p>Por volta do quarto mês, comecei a contribuir em projetos open source pequenos. Achei bugs em bibliotecas conhecidas, mandei PRs de correções triviais. A sensação de ver meu código mergeado foi um combustível absurdo. Mas o salto real veio quando comecei a fazer <strong>projetos completos com usuários reais</strong> — nem que fossem amigos e família.</p>
+<p>Projeto sem usuário é exercício. Com usuário, é engenharia.</p>
+<h2>O que me subestimaram os tutoriais</h2>
+<ul>
+<li><strong>Soft skills importam tanto quanto código</strong>. Comunicação assíncrona, capacidade de receber feedback e organizar tarefas em equipe são diferenciais reais em entrevistas.</li>
+<li><strong>Currículo não contrata</strong>. Portfolio contrata. Ter dois ou três projetos sólidos, com README honesto e deploy público, vale mais que uma lista infinita de cursos.</li>
+<li><strong>A comunidade é generosa</strong>. Participei de grupos locais, mentorias coletivas e canais no Discord. Pedir ajuda com humility e contexto rende muito mais do que esperar alguém descobrir seu talento.</li>
+</ul>
+<h2>O que eu faria diferente</h2>
+<p>Começaria por um projeto real desde o primeiro mês, mesmo que fosse horrível. Teria investido mais tempo em aprender <strong>a ler código de outras pessoas</strong>, não só a escrever o meu. E teria começado a contribuir em open source antes — o medo de "não estar pronto" foi meu maior inimigo.</p>
+<h2>Conclusão</h2>
+<p>Transição de carreira não é mágica. É trabalho deliberado, rotina consistente e exposição a problemas reais. Se você está começando, saiba: o caminho existe, mas ele é construído um commit por vez.</p>`,
     contentTranslations: {
       ptBR: `# Transição de carreira para tecnologia: o que aprendi em 12 meses
 

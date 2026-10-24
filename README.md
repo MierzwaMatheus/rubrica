@@ -9,7 +9,9 @@
 
 ### _Assine com a sua cara._
 
-Um sistema completo de portfólio profissional — pronto para você forkar, personalizar e publicar com domínio próprio.
+Um sistema completo de portfólio profissional — pronto para você criar com um comando, personalizar e publicar com domínio próprio.
+
+**[Veja os 13 layouts funcionando e monte o seu →](https://userubrica.vercel.app)**
 
 <br />
 
@@ -27,7 +29,7 @@ Um sistema completo de portfólio profissional — pronto para você forkar, per
 
 A maioria das pessoas trava na mesma encruzilhada: começar um portfólio do zero dá trabalho demais, e os construtores prontos deixam todo mundo com a mesma cara.
 
-Rubrica é a base que faltava no meio do caminho. É a estrutura técnica completa — home, portfólio, blog, currículo, propostas comerciais, painel admin, pagamentos — já resolvida. Você não monta o sistema. Você forka, personaliza a identidade e publica.
+Rubrica é a base que faltava no meio do caminho. É a estrutura técnica completa — home, portfólio, blog, currículo, propostas comerciais, painel admin, pagamentos — já resolvida. Você não monta o sistema. Você escolhe a cara, preenche o conteúdo e publica.
 
 A base técnica é coletiva. A identidade é sua.
 
@@ -43,22 +45,23 @@ A base técnica é coletiva. A identidade é sua.
 
 | | Módulo | O que entrega |
 |---|---|---|
-| 🏠 | **Home** | Hero, sobre, serviços e depoimentos |
-| 💼 | **Portfólio** | Filtros por tags, modal detalhado, ordenação por drag-and-drop |
+| 🏠 | **Home** | Apresentação, números de destaque, cases em destaque, serviços, depoimentos e chamada de contato |
+| 💼 | **Portfólio** | Filtro por categoria e estudos de caso com papel, contexto, decisões, métricas e aprendizados |
 | ✍️ | **Blog** | Editor rich text (TipTap), tags, busca e RSS automático |
 | 📄 | **Currículo** | Estruturado, com export em PDF otimizado para ATS |
 | 🤝 | **Propostas** | Proteção por senha, aceite eletrônico, assinatura manuscrita e contrato em PDF |
-| ⚙️ | **Admin** | CRUD de tudo via interface — sem tocar no código |
+| ⚙️ | **Admin** | CRUD de tudo via interface — sem tocar no código, inclusive cores, fontes e os textos fixos do site |
 | 🧩 | **Plugins** | Liga e desliga features que você não quer expor |
 | 🤖 | **IA** _(opcional)_ | Tradução automática e geração de CV otimizado para vagas |
 | 💳 | **Pagamentos** _(opcional)_ | Link de checkout com PIX, boleto e cartão em até 12x via Asaas. O cartão é digitado na página segura do Asaas, nunca no seu site |
 | 🔔 | **Notificações** _(opcional)_ | Telegram quando alguém aceita uma proposta ou paga |
+| 🧠 | **Skills de IA** | O seu agente (Claude Code, Codex, OpenCode) edita o site e escreve apresentação, cases, currículo e posts com a sua voz |
 
 <br />
 
 ## Templates e esquemas de cores
 
-Ao criar o projeto, você escolhe um de **13 layouts** e um de **15 esquemas de cores**, cada um com modo claro e escuro (ou automático, seguindo o sistema de quem visita), e uma textura opcional. Qualquer combinação funciona.
+Ao criar o projeto, você escolhe um de **13 layouts** e um de **15 esquemas de cores**, cada um com modo claro e escuro (ou automático, seguindo o sistema de quem visita), uma textura opcional e as fontes. Qualquer combinação funciona. No [combinador do site](https://userubrica.vercel.app/#combinador), você troca tudo isso ao vivo no app de verdade, nas 5 páginas.
 
 | [Cyberpunk](./docs/templates/cyberpunk.md) | [Brutalism Terminal](./docs/templates/brutalist.md) | [Swiss Grid](./docs/templates/swiss.md) | [Bento](./docs/templates/bento.md) | [Magazine](./docs/templates/magazine.md) |
 |---|---|---|---|---|
@@ -120,17 +123,62 @@ flowchart TB
 
 Antes de começar, você vai precisar de:
 
-- **Node.js 18+** e **pnpm** instalados
-- Conta no **[GitHub](https://github.com)** — para fork e deploy contínuo
-- Conta no **[Convex](https://convex.dev)** _(gratuita)_ — backend, banco e storage
-- Conta no **[Vercel](https://vercel.com)** _(gratuita)_ — hospedagem do frontend
+- **Node.js 20+** e **git** instalados (pnpm é opcional: o CLI usa npm se você não tiver)
+- Conta no **[Convex](https://convex.dev)** _(gratuita)_ — backend, banco e storage. O CLI abre o login no navegador.
+- Conta no **[Vercel](https://vercel.com)** _(gratuita)_ — hospedagem do site
+- _(Só no caminho manual)_ Conta no **[GitHub](https://github.com)** — para o fork e o deploy contínuo
+- _(Só para as skills de IA)_ **Python 3.8+**
 - _(Opcional)_ Contas no **[OpenRouter](https://openrouter.ai)**, **[Asaas](https://asaas.com)** ou **[Telegram BotFather](https://t.me/BotFather)** — só se for usar as features opcionais
 
 <br />
 
-## Do clone ao ar
+## Começando
 
-O caminho completo, do fork até o domínio próprio funcionando:
+O caminho mais curto é o CLI `create-rubrica`. Ele cria o projeto, prepara o banco, cria o seu login do painel e publica, sem copiar variável nenhuma.
+
+```mermaid
+flowchart LR
+    A["1 · Escolhe a cara<br/>no site"] --> B["2 · create<br/>cria o projeto"]
+    B --> C["3 · Preenche<br/>no /admin"]
+    C --> D["4 · Dá a sua<br/>cara ⚠️"]
+    D --> E["5 · publicar<br/>na Vercel"]
+    E --> F["6 · Domínio<br/>próprio"]
+
+    classDef step fill:#F5F2EA,stroke:#4D7C5F,stroke-width:2px,color:#1A1A18
+    classDef highlight fill:#C4664A,stroke:#1A1A18,stroke-width:2px,color:#F5F2EA
+    class A,B,C,E,F step
+    class D highlight
+```
+
+1. **Escolha a cara no [site do Rubrica](https://userubrica.vercel.app).** No combinador, teste layout, cores, modo, textura e fontes no app funcionando. Na seção **Crie o seu**, preencha os seus dados e copie o comando pronto (nada sai do navegador).
+2. **Cole o comando no terminal.** Ele cria o projeto com as suas escolhas, conecta o Convex (login pelo navegador) e pede só a senha do painel:
+   ```bash
+   npx create-rubrica@latest meu-portfolio --receita <código-do-site>
+   ```
+   Sem o site, `npx create-rubrica@latest meu-portfolio` faz as mesmas perguntas no terminal (no modo **Rápido**, só layout, plugins e identidade).
+3. **Rode e preencha o conteúdo:** `npm run dev` (ou `pnpm dev`), entre em `http://localhost:3000/login` e siga para [o painel admin](#7--preencher-o-conteúdo-no-admin).
+4. **Dê a sua cara** ([veja onde mexer](#8--personalize-o-visual-não-pule)). Não é opcional: é o que separa o seu portfólio de "mais um".
+5. **Publique:** `npx create-rubrica publicar` cria o projeto na Vercel, prepara o banco de produção, cria o admin do site publicado e põe no ar. Rodar de novo só publica.
+6. **Domínio próprio:** [passo a passo](#10--domínio-próprio).
+
+### Comandos do CLI
+
+Rode na pasta do projeto. Detalhes no [README do CLI](./cli/README.md).
+
+| Comando | Para quê |
+|---|---|
+| `npx create-rubrica@latest <pasta>` | Cria o projeto (aceita `--receita` do site e opções como `--layout` e `--esquema`) |
+| `npx create-rubrica setup` | Conecta o Convex, gera as chaves de login, cria o admin e os dados iniciais; liga Telegram e Vercel se você quiser |
+| `npx create-rubrica config` | Troca layout, cores, modo, textura, fontes, plugins e identidade depois de criado |
+| `npx create-rubrica publicar` | Põe o site no ar na Vercel (e publica de novo nas próximas vezes) |
+| `npx create-rubrica senha` | Troca a senha do painel e libera o login bloqueado, no site publicado ou no local |
+| `npx create-rubrica@latest update` | Traz a versão nova do Rubrica sem desfazer o que você personalizou |
+
+<br />
+
+## Caminho manual (fork)
+
+Para quem prefere fazer cada etapa à mão. Os passos 7 e 8 valem também para quem usou o CLI.
 
 ```mermaid
 flowchart LR
@@ -159,8 +207,6 @@ gh repo fork mierzwamatheus/rubrica --clone
 cd rubrica
 pnpm install
 ```
-
-> **Prefere um assistente?** `npx create-rubrica meu-portfolio` baixa a versão mais recente e pergunta o layout, o que o site vai ter e a identidade (no modo personalizado, também cores, modo claro/escuro, textura e fontes). Depois instala tudo, oferece conectar o Convex e criar o admin na hora, e deixa o projeto pronto para atualizações automáticas. Veja o [README do CLI](./cli/README.md). Os passos 2 a 10 valem para os dois caminhos.
 
 ### 2 · Provisionar o Convex
 
@@ -248,12 +294,16 @@ Logado em `/admin`, tudo é gerenciado por interface. Você não toca no código
 | Rota | O que você configura |
 |---|---|
 | `/admin/contact` | Nome, email, telefone, avatar, redes sociais |
-| `/admin/home` | Texto "sobre", disponibilidade, serviços/skills |
-| `/admin/projects` | Projetos do portfólio (imagens, tags, links, case study) |
+| `/admin/home` | Apresentação, números de destaque, disponibilidade, serviços e princípios de trabalho |
+| `/admin/projects` | Projetos do portfólio (imagens, categoria, links, estudo de caso com métricas) |
 | `/admin/blog` | Posts (editor rich text, tags, destaque) |
 | `/admin/resume` | Currículo (experiências, formação, skills, idiomas, certificações) |
 | `/admin/about` | Rotina diária + FAQ |
-| `/admin/testimonials` | Depoimentos (curados ou recebidos via wizard público) |
+| `/admin/depoimentos` | Depoimentos (curados ou recebidos pelo formulário público) |
+| `/admin/proposals` | Propostas comerciais com senha, aceite e contrato |
+| `/admin/contatos` | Pedidos de contato recebidos pelo site |
+| `/admin/site-config` | **Site & Aparência:** identidade, SEO, fontes e as 4 cores de cada modo |
+| `/admin/textos` | Os textos fixos do site, em português e inglês |
 | `/admin/plugins` | **Liga/desliga features** (blog, propostas, pagamentos, etc.) |
 
 #### Ou pelo seu agente de IA
@@ -285,13 +335,11 @@ Os planos, a entrevista e o seu perfil editorial (público, voz, palavras vetada
 
 Esta é a etapa **mais importante** depois do deploy técnico. Identidade visual é o que vai te diferenciar. Onde mexer:
 
-- **Cores** — o esquema fica em `src/index.css` (modo claro em `:root`, escuro em `.dark`) e é trocado com `npx create-rubrica config` → Aparência; as 4 cores principais também podem ser trocadas pelo admin em **Site & Aparência**. Veja os esquemas e as regras em [Esquemas de cores](./docs/templates/cores.md).
-- **Layout** — veja os 13 no [guia dos templates](./docs/templates/README.md). Em projeto criado pelo CLI, troque com `npx create-rubrica config`; no fork, copie os arquivos de `templates/layouts/<layout>/` para `src/components/` e `src/pages/`
-- `src/components/Layout.tsx` — estrutura visual da página
-- `src/pages/Home.tsx` — hero, copy, ordem das seções, animações
+- **Layout, esquema, modo, textura e fontes** — teste as combinações no [combinador](https://userubrica.vercel.app/#combinador) e aplique com `npx create-rubrica config` → Aparência. No fork, copie os arquivos de `templates/layouts/<layout>/` para `src/components/` e `src/pages/`. Veja o [guia dos templates](./docs/templates/README.md) e os [esquemas de cores](./docs/templates/cores.md).
+- **Cores e fontes pelo painel** — em **Site & Aparência**, troque as 4 cores principais de cada modo (claro e escuro) e as fontes, sem mexer no código. "Usar as cores do esquema" desfaz.
+- **Textos** — o seu agente de IA, com as skills `rubrica-*`, escreve apresentação, cases, currículo e posts com a sua voz ([veja acima](#ou-pelo-seu-agente-de-ia)).
 - `public/favicon.ico` — troque pelo seu logo
-- Fontes — importe do Google Fonts no `index.html` ou via Tailwind
-- `src/components/ui/` — componentes shadcn/ui, fáceis de customizar
+- No código: o esquema de cores fica em `src/index.css` (modo claro em `:root`, escuro em `.dark`); a estrutura em `src/components/Layout.tsx` e `src/pages/`; os componentes shadcn/ui em `src/components/ui/`.
 
 Teste com `pnpm dev` enquanto altera. Não suba sem dar a sua cara.
 
@@ -409,14 +457,17 @@ rubrica/
 │   ├── components/      # Componentes (UI, admin, layout)
 │   ├── contexts/        # AuthContext, ThemeContext, PluginsContext
 │   └── index.css        # ← Personalize cores e tema aqui
+├── domain/              # Casos de uso sem framework (ex.: o gerador de RSS)
 ├── scripts/             # Build-time: RSS, sitemap, fetch de dados estáticos
 ├── templates/           # Layouts que o CLI aplica (veja docs/templates)
+├── site/                # Site público do Rubrica (Astro): combinador e "Crie o seu"
+├── .agents/skills/      # Skills de IA: rubrica e as estrategistas rubrica-*
 ├── public/              # Assets estáticos (favicon, dados de exemplo/gerados)
 ├── docs/features.md     # Referência técnica completa
 ├── docs/templates/      # Guia dos layouts e das paletas, com capturas
 ├── docs/atualizacao.md  # Como atualizar sem perder personalizações
-├── cli/                 # create-rubrica: create, setup, config e update
-├── .github/workflows/   # CI: tipos e testes do template e do CLI
+├── cli/                 # create-rubrica: create, setup, config, publicar, senha e update
+├── .github/workflows/   # CI: tipos e testes do template e do CLI, e o build do site
 ├── .env.example         # Template de variáveis de ambiente
 └── vercel.json          # Build command, rewrites SPA, security headers
 ```

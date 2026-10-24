@@ -35,7 +35,7 @@ Depois ele inicia o git e instala as dependências sem perguntar: com pnpm se vo
 
 ### Com as escolhas feitas no site
 
-No [site do Rubrica](https://github.com/MierzwaMatheus/rubrica/tree/main/site), o combinador mostra o app funcionando com cada layout, esquema e fonte. Na seção **Crie o seu**, você preenche os seus dados e copia um comando pronto:
+No [site do Rubrica](https://userubrica.vercel.app), o combinador mostra o app funcionando com cada layout, esquema e fonte. Na seção **Crie o seu**, você preenche os seus dados e copia um comando pronto:
 
 ```bash
 npx create-rubrica@latest ana-souza --receita eyJ2IjoxLCJsIjoiZGVza3RvcCIs...

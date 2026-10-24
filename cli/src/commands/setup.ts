@@ -315,15 +315,16 @@ export async function runSetup(deps: RunSetupDeps = {}): Promise<void> {
     await optional("Segredo do webhook da Vercel (Enter para pular):", "VERCEL_WEBHOOK_SECRET");
   }
 
-  // 14. Personalização do portfolio
+  // 14. Personalização: a profissão aparece abaixo do nome no site; as especialidades
+  // entram no contexto que a IA usa para escrever propostas.
   const profession = await text({
-    message: "Qual é a sua profissão ou área de atuação? (Enter para usar padrão tech)",
+    message: "Qual é a sua profissão ou área de atuação? (aparece abaixo do seu nome no site; Enter para pular)",
     placeholder: "Ex: Designer UX, Fotógrafa, Advogada, Engenheira Civil...",
     initialValue: "",
   });
 
   const specialties = await text({
-    message: "Quais são suas principais especialidades? (separadas por vírgula, Enter para pular)",
+    message: "Quais são suas principais especialidades? (separadas por vírgula; a IA usa nas propostas; Enter para pular)",
     placeholder: "Ex: Branding, Motion Design, Fotografia de Produto",
     initialValue: "",
   });
@@ -331,46 +332,25 @@ export async function runSetup(deps: RunSetupDeps = {}): Promise<void> {
   const professionStr = isCancel(profession) ? "" : ((profession as string) || "").trim();
   const specialtiesStr = isCancel(specialties) ? "" : ((specialties as string) || "").trim();
 
-  if (professionStr || specialtiesStr) {
-    const tags: Array<{ label: string; color: string }> = specialtiesStr
-      ? specialtiesStr
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean)
-          .slice(0, 4)
-          .map((label, i) => ({ label, color: i % 2 === 0 ? "primary" : "secondary" }))
-      : [
-          { label: "React", color: "primary" },
-          { label: "TypeScript", color: "primary" },
-          { label: "Arquitetura de Sistemas", color: "secondary" },
-          { label: "DevOps & Infraestrutura", color: "secondary" },
-        ];
+  if (professionStr) {
+    const name = identity.authorName || adminEmail.split("@")[0];
+    const aiContext = specialtiesStr
+      ? `${name} é ${professionStr} com especialidade em ${specialtiesStr}. Entrega projetos com qualidade e comprometimento.`
+      : `${name} é ${professionStr}. Entrega projetos com qualidade e comprometimento.`;
 
     try {
       execFileSync(
         "npx",
-        ["convex", "run", "homeContent:set", JSON.stringify({ key: "hero_tags", value: tags })],
+        [
+          "convex",
+          "run",
+          "contactInfo:updateInternal",
+          JSON.stringify({ role: professionStr, roleTranslations: { ptBR: professionStr }, proposalAiContext: aiContext }),
+        ],
         { stdio: "pipe", cwd }
       );
     } catch {
-      // não crítico
-    }
-
-    if (professionStr) {
-      const name = identity.authorName || adminEmail.split("@")[0];
-      const aiContext = specialtiesStr
-        ? `${name} é ${professionStr} com especialidade em ${specialtiesStr}. Entrega projetos com qualidade e comprometimento.`
-        : `${name} é ${professionStr}. Entrega projetos com qualidade e comprometimento.`;
-
-      try {
-        execFileSync(
-          "npx",
-          ["convex", "run", "contactInfo:updateInternal", JSON.stringify({ proposalAiContext: aiContext })],
-          { stdio: "pipe", cwd }
-        );
-      } catch {
-        // não crítico
-      }
+      // não crítico: dá para editar no painel
     }
   }
 

@@ -101,7 +101,7 @@ describe("setup — conexão com o Convex", () => {
 
   it("todo comando do Convex roda via npx, na pasta do projeto, sem ecoar chaves no terminal", async () => {
     const deps = makeDeps();
-    vi.mocked(text).mockResolvedValueOnce("ana@ana.dev");
+    vi.mocked(text).mockResolvedValueOnce("ana@ana.dev").mockResolvedValueOnce("Designer").mockResolvedValueOnce("");
     await runSetup(deps);
     expect(deps.execFileSync.mock.calls.length).toBeGreaterThan(3);
     for (const c of deps.execFileSync.mock.calls) {
@@ -169,6 +169,68 @@ describe("setup — reaproveita o que o create já perguntou", () => {
     await runSetup(deps);
     const ai = calls(deps).find((c) => c.includes("proposalAiContext"));
     expect(ai).toContain("Ana Souza é Designer UX");
+  });
+
+  it("a profissão vira o cargo mostrado no site, gravado pela função interna (sem login)", async () => {
+    const deps = makeDeps();
+    vi.mocked(text).mockResolvedValueOnce("ana@ana.dev").mockResolvedValueOnce(" Designer UX ").mockResolvedValueOnce("");
+    await runSetup(deps);
+    const call = deps.execFileSync.mock.calls
+      .map((c) => c[1] as string[])
+      .find((a) => a[2] === "contactInfo:updateInternal" && a[3].includes("proposalAiContext"))!;
+    expect(JSON.parse(call[3])).toMatchObject({ role: "Designer UX", roleTranslations: { ptBR: "Designer UX" } });
+  });
+
+  it("as especialidades (sem espaços nas pontas) entram no contexto da IA", async () => {
+    const deps = makeDeps();
+    vi.mocked(text).mockResolvedValueOnce("ana@ana.dev").mockResolvedValueOnce("Designer UX").mockResolvedValueOnce("  UX, Ilustração  ");
+    await runSetup(deps);
+    const ai = calls(deps).find((c) => c.includes("proposalAiContext"))!;
+    expect(ai).toContain("Ana Souza é Designer UX com especialidade em UX, Ilustração. Entrega");
+  });
+
+  it("sem nome salvo, o contexto da IA usa o começo do e-mail", async () => {
+    const deps = makeDeps({ state: makeState({}, { siteUrl: "https://ana.dev" }) });
+    vi.mocked(text).mockResolvedValueOnce("ana.souza@ana.dev").mockResolvedValueOnce("Designer").mockResolvedValueOnce("");
+    await runSetup(deps);
+    expect(calls(deps).find((c) => c.includes("proposalAiContext"))).toContain("ana.souza é Designer. Entrega");
+  });
+
+  it("cancelar a profissão e as especialidades não grava nada", async () => {
+    const deps = makeDeps();
+    vi.mocked(text).mockResolvedValueOnce("ana@ana.dev").mockResolvedValueOnce("CANCEL").mockResolvedValueOnce("CANCEL");
+    await runSetup(deps);
+    expect(calls(deps).some((c) => c.includes("proposalAiContext"))).toBe(false);
+  });
+
+  it("especialidade cancelada não entra no contexto da IA", async () => {
+    const deps = makeDeps();
+    vi.mocked(text).mockResolvedValueOnce("ana@ana.dev").mockResolvedValueOnce("Designer").mockResolvedValueOnce("CANCEL");
+    await runSetup(deps);
+    expect(calls(deps).find((c) => c.includes("proposalAiContext"))).toContain("Ana Souza é Designer. Entrega");
+  });
+
+  it("sem profissão, não mexe no cargo nem no contexto da IA", async () => {
+    const deps = makeDeps();
+    vi.mocked(text).mockResolvedValueOnce("ana@ana.dev").mockResolvedValueOnce("").mockResolvedValueOnce("UX");
+    await runSetup(deps);
+    expect(calls(deps).some((c) => c.includes('"role"') || c.includes("proposalAiContext"))).toBe(false);
+  });
+
+  it("não chama mutations públicas, que exigem login de admin", async () => {
+    const deps = makeDeps();
+    vi.mocked(text).mockResolvedValueOnce("ana@ana.dev").mockResolvedValueOnce("Designer").mockResolvedValueOnce("UX, Ilustração");
+    await runSetup(deps);
+    const runs = deps.execFileSync.mock.calls.map((c) => c[1] as string[]).filter((a) => a[1] === "run").map((a) => a[2]);
+    expect(runs).toEqual(["seed:setupAdmin", "seed:seedAll", "siteConfig:setBatchInternal", "contactInfo:updateInternal", "contactInfo:updateInternal"]);
+  });
+
+  it("a pergunta da profissão explica onde ela aparece", async () => {
+    const deps = makeDeps();
+    vi.mocked(text).mockResolvedValueOnce("ana@ana.dev");
+    await runSetup(deps);
+    expect(messages().find((m) => /profissão/.test(m))).toMatch(/abaixo do seu nome/);
+    expect(messages().join("\n")).not.toMatch(/padrão tech/);
   });
 
   it("termina mostrando o próximo passo que o create passou", async () => {

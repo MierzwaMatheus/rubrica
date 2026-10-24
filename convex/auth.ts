@@ -15,8 +15,14 @@ const PasswordNoSignUp = Password({
   },
 });
 
+/** Senhas erradas por conta, por hora. Depois disso, uma nova tentativa a cada 12 minutos. */
+export const MAX_FAILED_SIGN_INS_PER_HOUR = 5;
+
 export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
   providers: [PasswordNoSignUp],
+  // O Convex Auth conta as falhas por conta (tabela authRateLimits) e bloqueia o login
+  // ao estourar o limite, mesmo com a senha certa, até a janela liberar.
+  signIn: { maxFailedAttempsPerHour: MAX_FAILED_SIGN_INS_PER_HOUR },
 });
 
 export const getAuthUser = query({

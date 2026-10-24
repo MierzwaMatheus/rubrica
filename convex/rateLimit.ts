@@ -1,6 +1,8 @@
 import { internalMutation } from './_generated/server';
 import { MutationCtx, QueryCtx } from './_generated/server';
 
+// O login com senha NÃO passa por aqui: o limite de tentativas é do Convex Auth
+// (convex/auth.ts → signIn.maxFailedAttempsPerHour). "login" fica por compatibilidade.
 const WINDOWS: Record<string, number> = {
   login: 15 * 60 * 1000,
   proposal_password: 15 * 60 * 1000,

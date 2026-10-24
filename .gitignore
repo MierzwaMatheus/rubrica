@@ -129,3 +129,10 @@ site/.astro/
 site/public/previews/
 site/public/data/
 site/public/samples/
+
+# Python
+__pycache__/
+*.pyc
+
+# Perfil editorial e planos das skills de conteúdo (dados pessoais). Tire esta linha para versionar.
+.rubrica/

@@ -268,6 +268,19 @@ O repositório já vem com a skill **`rubrica`** para Claude Code, Codex e OpenC
 - A skill usa o Convex do `VITE_CONVEX_URL` do `.env.local`. Para mexer em outro (ex.: produção), defina `RUBRICA_CONVEX_URL`.
 - Onde ela mora: `.agents/skills/rubrica/` (lido pelo Codex e pelo OpenCode) e o atalho `.claude/skills/rubrica` (lido pelo Claude Code). Requer Python 3.8+.
 
+Para escrever conteúdo novo com calma, há skills estrategistas que entrevistam você, escrevem em pt-BR e en-US e entregam um plano que a `rubrica` aplica depois do seu "ok". Todas começam pela sua voz: na primeira vez, o agente manda você para a [entrevista de voz](https://userubrica.vercel.app/voz), onde você responde falando ou digitando (uns 20 minutos, nada sai do navegador) e cola o resultado na conversa.
+
+| Skill | Para quê |
+|---|---|
+| `rubrica-voz` | extrai o seu tom de voz da entrevista e monta a parte pessoal da página Sobre (fora do trabalho, dia a dia, FAQ pessoal) |
+| `rubrica-apresentacao` | frase da home, cargo, "Sobre", números de destaque, princípios de trabalho e SEO da home |
+| `rubrica-case` | transforma dados técnicos, prints e resultados num case com visão de negócio, sem inventar números |
+| `rubrica-curriculo` | experiências, formação, habilidades e idiomas, de tarefas a conquistas |
+| `rubrica-blog` | post do tema ao rascunho: briefing, suas opiniões, SEO, fontes verificadas, edição, revisão e capa |
+| `rubrica-pilar` | revisão de todo texto antes de ir ao site: sinais de texto de IA, fatos sem origem e tradução |
+
+Os planos, a entrevista e o seu perfil editorial (público, voz, palavras vetadas) ficam em `.rubrica/`, na pasta do projeto, fora do git por padrão (são dados pessoais).
+
 ### 8 · Personalize o visual _(não pule)_
 
 Esta é a etapa **mais importante** depois do deploy técnico. Identidade visual é o que vai te diferenciar. Onde mexer:

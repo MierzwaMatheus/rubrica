@@ -660,8 +660,9 @@ def c_textos(a):
            **({"aviso": f"Mostrando {a.limite} de {total}; use --limite ou filtre."} if total > a.limite else {})})
 
 
-def _aplicar_textos(edicoes, so_pt):
-    """Valida tudo antes de gravar qualquer coisa; depois grava um por um."""
+def _aplicar_textos(edicoes, so_pt, gravar=True):
+    """Valida tudo antes de gravar qualquer coisa; depois grava um por um.
+    Com gravar=False só valida e devolve o antes/depois."""
     atuais = {x["key"]: x for x in todos_textos()}
     if not atuais:
         raise Falha("O Convex não tem textos do site (tabela siteTexts vazia). O plugin i18n "
@@ -684,7 +685,8 @@ def _aplicar_textos(edicoes, so_pt):
         args = {"key": e["key"], "ptBR": e["ptBR"]}
         if en:
             args["enUS"] = en
-        chamar("mutation", "siteTexts:update", args)
+        if gravar:
+            chamar("mutation", "siteTexts:update", args)
         feitos.append({"key": e["key"],
                        "antes": {"ptBR": antes.get("ptBR"), "enUS": antes.get("enUS")},
                        "depois": {"ptBR": e["ptBR"], "enUS": en},
@@ -739,6 +741,17 @@ def c_config_definir(a):
         itens.extend(dado)
     if not itens:
         raise Falha("Passe --item chave=valor (repetível) ou --arquivo.")
+    itens, atual, pares = _validar_config(itens, a.aceitar_contraste)
+    c = {m: v for m, v in pares} or None
+    chamar("mutation", "siteConfig:setBatch", {"items": itens})
+    saida({"ok": True,
+           "alterado": {i["key"]: {"antes": atual.get(i["key"]), "depois": i["value"]} for i in itens},
+           **({"contrasteTextoFundo": c} if c else {}),
+           "aviso": "Cores valem na hora. Título, descrição, SEO e RSS entram no HTML no próximo publicar-site."})
+
+
+def _validar_config(itens, aceitar_contraste=False):
+    """Confere chaves e contraste sem gravar. Devolve (itens, valores atuais, pares de contraste)."""
     validas = chaves_publicas_config()
     if validas:
         ruins = [i["key"] for i in itens if i["key"] not in validas]
@@ -753,16 +766,11 @@ def c_config_definir(a):
         novo[POR_MODO] = True
     pares = pares_texto_fundo(novo)
     ruins = [(m, c) for m, c in pares if c < 4.5]
-    if ruins and not a.aceitar_contraste:
+    if ruins and not aceitar_contraste:
         m, c = ruins[0]
         raise Falha(f"No modo {m}, o texto sobre o fundo fica com contraste {c}:1 (mínimo WCAG AA: 4.5:1). Nada foi gravado. "
                     "Ajuste as cores ou passe --aceitar-contraste se a pessoa quiser assim mesmo.")
-    c = {m: v for m, v in pares} or None
-    chamar("mutation", "siteConfig:setBatch", {"items": itens})
-    saida({"ok": True,
-           "alterado": {i["key"]: {"antes": atual.get(i["key"]), "depois": i["value"]} for i in itens},
-           **({"contrasteTextoFundo": c} if c else {}),
-           "aviso": "Cores valem na hora. Título, descrição, SEO e RSS entram no HTML no próximo publicar-site."})
+    return itens, atual, pares
 
 
 def c_og_imagem(a):
@@ -938,6 +946,36 @@ def c_chamar(a):
     saida(chamar(a.tipo, a.caminho, args_json(a)))
 
 
+def _chaves_balanceadas(texto, inicio):
+    """Trecho de texto[inicio] == '{' até a chave que fecha."""
+    nivel = 0
+    for i in range(inicio, len(texto)):
+        if texto[i] == "{":
+            nivel += 1
+        elif texto[i] == "}":
+            nivel -= 1
+            if nivel == 0:
+                return texto[inicio:i + 1]
+    return texto[inicio:]
+
+
+def _args_da_funcao(corpo, texto):
+    """O validador `args` da função, com objetos aninhados; resolve `args: nomeDaConst`."""
+    m = re.search(r"args:\s*", corpo)
+    if not m:
+        return "{}"
+    resto = corpo[m.end():]
+    if resto.startswith("{"):
+        return _chaves_balanceadas(resto, 0)
+    nome = re.match(r"(\w+)", resto)
+    if not nome:
+        return "{}"
+    const = re.search(r"^(?:export )?const " + nome.group(1) + r"\s*=\s*", texto, re.M)
+    if const and texto[const.end():const.end() + 1] == "{":
+        return _chaves_balanceadas(texto, const.end())
+    return nome.group(1)
+
+
 def c_funcoes(a):
     """Funções públicas do Convex lidas do próprio projeto (args e papéis)."""
     raiz = raiz_projeto()
@@ -960,16 +998,356 @@ def c_funcoes(a):
             item = {"funcao": f"{modulo}:{m.group(1)}", "tipo": m.group(2),
                     "papeis": papeis.group(1) if papeis else ("login" if "requireAuth" in corpo else "público")}
             if a.modulo:
-                args = (re.search(r"args:\s*(\{[^\n]*\}),[ \t]*\n", corpo)
-                        or re.search(r"args:\s*(\{\n.*?\n  \})", corpo, re.S)
-                        or re.search(r"args:\s*(\w+),", corpo))
-                valor = args.group(1) if args else "{}"
-                if re.fullmatch(r"\w+", valor):
-                    const = re.search(r"^const " + valor + r" = (\{.*?\n\});", texto, re.S | re.M)
-                    valor = const.group(1) if const else valor
-                item["args"] = valor
+                item["args"] = _args_da_funcao(corpo, texto)
             res.append(item)
     saida({"projeto": raiz, "funcoes": res})
+
+
+# ------------------------------------------------------------------ planos (aplicar-plano)
+#
+# As skills rubrica-* (case, apresentação, currículo, blog) montam o conteúdo e
+# entregam um plano em JSON. Este comando valida o plano inteiro antes de gravar,
+# mostra o antes/depois e grava passo a passo, guardando o progresso ao lado do
+# plano para poder retomar. Formato em references/plano.md.
+
+ACOES_PLANO = ("textos", "config", "perfil", "home", "imagem", "post-criar", "mutation")
+
+# Fora de plano: acesso, dinheiro, tradutor pago e plugins pedem conversa, não plano.
+PLANO_PROIBIDAS = re.compile(
+    r"^(users:|checkouts:|payments?:|asaas:|plugins:)|"
+    r":(resetPassword|translateBatch|translateAllMissing|permanentDelete|requestErasure|bootstrapRootUser)$")
+
+REF = re.compile(r"\{\{\s*([A-Za-z0-9_-]+)\.([A-Za-z0-9_]+)\s*\}\}")
+
+
+def _resolver_refs(valor, refs, pendente_ok=False):
+    """Troca {{passo.campo}} pelo resultado de um passo anterior.
+    Um valor que é só a referência mantém o tipo (ex.: id); dentro de um texto vira texto."""
+    if isinstance(valor, dict):
+        return {k: _resolver_refs(v, refs, pendente_ok) for k, v in valor.items()}
+    if isinstance(valor, list):
+        return [_resolver_refs(v, refs, pendente_ok) for v in valor]
+    if not isinstance(valor, str) or "{{" not in valor:
+        return valor
+
+    def busca(m):
+        passo, campo = m.group(1), m.group(2)
+        if passo in refs and campo in refs[passo]:
+            return refs[passo][campo]
+        if pendente_ok:
+            return f"(definido ao aplicar: {{{{{passo}.{campo}}}}})"
+        raise Falha(f"Referência {{{{{passo}.{campo}}}}} sem valor: o passo '{passo}' não devolveu '{campo}'.")
+
+    inteiro = REF.fullmatch(valor.strip())
+    if inteiro:
+        return busca(inteiro)
+    return REF.sub(lambda m: str(busca(m)), valor)
+
+
+def _trocar_no_arquivo(texto, refs):
+    """No corpo de um HTML só troca {{passo.campo}} de passos que existem: um post sobre
+    Vue ou Handlebars pode ter {{user.name}} de verdade no texto."""
+    return REF.sub(lambda m: str(refs[m.group(1)][m.group(2)])
+                   if m.group(1) in refs and m.group(2) in refs[m.group(1)] else m.group(0), texto)
+
+
+def _refs_usadas(valor):
+    if isinstance(valor, dict):
+        return [r for v in valor.values() for r in _refs_usadas(v)]
+    if isinstance(valor, list):
+        return [r for v in valor for r in _refs_usadas(v)]
+    if isinstance(valor, str):
+        return [m.group(1) for m in REF.finditer(valor)]
+    return []
+
+
+def _mutation_existe(funcao):
+    """True/False conforme convex/<modulo>.ts exporta a mutation; None se não der para saber."""
+    raiz = raiz_projeto()
+    modulo, nome = funcao.split(":", 1)
+    arq = os.path.join(raiz or "", "convex", modulo + ".ts")
+    if not raiz or not os.path.isfile(arq):
+        return None if not raiz else False
+    return re.search(r"^export const " + re.escape(nome) + r" = mutation\(", ler_arquivo(arq), re.M) is not None
+
+
+def _faltas_ingles(valor, caminho=""):
+    """Caminhos de campos *Translations que têm ptBR e não têm enUS."""
+    faltas = []
+    if isinstance(valor, dict):
+        for k, v in valor.items():
+            aqui = f"{caminho}.{k}" if caminho else k
+            if k.endswith("Translations") and isinstance(v, dict) and v.get("ptBR") not in (None, "") \
+                    and v.get("enUS") in (None, ""):
+                faltas.append(aqui)
+            faltas.extend(_faltas_ingles(v, aqui))
+    elif isinstance(valor, list):
+        for i, v in enumerate(valor):
+            faltas.extend(_faltas_ingles(v, f"{caminho}[{i}]"))
+    return faltas
+
+
+def _tags(valor):
+    """Aceita lista ou texto separado por vírgulas."""
+    if isinstance(valor, str):
+        return [t.strip() for t in valor.split(",") if t.strip()]
+    return [str(t).strip() for t in (valor or []) if str(t).strip()]
+
+
+def _caminho_plano(base, rel):
+    return rel if os.path.isabs(rel) else os.path.normpath(os.path.join(base, rel))
+
+
+def _validar_estrutura_plano(plano, base):
+    """Checagens que não precisam do Convex. Levanta Falha com todos os erros juntos."""
+    if not isinstance(plano, dict) or plano.get("rubricaPlano") != 1:
+        raise Falha('Isto não é um plano do Rubrica: falta "rubricaPlano": 1 no topo.')
+    passos = plano.get("passos")
+    if not isinstance(passos, list) or not passos:
+        raise Falha('O plano precisa de uma lista "passos" com pelo menos um passo.')
+    so_pt = bool(plano.get("soPt"))
+    erros, vistos = [], set()
+    for n, p in enumerate(passos, 1):
+        onde = f"passo {n}"
+        if not isinstance(p, dict):
+            erros.append(f"{onde}: precisa ser um objeto")
+            continue
+        acao = p.get("acao")
+        if p.get("id"):
+            onde = f"passo {n} ({p['id']})"
+            if p["id"] in vistos:
+                erros.append(f"{onde}: id repetido")
+        for r in _refs_usadas({k: v for k, v in p.items() if k != "id"}):
+            if r not in vistos:
+                erros.append(f"{onde}: usa {{{{{r}...}}}}, mas nenhum passo anterior tem id '{r}'")
+        if p.get("id"):
+            vistos.add(p["id"])
+        if acao not in ACOES_PLANO:
+            erros.append(f"{onde}: acao {acao!r} desconhecida (use {', '.join(ACOES_PLANO)})")
+            continue
+        for campo in ("arquivo", "enArquivo"):
+            if p.get(campo) and not os.path.isfile(_caminho_plano(base, p[campo])):
+                erros.append(f"{onde}: arquivo não encontrado: {p[campo]}")
+        if acao == "textos":
+            if not isinstance(p.get("itens"), list) or not p["itens"]:
+                erros.append(f"{onde}: textos precisa de itens [{{key, ptBR, enUS}}]")
+        elif acao == "config":
+            if not isinstance(p.get("itens"), dict) or not p["itens"]:
+                erros.append(f"{onde}: config precisa de itens {{chave: valor}}")
+        elif acao == "perfil":
+            dados = p.get("dados")
+            if not isinstance(dados, dict) or not dados:
+                erros.append(f"{onde}: perfil precisa de dados {{campo: valor}}")
+            else:
+                ruins = sorted(set(dados) - CAMPOS_PERFIL)
+                if ruins:
+                    erros.append(f"{onde}: campos de perfil desconhecidos: {', '.join(ruins)}")
+                if "role" in dados and "roleTranslations" not in dados and not so_pt:
+                    erros.append(f"{onde}: mudou role sem roleTranslations {{ptBR, enUS}}")
+        elif acao == "home":
+            if not p.get("chave") or "valor" not in p:
+                erros.append(f"{onde}: home precisa de chave e valor")
+            elif str(p["chave"]).startswith("plugin:"):
+                erros.append(f"{onde}: plugins não entram em plano")
+        elif acao == "imagem":
+            if not p.get("arquivo"):
+                erros.append(f"{onde}: imagem precisa de arquivo")
+            if not p.get("alt"):
+                erros.append(f"{onde}: imagem precisa de alt (texto alternativo)")
+        elif acao == "post-criar":
+            for campo in ("titulo", "slug", "arquivo"):
+                if not p.get(campo):
+                    erros.append(f"{onde}: post-criar precisa de {campo}")
+            if p.get("tags") is not None and not isinstance(p["tags"], (list, str)):
+                erros.append(f"{onde}: tags precisa ser lista ou texto separado por vírgulas")
+            if p.get("slug") and not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", str(p["slug"])):
+                erros.append(f"{onde}: slug precisa ser kebab-case sem acentos ({p['slug']!r})")
+            if not so_pt:
+                faltam = [en for pt, en in (("titulo", "enTitulo"), ("arquivo", "enArquivo"),
+                                            ("subtitulo", "enSubtitulo")) if p.get(pt) and not p.get(en)]
+                if faltam:
+                    erros.append(f"{onde}: faltou a versão em inglês: {', '.join(faltam)}")
+        elif acao == "mutation":
+            funcao = p.get("funcao") or ""
+            if not re.fullmatch(r"[A-Za-z0-9_/]+:[A-Za-z0-9_]+", funcao):
+                erros.append(f"{onde}: funcao precisa ser modulo:funcao, veio {funcao!r}")
+            elif PLANO_PROIBIDAS.search(funcao):
+                erros.append(f"{onde}: {funcao} não entra em plano (acesso, pagamento, tradutor pago ou plugin): "
+                             "faça direto, com o pedido explícito da pessoa")
+            elif _mutation_existe(funcao) is False:
+                erros.append(f"{onde}: {funcao} não existe como mutation em convex/ (veja `funcoes --modulo`)")
+            if not isinstance(p.get("args", {}), dict):
+                erros.append(f"{onde}: args precisa ser um objeto")
+            elif not so_pt:
+                faltas = _faltas_ingles(p.get("args") or {})
+                if faltas:
+                    erros.append(f"{onde}: faltou enUS em {', '.join(faltas)}")
+            ler = p.get("ler")
+            if ler is not None and (not isinstance(ler, dict) or not ler.get("funcao")):
+                erros.append(f"{onde}: ler precisa ser {{funcao, args}} de uma query")
+    if erros:
+        raise Falha("Plano inválido, nada foi gravado:\n  - " + "\n  - ".join(erros))
+    return passos, so_pt
+
+
+def _previa_passo(p, base, so_pt, refs, slugs):
+    """Valida o passo contra o Convex e devolve {antes, depois} sem gravar."""
+    acao = p["acao"]
+    q = lambda v: _resolver_refs(v, refs, pendente_ok=True)
+    if acao == "textos":
+        feitos = _aplicar_textos(q(p["itens"]), so_pt, gravar=False)
+        return {"alterados": [{"key": f["key"], "antes": f["antes"], "depois": f["depois"]} for f in feitos]}
+    if acao == "config":
+        itens = [{"key": k, "value": v} for k, v in q(p["itens"]).items()]
+        itens, atual, pares = _validar_config(itens, bool(p.get("aceitarContraste")))
+        return {"alterado": {i["key"]: {"antes": atual.get(i["key"]), "depois": i["value"]} for i in itens},
+                **({"contrasteTextoFundo": dict(pares)} if pares else {})}
+    if acao == "perfil":
+        atual = chamar("query", "contactInfo:get") or {}
+        return {"alterado": {k: {"antes": atual.get(k), "depois": v} for k, v in q(p["dados"]).items()}}
+    if acao == "home":
+        antes = chamar("query", "homeContent:getByKey", {"key": p["chave"]})
+        return {"chave": p["chave"], "antes": (antes or {}).get("value"), "depois": q(p["valor"])}
+    if acao == "imagem":
+        caminho = _caminho_plano(base, p["arquivo"])
+        tam = os.path.getsize(caminho) if os.path.isfile(caminho) else 0
+        if tam > LIMITE_IMAGEM:
+            raise Falha(f"{p['arquivo']} tem {tam / 1048576:.1f} MB; o limite é 10 MB.")
+        return {"sobe": p["arquivo"], "alt": p.get("alt"), "bytes": tam}
+    if acao == "post-criar":
+        if p["slug"] in slugs:
+            raise Falha(f"Já existe um post com o slug {p['slug']!r}. Troque o slug ou edite o post existente.")
+        slugs.add(p["slug"])
+        corpo = ler_arquivo(_caminho_plano(base, p["arquivo"]))
+        return {"novoRascunho": {"titulo": p["titulo"], "enTitulo": p.get("enTitulo"), "slug": p["slug"],
+                                 "subtitulo": p.get("subtitulo"), "tags": _tags(p.get("tags")),
+                                 "capa": q(p.get("imagemId")),
+                                 "palavras": len(re.sub(r"<[^>]+>", " ", corpo).split())}}
+    # mutation
+    antes = None
+    if p.get("ler"):
+        antes = chamar("query", p["ler"]["funcao"], q(p["ler"].get("args") or {}))
+    return {"funcao": p["funcao"], "antes": antes, "depois": q(p.get("args") or {})}
+
+
+def _executar_passo(p, base, so_pt, refs):
+    """Grava um passo (já validado). Devolve o que os passos seguintes podem referenciar."""
+    acao = p["acao"]
+    r = lambda v: _resolver_refs(v, refs)
+    if acao == "textos":
+        _aplicar_textos(r(p["itens"]), so_pt)
+        return {}
+    if acao == "config":
+        itens = [{"key": k, "value": v} for k, v in r(p["itens"]).items()]
+        itens, _, _ = _validar_config(itens, bool(p.get("aceitarContraste")))
+        chamar("mutation", "siteConfig:setBatch", {"items": itens})
+        return {}
+    if acao == "perfil":
+        chamar("mutation", "contactInfo:update", r(p["dados"]))
+        return {}
+    if acao == "home":
+        chamar("mutation", "homeContent:set", {"key": p["chave"], "value": r(p["valor"])})
+        return {}
+    if acao == "imagem":
+        tags = p.get("tags")
+        img = subir_imagem(_caminho_plano(base, p["arquivo"]), nome=p.get("nome"), alt=p.get("alt"),
+                           tags=",".join(tags) if isinstance(tags, list) else tags, pasta=p.get("pasta"))
+        return {k: img[k] for k in ("id", "storageId", "url") if img.get(k)}
+    if acao == "post-criar":
+        conteudo = _trocar_no_arquivo(ler_arquivo(_caminho_plano(base, p["arquivo"])), refs)
+        args = {"title": p["titulo"], "slug": p["slug"], "content": conteudo,
+                "tags": _tags(p.get("tags")), "featured": bool(p.get("destaque")), "status": "draft"}
+        if p.get("subtitulo"):
+            args["subtitle"] = p["subtitulo"]
+        if p.get("leitura"):
+            args["readTime"] = p["leitura"]
+        if p.get("imagemId"):
+            args["imageId"] = r(p["imagemId"])
+        if p.get("enTitulo"):
+            args["titleTranslations"] = {"ptBR": p["titulo"], "enUS": p["enTitulo"]}
+        if p.get("enSubtitulo"):
+            args["subtitleTranslations"] = {"ptBR": p.get("subtitulo") or "", "enUS": p["enSubtitulo"]}
+        if p.get("enArquivo"):
+            args["contentTranslations"] = {"ptBR": conteudo,
+                                           "enUS": _trocar_no_arquivo(
+                                               ler_arquivo(_caminho_plano(base, p["enArquivo"])), refs)}
+        return {"id": chamar("mutation", "posts:create", args), "slug": p["slug"]}
+    valor = chamar("mutation", p["funcao"], r(p.get("args") or {}))
+    return {"resultado": valor} if valor is not None else {}
+
+
+def c_aplicar_plano(a):
+    caminho = os.path.abspath(a.plano)
+    base = os.path.dirname(caminho)
+    plano = ler_json(caminho)
+    passos, so_pt = _validar_estrutura_plano(plano, base)
+    destino = convex()[0]
+    if plano.get("convex") and plano["convex"].rstrip("/") != destino.rstrip("/"):
+        raise Falha(f"O plano foi feito para {plano['convex']}, mas o Convex agora é {destino}. "
+                    "Nada foi gravado. Confira o RUBRICA_CONVEX_URL ou refaça o plano.")
+    progresso_arq = caminho + ".resultado.json"
+    feitos, refs, anteriores = set(), {}, []
+    if a.retomar:
+        if not os.path.isfile(progresso_arq):
+            raise Falha(f"Não há progresso salvo ({os.path.basename(progresso_arq)}): rode sem --retomar.")
+        prog = ler_json(progresso_arq)
+        anteriores = [x for x in prog.get("passos", []) if x.get("ok")]
+        feitos = {x["n"] for x in anteriores}
+        refs = prog.get("refs") or {}
+    elif os.path.isfile(progresso_arq) and not a.verificar:
+        raise Falha(f"Este plano já foi aplicado, ao menos em parte ({os.path.basename(progresso_arq)}). "
+                    "Use --retomar para continuar de onde parou, ou apague o arquivo de progresso para "
+                    "aplicar tudo de novo (pode duplicar posts e projetos).")
+
+    # Valida todos os passos contra o Convex antes de gravar qualquer coisa.
+    slugs = set()
+    if any(p["acao"] == "post-criar" for p in passos):
+        slugs = {x.get("slug") for x in (chamar("query", "posts:listAdmin", {"limit": 200}) or [])
+                 if isinstance(x, dict)}
+    previas = []
+    for n, p in enumerate(passos, 1):
+        if n in feitos:
+            previas.append({"n": n, "id": p.get("id"), "acao": p["acao"], "jaFeito": True})
+            continue
+        try:
+            prev = _previa_passo(p, base, so_pt, refs, slugs)
+        except Falha as e:
+            raise Falha(f"Passo {n} ({p.get('descricao') or p['acao']}): {e} Nada foi gravado.", e.codigo)
+        previas.append({"n": n, "id": p.get("id"), "acao": p["acao"], "descricao": p.get("descricao"), **prev})
+
+    cabeca = {"plano": os.path.relpath(caminho), "origem": plano.get("origem"), "resumo": plano.get("resumo"),
+              "convex": destino, "ambiente": ambiente()}
+    if a.verificar:
+        saida({"ok": True, "modo": "verificacao", **cabeca, "passos": previas,
+               "aviso": "Nada foi gravado. Mostre o antes/depois à pessoa e só aplique com o ok dela."})
+        return
+
+    registro = {"plano": cabeca["plano"], "convex": destino, "passos": anteriores, "refs": refs}
+
+    def salvar():
+        with open(progresso_arq, "w", encoding="utf-8") as f:
+            json.dump(registro, f, ensure_ascii=False, indent=2)
+
+    for n, p in enumerate(passos, 1):
+        if n in feitos:
+            continue
+        try:
+            res = _executar_passo(p, base, so_pt, refs)
+        except Falha as e:
+            registro["passos"].append({"n": n, "id": p.get("id"), "acao": p["acao"], "ok": False, "erro": str(e)})
+            salvar()
+            raise Falha(f"Passo {n} ({p.get('descricao') or p['acao']}) falhou: {e}\n"
+                        f"Os passos anteriores já foram gravados (veja {os.path.basename(progresso_arq)}). "
+                        "Corrija o plano e rode de novo com --retomar.", e.codigo)
+        if p.get("id"):
+            refs[p["id"]] = res
+        registro["passos"].append({"n": n, "id": p.get("id"), "acao": p["acao"], "ok": True, **res})
+        salvar()
+    saida({"ok": True, "modo": "aplicado", **cabeca, "resultados": registro["passos"],
+           "progresso": os.path.relpath(progresso_arq),
+           "aviso": "Gravado. Posts nascem rascunho. Textos fixos e cores valem na hora; perfil, blocos da "
+                    "home, SEO, projetos, currículo e posts entram no site no próximo publicar-site "
+                    "(só com pedido da pessoa)."})
 
 
 # ------------------------------------------------------------------ CLI
@@ -1106,6 +1484,11 @@ def parser():
     sp.add_argument("caminho", help="modulo:funcao, ex.: projects:update")
     sp.add_argument("--args", help="JSON")
     sp.add_argument("--args-arquivo", help="arquivo com o JSON")
+
+    sp = cmd("aplicar-plano", c_aplicar_plano, "aplica um plano JSON das skills rubrica-* (valida tudo antes)")
+    sp.add_argument("plano", help="arquivo do plano (ex.: .rubrica/planos/2026-10-24-case-x/plano.json)")
+    sp.add_argument("--verificar", action="store_true", help="só valida e mostra o antes/depois, sem gravar")
+    sp.add_argument("--retomar", action="store_true", help="pula os passos já gravados numa execução que falhou")
 
     sp = cmd("funcoes", c_funcoes, "lista funções do Convex do projeto (com --modulo mostra os args)")
     sp.add_argument("--modulo")

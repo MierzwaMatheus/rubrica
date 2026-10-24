@@ -2,7 +2,13 @@
 
 O que mudou em cada versão do Rubrica (template e CLI `create-rubrica`). Detalhes de cada uma nas [notas da release](https://github.com/MierzwaMatheus/rubrica/releases). Para atualizar um projeto existente, veja [Atualizando o seu Rubrica](./docs/atualizacao.md).
 
-## Não lançado
+## 1.1.0 — 2026-10-24
+
+8 layouts novos, 15 esquemas de cores com modo claro e escuro, alternância de modo pela visita, texturas e cores do admin separadas por modo. Nada quebra em quem está na 1.0.
+
+**Vindo da 1.0:**
+- Atualize com `npx create-rubrica@latest update` e depois rode `npx create-rubrica@latest config` → **Aparência** para escolher o esquema, o modo, a alternância e a textura. Antes do `update`, o `config` avisa que os layouts novos e o modo claro/escuro ainda não existem no projeto.
+- Cores trocadas antes pelo admin continuam valendo nos dois modos até a aparência ser salva de novo.
 
 ### 8 layouts novos
 - **Desktop Retrô**, **Índice**, **Monografia**, **Zine**, **Blueprint**, **Jardim Digital**, **Conversa** e **Pôster Cinético**, cada um com as 5 páginas (Início, Currículo, Portfólio, Sobre, Blog), funcionando no celular e nos dois modos. Veja o [guia dos templates](./docs/templates/README.md).
@@ -15,8 +21,6 @@ O que mudou em cada versão do Rubrica (template e CLI `create-rubrica`). Detalh
 - As páginas compartilhadas (post, estudo de caso, depoimentos, propostas, checkout, 404 e os formulários) passaram a funcionar no modo claro. O painel admin fica sempre escuro.
 - **Cores do admin por modo:** em Site & Aparência, cada modo tem as suas 4 cores. Os campos começam com as cores do esquema, só o que você muda fica salvo, e "Usar as cores do esquema" desfaz a personalização. Antes, salvar a aparência (mesmo só trocando a fonte) fixava as 4 cores por cima do esquema.
 - O link do Google Fonts passa a carregar também a fonte mono, que antes não era carregada.
-
-**Projetos existentes:** o `update` traz o novo `src/index.css` e o novo `index.html`; depois rode `create-rubrica config` → Aparência para escolher o esquema e o modo. Cores trocadas antes pelo admin continuam valendo nos dois modos até a aparência ser salva de novo.
 
 ## 1.0.0 — 2026-10-24
 

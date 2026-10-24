@@ -635,7 +635,7 @@ export function ContactWizard({
               size="sm"
               onClick={handleSubmit}
               disabled={state.isSubmitting}
-              className="bg-neon-purple hover:bg-neon-purple/80 text-white font-mono text-xs"
+              className="bg-neon-purple hover:bg-neon-purple/80 text-primary-foreground font-mono text-xs"
             >
               <Send className="mr-1.5 h-3 w-3" />
               {state.isSubmitting ? t("contactWizard.submitting") : t("contactWizard.submit")}
@@ -648,7 +648,7 @@ export function ContactWizard({
                 else if (canNext()) dispatch({ type: "NEXT" });
               }}
               disabled={!canNext()}
-              className="bg-neon-purple hover:bg-neon-purple/80 text-white font-mono text-xs disabled:opacity-40"
+              className="bg-neon-purple hover:bg-neon-purple/80 text-primary-foreground font-mono text-xs disabled:opacity-40"
             >
               {t("contactWizard.next")}
               <ArrowRight className="ml-1.5 h-3 w-3" />

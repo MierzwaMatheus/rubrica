@@ -58,6 +58,9 @@ const NO_MONO_LAYOUTS = new Set(["swiss"]);
 function setupPrompts(opts: {
   layout?: string;
   theme?: string;
+  colorMode?: string;
+  colorModeToggle?: boolean;
+  texture?: string;
   fontSans?: string;
   fontMono?: string;
   plugins?: string[];
@@ -65,10 +68,15 @@ function setupPrompts(opts: {
 }) {
   const layout = opts.layout ?? "cyberpunk";
   const hasMono = !NO_MONO_LAYOUTS.has(layout);
+  // Ordem: layout → esquema → modo de cor → (confirm alternância) → textura → fonte principal → fonte mono
   const mock = vi.mocked(select)
     .mockResolvedValueOnce(layout)
     .mockResolvedValueOnce(opts.theme ?? "editorial-cream")
+    .mockResolvedValueOnce(opts.colorMode ?? "dark")
+    .mockResolvedValueOnce(opts.texture ?? "none")
     .mockResolvedValueOnce(opts.fontSans ?? "Inter");
+  // Primeiro confirm: botão de alternar claro/escuro (o do git init vem depois)
+  vi.mocked(confirm).mockResolvedValueOnce(opts.colorModeToggle ?? false);
   if (hasMono) {
     mock.mockResolvedValueOnce(opts.fontMono ?? "JetBrains Mono");
   }
@@ -100,6 +108,7 @@ const mockApplyFont = vi.fn(async () => undefined);
 const mockApplyPlugins = vi.fn(async () => undefined);
 const mockApplyIndexHtml = vi.fn(async () => undefined);
 const mockApplyRubricalConfig = vi.fn(async () => undefined);
+const mockApplyAppearance = vi.fn(async () => undefined);
 const mockIdentityPrompt = vi.fn(async () => ({
   siteName: "Test Site",
   siteUrl: "https://test.com",
@@ -124,6 +133,7 @@ function makeDefaultDeps(vol: InstanceType<typeof Volume>, extraDirs?: string[])
     applyPlugins: mockApplyPlugins as Deps["applyPlugins"],
     applyIndexHtml: mockApplyIndexHtml as Deps["applyIndexHtml"],
     applyRubricalConfig: mockApplyRubricalConfig as Deps["applyRubricalConfig"],
+    applyAppearance: mockApplyAppearance as Deps["applyAppearance"],
     identityPrompt: mockIdentityPrompt as Deps["identityPrompt"],
   };
 }
@@ -137,6 +147,9 @@ async function callRunCreate(opts: {
   fontMono?: string;
   radius?: string;
   plugins?: string[];
+  colorMode?: string;
+  colorModeToggle?: boolean;
+  texture?: string;
 }) {
   vi.clearAllMocks();
   setupPrompts(opts);
@@ -147,7 +160,7 @@ async function callRunCreate(opts: {
 
   await runCreate("meu-portfolio", deps);
 
-  return { mockApplyLayout, mockApplyTheme, mockApplyFont, mockApplyPlugins, mockApplyIndexHtml, mockApplyRubricalConfig };
+  return { mockApplyLayout, mockApplyTheme, mockApplyFont, mockApplyPlugins, mockApplyIndexHtml, mockApplyRubricalConfig, mockApplyAppearance };
 }
 
 // ---- Ciclo 1: validação do nome do projeto ----------------------------------
@@ -310,14 +323,14 @@ describe("create — applyTheme", () => {
 // ---- Ciclo 4b: hints descritivos em temas e layout -------------------------
 
 describe("create — hints descritivos nos selects de tema e layout", () => {
-  it("select de tema tem hint descritivo nas opções", async () => {
+  it("select de esquema de cores tem hint descritivo nas opções", async () => {
     vi.clearAllMocks();
     setupPrompts({});
     const vol = Volume.fromJSON({});
     vol.mkdirSync("/projects", { recursive: true });
     await runCreate("meu-portfolio", makeDefaultDeps(vol));
     const themeCall = vi.mocked(select).mock.calls.find(
-      (args) => (args[0] as { message?: string }).message === "Tema visual"
+      (args) => (args[0] as { message?: string }).message === "Esquema de cores"
     );
     expect(themeCall?.[0]).toEqual(
       expect.objectContaining({
@@ -329,6 +342,20 @@ describe("create — hints descritivos nos selects de tema e layout", () => {
         ]),
       })
     );
+  });
+
+  it("marca o esquema recomendado para o layout escolhido", async () => {
+    vi.clearAllMocks();
+    setupPrompts({ layout: "cyberpunk" });
+    const vol = Volume.fromJSON({});
+    vol.mkdirSync("/projects", { recursive: true });
+    await runCreate("meu-portfolio", makeDefaultDeps(vol));
+    const themeCall = vi.mocked(select).mock.calls.find(
+      (args) => (args[0] as { message?: string }).message === "Esquema de cores"
+    );
+    const options = (themeCall?.[0] as { options: Array<{ value: string; hint?: string }> }).options;
+    expect(options.find((o) => o.value === "neon")?.hint).toMatch(/^recomendado/);
+    expect(options.filter((o) => o.hint?.startsWith("recomendado"))).toHaveLength(1);
   });
 
   it("select de layout tem hint descritivo nas opções", async () => {
@@ -364,6 +391,30 @@ describe("create — hints descritivos nos selects de tema e layout", () => {
           expect.objectContaining({ value: "swiss", hint: expect.any(String) }),
         ]),
       })
+    );
+  });
+});
+
+// ---- Aparência: modo de cor, alternância e textura ------------------------
+
+describe("create — applyAppearance", () => {
+  it("chama applyAppearance com modo, alternância e textura escolhidos, sobre o index.html", async () => {
+    const { mockApplyAppearance } = await callRunCreate({
+      colorMode: "light",
+      colorModeToggle: true,
+      texture: "grain",
+    });
+    expect(mockApplyAppearance).toHaveBeenCalledWith(
+      { colorMode: "light", colorModeToggle: true, texture: "grain" },
+      "/projects/meu-portfolio/index.html",
+      expect.anything()
+    );
+  });
+
+  it("aplica a aparência depois do esquema de cores", async () => {
+    const { mockApplyAppearance, mockApplyTheme } = await callRunCreate({});
+    expect(mockApplyTheme.mock.invocationCallOrder[0]).toBeLessThan(
+      mockApplyAppearance.mock.invocationCallOrder[0]
     );
   });
 });
@@ -491,6 +542,24 @@ describe("create — novas fontes e recomendação por template", () => {
     );
   });
 
+  it("JetBrains Mono aparece como fonte principal recomendada quando brutalist é selecionado", async () => {
+    vi.clearAllMocks();
+    setupPrompts({ layout: "brutalist", fontSans: "JetBrains Mono" });
+    const vol = Volume.fromJSON({});
+    vol.mkdirSync("/projects", { recursive: true });
+    await runCreate("meu-portfolio", makeDefaultDeps(vol));
+    const fontSansCall = vi.mocked(select).mock.calls.find(
+      (args) => (args[0] as { message?: string }).message === "Fonte principal"
+    );
+    expect(fontSansCall?.[0]).toEqual(
+      expect.objectContaining({
+        options: expect.arrayContaining([
+          expect.objectContaining({ value: "JetBrains Mono", hint: "recomendada" }),
+        ]),
+      })
+    );
+  });
+
   it("Manrope aparece como recomendada quando bento é selecionado", async () => {
     vi.clearAllMocks();
     setupPrompts({ layout: "bento", fontSans: "Inter" });
@@ -608,7 +677,7 @@ describe("create — applyPlugins", () => {
 
 describe("create — applyIndexHtml", () => {
   it("chama applyIndexHtml com fontFamily, siteName e siteUrl do identityPrompt", async () => {
-    const { mockApplyIndexHtml } = await callRunCreate({ fontSans: "Inter", theme: "cyberpunk" });
+    const { mockApplyIndexHtml } = await callRunCreate({ fontSans: "Inter", theme: "neon" });
     expect(mockApplyIndexHtml).toHaveBeenCalledWith(
       expect.objectContaining({
         fontFamily: "Inter",
@@ -676,6 +745,23 @@ describe("create — writeState", () => {
     const call = (vi.mocked(mockWriteState).mock.calls[0] as unknown as [string, Record<string, unknown>])[1];
     expect(call.radius).toBeUndefined();
     expect(call.accentColor).toBeUndefined();
+  });
+
+  it("grava colorMode, colorModeToggle e texture no rubrica.json", async () => {
+    vi.clearAllMocks();
+    setupPrompts({ colorMode: "system", colorModeToggle: true, texture: "paper" });
+    const vol = Volume.fromJSON({});
+    vol.mkdirSync("/projects", { recursive: true });
+    const mockWriteState = vi.fn(async () => ({}));
+    await runCreate("meu-portfolio", {
+      ...makeDefaultDeps(vol),
+      writeState: mockWriteState as unknown as Deps["writeState"],
+    });
+    expect(mockWriteState).toHaveBeenCalledWith(
+      "/projects/meu-portfolio",
+      expect.objectContaining({ colorMode: "system", colorModeToggle: true, texture: "paper" }),
+      expect.anything()
+    );
   });
 });
 

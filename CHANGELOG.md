@@ -2,6 +2,22 @@
 
 O que mudou em cada versão do Rubrica (template e CLI `create-rubrica`). Detalhes de cada uma nas [notas da release](https://github.com/MierzwaMatheus/rubrica/releases). Para atualizar um projeto existente, veja [Atualizando o seu Rubrica](./docs/atualizacao.md).
 
+## Não lançado
+
+### 8 layouts novos
+- **Desktop Retrô**, **Índice**, **Monografia**, **Zine**, **Blueprint**, **Jardim Digital**, **Conversa** e **Pôster Cinético**, cada um com as 5 páginas (Início, Currículo, Portfólio, Sobre, Blog), funcionando no celular e nos dois modos. Veja o [guia dos templates](./docs/templates/README.md).
+
+### Esquemas de cores, modo claro/escuro e textura
+- **15 esquemas de cores**, cada um com modo claro e escuro e 11 papéis de cor: os 4 presets originais (agora também no outro modo), o Neon (o visual original) e 10 novos (Riso, Cianotipia, Tropicália, Azulejo, Sumi, Fósforo, Crepúsculo, Concreto, Sorbet, Alto Contraste). Os 5 layouts originais seguem usando só as 4 cores de sempre; os novos usam o esquema completo.
+- **Modo claro, escuro ou automático** (segue o sistema de quem visita), com opção de mostrar um botão para a visita alternar. Todos os 13 layouts têm o botão.
+- **Texturas** opcionais: grão de filme, papel e scanlines.
+- `create-rubrica` e `create-rubrica config` → Aparência perguntam esquema, modo, alternância e textura, com o recomendado de cada layout marcado.
+- As páginas compartilhadas (post, estudo de caso, depoimentos, propostas, checkout, 404 e os formulários) passaram a funcionar no modo claro. O painel admin fica sempre escuro.
+- **Cores do admin por modo:** em Site & Aparência, cada modo tem as suas 4 cores. Os campos começam com as cores do esquema, só o que você muda fica salvo, e "Usar as cores do esquema" desfaz a personalização. Antes, salvar a aparência (mesmo só trocando a fonte) fixava as 4 cores por cima do esquema.
+- O link do Google Fonts passa a carregar também a fonte mono, que antes não era carregada.
+
+**Projetos existentes:** o `update` traz o novo `src/index.css` e o novo `index.html`; depois rode `create-rubrica config` → Aparência para escolher o esquema e o modo. Cores trocadas antes pelo admin continuam valendo nos dois modos até a aparência ser salva de novo.
+
 ## 1.0.0 — 2026-10-24
 
 Primeira versão estável. A partir daqui, dentro da 1.x, atualizar não quebra o que você personalizou nem os seus dados: campos novos no banco são sempre opcionais, e mudanças que exijam migração só entram numa versão major nova, com guia.

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="dark" data-color-mode="dark" data-color-toggle="false" data-texture="none">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
@@ -66,6 +66,23 @@
       href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
+    <!-- Modo de cor e textura (data-* do <html>, gravados pelo CLI). Roda antes da
+         página aparecer para não piscar o modo errado. -->
+    <script>
+      (function () {
+        var d = document.documentElement;
+        var mode = d.getAttribute("data-color-mode") || "dark";
+        if (d.getAttribute("data-color-toggle") === "true") {
+          try {
+            var saved = localStorage.getItem("rubrica-color-mode");
+            if (saved === "light" || saved === "dark") mode = saved;
+          } catch (e) {}
+        }
+        if (mode === "system") mode = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        if (location.pathname.indexOf("/admin") === 0) mode = "dark";
+        d.classList.toggle("dark", mode === "dark");
+      })();
+    </script>
   </head>
 
   <body>

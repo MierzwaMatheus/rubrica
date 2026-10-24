@@ -243,7 +243,7 @@ export default function BentoPortfolio() {
                     padding: "5px 10px",
                     borderRadius: 999,
                     background: "var(--accent)",
-                    color: "var(--text)",
+                    color: "var(--bento-on-accent)",
                     fontSize: 10,
                     fontWeight: 700,
                     letterSpacing: "0.14em",

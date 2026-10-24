@@ -14,8 +14,10 @@ npx create-rubrica meu-portfolio
 
 O assistente baixa a versão mais recente do template e pergunta:
 
-- **Layout**: Cyberpunk, Brutalism Terminal, Swiss Grid, Bento ou Magazine ([guia dos layouts](https://github.com/MierzwaMatheus/rubrica/blob/main/docs/templates/README.md))
-- **Paleta**: Editorial Cream, Paper Noir, Midnight Blue ou Solar Warm ([esquemas de cores](https://github.com/MierzwaMatheus/rubrica/blob/main/docs/templates/cores.md))
+- **Layout**: um de 13 — Cyberpunk, Brutalism Terminal, Swiss Grid, Bento, Magazine, Desktop Retrô, Índice, Monografia, Zine, Blueprint, Jardim Digital, Conversa ou Pôster Cinético ([guia dos layouts](https://github.com/MierzwaMatheus/rubrica/blob/main/docs/templates/README.md))
+- **Esquema de cores**: um de 15, cada um com modo claro e escuro; o recomendado para o layout vem marcado ([esquemas de cores](https://github.com/MierzwaMatheus/rubrica/blob/main/docs/templates/cores.md))
+- **Modo de cor**: claro, escuro ou automático (segue o sistema de quem visita), e se a visita pode alternar
+- **Textura**: nenhuma, grão de filme, papel ou scanlines
 - **Fontes**: principal e mono (o layout sugere uma combinação)
 - **Plugins**: blog, portfólio, currículo, propostas, depoimentos, IA etc.
 - **Identidade**: nome do site, URL, descrição, autor, e-mail, handle do X, idioma
@@ -25,10 +27,10 @@ Arquivos que saem com as suas escolhas:
 
 | Arquivo | O que tem |
 |---|---|
-| `rubrica.json` | Estado do CLI: versão de origem, layout, paleta, fontes, plugins e identidade. Versione junto com o projeto: o `update` depende dele. |
+| `rubrica.json` | Estado do CLI: versão de origem, layout, esquema de cores, modo, textura, fontes, plugins e identidade. Versione junto com o projeto: o `update` depende dele. |
 | `rubrica.config.ts` | Identidade, SEO e RSS usados no build |
-| `src/index.css` | As 4 cores da paleta e as fontes |
-| `index.html` | Meta tags e fonte do Google Fonts |
+| `src/index.css` | O esquema de cores (modo claro e escuro) e as fontes |
+| `index.html` | Meta tags, o link das fontes e a aparência (modo de cor, alternância e textura, como atributos do `<html>`) |
 | `src/components/`, `src/pages/` | Arquivos do layout escolhido |
 | `convex/pluginRegistry.ts` | Plugins ligados por padrão |
 
@@ -62,7 +64,7 @@ npx create-rubrica config
 Muda as escolhas feitas no `create`:
 
 - **Identidade**: atualiza `rubrica.config.ts`, as meta tags do `index.html` e o `rubrica.json`
-- **Aparência**: paleta e fontes
+- **Aparência**: esquema de cores, modo claro/escuro, alternância, textura e fontes
 - **Layout**: troca o layout (⚠ sobrescreve os arquivos do layout; personalizações neles se perdem)
 - **Plugins**: quais vêm ligados por padrão
 

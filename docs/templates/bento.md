@@ -17,7 +17,7 @@ A **primária** vira fundo dos cartões mais importantes (com texto na cor do fu
 
 ## Estrutura global
 
-- **Dock flutuante** fixa no rodapé, centralizada: cápsula translúcida com desfoque de fundo e 5 itens (ícone + rótulo). O item ativo fica num bloco na primária.
+- **Dock flutuante** fixa no rodapé, centralizada: cápsula translúcida com desfoque de fundo e 5 itens (ícone + rótulo) e, separado por um filete, o ícone de modo claro/escuro (só com a alternância ligada). O item ativo fica num bloco na primária. No celular, os itens ficam mais estreitos para a dock caber em 360px.
 - As páginas reservam espaço no rodapé para a dock não cobrir o conteúdo.
 
 ## Páginas
@@ -73,4 +73,5 @@ A **primária** vira fundo dos cartões mais importantes (com texto na cor do fu
 ## Limitações conhecidas
 
 - Os grids são fixos (12, 6, 3 e 2 colunas) sem breakpoints: no celular as colunas encolhem, e o título de 76px pode estourar.
+- O texto sobre a cor de destaque (cartão de e-mail, idiomas, RSS, selo "Destaque") vira preto ou branco conforme a luminosidade do destaque (`--bento-on-accent`, definido no `Layout.tsx`), para ficar legível nos dois modos. Precisa de navegador com sintaxe de cor relativa (`oklch(from …)`).
 - Só o post em destaque tem link; os cartões de projetos e dos demais posts ainda não são clicáveis.

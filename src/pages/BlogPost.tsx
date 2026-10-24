@@ -154,7 +154,7 @@ function PostFooter({ name, avatarUrl, role, related, showContact, onContact, t 
                     <button
                         onClick={onContact}
                         data-umami-event="blog-cta-contato"
-                        className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-neon-purple text-white font-semibold hover:bg-neon-purple/90 transition-colors"
+                        className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-neon-purple text-primary-foreground font-semibold hover:bg-neon-purple/90 transition-colors"
                     >
                         <MessageSquare className="w-4 h-4" />
                         {t('blog.authorCta')}

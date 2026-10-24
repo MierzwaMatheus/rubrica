@@ -23,10 +23,10 @@ A sidebar (`w-72`, fixa) tem, de cima para baixo:
 2. Nome e cargo em uma caixa `<code>`
 3. Navegação com ícones — Currículo, Portfólio, Sobre e Blog somem quando o plugin correspondente está desligado
 4. Contato (e-mail e WhatsApp, cada um só se estiver marcado como visível) e redes sociais com URL preenchida
-5. Alternância de idioma PT/EN
+5. Botão de modo claro/escuro ("Modo escuro"/"Modo claro", logo acima do idioma; só aparece com a alternância ligada) e alternância de idioma PT/EN
 6. Botão do assistente de contato (plugin `contact-wizard`) e **"Baixar CV"**, que gera um PDF com currículo e projetos
 
-Abaixo de `lg`, a sidebar vira um cabeçalho fixo com mini-avatar e um menu lateral com o mesmo conteúdo.
+Abaixo de `lg`, a sidebar vira um cabeçalho fixo com mini-avatar, o ícone de modo claro/escuro ao lado do botão de menu e um menu lateral com o mesmo conteúdo.
 
 ## Páginas
 
@@ -91,6 +91,8 @@ Abaixo de `lg`, a sidebar vira um cabeçalho fixo com mini-avatar e um menu late
 - No fim de cada post: bloco do autor com botão de contato e o **case relacionado** (o primeiro projeto com case que compartilha uma tag com o post).
 
 ## Extras
+
+- Funciona nos dois modos com qualquer esquema: texto sobre a primária usa a cor "sobre a primária" do esquema, e os degradês sobre imagens (blog, portfólio, dia a dia) usam o fundo da página em vez de preto.
 
 - **Terminal**: `` ` `` ou `~` abre um terminal com comandos de navegação (`help`, `projects`, `blog`, `open <slug>`, `whoami`…), histórico e autocompletar. Ele é global, então funciona em qualquer layout, mas a dica "Press ~ for terminal" só aparece na sidebar do Cyberpunk.
 - É o layout mais completo em interações (filtros, busca, carrosséis, diálogos) e o único com versão mobile dedicada para todas as páginas.

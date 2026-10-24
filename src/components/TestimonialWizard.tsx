@@ -179,7 +179,7 @@ function AvatarUploader() {
             <button
               type="button"
               onClick={() => dispatch({ type: "CLEAR_AVATAR" })}
-              className="text-xs text-red-400 hover:text-red-300 underline underline-offset-2"
+              className="text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 underline underline-offset-2"
             >
               Remover
             </button>
@@ -209,7 +209,7 @@ function AvatarUploader() {
       />
 
       {showCrop && rawSrc && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 p-4">
           <div className="bg-muted rounded-2xl border border-foreground/10 p-5 space-y-4 w-full max-w-sm">
             <p className="text-foreground-strong font-semibold text-sm">Ajustar foto</p>
             <div className="overflow-hidden rounded-lg">
@@ -237,7 +237,7 @@ function AvatarUploader() {
                 size="sm"
                 onClick={() => confirmCrop()}
                 disabled={!completedCrop}
-                className="bg-neon-lime text-black hover:bg-neon-lime/90 font-semibold"
+                className="bg-neon-lime text-on-accent hover:bg-neon-lime/90 font-semibold"
               >
                 Confirmar
               </Button>
@@ -361,7 +361,7 @@ function TextInputStep() {
         <Button
           onClick={() => dispatch({ type: "NEXT_STEP" })}
           disabled={!isValid}
-          className="bg-neon-lime text-black hover:bg-neon-lime/90 font-semibold"
+          className="bg-neon-lime text-on-accent hover:bg-neon-lime/90 font-semibold"
         >
           Continuar <ArrowRight className="w-4 h-4 ml-2" />
         </Button>
@@ -506,7 +506,7 @@ function VideoUploadStep() {
         <Button
           onClick={() => dispatch({ type: "NEXT_STEP" })}
           disabled={!state.videoStorageId || uploading}
-          className="bg-neon-lime text-black hover:bg-neon-lime/90 font-semibold"
+          className="bg-neon-lime text-on-accent hover:bg-neon-lime/90 font-semibold"
         >
           Continuar <ArrowRight className="w-4 h-4 ml-2" />
         </Button>
@@ -598,7 +598,7 @@ function PersonalInfoStep() {
         <Button
           onClick={() => dispatch({ type: "NEXT_STEP" })}
           disabled={!isValid}
-          className="bg-neon-lime text-black hover:bg-neon-lime/90 font-semibold"
+          className="bg-neon-lime text-on-accent hover:bg-neon-lime/90 font-semibold"
         >
           Revisar <ArrowRight className="w-4 h-4 ml-2" />
         </Button>
@@ -672,7 +672,7 @@ function SummaryStep({ onClose }: { onClose: () => void }) {
         <p className="text-foreground/65 text-sm max-w-xs">
           Recebi seu depoimento e vou revisá-lo em breve. Após aprovação, ele poderá aparecer no meu portfólio.
         </p>
-        <Button onClick={onClose} className="mt-4 bg-neon-lime text-black hover:bg-neon-lime/90 font-semibold">
+        <Button onClick={onClose} className="mt-4 bg-neon-lime text-on-accent hover:bg-neon-lime/90 font-semibold">
           Fechar
         </Button>
       </div>
@@ -716,7 +716,7 @@ function SummaryStep({ onClose }: { onClose: () => void }) {
       </div>
 
       {state.error && (
-        <p className="text-sm text-red-400 bg-red-400/10 border border-red-400/20 rounded-lg p-3">
+        <p className="text-sm text-red-600 dark:text-red-400 bg-red-400/10 border border-red-400/20 rounded-lg p-3">
           {state.error}
         </p>
       )}
@@ -733,7 +733,7 @@ function SummaryStep({ onClose }: { onClose: () => void }) {
         <Button
           onClick={handleSubmit}
           disabled={state.isSubmitting}
-          className="bg-neon-purple text-white hover:bg-neon-purple/90 font-semibold"
+          className="bg-neon-purple text-primary-foreground hover:bg-neon-purple/90 font-semibold"
         >
           {state.isSubmitting ? (
             <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Enviando...</>
@@ -820,7 +820,7 @@ export function TestimonialWizard({ open, onClose }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && handleClose()}>
-      <DialogContent className="bg-[#121212] border-foreground/10 max-w-lg w-full">
+      <DialogContent className="bg-card border-foreground/10 max-w-lg w-full">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-foreground-strong">
             <Star className="w-5 h-5 text-neon-purple" />

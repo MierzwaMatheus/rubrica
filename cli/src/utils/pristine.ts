@@ -3,6 +3,7 @@ import * as path from "node:path";
 import { downloadRelease as defaultDownloadRelease } from "./download.js";
 import { applyLayout } from "../transforms/applyLayout.js";
 import { applyTheme } from "../transforms/applyTheme.js";
+import { applyAppearance } from "../transforms/applyAppearance.js";
 import { applyFont } from "../transforms/applyFont.js";
 import { applyPlugins } from "../transforms/applyPlugins.js";
 import { applyIndexHtml } from "../transforms/applyIndexHtml.js";
@@ -57,6 +58,14 @@ export async function buildPristine(options: BuildPristineOptions): Promise<void
   const cssPath = path.join(dir, "src", "index.css");
   const htmlPath = path.join(dir, "index.html");
   await applyTheme({ preset: state.theme }, cssPath, fs);
+  // Projetos criados antes da aparência (modo de cor e textura) não têm estes campos.
+  if (state.colorMode) {
+    await applyAppearance(
+      { colorMode: state.colorMode, colorModeToggle: state.colorModeToggle ?? false, texture: state.texture ?? "none" },
+      htmlPath,
+      fs
+    );
+  }
   await applyFont({ fontSans: state.fontSans, fontMono: state.fontMono }, { css: cssPath, html: htmlPath }, fs);
 
   const registryPath = path.join(dir, "convex", "pluginRegistry.ts");
@@ -68,7 +77,7 @@ export async function buildPristine(options: BuildPristineOptions): Promise<void
 
   const identity = state.identity;
   if (identity) {
-    await applyIndexHtml(indexHtmlInput(identity, state.fontSans), htmlPath, fs);
+    await applyIndexHtml(indexHtmlInput(identity, state.fontSans, state.fontMono), htmlPath, fs);
     await applyRubricalConfig(rubricaConfigInput(identity, state.fontSans, state.fontMono), dir, fs);
   }
 

@@ -3,6 +3,14 @@ import { Volume } from "memfs";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { applyTheme } from "../transforms/applyTheme.js";
+import { getScheme, schemeCss, SCHEME_START, SCHEME_END, ROLE_VARS } from "../themes/schemes.js";
+
+/** O CSS sem o trecho entre os marcadores do esquema. */
+function outsideBlock(css: string): string {
+  const i = css.indexOf(SCHEME_START);
+  const j = css.indexOf(SCHEME_END);
+  return css.slice(0, i) + css.slice(j + SCHEME_END.length);
+}
 
 function makeFsModule(vol: InstanceType<typeof Volume>) {
   return {
@@ -30,6 +38,92 @@ const stubCss = `@import "tailwindcss";
 
 body { margin: 0; }
 `;
+
+// ---- index.css com marcadores (projetos novos) ------------------------------
+
+const markedCss = `@import "tailwindcss";
+
+${SCHEME_START}
+:root { --bg: #000000; }
+.dark { --bg: #ffffff; }
+${SCHEME_END}
+
+:root {
+  --radius: 0.5rem;
+  --text-strong: hsl(from var(--text) h s l);
+}
+
+body { margin: 0; }
+`;
+
+describe("applyTheme — esquema completo entre os marcadores", () => {
+  it("substitui o bloco por :root (claro) e .dark (escuro) com os 11 papéis", async () => {
+    const vol = Volume.fromJSON({ "/project/src/index.css": markedCss });
+    await applyTheme({ preset: "riso" }, "/project/src/index.css", makeFsModule(vol));
+
+    const result = vol.readFileSync("/project/src/index.css", "utf-8") as string;
+    const scheme = getScheme("riso")!;
+    const block = result.slice(result.indexOf(SCHEME_START), result.indexOf(SCHEME_END));
+    const light = block.match(/:root \{([^}]*)\}/)?.[1] ?? "";
+    const dark = block.match(/\.dark \{([^}]*)\}/)?.[1] ?? "";
+    for (const [role, cssVar] of Object.entries(ROLE_VARS)) {
+      const r = role as keyof typeof scheme.light;
+      expect(light).toContain(`${cssVar}: ${scheme.light[r]};`);
+      expect(dark).toContain(`${cssVar}: ${scheme.dark[r]};`);
+    }
+    expect(result).not.toContain("--bg: #000000");
+  });
+
+  it("mantém intacto tudo o que está fora dos marcadores", async () => {
+    const vol = Volume.fromJSON({ "/project/src/index.css": markedCss });
+    await applyTheme({ preset: "sumi" }, "/project/src/index.css", makeFsModule(vol));
+
+    const result = vol.readFileSync("/project/src/index.css", "utf-8") as string;
+    expect(outsideBlock(result)).toBe(outsideBlock(markedCss));
+    expect(result.split(SCHEME_START)).toHaveLength(2);
+  });
+
+  it("trocar de esquema duas vezes não duplica o bloco e é idempotente", async () => {
+    const vol = Volume.fromJSON({ "/project/src/index.css": markedCss });
+    const fs = makeFsModule(vol);
+    await applyTheme({ preset: "neon" }, "/project/src/index.css", fs);
+    await applyTheme({ preset: "azulejo" }, "/project/src/index.css", fs);
+    const first = vol.readFileSync("/project/src/index.css", "utf-8") as string;
+    await applyTheme({ preset: "azulejo" }, "/project/src/index.css", fs);
+    const second = vol.readFileSync("/project/src/index.css", "utf-8") as string;
+
+    expect(second).toBe(first);
+    expect(second.split(SCHEME_START)).toHaveLength(2);
+    expect(second).toContain(schemeCss(getScheme("azulejo")!));
+  });
+
+  it("esquema inexistente lança erro com a mensagem do applyTheme", async () => {
+    const vol = Volume.fromJSON({ "/project/src/index.css": markedCss });
+    await expect(
+      applyTheme({ preset: "x" }, "/project/src/index.css", makeFsModule(vol))
+    ).rejects.toThrow('applyTheme: esquema "x" não encontrado.');
+  });
+});
+
+// ---- index.css antigo, sem marcadores (modo legado) ---------------------------
+
+describe("applyTheme — modo legado (index.css sem marcadores)", () => {
+  it("esquema novo grava só as 4 cores do contrato, com os valores do modo escuro", async () => {
+    const vol = Volume.fromJSON({ "/project/src/index.css": ":root {\n  --radius: 0.5rem;\n}\n" });
+    await applyTheme({ preset: "tropicalia" }, "/project/src/index.css", makeFsModule(vol));
+
+    const result = vol.readFileSync("/project/src/index.css", "utf-8") as string;
+    const dark = getScheme("tropicalia")!.dark;
+    expect(result).toContain(`--bg: ${dark.bg};`);
+    expect(result).toContain(`--text: ${dark.text};`);
+    expect(result).toContain(`--primary: ${dark.primary};`);
+    expect(result).toContain(`--accent: ${dark.accent};`);
+    for (const extra of ["--surface:", "--on-primary:", "--accent-2:", SCHEME_START]) {
+      expect(result).not.toContain(extra);
+    }
+    expect(result).toContain("--radius: 0.5rem;");
+  });
+});
 
 describe("applyTheme", () => {
   // ---- editorial-cream (☀ claro) -----------------------------------------------
@@ -149,7 +243,7 @@ describe("applyTheme", () => {
     expect(dark).not.toContain("--bg:");
   });
 
-  it("aplicado ao src/index.css real, mantém os tokens derivados e o --radius", async () => {
+  it("aplicado ao src/index.css real, troca só o bloco do esquema e mantém tokens derivados e o --radius", async () => {
     const realCss = readFileSync(resolve(import.meta.dirname, "../../../src/index.css"), "utf-8");
     const vol = Volume.fromJSON({ "/project/src/index.css": realCss });
     const fs = makeFsModule(vol);
@@ -157,14 +251,13 @@ describe("applyTheme", () => {
     await applyTheme({ preset: "editorial-cream" }, "/project/src/index.css", fs);
 
     const result = vol.readFileSync("/project/src/index.css", "utf-8") as string;
-    const root = result.match(/\n:root \{([^}]*)\}/s)?.[1] ?? "";
-    for (const v of ["--bg: #faf7f2", "--text: #1a1614", "--primary: #a855f7", "--accent: #ef4444"]) {
-      expect(root).toContain(v);
+    const scheme = getScheme("editorial-cream")!;
+    expect(result).toContain(schemeCss(scheme));
+    // fora do bloco, nada muda
+    expect(outsideBlock(result)).toBe(outsideBlock(realCss));
+    for (const kept of ["--text-strong:", "--radius:", "--color-primary: var(--primary);"]) {
+      expect(result).toContain(kept);
     }
-    for (const kept of ["--surface:", "--subtle:", "--line:", "--text-muted:", "--radius:"]) {
-      expect(root).toContain(kept);
-    }
-    expect(result).toContain("--color-primary: var(--primary);");
   });
 
   it("preset inexistente lança erro descritivo", async () => {

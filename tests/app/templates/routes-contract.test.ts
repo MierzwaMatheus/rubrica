@@ -10,6 +10,9 @@ const ROOT = resolve(import.meta.dirname, "../../..");
 const routes = [...readFileSync(resolve(ROOT, "src/App.tsx"), "utf-8").matchAll(/<Route path="([^"]+)"/g)]
   .map(([, path]) => new RegExp(`^${path.replace(/:[^/]+/g, "[^/]+")}/?$`));
 
+/** Arquivos gerados no build (scripts/generate-*.ts), servidos como estáticos e não como rotas. */
+const STATIC_FILES = new Set(["/rss.xml", "/sitemap.xml"]);
+
 function listTemplates(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
     const p = resolve(dir, e.name);
@@ -27,7 +30,7 @@ describe("templates — links internos apontam para rotas do app", () => {
     if (!links.length) continue;
 
     it(relative(ROOT, file), () => {
-      const broken = links.filter((p) => p !== "/" && !routes.some((r) => r.test(p)));
+      const broken = links.filter((p) => p !== "/" && !STATIC_FILES.has(p) && !routes.some((r) => r.test(p)));
       expect(broken, `links sem rota: ${broken.join(", ")}`).toEqual([]);
     });
   }

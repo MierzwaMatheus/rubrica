@@ -15,10 +15,10 @@ interface TerminalProps {
 function LineText({ line }: { line: TerminalLine }) {
   const colorMap: Record<TerminalLine["type"], string> = {
     input: "text-foreground-strong",
-    output: "text-green-400",
-    error: "text-red-400",
-    nav: "text-yellow-400",
-    welcome: "text-cyan-400",
+    output: "text-green-700 dark:text-green-400",
+    error: "text-red-600 dark:text-red-400",
+    nav: "text-yellow-700 dark:text-yellow-400",
+    welcome: "text-cyan-700 dark:text-cyan-400",
   };
   return (
     <p className={`font-mono text-sm leading-5 whitespace-pre-wrap ${colorMap[line.type]}`}>
@@ -55,7 +55,7 @@ export function Terminal({ onClose, ownerInfo }: TerminalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 backdrop-blur-sm p-4"
       onClick={onClose}
     >
       <motion.div
@@ -63,11 +63,11 @@ export function Terminal({ onClose, ownerInfo }: TerminalProps) {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 40 }}
         transition={{ duration: 0.2, ease: "easeOut" }}
-        className="w-full max-w-2xl bg-[#0d0d0d] border border-foreground/10 rounded-xl shadow-2xl overflow-hidden"
+        className="w-full max-w-2xl bg-card border border-border rounded-xl shadow-2xl overflow-hidden"
         onClick={e => e.stopPropagation()}
       >
         {/* Title bar */}
-        <div className="flex items-center gap-2 px-4 py-3 bg-muted border-b border-foreground/10">
+        <div className="flex items-center gap-2 px-4 py-3 bg-muted border-b border-border">
           <span className="w-3 h-3 rounded-full bg-red-500 cursor-pointer" onClick={onClose} />
           <span className="w-3 h-3 rounded-full bg-yellow-400" />
           <span className="w-3 h-3 rounded-full bg-green-500" />
@@ -88,8 +88,8 @@ export function Terminal({ onClose, ownerInfo }: TerminalProps) {
         </div>
 
         {/* Input */}
-        <div className="flex items-center gap-2 px-4 py-3 border-t border-foreground/10 bg-[#111]">
-          <span className="font-mono text-sm text-green-400 shrink-0">
+        <div className="flex items-center gap-2 px-4 py-3 border-t border-border bg-muted">
+          <span className="font-mono text-sm text-green-700 dark:text-green-400 shrink-0">
             visitor@{slug}:~$
           </span>
           <input
@@ -97,7 +97,7 @@ export function Terminal({ onClose, ownerInfo }: TerminalProps) {
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="flex-1 bg-transparent font-mono text-sm text-foreground-strong outline-none caret-green-400"
+            className="flex-1 bg-transparent font-mono text-sm text-foreground-strong outline-none caret-green-700 dark:caret-green-400"
             autoComplete="off"
             spellCheck={false}
           />

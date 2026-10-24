@@ -1,0 +1,140 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1078" height="272" viewBox="0 0 1078 272">
+<rect width="1078" height="272" rx="16" fill="#ffffff"/>
+<text x="20" y="38" font-family="Inter,Helvetica,Arial,sans-serif" font-size="20" font-weight="800" fill="#111">Concreto</text>
+<text x="1058" y="38" text-anchor="end" font-family="Inter,Helvetica,Arial,sans-serif" font-size="12.5" fill="#666">concreto · ● = as 4 cores dos layouts originais</text>
+<text x="20" y="109" font-family="Inter,Helvetica,Arial,sans-serif" font-size="13" font-weight="600" fill="#444">Claro</text>
+<g>
+  <rect x="92" y="62" width="82" height="84" rx="8" fill="#E3E4E5" stroke="#00000022"/>
+  <circle cx="164" cy="72" r="4" fill="#111111"/>
+  <text x="100" y="84" font-family="Inter,Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#111111">fundo</text>
+  <text x="100" y="136" font-family="ui-monospace,Menlo,monospace" font-size="10.5" fill="#111111">#e3e4e5</text>
+</g>
+<g>
+  <rect x="180" y="62" width="82" height="84" rx="8" fill="#EEEFF0" stroke="#00000022"/>
+  
+  <text x="188" y="84" font-family="Inter,Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#111111">cartão</text>
+  <text x="188" y="136" font-family="ui-monospace,Menlo,monospace" font-size="10.5" fill="#111111">#eeeff0</text>
+</g>
+<g>
+  <rect x="268" y="62" width="82" height="84" rx="8" fill="#D3D5D7" stroke="#00000022"/>
+  
+  <text x="276" y="84" font-family="Inter,Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#111111">sutil</text>
+  <text x="276" y="136" font-family="ui-monospace,Menlo,monospace" font-size="10.5" fill="#111111">#d3d5d7</text>
+</g>
+<g>
+  <rect x="356" y="62" width="82" height="84" rx="8" fill="#111214" stroke="#00000022"/>
+  <circle cx="428" cy="72" r="4" fill="#ffffff"/>
+  <text x="364" y="84" font-family="Inter,Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#ffffff">texto</text>
+  <text x="364" y="136" font-family="ui-monospace,Menlo,monospace" font-size="10.5" fill="#ffffff">#111214</text>
+</g>
+<g>
+  <rect x="444" y="62" width="82" height="84" rx="8" fill="#55595F" stroke="#00000022"/>
+  
+  <text x="452" y="84" font-family="Inter,Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#ffffff">texto 2</text>
+  <text x="452" y="136" font-family="ui-monospace,Menlo,monospace" font-size="10.5" fill="#ffffff">#55595f</text>
+</g>
+<g>
+  <rect x="532" y="62" width="82" height="84" rx="8" fill="#B9BCC0" stroke="#00000022"/>
+  
+  <text x="540" y="84" font-family="Inter,Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#111111">linha</text>
+  <text x="540" y="136" font-family="ui-monospace,Menlo,monospace" font-size="10.5" fill="#111111">#b9bcc0</text>
+</g>
+<g>
+  <rect x="620" y="62" width="82" height="84" rx="8" fill="#1F2124" stroke="#00000022"/>
+  <circle cx="692" cy="72" r="4" fill="#ffffff"/>
+  <text x="628" y="84" font-family="Inter,Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#ffffff">primária</text>
+  <text x="628" y="136" font-family="ui-monospace,Menlo,monospace" font-size="10.5" fill="#ffffff">#1f2124</text>
+</g>
+<g>
+  <rect x="708" y="62" width="82" height="84" rx="8" fill="#FFD400" stroke="#00000022"/>
+  
+  <text x="716" y="84" font-family="Inter,Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#111111">sobre prim.</text>
+  <text x="716" y="136" font-family="ui-monospace,Menlo,monospace" font-size="10.5" fill="#111111">#ffd400</text>
+</g>
+<g>
+  <rect x="796" y="62" width="82" height="84" rx="8" fill="#A87F00" stroke="#00000022"/>
+  <circle cx="868" cy="72" r="4" fill="#111111"/>
+  <text x="804" y="84" font-family="Inter,Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#111111">acento</text>
+  <text x="804" y="136" font-family="ui-monospace,Menlo,monospace" font-size="10.5" fill="#111111">#a87f00</text>
+</g>
+<g>
+  <rect x="884" y="62" width="82" height="84" rx="8" fill="#111214" stroke="#00000022"/>
+  
+  <text x="892" y="84" font-family="Inter,Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#ffffff">sobre acento</text>
+  <text x="892" y="136" font-family="ui-monospace,Menlo,monospace" font-size="10.5" fill="#ffffff">#111214</text>
+</g>
+<g>
+  <rect x="972" y="62" width="82" height="84" rx="8" fill="#FFD400" stroke="#00000022"/>
+  
+  <text x="980" y="84" font-family="Inter,Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#111111">acento 2</text>
+  <text x="980" y="136" font-family="ui-monospace,Menlo,monospace" font-size="10.5" fill="#111111">#ffd400</text>
+</g>
+<text x="20" y="207" font-family="Inter,Helvetica,Arial,sans-serif" font-size="13" font-weight="600" fill="#444">Escuro</text>
+<g>
+  <rect x="92" y="160" width="82" height="84" rx="8" fill="#18191B" stroke="#00000022"/>
+  <circle cx="164" cy="170" r="4" fill="#ffffff"/>
+  <text x="100" y="182" font-family="Inter,Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#ffffff">fundo</text>
+  <text x="100" y="234" font-family="ui-monospace,Menlo,monospace" font-size="10.5" fill="#ffffff">#18191b</text>
+</g>
+<g>
+  <rect x="180" y="160" width="82" height="84" rx="8" fill="#212325" stroke="#00000022"/>
+  
+  <text x="188" y="182" font-family="Inter,Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#ffffff">cartão</text>
+  <text x="188" y="234" font-family="ui-monospace,Menlo,monospace" font-size="10.5" fill="#ffffff">#212325</text>
+</g>
+<g>
+  <rect x="268" y="160" width="82" height="84" rx="8" fill="#2A2C2F" stroke="#00000022"/>
+  
+  <text x="276" y="182" font-family="Inter,Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#ffffff">sutil</text>
+  <text x="276" y="234" font-family="ui-monospace,Menlo,monospace" font-size="10.5" fill="#ffffff">#2a2c2f</text>
+</g>
+<g>
+  <rect x="356" y="160" width="82" height="84" rx="8" fill="#E8E9EA" stroke="#00000022"/>
+  <circle cx="428" cy="170" r="4" fill="#111111"/>
+  <text x="364" y="182" font-family="Inter,Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#111111">texto</text>
+  <text x="364" y="234" font-family="ui-monospace,Menlo,monospace" font-size="10.5" fill="#111111">#e8e9ea</text>
+</g>
+<g>
+  <rect x="444" y="160" width="82" height="84" rx="8" fill="#9A9EA4" stroke="#00000022"/>
+  
+  <text x="452" y="182" font-family="Inter,Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#111111">texto 2</text>
+  <text x="452" y="234" font-family="ui-monospace,Menlo,monospace" font-size="10.5" fill="#111111">#9a9ea4</text>
+</g>
+<g>
+  <rect x="532" y="160" width="82" height="84" rx="8" fill="#3A3D41" stroke="#00000022"/>
+  
+  <text x="540" y="182" font-family="Inter,Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#ffffff">linha</text>
+  <text x="540" y="234" font-family="ui-monospace,Menlo,monospace" font-size="10.5" fill="#ffffff">#3a3d41</text>
+</g>
+<g>
+  <rect x="620" y="160" width="82" height="84" rx="8" fill="#FFD400" stroke="#00000022"/>
+  <circle cx="692" cy="170" r="4" fill="#111111"/>
+  <text x="628" y="182" font-family="Inter,Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#111111">primária</text>
+  <text x="628" y="234" font-family="ui-monospace,Menlo,monospace" font-size="10.5" fill="#111111">#ffd400</text>
+</g>
+<g>
+  <rect x="708" y="160" width="82" height="84" rx="8" fill="#111214" stroke="#00000022"/>
+  
+  <text x="716" y="182" font-family="Inter,Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#ffffff">sobre prim.</text>
+  <text x="716" y="234" font-family="ui-monospace,Menlo,monospace" font-size="10.5" fill="#ffffff">#111214</text>
+</g>
+<g>
+  <rect x="796" y="160" width="82" height="84" rx="8" fill="#6E737A" stroke="#00000022"/>
+  <circle cx="868" cy="170" r="4" fill="#ffffff"/>
+  <text x="804" y="182" font-family="Inter,Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#ffffff">acento</text>
+  <text x="804" y="234" font-family="ui-monospace,Menlo,monospace" font-size="10.5" fill="#ffffff">#6e737a</text>
+</g>
+<g>
+  <rect x="884" y="160" width="82" height="84" rx="8" fill="#E8E9EA" stroke="#00000022"/>
+  
+  <text x="892" y="182" font-family="Inter,Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#111111">sobre acento</text>
+  <text x="892" y="234" font-family="ui-monospace,Menlo,monospace" font-size="10.5" fill="#111111">#e8e9ea</text>
+</g>
+<g>
+  <rect x="972" y="160" width="82" height="84" rx="8" fill="#E8E9EA" stroke="#00000022"/>
+  
+  <text x="980" y="182" font-family="Inter,Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#111111">acento 2</text>
+  <text x="980" y="234" font-family="ui-monospace,Menlo,monospace" font-size="10.5" fill="#111111">#e8e9ea</text>
+</g>
+<text x="20" y="262" font-family="Inter,Helvetica,Arial,sans-serif" font-size="12" fill="#666">cinzas frios e um amarelo de sinalização</text>
+</svg>

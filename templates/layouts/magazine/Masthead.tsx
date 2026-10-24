@@ -6,6 +6,7 @@ import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { usePlugins } from "@/contexts/PluginsContext";
 import { useSidebar } from "@/hooks/useSidebar";
 import { sidebarRepository } from "@/repositories/instances";
+import { ColorModeToggle } from "@/components/ColorModeToggle";
 import type { PluginId } from "../../convex/pluginRegistry";
 
 const NAV_ITEMS_KEYS: Array<{ key: string; href: string; pluginId?: PluginId }> = [
@@ -72,7 +73,11 @@ export function Masthead() {
       <div className="flex justify-between items-center px-6 md:px-12 py-[18px] text-[10.5px] font-mono tracking-[0.22em] uppercase text-[var(--text)]/55 border-b border-[var(--text)]/20">
         <span>Vol. 01 · No. 26</span>
         <span className="hidden sm:block">Portfolio Profissional</span>
-        <span>Est. MMXX</span>
+        <span className="flex items-center gap-4">
+          {/* Modo claro/escuro (só aparece com a alternância ligada) */}
+          <ColorModeToggle iconSize={13} className="hover:text-[var(--text)] transition-colors" />
+          <span>Est. MMXX</span>
+        </span>
       </div>
 
       {/* Display title */}
@@ -118,6 +123,11 @@ export function Masthead() {
                 </Link>
               ))}
             </nav>
+            <ColorModeToggle
+              showLabel
+              iconSize={13}
+              className="text-[11px] font-mono tracking-widest uppercase text-[var(--text)]/70 hover:text-[var(--text)]"
+            />
           </SheetContent>
         </Sheet>
       </div>

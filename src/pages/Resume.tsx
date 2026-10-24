@@ -31,6 +31,8 @@ export default function Resume() {
   const { aboutText } = useHome(homeRepository);
   const { downloadCV, canDownload } = useDownloadCV();
   const [showOlder, setShowOlder] = useState(false);
+  // Todo hook antes do retorno antecipado: a ordem precisa ser a mesma em toda renderização.
+  const { metrics } = useHomeMetrics(homeRepository);
 
   if (isLoading) {
     return <PageSkeleton />;
@@ -45,7 +47,6 @@ export default function Resume() {
   const softSkills = getItemsByType("soft_skill");
 
   const summary = splitParagraphs(aboutText)[0] ?? "";
-  const { metrics } = useHomeMetrics(homeRepository);
   const { recent: recentExperience, older: olderExperience } = splitExperiences(experience);
   const skillGroups = groupSkills(skills, t("resume.stack"));
 
@@ -61,12 +62,12 @@ export default function Resume() {
         <Card className="bg-card border-foreground/10 hover:border-neon-purple/50 transition-colors">
           <CardHeader>
             <CardTitle className="text-xl text-foreground-strong">{content.role}</CardTitle>
-            <p className="text-neon-green font-medium">{content.company}</p>
+            <p className="text-neon-lime font-medium">{content.company}</p>
             <p className="text-sm text-foreground/65">{content.period}</p>
           </CardHeader>
           <CardContent>
             <div
-              className="text-foreground/90 leading-relaxed prose prose-invert prose-headings:text-white prose-strong:text-white prose-ul:text-foreground/90 prose-li:text-foreground/90 max-w-none [&_ul]:list-disc [&_ul]:list-outside [&_ul]:space-y-2 [&_ul]:ml-6 [&_ul]:pl-0 [&_li]:pl-2"
+              className="text-foreground/90 leading-relaxed prose dark:prose-invert prose-headings:text-foreground-strong prose-strong:text-foreground-strong prose-ul:text-foreground/90 prose-li:text-foreground/90 max-w-none [&_ul]:list-disc [&_ul]:list-outside [&_ul]:space-y-2 [&_ul]:ml-6 [&_ul]:pl-0 [&_li]:pl-2"
               dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content.description) }}
             />
           </CardContent>
@@ -88,7 +89,7 @@ export default function Resume() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-foreground-strong to-foreground/60 bg-clip-text text-transparent">
             {t("resume.title")}
           </h1>
           <p className="text-xl text-foreground/65">{t("resume.subtitle")}</p>
@@ -127,7 +128,7 @@ export default function Resume() {
             onClick={downloadCV}
             disabled={!canDownload}
             data-umami-event="resume-download-cv"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-neon-purple text-foreground-strong font-semibold hover:bg-neon-purple/90 transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-neon-purple text-primary-foreground font-semibold hover:bg-neon-purple/90 transition-colors disabled:opacity-50"
           >
             <Download className="w-4 h-4" />
             {t("resume.downloadCV")}
@@ -256,7 +257,7 @@ export default function Resume() {
                             </CardHeader>
                             <CardContent>
                               <div
-                                className="text-foreground/90 leading-relaxed prose prose-invert prose-headings:text-foreground-strong prose-strong:text-foreground-strong prose-ul:text-foreground/90 prose-li:text-foreground/90 max-w-none [&_ul]:list-disc [&_ul]:list-outside [&_ul]:space-y-2 [&_ul]:ml-6 [&_ul]:pl-0 [&_li]:pl-2"
+                                className="text-foreground/90 leading-relaxed prose dark:prose-invert prose-headings:text-foreground-strong prose-strong:text-foreground-strong prose-ul:text-foreground/90 prose-li:text-foreground/90 max-w-none [&_ul]:list-disc [&_ul]:list-outside [&_ul]:space-y-2 [&_ul]:ml-6 [&_ul]:pl-0 [&_li]:pl-2"
                                 dangerouslySetInnerHTML={{
                                   __html: DOMPurify.sanitize(content.description),
                                 }}

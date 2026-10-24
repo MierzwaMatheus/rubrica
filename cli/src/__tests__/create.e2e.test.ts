@@ -8,6 +8,7 @@ import { applyPlugins } from "../transforms/applyPlugins.js";
 import { applyRubricalConfig } from "../transforms/applyRubricalConfig.js";
 import { applyIndexHtml } from "../transforms/applyIndexHtml.js";
 import { writeState } from "../state/writeState.js";
+import { applyAppearance } from "../transforms/applyAppearance.js";
 
 // ---- mocks de @clack/prompts ------------------------------------------------
 
@@ -23,7 +24,7 @@ vi.mock("@clack/prompts", () => ({
   spinner: vi.fn(() => ({ start: vi.fn(), stop: vi.fn() })),
 }));
 
-import { select, multiselect } from "@clack/prompts";
+import { select, multiselect, confirm } from "@clack/prompts";
 
 // ---- conteúdo mínimo dos arquivos de template -------------------------------
 
@@ -141,13 +142,17 @@ const mockIdentityPrompt = vi.fn(async () => ({
   lang: "pt-BR",
 }));
 
+/** Ordem: layout → esquema → modo → (confirm alternância) → textura → fontes → gerenciador de pacotes */
 function setupSelectPrompts(layout: string, theme = "editorial-cream") {
   vi.mocked(select)
     .mockResolvedValueOnce(layout)
     .mockResolvedValueOnce(theme)
+    .mockResolvedValueOnce("light") // modo de cor
+    .mockResolvedValueOnce("grain") // textura
     .mockResolvedValueOnce("Inter")
     .mockResolvedValueOnce("JetBrains Mono")
     .mockResolvedValueOnce("none");
+  vi.mocked(confirm).mockResolvedValueOnce(true); // botão de alternar claro/escuro
 }
 
 type RealDeps = Parameters<typeof runCreate>[1];
@@ -164,6 +169,7 @@ function makeRealDeps(vol: InstanceType<typeof Volume>): RealDeps {
     applyPlugins,
     applyIndexHtml,
     applyRubricalConfig,
+    applyAppearance,
     writeState,
     identityPrompt: mockIdentityPrompt,
   };
@@ -241,6 +247,41 @@ describe("create e2e — rubrica.json", () => {
     expect((state.plugins as Record<string, boolean>).blog).toBe(true);
     expect((state.plugins as Record<string, boolean>).portfolio).toBe(false);
     expect((state.plugins as Record<string, boolean>).resume).toBe(false);
+    expect(state.colorMode).toBe("light");
+    expect(state.colorModeToggle).toBe(true);
+    expect(state.texture).toBe("grain");
+  });
+});
+
+// ---- Aparência e fontes no index.html ----------------------------------------
+
+describe("create e2e — index.html", () => {
+  it("grava modo de cor, alternância e textura no <html>, sem a classe dark no modo claro", async () => {
+    const { fs } = await runE2eCreate("cyberpunk");
+    const html = await fs.readFile("/projects/meu-portfolio/index.html", "utf-8");
+    const tag = html.match(/<html\b[^>]*>/)?.[0] ?? "";
+
+    expect(tag).toContain('data-color-mode="light"');
+    expect(tag).toContain('data-color-toggle="true"');
+    expect(tag).toContain('data-texture="grain"');
+    expect(tag).not.toMatch(/class="[^"]*\bdark\b/);
+  });
+
+  it("carrega a fonte principal e a mono em um único link do Google Fonts", async () => {
+    const { fs } = await runE2eCreate("cyberpunk");
+    const html = await fs.readFile("/projects/meu-portfolio/index.html", "utf-8");
+
+    expect(html.match(/fonts\.googleapis\.com\/css2/g)).toHaveLength(1);
+    expect(html).toContain(
+      "family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap"
+    );
+  });
+
+  it("aplica o esquema de cores escolhido no index.css", async () => {
+    const { fs } = await runE2eCreate("cyberpunk");
+    const css = await fs.readFile("/projects/meu-portfolio/src/index.css", "utf-8");
+    // o MINIMAL_CSS não tem marcadores: cai no modo legado com os valores antigos do editorial-cream
+    expect(css).toContain("--bg: #faf7f2");
   });
 });
 

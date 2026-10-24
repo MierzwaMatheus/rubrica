@@ -10,34 +10,7 @@ export interface LayoutFsModule {
   exists: (path: string) => Promise<boolean>;
 }
 
-import type { RubricaLayout as Layout } from "../state/readState.js";
-
-const LAYOUT_FILES: Record<Layout, { copy: string[]; remove: string[]; pages?: string[] }> = {
-  cyberpunk: {
-    copy: ["Layout.tsx", "Sidebar.tsx"],
-    remove: ["Navbar.tsx", "Footer.tsx"],
-  },
-  brutalist: {
-    copy: ["Layout.tsx", "Navbar.tsx"],
-    remove: ["Sidebar.tsx", "Footer.tsx"],
-    pages: ["Home.tsx", "Resume.tsx", "Portfolio.tsx", "About.tsx", "Blog.tsx"],
-  },
-  swiss: {
-    copy: ["Layout.tsx", "Sidebar.tsx", "SwissShared.tsx"],
-    remove: ["Navbar.tsx", "Footer.tsx"],
-    pages: ["Home.tsx", "Resume.tsx", "Portfolio.tsx", "About.tsx", "Blog.tsx"],
-  },
-  bento: {
-    copy: ["Layout.tsx", "FloatingDock.tsx"],
-    remove: [],
-    pages: ["Home.tsx", "Resume.tsx", "Portfolio.tsx", "About.tsx", "Blog.tsx"],
-  },
-  magazine: {
-    copy: ["Layout.tsx", "Masthead.tsx"],
-    remove: ["Sidebar.tsx", "Footer.tsx"],
-    pages: ["Home.tsx", "Resume.tsx", "Portfolio.tsx", "About.tsx", "Blog.tsx"],
-  },
-};
+import { getLayout } from "../layouts.js";
 
 const defaultFs: LayoutFsModule = {
   ...(nodeFsPromises as unknown as LayoutFsModule),
@@ -52,11 +25,11 @@ const defaultFs: LayoutFsModule = {
 };
 
 export async function applyLayout(
-  layout: Layout,
+  layout: string,
   options: { projectDir: string; templatesDir: string },
   fsModule: LayoutFsModule = defaultFs
 ): Promise<void> {
-  const spec = LAYOUT_FILES[layout];
+  const spec = getLayout(layout);
   if (!spec) {
     throw new Error(`applyLayout: layout "${layout}" não reconhecido.`);
   }

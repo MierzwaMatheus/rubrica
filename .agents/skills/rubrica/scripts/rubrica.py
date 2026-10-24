@@ -63,6 +63,17 @@ CAMPOS_PERFIL = {
 }
 
 CORES_TEMA = ("theme_background", "theme_foreground", "theme_primary", "theme_accent")
+# Modo escuro. Com "theme_colors_per_mode" verdadeiro, CORES_TEMA vale só para o claro.
+CORES_TEMA_ESCURO = ("theme_dark_background", "theme_dark_foreground", "theme_dark_primary", "theme_dark_accent")
+POR_MODO = "theme_colors_per_mode"
+
+
+def pares_texto_fundo(cfg):
+    """(modo, contraste texto/fundo) de cada modo que tem as duas cores salvas."""
+    pares = [("claro", cfg.get("theme_background"), cfg.get("theme_foreground"))]
+    if cfg.get(POR_MODO) in (True, "true"):
+        pares.append(("escuro", cfg.get("theme_dark_background"), cfg.get("theme_dark_foreground")))
+    return [(m, contraste(f, t)) for m, f, t in pares if contraste(f, t) is not None]
 
 
 class Falha(Exception):
@@ -702,12 +713,13 @@ def c_config(a):
     itens = chamar("query", "siteConfig:getAll") or []
     cfg = {x["key"]: x.get("value") for x in itens}
     res = {"config": dict(sorted(cfg.items()))}
-    cores = {k: cfg.get(k) for k in CORES_TEMA if cfg.get(k)}
+    cores = {k: cfg.get(k) for k in CORES_TEMA + CORES_TEMA_ESCURO if cfg.get(k)}
     if cores:
         res["cores"] = cores
-        c = contraste(cfg.get("theme_background"), cfg.get("theme_foreground"))
-        if c:
-            res["contrasteTextoFundo"] = c
+        res["coresPorModo"] = cfg.get(POR_MODO) in (True, "true")
+        pares = pares_texto_fundo(cfg)
+        if pares:
+            res["contrasteTextoFundo"] = {m: c for m, c in pares}
     saida(res)
 
 
@@ -735,10 +747,17 @@ def c_config_definir(a):
                         "Para a imagem de compartilhamento use `og-imagem`.")
     atual = {x["key"]: x.get("value") for x in (chamar("query", "siteConfig:getAll") or [])}
     novo = {**atual, **{i["key"]: i["value"] for i in itens}}
-    c = contraste(novo.get("theme_background"), novo.get("theme_foreground"))
-    if c is not None and c < 4.5 and not a.aceitar_contraste:
-        raise Falha(f"Texto sobre fundo fica com contraste {c}:1 (mínimo WCAG AA: 4.5:1). Nada foi gravado. "
+    if any(i["key"] in CORES_TEMA_ESCURO for i in itens) and novo.get(POR_MODO) not in (True, "true"):
+        # Cor do escuro só vale com as cores separadas por modo: liga junto.
+        itens.append({"key": POR_MODO, "value": True})
+        novo[POR_MODO] = True
+    pares = pares_texto_fundo(novo)
+    ruins = [(m, c) for m, c in pares if c < 4.5]
+    if ruins and not a.aceitar_contraste:
+        m, c = ruins[0]
+        raise Falha(f"No modo {m}, o texto sobre o fundo fica com contraste {c}:1 (mínimo WCAG AA: 4.5:1). Nada foi gravado. "
                     "Ajuste as cores ou passe --aceitar-contraste se a pessoa quiser assim mesmo.")
+    c = {m: v for m, v in pares} or None
     chamar("mutation", "siteConfig:setBatch", {"items": itens})
     saida({"ok": True,
            "alterado": {i["key"]: {"antes": atual.get(i["key"]), "depois": i["value"]} for i in itens},

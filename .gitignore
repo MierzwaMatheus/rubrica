@@ -123,3 +123,9 @@ src/data/
 # Claude Code: só os arquivos locais de cada pessoa (skills e settings.json do projeto ficam versionados)
 .claude/settings.local.json
 .claude/*.lock
+
+# Site público: gerados no build (site/scripts/build-previews.ts)
+site/.astro/
+site/public/previews/
+site/public/data/
+site/public/samples/

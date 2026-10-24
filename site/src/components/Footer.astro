@@ -1,0 +1,60 @@
+---
+import { REPO } from "../lib/data";
+
+const links = [
+  { href: REPO, label: "Repositório" },
+  { href: `${REPO}/blob/main/docs/templates/README.md`, label: "Guia dos templates" },
+  { href: `${REPO}/blob/main/docs/templates/cores.md`, label: "Esquemas de cores" },
+  { href: `${REPO}/blob/main/CHANGELOG.md`, label: "Novidades" },
+  { href: "https://www.npmjs.com/package/create-rubrica", label: "create-rubrica no npm" },
+];
+---
+
+<footer class="ftr">
+  <div class="wrap in">
+    <img src="/img/marca/rubrica-horizontal-positivo.svg" alt="Rubrica" width="148" height="44" />
+    <ul>
+      {links.map((l) => <li><a href={l.href} target="_blank" rel="noopener">{l.label}</a></li>)}
+    </ul>
+    <p class="fine">
+      Código aberto sob{" "}<a href={`${REPO}/blob/main/LICENSE`} target="_blank" rel="noopener">GPL-3.0</a>. Feito por
+      Matheus Mierzwa.
+    </p>
+  </div>
+</footer>
+
+<style>
+  .ftr {
+    border-top: 1px solid var(--line);
+    padding-block: 44px calc(44px + env(safe-area-inset-bottom, 0px));
+  }
+  .in {
+    display: grid;
+    gap: 18px;
+    justify-items: start;
+  }
+  img {
+    height: 36px;
+    width: auto;
+  }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    font-size: 15px;
+  }
+  a {
+    color: var(--ink-2);
+    text-underline-offset: 3px;
+  }
+  a:hover {
+    color: var(--terracota-ink);
+  }
+  .fine {
+    font-size: 13.5px;
+    color: var(--ink-3);
+  }
+</style>

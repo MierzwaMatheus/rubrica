@@ -254,6 +254,8 @@ export async function runCreate(
   // Ciclo 2: limpeza após uso dos templates
   await removeDir(`${projectDir}/templates`, fs);
   await removeDir(`${projectDir}/cli`, fs);
+  // O site público do Rubrica vive no repositório, mas não faz parte do portfólio.
+  await removeDir(`${projectDir}/site`, fs);
 
   // Ciclo 11: next steps
   const installStep = packageManager === "none" ? "pnpm install\n  " : "";

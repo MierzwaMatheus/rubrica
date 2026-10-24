@@ -1,0 +1,91 @@
+---
+import { STEPS, REPO } from "../lib/data";
+---
+
+<section id="comecar" class="section start">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Começar</p>
+      <h2 class="display">Do terminal ao domínio próprio.</h2>
+      <p>
+        O CLI baixa a versão mais recente e aplica as suas escolhas. Depois, tudo se edita pelo painel admin, e o
+        <code>update</code> traz as versões novas sem apagar o que você personalizou.
+      </p>
+    </div>
+    <ol class="steps">
+      {
+        STEPS.map((s) => (
+          <li>
+            <h3>{s.title}</h3>
+            <div class="cmd">
+              <code>{s.code}</code>
+              <button class="copy" type="button" data-copy={s.code}>Copiar</button>
+            </div>
+            <p>{s.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+    <p class="more">
+      Passo a passo completo, variáveis de ambiente e publicação na Vercel no{" "}
+      <a href={`${REPO}#readme`} target="_blank" rel="noopener">README</a>.
+    </p>
+  </div>
+</section>
+
+<style>
+  .section-head code {
+    font-family: var(--f-mono);
+    font-size: 0.9em;
+  }
+  .steps {
+    list-style: none;
+    counter-reset: step;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+    gap: 20px;
+  }
+  .steps li {
+    counter-increment: step;
+    display: grid;
+    gap: 12px;
+    align-content: start;
+    padding: 22px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--card);
+    min-width: 0;
+  }
+  .steps li::before {
+    content: counter(step);
+    font-family: var(--f-display);
+    font-style: italic;
+    font-weight: 600;
+    font-size: 44px;
+    line-height: 0.8;
+    color: var(--terracota);
+  }
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .steps p {
+    color: var(--ink-2);
+    font-size: 15px;
+  }
+  .steps .cmd {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+  }
+  .more {
+    margin-top: 32px;
+    color: var(--ink-2);
+  }
+  .more a {
+    color: var(--terracota-ink);
+    text-underline-offset: 3px;
+  }
+</style>

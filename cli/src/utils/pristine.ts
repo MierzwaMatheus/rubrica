@@ -90,6 +90,7 @@ export async function buildPristine(options: BuildPristineOptions): Promise<void
 
   await nodeFsPromises.rm(path.join(dir, "templates"), { recursive: true, force: true });
   await nodeFsPromises.rm(path.join(dir, "cli"), { recursive: true, force: true });
+  await nodeFsPromises.rm(path.join(dir, "site"), { recursive: true, force: true });
 }
 
 /** Plugins que a versão conhece: versões antigas podem não ter os mais novos. */

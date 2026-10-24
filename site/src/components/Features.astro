@@ -1,0 +1,54 @@
+---
+import { FEATURES } from "../lib/data";
+---
+
+<section id="recursos" class="section">
+  <div class="wrap feat">
+    <div class="section-head">
+      <p class="eyebrow">O que vem pronto</p>
+      <h2 class="display">A base técnica é coletiva. A identidade é sua.</h2>
+      <p>
+        Começar um portfólio do zero dá trabalho demais, e os construtores prontos deixam todo mundo com a mesma cara.
+        O Rubrica fica no meio do caminho: o sistema inteiro já resolvido, para você cuidar do conteúdo e da marca.
+      </p>
+    </div>
+    <dl class="list">
+      {
+        FEATURES.map((f) => (
+          <div class="item">
+            <dt>{f.title}</dt>
+            <dd>{f.text}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+</section>
+
+<style>
+  .list {
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+    border-top: 1px solid var(--ink);
+  }
+  .item {
+    padding: 22px 22px 26px 0;
+    border-bottom: 1px solid var(--line);
+    display: grid;
+    gap: 6px;
+  }
+  dt {
+    font-family: var(--f-display);
+    font-style: italic;
+    font-weight: 600;
+    font-size: 27px;
+    line-height: 1.1;
+  }
+  dd {
+    margin: 0;
+    color: var(--ink-2);
+    font-size: 15.5px;
+    max-width: 38ch;
+  }
+</style>

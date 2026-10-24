@@ -2,7 +2,14 @@
 
 O que mudou em cada versão do Rubrica (template e CLI `create-rubrica`). Detalhes de cada uma nas [notas da release](https://github.com/MierzwaMatheus/rubrica/releases). Para atualizar um projeto existente, veja [Atualizando o seu Rubrica](./docs/atualizacao.md).
 
-## Não lançado
+## 1.0.0 — 2026-10-24
+
+Primeira versão estável. A partir daqui, dentro da 1.x, atualizar não quebra o que você personalizou nem os seus dados: campos novos no banco são sempre opcionais, e mudanças que exijam migração só entram numa versão major nova, com guia.
+
+**Vindo da 0.x:**
+- Atualize com `npx create-rubrica@latest update`. Projetos criados com o CLI até a v0.3.18 informam a versão de origem com `--from` (veja [Atualizando o seu Rubrica](./docs/atualizacao.md)); projetos de fork usam `git merge v1.0.0`.
+- Pagamentos agora são reais: configure `ASAAS_API_KEY` e cadastre o webhook do Asaas (README → "Configurando os pagamentos"). A integração com o Stripe foi removida.
+- O script do Umami passa a usar `VITE_UMAMI_SCRIPT_URL` e `VITE_UMAMI_WEBSITE_ID` (as variáveis antigas continuam aceitas).
 
 ### Atualizar sem perder personalizações
 - `create-rubrica update` foi reescrito. Antes, ele extraía a versão nova por cima do projeto (perdendo qualquer arquivo editado à mão) e zerava a identidade do `rubrica.config.ts`. Agora ele mescla, arquivo por arquivo, as mudanças do Rubrica com as suas; quando os dois mexeram no mesmo trecho, o seu arquivo fica intacto e a versão nova vai para `<arquivo>.rubrica-new`. Novas opções: `--dry-run`, `--from`, `--to`, `--yes`.

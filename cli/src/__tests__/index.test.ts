@@ -22,6 +22,10 @@ vi.mock("../commands/setup.js", () => ({
   runSetup: vi.fn().mockResolvedValue(undefined),
 }));
 
+vi.mock("../commands/password.js", () => ({
+  runPassword: vi.fn().mockResolvedValue(undefined),
+}));
+
 import { encodeRecipe } from "../recipe.js";
 
 // Importar após mocks
@@ -30,6 +34,7 @@ const { runSetup } = await import("../commands/setup.js");
 const { runCreate } = await import("../commands/create.js");
 const { runConfig } = await import("../commands/config.js");
 const { runUpdate } = await import("../commands/update.js");
+const { runPassword } = await import("../commands/password.js");
 
 describe("runCli — roteamento de comandos", () => {
   beforeEach(() => {
@@ -44,6 +49,19 @@ describe("runCli — roteamento de comandos", () => {
   it("roteia 'create' para runCreate com nome do projeto", async () => {
     await runCli(["node", "rubrica", "create", "meu-projeto"], process.cwd());
     expect(vi.mocked(runCreate)).toHaveBeenCalledWith("meu-projeto", expect.objectContaining({ projectsDir: process.cwd() }));
+  });
+
+  it("roteia 'senha' para runPassword", async () => {
+    await runCli(["node", "rubrica", "senha"], "/p");
+    expect(vi.mocked(runPassword)).toHaveBeenCalledWith({ cwd: "/p" });
+    expect(vi.mocked(runCreate)).not.toHaveBeenCalled();
+  });
+
+  it("a ajuda lista o comando senha", async () => {
+    const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+    await runCli(["node", "rubrica"], "/p");
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringMatching(/senha/));
+    consoleSpy.mockRestore();
   });
 
   it("roteia 'config' para runConfig", async () => {

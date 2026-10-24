@@ -4,6 +4,7 @@ import { runConfig } from "./commands/config.js";
 import { runUpdate, type UpdateOptions } from "./commands/update.js";
 import { runSetup } from "./commands/setup.js";
 import { parseCreateArgs } from "./args.js";
+import { runPassword } from "./commands/password.js";
 
 export async function runCli(argv: string[], cwd: string): Promise<void> {
   const [,, command, projectName] = argv;
@@ -22,12 +23,14 @@ export async function runCli(argv: string[], cwd: string): Promise<void> {
     await runUpdate({ cwd, options: parseUpdateOptions(argv.slice(3)) });
   } else if (command === "setup") {
     await runSetup({ cwd });
+  } else if (command === "senha") {
+    await runPassword({ cwd });
   } else if (command && !command.startsWith("-")) {
     // `pnpm create rubrica <nome>` / `npx create-rubrica <nome>` chegam sem o "create".
     await create(argv.slice(2), cwd);
   } else {
     console.log(
-      "Comandos disponíveis: create <nome-do-projeto> [--receita <código>] | config | setup\n" +
+      "Comandos disponíveis: create <nome-do-projeto> [--receita <código>] | config | setup | senha\n" +
       "  update [--dry-run] [--from <versão>] [--to <versão>] [--yes]"
     );
   }

@@ -54,36 +54,85 @@
   --color-neon-purple: var(--primary);
   --color-neon-lime: var(--accent);
 
+  /* Esquema completo (templates novos) */
+  --color-on-accent: var(--on-accent);
+  --color-accent-2: var(--accent-2);
+
   --font-sans: "Chakra Petch", sans-serif;
   --font-mono: "Chakra Petch", monospace;
 }
 
+/* rubrica:esquema:inicio */
+/* Esquema de cores: Neon (neon). Gerado pelo CLI (rubrica config → Aparência). */
+:root {
+  --bg: #F7F7F8;
+  --surface: #EFEFF2;
+  --subtle: #F1F1F4;
+  --text: #141414;
+  --text-muted: #55555C;
+  --line: #DCDCE2;
+  --primary: #7E22CE;
+  --on-primary: #F7F7F8;
+  --accent: #4D7C0F;
+  --on-accent: #F7F7F8;
+  --accent-2: #0891B2;
+}
+.dark {
+  --bg: #141414;
+  --surface: #0A0A0A;
+  --subtle: #171717;
+  --text: #E6E6E6;
+  --text-muted: #A2A2A2;
+  --line: #252525;
+  --primary: #A855F7;
+  --on-primary: #FFFFFF;
+  --accent: #BEF264;
+  --on-accent: #141414;
+  --accent-2: #22D3EE;
+}
+/* rubrica:esquema:fim */
+
 :root {
   /*
-   * Contrato de 4 cores: as únicas cores que um tema define. Aceitam qualquer cor
-   * CSS completa (hex, hsl(), ...). São sobrescritas pelo CLI (applyTheme) e pelas
-   * cores salvas em /admin/site-config (ThemeApplier). Os templates de layout só
-   * podem usar estas quatro.
+   * Esquema de cores: 11 papéis por modo (claro em :root, escuro em .dark), gravados
+   * acima pelo CLI. Os templates antigos usam só --bg, --text, --primary e --accent; os
+   * novos usam o esquema completo. As cores salvas em /admin/site-config (ThemeApplier)
+   * sobrescrevem as 4 do contrato nos dois modos e recalculam as derivadas.
    */
-  --bg: hsl(0 0% 8%);
-  --text: hsl(0 0% 90%);
-  --primary: hsl(271 91% 65%);
-  --accent: hsl(82 85% 67%);
 
-  /* Derivadas do contrato; com as cores padrão reproduzem a paleta escura original */
-  --surface: hsl(from var(--bg) h s calc(l - 4));
-  --subtle: color-mix(in srgb, var(--text) 1.4%, var(--bg));
-  --line: color-mix(in srgb, var(--text) 8.5%, var(--bg));
-  --text-muted: color-mix(in srgb, var(--text) 68%, var(--bg));
-  /* Títulos: o texto empurrado para longe do meio-tom (branco no tema escuro, quase preto no claro) */
+  /* Títulos: o texto empurrado para longe do meio-tom (branco no escuro, quase preto no claro) */
   --text-strong: hsl(from var(--text) h s calc(l + (l - 50) * 0.25));
 
-  /* Fixas: não fazem parte do contrato */
-  --on-primary: #ffffff;
-  --secondary: hsl(215 28% 17%);
+  /* Fixas: não fazem parte do esquema */
+  --secondary: color-mix(in srgb, var(--text) 12%, var(--bg));
   --destructive: hsl(0 84% 60%);
 
   --radius: 0.5rem;
+
+  /* Texturas (data-texture no <html>, gravado pelo CLI) */
+  --rb-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --rb-paper: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.035 .09' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");
+}
+
+/*
+ * Texturas: uma camada fixa por cima da página inteira, que não recebe cliques.
+ * O painel admin não usa textura (data-admin no <html>).
+ */
+html[data-texture]:not([data-texture="none"]):not([data-admin]) body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2147483000;
+}
+html[data-texture="grain"]:not([data-admin]) body::after { background-image: var(--rb-noise); mix-blend-mode: multiply; opacity: 0.22; }
+html.dark[data-texture="grain"]:not([data-admin]) body::after { mix-blend-mode: screen; opacity: 0.09; }
+html[data-texture="paper"]:not([data-admin]) body::after { background-image: var(--rb-paper), var(--rb-noise); background-size: 320px, 180px; mix-blend-mode: multiply; opacity: 0.17; }
+html.dark[data-texture="paper"]:not([data-admin]) body::after { mix-blend-mode: screen; opacity: 0.07; }
+html[data-texture="scanlines"]:not([data-admin]) body::after { background: repeating-linear-gradient(0deg, rgb(0 0 0 / 0.08) 0 1px, transparent 1px 3px); }
+html.dark[data-texture="scanlines"]:not([data-admin]) body::after { background: repeating-linear-gradient(0deg, rgb(0 0 0 / 0.38) 0 1px, transparent 1px 3px); }
+@media (prefers-reduced-transparency: reduce) {
+  html[data-texture] body::after { display: none; }
 }
 
 @layer base {
@@ -91,7 +140,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground font-sans antialiased selection:bg-neon-purple/30 selection:text-white;
+    @apply bg-background text-foreground font-sans antialiased selection:bg-neon-purple/30 selection:text-foreground-strong;
   }
   
   /* Custom Scrollbar */
@@ -103,7 +152,7 @@
     @apply bg-background;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-white/10 rounded-full hover:bg-white/20 transition-colors;
+    @apply bg-foreground/10 rounded-full hover:bg-foreground/20 transition-colors;
   }
 
   /* Typography utilities */
@@ -146,7 +195,7 @@
   }
   
   .card-gradient {
-    @apply bg-gradient-to-br from-white/5 to-transparent border border-white/10;
+    @apply bg-gradient-to-br from-foreground/5 to-transparent border border-foreground/10;
   }
   
   .section-transition {
@@ -156,7 +205,7 @@
   /* Blog Post Content Styles */
   .blog-content {
     max-width: none;
-    color: hsl(0, 0%, 90%);
+    color: var(--text);
   }
 
   .blog-content h1 {
@@ -165,7 +214,7 @@
     font-weight: 700 !important;
     margin-top: 2rem !important;
     margin-bottom: 1rem !important;
-    color: white !important;
+    color: var(--text-strong) !important;
   }
 
   .blog-content h2 {
@@ -174,7 +223,7 @@
     font-weight: 700 !important;
     margin-top: 2rem !important;
     margin-bottom: 1rem !important;
-    color: white !important;
+    color: var(--text-strong) !important;
   }
 
   .blog-content h3 {
@@ -183,7 +232,7 @@
     font-weight: 600 !important;
     margin-top: 1.5rem !important;
     margin-bottom: 0.75rem !important;
-    color: white !important;
+    color: var(--text-strong) !important;
   }
 
   .blog-content h4 {
@@ -192,7 +241,7 @@
     font-weight: 600 !important;
     margin-top: 1.5rem !important;
     margin-bottom: 0.75rem !important;
-    color: white !important;
+    color: var(--text-strong) !important;
   }
 
   .blog-content h5 {
@@ -201,7 +250,7 @@
     font-weight: 500 !important;
     margin-top: 1rem !important;
     margin-bottom: 0.5rem !important;
-    color: white !important;
+    color: var(--text-strong) !important;
   }
 
   .blog-content h6 {
@@ -210,11 +259,11 @@
     font-weight: 500 !important;
     margin-top: 1rem !important;
     margin-bottom: 0.5rem !important;
-    color: white !important;
+    color: var(--text-strong) !important;
   }
 
   .blog-content p {
-    color: hsl(0, 0%, 70%) !important;
+    color: var(--text-muted) !important;
     line-height: 1.75 !important;
     margin-bottom: 1.5rem !important;
     font-size: 1rem !important;
@@ -226,12 +275,12 @@
   }
 
   .blog-content strong {
-    color: white !important;
+    color: var(--text-strong) !important;
     font-weight: 700 !important;
   }
 
   .blog-content a {
-    color: hsl(271, 91%, 65%) !important;
+    color: var(--primary) !important;
     text-decoration: none !important;
   }
 
@@ -240,16 +289,16 @@
   }
 
   .blog-content code {
-    color: hsl(187, 100%, 50%) !important;
-    background-color: hsla(0, 0%, 100%, 0.1) !important;
+    color: var(--accent-2) !important;
+    background-color: color-mix(in srgb, var(--text) 10%, transparent) !important;
     padding: 0.125rem 0.25rem !important;
     border-radius: 0.25rem !important;
-    font-family: "Chakra Petch", monospace !important;
+    font-family: var(--font-mono) !important;
     font-size: 0.875em !important;
   }
 
   .blog-content ul {
-    color: hsl(0, 0%, 70%) !important;
+    color: var(--text-muted) !important;
     list-style-type: disc !important;
     margin-left: 1.5rem !important;
     margin-bottom: 1.5rem !important;
@@ -261,7 +310,7 @@
   }
 
   .blog-content ol {
-    color: hsl(0, 0%, 70%) !important;
+    color: var(--text-muted) !important;
     list-style-type: decimal !important;
     margin-left: 1.5rem !important;
     margin-bottom: 1.5rem !important;
@@ -273,22 +322,22 @@
   }
 
   .blog-content li {
-    color: hsl(0, 0%, 70%) !important;
+    color: var(--text-muted) !important;
     line-height: 1.75 !important;
     padding-left: 0.5rem !important;
   }
 
   .blog-content blockquote {
-    border-left: 4px solid hsl(271, 91%, 65%) !important;
+    border-left: 4px solid var(--primary) !important;
     padding-left: 1rem !important;
     font-style: italic !important;
-    color: hsl(0, 0%, 64%) !important;
+    color: var(--text-muted) !important;
     margin-top: 1.5rem !important;
     margin-bottom: 1.5rem !important;
   }
 
   .blog-content hr {
-    border-color: hsla(0, 0%, 100%, 0.1) !important;
+    border-color: var(--line) !important;
     margin-top: 2rem !important;
     margin-bottom: 2rem !important;
   }

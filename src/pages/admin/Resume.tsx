@@ -208,7 +208,12 @@ function SortableSkillCard({ item, onEdit, onDelete, onRestore }: { item: Resume
           <div className="flex items-center gap-4">
             {!isDeleted && <div {...attributes} {...listeners} className="cursor-move"><GripVertical className="w-4 h-4 text-foreground/42 hover:text-foreground-strong" /></div>}
             <div>
-              <h4 className="text-foreground-strong font-medium">{item.content.name}</h4>
+              <h4 className="text-foreground-strong font-medium">
+                {item.content.name}
+                {item.content.group && (
+                  <span className="ml-2 text-xs font-normal text-foreground/42">· {item.content.group}</span>
+                )}
+              </h4>
               {isDeleted && (
                 <div className="flex items-center gap-1.5 text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded px-2 py-0.5 w-fit mt-1">
                   <ShieldAlert className="w-3 h-3" />Deletado
@@ -354,6 +359,9 @@ export default function AdminResume() {
 
     if (activeModal === "skill") {
       content.level = skillLevel[0].toString();
+      // grupo vazio não é salvo: a habilidade cai no grupo padrão "Stack"
+      if (typeof content.group === "string") content.group = content.group.trim();
+      if (!content.group) delete content.group;
     }
     if (activeModal === "language" && languageLevel) {
       content.level = languageLevel;
@@ -894,6 +902,18 @@ export default function AdminResume() {
                     <div className="space-y-2">
                       <Label className="text-foreground-strong">Nome da Habilidade</Label>
                       <Input name="name" defaultValue={editingItem?.content.name} className="bg-foreground/5 border-foreground/10 text-foreground-strong" required />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-foreground-strong">Grupo</Label>
+                      <Input
+                        name="group"
+                        defaultValue={editingItem?.content.group}
+                        placeholder="Ex.: IA, Front-end, Infra"
+                        className="bg-foreground/5 border-foreground/10 text-foreground-strong"
+                      />
+                      <p className="text-xs text-foreground/42">
+                        Agrupa a stack no currículo. Sem grupo, a habilidade aparece em "Stack".
+                      </p>
                     </div>
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">

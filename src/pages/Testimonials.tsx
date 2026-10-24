@@ -7,6 +7,7 @@ import { SEO } from "@/components/SEO";
 import { TestimonialWizard } from "@/components/TestimonialWizard";
 import { usePlugin } from "@/contexts/PluginsContext";
 import { useI18n } from "@/i18n/context/I18nContext";
+import { groupByCategory } from "@/utils/groupByCategory";
 
 const container = {
   hidden: { opacity: 0 },
@@ -109,45 +110,57 @@ export default function TestimonialsPage() {
               <p className="text-foreground/42 text-sm">Nenhum depoimento publicado ainda.</p>
             </div>
           ) : (
-            <div className="columns-1 md:columns-2 gap-5">
-              {resolved.map((testimonial, idx) => {
-                const gradient = CARD_GRADIENTS[idx % CARD_GRADIENTS.length];
-                const initials = testimonial.name
-                  .split(" ")
-                  .slice(0, 2)
-                  .map((n: string) => n[0])
-                  .join("")
-                  .toUpperCase();
+            <div className="space-y-10">
+              {groupByCategory(resolved).map(group => (
+                <div key={group.category ?? "__none"}>
+                  {group.category && (
+                    <h3 className="text-sm font-mono uppercase tracking-wider text-neon-purple mb-4">
+                      <span className="text-foreground-strong/40 mr-2">//</span>
+                      {group.category}
+                    </h3>
+                  )}
+                  <div className="columns-1 md:columns-2 gap-5">
+                    {group.items.map((testimonial, idx) => {
+                      const gradient = CARD_GRADIENTS[idx % CARD_GRADIENTS.length];
+                      const initials = testimonial.name
+                        .split(" ")
+                        .slice(0, 2)
+                        .map((n: string) => n[0])
+                        .join("")
+                        .toUpperCase();
 
-                return (
-                  <div
-                    key={testimonial._id}
-                    className={`bg-gradient-to-br ${gradient} border border-foreground/5 rounded-xl p-6 relative overflow-hidden break-inside-avoid mb-5`}
-                  >
-                    <Quote className="absolute top-5 right-5 w-8 h-8 text-white/[0.04]" />
-                    <div className="flex items-center mb-4">
-                      {testimonial.imageUrl ? (
-                        <img
-                          src={testimonial.imageUrl}
-                          alt={testimonial.name}
-                          className="w-12 h-12 rounded-full object-cover border border-foreground/10 mr-4 flex-shrink-0"
-                        />
-                      ) : (
-                        <div className="w-12 h-12 rounded-full bg-neon-purple/20 border border-neon-purple/20 flex items-center justify-center text-neon-purple font-semibold text-sm mr-4 flex-shrink-0">
-                          {initials}
+                      return (
+                        <div
+                          key={testimonial._id}
+                          className={`bg-gradient-to-br ${gradient} border border-foreground/5 rounded-xl p-6 relative overflow-hidden break-inside-avoid mb-5`}
+                        >
+                          <Quote className="absolute top-5 right-5 w-8 h-8 text-white/[0.04]" />
+                          <div className="flex items-center mb-4">
+                            {testimonial.imageUrl ? (
+                              <img
+                                src={testimonial.imageUrl}
+                                alt={testimonial.name}
+                                className="w-12 h-12 rounded-full object-cover border border-foreground/10 mr-4 flex-shrink-0"
+                              />
+                            ) : (
+                              <div className="w-12 h-12 rounded-full bg-neon-purple/20 border border-neon-purple/20 flex items-center justify-center text-neon-purple font-semibold text-sm mr-4 flex-shrink-0">
+                                {initials}
+                              </div>
+                            )}
+                            <div>
+                              <p className="font-semibold text-foreground-strong">{testimonial.name}</p>
+                              <p className="text-xs text-neon-purple">{testimonial.displayRole}</p>
+                            </div>
+                          </div>
+                          <p className="text-foreground/65 text-sm italic leading-relaxed">
+                            &ldquo;{testimonial.displayText}&rdquo;
+                          </p>
                         </div>
-                      )}
-                      <div>
-                        <p className="font-semibold text-foreground-strong">{testimonial.name}</p>
-                        <p className="text-xs text-neon-purple">{testimonial.displayRole}</p>
-                      </div>
-                    </div>
-                    <p className="text-foreground/65 text-sm italic leading-relaxed">
-                      &ldquo;{testimonial.displayText}&rdquo;
-                    </p>
+                      );
+                    })}
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
           )}
         </motion.section>

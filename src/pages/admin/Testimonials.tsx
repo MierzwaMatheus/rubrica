@@ -311,6 +311,7 @@ function AdminCreateForm() {
   const [name, setName] = useState("");
   const [role, setRole] = useState("");
   const [text, setText] = useState("");
+  const [category, setCategory] = useState("");
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -328,7 +329,7 @@ function AdminCreateForm() {
   }
 
   function reset() {
-    setName(""); setRole(""); setText("");
+    setName(""); setRole(""); setText(""); setCategory("");
     setAvatarFile(null); setAvatarPreview(null);
     setOpen(false);
   }
@@ -359,6 +360,7 @@ function AdminCreateForm() {
         textTranslations: { ptBR: text.trim(), enUS: translated.text ?? text.trim() },
         avatarStorageId: avatarStorageId as any,
         avatarFileSize,
+        category: category.trim() || undefined,
       });
       toast.success("Depoimento cadastrado!");
       reset();
@@ -392,6 +394,10 @@ function AdminCreateForm() {
               <Label className="text-xs text-foreground/65">Cargo / Empresa *</Label>
               <Input value={role} onChange={(e) => setRole(e.target.value)} placeholder="Ex: CTO na Acme" className="bg-foreground/5 border-foreground/10 text-foreground-strong text-sm h-9" required />
             </div>
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs text-foreground/65">Categoria (opcional)</Label>
+            <Input value={category} onChange={(e) => setCategory(e.target.value)} placeholder="Ex: Tecnologia, Marca e design" className="bg-foreground/5 border-foreground/10 text-foreground-strong text-sm h-9" />
           </div>
           <div className="space-y-1.5">
             <Label className="text-xs text-foreground/65">Depoimento *</Label>
@@ -453,9 +459,11 @@ function DirectTestimonialsTab() {
   const [editName, setEditName] = useState("");
   const [editRole, setEditRole] = useState("");
   const [editText, setEditText] = useState("");
+  const [editCategory, setEditCategory] = useState("");
   const [saving, setSaving] = useState(false);
 
-  function openEdit(item: { _id: string; name: string; role: string; roleTranslations?: any; text: string; textTranslations?: any }) {
+  function openEdit(item: { _id: string; name: string; role: string; roleTranslations?: any; text: string; textTranslations?: any; category?: string }) {
+    setEditCategory(item.category ?? "");
     setEditing(item._id);
     setEditingItem(item);
     setEditName(item.name);
@@ -493,6 +501,7 @@ function DirectTestimonialsTab() {
         text: editText,
         roleTranslations,
         textTranslations,
+        category: editCategory.trim(),
       });
       toast.success("Salvo!");
       setEditing(null);
@@ -570,6 +579,10 @@ function DirectTestimonialsTab() {
                     <Label className="text-xs text-foreground/65">Cargo</Label>
                     <Input value={editRole} onChange={(e) => setEditRole(e.target.value)} className="bg-foreground/5 border-foreground/10 text-foreground-strong text-sm h-8" />
                   </div>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs text-foreground/65">Categoria</Label>
+                  <Input value={editCategory} onChange={(e) => setEditCategory(e.target.value)} placeholder="Ex: Tecnologia, Marca e design" className="bg-foreground/5 border-foreground/10 text-foreground-strong text-sm h-8" />
                 </div>
                 <div className="space-y-1">
                   <Label className="text-xs text-foreground/65">Texto</Label>

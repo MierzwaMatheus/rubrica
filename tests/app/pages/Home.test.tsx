@@ -9,6 +9,19 @@ vi.mock("@/hooks/useSiteConfig", () => ({
 vi.mock("@/repositories/instances", () => ({
   homeRepository: {},
   sidebarRepository: {},
+  portfolioRepository: {},
+}));
+
+vi.mock("@/hooks/usePortfolio", () => ({
+  usePortfolio: vi.fn(() => ({ projects: [], isLoading: false })),
+}));
+
+vi.mock("@/hooks/useHomeMetrics", () => ({
+  useHomeMetrics: vi.fn(() => ({ metrics: [], isLoading: false })),
+}));
+
+vi.mock("@/contexts/ContactWizardContext", () => ({
+  useContactWizard: vi.fn(() => ({ openWizard: vi.fn() })),
 }));
 
 vi.mock("@/hooks/useHome", () => ({

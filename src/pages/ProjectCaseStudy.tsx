@@ -15,6 +15,11 @@ import {
   ChevronLeft,
   ChevronRight,
   Quote,
+  UserCog,
+  History,
+  GitBranch,
+  GraduationCap,
+  ArrowRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -29,7 +34,8 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { useI18n } from "@/i18n/context/I18nContext";
 import { useTranslation } from "@/i18n/hooks/useTranslation";
-import { useProjectBySlug } from "@/hooks/usePortfolio";
+import { useProjectBySlug, usePortfolio } from "@/hooks/usePortfolio";
+import { nextCase } from "@/utils/portfolioContent";
 import { portfolioRepository } from "@/repositories/instances";
 import { useContactWizard } from "@/contexts/ContactWizardContext";
 import { usePlugin } from "@/contexts/PluginsContext";
@@ -42,7 +48,17 @@ function DynamicIcon({ name, className }: { name?: string; className?: string })
   return <Icon className={className} />;
 }
 
+// Ordem da narrativa: antes → problema → solução → decisões → resultados.
+// Seções opcionais (context, decisions) só aparecem quando preenchidas.
 const narrativeSections = [
+  {
+    key: "context" as const,
+    icon: History,
+    iconColor: "text-foreground/90",
+    borderColor: "border-foreground/15",
+    bgColor: "bg-foreground/[0.03]",
+    labelKey: "portfolio.before",
+  },
   {
     key: "problem" as const,
     icon: AlertTriangle,
@@ -60,6 +76,14 @@ const narrativeSections = [
     labelKey: "portfolio.solution",
   },
   {
+    key: "decisions" as const,
+    icon: GitBranch,
+    iconColor: "text-neon-purple",
+    borderColor: "border-neon-purple/30",
+    bgColor: "bg-neon-purple/5",
+    labelKey: "portfolio.decisions",
+  },
+  {
     key: "results" as const,
     icon: TrendingUp,
     iconColor: "text-green-400",
@@ -74,6 +98,8 @@ export default function ProjectCaseStudy() {
   const { isLoading: i18nLoading } = useI18n();
   const [, params] = useRoute("/portfolio/:slug");
   const { project, isLoading } = useProjectBySlug(portfolioRepository, params?.slug);
+  const { projects } = usePortfolio(portfolioRepository);
+  const next = nextCase(projects, params?.slug);
   const { openWizard } = useContactWizard();
   const wizardEnabled = usePlugin('contact-wizard');
   const [expandedImage, setExpandedImage] = useState<{
@@ -188,6 +214,17 @@ export default function ProjectCaseStudy() {
           </div>
         </div>
 
+        {/* Meu papel */}
+        {cs?.role && (
+          <div className="rounded-xl border border-neon-purple/30 bg-gradient-to-br from-neon-purple/10 to-transparent p-6">
+            <div className="flex items-center gap-3 mb-3">
+              <UserCog className="h-5 w-5 text-neon-purple shrink-0" />
+              <h2 className="text-lg font-semibold text-foreground-strong">{t("portfolio.myRole")}</h2>
+            </div>
+            <p className="text-foreground leading-relaxed whitespace-pre-line">{cs.role}</p>
+          </div>
+        )}
+
         {/* Narrative sections */}
         {cs && (
           <motion.div
@@ -196,7 +233,7 @@ export default function ProjectCaseStudy() {
             variants={{ visible: { transition: { staggerChildren: 0.12 } } }}
             className="space-y-6"
           >
-            {narrativeSections.map(({ key, icon: Icon, iconColor, borderColor, bgColor, labelKey }) => (
+            {narrativeSections.filter(({ key }) => cs[key]?.trim()).map(({ key, icon: Icon, iconColor, borderColor, bgColor, labelKey }) => (
               <motion.div
                 key={key}
                 variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } }}
@@ -233,6 +270,17 @@ export default function ProjectCaseStudy() {
                 </motion.div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* Aprendizados */}
+        {cs?.learnings?.trim() && (
+          <div className="rounded-xl border border-foreground/15 bg-foreground/[0.03] p-6">
+            <div className="flex items-center gap-3 mb-3">
+              <GraduationCap className="h-5 w-5 text-neon-lime shrink-0" />
+              <h2 className="text-lg font-semibold text-foreground-strong">{t("portfolio.learnings")}</h2>
+            </div>
+            <p className="text-foreground/90 leading-relaxed whitespace-pre-line">{cs.learnings}</p>
           </div>
         )}
 
@@ -284,20 +332,38 @@ export default function ProjectCaseStudy() {
           </div>
         )}
 
-        {/* Contact CTA */}
-        {wizardEnabled && (
-          <div className="mt-10 rounded-xl border border-neon-purple/20 bg-neon-purple/5 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div>
-              <p className="text-foreground-strong font-semibold text-sm">Gostou do que viu?</p>
-              <p className="text-foreground/65 text-xs mt-0.5">Entre em contato para discutir um projeto similar</p>
+        {/* CTA específico + próximo case */}
+        {(wizardEnabled || next) && (
+          <div className="mt-10 rounded-xl border border-neon-purple/30 bg-gradient-to-br from-neon-purple/10 to-transparent p-6 md:p-8">
+            <p className="text-sm font-mono text-neon-purple mb-2">
+              <span className="text-foreground-strong mr-2">$</span>./contato.sh --projeto
+            </p>
+            <h2 className="text-xl md:text-2xl font-bold text-foreground-strong">{t("portfolio.ctaTitle")}</h2>
+            <p className="text-foreground/65 text-sm mt-1">{t("portfolio.ctaSubtitle")}</p>
+            <div className="flex flex-wrap gap-3 mt-5">
+              {wizardEnabled && (
+                <Button
+                  onClick={() => openWizard({ flowType: "project", sourceContext: `case-${params?.slug ?? ""}` })}
+                  data-umami-event="case-cta-projeto"
+                  data-umami-event-case={params?.slug}
+                  className="bg-neon-purple hover:bg-neon-purple/80 text-foreground-strong font-semibold"
+                >
+                  <MessageSquare className="mr-2 h-4 w-4" />
+                  {t("portfolio.ctaProject")}
+                </Button>
+              )}
+              {next && (
+                <Link
+                  href={`/portfolio/${next.slug}`}
+                  data-umami-event="case-next"
+                  data-umami-event-case={next.slug}
+                  className="inline-flex items-center gap-2 h-9 px-4 rounded-md border border-foreground/15 text-foreground hover:border-neon-lime/50 hover:text-neon-lime transition-colors text-sm"
+                >
+                  {t("portfolio.nextCase")}: <span className="font-semibold">{next.title}</span>
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              )}
             </div>
-            <Button
-              onClick={() => openWizard({ flowType: "project", sourceContext: `case-study:${params?.slug ?? ""}` })}
-              className="bg-neon-purple hover:bg-neon-purple/80 text-white font-mono text-xs shrink-0"
-            >
-              <MessageSquare className="mr-2 h-3.5 w-3.5" />
-              {t("contactWizard.trigger")}
-            </Button>
           </div>
         )}
       </motion.div>

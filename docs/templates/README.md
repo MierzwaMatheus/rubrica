@@ -4,10 +4,11 @@ O Rubrica vem com **13 layouts** e **15 esquemas de cores**, cada esquema com mo
 
 ```bash
 npx create-rubrica meu-portfolio
-# Layout → Esquema de cores → Modo (claro/escuro/automático) → Alternância → Textura → Fontes → Plugins → identidade
+# Rápido: Layout → Plugins → Identidade (cores, textura e fontes vêm recomendadas pelo layout)
+# Personalizado: Layout → Esquema de cores → Modo (claro/escuro/automático) → Alternância → Textura → Fontes → Plugins → Identidade
 ```
 
-Layout, esquema, modo e textura são independentes: qualquer layout funciona com qualquer esquema, nos dois modos. Cada layout sugere uma combinação, marcada como recomendada no CLI.
+Layout, esquema, modo e textura são independentes: qualquer layout funciona com qualquer esquema, nos dois modos. Cada layout sugere uma combinação: o modo rápido aplica essa combinação direto, e o personalizado mostra ela como recomendada.
 
 ## Layouts originais
 

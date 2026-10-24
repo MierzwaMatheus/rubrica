@@ -688,8 +688,8 @@ export const GARDEN_CSS = `
 
 /* coluna de leitura */
 .gd-body { min-width: 0; }
-.gd-main { padding: 40px 48px 72px; max-width: 790px; display: flex; flex-direction: column; gap: 56px; }
-.gd-shared { padding: 36px 40px 64px; max-width: 1120px; }
+.gd-main { padding: 40px 48px 72px; max-width: 790px; margin-inline: auto; display: flex; flex-direction: column; gap: 56px; }
+.gd-shared { padding: 36px 40px 64px; max-width: 1120px; margin-inline: auto; }
 .gd-mapfoot { display: none; }
 .gd-sec { display: flex; flex-direction: column; gap: 16px; scroll-margin-top: 80px; }
 .gd-sh { display: flex; justify-content: space-between; align-items: baseline; gap: 6px 16px; flex-wrap: wrap; }

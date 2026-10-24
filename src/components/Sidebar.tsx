@@ -29,6 +29,7 @@ import { useContactWizard } from "@/contexts/ContactWizardContext";
 import { usePlugins } from "@/contexts/PluginsContext";
 import { useHome } from "@/hooks/useHome";
 import { MessageSquare } from "lucide-react";
+import { ColorModeToggle } from "@/components/ColorModeToggle";
 import { useSidebar } from "@/hooks/useSidebar";
 import { sidebarRepository } from "@/repositories/instances";
 import type { SidebarContactInfo } from "@/repositories/interfaces/SidebarRepository";
@@ -143,7 +144,7 @@ const NAV_ITEMS = NAV_ITEMS_KEYS
 
         {/* Divider */}
         <div className="px-6 py-2">
-          <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+          <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-foreground/10 to-transparent"></div>
         </div>
 
         {/* Navigation */}
@@ -163,7 +164,7 @@ const NAV_ITEMS = NAV_ITEMS_KEYS
                     )}
                   >
                     {isActive && (
-                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-neon-purple shadow-[0_0_10px_rgba(168,85,247,0.5)]"></div>
+                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-neon-purple shadow-[0_0_10px_color-mix(in_srgb,var(--primary)_50%,transparent)]"></div>
                     )}
                     <item.icon
                       className={cn(
@@ -258,6 +259,15 @@ const NAV_ITEMS = NAV_ITEMS_KEYS
             )}
           </div>
 
+          {/* Modo claro/escuro (só aparece com a alternância ligada) */}
+          <ColorModeToggle
+            showLabel
+            iconSize={12}
+            // libera fundo, borda e espaçamento das classes (o botão zera esses estilos inline)
+            style={{ background: undefined, border: undefined, padding: undefined }}
+            className="w-full justify-center mb-4 py-2 rounded-md text-xs font-medium text-foreground/65 hover:text-neon-lime bg-foreground/5 border border-foreground/5 transition-colors"
+          />
+
           {/* Language Selector */}
           <div className="mb-4">
             <div className="flex items-center justify-between px-1">
@@ -346,12 +356,17 @@ const NAV_ITEMS = NAV_ITEMS_KEYS
               size="sm"
               onClick={() => openWizard({ sourceContext: "mobile-header" })}
               data-umami-event="mobile-header-fale-comigo"
-              className="bg-neon-purple text-foreground-strong hover:bg-neon-purple/90 h-8 px-3 text-xs font-semibold"
+              className="bg-neon-purple text-primary-foreground hover:bg-neon-purple/90 h-8 px-3 text-xs font-semibold"
             >
               <MessageSquare className="mr-1.5 h-3.5 w-3.5" />
               {t("contactWizard.trigger")}
             </Button>
           )}
+          <ColorModeToggle
+            iconSize={18}
+            style={{ background: undefined }}
+            className="h-9 w-9 justify-center rounded-md text-foreground-strong hover:bg-foreground/10"
+          />
         <Sheet>
           <SheetTrigger asChild>
             <Button

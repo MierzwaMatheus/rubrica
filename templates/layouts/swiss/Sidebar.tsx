@@ -7,6 +7,7 @@ import { useTranslation } from "@/i18n/hooks/useTranslation";
 import { usePlugins } from "@/contexts/PluginsContext";
 import { useSidebar } from "@/hooks/useSidebar";
 import { sidebarRepository } from "@/repositories/instances";
+import { ColorModeToggle } from "@/components/ColorModeToggle";
 import type { PluginId } from "../../convex/pluginRegistry";
 
 const NAV_ITEMS_KEYS: Array<{ key: string; href: string; pluginId?: PluginId }> = [
@@ -69,8 +70,10 @@ export function SwissNav() {
           <span className="bg-[var(--text)] text-[var(--bg)] px-1.5 mr-1.5">R</span>
           {contactInfo?.name ?? "Rubrica"}
         </div>
-        <div className="text-xs font-semibold tracking-widest uppercase text-right opacity-60">
-          Portfolio · 2026
+        <div className="flex items-center justify-end gap-3 text-xs font-semibold tracking-widest uppercase">
+          <span className="opacity-60">Portfolio · 2026</span>
+          {/* Modo claro/escuro (só aparece com a alternância ligada) */}
+          <ColorModeToggle iconSize={14} className="opacity-60 hover:opacity-100 transition-opacity" />
         </div>
       </div>
 
@@ -97,6 +100,10 @@ export function SwissNav() {
             <nav className="flex flex-col pt-8">
               <NavItems location={location} />
             </nav>
+            <ColorModeToggle
+              showLabel
+              className="mx-4 mt-6 text-xs font-semibold tracking-widest uppercase opacity-70 hover:opacity-100"
+            />
           </SheetContent>
         </Sheet>
       </div>

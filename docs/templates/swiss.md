@@ -17,7 +17,7 @@ A cor entra em **blocos sólidos**: a primária e o destaque viram fundo de card
 
 ## Estrutura global
 
-- **Navegação** (`SwissNav`): faixa com um "R" invertido, o nome e "Portfolio · 2026"; abaixo, uma barra de 5 colunas iguais numeradas `.01`–`.05`. O item ativo e o hover ficam invertidos. Itens de plugins desligados somem; no celular, vira um menu lateral.
+- **Navegação** (`SwissNav`): faixa com um "R" invertido, o nome, "Portfolio · 2026" e o ícone de modo claro/escuro (também no celular; o menu lateral repete o botão com texto); abaixo, uma barra de 5 colunas iguais numeradas `.01`–`.05`. O item ativo e o hover ficam invertidos. Itens de plugins desligados somem; no celular, vira um menu lateral.
 - **Moldura de página** (`SwissShell`), em todas as páginas:
   - **Cantos**: "Rubrica / sobrenome / ano" à esquerda; "Folha 0X / 05" e o capítulo à direita.
   - **Masthead**: "Index — Portfólio Pessoal" sobre o nome com a inicial invertida (ex.: **A.** Rocha) e o cargo atual à direita.
@@ -77,4 +77,5 @@ A cor entra em **blocos sólidos**: a primária e o destaque viram fundo de card
 
 - Só a navegação, a faixa de números, os cases em destaque e o fechamento da Início se reorganizam no celular; o resto das páginas usa grids e tamanhos fixos.
 - A busca do Blog é visual (sem ação).
+- Os destaques em bloco ("Vitæ.", "como.", números do currículo) põem a cor do fundo sobre a primária/destaque. Em esquemas cujo destaque é médio no modo claro (ex.: `midnight-blue`, `sorbet`, `tropicalia`), o contraste desses blocos fica baixo.
 - Alguns textos são fixos no código: "Portfolio · 2026", "Grid 12 · Helvetica", "Folha X / 05".

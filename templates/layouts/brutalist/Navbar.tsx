@@ -1,5 +1,6 @@
 import { Link, useRoute } from "wouter";
 import { usePlugin } from "@/contexts/PluginsContext";
+import { ColorModeToggle } from "@/components/ColorModeToggle";
 import type { PluginId } from "../../convex/pluginRegistry";
 
 const NAV_ITEMS: Array<{ href: string; label: string; pluginId: PluginId | null }> = [
@@ -19,7 +20,13 @@ export function Navbar() {
       <div className="flex items-center px-4 py-2 border-b border-[var(--text)] text-xs gap-4">
         <span className="opacity-70">[●][○][○]</span>
         <span className="flex-1 text-xs">rubrica:~/portfolio</span>
-        <span className="opacity-50">tty1 · 80x40</span>
+        {/* Modo claro/escuro: no celular fica só o ícone */}
+        <ColorModeToggle
+          showLabel
+          iconSize={13}
+          className="opacity-70 hover:opacity-100 lowercase [&>span]:hidden sm:[&>span]:inline"
+        />
+        <span className="opacity-50 hidden sm:inline">tty1 · 80x40</span>
       </div>
       <div className="flex text-xs overflow-x-auto">
         {NAV_ITEMS.map((item) => (

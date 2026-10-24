@@ -1,6 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { Home, Briefcase, FolderOpen, User, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ColorModeToggle } from "@/components/ColorModeToggle";
 
 const NAV_ITEMS = [
   { href: "/", label: "Início", icon: Home },
@@ -15,14 +16,14 @@ export function FloatingDock() {
 
   return (
     <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
-      <div className="flex items-center gap-1 rounded-[28px] border border-[var(--text)]/20 bg-[var(--bg)]/80 px-3 py-2.5 shadow-2xl backdrop-blur-xl">
+      <div className="flex items-center gap-1 rounded-[28px] border border-[var(--text)]/20 bg-[var(--bg)]/80 px-2 sm:px-3 py-2.5 shadow-2xl backdrop-blur-xl">
         {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
           const active = location === href;
           return (
             <Link key={href} href={href}>
               <a
                 className={cn(
-                  "flex flex-col items-center gap-1 rounded-[18px] px-3.5 py-2 text-[10.5px] font-semibold tracking-wide transition-colors",
+                  "flex flex-col items-center gap-1 rounded-[18px] px-2.5 sm:px-3.5 py-2 text-[10.5px] font-semibold tracking-wide transition-colors",
                   active
                     ? "bg-primary text-[var(--bg)]"
                     : "text-[var(--text)]/40 hover:text-[var(--text)]"
@@ -34,6 +35,12 @@ export function FloatingDock() {
             </Link>
           );
         })}
+        {/* Modo claro/escuro: some sozinho com a alternância desligada */}
+        <ColorModeToggle
+          iconSize={18}
+          className="ml-0.5 sm:ml-1 self-stretch justify-center border-l border-[var(--text)]/15 pl-2 sm:pl-3 pr-1 sm:pr-1.5 text-[var(--text)]/40 hover:text-[var(--text)] transition-colors"
+          style={{ padding: undefined, border: undefined }}
+        />
       </div>
     </nav>
   );

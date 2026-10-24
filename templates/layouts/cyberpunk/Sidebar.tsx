@@ -29,6 +29,7 @@ import { useContactWizard } from "@/contexts/ContactWizardContext";
 import { usePlugins } from "@/contexts/PluginsContext";
 import { useHome } from "@/hooks/useHome";
 import { MessageSquare } from "lucide-react";
+import { ColorModeToggle } from "@/components/ColorModeToggle";
 import { useQuery } from "@tanstack/react-query";
 import { useSidebar } from "@/hooks/useSidebar";
 import { useResume } from "@/hooks/useResume";
@@ -273,6 +274,15 @@ const NAV_ITEMS = NAV_ITEMS_KEYS
             )}
           </div>
 
+          {/* Modo claro/escuro (só aparece com a alternância ligada) */}
+          <ColorModeToggle
+            showLabel
+            iconSize={12}
+            // libera fundo, borda e espaçamento das classes (o botão zera esses estilos inline)
+            style={{ background: undefined, border: undefined, padding: undefined }}
+            className="w-full justify-center mb-4 py-2 rounded-md text-xs font-medium text-[var(--text)]/60 hover:text-[var(--accent)] bg-[var(--text)]/5 border border-[var(--text)]/5 transition-colors"
+          />
+
           {/* Language Selector */}
           <div className="mb-4">
             <div className="flex items-center justify-between px-1">
@@ -353,26 +363,33 @@ const NAV_ITEMS = NAV_ITEMS_KEYS
           </span>
         </div>
 
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-[var(--text)] hover:bg-[var(--text)]/10"
+        <div className="flex items-center gap-1">
+          <ColorModeToggle
+            iconSize={18}
+            style={{ background: undefined }}
+            className="h-9 w-9 justify-center rounded-md text-[var(--text)] hover:bg-[var(--text)]/10"
+          />
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-[var(--text)] hover:bg-[var(--text)]/10"
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent
+              side="left"
+              className="p-0 w-72 border-r border-[var(--text)]/10 bg-[var(--bg)]"
             >
-              <Menu className="h-5 w-5" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent
-            side="left"
-            className="p-0 w-72 border-r border-[var(--text)]/10 bg-[var(--bg)]"
-          >
-            <VisuallyHidden>
-              <SheetTitle>{t("sidebar.menu")}</SheetTitle>
-            </VisuallyHidden>
-            <SidebarContent />
-          </SheetContent>
-        </Sheet>
+              <VisuallyHidden>
+                <SheetTitle>{t("sidebar.menu")}</SheetTitle>
+              </VisuallyHidden>
+              <SidebarContent />
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
 
       {/* Desktop Sidebar */}

@@ -1,0 +1,76 @@
+---
+import { REPO } from "../lib/data";
+
+const links = [
+  { href: "#combinador", label: "Combinador" },
+  { href: "#layouts", label: "Layouts" },
+  { href: "#esquemas", label: "Esquemas" },
+  { href: "#comecar", label: "Começar" },
+];
+---
+
+<header class="hdr">
+  <div class="wrap hdr-in">
+    <a href="/" class="logo" aria-label="Rubrica — início">
+      <img src="/img/marca/rubrica-horizontal-positivo.svg" alt="Rubrica" width="148" height="44" />
+    </a>
+    <nav aria-label="Seções">
+      <ul>
+        {links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+      </ul>
+    </nav>
+    <a class="btn gh" href={REPO} target="_blank" rel="noopener">GitHub</a>
+  </div>
+</header>
+
+<style>
+  .hdr {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .hdr-in {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    height: 68px;
+  }
+  .logo img {
+    display: block;
+    height: 38px;
+    width: auto;
+  }
+  nav {
+    margin-left: auto;
+  }
+  nav ul {
+    display: flex;
+    gap: 26px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 15px;
+  }
+  nav a {
+    text-decoration: none;
+    color: var(--ink-2);
+  }
+  nav a:hover {
+    color: var(--terracota-ink);
+  }
+  .gh {
+    padding: 9px 16px;
+    font-size: 14px;
+  }
+  @media (max-width: 760px) {
+    nav {
+      display: none;
+    }
+    .gh {
+      margin-left: auto;
+    }
+  }
+</style>

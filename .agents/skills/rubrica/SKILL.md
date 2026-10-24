@@ -32,6 +32,28 @@ export RUBRICA_CONVEX_URL="https://<deployment-de-producao>.convex.cloud"
 
 Códigos de saída: `3` = projeto/Convex não encontrado, `4` = sem login, `5` = sem permissão (repasse à pessoa), `2` = bloqueado pela skill, `7` = rede. Os erros saem em português no stderr: mostre-os, não contorne.
 
+## Quem escreve e quem grava
+Esta skill **executa**: lê, grava e publica. Escrever conteúdo novo e longo é trabalho das skills estrategistas, e todas começam pela voz da pessoa (`rubrica-voz`). Elas entrevistam a pessoa, pesquisam, escrevem em pt-BR e en-US, passam o texto pela `rubrica-pilar` e entregam um plano que esta skill aplica.
+
+| Pedido | Skill |
+|---|---|
+| Tom de voz: entrevista de voz, colar a "Entrevista de voz", fazer o site soar como a pessoa, parte pessoal do Sobre (fora do trabalho, dia a dia, FAQ pessoal) | `rubrica-voz` |
+| Escrever ou reescrever a apresentação, o "sobre mim", a frase da home, o posicionamento ou os princípios | `rubrica-apresentacao` |
+| Criar ou reescrever o case de um projeto, transformar resultado técnico em case | `rubrica-case` |
+| Montar ou reescrever o currículo, importar LinkedIn ou CV | `rubrica-curriculo` |
+| Escrever um post do blog do zero | `rubrica-blog` |
+| Revisar qualquer texto antes de ir ao site (sinais de IA, fatos, tradução) | `rubrica-pilar` |
+
+Mudança pontual (trocar um botão, corrigir uma frase, ajustar uma cor, publicar um post pronto) continua aqui, direto. Na dúvida, pergunte se a pessoa quer só trocar o texto ou reescrever com calma.
+
+## Aplicar um plano
+As estrategistas entregam `.rubrica/planos/<pasta>/plano.json`. Formato e regras em `references/plano.md`.
+1. `$RB aplicar-plano .rubrica/planos/<pasta>/plano.json --verificar` valida o plano (estrutura, arquivos, chaves de texto, slug repetido, contraste, inglês faltando, funções que não existem ou proibidas) e mostra o antes → depois, sem gravar. Os `args` de uma mutation só são conferidos pelo Convex na hora de gravar.
+2. Mostre a prévia à pessoa, resumida, e espere o "ok".
+3. `$RB aplicar-plano .rubrica/planos/<pasta>/plano.json` grava na ordem. Se algo falhar no meio, corrija e rode com `--retomar`.
+
+O plano é aplicado do jeito que está. Se a pessoa quiser mudar algum texto, volte à skill que fez o plano, ou edite o `plano.json` e rode `--verificar` de novo.
+
 ## Antes de tudo
 1. `$RB status`: mostra o projeto, **qual Convex** (e de onde veio), o `ambiente` (produção, desenvolvimento ou local), o site, a conta e o papel. Antes da primeira escrita, diga à pessoa em qual Convex e em qual ambiente você vai mexer. Se o `status` trouxer `aviso`, repasse: em dev o site no ar não muda; em produção toda escrita vale na hora. Cada Convex tem seu próprio login.
 2. Sem login (código 4): a senha **nunca** passa pela conversa. Peça para a pessoa rodar num terminal dela, na pasta do projeto:

@@ -2,6 +2,14 @@
 
 O que mudou em cada versão do Rubrica (template e CLI `create-rubrica`). Detalhes de cada uma nas [notas da release](https://github.com/MierzwaMatheus/rubrica/releases). Para atualizar um projeto existente, veja [Atualizando o seu Rubrica](./docs/atualizacao.md).
 
+## Próxima versão
+
+### Skills de conteúdo
+- **Seis skills novas** para o agente de IA escrever o conteúdo do site com método e com a voz do dono: `rubrica-voz`, `rubrica-apresentacao`, `rubrica-case`, `rubrica-curriculo`, `rubrica-blog` e `rubrica-pilar`. As técnicas de apresentação, case e currículo vêm de pesquisa com fontes (que acompanham cada skill em `references/pesquisa.md`).
+- **A voz vem primeiro.** Sem perfil de voz, as skills mandam a pessoa para a entrevista de voz no site (`/voz`, fora dos buscadores): 21 perguntas, respondidas falando (ditado do navegador) ou digitando, com um botão que copia tudo em Markdown para o agente. A `rubrica-voz` mede o estilo com um script, monta o perfil com trechos literais, calibra às cegas com a pessoa e propõe o lado pessoal da página Sobre.
+- As estrategistas não gravam nada: entregam um plano em `.rubrica/planos/`, revisado pela `rubrica-pilar`, que a skill `rubrica` aplica.
+- Novo comando `aplicar-plano` no script da skill `rubrica`: valida o plano antes de gravar (estrutura, arquivos, chaves de texto, slug repetido, contraste, inglês faltando, funções que não existem), mostra o antes → depois (`--verificar`), recusa planos feitos para outro Convex e retoma de onde parou se algo falhar (`--retomar`).
+
 ## 1.2.0 — 2026-10-24
 
 CLI pensado para quem não é da área técnica: menos perguntas, nada repetido, do site direto para o terminal e troca de senha do painel pelo terminal. Nada quebra em quem está na 1.1.

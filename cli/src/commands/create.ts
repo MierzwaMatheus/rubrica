@@ -1,4 +1,4 @@
-import { intro, outro, select, multiselect, confirm, isCancel, cancel } from "@clack/prompts";
+import { outro, select, confirm, isCancel, cancel, log } from "@clack/prompts";
 import * as nodeFsPromises from "node:fs/promises";
 import { identityPrompt as defaultIdentityPrompt } from "../prompts/identityPrompt.js";
 import { downloadRelease as defaultDownloadRelease, getLatestVersion as defaultGetLatestVersion } from "../utils/download.js";
@@ -12,25 +12,16 @@ import { writeState as defaultWriteState } from "../state/writeState.js";
 import { indexHtmlInput, rubricaConfigInput } from "../transforms/identityInputs.js";
 import { applyAppearance as defaultApplyAppearance } from "../transforms/applyAppearance.js";
 import { layoutPrompt, schemePrompt, appearancePrompt, fontPrompts } from "../prompts/appearancePrompt.js";
+import { pluginsPrompt } from "../prompts/pluginsPrompt.js";
+import { pluginsRecord } from "../plugins.js";
+import { recommendedAppearance } from "../layouts.js";
+import { packageManagerFromUserAgent } from "../utils/packageManager.js";
+import { runSetup as defaultRunSetup } from "./setup.js";
 
 // ---- Tipos -----------------------------------------------------------------
 
-export const ALL_PLUGINS = [
-  "contact-wizard",
-  "proposals",
-  "payments",
-  "blog",
-  "portfolio",
-  "resume",
-  "about",
-  "ai-resumes",
-  "audit-log",
-  "media-manager",
-  "i18n",
-  "playground",
-  "testimonials",
-  "testimonials-intake",
-] as const;
+// A lista de plugins mora em ../plugins.ts; o re-export mantém quem importava daqui.
+export { ALL_PLUGINS } from "../plugins.js";
 
 export interface FsModule {
   readFile: (path: string, encoding: string) => Promise<string>;
@@ -57,6 +48,22 @@ export interface RunCreateDeps {
   writeState?: typeof defaultWriteState;
   exec?: (command: string, cwd: string) => Promise<void>;
   identityPrompt?: typeof defaultIdentityPrompt;
+  /** Setup do backend, encadeado no final quando a pessoa aceita. */
+  setup?: (opts: { cwd: string; nextStep: string }) => Promise<void>;
+  /** `npm_config_user_agent`: diz se o create veio do pnpm ou do npm. */
+  userAgent?: string;
+}
+
+/** Endereço que a Vercel dá a um projeto com esse nome: bom padrão para quem ainda não tem domínio. */
+export function suggestedSiteUrl(projectName: string): string {
+  return `https://${projectName.toLowerCase().replace(/_/g, "-")}.vercel.app`;
+}
+
+function assertNotCancelled<T>(value: T | symbol): asserts value is T {
+  if (isCancel(value)) {
+    cancel("Operação cancelada.");
+    throw new Error("Prompt cancelado pelo usuário.");
+  }
 }
 
 // ---- Validação do nome do projeto ------------------------------------------
@@ -81,6 +88,7 @@ async function removeDir(dirPath: string, fs: FsModule): Promise<void> {
     await fs.rm(dirPath, { recursive: true, force: true });
   }
 }
+
 
 // ---- Comando runCreate -----------------------------------------------------
 
@@ -111,15 +119,29 @@ export async function runCreate(
     execSync(cmd, { cwd, stdio: "inherit" });
   });
   const doIdentityPrompt = deps.identityPrompt ?? defaultIdentityPrompt;
+  const setupFn = deps.setup ?? defaultRunSetup;
+  const packageManager = packageManagerFromUserAgent(deps.userAgent ?? process.env.npm_config_user_agent);
 
   const projectDir = `${deps.projectsDir}/${projectName}`;
 
-  // Ciclo 2: download
+  // Modo: o rápido só pergunta layout, plugins e identidade; o resto vem do layout.
+  const mode = await select({
+    message: "Como você quer montar o site?",
+    initialValue: "quick",
+    options: [
+      { value: "quick", label: "Rápido", hint: "escolho o visual, cores e fontes vêm combinadas" },
+      { value: "custom", label: "Personalizado", hint: "escolho cores, modo claro/escuro, textura e fontes" },
+    ],
+  });
+  assertNotCancelled(mode);
+  const custom = mode === "custom";
+
   const version = await getVersion();
   await download(projectDir, version);
 
-  // Ciclo 3: prompt e apply de layout (antes de remover templates/)
+  // Layout (antes de remover templates/)
   const layout = await layoutPrompt();
+  assertNotCancelled(layout);
 
   await applyLayoutFn(
     layout,
@@ -127,8 +149,21 @@ export async function runCreate(
     fs as Parameters<typeof defaultApplyLayout>[2]
   );
 
-  // Ciclo 4: prompt e apply de tema
-  const themeChoice = await schemePrompt(layout);
+  let themeChoice: string;
+  let appearance: Awaited<ReturnType<typeof appearancePrompt>>;
+  let fontSans: string;
+  let fontMono: string;
+  if (custom) {
+    themeChoice = await schemePrompt(layout);
+    appearance = await appearancePrompt(layout);
+    ({ fontSans, fontMono } = await fontPrompts(layout));
+  } else {
+    const rec = recommendedAppearance(layout);
+    themeChoice = rec.theme;
+    appearance = { colorMode: rec.colorMode, colorModeToggle: rec.colorModeToggle, texture: rec.texture };
+    fontSans = rec.fontSans;
+    fontMono = rec.fontMono;
+  }
 
   await applyThemeFn(
     { preset: themeChoice },
@@ -137,15 +172,11 @@ export async function runCreate(
   );
 
   // Aparência: modo de cor, alternância e textura (atributos do <html>)
-  const appearance = await appearancePrompt(layout);
   await applyAppearanceFn(
     appearance,
     `${projectDir}/index.html`,
     fs as Parameters<typeof defaultApplyAppearance>[2]
   );
-
-  // Ciclo 5: prompts de fonte
-  const { fontSans, fontMono } = await fontPrompts(layout);
 
   await applyFontFn(
     { fontSans, fontMono },
@@ -153,40 +184,20 @@ export async function runCreate(
     fs as Parameters<typeof defaultApplyFont>[2]
   );
 
-  // Ciclo 6: plugins multi-select + applyPlugins
-  const selectedPlugins = await multiselect({
-    message: "Plugins ativos",
-    options: [
-      { value: "contact-wizard", label: "Contact Wizard — formulário de contato multi-etapas", hint: "recomendado" },
-      { value: "proposals", label: "Propostas — propostas comerciais com assinatura eletrônica", hint: "recomendado" },
-      { value: "payments", label: "Pagamentos — checkout com PIX, boleto e cartão via Asaas" },
-      { value: "blog", label: "Blog — listagem e leitura de posts", hint: "recomendado" },
-      { value: "portfolio", label: "Portfolio — galeria de projetos", hint: "recomendado" },
-      { value: "resume", label: "Currículo — currículo interativo com download de PDF", hint: "recomendado" },
-      { value: "about", label: "Sobre — página sobre mim", hint: "recomendado" },
-      { value: "ai-resumes", label: "CV com IA — geração de currículo customizado por IA" },
-      { value: "audit-log", label: "Audit Log — log de auditoria do painel admin", hint: "recomendado" },
-      { value: "media-manager", label: "Media Manager — gerenciador de arquivos e imagens" },
-      { value: "i18n", label: "Tradução IA — internacionalização automática de conteúdo" },
-      { value: "playground", label: "Playground — ambiente de testes interativo" },
-      { value: "testimonials", label: "Depoimentos — seção de testimoniais de clientes", hint: "recomendado" },
-      { value: "testimonials-intake", label: "Coleta de Depoimentos — formulário público para coleta", hint: "recomendado" },
-    ],
-    required: false,
-  }) as string[];
-
-  const pluginsRecord = Object.fromEntries(
-    ALL_PLUGINS.map((id) => [id, selectedPlugins.includes(id)])
-  );
+  // Plugins: pacote pronto ou um por um
+  const plugins = pluginsRecord(await pluginsPrompt());
 
   await applyPluginsFn(
-    pluginsRecord,
+    plugins,
     `${projectDir}/convex/pluginRegistry.ts`,
     fs as Parameters<typeof defaultApplyPlugins>[2]
   );
 
-  // Ciclo 7: identityPrompt + applyIndexHtml + applyRubricalConfig
-  const identity = await doIdentityPrompt();
+  // Identidade. Sem domínio ainda, o endereço da Vercel é um bom ponto de partida.
+  const identity = await doIdentityPrompt(
+    { siteUrl: suggestedSiteUrl(projectName) },
+    { askLang: custom }
+  );
 
   await applyIndexHtmlFn(
     indexHtmlInput(identity, fontSans, fontMono),
@@ -200,14 +211,12 @@ export async function runCreate(
     fs as Parameters<typeof defaultApplyRubricalConfig>[2]
   );
 
-  // Ciclo 9: atualiza name em package.json
   const pkgPath = `${projectDir}/package.json`;
   const pkgRaw = await fs.readFile(pkgPath, "utf-8");
   const pkg = JSON.parse(pkgRaw) as Record<string, unknown>;
   pkg.name = projectName;
   await fs.writeFile(pkgPath, JSON.stringify(pkg, null, 2));
 
-  // Ciclo 8: writeState → rubrica.json
   await writeStateFn(
     projectDir,
     {
@@ -218,7 +227,7 @@ export async function runCreate(
       ...appearance,
       fontSans,
       fontMono,
-      plugins: pluginsRecord,
+      plugins,
       identity: {
         siteName: identity.siteName,
         siteUrl: identity.siteUrl,
@@ -232,38 +241,45 @@ export async function runCreate(
     fs as Parameters<typeof defaultWriteState>[2]
   );
 
-  // Ciclo 10: git init + package install
-  const doGitInit = await confirm({ message: "Inicializar repositório git?" }) as boolean;
-  const packageManager = await select({
-    message: "Gerenciador de pacotes",
-    options: [
-      { value: "pnpm", label: "pnpm (recomendado)" },
-      { value: "npm", label: "npm" },
-      { value: "none", label: "Não agora" },
-    ],
-  }) as string;
-
-  if (doGitInit) {
+  // Git e dependências, sem perguntar. Sem git instalado, o projeto funciona do mesmo jeito.
+  try {
     await execFn("git init", projectDir);
+  } catch {
+    log.warn("Não deu para iniciar o git (ele está instalado?). O projeto funciona sem; dá para rodar `git init` depois.");
   }
+  await execFn(`${packageManager} install`, projectDir);
 
-  if (packageManager !== "none") {
-    await execFn(`${packageManager} install`, projectDir);
-  }
-
-  // Ciclo 2: limpeza após uso dos templates
   await removeDir(`${projectDir}/templates`, fs);
   await removeDir(`${projectDir}/cli`, fs);
   // O site público do Rubrica vive no repositório, mas não faz parte do portfólio.
   await removeDir(`${projectDir}/site`, fs);
 
-  // Ciclo 11: next steps
-  const installStep = packageManager === "none" ? "pnpm install\n  " : "";
+  const devCommand = `${packageManager} run dev`;
+  const nextStep = `cd ${projectName} && ${devCommand}`;
+
+  // Backend: o Convex cria a conta/projeto pelo navegador e o setup cria o admin.
+  const setupNow = await confirm({
+    message: "Configurar o painel admin agora? Abre o login do Convex no navegador (conta gratuita).",
+    initialValue: true,
+  });
+  if (setupNow === true) {
+    try {
+      await execFn("npx convex dev --once", projectDir);
+    } catch {
+      outro(
+        `Projeto criado, mas a conexão com o Convex não terminou.\n\n` +
+        `Para continuar depois:\n\n  cd ${projectName}\n  npx create-rubrica setup\n  ${devCommand}`
+      );
+      return;
+    }
+    await setupFn({ cwd: projectDir, nextStep });
+    return;
+  }
+
   outro(
-    `Projeto criado com sucesso!\n\n  cd ${projectName}\n\n` +
+    `Projeto criado!\n\n  cd ${projectName}\n\n` +
     `Próximos passos:\n\n` +
-    `  1. Suba o backend:\n     npx convex dev\n     (deixe rodando em um terminal)\n\n` +
-    `  2. Configure o ambiente (em outro terminal, com Convex ativo):\n     rubrica setup\n\n` +
-    `  3. Inicie o frontend:\n     ${installStep}pnpm dev\n\nBoa sorte! 🚀`
+    `  1. Conecte o backend e crie o admin:\n     npx create-rubrica setup\n\n` +
+    `  2. Abra o site no navegador:\n     ${devCommand}\n\nBoa sorte! 🚀`
   );
 }

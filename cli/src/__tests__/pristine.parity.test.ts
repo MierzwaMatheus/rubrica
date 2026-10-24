@@ -55,11 +55,14 @@ describe("buildPristine reproduz o create", () => {
     };
 
     vi.mocked(select)
+      .mockResolvedValueOnce("custom") // modo personalizado
       .mockResolvedValueOnce("brutalist")
       .mockResolvedValueOnce("solar-warm")
+      .mockResolvedValueOnce("light") // modo de cor
+      .mockResolvedValueOnce("grain") // textura
       .mockResolvedValueOnce("Space Grotesk")
       .mockResolvedValueOnce("Fira Code")
-      .mockResolvedValueOnce("none");
+      .mockResolvedValueOnce("custom"); // plugins um por um
     vi.mocked(multiselect).mockResolvedValueOnce(["blog"]);
 
     await runCreate("ana", {

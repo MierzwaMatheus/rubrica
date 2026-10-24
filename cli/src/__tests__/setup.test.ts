@@ -45,6 +45,8 @@ vi.mock("@clack/prompts", () => ({
   outro: vi.fn(),
   text: vi.fn().mockResolvedValue("https://meusite.com"),
   password: vi.fn().mockResolvedValue("senha12caracteres"),
+  // Integrações opcionais (Telegram, Vercel): "sim" mantém a sequência de perguntas destes testes.
+  confirm: vi.fn().mockResolvedValue(true),
   spinner: vi.fn(() => ({ start: vi.fn(), stop: vi.fn() })),
   isCancel: vi.fn(() => false),
   cancel: vi.fn(),
@@ -225,17 +227,15 @@ describe("runSetup — Ciclo 2: JWT keys e convex env set", () => {
     expect(calls.some((c) => c.includes("SITE_URL"))).toBe(true);
   });
 
-  it("prompt de SITE_URL usa VITE_CONVEX_SITE_URL como initialValue", async () => {
+  it("sem endereço salvo, a pergunta do endereço começa vazia (o domínio do Convex não é o do site)", async () => {
     const { text } = await import("@clack/prompts");
 
     const deps = makeValidSetup();
     await runSetup(deps);
 
-    expect(text).toHaveBeenCalledWith(
-      expect.objectContaining({
-        initialValue: "https://precise-husky-581.convex.site",
-      })
-    );
+    const siteUrlCall = vi.mocked(text).mock.calls.find((c) => /Endereço do site/.test((c[0] as { message: string }).message));
+    expect(siteUrlCall![0]).toMatchObject({ initialValue: "" });
+    expect(text).not.toHaveBeenCalledWith(expect.objectContaining({ initialValue: expect.stringContaining("convex.site") }));
   });
 });
 
@@ -518,7 +518,7 @@ describe("runSetup — Ciclo 7: prompts de admin (validações)", () => {
     await runSetup(deps);
 
     const emailCall = vi.mocked(textPrompt).mock.calls.find(
-      (c) => typeof c[0] === "object" && (c[0] as { message?: string }).message?.toLowerCase().includes("email")
+      (c) => typeof c[0] === "object" && (c[0] as { message?: string }).message?.toLowerCase().includes("e-mail")
     );
     expect(emailCall).toBeDefined();
     const { validate } = emailCall![0] as { validate: (v: string) => string | undefined };
@@ -533,7 +533,7 @@ describe("runSetup — Ciclo 7: prompts de admin (validações)", () => {
     await runSetup(deps);
 
     const emailCall = vi.mocked(textPrompt).mock.calls.find(
-      (c) => typeof c[0] === "object" && (c[0] as { message?: string }).message?.toLowerCase().includes("email")
+      (c) => typeof c[0] === "object" && (c[0] as { message?: string }).message?.toLowerCase().includes("e-mail")
     );
     const { validate } = emailCall![0] as { validate: (v: string) => string | undefined };
     expect(validate("sem@ponto")).toBeTruthy();
@@ -725,8 +725,8 @@ describe("runSetup — Ciclo 9: siteTexts seed", () => {
   }
 
   it("chama convex run seed:seedAll com payload JSON contendo enabledPlugins derivados de plugins ativos", async () => {
+    // O endereço vem do rubrica.json: a primeira pergunta já é o e-mail.
     vi.mocked(textPrompt)
-      .mockResolvedValueOnce("https://meusite.com")
       .mockResolvedValueOnce("admin@teste.com")
       .mockResolvedValue("");
 
@@ -753,8 +753,8 @@ describe("runSetup — Ciclo 9: siteTexts seed", () => {
   });
 
   it("com plugins vazios, chama seed:seedAll com enabledPlugins:[] (não chama siteTexts:seed nem contractTemplates:seedDefaultTemplate)", async () => {
+    // O endereço vem do rubrica.json: a primeira pergunta já é o e-mail.
     vi.mocked(textPrompt)
-      .mockResolvedValueOnce("https://meusite.com")
       .mockResolvedValueOnce("admin@teste.com")
       .mockResolvedValue("");
 
@@ -772,8 +772,8 @@ describe("runSetup — Ciclo 9: siteTexts seed", () => {
   });
 
   it("só inclui enabledPlugins com valor true (ignora flags false)", async () => {
+    // O endereço vem do rubrica.json: a primeira pergunta já é o e-mail.
     vi.mocked(textPrompt)
-      .mockResolvedValueOnce("https://meusite.com")
       .mockResolvedValueOnce("admin@teste.com")
       .mockResolvedValue("");
 
@@ -798,8 +798,8 @@ describe("runSetup — Ciclo 9: siteTexts seed", () => {
   });
 
   it("chamada seed:seedAll tem estrutura exata: convex run seed:seedAll {payload JSON} (sem flag --data, ordem importa)", async () => {
+    // O endereço vem do rubrica.json: a primeira pergunta já é o e-mail.
     vi.mocked(textPrompt)
-      .mockResolvedValueOnce("https://meusite.com")
       .mockResolvedValueOnce("admin@teste.com")
       .mockResolvedValue("");
 
@@ -858,8 +858,8 @@ describe("runSetup — identidade usa funções internas do Convex", () => {
   }
 
   async function runWithIdentity() {
+    // O endereço vem do rubrica.json: a primeira pergunta já é o e-mail.
     vi.mocked(textPrompt)
-      .mockResolvedValueOnce("https://meusite.com")
       .mockResolvedValueOnce("admin@teste.com")
       .mockResolvedValue("");
     vi.mocked(passwordPrompt)

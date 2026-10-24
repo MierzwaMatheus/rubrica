@@ -1,4 +1,5 @@
 import { text, select, isCancel, cancel } from "@clack/prompts";
+import { normalizeUrl, validateUrl, normalizeEmail, validateEmail, normalizeHandle } from "../utils/normalize.js";
 
 export interface IdentityInput {
   siteName: string;
@@ -12,6 +13,11 @@ export interface IdentityInput {
 
 export type IdentityDefaults = Partial<IdentityInput>;
 
+export interface IdentityPromptOptions {
+  /** `false` no modo rápido: usa `defaults.lang` ou pt-BR sem perguntar. */
+  askLang?: boolean;
+}
+
 function assertNotCancelled(value: unknown): asserts value is string {
   if (isCancel(value)) {
     cancel("Operação cancelada.");
@@ -19,72 +25,73 @@ function assertNotCancelled(value: unknown): asserts value is string {
   }
 }
 
+async function ask(opts: Parameters<typeof text>[0]): Promise<string> {
+  const value = await text(opts);
+  assertNotCancelled(value);
+  return value.trim();
+}
+
+/**
+ * Identidade do site. As perguntas aceitam o jeito natural de escrever (URL sem https://,
+ * @ do X, link do perfil) e devolvem tudo normalizado.
+ */
 export async function identityPrompt(
-  defaults?: IdentityDefaults
+  defaults?: IdentityDefaults,
+  options: IdentityPromptOptions = {}
 ): Promise<IdentityInput> {
-  const siteName = await text({
-    message: "Nome do site (aparece no título do browser e SEO)",
-    initialValue: defaults?.siteName ?? "",
+  const authorName = await ask({
+    message: "Seu nome",
+    initialValue: defaults?.authorName ?? "",
+    validate: (v) => (v.trim() ? undefined : "Informe seu nome"),
   });
-  assertNotCancelled(siteName);
 
-  const siteUrl = await text({
-    message: "URL do site (sem barra no final)",
-    initialValue: defaults?.siteUrl ?? "",
-    validate: (v) => {
-      if (!v.startsWith("http://") && !v.startsWith("https://")) {
-        return "A URL deve começar com http:// ou https://";
-      }
-    },
-  });
-  assertNotCancelled(siteUrl);
+  const siteName =
+    (await ask({
+      message: "Nome do site (aparece na aba do navegador e no Google)",
+      initialValue: defaults?.siteName ?? authorName,
+    })) || authorName;
 
-  const siteDescription = await text({
-    message: "Descrição curta (SEO e Open Graph)",
+  const siteUrl = normalizeUrl(
+    await ask({
+      message: "Endereço do site (ex: meusite.com — não precisa do https://)",
+      initialValue: defaults?.siteUrl ?? "",
+      validate: validateUrl,
+    })
+  );
+
+  const siteDescription = await ask({
+    message: "Em uma frase, o que você faz? (aparece no Google e quando alguém compartilha o link)",
     initialValue: defaults?.siteDescription ?? "",
   });
-  assertNotCancelled(siteDescription);
 
-  const authorName = await text({
-    message: "Seu nome (para RSS e meta author)",
-    initialValue: defaults?.authorName ?? "",
-  });
-  assertNotCancelled(authorName);
+  const authorEmail = normalizeEmail(
+    await ask({
+      message: "Seu e-mail (não aparece no site)",
+      initialValue: defaults?.authorEmail ?? "",
+      validate: validateEmail,
+    })
+  );
 
-  const authorEmail = await text({
-    message: "Seu email (para RSS — não aparece publicamente)",
-    initialValue: defaults?.authorEmail ?? "",
-    validate: (v) => {
-      if (!v.includes("@") || !v.includes(".")) {
-        return "Informe um email válido (ex: contato@meusite.com)";
-      }
-    },
-  });
-  assertNotCancelled(authorEmail);
+  const twitterHandle = normalizeHandle(
+    await ask({
+      message: "Seu perfil no X/Twitter (opcional — Enter para pular)",
+      initialValue: defaults?.twitterHandle ?? "",
+    })
+  );
 
-  const twitterHandle = await text({
-    message: "Twitter/X handle (sem @, Enter para pular)",
-    initialValue: defaults?.twitterHandle ?? "",
-  });
-  assertNotCancelled(twitterHandle);
+  let lang = defaults?.lang ?? "pt-BR";
+  if (options.askLang !== false) {
+    const chosen = await select({
+      message: "Idioma do site",
+      initialValue: lang,
+      options: [
+        { value: "pt-BR", label: "Português (pt-BR)" },
+        { value: "en-US", label: "Inglês (en-US)" },
+      ],
+    });
+    assertNotCancelled(chosen);
+    lang = chosen;
+  }
 
-  const lang = await select({
-    message: "Idioma padrão",
-    initialValue: defaults?.lang ?? "pt-BR",
-    options: [
-      { value: "pt-BR", label: "Português (pt-BR)" },
-      { value: "en-US", label: "Inglês (en-US)" },
-    ],
-  });
-  assertNotCancelled(lang);
-
-  return {
-    siteName: siteName as string,
-    siteUrl: siteUrl as string,
-    siteDescription: siteDescription as string,
-    authorName: authorName as string,
-    authorEmail: authorEmail as string,
-    twitterHandle: (twitterHandle as string) ?? "",
-    lang: lang as string,
-  };
+  return { siteName, siteUrl, siteDescription, authorName, authorEmail, twitterHandle, lang };
 }

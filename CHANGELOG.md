@@ -2,6 +2,19 @@
 
 O que mudou em cada versão do Rubrica (template e CLI `create-rubrica`). Detalhes de cada uma nas [notas da release](https://github.com/MierzwaMatheus/rubrica/releases). Para atualizar um projeto existente, veja [Atualizando o seu Rubrica](./docs/atualizacao.md).
 
+## Próxima versão
+
+CLI mais simples para quem não é da área técnica.
+
+- `create` começa perguntando **Rápido** ou **Personalizado**. No rápido, as cores, a textura e as fontes vêm do layout, e o idioma fica em português.
+- Plugins em **pacotes prontos** (Completo, Para vender serviços, Só o portfólio), com a lista um por um como opção. Nomes e descrições em linguagem comum, também no `config`.
+- Endereço do site **sem precisar digitar `https://`**: `meusite.com/` vira `https://meusite.com`. O `@` e o link do perfil do X também são aceitos. Quem não tem domínio pode deixar o `<projeto>.vercel.app` sugerido.
+- Git e instalação das dependências **sem perguntas**: com pnpm se o create veio do `pnpm create`, com npm nos outros casos.
+- O `create` oferece configurar o painel na hora: conecta o Convex e roda o `setup` no mesmo fluxo, sem segundo terminal.
+- `setup` conecta o Convex sozinho quando falta o `.env.local`, **não pergunta de novo** o endereço do site e já preenche o e-mail do admin. Telegram e Vercel ficam atrás de um sim/não, e as perguntas não mostram mais nomes de variável de ambiente.
+- `config` → Identidade abre as perguntas com os valores salvos, em vez de pedir tudo de novo.
+- Guia de [manutenção do CLI](./docs/cli/manutencao.md): o que mudar no CLI quando entra layout, esquema, fonte ou plugin novo.
+
 ## 1.1.0 — 2026-10-24
 
 8 layouts novos, 15 esquemas de cores com modo claro e escuro, alternância de modo pela visita, texturas e cores do admin separadas por modo. Nada quebra em quem está na 1.0.

@@ -16,7 +16,8 @@ import { indexHtmlInput, rubricaConfigInput } from "../transforms/identityInputs
 import { applyAppearance as defaultApplyAppearance } from "../transforms/applyAppearance.js";
 import { SCHEME_START } from "../themes/schemes.js";
 import { layoutPrompt, schemePrompt, appearancePrompt, fontPrompts } from "../prompts/appearancePrompt.js";
-import { ALL_PLUGINS } from "./create.js";
+import { ALL_PLUGINS } from "../plugins.js";
+import { pluginOptions } from "../prompts/pluginsPrompt.js";
 import { tmpdir } from "node:os";
 import type { RubricaLayout, RubricaState } from "../state/readState.js";
 
@@ -104,7 +105,8 @@ export async function runConfig(deps: RunConfigDeps = {}): Promise<void> {
 
   // Ciclo 4: identidade
   if (selected.includes("identity")) {
-    const identityData = await doIdentityPrompt();
+    // Começa do que está salvo: a pessoa só muda o que quiser.
+    const identityData = await doIdentityPrompt(currentState.identity);
     await applyRubricalConfigFn(
       rubricaConfigInput(identityData, currentState.fontSans, currentState.fontMono),
       projectDir,
@@ -214,7 +216,7 @@ export async function runConfig(deps: RunConfigDeps = {}): Promise<void> {
     const selectedPlugins = await multiselect({
       message: "Plugins ativos",
       initialValues: activePlugins,
-      options: ALL_PLUGINS.map((p) => ({ value: p, label: p })),
+      options: pluginOptions(),
       required: false,
     });
 

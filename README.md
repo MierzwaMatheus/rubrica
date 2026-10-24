@@ -160,7 +160,7 @@ cd rubrica
 pnpm install
 ```
 
-> **Prefere um assistente?** `npx create-rubrica meu-portfolio` baixa a versão mais recente, pergunta layout, esquema de cores, modo claro/escuro, textura, fontes, plugins e identidade, e já deixa o projeto pronto para `npx create-rubrica setup` e para atualizações automáticas. Veja o [README do CLI](./cli/README.md). Os passos 2 a 10 valem para os dois caminhos.
+> **Prefere um assistente?** `npx create-rubrica meu-portfolio` baixa a versão mais recente e pergunta o layout, o que o site vai ter e a identidade (no modo personalizado, também cores, modo claro/escuro, textura e fontes). Depois instala tudo, oferece conectar o Convex e criar o admin na hora, e deixa o projeto pronto para atualizações automáticas. Veja o [README do CLI](./cli/README.md). Os passos 2 a 10 valem para os dois caminhos.
 
 ### 2 · Provisionar o Convex
 

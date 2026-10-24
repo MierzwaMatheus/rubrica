@@ -1,0 +1,113 @@
+---
+import { COMMAND, REPO, LAYOUTS, SCHEMES } from "../lib/data";
+---
+
+<section class="hero">
+  <div class="wrap hero-in">
+    <div class="copy-col">
+      <p class="eyebrow">Portfólio profissional · open source</p>
+      <h1 class="display">Assine com a sua cara.</h1>
+      <p class="lede">
+        Home, portfólio, blog, currículo, propostas comerciais, painel admin e pagamentos já resolvidos. Você escolhe
+        a aparência, escreve o seu conteúdo e publica com domínio próprio.
+      </p>
+      <div class="cta">
+        <div class="cmd">
+          <code>{COMMAND}</code>
+          <button class="copy" type="button" data-copy={COMMAND}>Copiar</button>
+        </div>
+        <a class="btn ghost" href="#combinador">Montar o meu</a>
+      </div>
+      <ul class="facts" aria-label="O que vem no Rubrica">
+        <li><b>{LAYOUTS.length}</b> layouts</li>
+        <li><b>{SCHEMES.length}</b> esquemas de cores</li>
+        <li><b>claro e escuro</b> em todos</li>
+        <li><a href={`${REPO}/blob/main/LICENSE`} target="_blank" rel="noopener">GPL-3.0</a></li>
+      </ul>
+    </div>
+    <figure class="art">
+      <picture>
+        <source srcset="/img/capa.webp" type="image/webp" />
+        <img
+          src="/img/capa.jpg"
+          width="1279"
+          height="720"
+          alt="Uma caneta-tinteiro desenha o r do Rubrica com o floreio em terracota sobre papel envelhecido, ao lado de um ramo de folhas."
+        />
+      </picture>
+    </figure>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding-block: clamp(48px, 7vw, 96px) clamp(56px, 8vw, 104px);
+  }
+  .hero-in {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    gap: clamp(32px, 5vw, 72px);
+    align-items: center;
+  }
+  .copy-col {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+    min-width: 0;
+  }
+  h1 {
+    font-size: clamp(56px, 8.4vw, 116px);
+  }
+  .lede {
+    font-size: clamp(17px, 1.5vw, 19.5px);
+    color: var(--ink-2);
+    max-width: 52ch;
+  }
+  .cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+  .cmd {
+    min-width: 0;
+  }
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 22px;
+    list-style: none;
+    padding: 0;
+    margin: 6px 0 0;
+    font-size: 14px;
+    color: var(--ink-3);
+  }
+  .facts b {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .facts a {
+    color: var(--ink-3);
+    text-underline-offset: 3px;
+  }
+  .art {
+    margin: 0;
+    position: relative;
+  }
+  .art img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+    box-shadow: var(--shadow);
+    transform: rotate(1.2deg);
+  }
+  @media (max-width: 900px) {
+    .hero-in {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .art img {
+      transform: none;
+    }
+  }
+</style>

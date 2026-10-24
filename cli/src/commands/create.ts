@@ -251,6 +251,8 @@ export async function runCreate(
 
   await removeDir(`${projectDir}/templates`, fs);
   await removeDir(`${projectDir}/cli`, fs);
+  // O site público do Rubrica vive no repositório, mas não faz parte do portfólio.
+  await removeDir(`${projectDir}/site`, fs);
 
   const devCommand = `${packageManager} run dev`;
   const nextStep = `cd ${projectName} && ${devCommand}`;

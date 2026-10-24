@@ -1,0 +1,126 @@
+---
+import { SCHEMES, REPO } from "../lib/data";
+
+const roles = [
+  ["bg", "fundo"],
+  ["surface", "cartão"],
+  ["text", "texto"],
+  ["primary", "primária"],
+  ["accent", "acento"],
+  ["accent2", "acento 2"],
+] as const;
+---
+
+<section id="esquemas" class="section schemes-sec">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Esquemas de cores</p>
+      <h2 class="display">Quinze paletas, cada uma em claro e escuro.</h2>
+      <p>
+        Qualquer esquema funciona com qualquer layout. O site pode abrir no claro, no escuro ou seguir o sistema de
+        quem visita, e mostrar um botão para alternar. Clique numa paleta para aplicá-la no combinador.
+      </p>
+    </div>
+    <ul class="list">
+      {
+        SCHEMES.map((s) => (
+          <li>
+            <button type="button" class="scheme" data-cb-scheme={s.id}>
+              <span class="top">
+                <span class="name">{s.label}</span>
+                <span class="hint">{s.hint}</span>
+              </span>
+              {(["light", "dark"] as const).map((mode) => (
+                <span class="strip" aria-label={`${mode === "light" ? "Modo claro" : "Modo escuro"} de ${s.label}`}>
+                  <span class="mode">{mode === "light" ? "claro" : "escuro"}</span>
+                  {roles.map(([r, label]) => (
+                    <i style={`background:${s[mode][r]}`} title={`${label}: ${s[mode][r]}`} />
+                  ))}
+                </span>
+              ))}
+            </button>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="more">
+      Os 11 papéis de cor de cada esquema, as texturas e as cores do painel admin estão em{" "}
+      <a href={`${REPO}/blob/main/docs/templates/cores.md`} target="_blank" rel="noopener">Esquemas de cores</a>.
+    </p>
+  </div>
+</section>
+
+<style>
+  .schemes-sec {
+    background: var(--paper-2);
+    border-block: 1px solid var(--line);
+  }
+  .list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+    gap: 14px;
+  }
+  .scheme {
+    width: 100%;
+    display: grid;
+    gap: 10px;
+    padding: 16px;
+    text-align: left;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .scheme:hover {
+    border-color: var(--terracota);
+    transform: translateY(-2px);
+  }
+  .top {
+    display: grid;
+    gap: 2px;
+  }
+  .name {
+    font-weight: 600;
+    font-size: 16.5px;
+  }
+  .hint {
+    font-size: 13.5px;
+    color: var(--ink-3);
+    line-height: 1.4;
+  }
+  .strip {
+    display: grid;
+    grid-template-columns: 48px repeat(6, 1fr);
+    gap: 3px;
+    align-items: center;
+  }
+  .mode {
+    font-family: var(--f-mono);
+    font-size: 11px;
+    color: var(--ink-3);
+  }
+  .strip i {
+    height: 26px;
+    border-radius: 4px;
+    border: 1px solid rgb(26 26 24 / 0.12);
+  }
+  .more {
+    margin-top: 36px;
+    color: var(--ink-2);
+  }
+  .more a {
+    color: var(--terracota-ink);
+    text-underline-offset: 3px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .scheme {
+      transition: none;
+    }
+  }
+</style>

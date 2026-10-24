@@ -1,0 +1,16 @@
+{
+  "name": "rubrica-site",
+  "private": true,
+  "type": "module",
+  "description": "Site público do Rubrica, com o combinador de layouts e esquemas.",
+  "scripts": {
+    "previews": "cd .. && npx tsx site/scripts/build-previews.ts",
+    "dev": "astro dev",
+    "build": "astro build",
+    "build:full": "pnpm previews && astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "astro": "7.4.1"
+  }
+}

@@ -1,0 +1,146 @@
+---
+import { LAYOUTS, SCHEMES, REPO } from "../lib/data";
+
+const schemeLabel = (id: string) => SCHEMES.find((s) => s.id === id)?.label ?? id;
+const groups = [
+  { title: "Novos", text: "Usam o esquema de cores completo.", items: LAYOUTS.filter((l) => !l.legacy) },
+  { title: "Originais", text: "Os cinco primeiros, com as quatro cores principais do esquema.", items: LAYOUTS.filter((l) => l.legacy) },
+];
+---
+
+<section id="layouts" class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Layouts</p>
+      <h2 class="display">Treze jeitos de contar a mesma história.</h2>
+      <p>
+        O conteúdo é o mesmo em todos: o layout muda a forma. Cada miniatura é a home de verdade, na aparência que o
+        CLI recomenda para ela. Clique para abrir no combinador.
+      </p>
+    </div>
+
+    {
+      groups.map((g) => (
+        <div class="group">
+          <div class="group-head">
+            <h3>{g.title}</h3>
+            <p>{g.text}</p>
+          </div>
+          <ul class="grid">
+            {g.items.map((l) => (
+              <li>
+                <a class="card" href="#combinador" data-cb-layout={l.id}>
+                  <span class="shot">
+                    <img src={`/img/layouts/${l.id}.jpg`} alt={`Home do layout ${l.label}`} width="1280" height="800" loading="lazy" />
+                  </span>
+                  <span class="meta">
+                    <span class="name">{l.label}</span>
+                    <span class="hint">{l.hint}</span>
+                    <span class="rec">
+                      {schemeLabel(l.recommended.scheme)} · {l.recommended.mode === "dark" ? "escuro" : "claro"} · {l.fonts.sans[0]}
+                    </span>
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+    <p class="more">
+      Cada página de cada layout está descrita no{" "}<a href={`${REPO}/blob/main/docs/templates/README.md`} target="_blank" rel="noopener">guia dos templates</a>.
+    </p>
+  </div>
+</section>
+
+<style>
+  .group + .group {
+    margin-top: 56px;
+  }
+  .group-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .group-head h3 {
+    font-family: var(--f-display);
+    font-style: italic;
+    font-weight: 600;
+    font-size: 30px;
+  }
+  .group-head p {
+    color: var(--ink-3);
+    font-size: 15px;
+  }
+  .grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 270px), 1fr));
+    gap: 26px 22px;
+  }
+  .card {
+    display: grid;
+    gap: 12px;
+    text-decoration: none;
+    color: inherit;
+  }
+  .shot {
+    display: block;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--line-strong);
+    box-shadow: var(--shadow);
+    aspect-ratio: 16 / 10;
+    background: var(--paper-2);
+  }
+  .shot img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    transition: transform 0.35s ease;
+  }
+  .card:hover .shot img {
+    transform: scale(1.03);
+  }
+  .meta {
+    display: grid;
+    gap: 4px;
+  }
+  .name {
+    font-weight: 600;
+    font-size: 17px;
+  }
+  .card:hover .name {
+    color: var(--terracota-ink);
+  }
+  .hint {
+    font-size: 14.5px;
+    color: var(--ink-2);
+  }
+  .rec {
+    font-family: var(--f-mono);
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+  .more {
+    margin-top: 40px;
+    color: var(--ink-2);
+  }
+  .more a {
+    color: var(--terracota-ink);
+    text-underline-offset: 3px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .shot img {
+      transition: none;
+    }
+  }
+</style>

@@ -221,6 +221,18 @@ describe("create — download e limpeza do projeto extraído", () => {
 
     expect(await (deps.fs as ReturnType<typeof makeFsModule>).exists("/projects/meu-portfolio/cli")).toBe(false);
   });
+
+  it("remove a pasta site/ (o site público do Rubrica não vai para o portfólio)", async () => {
+    vi.clearAllMocks();
+    setupPrompts({});
+    const vol = Volume.fromJSON({});
+    vol.mkdirSync("/projects", { recursive: true });
+    const deps = makeDefaultDeps(vol, ["cli", "templates", "site"]);
+
+    await runCreate("meu-portfolio", deps);
+
+    expect(await (deps.fs as ReturnType<typeof makeFsModule>).exists("/projects/meu-portfolio/site")).toBe(false);
+  });
 });
 
 // ---- Ciclo 3: applyLayout --------------------------------------------------

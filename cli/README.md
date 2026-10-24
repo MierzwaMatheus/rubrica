@@ -33,6 +33,33 @@ No personalizado, entram também:
 
 Depois ele inicia o git e instala as dependências sem perguntar: com pnpm se você rodou `pnpm create`, com npm nos outros casos. Por fim, oferece configurar o painel admin na hora. Aceitando, ele conecta o projeto ao Convex (login pelo navegador, conta gratuita) e já roda o `setup`.
 
+### Com as escolhas feitas no site
+
+No [site do Rubrica](https://github.com/MierzwaMatheus/rubrica/tree/main/site), o combinador mostra o app funcionando com cada layout, esquema e fonte. Na seção **Crie o seu**, você preenche os seus dados e copia um comando pronto:
+
+```bash
+npx create-rubrica@latest ana-souza --receita eyJ2IjoxLCJsIjoiZGVza3RvcCIs...
+```
+
+A **receita** leva o visual, os plugins e a identidade num texto só, sem espaços nem acentos, então funciona colada em qualquer terminal (bash, PowerShell, cmd). O CLI mostra um resumo, pede confirmação e só pergunta o que faltar: nome, endereço e e-mail, se não vieram. Nada é enviado a servidor nenhum: o site monta o comando no navegador. A senha do painel é sempre pedida no terminal.
+
+Se algo da receita não existir na versão do CLI (um layout novo, por exemplo), ele avisa e pergunta só aquilo.
+
+### Opções
+
+Também dá para passar as escolhas uma a uma. Elas valem por cima da receita.
+
+| Opção | Valores |
+|---|---|
+| `--receita <código>` | o código gerado pelo site |
+| `--layout <id>` | `cyberpunk`, `brutalist`, `swiss`, `bento`, `magazine`, `desktop`, `index`, `monograph`, `zine`, `blueprint`, `garden`, `chat`, `poster` |
+| `--esquema <id>` | um dos [esquemas de cores](https://github.com/MierzwaMatheus/rubrica/blob/main/docs/templates/cores.md) (`neon`, `riso`, `sumi`...) |
+| `--modo <modo>` | `claro`, `escuro` ou `automatico` |
+| `--alternancia` / `--sem-alternancia` | mostra ou esconde o botão para a visita alternar o modo |
+| `--textura <textura>` | `nenhuma`, `grao`, `papel` ou `scanlines` |
+| `--fonte <família>` / `--mono <família>` | nome da fonte, com hífens no lugar dos espaços (`--fonte instrument-sans`) |
+| `--plugins <lista>` | ids separados por vírgula (`blog,portfolio`), um pacote (`recommended`, `freelancer`, `simple`) ou `nenhum` |
+
 Arquivos que saem com as suas escolhas:
 
 | Arquivo | O que tem |

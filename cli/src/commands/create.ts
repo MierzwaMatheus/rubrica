@@ -50,7 +50,12 @@ export interface RunCreateDeps {
   exec?: (command: string, cwd: string) => Promise<void>;
   identityPrompt?: typeof defaultIdentityPrompt;
   /** Setup do backend, encadeado no final quando a pessoa aceita. */
-  setup?: (opts: { cwd: string; nextStep: string }) => Promise<void>;
+  setup?: (opts: {
+    cwd: string;
+    nextStep: string;
+    newProject: string;
+    site?: { profession?: string; specialties?: string };
+  }) => Promise<void>;
   /** `npm_config_user_agent`: diz se o create veio do pnpm ou do npm. */
   userAgent?: string;
   /** Escolhas que vieram do site (`--receita`) ou das opções legíveis. Já validadas. */
@@ -279,22 +284,23 @@ export async function runCreate(
   const devCommand = `${packageManager} run dev`;
   const nextStep = `cd ${projectName} && ${devCommand}`;
 
-  // Backend: o Convex cria a conta/projeto pelo navegador e o setup cria o admin.
-  const setupNow = await confirm({
-    message: "Configurar o painel admin agora? Abre o login do Convex no navegador (conta gratuita).",
-    initialValue: true,
-  });
+  // Backend: o setup conecta o Convex (cria o projeto, login pelo navegador) e cria o admin.
+  // Vindo do site, não pergunta: o site já explicou que o comando faz isso.
+  const setupNow = fromRecipe
+    ? true
+    : await confirm({
+        message: "Configurar o painel admin agora? Abre o login do Convex no navegador (conta gratuita).",
+        initialValue: true,
+      });
   if (setupNow === true) {
-    try {
-      await execFn("npx convex dev --once", projectDir);
-    } catch {
-      outro(
-        `Projeto criado, mas a conexão com o Convex não terminou.\n\n` +
-        `Para continuar depois:\n\n  cd ${projectName}\n  npx create-rubrica setup\n  ${devCommand}`
-      );
-      return;
-    }
-    await setupFn({ cwd: projectDir, nextStep });
+    await setupFn({
+      cwd: projectDir,
+      nextStep,
+      newProject: projectName,
+      ...(fromRecipe && {
+        site: { profession: recipe.identity?.profession, specialties: recipe.identity?.specialties },
+      }),
+    });
     return;
   }
 

@@ -35,16 +35,21 @@ function makeState(plugins: Record<string, boolean> = {}, identity: object | und
   return { version: "1.1.0", layout: "cyberpunk", theme: "neon", fontSans: "Inter", fontMono: "", plugins, identity };
 }
 
-function makeDeps(opts: { state?: ReturnType<typeof makeState>; env?: string | null; connectWritesEnv?: boolean } = {}) {
+function makeDeps(opts: { state?: ReturnType<typeof makeState>; env?: string | null; connectWritesEnv?: boolean; convexJson?: string; adminExists?: boolean } = {}) {
   const state = opts.state ?? makeState();
   const files: Record<string, string> = { "/p/rubrica.json": JSON.stringify(state) };
   if (opts.env !== null) files["/p/.env.local"] = opts.env ?? ENV;
+  if (opts.convexJson) files["/p/convex.json"] = opts.convexJson;
   const vol = Volume.fromJSON(files);
   const execFileSync = vi.fn((_file: string, args: string[], _opts?: object) => {
-    if (args.join(" ") === "convex dev --once" && opts.connectWritesEnv) vol.writeFileSync("/p/.env.local", ENV);
+    if (args.slice(0, 3).join(" ") === "convex dev --once" && opts.connectWritesEnv) vol.writeFileSync("/p/.env.local", ENV);
+    if (args.join(" ") === "convex run users:isSetupRequired" && opts.adminExists !== undefined) {
+      return Buffer.from(opts.adminExists ? "false\n" : "true\n");
+    }
     return Buffer.from("");
   });
   return {
+    vol,
     cwd: "/p",
     fs: {
       access: (p: string) => vol.promises.access(p).then(() => undefined),
@@ -83,10 +88,48 @@ describe("setup — conexão com o Convex", () => {
     expect(cancel).not.toHaveBeenCalled();
   });
 
-  it("se a conexão não criar o .env.local, para com a instrução de rodar o Convex", async () => {
+  it("se a conexão não criar o .env.local, para dizendo como tentar de novo", async () => {
     const deps = makeDeps({ env: null });
     await runSetup(deps);
-    expect(cancel).toHaveBeenCalledWith(expect.stringContaining("npx convex dev"));
+    expect(cancel).toHaveBeenCalledWith(expect.stringMatching(/Não deu para conectar.*npx create-rubrica setup/s));
+  });
+
+  it("projeto novo (vindo do create): cria o projeto no Convex sem perguntas", async () => {
+    const deps = makeDeps({ env: null, connectWritesEnv: true });
+    vi.mocked(text).mockResolvedValueOnce("ana@ana.dev");
+    await runSetup({ ...deps, newProject: "ana-souza" });
+    expect(deps.execFileSync).toHaveBeenCalledWith(
+      "npx",
+      ["convex", "dev", "--once", "--configure", "new", "--project", "ana-souza", "--dev-deployment", "cloud"],
+      expect.objectContaining({ cwd: "/p", stdio: "inherit" })
+    );
+  });
+
+  it("projeto novo com falha na conexão: a instrução inclui entrar na pasta", async () => {
+    const deps = makeDeps({ env: null });
+    await runSetup({ ...deps, newProject: "ana" });
+    expect(cancel).toHaveBeenCalledWith(expect.stringContaining("cd ana && npx create-rubrica setup"));
+  });
+
+  it("projeto novo: desliga a pergunta dos arquivos de IA do Convex no convex.json", async () => {
+    const deps = makeDeps({ env: null, connectWritesEnv: true });
+    vi.mocked(text).mockResolvedValueOnce("ana@ana.dev");
+    await runSetup({ ...deps, newProject: "ana" });
+    expect(JSON.parse(deps.vol.readFileSync("/p/convex.json", "utf-8") as string)).toEqual({ aiFiles: { enabled: false } });
+  });
+
+  it("projeto novo com convex.json existente: não mexe nele", async () => {
+    const deps = makeDeps({ env: null, connectWritesEnv: true, convexJson: '{"functions":"convex/"}' });
+    vi.mocked(text).mockResolvedValueOnce("ana@ana.dev");
+    await runSetup({ ...deps, newProject: "ana" });
+    expect(deps.vol.readFileSync("/p/convex.json", "utf-8")).toBe('{"functions":"convex/"}');
+  });
+
+  it("projeto já ligado ao Convex: newProject não reconecta", async () => {
+    const deps = makeDeps();
+    vi.mocked(text).mockResolvedValueOnce("ana@ana.dev");
+    await runSetup({ ...deps, newProject: "ana" });
+    expect(calls(deps).some((c) => c.startsWith("convex dev"))).toBe(false);
   });
 
   it("se a conexão falhar, para com a mesma instrução", async () => {
@@ -95,7 +138,7 @@ describe("setup — conexão com o Convex", () => {
       throw new Error("login cancelado");
     });
     await runSetup(deps);
-    expect(cancel).toHaveBeenCalledWith(expect.stringMatching(/Não deu para conectar.*npx convex dev/));
+    expect(cancel).toHaveBeenCalledWith(expect.stringMatching(/Não deu para conectar/));
     expect(deps.execFileSync).toHaveBeenCalledTimes(1);
   });
 
@@ -217,12 +260,12 @@ describe("setup — reaproveita o que o create já perguntou", () => {
     expect(calls(deps).some((c) => c.includes('"role"') || c.includes("proposalAiContext"))).toBe(false);
   });
 
-  it("não chama mutations públicas, que exigem login de admin", async () => {
+  it("não chama mutations públicas, que exigem login de admin (só a consulta pública isSetupRequired)", async () => {
     const deps = makeDeps();
     vi.mocked(text).mockResolvedValueOnce("ana@ana.dev").mockResolvedValueOnce("Designer").mockResolvedValueOnce("UX, Ilustração");
     await runSetup(deps);
     const runs = deps.execFileSync.mock.calls.map((c) => c[1] as string[]).filter((a) => a[1] === "run").map((a) => a[2]);
-    expect(runs).toEqual(["seed:setupAdmin", "seed:seedAll", "siteConfig:setBatchInternal", "contactInfo:updateInternal", "contactInfo:updateInternal"]);
+    expect(runs).toEqual(["users:isSetupRequired", "seed:setupAdmin", "seed:seedAll", "siteConfig:setBatchInternal", "contactInfo:updateInternal", "contactInfo:updateInternal"]);
   });
 
   it("a pergunta da profissão explica onde ela aparece", async () => {
@@ -238,6 +281,86 @@ describe("setup — reaproveita o que o create já perguntou", () => {
     vi.mocked(text).mockResolvedValueOnce("ana@ana.dev");
     await runSetup({ ...deps, nextStep: "cd ana && npm run dev" });
     expect(vi.mocked(outro).mock.calls[0][0]).toContain("cd ana && npm run dev");
+  });
+});
+
+describe("setup — admin já existe", () => {
+  it("rodando de novo, não pede e-mail nem senha e indica o comando de trocar a senha", async () => {
+    const deps = makeDeps({ adminExists: true });
+    await runSetup(deps);
+    expect(messages().some((m) => /E-mail/.test(m))).toBe(false);
+    const { password: passwordPrompt } = await import("@clack/prompts");
+    expect(passwordPrompt).not.toHaveBeenCalled();
+    expect(calls(deps).some((c) => c.includes("setupAdmin"))).toBe(false);
+    expect(calls(deps)).toContain('convex run seed:seedAll {"enabledPlugins":[]}');
+    expect(log.info).toHaveBeenCalledWith(expect.stringContaining("npx create-rubrica senha"));
+  });
+
+  it("se a consulta do admin falhar, segue pedindo e-mail e senha", async () => {
+    const deps = makeDeps();
+    const original = deps.execFileSync.getMockImplementation()!;
+    deps.execFileSync.mockImplementation((file: string, args: string[], opts?: object) => {
+      if (args.join(" ") === "convex run users:isSetupRequired") throw new Error("offline");
+      return original(file, args, opts);
+    });
+    vi.mocked(text).mockResolvedValueOnce("ana@ana.dev");
+    await runSetup(deps);
+    expect(calls(deps).some((c) => c.startsWith("convex run seed:setupAdmin"))).toBe(true);
+  });
+
+  it("sem admin, segue pedindo e-mail e senha", async () => {
+    const deps = makeDeps({ adminExists: false });
+    vi.mocked(text).mockResolvedValueOnce("ana@ana.dev");
+    await runSetup(deps);
+    expect(calls(deps).some((c) => c.startsWith("convex run seed:setupAdmin"))).toBe(true);
+  });
+
+  it("a senha do admin segue as regras do painel", async () => {
+    const deps = makeDeps({ adminExists: false });
+    vi.mocked(text).mockResolvedValueOnce("ana@ana.dev");
+    const { password: passwordPrompt } = await import("@clack/prompts");
+    await runSetup(deps);
+    const first = vi.mocked(passwordPrompt).mock.calls[0][0] as { validate: (v: string) => string | undefined };
+    expect(first.validate("semmaiuscula123")).toMatch(/maiúscula/);
+    expect(first.validate("NovaSenha123")).toBeUndefined();
+  });
+});
+
+describe("setup — vindo do site", () => {
+  it("não pergunta Telegram, Vercel, e-mail, profissão nem especialidades; só a senha", async () => {
+    const deps = makeDeps({ state: makeState({ "contact-wizard": true }) });
+    await runSetup({ ...deps, site: { profession: "Designer UX", specialties: "UX, Ilustração" } });
+    expect(text).not.toHaveBeenCalled();
+    expect(confirm).not.toHaveBeenCalled();
+    expect(calls(deps).find((c) => c.startsWith("convex run seed:setupAdmin"))).toContain('"email":"ana@ana.dev"');
+    const contact = deps.execFileSync.mock.calls.map((c) => c[1] as string[]).find((a) => a[3]?.includes("proposalAiContext"))!;
+    expect(JSON.parse(contact[3])).toMatchObject({ role: "Designer UX", proposalAiContext: expect.stringContaining("Ana Souza é Designer UX com especialidade em UX, Ilustração") });
+  });
+
+  it("mostra com qual e-mail entrar no painel", async () => {
+    const deps = makeDeps();
+    await runSetup({ ...deps, site: {} });
+    expect(log.info).toHaveBeenCalledWith(expect.stringContaining("ana@ana.dev"));
+  });
+
+  it("sem profissão no site, não grava cargo nem pergunta", async () => {
+    const deps = makeDeps();
+    await runSetup({ ...deps, site: {} });
+    expect(text).not.toHaveBeenCalled();
+    expect(calls(deps).some((c) => c.includes("proposalAiContext"))).toBe(false);
+  });
+
+  it("sem e-mail válido salvo, pergunta o e-mail mesmo vindo do site", async () => {
+    const deps = makeDeps({ state: makeState({}, { ...IDENTITY, authorEmail: "" }) });
+    vi.mocked(text).mockResolvedValueOnce("ana@ana.dev");
+    await runSetup({ ...deps, site: {} });
+    expect(messages()).toEqual([expect.stringMatching(/E-mail/)]);
+  });
+
+  it("avisa que as integrações ficam para depois", async () => {
+    const deps = makeDeps();
+    await runSetup({ ...deps, site: {} });
+    expect(log.info).toHaveBeenCalledWith(expect.stringMatching(/Telegram.*Vercel.*npx create-rubrica setup/s));
   });
 });
 

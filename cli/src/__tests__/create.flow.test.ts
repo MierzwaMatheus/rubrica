@@ -225,15 +225,14 @@ describe("create — backend no mesmo fluxo", () => {
     expect(confirm).toHaveBeenCalledWith(expect.objectContaining({ message: expect.stringMatching(/painel/), initialValue: true }));
   });
 
-  it("aceitando, conecta o Convex na pasta do projeto e roda o setup lá", async () => {
+  it("aceitando, roda o setup na pasta do projeto, que cria o projeto no Convex", async () => {
     quick();
     vi.mocked(confirm).mockResolvedValueOnce(true);
     const deps = makeDeps();
     await runCreate("ana", deps);
-    expect(deps.exec).toHaveBeenCalledWith("npx convex dev --once", "/projects/ana");
-    expect(deps.setup).toHaveBeenCalledWith({ cwd: "/projects/ana", nextStep: "cd ana && npm run dev" });
-    const order = vi.mocked(deps.exec).mock.calls.map((c) => c[0]);
-    expect(order.indexOf("npm install")).toBeLessThan(order.indexOf("npx convex dev --once"));
+    expect(deps.setup).toHaveBeenCalledWith({ cwd: "/projects/ana", nextStep: "cd ana && npm run dev", newProject: "ana" });
+    expect(vi.mocked(deps.exec).mock.calls.some((c) => String(c[0]).includes("convex"))).toBe(false);
+    expect(vi.mocked(deps.exec).mock.invocationCallOrder.at(-1)!).toBeLessThan(vi.mocked(deps.setup).mock.invocationCallOrder[0]);
     expect(outro).not.toHaveBeenCalled(); // o setup fecha com os próximos passos
   });
 
@@ -242,23 +241,10 @@ describe("create — backend no mesmo fluxo", () => {
     const deps = makeDeps({ userAgent: "pnpm/9.0.0" });
     await runCreate("ana", deps);
     expect(deps.setup).not.toHaveBeenCalled();
-    expect(deps.exec).not.toHaveBeenCalledWith("npx convex dev --once", expect.anything());
     const msg = vi.mocked(outro).mock.calls[0][0] as string;
     expect(msg).toMatch(/cd ana/);
     expect(msg).toMatch(/npx create-rubrica setup/);
     expect(msg).toMatch(/pnpm run dev/);
-  });
-
-  it("se o Convex falhar, não roda o setup e diz como continuar depois", async () => {
-    quick();
-    vi.mocked(confirm).mockResolvedValueOnce(true);
-    const exec = vi.fn(async (cmd: string) => {
-      if (cmd.startsWith("npx convex")) throw new Error("login cancelado");
-    });
-    const deps = makeDeps({ exec });
-    await runCreate("ana", deps);
-    expect(deps.setup).not.toHaveBeenCalled();
-    expect(vi.mocked(outro).mock.calls[0][0]).toMatch(/npx create-rubrica setup/);
   });
 });
 
@@ -356,6 +342,26 @@ describe("create — com receita do site", () => {
     const deps = makeDeps({ recipe: { layout: "swiss", fontMono: "Space Mono", plugins: [] } });
     await runCreate("ana", deps);
     expect(deps.applyFont).toHaveBeenCalledWith({ fontSans: "Archivo", fontMono: "" }, expect.anything(), expect.anything());
+  });
+
+  it("não pergunta se quer configurar o painel: roda o setup no modo do site, com profissão e especialidades", async () => {
+    vi.mocked(confirm).mockResolvedValueOnce(true);
+    const deps = makeDeps({ recipe: { ...FULL, identity: { ...FULL.identity, profession: "Designer", specialties: "UX" } } });
+    await runCreate("ana", deps);
+    expect(confirm).toHaveBeenCalledTimes(1); // só o resumo
+    expect(deps.setup).toHaveBeenCalledWith({
+      cwd: "/projects/ana",
+      nextStep: "cd ana && npm run dev",
+      newProject: "ana",
+      site: { profession: "Designer", specialties: "UX" },
+    });
+  });
+
+  it("receita sem profissão: o setup roda no modo do site sem cargo", async () => {
+    vi.mocked(confirm).mockResolvedValueOnce(true);
+    const deps = makeDeps({ recipe: FULL });
+    await runCreate("ana", deps);
+    expect(deps.setup).toHaveBeenCalledWith(expect.objectContaining({ site: { profession: undefined, specialties: undefined } }));
   });
 
   it("receita vazia segue o fluxo normal (pergunta o modo)", async () => {

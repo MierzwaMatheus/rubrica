@@ -75,7 +75,7 @@ describe("setup E2E — Ciclo 1: sem .env.local", () => {
     });
 
     expect(cancel).toHaveBeenCalledWith(
-      expect.stringContaining("npx convex dev")
+      expect.stringContaining("npx create-rubrica setup")
     );
     expect(execFileSyncMock).toHaveBeenCalledTimes(1);
     expect(execFileSyncMock).toHaveBeenCalledWith("npx", ["convex", "dev", "--once"], expect.objectContaining({ cwd: "/project" }));

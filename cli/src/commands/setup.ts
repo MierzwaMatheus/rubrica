@@ -7,6 +7,7 @@ import { detectProject as defaultDetectProject } from "../utils/detectProject.js
 import { generateJwtKeys as defaultGenerateJwtKeys } from "../utils/generateJwtKeys.js";
 import { readState as defaultReadState } from "../state/readState.js";
 import { normalizeUrl, validateUrl, normalizeEmail, validateEmail } from "../utils/normalize.js";
+import { validatePassword } from "../utils/password.js";
 
 // ---- Tipos ------------------------------------------------------------------
 
@@ -28,6 +29,16 @@ export interface RunSetupDeps {
   execFileSync?: (file: string, args: string[], opts?: object) => Buffer;
   /** Última linha do resumo final. O create passa `cd <projeto> && <pm> run dev`. */
   nextStep?: string;
+  /**
+   * Projeto recém-criado pelo create: se ainda não houver `.env.local`, cria um projeto
+   * novo no Convex com este nome, sem as perguntas do Convex.
+   */
+  newProject?: string;
+  /**
+   * O create veio do site (receita): não pergunta integrações, nem o e-mail (se válido),
+   * nem profissão e especialidades, que já vieram no formulário. Só a senha.
+   */
+  site?: { profession?: string; specialties?: string };
 }
 
 // ---- Helpers ----------------------------------------------------------------
@@ -89,11 +100,21 @@ export async function runSetup(deps: RunSetupDeps = {}): Promise<void> {
   } catch {
     log.info("Conectando o projeto ao Convex (o backend do site). Se pedir, faça login no navegador.");
     try {
-      execFileSync("npx", ["convex", "dev", "--once"], { stdio: "inherit", cwd });
+      const args = ["convex", "dev", "--once"];
+      if (deps.newProject) {
+        // Projeto novo: cria no Convex sem perguntar (nome, nuvem) e desliga a pergunta
+        // dos arquivos de IA do Convex. Quem quiser: `npx convex ai-files install`.
+        args.push("--configure", "new", "--project", deps.newProject, "--dev-deployment", "cloud");
+        const convexJson = path.join(cwd, "convex.json");
+        const exists = await fs.access(convexJson).then(() => true, () => false);
+        if (!exists) await fs.writeFile(convexJson, JSON.stringify({ aiFiles: { enabled: false } }, null, 2) + "\n");
+      }
+      execFileSync("npx", args, { stdio: "inherit", cwd });
       envVars = await readEnv();
     } catch {
       cancel(
-        "Não deu para conectar ao Convex. Rode npx convex dev nesta pasta, espere terminar e rode o setup de novo."
+        "Não deu para conectar ao Convex. Quando quiser tentar de novo, rode: " +
+          (deps.newProject ? `cd ${deps.newProject} && npx create-rubrica setup` : "npx create-rubrica setup (nesta pasta)")
       );
       return;
     }
@@ -155,9 +176,11 @@ export async function runSetup(deps: RunSetupDeps = {}): Promise<void> {
     if (!isCancel(value) && value && (value as string).trim()) setEnv(key, (value as string).trim());
   };
   const wants = async (message: string) => (await confirm({ message, initialValue: false })) === true;
+  // Vindo do site, as integrações ficam para depois: nenhuma pergunta além da senha.
+  const fromSite = deps.site !== undefined;
 
   // 8. Telegram (contact-wizard ou testimonials-intake)
-  if (plugins["contact-wizard"] || plugins["testimonials-intake"]) {
+  if (!fromSite && (plugins["contact-wizard"] || plugins["testimonials-intake"])) {
     if (await wants("Quer receber um aviso no Telegram a cada novo contato ou depoimento? (dá para configurar depois)")) {
       await optional("Token do bot do Telegram (quem cria é o @BotFather; Enter para pular):", "TELEGRAM_BOT_TOKEN");
       await optional("Id da conversa que recebe os avisos (Enter para pular):", "TELEGRAM_ADMIN_CHAT_ID");
@@ -200,54 +223,70 @@ export async function runSetup(deps: RunSetupDeps = {}): Promise<void> {
     }
   }
 
-  // 12. Prompts de admin (email + senha)
-  const adminEmailAnswer = await text({
-    message: "E-mail para entrar no painel admin:",
-    initialValue: normalizeEmail(identity.authorEmail ?? ""),
-    validate: validateEmail,
-  });
-  if (isCancel(adminEmailAnswer)) {
-    cancel("Setup cancelado.");
-    return;
-  }
-  const adminEmail = normalizeEmail(adminEmailAnswer as string);
-
-  const adminPassword = await password({
-    message: "Senha do painel admin (mínimo 12 caracteres):",
-    validate: (v) => {
-      if (v.length < 12) return "Senha deve ter pelo menos 12 caracteres";
-    },
-  });
-  if (isCancel(adminPassword)) {
-    cancel("Setup cancelado.");
-    return;
-  }
-
-  const adminPasswordConfirm = await password({
-    message: "Confirme a senha:",
-    validate: (v) => {
-      if (v !== adminPassword) return "As senhas não coincidem";
-    },
-  });
-  if (isCancel(adminPasswordConfirm)) {
-    cancel("Setup cancelado.");
-    return;
-  }
-
+  // 12. Admin (e-mail + senha). Rodando o setup de novo, o admin já existe: não pede nada
+  // (antes pedia a senha duas vezes para só então avisar). Para trocar: `senha`.
+  const savedEmail = normalizeEmail(identity.authorEmail ?? "");
+  let adminExists = false;
   try {
-    execFileSync(
-      "npx",
-      ["convex", "run", "seed:setupAdmin", JSON.stringify({ email: adminEmail, password: adminPassword as string })],
-      { stdio: "pipe", cwd }
-    );
-  } catch (err: unknown) {
-    const e = err as { stdout?: Buffer; stderr?: Buffer; message?: string };
-    const output = e.stdout?.toString() || e.stderr?.toString() || e.message || "";
-    if (output.includes("Root user already exists")) {
-      log.warn("Admin já configurado — credenciais mantidas. Para redefinir, acesse o Convex Dashboard.");
+    adminExists = execFileSync("npx", ["convex", "run", "users:isSetupRequired"], { stdio: "pipe", cwd }).toString().trim() === "false";
+  } catch {
+    // sem resposta: segue o fluxo normal, e o setupAdmin avisa se o admin já existir
+  }
+
+  let adminEmail = savedEmail;
+  if (adminExists) {
+    log.info("O painel já tem um admin; o login continua o mesmo. Para trocar a senha: npx create-rubrica senha");
+  } else {
+    if (fromSite && savedEmail && !validateEmail(savedEmail)) {
+      log.info(`Login do painel: ${adminEmail}. Agora escolha a senha.`);
     } else {
-      cancel(`Erro ao criar usuário root: ${output || String(err)}`);
+      const adminEmailAnswer = await text({
+        message: "E-mail para entrar no painel admin:",
+        initialValue: savedEmail,
+        validate: validateEmail,
+      });
+      if (isCancel(adminEmailAnswer)) {
+        cancel("Setup cancelado.");
+        return;
+      }
+      adminEmail = normalizeEmail(adminEmailAnswer as string);
+    }
+
+    const adminPassword = await password({
+      message: "Senha do painel admin (12 ou mais caracteres, com maiúscula, minúscula e número):",
+      validate: validatePassword,
+    });
+    if (isCancel(adminPassword)) {
+      cancel("Setup cancelado.");
       return;
+    }
+
+    const adminPasswordConfirm = await password({
+      message: "Confirme a senha:",
+      validate: (v) => {
+        if (v !== adminPassword) return "As senhas não coincidem";
+      },
+    });
+    if (isCancel(adminPasswordConfirm)) {
+      cancel("Setup cancelado.");
+      return;
+    }
+
+    try {
+      execFileSync(
+        "npx",
+        ["convex", "run", "seed:setupAdmin", JSON.stringify({ email: adminEmail, password: adminPassword as string })],
+        { stdio: "pipe", cwd }
+      );
+    } catch (err: unknown) {
+      const e = err as { stdout?: Buffer; stderr?: Buffer; message?: string };
+      const output = e.stdout?.toString() || e.stderr?.toString() || e.message || "";
+      if (output.includes("Root user already exists")) {
+        log.warn("O painel já tinha um admin; o login continua o mesmo. Para trocar a senha: npx create-rubrica senha");
+      } else {
+        cancel(`Erro ao criar usuário root: ${output || String(err)}`);
+        return;
+      }
     }
   }
 
@@ -310,27 +349,29 @@ export async function runSetup(deps: RunSetupDeps = {}): Promise<void> {
   }
 
   // 13. Vercel — sempre presentes (opcionais)
-  if (await wants("O site vai ficar na Vercel e você quer o botão de publicar no painel? (dá para configurar depois)")) {
+  if (!fromSite && await wants("O site vai ficar na Vercel e você quer o botão de publicar no painel? (dá para configurar depois)")) {
     await optional("Link do Deploy Hook da Vercel (Settings → Git → Deploy Hooks; Enter para pular):", "VERCEL_DEPLOY_HOOK_URL");
     await optional("Segredo do webhook da Vercel (Enter para pular):", "VERCEL_WEBHOOK_SECRET");
   }
 
   // 14. Personalização: a profissão aparece abaixo do nome no site; as especialidades
   // entram no contexto que a IA usa para escrever propostas.
-  const profession = await text({
-    message: "Qual é a sua profissão ou área de atuação? (aparece abaixo do seu nome no site; Enter para pular)",
-    placeholder: "Ex: Designer UX, Fotógrafa, Advogada, Engenheira Civil...",
-    initialValue: "",
-  });
-
-  const specialties = await text({
-    message: "Quais são suas principais especialidades? (separadas por vírgula; a IA usa nas propostas; Enter para pular)",
-    placeholder: "Ex: Branding, Motion Design, Fotografia de Produto",
-    initialValue: "",
-  });
-
-  const professionStr = isCancel(profession) ? "" : ((profession as string) || "").trim();
-  const specialtiesStr = isCancel(specialties) ? "" : ((specialties as string) || "").trim();
+  const askText = async (message: string, placeholder: string) => {
+    const value = await text({ message, placeholder, initialValue: "" });
+    return isCancel(value) ? "" : ((value as string) || "").trim();
+  };
+  const professionStr = fromSite
+    ? (deps.site?.profession ?? "").trim()
+    : await askText(
+        "Qual é a sua profissão ou área de atuação? (aparece abaixo do seu nome no site; Enter para pular)",
+        "Ex: Designer UX, Fotógrafa, Advogada, Engenheira Civil..."
+      );
+  const specialtiesStr = fromSite
+    ? (deps.site?.specialties ?? "").trim()
+    : await askText(
+        "Quais são suas principais especialidades? (separadas por vírgula; a IA usa nas propostas; Enter para pular)",
+        "Ex: Branding, Motion Design, Fotografia de Produto"
+      );
 
   if (professionStr) {
     const name = identity.authorName || adminEmail.split("@")[0];
@@ -354,7 +395,14 @@ export async function runSetup(deps: RunSetupDeps = {}): Promise<void> {
     }
   }
 
+  if (fromSite) {
+    log.info(
+      "Avisos no Telegram e o botão de publicar da Vercel ficam para depois: " +
+        "quando quiser, rode npx create-rubrica setup nesta pasta."
+    );
+  }
+
   outro(
-    `Pronto!\n\n  Admin: ${adminEmail}\n  O painel fica em /login\n\n  Para abrir o site:\n  ${deps.nextStep ?? "pnpm dev"}`
+    `Pronto!\n\n  Admin: ${adminEmail || "o mesmo de antes"}\n  O painel fica em /login\n\n  Para abrir o site:\n  ${deps.nextStep ?? "pnpm dev"}`
   );
 }

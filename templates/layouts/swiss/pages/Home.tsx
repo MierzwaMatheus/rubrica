@@ -1,9 +1,46 @@
-import { Code, Terminal, Cpu, Palette, Zap, Layout, MessageSquare, Layers } from "lucide-react";
+import { Code, Terminal, Cpu, Palette, Zap, Layout, MessageSquare, Layers, ArrowRight } from "lucide-react";
+import { Link } from "wouter";
 import { useHome } from "@/hooks/useHome";
 import { useResume } from "@/hooks/useResume";
 import { useSidebar } from "@/hooks/useSidebar";
-import { homeRepository, resumeRepository, sidebarRepository } from "@/repositories/instances";
+import { usePortfolio } from "@/hooks/usePortfolio";
+import { useHomeMetrics } from "@/hooks/useHomeMetrics";
+import { useContactWizard } from "@/contexts/ContactWizardContext";
+import { usePlugin } from "@/contexts/PluginsContext";
+import { useTranslation } from "@/i18n/hooks/useTranslation";
+import { selectFeaturedCases } from "@/utils/homeContent";
+import { homeRepository, resumeRepository, sidebarRepository, portfolioRepository } from "@/repositories/instances";
 import { SwissShell, SwissGridLines } from "@/components/SwissShared";
+
+const chapterLabel: React.CSSProperties = {
+  gridColumn: "span 2",
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: "0.16em",
+  textTransform: "uppercase",
+  paddingTop: 6,
+};
+const chapterTitle: React.CSSProperties = {
+  gridColumn: "span 10",
+  fontSize: 44,
+  fontWeight: 900,
+  letterSpacing: "-0.03em",
+  margin: 0,
+  lineHeight: 1,
+};
+const btnBase: React.CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 8,
+  padding: "12px 18px",
+  fontSize: 12,
+  fontWeight: 800,
+  letterSpacing: "0.12em",
+  textTransform: "uppercase",
+  border: "2px solid var(--text)",
+  cursor: "pointer",
+  textDecoration: "none",
+};
 
 const SERVICE_ICONS = [
   <Code size={26} strokeWidth={2.5} />,
@@ -17,9 +54,15 @@ const SERVICE_ICONS = [
 ];
 
 export default function SwissHome() {
-  const { contactRole, aboutText, services, testimonials, isLoading } = useHome(homeRepository);
+  const { t } = useTranslation();
+  const { contactRole, aboutText, services, testimonials, contactWizardEnabled, isLoading } = useHome(homeRepository);
   const { getItemsByType } = useResume(resumeRepository);
   const { contactInfo } = useSidebar(sidebarRepository);
+  const { projects } = usePortfolio(portfolioRepository);
+  const { metrics } = useHomeMetrics(homeRepository);
+  const { openWizard } = useContactWizard();
+  const portfolioEnabled = usePlugin("portfolio");
+  const featuredCases = portfolioEnabled ? selectFeaturedCases(projects) : [];
 
   if (isLoading) return null;
 
@@ -65,28 +108,50 @@ export default function SwissHome() {
             </div>
             <h1
               style={{
-                fontSize: 132,
+                fontSize: "clamp(48px, 7vw, 96px)",
                 fontWeight: 900,
                 letterSpacing: "-0.05em",
                 margin: 0,
-                lineHeight: 0.85,
+                lineHeight: 0.92,
               }}
             >
-              Oi! Eu
-              <br />
-              sou o
-              <br />
-              <span
-                style={{
-                  background: "var(--primary)",
-                  color: "var(--bg)",
-                  padding: "0 12px",
-                  display: "inline-block",
-                }}
-              >
-                {authorFirstName}.
-              </span>
+              {t("home.hero.headline")}
             </h1>
+            <div
+              style={{
+                marginTop: 18,
+                fontSize: 14,
+                fontWeight: 700,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+              }}
+            >
+              <span style={{ background: "var(--primary)", color: "var(--bg)", padding: "2px 8px" }}>
+                {authorFirstName}
+              </span>{" "}
+              — {contactRole}
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 24 }}>
+              {featuredCases.length > 0 && (
+                <a
+                  href="#cases"
+                  data-umami-event="home-hero-ver-cases"
+                  style={{ ...btnBase, background: "var(--text)", color: "var(--bg)" }}
+                >
+                  {t("home.hero.ctaCases")} <ArrowRight size={14} strokeWidth={3} />
+                </a>
+              )}
+              {contactWizardEnabled && (
+                <button
+                  type="button"
+                  onClick={() => openWizard({ sourceContext: "home-hero" })}
+                  data-umami-event="home-hero-fale-comigo"
+                  style={{ ...btnBase, background: "transparent", color: "var(--text)" }}
+                >
+                  {t("home.hero.ctaContact")}
+                </button>
+              )}
+            </div>
           </div>
           <div style={{ gridColumn: "span 4" }}>
             {contactInfo?.avatar_url ? (
@@ -128,7 +193,38 @@ export default function SwissHome() {
         </div>
       </div>
 
-      {/* Stack band */}
+      {/* Metrics band: prova logo abaixo do topo (cai para a stack quando não há números) */}
+      {metrics.length > 0 ? (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+            borderBottom: "2px solid var(--text)",
+          }}
+        >
+          {metrics.map((m, i) => (
+            <div
+              key={m.label}
+              style={{
+                padding: "22px 18px",
+                borderLeft: i > 0 ? "1px solid var(--text)" : "none",
+                background: i === 0 ? "var(--text)" : "transparent",
+                color: i === 0 ? "var(--bg)" : "var(--text)",
+              }}
+            >
+              <div style={{ fontSize: 10, fontWeight: 500, letterSpacing: "0.14em", opacity: 0.7 }}>
+                .{String(i + 1).padStart(2, "0")}
+              </div>
+              <div style={{ fontSize: 40, fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1, marginTop: 6 }}>
+                {m.value}
+              </div>
+              <div style={{ fontSize: 11, fontWeight: 500, lineHeight: 1.4, marginTop: 8, opacity: 0.85 }}>
+                {m.label}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
       <div
         style={{
           display: "grid",
@@ -182,6 +278,86 @@ export default function SwissHome() {
           </div>
         ))}
       </div>
+      )}
+
+      {/* Cases em destaque */}
+      {featuredCases.length > 0 && (
+        <div id="cases" style={{ padding: "40px 18px", borderBottom: "2px solid var(--text)", scrollMarginTop: 16 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(12, 1fr)", gap: 12, marginBottom: 28 }}>
+            <div style={chapterLabel}>Capítulo .02</div>
+            <h2 style={{ ...chapterTitle, gridColumn: "span 8" }}>{t("home.cases.title").trim()}.</h2>
+            <Link
+              href="/portfolio"
+              style={{
+                gridColumn: "span 2",
+                alignSelf: "end",
+                textAlign: "right",
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: "var(--text)",
+              }}
+            >
+              {t("home.cases.viewAll")} →
+            </Link>
+          </div>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+              gap: 1,
+              background: "var(--text)",
+              border: "1px solid var(--text)",
+            }}
+          >
+            {featuredCases.map((p, i) => {
+              const metric = p.case_study?.metrics?.[0];
+              return (
+                <Link
+                  key={p.id}
+                  href={`/portfolio/${p.slug}`}
+                  data-umami-event="home-case"
+                  data-umami-event-case={p.slug}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    background: "var(--bg)",
+                    color: "var(--text)",
+                    textDecoration: "none",
+                  }}
+                >
+                  <div style={{ aspectRatio: "16 / 10", overflow: "hidden", borderBottom: "1px solid var(--text)", background: "var(--text)" }}>
+                    {p.images?.[0] && (
+                      <img src={p.images[0]} alt={p.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", filter: "grayscale(1)" }} />
+                    )}
+                  </div>
+                  <div style={{ padding: 18, display: "flex", flexDirection: "column", gap: 8, flex: 1 }}>
+                    <span style={{ fontSize: 10, fontWeight: 500, letterSpacing: "0.14em", opacity: 0.7 }}>
+                      .{String(i + 1).padStart(2, "0")} {p.category ? `/ ${p.category}` : ""}
+                    </span>
+                    <h3 style={{ fontSize: 20, fontWeight: 900, letterSpacing: "-0.02em", margin: 0, lineHeight: 1.1 }}>{p.title}</h3>
+                    <p style={{ fontSize: 11, lineHeight: 1.55, margin: 0, opacity: 0.85 }}>{p.description}</p>
+                    {metric && (
+                      <div style={{ marginTop: 6 }}>
+                        <span style={{ background: "var(--primary)", color: "var(--bg)", padding: "2px 8px", fontSize: 18, fontWeight: 900 }}>
+                          {metric.value}
+                        </span>
+                        <span style={{ fontSize: 10, fontWeight: 600, marginLeft: 8, textTransform: "uppercase", letterSpacing: "0.1em" }}>
+                          {metric.label}
+                        </span>
+                      </div>
+                    )}
+                    <span style={{ marginTop: "auto", paddingTop: 10, fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase" }}>
+                      {t("portfolio.viewCase")} →
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Capabilities */}
       <div
@@ -209,7 +385,7 @@ export default function SwissHome() {
               paddingTop: 6,
             }}
           >
-            Capítulo .02
+            Capítulo .03
           </div>
           <h2
             style={{
@@ -306,7 +482,7 @@ export default function SwissHome() {
                 paddingTop: 6,
               }}
             >
-              Capítulo .03
+              Capítulo .04
             </div>
             <h2
               style={{
@@ -406,6 +582,39 @@ export default function SwissHome() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Fechamento: um caminho para quem tem projeto e outro para quem tem vaga */}
+      {contactWizardEnabled && (
+        <div style={{ padding: "40px 18px", background: "var(--primary)", color: "var(--bg)" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 24, alignItems: "flex-end", justifyContent: "space-between" }}>
+            <div style={{ flex: "1 1 420px" }}>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", marginBottom: 12 }}>
+                Capítulo .05
+              </div>
+              <h2 style={{ fontSize: "clamp(32px, 5vw, 44px)", fontWeight: 900, letterSpacing: "-0.03em", margin: 0, lineHeight: 1 }}>{t("home.cta.title")}</h2>
+              <p style={{ fontSize: 13, margin: "10px 0 0", opacity: 0.85 }}>{t("home.cta.subtitle")}</p>
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+              <button
+                type="button"
+                onClick={() => openWizard({ flowType: "project", sourceContext: "home-cta" })}
+                data-umami-event="home-cta-projeto"
+                style={{ ...btnBase, background: "var(--bg)", color: "var(--text)", borderColor: "var(--bg)" }}
+              >
+                {t("home.cta.project")}
+              </button>
+              <button
+                type="button"
+                onClick={() => openWizard({ flowType: "job", sourceContext: "home-cta" })}
+                data-umami-event="home-cta-vaga"
+                style={{ ...btnBase, background: "transparent", color: "var(--bg)", borderColor: "var(--bg)" }}
+              >
+                {t("home.cta.job")}
+              </button>
             </div>
           </div>
         </div>

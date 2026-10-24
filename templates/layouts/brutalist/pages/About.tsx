@@ -1,6 +1,24 @@
 import { useAbout } from "@/hooks/useAbout";
 import { useHome } from "@/hooks/useHome";
+import { useWorkPrinciples } from "@/hooks/useWorkPrinciples";
+import { useTranslation } from "@/i18n/hooks/useTranslation";
 import { aboutRepository, homeRepository } from "@/repositories/instances";
+import { splitParagraphs } from "@/utils/aboutContent";
+import { highlightNumbers } from "@/utils/homeContent";
+
+function Highlighted({ text }: { text: string }) {
+  return (
+    <>
+      {highlightNumbers(text).map((seg, i) =>
+        seg.highlight ? (
+          <b key={i} style={{ color: "var(--primary)" }}>{seg.text}</b>
+        ) : (
+          <span key={i}>{seg.text}</span>
+        ),
+      )}
+    </>
+  );
+}
 
 function AsciiRule({ char = "─", label }: { char?: string; label?: string }) {
   return (
@@ -69,10 +87,13 @@ function BrutPrompt({
 }
 
 export default function About() {
+  const { t } = useTranslation();
   const { aboutText } = useHome(homeRepository);
   const { dailyRoutine, faq } = useAbout(aboutRepository);
+  const { principles } = useWorkPrinciples(homeRepository);
 
-  const bio = [aboutText].filter(Boolean);
+  const bio = splitParagraphs(aboutText ?? "");
+  const personal = splitParagraphs(t("about.aboutMe.text"));
 
   return (
     <div
@@ -87,7 +108,7 @@ export default function About() {
       }}
     >
       <div style={{ fontSize: 11, opacity: 0.6, marginBottom: 8 }}>
-        // personal / non-technical
+        // professional · method · personal
       </div>
       <h1
         style={{ fontSize: 28, fontWeight: 700, margin: "4px 0 14px" }}
@@ -95,7 +116,7 @@ export default function About() {
         $ cat about.txt
       </h1>
 
-      <AsciiRule label="bio" />
+      <AsciiRule label={t("about.professional.title")} />
 
       <BrutPrompt
         cmd="head -n 30 ~/about.txt"
@@ -121,12 +142,63 @@ export default function About() {
                 >
                   {String(i + 1).padStart(2, "0")}|
                 </span>
-                {p}
+                <Highlighted text={p} />
               </p>
             ))}
           </div>
         }
       />
+
+      {principles.length > 0 && (
+        <>
+          <AsciiRule label={t("about.principles.title")} />
+          <BrutPrompt
+            cmd="cat ~/method.md"
+            output={
+              <div
+                style={{
+                  marginTop: 8,
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+                  border: "1px solid var(--text)",
+                }}
+              >
+                {principles.map((pr, i) => (
+                  <div
+                    key={pr.title}
+                    style={{
+                      padding: 16,
+                      borderLeft: i === 0 ? "none" : "1px solid var(--text)",
+                      whiteSpace: "normal",
+                    }}
+                  >
+                    <div style={{ fontWeight: 700, marginBottom: 6 }}>
+                      <span style={{ color: "var(--primary)" }}>[{String(i + 1).padStart(2, "0")}]</span> {pr.title}
+                    </div>
+                    <div style={{ fontSize: 12, opacity: 0.82, lineHeight: 1.6 }}>{pr.description}</div>
+                  </div>
+                ))}
+              </div>
+            }
+          />
+        </>
+      )}
+
+      {personal.length > 0 && (
+        <>
+          <AsciiRule label={t("about.aboutMe.title")} />
+          <BrutPrompt
+            cmd="cat ~/offline.txt"
+            output={
+              <div style={{ marginTop: 8, paddingLeft: 14, borderLeft: "2px solid var(--accent)" }}>
+                {personal.map((p, i) => (
+                  <p key={i} style={{ fontSize: 13, lineHeight: 1.7, margin: "0 0 14px" }}>{p}</p>
+                ))}
+              </div>
+            }
+          />
+        </>
+      )}
 
       <AsciiRule label="daily.snapshots" />
 

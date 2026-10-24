@@ -121,7 +121,8 @@
     "type": "skill",
     "content": {
       "name": "Figma",
-      "level": "95"
+      "level": "95",
+      "group": "Design"
     },
     "orderIndex": 5
   },
@@ -132,7 +133,8 @@
     "type": "skill",
     "content": {
       "name": "Pesquisa com usuários",
-      "level": "90"
+      "level": "90",
+      "group": "Pesquisa e UX"
     },
     "orderIndex": 6
   },
@@ -143,7 +145,8 @@
     "type": "skill",
     "content": {
       "name": "Design Systems",
-      "level": "92"
+      "level": "92",
+      "group": "Design"
     },
     "orderIndex": 7
   },
@@ -154,7 +157,8 @@
     "type": "skill",
     "content": {
       "name": "React",
-      "level": "85"
+      "level": "85",
+      "group": "Front-end"
     },
     "orderIndex": 8
   },
@@ -165,7 +169,8 @@
     "type": "skill",
     "content": {
       "name": "TypeScript",
-      "level": "80"
+      "level": "80",
+      "group": "Front-end"
     },
     "orderIndex": 9
   },
@@ -176,7 +181,8 @@
     "type": "skill",
     "content": {
       "name": "Prototipação",
-      "level": "88"
+      "level": "88",
+      "group": "Design"
     },
     "orderIndex": 10
   },
@@ -187,7 +193,8 @@
     "type": "skill",
     "content": {
       "name": "Acessibilidade",
-      "level": "82"
+      "level": "82",
+      "group": "Pesquisa e UX"
     },
     "orderIndex": 11
   },
@@ -198,7 +205,8 @@
     "type": "skill",
     "content": {
       "name": "CSS",
-      "level": "86"
+      "level": "86",
+      "group": "Front-end"
     },
     "orderIndex": 12
   },
@@ -209,7 +217,8 @@
     "type": "skill",
     "content": {
       "name": "Motion",
-      "level": "70"
+      "level": "70",
+      "group": "Design"
     },
     "orderIndex": 13
   },
@@ -220,7 +229,8 @@
     "type": "skill",
     "content": {
       "name": "Testes de usabilidade",
-      "level": "84"
+      "level": "84",
+      "group": "Pesquisa e UX"
     },
     "orderIndex": 14
   },
@@ -231,7 +241,8 @@
     "type": "skill",
     "content": {
       "name": "Escrita de UX",
-      "level": "75"
+      "level": "75",
+      "group": "Pesquisa e UX"
     },
     "orderIndex": 15
   },
@@ -242,7 +253,8 @@
     "type": "skill",
     "content": {
       "name": "Next.js",
-      "level": "65"
+      "level": "65",
+      "group": "Front-end"
     },
     "orderIndex": 16
   },

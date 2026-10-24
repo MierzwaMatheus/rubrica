@@ -1,18 +1,46 @@
 import { useAbout } from "@/hooks/useAbout";
 import { useHome } from "@/hooks/useHome";
+import { useWorkPrinciples } from "@/hooks/useWorkPrinciples";
+import { useTranslation } from "@/i18n/hooks/useTranslation";
+import { splitParagraphs } from "@/utils/aboutContent";
+import { highlightNumbers } from "@/utils/homeContent";
 import { aboutRepository, homeRepository } from "@/repositories/instances";
 import { SwissShell, SwissGridLines } from "@/components/SwissShared";
+
+/** Parágrafo com os números de resultado em destaque. */
+function Highlighted({ text }: { text: string }) {
+  return (
+    <>
+      {highlightNumbers(text).map((seg, i) =>
+        seg.highlight ? (
+          <strong key={i} style={{ fontWeight: 900, background: "color-mix(in oklab, var(--primary) 22%, transparent)", padding: "0 2px" }}>
+            {seg.text}
+          </strong>
+        ) : (
+          <span key={i}>{seg.text}</span>
+        )
+      )}
+    </>
+  );
+}
+
+const sectionLabel: React.CSSProperties = {
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: "0.16em",
+  textTransform: "uppercase",
+};
 
 export default function SwissAbout() {
   const { dailyRoutine, faq, isLoading: aboutLoading } = useAbout(aboutRepository);
   const { aboutText, isLoading: homeLoading } = useHome(homeRepository);
+  const { principles } = useWorkPrinciples(homeRepository);
+  const { t } = useTranslation();
 
   if (aboutLoading || homeLoading) return null;
 
-  const introSections = aboutText.split("\n\n").filter(Boolean).slice(0, 3);
-  while (introSections.length < 3) {
-    introSections.push("");
-  }
+  const introSections = splitParagraphs(aboutText ?? "").slice(0, 3);
+  const personalParagraphs = splitParagraphs(t("about.aboutMe.text") ?? "");
 
   return (
     <SwissShell page="Sobre Mim" idx={4}>
@@ -56,9 +84,9 @@ export default function SwissAbout() {
               lineHeight: 0.92,
             }}
           >
-            Quem faz o trabalho,
+            Quem faz o trabalho
             <br />
-            fora do{" "}
+            e{" "}
             <span
               style={{
                 background: "var(--primary)",
@@ -66,7 +94,7 @@ export default function SwissAbout() {
                 padding: "0 10px",
               }}
             >
-              computador.
+              como.
             </span>
           </h1>
         </div>
@@ -89,12 +117,10 @@ export default function SwissAbout() {
               textTransform: "uppercase",
             }}
           >
-            .13 — Manifesto
-            <br />
-            Pessoal
+            .13 — {t("about.professional.title")}
           </div>
           {introSections.map((para, i) => (
-            <p key={i} style={{ fontSize: 12.5, lineHeight: 1.65, margin: 0 }}>
+            <p key={i} style={{ fontSize: 12.5, lineHeight: 1.65, margin: 0, gridColumn: introSections.length === 1 ? "span 3" : undefined }}>
               {i === 0 && para.length > 0 ? (
                 <>
                   <span
@@ -110,15 +136,67 @@ export default function SwissAbout() {
                   >
                     {para[0]}
                   </span>
-                  {para.slice(1)}
+                  <Highlighted text={para.slice(1)} />
                 </>
               ) : (
-                para
+                <Highlighted text={para} />
               )}
             </p>
           ))}
         </div>
       </div>
+
+      {/* Como eu trabalho: metodologia antes do conteúdo pessoal */}
+      {principles.length > 0 && (
+        <div style={{ padding: "40px 18px", borderBottom: "2px solid var(--text)" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(12, 1fr)", gap: 12, marginBottom: 28 }}>
+            <div style={{ ...sectionLabel, gridColumn: "span 2" }}>.14 — Método</div>
+            <h3 style={{ gridColumn: "span 10", fontSize: 36, fontWeight: 900, letterSpacing: "-0.02em", margin: 0, lineHeight: 1 }}>
+              {t("about.principles.title")}.
+            </h3>
+          </div>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: `repeat(${Math.min(principles.length, 4)}, 1fr)`,
+              border: "1px solid var(--text)",
+            }}
+          >
+            {principles.map((p, i) => (
+              <div
+                key={p.title}
+                style={{
+                  padding: 20,
+                  borderLeft: i % 4 !== 0 ? "1px solid var(--text)" : "none",
+                  borderTop: i >= 4 ? "1px solid var(--text)" : "none",
+                  background: i === 0 ? "var(--primary)" : "transparent",
+                  color: i === 0 ? "var(--bg)" : "var(--text)",
+                }}
+              >
+                <div style={{ fontSize: 30, fontWeight: 900, lineHeight: 0.85, letterSpacing: "-0.03em", marginBottom: 14 }}>
+                  {String(i + 1).padStart(2, "0")}
+                </div>
+                <h4 style={{ fontSize: 16, fontWeight: 800, margin: "0 0 8px", letterSpacing: "-0.01em", lineHeight: 1.2 }}>{p.title}</h4>
+                <p style={{ fontSize: 11.5, lineHeight: 1.55, margin: 0, opacity: 0.85 }}>{p.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Fora do trabalho: o conteúdo pessoal vem depois do profissional */}
+      {personalParagraphs.length > 0 && (
+        <div style={{ padding: "40px 18px", borderBottom: "2px solid var(--text)" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 3fr", gap: 16 }}>
+            <div style={sectionLabel}>.15 — {t("about.aboutMe.title")}</div>
+            <div style={{ display: "grid", gap: 12, maxWidth: 760 }}>
+              {personalParagraphs.map((para, i) => (
+                <p key={i} style={{ fontSize: 13, lineHeight: 1.65, margin: 0 }}>{para}</p>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Gallery */}
       {dailyRoutine.length > 0 && (
@@ -140,7 +218,7 @@ export default function SwissAbout() {
                 textTransform: "uppercase",
               }}
             >
-              .14 — Meu
+              .16 — Meu
               <br />
               dia-a-dia
             </div>
@@ -240,7 +318,7 @@ export default function SwissAbout() {
                 textTransform: "uppercase",
               }}
             >
-              .15 — FAQ
+              .17 — FAQ
               <br />
               Pessoal
             </div>

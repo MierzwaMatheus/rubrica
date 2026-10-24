@@ -29,18 +29,21 @@ A cor entra em **blocos sólidos**: a primária e o destaque viram fundo de card
 
 ![Início](img/swiss/home.jpg)
 
-- Hero em 8 das 12 colunas: **"Oi! Eu sou o Alex."** em 132px, com o nome sobre um bloco na primária; avatar e texto "sobre" nas outras 4.
-- Faixa **"Stack Principal"**: as 4 primeiras habilidades do currículo, uma delas em bloco no destaque.
-- Capítulo .02: os 4 primeiros serviços em 4 colunas, o primeiro em bloco na primária.
-- Capítulo .03 "Vozes": o primeiro depoimento em destaque invertido, os demais em lista ao lado.
+- Hero em 8 das 12 colunas com o **título principal** (texto editável em Textos), o nome em bloco na primária ao lado do cargo e dois botões: **"Ver cases"** e **"Fale comigo"** (abre o formulário de contato). Avatar e texto "sobre" nas outras 4 colunas.
+- **Faixa de números** logo abaixo do topo: até 4 resultados cadastrados no admin (Home → Números), o primeiro invertido. Sem números, a faixa volta a mostrar a stack principal.
+- Capítulo .02 **"Cases em destaque"**: os 3 primeiros projetos com estudo de caso, com categoria, a primeira métrica do case em bloco na primária e link para o case.
+- Capítulo .03: os 4 primeiros serviços em 4 colunas, o primeiro em bloco na primária.
+- Capítulo .04 "Vozes": o primeiro depoimento em destaque invertido, os demais em lista ao lado.
+- Capítulo .05: fechamento na primária com dois caminhos, **"Tenho um projeto"** e **"Tenho uma vaga"**.
 
 ### Currículo (Folha 02)
 
 ![Currículo](img/swiss/curriculo.jpg)
 
-- Título **"Curriculum Vitæ."** com "Vitæ." sobre o destaque e uma faixa de 3 números grandes (cargos, habilidades, certificações).
-- Experiência em linhas de 3 colunas (número, período, cargo/empresa/descrição).
-- Habilidades num grid de 6 colunas, ordenadas por nível: **≥ 90 em bloco na primária**, ≥ 80 em bloco invertido, abaixo disso só contorno — o nível vira hierarquia visual.
+- Título **"Curriculum Vitæ."** com "Vitæ." sobre o destaque; ao lado, o **resumo** (primeiro parágrafo do "sobre") e o botão **"Baixar CV (PDF)"**.
+- Faixa com os **números de resultado** do admin; sem números, mostra cargos, habilidades e certificações.
+- Experiência em linhas de 3 colunas: as 2 mais recentes abertas e as anteriores atrás de "ver experiências anteriores".
+- **Habilidades agrupadas por área** (campo "Grupo" no admin), em chips sem nível numérico; as sem grupo vão para "Stack".
 - Formação, idiomas e soft skills lado a lado; cursos e voluntariado no fim.
 
 ### Portfólio (Folha 03)
@@ -48,15 +51,18 @@ A cor entra em **blocos sólidos**: a primária e o destaque viram fundo de card
 ![Portfólio](img/swiss/portfolio.jpg)
 
 - Título **"6 obras selecionadas."** com o número em bloco na primária.
-- Barra `.filtros` com as tags dos projetos (visual).
-- Projetos em grid de 2 colunas com imagem 4:3, número grande, título, descrição e tags; o primeiro projeto em bloco no destaque.
+- Barra `.filtros` **por categoria** e funcional ("Todos" + categorias dos projetos). Fica escondida quando nenhum projeto tem categoria.
+- Projetos em grid de 2 colunas com imagem 4:3, número grande, título, descrição, a primeira métrica do case e até 3 tags; o primeiro projeto em bloco no destaque.
+- Uma ação por projeto: **"$ cat case.md →"** quando há estudo de caso, ou "Ver projeto ↗" quando só há link de demo.
 
 ### Sobre (Folha 04)
 
 ![Sobre](img/swiss/sobre.jpg)
 
-- Título "Quem faz o trabalho, fora do **computador.**" com a última palavra em bloco na primária.
-- **Manifesto pessoal**: o texto "sobre" dividido em até 3 parágrafos, o primeiro com capitular.
+- Título "Quem faz o trabalho e **como.**" com a última palavra em bloco na primária.
+- **.13 Resumo profissional**: o texto "sobre" em até 3 parágrafos, o primeiro com capitular e os números de resultado em destaque.
+- **.14 Como eu trabalho**: os princípios cadastrados no admin (Home → Princípios) em colunas numeradas, o primeiro na primária.
+- **.15 Fora do trabalho**: o texto pessoal, depois do conteúdo profissional.
 - Galeria do dia-a-dia em 6 colunas (fotos 4:5) e FAQ em linhas de 3 colunas, a primeira invertida.
 
 ### Blog (Folha 05)
@@ -69,6 +75,6 @@ A cor entra em **blocos sólidos**: a primária e o destaque viram fundo de card
 
 ## Limitações conhecidas
 
-- Só a navegação é responsiva; as páginas usam grids e tamanhos fixos e não se reorganizam no celular.
-- Filtros do Portfólio, busca do Blog e "Estudo de caso →" são visuais (sem ação).
+- Só a navegação, a faixa de números, os cases em destaque e o fechamento da Início se reorganizam no celular; o resto das páginas usa grids e tamanhos fixos.
+- A busca do Blog é visual (sem ação).
 - Alguns textos são fixos no código: "Portfolio · 2026", "Grid 12 · Helvetica", "Folha X / 05".

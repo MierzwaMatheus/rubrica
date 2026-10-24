@@ -35,34 +35,48 @@ Abaixo de `lg`, a sidebar vira um cabeçalho fixo com mini-avatar e um menu late
 ![Início](img/cyberpunk/home.jpg)
 
 - Entrada em cascata: cada bloco aparece com fade e leve subida.
-- Hero com selo "disponível para novos projetos" (ponto pulsante), `$ whoami`, a saudação na primária e o **primeiro nome** com sublinhado no destaque.
-- `$ cat role.txt` seguido do cargo e da frase de apresentação com borda lateral.
-- Chips de tecnologias, editáveis em **Textos** (chaves `home.hero.technologies.N.name`); a cor de cada um vem de `home.hero.technologies.N.color`, uma classe do Tailwind.
-- Card "Sobre mim", serviços em grade de 2 colunas com ícones alternados (o último ocupa a linha inteira quando a quantidade é ímpar) e depoimentos com foto.
-- Com os plugins de depoimentos ligados: link "Ver todos" e botão "Deixar meu depoimento", que abre o assistente.
+- Hero em uma tela só:
+  - o selo "disponível para novos projetos";
+  - `$ whoami → nome`;
+  - o título (`home.hero.headline`, editável em **Textos**), o cargo e a frase de apresentação;
+  - dois botões: **Ver cases** e **Fale comigo**, que abre o assistente de contato.
+- **Faixa de números** logo abaixo do hero: até 4 resultados editáveis no admin, na aba **Home → Números** (chave `home_metrics`). Sem números, a faixa não aparece.
+- **Cases em destaque**: os 3 primeiros projetos com estudo de caso, cada um com a primeira métrica do case e o link `$ cat case.md`.
+- "Sobre mim" em parágrafos, com os números em destaque, e serviços em grade de 2 colunas.
+- Depoimentos com foto. Com os plugins de depoimentos ligados: link "Ver todos" e botão "Deixar meu depoimento".
+- Fechamento com dois caminhos: **Tenho um projeto** e **Tenho uma vaga**, cada um abrindo o assistente no fluxo certo.
 
 ### Currículo
 
 ![Currículo](img/cyberpunk/curriculo.jpg)
 
+- **Resumo no topo**: o primeiro parágrafo do "Sobre", a faixa de números e o botão **Baixar CV (PDF)**.
 - Grade de 3 colunas: Experiência, Formação, Cursos e Voluntariado na coluna principal (2/3); Habilidades, Soft skills e Idiomas na lateral.
-- Habilidades com **barras de progresso animadas** de 0 até o nível.
+- As 2 experiências mais recentes ficam abertas; as anteriores, atrás de "ver experiências anteriores".
+- **Habilidades por categoria**: o campo **Grupo** de cada habilidade, no admin, define a categoria. Sem grupo, a habilidade vai para "Stack". Não há porcentagens nem barras de nível.
 - Descrições de experiência e formação em HTML (sanitizado).
-- Itens entram deslizando, com atraso progressivo; seções sem itens não aparecem.
 
 ### Portfólio
 
 ![Portfólio](img/cyberpunk/portfolio.jpg)
 
-- **Filtro por tags** funcional ("Todos" + tags em ordem alfabética), com animação de reorganização da grade.
-- Cards com zoom na imagem ao passar o mouse, até 3 tags (+N) e atalhos para o estudo de caso e para o assistente de contato sobre aquele projeto.
-- Diálogo "Detalhes" com carrossel de imagens, todas as tags, descrição e links de demo/código; imagem ampliada navegável com ← →.
+- **Filtro por categoria** ("Todos" + as categorias na ordem dos projetos). A categoria é um campo do projeto no admin. Sem categorias, a linha de filtros não aparece.
+- Cards com zoom na imagem ao passar o mouse, até 3 tags (+N) e a primeira métrica do case.
+- Uma ação por card: `$ cat case.md` quando o projeto tem estudo de caso, ou o diálogo "Detalhes" quando não tem.
+- O diálogo "Detalhes" tem carrossel de imagens, todas as tags, descrição e links de demo/código; a imagem ampliada navega com ← →.
+
+### Estudo de caso
+
+- Seções na ordem: **Meu papel**, **Antes**, Problema, Solução, **Decisões e trade-offs**, Resultados e números, **Aprendizados**, capturas e depoimento. As seções em negrito são opcionais e só aparecem quando preenchidas.
+- Fechamento com "Precisa de algo parecido?", que abre o assistente de contato, e um link para o **próximo case**.
 
 ### Sobre
 
 ![Sobre](img/cyberpunk/sobre.jpg)
 
-- Texto "Sobre mim" editável no admin em **Textos** (chave `about.aboutMe.text`).
+- **Resumo profissional** primeiro (o texto "Sobre" da Home, em parágrafos).
+- **Como eu trabalho**: os princípios de trabalho, editáveis no admin em **Home → Princípios**. Sem princípios, a seção não aparece.
+- **Fora do trabalho**: o texto pessoal, editável em **Textos** (chave `about.aboutMe.text`).
 - **"Meu dia-a-dia" em grade bento**: cada foto escolhe seu tamanho (1x1, 1x2, 2x1, 2x2) e mostra a descrição ao passar o mouse; no celular, abre com toque.
 - FAQ em acordeão.
 
@@ -73,6 +87,8 @@ Abaixo de `lg`, a sidebar vira um cabeçalho fixo com mini-avatar e um menu late
 - Destaques no topo: um card grande quando há um destaque, **carrossel em loop** quando há vários (tags, data e tempo de leitura).
 - **Busca** por título, subtítulo ou tags e **filtro por várias tags** com contador.
 - Link para o feed RSS no cabeçalho.
+- Posts sem imagem ganham uma capa padrão nas cores do tema, com a primeira tag.
+- No fim de cada post: bloco do autor com botão de contato e o **case relacionado** (o primeiro projeto com case que compartilha uma tag com o post).
 
 ## Extras
 

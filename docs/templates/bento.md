@@ -26,9 +26,11 @@ A **primária** vira fundo dos cartões mais importantes (com texto na cor do fu
 
 ![Início](img/bento/home.jpg)
 
-- **Hero** em 8 colunas × 2 linhas com gradiente primária → destaque: "Oi! Eu sou o **Alex**", com o nome numa pílula invertida, cargo e texto "sobre".
+- **Hero** em 8 colunas × 2 linhas com gradiente primária → destaque: `$ whoami → Nome`, a frase de valor (`home.hero.headline`), o cargo e dois botões, **"Ver cases"** e **"Fale comigo"** (abre o formulário de contato).
 - Cartão de **perfil** com avatar de iniciais e botões de GitHub/LinkedIn.
 - Cartões de **contato** (e-mail no destaque, WhatsApp) conforme a visibilidade de cada um.
+- **Números de destaque** logo abaixo do hero: até 4 cartões vindos de `home_metrics` (admin → Home → Números), o primeiro na primária. A faixa some quando não há números.
+- **"Cases em destaque"**: os 3 primeiros projetos com página de case, cada um com imagem, a primeira métrica do case e o link `$ cat case.md`.
 - Serviços em 2×2 numerados "01 / 04"; depoimentos com o primeiro grande na primária e os seguintes pequenos.
 - Rodapé com atalhos em pílula para as outras páginas.
 
@@ -36,23 +38,27 @@ A **primária** vira fundo dos cartões mais importantes (com texto na cor do fu
 
 ![Currículo](img/bento/curriculo.jpg)
 
-- Linha de cartões-resumo: título "Trajetória", **"3+ experiências"** em número grande na primária, certificações e idiomas no destaque.
-- Experiências em 3 colunas com até 3 marcadores cada.
-- **"Stack técnico"**: habilidades como chips em 3 colunas, com o nível definindo o peso visual (≥ 85 em bloco na primária).
+- Linha de cartões-resumo: **"Trajetória"** com o resumo (primeiro parágrafo do "sobre") e o botão **"Baixar CV (PDF)"**, ao lado de experiências em número grande na primária, certificações e idiomas.
+- **Números de destaque** (os mesmos da home) logo abaixo.
+- Experiências em 3 colunas com até 3 marcadores cada; as mais antigas ficam atrás de "ver experiências anteriores".
+- **"Stack técnico"**: habilidades em chips **agrupados por categoria** (campo "Grupo" no admin), o primeiro grupo na primária. Sem níveis numéricos.
 - Soft skills e idiomas ao lado; formação, cursos e voluntariado na última linha.
 
 ### Portfólio
 
 ![Portfólio](img/bento/portfolio.jpg)
 
-- **Filtro por tag funcional** em pílulas ("Todos" + até 18 tags); clicar de novo na tag ativa limpa o filtro.
+- **Filtro por categoria** em pílulas ("Todos" + as categorias dos projetos). Sem nenhuma categoria cadastrada, o filtro some.
 - **Grid hierárquico**: o 1º projeto vira destaque (7 colunas × 2 linhas, imagem grande, selo "★ Destaque"), o 2º e o 3º ficam médios, e os demais viram cartões compactos com a inicial.
+- Cada cartão mostra a **primeira métrica do case** e **uma ação só**: `$ cat case.md` quando há case, senão o link do projeto.
 
 ### Sobre
 
 ![Sobre](img/bento/sobre.jpg)
 
-- Cartão "Sobre Mim" com o texto e, ao lado, **"Interesses"** reaproveitando os serviços da Home.
+- Cartão "Sobre Mim" abrindo com o **"Resumo profissional"** (o texto "sobre", com os números em destaque) e, ao lado, **"Interesses"** reaproveitando os serviços da Home.
+- **"Como eu trabalho"**: os princípios de trabalho (admin → Home → Princípios) em cartões numerados, o primeiro na primária.
+- **"Fora do trabalho"**: o texto pessoal, depois da parte profissional.
 - **"Meu dia-a-dia" como mosaico** de 6 colunas com tamanhos variados, o primeiro item maior e na primária.
 - FAQ em 2×2 numerado, a primeira pergunta na primária.
 

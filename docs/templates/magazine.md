@@ -27,32 +27,40 @@ A composição é **assimétrica** (`1.4fr 1fr`, `1.2fr 1fr`, `180px 1fr`) e usa
 
 ![Início](img/magazine/home.jpg)
 
-- **"↘ Reportagem de Capa"**: o cargo vira a manchete em 124px, com o primeiro depoimento em itálico como "chamada" ao lado.
-- **"✦ Dossiê de Capacidades ✦"**: os serviços em 2 colunas, cada um com um numeral grande na primária.
-- **"Vozes do Campo"**: um depoimento como citação central em itálico e os demais em 3 colunas.
+- **"↘ Reportagem de Capa · cargo"**: a frase de valor vira a manchete, com a descrição em itálico ao lado e dois botões: "Ver cases" e "Fale comigo".
+- **Faixa de números** logo abaixo da capa, com até 4 resultados editados no admin (aba Números). Some quando não há números.
+- **"✦ Cases em destaque ✦"**: os 3 primeiros projetos com case, cada um com numeral, categoria, a primeira métrica do case e o link "Ler a reportagem".
+- **"✦ Dossiê de Capacidades ✦"**: os serviços em colunas, cada um com um numeral grande na primária.
+- **"Vozes do Campo"**: um depoimento como citação central em itálico e os demais em colunas.
+- **"↘ Carta ao Leitor"**: fechamento com dois caminhos, "Tenho um projeto" e "Tenho uma vaga".
 
 ### Currículo
 
 ![Currículo](img/magazine/curriculo.jpg)
 
-- Título "_Curriculum_ Vitæ" e seções numeradas: **§ I Trajetória Profissional**, **§ II Catálogo de Habilidades**, § III Formação, § IV Idiomas, § V Certificações, § VI Voluntariado.
-- Experiência em grade `180px 1fr`: período e empresa em itálico à esquerda, cargo e descrição à direita.
-- Habilidades em 3 colunas com a **opacidade variando pelo nível**.
+- Título "_Curriculum_ Vitæ" seguido de um **resumo**: o primeiro parágrafo do "sobre" com capitular, os números de destaque e o botão "Baixar CV (PDF)".
+- Seções numeradas: **§ I Trajetória Profissional**, **§ II Catálogo de Habilidades**, § III Formação, § IV Idiomas, § V Certificações e cursos, § VI Voluntariado.
+- Experiência em grade: período e empresa em itálico à esquerda, cargo e descrição à direita.
+- Habilidades **agrupadas por categoria** (campo "Grupo" no admin), sem nível numérico. As sem grupo vão para "Stack".
 
 ### Portfólio
 
 ![Portfólio](img/magazine/portfolio.jpg)
 
-- Título "_Obras_ Selecionadas" e uma faixa "Filtrar por tecnologia ↓".
-- Projetos como **matérias em zigue-zague**: imagem e texto trocam de lado a cada projeto, com numeral de 64px, rótulo "Edição 0N", título de 44px e descrição em itálico.
+- Título "_Obras_ Selecionadas" e a faixa **"Seções desta edição"**, que filtra por categoria. A faixa some quando nenhum projeto tem categoria.
+- Projetos como **matérias em zigue-zague**: imagem e texto trocam de lado a cada projeto, com numeral de 64px, categoria, título de 44px, descrição em itálico e a primeira métrica do case.
+- Uma ação por projeto: "Ler a reportagem" quando há case, "Ver o projeto ↗" quando há só link de demo.
 
 ### Sobre
 
 ![Sobre](img/magazine/sobre.jpg)
 
-- **"↘ Ensaio Pessoal"**: título "Quem faz o _trabalho_, fora do _computador_."
-- O dia-a-dia vira um **ensaio em 3 colunas de texto**, abrindo com capitular de 72px na primária.
-- FAQ como **"A Entrevista"**: perguntas numeradas "P 01" em 2 colunas, respostas com filete no destaque.
+- Título "Quem faz o _trabalho_, e _como_ ele é feito."
+- **§ I Resumo profissional**: o texto "sobre" com capitular e os números em destaque.
+- **§ II Como eu trabalho**: os princípios de trabalho (aba Princípios no admin) numerados em colunas. Some quando não há princípios.
+- **"Ensaio Pessoal · Fora do trabalho"**: o lado pessoal, depois do profissional.
+- O dia-a-dia como **ensaio em colunas de texto**, abrindo com capitular na primária.
+- FAQ como **"A Entrevista"**: perguntas numeradas "P 01", respostas com filete no destaque.
 
 ### Blog
 
@@ -63,6 +71,5 @@ A composição é **assimétrica** (`1.4fr 1fr`, `1.2fr 1fr`, `180px 1fr`) e usa
 
 ## Limitações conhecidas
 
-- Só o masthead é responsivo; as páginas usam grades e tamanhos fixos e não se reorganizam no celular.
-- O layout ainda não lê imagens: projetos e posts aparecem com blocos de placeholder.
-- O filtro do Portfólio é visual, e os itens do sumário do Blog ainda não têm link.
+- As seções de Início, Currículo, Portfólio e Sobre se reorganizam no celular, mas os espaçamentos laterais continuam fixos em 48px.
+- Os posts do Blog ainda aparecem com blocos de placeholder, e os itens do sumário ainda não têm link.

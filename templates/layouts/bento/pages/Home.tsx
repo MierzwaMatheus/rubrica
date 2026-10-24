@@ -1,7 +1,13 @@
 import { useHome } from "@/hooks/useHome";
 import { useSidebar } from "@/hooks/useSidebar";
-import { homeRepository, sidebarRepository } from "@/repositories/instances";
-import { Github, Linkedin, Mail, Phone, Quote } from "lucide-react";
+import { usePortfolio } from "@/hooks/usePortfolio";
+import { useHomeMetrics } from "@/hooks/useHomeMetrics";
+import { useContactWizard } from "@/contexts/ContactWizardContext";
+import { usePlugin } from "@/contexts/PluginsContext";
+import { useTranslation } from "@/i18n/hooks/useTranslation";
+import { homeRepository, sidebarRepository, portfolioRepository } from "@/repositories/instances";
+import { selectFeaturedCases } from "@/utils/homeContent";
+import { ArrowRight, Github, Linkedin, Mail, MessageSquare, Phone, Quote } from "lucide-react";
 import { Link } from "wouter";
 
 function BentoCard({
@@ -40,10 +46,15 @@ function BentoCard({
 }
 
 export default function BentoHome() {
-  const { contactRole, aboutText, services, testimonials } = useHome(homeRepository);
+  const { t } = useTranslation();
+  const { contactRole, services, testimonials, contactWizardEnabled } = useHome(homeRepository);
   const { contactInfo } = useSidebar(sidebarRepository);
+  const { projects } = usePortfolio(portfolioRepository);
+  const { metrics } = useHomeMetrics(homeRepository);
+  const { openWizard } = useContactWizard();
+  const portfolioEnabled = usePlugin("portfolio");
+  const featuredCases = portfolioEnabled ? selectFeaturedCases(projects) : [];
 
-  const ownerFirstName = contactInfo?.name?.split(" ")[0] ?? "";
   const email = contactInfo?.email ?? "";
   const phone = contactInfo?.phone ?? "";
   const showEmail = !!(contactInfo?.show_email && email);
@@ -60,6 +71,16 @@ export default function BentoHome() {
         boxSizing: "border-box",
       }}
     >
+      <style>{`
+        @media (max-width: 760px) {
+          .bento-metrics { grid-template-columns: repeat(2, 1fr) !important; }
+          .bento-cases { grid-template-columns: 1fr !important; }
+          .bento-hero-row { grid-template-columns: 1fr !important; }
+          .bento-hero-row > * { grid-column: auto !important; grid-row: auto !important; }
+          .bento-hero-title { font-size: 38px !important; }
+        }
+      `}</style>
+
       {/* Row 1 — Hero (large) + profile sidebar */}
       <div
         style={{
@@ -69,6 +90,7 @@ export default function BentoHome() {
           gap,
           marginBottom: gap,
         }}
+        className="bento-hero-row"
       >
         {/* Hero card */}
         <BentoCard
@@ -91,52 +113,75 @@ export default function BentoHome() {
               marginBottom: 14,
             }}
           >
-            $ whoami
+            $ whoami → {contactInfo?.name ?? ""}
           </div>
           <h1
+            className="bento-hero-title"
             style={{
-              fontSize: 76,
-              lineHeight: 0.95,
+              fontSize: 56,
+              lineHeight: 1,
               margin: 0,
               fontWeight: 700,
               letterSpacing: "-0.03em",
+              maxWidth: 640,
             }}
           >
-            Oi! Eu sou
-            <br />o{" "}
-            <em
-              style={{
-                fontStyle: "normal",
-                background: "var(--bg)",
-                color: "var(--primary)",
-                padding: "0 12px",
-                borderRadius: 12,
-              }}
-            >
-              {ownerFirstName}
-            </em>
+            {t("home.hero.headline")}
           </h1>
           <div
             style={{
-              marginTop: 24,
+              marginTop: 22,
               fontSize: 17,
               fontWeight: 500,
               opacity: 0.95,
-              maxWidth: 480,
+              maxWidth: 520,
             }}
           >
             {contactRole}
           </div>
-          <div
-            style={{
-              marginTop: 18,
-              fontSize: 14,
-              lineHeight: 1.5,
-              maxWidth: 520,
-              opacity: 0.85,
-            }}
-          >
-            {aboutText}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: "auto", paddingTop: 26 }}>
+            {featuredCases.length > 0 && (
+              <a
+                href="#cases"
+                data-umami-event="home-hero-ver-cases"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "11px 18px",
+                  borderRadius: 14,
+                  background: "var(--bg)",
+                  color: "var(--primary)",
+                  fontWeight: 700,
+                  fontSize: 14,
+                  textDecoration: "none",
+                }}
+              >
+                {t("home.hero.ctaCases")} <ArrowRight size={15} />
+              </a>
+            )}
+            {contactWizardEnabled && (
+              <button
+                type="button"
+                onClick={() => openWizard({ sourceContext: "home-hero" })}
+                data-umami-event="home-hero-fale-comigo"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "11px 18px",
+                  borderRadius: 14,
+                  background: "color-mix(in srgb, var(--bg) 18%, transparent)",
+                  border: "1px solid color-mix(in srgb, var(--bg) 45%, transparent)",
+                  color: "var(--bg)",
+                  fontWeight: 700,
+                  fontSize: 14,
+                  cursor: "pointer",
+                }}
+              >
+                <MessageSquare size={15} /> {t("home.hero.ctaContact")}
+              </button>
+            )}
           </div>
         </BentoCard>
 
@@ -226,6 +271,115 @@ export default function BentoHome() {
           </BentoCard>
         )}
       </div>
+
+      {/* Números de prova — logo abaixo do hero */}
+      {metrics.length > 0 && (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: `repeat(${metrics.length}, 1fr)`,
+            gap,
+            marginBottom: gap,
+          }}
+          className="bento-metrics"
+        >
+          {metrics.map((m, i) => (
+            <BentoCard
+              key={m.label}
+              padding={22}
+              tint={i === 0 ? "var(--primary)" : undefined}
+              style={i === 0 ? { color: "var(--bg)" } : {}}
+            >
+              <div style={{ fontSize: 34, fontWeight: 700, letterSpacing: "-0.03em", lineHeight: 1 }}>{m.value}</div>
+              <div style={{ fontSize: 12.5, lineHeight: 1.4, marginTop: 10, opacity: 0.75 }}>{m.label}</div>
+            </BentoCard>
+          ))}
+        </div>
+      )}
+
+      {/* Cases em destaque — o melhor trabalho logo na chegada */}
+      {featuredCases.length > 0 && (
+        <div id="cases" style={{ scrollMarginTop: 90, marginBottom: gap }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "baseline",
+              justifyContent: "space-between",
+              gap: 12,
+              margin: "8px 4px 14px",
+            }}
+          >
+            <h2 style={{ fontSize: 26, fontWeight: 700, letterSpacing: "-0.02em", margin: 0 }}>
+              {t("home.cases.title").trim()}
+            </h2>
+            <Link
+              to="/portfolio"
+              style={{ fontFamily: "var(--font-mono)", fontSize: 12, opacity: 0.7, textDecoration: "none" }}
+            >
+              {t("home.cases.viewAll")} →
+            </Link>
+          </div>
+          <div
+            style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap }}
+            className="bento-cases"
+          >
+            {featuredCases.map((project, i) => {
+              const metric = project.case_study?.metrics?.[0];
+              return (
+                <Link
+                  key={project.id}
+                  to={`/portfolio/${project.slug}`}
+                  data-umami-event="home-case"
+                  data-umami-event-case={project.slug}
+                  style={{ textDecoration: "none", color: "inherit", display: "flex" }}
+                >
+                  <BentoCard padding={0} style={{ flex: 1 }}>
+                    <div
+                      style={{
+                        aspectRatio: "16 / 9",
+                        background: i === 0 ? "var(--primary)" : "color-mix(in srgb, var(--text) 14%, var(--bg))",
+                        overflow: "hidden",
+                      }}
+                    >
+                      {project.images?.[0] && (
+                        <img
+                          src={project.images[0]}
+                          alt={project.title}
+                          loading="lazy"
+                          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                        />
+                      )}
+                    </div>
+                    <div style={{ padding: 20, display: "flex", flexDirection: "column", flex: 1 }}>
+                      <div style={{ fontSize: 17, fontWeight: 700, lineHeight: 1.25 }}>{project.title}</div>
+                      <p style={{ fontSize: 12.5, lineHeight: 1.5, margin: "8px 0 0", opacity: 0.72 }}>
+                        {project.description}
+                      </p>
+                      {metric && (
+                        <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginTop: 14 }}>
+                          <span style={{ fontSize: 22, fontWeight: 700, color: "var(--primary)" }}>{metric.value}</span>
+                          <span style={{ fontSize: 11.5, opacity: 0.7 }}>{metric.label}</span>
+                        </div>
+                      )}
+                      <span
+                        style={{
+                          marginTop: "auto",
+                          paddingTop: 14,
+                          fontFamily: "var(--font-mono)",
+                          fontSize: 12,
+                          color: "var(--primary)",
+                        }}
+                      >
+                        {t("home.cases.read")} →
+                      </span>
+                    </div>
+                  </BentoCard>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Services / Capabilities — grid 2x2 */}
       {services.length > 0 && (

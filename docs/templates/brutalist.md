@@ -29,33 +29,38 @@ As cores seguem um código fixo: a **primária** pinta comandos, rótulos e dest
 ![Início](img/brutalist/home.jpg)
 
 - O nome vira um **banner ASCII** gerado com [figlet](https://github.com/patorjk/figlet.js) (fonte "Big") na primária; enquanto ele é gerado, aparece o nome em texto grande.
-- `cat /etc/motd` mostra saudação, cargo e o texto "sobre", com borda lateral no destaque.
-- `ls --primary-stack` lista os serviços como chips; `[ CAPABILITIES ]` os detalha numerados (`[01]`, `[02]`…).
+- `cat /etc/motd` mostra a **frase de valor** (`home.hero.headline`), o cargo e o texto "sobre", seguidos dos botões `› Ver cases` e `› Fale comigo` (este só com o formulário de contato ativo).
+- `[ STATS ]`: até 4 **números de destaque** (admin → Home → Números) em caixas lado a lado; some quando não há números.
+- `[ CASES EM DESTAQUE ]`: `ls -la cases/ --featured` mostra os 3 primeiros projetos com case, cada um com a primeira métrica e o link `$ cat case.md`.
+- `[ CAPABILITIES ]` detalha os serviços numerados (`[01]`, `[02]`…).
 - `cat clients/*.txt | head` mostra os depoimentos como arquivos (`> from: nome <cargo>`), com o primeiro invertido.
-- `echo $CONTACT` imprime `email=` e `phone=` conforme a visibilidade de cada um.
-- Termina com um prompt e um **cursor piscando**.
+- `[ CONTACT ]`: `./contato.sh` com dois caminhos, `› Tenho um projeto` e `› Tenho uma vaga`.
+- `echo $CONTACT` imprime `email=` e `phone=` conforme a visibilidade de cada um, e a página termina com um **cursor piscando**.
 
 ### Currículo
 
 ![Currículo](img/brutalist/curriculo.jpg)
 
-- Experiência como **`git log --oneline --graph`**: cada cargo é um commit, com o período atual destacado.
-- Habilidades com **barras ASCII** `█░` de 28 caracteres e o percentual.
+- `[ RESUMO ]`: `cat summary.txt` com o primeiro parágrafo do "sobre", os números de destaque e o botão `↓ Baixar CV (PDF)`.
+- Experiência como **`git log --oneline --graph`**: cada cargo é um commit, com o período atual destacado. As 2 mais recentes aparecem; as anteriores ficam atrás de `[+] ver experiências anteriores`.
+- Habilidades **agrupadas por categoria** (`## design`, `## front-end`…) em chips, sem nível numérico. Skills sem grupo vão para `## stack`.
 - Soft skills como `#hashtags-em-kebab`, idiomas como `Nome = "nível"`, formação em caixas `[edu]`, cursos numerados em 2 colunas e voluntariado num bloco `<pre>`.
 
 ### Portfólio
 
 ![Portfólio](img/brutalist/portfolio.jpg)
 
-- **Filtro funcional** em forma de flags: `--todos`, `--react`, `--design`… (gerado das tags dos projetos).
-- `[ INDEX ]`: a lista de projetos no formato de `ls -la` (`drwxr-xr-x`, contagem de tags, nome-em-kebab/).
-- `[ DETAILS ]`: um "README" por projeto, com cabeçalho invertido `[01] ./nome/README.md`, imagem, descrição, `stack=[…]` e os botões `$ open --demo` e `$ open --source` quando há links.
+- **Filtro por categoria** em forma de flags: `--todos`, `--produto-digital`, `--e-commerce`… A linha some quando nenhum projeto tem categoria.
+- `[ INDEX ]`: a lista de projetos no formato de `ls -la` (`drwxr-xr-x`, nome-em-kebab/ e a categoria).
+- `[ DETAILS ]`: um "README" por projeto, com cabeçalho invertido `[01] ./nome/README.md`, imagem, descrição, a **primeira métrica do case** e `stack=[…]`. A ação é uma só: `$ cat case.md` quando há case; senão, `$ open --demo` e `$ open --source` quando há links.
 
 ### Sobre
 
 ![Sobre](img/brutalist/sobre.jpg)
 
-- `head -n 30 ~/about.txt`: o texto "sobre" com numeração de linha (`01|`).
+- `[ RESUMO PROFISSIONAL ]`: `head -n 30 ~/about.txt`, o texto "sobre" em parágrafos numerados (`01|`), com os números de resultado em destaque.
+- `[ COMO EU TRABALHO ]`: `cat ~/method.md` com os princípios de trabalho (admin → Home → Princípios) em caixas numeradas; some quando não há princípios.
+- `[ FORA DO TRABALHO ]`: `cat ~/offline.txt` com o texto pessoal, depois do profissional.
 - `find ~/photos`: o dia-a-dia em grade de 3 colunas, com legendas `img_001.jpg`.
 - `cat faq.txt | less`: FAQ em `<details>` (`Q01.` / `A.`), o primeiro aberto e invertido.
 

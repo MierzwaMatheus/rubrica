@@ -1,5 +1,12 @@
+import { useState } from "react";
 import { useResume } from "@/hooks/useResume";
-import { resumeRepository } from "@/repositories/instances";
+import { useHome } from "@/hooks/useHome";
+import { useHomeMetrics } from "@/hooks/useHomeMetrics";
+import { useDownloadCV } from "@/hooks/useDownloadCV";
+import { useTranslation } from "@/i18n/hooks/useTranslation";
+import { resumeRepository, homeRepository } from "@/repositories/instances";
+import { splitParagraphs } from "@/utils/aboutContent";
+import { groupSkills, splitExperiences } from "@/utils/resumeContent";
 
 function AsciiRule({ char = "─", label }: { char?: string; label?: string }) {
   return (
@@ -67,18 +74,13 @@ function BrutPrompt({
   );
 }
 
-function AsciiBar({ value, width = 24 }: { value: number; width?: number }) {
-  const filled = Math.round((value / 100) * width);
-  return (
-    <span style={{ fontFamily: "var(--font-mono)" }}>
-      <span style={{ color: "var(--primary)" }}>{"█".repeat(filled)}</span>
-      <span style={{ opacity: 0.25 }}>{"░".repeat(width - filled)}</span>
-    </span>
-  );
-}
-
 export default function Resume() {
+  const { t } = useTranslation();
   const { getItemsByType } = useResume(resumeRepository);
+  const { aboutText } = useHome(homeRepository);
+  const { metrics } = useHomeMetrics(homeRepository);
+  const { downloadCV, canDownload } = useDownloadCV();
+  const [showOlder, setShowOlder] = useState(false);
 
   const experience = getItemsByType("experience");
   const skills = getItemsByType("skill");
@@ -87,6 +89,10 @@ export default function Resume() {
   const languages = getItemsByType("language");
   const certs = getItemsByType("course");
   const volunteering = getItemsByType("volunteer");
+  const summary = splitParagraphs(aboutText ?? "")[0] ?? "";
+  const { recent, older } = splitExperiences(experience);
+  const visibleExperience = showOlder ? [...recent, ...older] : recent;
+  const skillGroups = groupSkills(skills, t("resume.stack"));
 
   return (
     <div
@@ -114,6 +120,53 @@ export default function Resume() {
         $ curriculum_vitae.md
       </h1>
 
+      <AsciiRule label={t("resume.summary")} />
+      <BrutPrompt
+        cmd="cat summary.txt"
+        output={
+          <div style={{ paddingLeft: 14, borderLeft: "2px solid var(--accent)" }}>
+            {summary && <p style={{ margin: "6px 0 0", fontSize: 13, lineHeight: 1.65 }}>{summary}</p>}
+          </div>
+        }
+      />
+      {metrics.length > 0 && (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+            border: "1px solid var(--text)",
+            marginTop: 14,
+          }}
+        >
+          {metrics.map((m, i) => (
+            <div key={m.label} style={{ padding: "12px 14px", borderLeft: i === 0 ? "none" : "1px solid var(--text)" }}>
+              <div style={{ fontSize: 22, fontWeight: 700, color: "var(--primary)", lineHeight: 1.1 }}>{m.value}</div>
+              <div style={{ fontSize: 11, opacity: 0.75, marginTop: 6 }}>{m.label}</div>
+            </div>
+          ))}
+        </div>
+      )}
+      <button
+        type="button"
+        onClick={downloadCV}
+        disabled={!canDownload}
+        data-umami-event="resume-download-cv"
+        style={{
+          marginTop: 14,
+          padding: "8px 16px",
+          border: "2px solid var(--text)",
+          background: "var(--text)",
+          color: "var(--bg)",
+          fontFamily: "var(--font-mono)",
+          fontSize: 13,
+          fontWeight: 700,
+          cursor: canDownload ? "pointer" : "not-allowed",
+          opacity: canDownload ? 1 : 0.5,
+        }}
+      >
+        ↓ {t("resume.downloadCV")}
+      </button>
+
       <AsciiRule label="experiência" />
       <BrutPrompt
         cmd="git log --oneline --graph"
@@ -126,7 +179,7 @@ export default function Resume() {
               whiteSpace: "pre-wrap",
             }}
           >
-            {experience.map((e, i) => {
+            {visibleExperience.map((e, i) => {
               const c = e.translatedContent as {
                 role?: string;
                 company?: string;
@@ -175,37 +228,43 @@ export default function Resume() {
           </pre>
         }
       />
+      {older.length > 0 && (
+        <button
+          type="button"
+          onClick={() => setShowOlder(v => !v)}
+          style={{
+            background: "transparent",
+            border: "1px solid var(--text)",
+            color: "var(--text)",
+            fontFamily: "var(--font-mono)",
+            fontSize: 12,
+            padding: "4px 10px",
+            cursor: "pointer",
+          }}
+        >
+          {showOlder ? `[-] ${t("resume.hideOlder")}` : `[+] ${t("resume.showOlder")} (${older.length})`}
+        </button>
+      )}
 
       <AsciiRule label="habilidades" />
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: "0 32px",
-        }}
-      >
-        {skills.map((s) => {
-          const c = s.translatedContent as { name?: string; level?: number };
-          return (
-            <div
-              key={s.id}
-              style={{
-                padding: "4px 0",
-                display: "grid",
-                gridTemplateColumns: "160px 1fr 36px",
-                alignItems: "center",
-                gap: 10,
-                fontSize: 12,
-              }}
-            >
-              <span style={{ opacity: 0.9 }}>{c.name}</span>
-              <AsciiBar value={c.level ?? 0} width={28} />
-              <span style={{ color: "var(--primary)", textAlign: "right" }}>
-                {c.level}%
-              </span>
+      <div style={{ display: "grid", gap: 12 }}>
+        {skillGroups.map((g) => (
+          <div key={g.name}>
+            <div style={{ fontSize: 11, color: "var(--primary)", fontWeight: 700, marginBottom: 6 }}>
+              <span style={{ color: "var(--accent)" }}>##</span> {g.name.toLowerCase()}
             </div>
-          );
-        })}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 4, fontSize: 12 }}>
+              {g.items.map((s) => {
+                const c = s.translatedContent as { name?: string };
+                return (
+                  <span key={s.id} style={{ padding: "3px 8px", border: "1px solid var(--text)" }}>
+                    <span style={{ color: "var(--accent)" }}>›</span> {c.name}
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </div>
 
       <AsciiRule label="soft-skills" />

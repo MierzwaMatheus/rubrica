@@ -10,5 +10,57 @@
       "enUS": "available for new projects"
     }
   },
-  "contact_wizard_enabled": true
+  "contact_wizard_enabled": true,
+  "home_metrics": [
+    {
+      "value": "8+",
+      "label": "anos de experiência",
+      "labelTranslations": {
+        "ptBR": "anos de experiência",
+        "enUS": "years of experience"
+      }
+    },
+    {
+      "value": "4",
+      "label": "produtos no mesmo design system",
+      "labelTranslations": {
+        "ptBR": "produtos no mesmo design system",
+        "enUS": "products on one design system"
+      }
+    },
+    {
+      "value": "−68%",
+      "label": "de desistência no agendamento (Lumen)",
+      "labelTranslations": {
+        "ptBR": "de desistência no agendamento (Lumen)",
+        "enUS": "booking drop-off (Lumen)"
+      }
+    },
+    {
+      "value": "9",
+      "label": "times usando o painel diariamente",
+      "labelTranslations": {
+        "ptBR": "times usando o painel diariamente",
+        "enUS": "teams using the dashboard daily"
+      }
+    }
+  ],
+  "work_principles": [
+    {
+      "title": "Entender antes de construir",
+      "description": "Todo projeto começa com o problema escrito, quem usa e como vamos medir o resultado."
+    },
+    {
+      "title": "Testar com quem usa",
+      "description": "Protótipos validados com usuários reais antes de virar código de produção."
+    },
+    {
+      "title": "Acessível por padrão",
+      "description": "Contraste, teclado e leitor de tela fazem parte da tarefa, não de uma fase depois."
+    },
+    {
+      "title": "Fácil de manter",
+      "description": "Componentes documentados e decisões registradas: o produto continua saudável depois da entrega."
+    }
+  ]
 }

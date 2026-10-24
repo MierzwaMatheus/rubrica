@@ -41,7 +41,39 @@
     ],
     "demoLink": "",
     "orderIndex": 0,
-    "updatedAt": 1768435200000
+    "updatedAt": 1768435200000,
+    "category": "Produto digital",
+    "categoryTranslations": {
+      "ptBR": "Produto digital",
+      "enUS": "Digital product"
+    },
+    "slug": "lumen-sa-de",
+    "caseStudy": {
+      "role": "Product designer e front-end líder, num time de 5 pessoas.",
+      "context": "O agendamento pelo app tinha 7 etapas e 38% das pessoas desistiam antes de confirmar.",
+      "problem": "Pacientes idosos e com baixa visão não conseguiam marcar consultas sozinhos, e a central telefônica ficava sobrecarregada.",
+      "solution": "Novo fluxo de agendamento em 3 etapas, com contraste AA, textos maiores e leitura por leitor de tela testada com pacientes reais.",
+      "decisions": "Mantivemos o app nativo existente e refizemos só o fluxo crítico, em vez de reescrever tudo. Descartamos o login por biometria na primeira versão.",
+      "results": "A desistência no agendamento caiu de 38% para 12%, e as ligações para a central caíram 30% em três meses.",
+      "learnings": "Testar com as pessoas que mais sofriam com o fluxo antigo trouxe as melhorias que valeram para todo mundo.",
+      "metrics": [
+        {
+          "label": "desistência no agendamento",
+          "value": "38% → 12%",
+          "icon": "TrendingDown"
+        },
+        {
+          "label": "ligações para a central",
+          "value": "−30%",
+          "icon": "Phone"
+        },
+        {
+          "label": "etapas no fluxo",
+          "value": "7 → 3",
+          "icon": "ListChecks"
+        }
+      ]
+    }
   },
   {
     "_creationTime": 1768435200028,
@@ -85,51 +117,39 @@
     ],
     "demoLink": "",
     "orderIndex": 1,
-    "updatedAt": 1768435200000
-  },
-  {
-    "_creationTime": 1768435200030,
-    "_id": "sample00000000000000000000000000000v",
-    "createdAt": 1768435200031,
-    "title": "Atelier 9",
-    "titleTranslations": {
-      "ptBR": "Atelier 9",
-      "enUS": "Atelier 9"
+    "updatedAt": 1768435200000,
+    "category": "Design system",
+    "categoryTranslations": {
+      "ptBR": "Design system",
+      "enUS": "Design system"
     },
-    "description": "Loja online para uma marca de cerâmica autoral, do branding ao checkout.",
-    "descriptionTranslations": {
-      "ptBR": "Loja online para uma marca de cerâmica autoral, do branding ao checkout.",
-      "enUS": "Online store for an independent ceramics brand, from branding to checkout."
-    },
-    "longDescription": "Loja online para uma marca de cerâmica autoral, do branding ao checkout.",
-    "longDescriptionTranslations": {
-      "ptBR": "Loja online para uma marca de cerâmica autoral, do branding ao checkout.",
-      "enUS": "Online store for an independent ceramics brand, from branding to checkout."
-    },
-    "tags": [
-      "E-commerce",
-      "Branding",
-      "Next.js"
-    ],
-    "images": [
-      {
-        "_creationTime": 1768435200029,
-        "_id": "sample00000000000000000000000000000u",
-        "createdAt": 1768435200030,
-        "displayName": "projeto-3.svg",
-        "fileSize": 2048,
-        "folderId": "samples",
-        "mimeType": "image/svg+xml",
-        "storageId": "sample00000000000000000000000000000u",
-        "url": "/samples/projeto-3.svg"
-      }
-    ],
-    "imageIds": [
-      "sample00000000000000000000000000000u"
-    ],
-    "demoLink": "",
-    "orderIndex": 2,
-    "updatedAt": 1768435200000
+    "slug": "norte-design-system",
+    "caseStudy": {
+      "role": "Responsável pelo design system, ponte entre design e os 4 times de front-end.",
+      "context": "Cada produto tinha a própria versão de botão, formulário e cor; uma mudança de marca levava semanas.",
+      "problem": "Quatro produtos com interfaces inconsistentes e retrabalho constante entre design e desenvolvimento.",
+      "solution": "Biblioteca de componentes em React com tokens de design, documentação em Storybook e versionamento semântico.",
+      "decisions": "Começamos pelos 12 componentes mais usados em vez de cobrir tudo. Tokens antes de componentes, para a troca de tema ser só configuração.",
+      "results": "Os 4 produtos migraram em dois trimestres e uma atualização de marca passou a levar um dia.",
+      "learnings": "Adoção depende de documentação e de exemplos prontos, não só de bons componentes.",
+      "metrics": [
+        {
+          "label": "produtos usando o sistema",
+          "value": "4",
+          "icon": "Layers"
+        },
+        {
+          "label": "atualização de marca",
+          "value": "semanas → 1 dia",
+          "icon": "Clock"
+        },
+        {
+          "label": "componentes publicados",
+          "value": "48",
+          "icon": "Package"
+        }
+      ]
+    }
   },
   {
     "_creationTime": 1768435200032,
@@ -172,8 +192,89 @@
       "sample00000000000000000000000000000w"
     ],
     "demoLink": "",
+    "orderIndex": 2,
+    "updatedAt": 1768435200000,
+    "category": "Produto digital",
+    "categoryTranslations": {
+      "ptBR": "Produto digital",
+      "enUS": "Digital product"
+    },
+    "slug": "orbe-analytics",
+    "caseStudy": {
+      "role": "Desenvolvedora front-end principal, do protótipo à produção.",
+      "context": "Os times de produto exportavam planilhas toda segunda-feira para montar relatórios à mão.",
+      "problem": "Métricas de produto espalhadas em ferramentas diferentes e sempre desatualizadas.",
+      "solution": "Painel em tempo real com gráficos configuráveis, alertas e links compartilháveis para cada visão.",
+      "decisions": "Priorizamos poucas visões prontas em vez de um construtor de gráficos livre, que atrasaria o lançamento.",
+      "results": "Os relatórios manuais acabaram e 9 times passaram a acompanhar as métricas diariamente.",
+      "learnings": "Um bom painel responde a uma pergunta por tela. Menos gráficos, mais decisões.",
+      "metrics": [
+        {
+          "label": "times usando diariamente",
+          "value": "9",
+          "icon": "Users"
+        },
+        {
+          "label": "relatório manual por semana",
+          "value": "4h → 0",
+          "icon": "Clock"
+        },
+        {
+          "label": "tempo de carregamento",
+          "value": "< 1s",
+          "icon": "Zap"
+        }
+      ]
+    }
+  },
+  {
+    "_creationTime": 1768435200030,
+    "_id": "sample00000000000000000000000000000v",
+    "createdAt": 1768435200031,
+    "title": "Atelier 9",
+    "titleTranslations": {
+      "ptBR": "Atelier 9",
+      "enUS": "Atelier 9"
+    },
+    "description": "Loja online para uma marca de cerâmica autoral, do branding ao checkout.",
+    "descriptionTranslations": {
+      "ptBR": "Loja online para uma marca de cerâmica autoral, do branding ao checkout.",
+      "enUS": "Online store for an independent ceramics brand, from branding to checkout."
+    },
+    "longDescription": "Loja online para uma marca de cerâmica autoral, do branding ao checkout.",
+    "longDescriptionTranslations": {
+      "ptBR": "Loja online para uma marca de cerâmica autoral, do branding ao checkout.",
+      "enUS": "Online store for an independent ceramics brand, from branding to checkout."
+    },
+    "tags": [
+      "E-commerce",
+      "Branding",
+      "Next.js"
+    ],
+    "images": [
+      {
+        "_creationTime": 1768435200029,
+        "_id": "sample00000000000000000000000000000u",
+        "createdAt": 1768435200030,
+        "displayName": "projeto-3.svg",
+        "fileSize": 2048,
+        "folderId": "samples",
+        "mimeType": "image/svg+xml",
+        "storageId": "sample00000000000000000000000000000u",
+        "url": "/samples/projeto-3.svg"
+      }
+    ],
+    "imageIds": [
+      "sample00000000000000000000000000000u"
+    ],
+    "demoLink": "",
     "orderIndex": 3,
-    "updatedAt": 1768435200000
+    "updatedAt": 1768435200000,
+    "category": "E-commerce",
+    "categoryTranslations": {
+      "ptBR": "E-commerce",
+      "enUS": "E-commerce"
+    }
   },
   {
     "_creationTime": 1768435200034,
@@ -217,7 +318,12 @@
     ],
     "demoLink": "",
     "orderIndex": 4,
-    "updatedAt": 1768435200000
+    "updatedAt": 1768435200000,
+    "category": "Apps mobile",
+    "categoryTranslations": {
+      "ptBR": "Apps mobile",
+      "enUS": "Mobile apps"
+    }
   },
   {
     "_creationTime": 1768435200036,
@@ -261,6 +367,11 @@
     ],
     "demoLink": "",
     "orderIndex": 5,
-    "updatedAt": 1768435200000
+    "updatedAt": 1768435200000,
+    "category": "Educação",
+    "categoryTranslations": {
+      "ptBR": "Educação",
+      "enUS": "Education"
+    }
   }
 ]

@@ -1,6 +1,10 @@
 import { useAbout } from "@/hooks/useAbout";
 import { useHome } from "@/hooks/useHome";
+import { useWorkPrinciples } from "@/hooks/useWorkPrinciples";
+import { useTranslation } from "@/i18n/hooks/useTranslation";
 import { aboutRepository, homeRepository } from "@/repositories/instances";
+import { splitParagraphs } from "@/utils/aboutContent";
+import { highlightNumbers } from "@/utils/homeContent";
 
 function BentoCard({
   children,
@@ -37,9 +41,30 @@ function BentoCard({
   );
 }
 
+/** Parágrafo com os números de resultado em negrito. */
+function Highlighted({ text }: { text: string }) {
+  return (
+    <>
+      {highlightNumbers(text).map((seg, i) =>
+        seg.highlight ? (
+          <strong key={i} style={{ fontWeight: 700, color: "var(--primary)" }}>
+            {seg.text}
+          </strong>
+        ) : (
+          <span key={i}>{seg.text}</span>
+        )
+      )}
+    </>
+  );
+}
+
 export default function BentoAbout() {
+  const { t } = useTranslation();
   const { dailyRoutine, faq } = useAbout(aboutRepository);
   const { aboutText, services } = useHome(homeRepository);
+  const { principles } = useWorkPrinciples(homeRepository);
+  const paragraphs = splitParagraphs(aboutText ?? "");
+  const personalText = t("about.aboutMe.text");
 
   const gap = 14;
 
@@ -90,18 +115,31 @@ export default function BentoAbout() {
           >
             Sobre Mim
           </h1>
-          {aboutText && (
+          <div
+            style={{
+              fontSize: 11,
+              opacity: 0.55,
+              margin: "18px 0 8px",
+              fontFamily: "var(--font-mono)",
+              letterSpacing: "0.16em",
+              textTransform: "uppercase",
+            }}
+          >
+            {t("about.professional.title")}
+          </div>
+          {paragraphs.map((para, i) => (
             <p
+              key={i}
               style={{
-                fontSize: 13.5,
+                fontSize: i === 0 ? 15 : 13.5,
                 lineHeight: 1.6,
-                opacity: 0.85,
-                margin: "18px 0 0",
+                opacity: i === 0 ? 0.95 : 0.78,
+                margin: i === 0 ? 0 : "12px 0 0",
               }}
             >
-              {aboutText}
+              <Highlighted text={para} />
             </p>
-          )}
+          ))}
         </BentoCard>
         <BentoCard span={4} padding={24}>
           <h3 style={{ fontSize: 15, margin: "0 0 14px", fontWeight: 700 }}>
@@ -129,6 +167,86 @@ export default function BentoAbout() {
           </div>
         </BentoCard>
       </div>
+
+      {/* Como eu trabalho — metodologia antes do conteúdo pessoal */}
+      {principles.length > 0 && (
+        <div style={{ marginBottom: gap }}>
+          <div
+            style={{
+              fontSize: 11,
+              opacity: 0.55,
+              marginBottom: 10,
+              fontFamily: "var(--font-mono)",
+              letterSpacing: "0.16em",
+              textTransform: "uppercase",
+            }}
+          >
+            {t("about.principles.title")}
+          </div>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: `repeat(${Math.min(principles.length, 4)}, 1fr)`,
+              gap,
+            }}
+            className="bento-principles"
+          >
+            {principles.map((pr, i) => (
+              <BentoCard
+                key={pr.title}
+                padding={22}
+                style={i === 0 ? { background: "var(--primary)", color: "var(--bg)" } : {}}
+              >
+                <div
+                  style={{
+                    width: 34,
+                    height: 34,
+                    borderRadius: 11,
+                    background: i === 0 ? "var(--bg)" : "var(--primary)",
+                    color: i === 0 ? "var(--primary)" : "var(--bg)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontWeight: 700,
+                    fontSize: 13,
+                    marginBottom: 14,
+                  }}
+                >
+                  {String(i + 1).padStart(2, "0")}
+                </div>
+                <h3 style={{ fontSize: 16, margin: "0 0 8px", fontWeight: 700, lineHeight: 1.25 }}>{pr.title}</h3>
+                <p style={{ fontSize: 12.5, lineHeight: 1.55, margin: 0, opacity: 0.8 }}>{pr.description}</p>
+              </BentoCard>
+            ))}
+          </div>
+          <style>{`@media (max-width: 760px) { .bento-principles { grid-template-columns: 1fr !important; } }`}</style>
+        </div>
+      )}
+
+      {/* Fora do trabalho — o lado pessoal vem depois */}
+      {personalText && personalText !== "about.aboutMe.text" && (
+        <div style={{ marginBottom: gap }}>
+          <BentoCard padding={28}>
+            <div
+              style={{
+                fontSize: 11,
+                opacity: 0.55,
+                marginBottom: 10,
+                fontFamily: "var(--font-mono)",
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+              }}
+            >
+              {t("about.aboutMe.title")}
+            </div>
+            {splitParagraphs(personalText).map((para, i) => (
+              <p key={i} style={{ fontSize: 13.5, lineHeight: 1.6, opacity: 0.82, margin: i === 0 ? 0 : "12px 0 0" }}>
+                {para}
+              </p>
+            ))}
+          </BentoCard>
+        </div>
+      )}
 
       {/* Daily routine as gallery-style bento */}
       {dailyRoutine.length > 0 && (

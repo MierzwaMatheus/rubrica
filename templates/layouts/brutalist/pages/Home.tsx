@@ -1,6 +1,12 @@
 import { useHome } from "@/hooks/useHome";
+import { useHomeMetrics } from "@/hooks/useHomeMetrics";
+import { usePortfolio } from "@/hooks/usePortfolio";
+import { useContactWizard } from "@/contexts/ContactWizardContext";
+import { usePlugin } from "@/contexts/PluginsContext";
 import { useTranslation } from "@/i18n/hooks/useTranslation";
-import { homeRepository } from "@/repositories/instances";
+import { homeRepository, portfolioRepository } from "@/repositories/instances";
+import { selectFeaturedCases } from "@/utils/homeContent";
+import { Link } from "wouter";
 import { useState, useEffect } from "react";
 import figlet from "figlet";
 // @ts-ignore — importable font bundle
@@ -127,10 +133,28 @@ function AsciiBanner({ name }: { name: string }) {
 
 export default function Home() {
   const { t } = useTranslation();
-  const { contactName, contactRole, aboutText, services, testimonials, contactInfo } =
+  const { contactName, contactRole, aboutText, services, testimonials, contactInfo, contactWizardEnabled } =
     useHome(homeRepository);
+  const { metrics } = useHomeMetrics(homeRepository);
+  const { projects } = usePortfolio(portfolioRepository);
+  const { openWizard } = useContactWizard();
+  const portfolioEnabled = usePlugin("portfolio");
+  const featuredCases = portfolioEnabled ? selectFeaturedCases(projects) : [];
 
-  const primaryStack = services.map((s) => s.title);
+  const btn = (inverted: boolean): React.CSSProperties => ({
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 8,
+    padding: "8px 16px",
+    border: "2px solid var(--text)",
+    background: inverted ? "var(--text)" : "transparent",
+    color: inverted ? "var(--bg)" : "var(--text)",
+    fontFamily: "var(--font-mono)",
+    fontSize: 13,
+    fontWeight: 700,
+    cursor: "pointer",
+    textDecoration: "none",
+  });
 
   return (
     <div
@@ -165,7 +189,7 @@ export default function Home() {
                 margin: "6px 0",
               }}
             >
-              {t("home.greeting")}
+              {t("home.hero.headline")}
             </div>
             <div style={{ opacity: 0.85, marginBottom: 8 }}>{contactRole}</div>
             <div style={{ opacity: 0.7, fontSize: 12, lineHeight: 1.6 }}>
@@ -175,34 +199,111 @@ export default function Home() {
         }
       />
 
-      <div style={{ marginTop: 18 }}>
-        <BrutPrompt
-          cmd="ls --primary-stack"
-          output={
-            <div
-              style={{
-                display: "flex",
-                gap: 14,
-                flexWrap: "wrap",
-                marginTop: 6,
-              }}
-            >
-              {primaryStack.map((s) => (
-                <span
-                  key={s}
-                  style={{
-                    padding: "3px 10px",
-                    border: "1px solid var(--text)",
-                    color: "var(--text)",
-                  }}
-                >
-                  <span style={{ color: "var(--accent)" }}>›</span> {s}
-                </span>
-              ))}
-            </div>
-          }
-        />
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 18 }}>
+        {featuredCases.length > 0 && (
+          <a href="#cases" data-umami-event="home-hero-ver-cases" style={btn(true)}>
+            <span style={{ color: "var(--accent)" }}>›</span> {t("home.hero.ctaCases")}
+          </a>
+        )}
+        {contactWizardEnabled && (
+          <button
+            type="button"
+            onClick={() => openWizard({ sourceContext: "home-hero" })}
+            data-umami-event="home-hero-fale-comigo"
+            style={btn(false)}
+          >
+            <span style={{ color: "var(--accent)" }}>›</span> {t("home.hero.ctaContact")}
+          </button>
+        )}
       </div>
+
+      {metrics.length > 0 && (
+        <>
+          <AsciiRule label="stats" />
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+              border: "1px solid var(--text)",
+            }}
+          >
+            {metrics.map((m, i) => (
+              <div
+                key={m.label}
+                style={{
+                  padding: "14px 16px",
+                  borderLeft: i === 0 ? "none" : "1px solid var(--text)",
+                }}
+              >
+                <div style={{ fontSize: 24, fontWeight: 700, color: "var(--primary)", lineHeight: 1.1 }}>
+                  {m.value}
+                </div>
+                <div style={{ fontSize: 11, opacity: 0.75, marginTop: 6 }}>{m.label}</div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {featuredCases.length > 0 && (
+        <section id="cases" style={{ scrollMarginTop: 80 }}>
+          <AsciiRule label={t("home.cases.title").trim()} />
+          <BrutPrompt
+            cmd="ls -la cases/ --featured"
+            output={
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+                  gap: 0,
+                  border: "1px solid var(--text)",
+                  marginTop: 8,
+                }}
+              >
+                {featuredCases.map((p, i) => {
+                  const metric = p.case_study?.metrics?.[0];
+                  return (
+                    <Link
+                      key={p.id}
+                      href={`/portfolio/${p.slug}`}
+                      data-umami-event="home-case"
+                      data-umami-event-case={p.slug}
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 8,
+                        padding: 16,
+                        color: "inherit",
+                        textDecoration: "none",
+                        borderLeft: i === 0 ? "none" : "1px solid var(--text)",
+                      }}
+                    >
+                      <span style={{ color: "var(--primary)", fontWeight: 700 }}>
+                        [{String(i + 1).padStart(2, "0")}] {p.title}
+                      </span>
+                      <span style={{ fontSize: 12, opacity: 0.8, lineHeight: 1.5 }}>{p.description}</span>
+                      {metric && (
+                        <span style={{ fontSize: 12 }}>
+                          <span style={{ color: "var(--accent)" }}>#</span>{" "}
+                          <b style={{ color: "var(--primary)" }}>{metric.value}</b> {metric.label}
+                        </span>
+                      )}
+                      <span style={{ marginTop: "auto", fontSize: 12, color: "var(--accent)" }}>
+                        {t("home.cases.read")} →
+                      </span>
+                    </Link>
+                  );
+                })}
+              </div>
+            }
+          />
+          <div style={{ marginTop: 8, fontSize: 12 }}>
+            <Link href="/portfolio" style={{ color: "var(--primary)" }}>
+              › {t("home.cases.viewAll")}
+            </Link>
+          </div>
+        </section>
+      )}
 
       <AsciiRule label="capabilities" />
 
@@ -292,6 +393,35 @@ export default function Home() {
           </div>
         }
       />
+
+      {contactWizardEnabled && (
+        <>
+          <AsciiRule label="contact" />
+          <div style={{ border: "2px solid var(--text)", padding: 18 }}>
+            <BrutPrompt cmd="./contato.sh" />
+            <div style={{ fontSize: 20, fontWeight: 700, margin: "10px 0 4px" }}>{t("home.cta.title")}</div>
+            <div style={{ fontSize: 12, opacity: 0.75 }}>{t("home.cta.subtitle")}</div>
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 14 }}>
+              <button
+                type="button"
+                onClick={() => openWizard({ flowType: "project", sourceContext: "home-cta" })}
+                data-umami-event="home-cta-projeto"
+                style={btn(true)}
+              >
+                › {t("home.cta.project")}
+              </button>
+              <button
+                type="button"
+                onClick={() => openWizard({ flowType: "job", sourceContext: "home-cta" })}
+                data-umami-event="home-cta-vaga"
+                style={btn(false)}
+              >
+                › {t("home.cta.job")}
+              </button>
+            </div>
+          </div>
+        </>
+      )}
 
       <div style={{ marginTop: 16 }}>
         <BrutPrompt

@@ -1,13 +1,20 @@
+import { useState } from "react";
+import { Link } from "wouter";
 import { usePortfolio } from "@/hooks/usePortfolio";
+import { useTranslation } from "@/i18n/hooks/useTranslation";
+import { hasCaseStudy, listCategories, filterByCategory } from "@/utils/portfolioContent";
 import { portfolioRepository } from "@/repositories/instances";
 import { SwissShell, SwissGridLines } from "@/components/SwissShared";
 
 export default function SwissPortfolio() {
+  const { t } = useTranslation();
   const { projects, isLoading } = usePortfolio(portfolioRepository);
+  const [category, setCategory] = useState<string | null>(null);
 
   if (isLoading) return null;
 
-  const portfolioFilters = Array.from(new Set(projects.flatMap((p) => p.tags)));
+  const categories = listCategories(projects);
+  const visible = filterByCategory(projects, category);
 
   return (
     <SwissShell page="Portfólio" idx={3}>
@@ -72,49 +79,57 @@ export default function SwissPortfolio() {
         </div>
       </div>
 
-      {/* Filters */}
-      <div
-        style={{
-          padding: "20px 18px",
-          borderBottom: "2px solid var(--text)",
-          display: "flex",
-          flexWrap: "wrap",
-          alignItems: "baseline",
-          gap: "6px 4px",
-        }}
-      >
-        <span
+      {/* Filtros por categoria (escondidos quando nenhum projeto tem categoria) */}
+      {categories.length > 0 && (
+        <div
           style={{
-            fontSize: 10,
-            fontWeight: 700,
-            letterSpacing: "0.16em",
-            textTransform: "uppercase",
-            marginRight: 14,
-            opacity: 0.6,
+            padding: "20px 18px",
+            borderBottom: "2px solid var(--text)",
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "baseline",
+            gap: "6px 4px",
           }}
         >
-          .filtros
-        </span>
-        {portfolioFilters.map((f, i) => (
           <span
-            key={f}
             style={{
-              padding: "4px 10px",
-              fontSize: 11,
-              fontWeight: 600,
-              background: i === 0 ? "var(--primary)" : "transparent",
-              color: i === 0 ? "var(--bg)" : "var(--text)",
-              border:
-                i === 0
-                  ? "none"
-                  : "1px solid color-mix(in oklab, var(--text) 25%, transparent)",
-              letterSpacing: "-0.005em",
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: "0.16em",
+              textTransform: "uppercase",
+              marginRight: 14,
+              opacity: 0.6,
             }}
           >
-            {f}
+            .filtros
           </span>
-        ))}
-      </div>
+          {[null, ...categories].map((c) => {
+            const active = category === c;
+            return (
+              <button
+                key={c ?? "__all"}
+                type="button"
+                onClick={() => setCategory(c)}
+                aria-pressed={active}
+                style={{
+                  padding: "6px 12px",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  background: active ? "var(--primary)" : "transparent",
+                  color: active ? "var(--bg)" : "var(--text)",
+                  border: active
+                    ? "1px solid var(--primary)"
+                    : "1px solid color-mix(in oklab, var(--text) 25%, transparent)",
+                  letterSpacing: "-0.005em",
+                }}
+              >
+                {c ?? t("portfolio.all")}
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {/* Project grid */}
       <div
@@ -124,13 +139,16 @@ export default function SwissPortfolio() {
           borderBottom: "2px solid var(--text)",
         }}
       >
-        {projects.map((p, i) => (
+        {visible.map((p, i) => {
+          const metric = p.case_study?.metrics?.[0];
+          const withCase = hasCaseStudy(p);
+          return (
           <article
             key={p.id}
             style={{
               padding: 20,
               borderRight: i % 2 === 0 ? "1px solid var(--text)" : "none",
-              borderBottom: i < projects.length - 2 ? "1px solid var(--text)" : "none",
+              borderBottom: i < visible.length - 2 ? "1px solid var(--text)" : "none",
               background: i === 0 ? "var(--accent)" : "transparent",
               color: i === 0 ? "var(--bg)" : "var(--text)",
             }}
@@ -207,14 +225,41 @@ export default function SwissPortfolio() {
                     opacity: i === 0 ? 0.9 : 0.8,
                   }}
                 >
-                  {p.description.slice(0, 180)}…
+                  {p.description.length > 180 ? `${p.description.slice(0, 180)}…` : p.description}
                 </p>
+                {metric && (
+                  <div style={{ marginBottom: 12 }}>
+                    <span
+                      style={{
+                        background: i === 0 ? "var(--bg)" : "var(--primary)",
+                        color: i === 0 ? "var(--accent)" : "var(--bg)",
+                        padding: "2px 8px",
+                        fontSize: 18,
+                        fontWeight: 900,
+                        letterSpacing: "-0.02em",
+                      }}
+                    >
+                      {metric.value}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 700,
+                        marginLeft: 8,
+                        letterSpacing: "0.1em",
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      {metric.label}
+                    </span>
+                  </div>
+                )}
                 <div
                   style={{ display: "flex", flexWrap: "wrap", gap: 3, marginBottom: 12 }}
                 >
-                  {p.tags.slice(0, 5).map((t) => (
+                  {p.tags.slice(0, 3).map((tag) => (
                     <span
-                      key={t}
+                      key={tag}
                       style={{
                         padding: "2px 6px",
                         background:
@@ -228,27 +273,42 @@ export default function SwissPortfolio() {
                         textTransform: "uppercase",
                       }}
                     >
-                      {t}
+                      {tag}
                     </span>
                   ))}
                 </div>
-                <div
-                  style={{
+                {(withCase || p.demo_link) && (() => {
+                  const ctaStyle: React.CSSProperties = {
+                    display: "block",
                     fontSize: 11,
-                    fontWeight: 700,
+                    fontWeight: 800,
                     letterSpacing: "0.14em",
                     textTransform: "uppercase",
                     borderTop: "1px solid currentColor",
                     paddingTop: 8,
-                    opacity: 0.8,
-                  }}
-                >
-                  Estudo de caso →
-                </div>
+                    color: "inherit",
+                    textDecoration: "none",
+                  };
+                  return withCase ? (
+                    <Link
+                      href={`/portfolio/${p.slug}`}
+                      data-umami-event="portfolio-case"
+                      data-umami-event-case={p.slug}
+                      style={ctaStyle}
+                    >
+                      {t("portfolio.viewCase")} →
+                    </Link>
+                  ) : (
+                    <a href={p.demo_link} target="_blank" rel="noopener noreferrer" style={ctaStyle}>
+                      Ver projeto ↗
+                    </a>
+                  );
+                })()}
               </div>
             </div>
           </article>
-        ))}
+          );
+        })}
       </div>
     </SwissShell>
   );

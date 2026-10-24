@@ -3,7 +3,6 @@ TASKS.md              export-ignore
 PRD.md                export-ignore
 ideas.md              export-ignore
 docs/                 export-ignore
-domain/               export-ignore
 .windsurf/            export-ignore
 tests/                export-ignore
 package-lock.json     export-ignore

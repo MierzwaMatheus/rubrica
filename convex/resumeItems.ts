@@ -7,9 +7,9 @@ import { requirePlugin, isPluginEnabled } from './plugins';
 import { softDeleteDoc, restoreDoc } from './lib/softDelete';
 
 const RESUME_ITEMS_SEED_VALUES = [
-  { type: 'skill' as const, content: { name: 'TypeScript', level: 'Avançado' }, orderIndex: 0 },
-  { type: 'skill' as const, content: { name: 'React', level: 'Avançado' }, orderIndex: 1 },
-  { type: 'skill' as const, content: { name: 'Node.js', level: 'Intermediário' }, orderIndex: 2 },
+  { type: 'skill' as const, content: { name: 'TypeScript', level: 'Avançado', group: 'Front-end' }, orderIndex: 0 },
+  { type: 'skill' as const, content: { name: 'React', level: 'Avançado', group: 'Front-end' }, orderIndex: 1 },
+  { type: 'skill' as const, content: { name: 'Node.js', level: 'Intermediário', group: 'Back-end' }, orderIndex: 2 },
   {
     type: 'experience' as const,
     content: {

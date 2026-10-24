@@ -12,6 +12,8 @@ const EXPECTED_KEYS = [
   "hero_subtitle",
   "about_short",
   "hero_tags",
+  "work_principles",
+  "home_metrics",
 ];
 
 describe("convex/homeContent · seed", () => {
@@ -21,7 +23,7 @@ describe("convex/homeContent · seed", () => {
     ctx = createMockCtx();
   });
 
-  it("insere exatamente 7 registros correspondentes às PUBLIC_HOME_KEYS em banco vazio", async () => {
+  it("insere exatamente 9 registros correspondentes às PUBLIC_HOME_KEYS em banco vazio", async () => {
     await handler(seed)(ctx, {});
     const docs = ctx.db._all("homeContent");
     expect(docs.length).toBe(EXPECTED_KEYS.length);

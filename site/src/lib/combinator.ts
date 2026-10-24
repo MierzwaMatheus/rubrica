@@ -3,6 +3,8 @@
  * Layout, modo e botão de modo recarregam o iframe (a ponte lê da URL); esquema, fontes,
  * textura e página mudam ao vivo por postMessage (site/scripts/preview-bridge.js).
  */
+import { publishChoice } from "./combinatorStore";
+
 interface Config {
   layouts: { id: string; label: string; recommended: { scheme: string; mode: Mode; texture: string }; fonts: { sans: string[]; mono: string } }[];
   schemes: { id: string; label: string }[];
@@ -101,6 +103,9 @@ export function initCombinator(): void {
       const on = m.layout === state.layout && m.scheme === state.scheme && m.mode === state.mode && m.texture === state.texture && m.sans === state.sans && m.mono === state.mono;
       b.setAttribute("aria-pressed", String(on));
     });
+    // A seção "Crie o seu" monta o comando a partir destas escolhas.
+    const { layout, scheme, mode, toggle, texture, sans, mono } = state;
+    publishChoice({ layout, scheme, mode, toggle, texture, sans, mono });
     sansSel.value = state.sans;
     monoSel.value = state.mono;
     stage!.dataset.device = state.device;

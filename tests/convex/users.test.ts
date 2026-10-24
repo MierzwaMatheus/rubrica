@@ -36,6 +36,9 @@ import {
   getMyRole,
   getMustChangePassword,
   adminCreateUser,
+  resetPasswordInternal,
+  findPasswordAccount,
+  afterPasswordReset,
 } from "../../convex/users";
 import { createMockCtx, type MockCtx } from "../_helpers/convexCtx";
 
@@ -350,5 +353,70 @@ describe("convex/users · adminCreateUser", () => {
         mustChangePassword: true,
       }),
     );
+  });
+});
+
+describe("convex/users · troca de senha pelo terminal", () => {
+  let ctx: MockCtx;
+  beforeEach(() => {
+    ctx = createMockCtx();
+    modifyAccountCredentials.mockReset();
+    modifyAccountCredentials.mockResolvedValue(undefined);
+  });
+
+  it("findPasswordAccount acha a conta de senha pelo e-mail (ou devolve null)", async () => {
+    const [accountId] = ctx.db._seed("authAccounts", [{ userId: "u1", provider: "password", providerAccountId: "ana@a.dev" }]);
+    ctx.db._seed("authAccounts", [{ userId: "u2", provider: "google", providerAccountId: "outro@a.dev" }]);
+    expect(await handler(findPasswordAccount)(ctx, { email: "ana@a.dev" })).toEqual({ accountId, userId: "u1" });
+    expect(await handler(findPasswordAccount)(ctx, { email: "outro@a.dev" })).toBeNull();
+  });
+
+  it("afterPasswordReset destrava o login, limpa o 'precisa trocar a senha' e registra no histórico", async () => {
+    const [userId] = ctx.db._seed("users", [{ email: "ana@a.dev" }]);
+    ctx.db._seed("authRateLimits", [
+      { identifier: "acc1", lastAttemptTime: 1, attemptsLeft: 0 },
+      { identifier: "acc2", lastAttemptTime: 1, attemptsLeft: 0 },
+    ]);
+    ctx.db._seed("userRoles", [{ userId, role: "root", mustChangePassword: true }]);
+    await handler(afterPasswordReset)(ctx, { accountId: "acc1", userId });
+    expect(ctx.db._all("authRateLimits").map((r) => r.identifier)).toEqual(["acc2"]);
+    expect(ctx.db._all("userRoles")[0].mustChangePassword).toBe(false);
+    expect(ctx.db._all("auditLog")).toEqual([
+      expect.objectContaining({ eventType: "auth.password_reset", actorType: "system", targetId: userId }),
+    ]);
+  });
+
+  it("resetPasswordInternal troca a senha da conta e chama a limpeza", async () => {
+    ctx.runQuery = vi.fn().mockResolvedValue({ accountId: "acc1", userId: "u1" });
+    ctx.runMutation = vi.fn().mockResolvedValue(undefined);
+    const result = await handler(resetPasswordInternal)(ctx, { email: "  Ana@A.dev ", password: "NovaSenha1234" });
+    expect(ctx.runQuery).toHaveBeenCalledWith(expect.anything(), { email: "ana@a.dev" });
+    expect(modifyAccountCredentials).toHaveBeenCalledWith(ctx, {
+      provider: "password",
+      account: { id: "ana@a.dev", secret: "NovaSenha1234" },
+    });
+    expect(ctx.runMutation).toHaveBeenCalledWith(expect.anything(), { accountId: "acc1", userId: "u1" });
+    expect(result).toEqual({ email: "ana@a.dev" });
+  });
+
+  it("e-mail sem conta: erro claro e nada muda", async () => {
+    ctx.runQuery = vi.fn().mockResolvedValue(null);
+    ctx.runMutation = vi.fn();
+    await expect(handler(resetPasswordInternal)(ctx, { email: "x@a.dev", password: "NovaSenha1234" })).rejects.toThrow(
+      "Nenhum usuário com o e-mail x@a.dev"
+    );
+    expect(modifyAccountCredentials).not.toHaveBeenCalled();
+    expect(ctx.runMutation).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["Curta1A", "mínimo 12 caracteres"],
+    ["semmaiuscula123", "maiúscula"],
+    ["SEMMINUSCULA123", "minúscula"],
+    ["SemNumeroNenhum", "número"],
+  ])("senha fraca %j é recusada como no painel (%s)", async (password, message) => {
+    ctx.runQuery = vi.fn().mockResolvedValue({ accountId: "acc1", userId: "u1" });
+    await expect(handler(resetPasswordInternal)(ctx, { email: "a@a.dev", password })).rejects.toThrow(message);
+    expect(modifyAccountCredentials).not.toHaveBeenCalled();
   });
 });

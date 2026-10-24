@@ -33,6 +33,33 @@ No personalizado, entram também:
 
 Depois ele inicia o git e instala as dependências sem perguntar: com pnpm se você rodou `pnpm create`, com npm nos outros casos. Por fim, oferece configurar o painel admin na hora. Aceitando, ele conecta o projeto ao Convex (login pelo navegador, conta gratuita) e já roda o `setup`.
 
+### Com as escolhas feitas no site
+
+No [site do Rubrica](https://github.com/MierzwaMatheus/rubrica/tree/main/site), o combinador mostra o app funcionando com cada layout, esquema e fonte. Na seção **Crie o seu**, você preenche os seus dados e copia um comando pronto:
+
+```bash
+npx create-rubrica@latest ana-souza --receita eyJ2IjoxLCJsIjoiZGVza3RvcCIs...
+```
+
+A **receita** leva o visual, os plugins, a identidade, a profissão e as especialidades num texto só, sem espaços nem acentos, então funciona colada em qualquer terminal (bash, PowerShell, cmd). O CLI mostra um resumo, pede confirmação e só pergunta o que faltar: nome, endereço e e-mail, se não vieram. Depois cria o projeto no Convex sem as perguntas dele (login pelo navegador, se for a primeira vez) e roda o `setup` pedindo só a senha do painel. Telegram e Vercel ficam para um `setup` posterior. Nada é enviado a servidor nenhum: o site monta o comando no navegador. A senha do painel é sempre pedida no terminal.
+
+Se algo da receita não existir na versão do CLI (um layout novo, por exemplo), ele avisa e pergunta só aquilo.
+
+### Opções
+
+Também dá para passar as escolhas uma a uma. Elas valem por cima da receita.
+
+| Opção | Valores |
+|---|---|
+| `--receita <código>` | o código gerado pelo site |
+| `--layout <id>` | `cyberpunk`, `brutalist`, `swiss`, `bento`, `magazine`, `desktop`, `index`, `monograph`, `zine`, `blueprint`, `garden`, `chat`, `poster` |
+| `--esquema <id>` | um dos [esquemas de cores](https://github.com/MierzwaMatheus/rubrica/blob/main/docs/templates/cores.md) (`neon`, `riso`, `sumi`...) |
+| `--modo <modo>` | `claro`, `escuro` ou `automatico` |
+| `--alternancia` / `--sem-alternancia` | mostra ou esconde o botão para a visita alternar o modo |
+| `--textura <textura>` | `nenhuma`, `grao`, `papel` ou `scanlines` |
+| `--fonte <família>` / `--mono <família>` | nome da fonte, com hífens no lugar dos espaços (`--fonte instrument-sans`) |
+| `--plugins <lista>` | ids separados por vírgula (`blog,portfolio`), um pacote (`recommended`, `freelancer`, `simple`) ou `nenhum` |
+
 Arquivos que saem com as suas escolhas:
 
 | Arquivo | O que tem |
@@ -64,7 +91,17 @@ npx create-rubrica setup
 
 Configura o backend Convex. Se o projeto ainda não estiver ligado ao Convex (sem `.env.local`), ele conecta sozinho: abre o login no navegador e cria o projeto, sem precisar deixar o `npx convex dev` rodando em outro terminal.
 
-Depois gera as chaves de autenticação, grava o endereço do site que você informou no `create`, cria o usuário admin (o e-mail já vem preenchido) e popula os dados iniciais. As integrações são opcionais e só aparecem para os plugins ligados: o Telegram e a Vercel começam com uma pergunta de sim/não; OpenRouter e Asaas pedem a chave, e dá para pular com Enter. Com a chave do Asaas, ele também gera o token do webhook e mostra a URL e o token para cadastrar no painel do Asaas. Pode ser rodado de novo: o admin existente é mantido e o seed só cria o que falta.
+Depois gera as chaves de autenticação, grava o endereço do site que você informou no `create`, cria o usuário admin (o e-mail já vem preenchido) e popula os dados iniciais. As integrações são opcionais e só aparecem para os plugins ligados: o Telegram e a Vercel começam com uma pergunta de sim/não; OpenRouter e Asaas pedem a chave, e dá para pular com Enter. Com a chave do Asaas, ele também gera o token do webhook e mostra a URL e o token para cadastrar no painel do Asaas. Pode ser rodado de novo: o admin existente é mantido (sem pedir a senha de novo; para trocá-la, use o `senha`) e o seed só cria o que falta.
+
+### `senha`
+
+```bash
+npx create-rubrica senha
+```
+
+Troca a senha de quem entra no painel admin: para quem esqueceu a senha ou ficou bloqueado por tentativas erradas (o bloqueio também é liberado). Pergunta se a troca é no site publicado ou no do seu computador, o e-mail e a senha nova. A senha segue as mesmas regras do painel: 12 ou mais caracteres, com maiúscula, minúscula e número.
+
+Só funciona para quem tem acesso ao projeto no Convex, ou seja, o dono, com a pasta do projeto e logado no Convex. Projetos de versões anteriores precisam de `npx create-rubrica@latest update` antes; no site publicado, publique de novo depois de atualizar.
 
 ### `config`
 

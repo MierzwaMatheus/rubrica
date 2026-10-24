@@ -13,6 +13,12 @@ O combinador não mostra imagens: mostra o próprio app do Rubrica, compilado um
 - Layouts, esquemas e fontes vêm de `cli/src` (`layouts.ts`, `themes/schemes.ts`, `themes/fonts.ts`): o combinador só oferece o que o CLI oferece.
 - As miniaturas da galeria (`public/img/layouts/*.jpg`) são fotos dos próprios previews, geradas por `scripts/shot-thumbnails.mjs`. Regere quando um layout mudar.
 
+## Crie o seu: o comando com a receita
+
+Abaixo do combinador, a seção **Crie o seu** (`src/components/CreateYours.astro`, `src/lib/recipeForm.ts`) junta as escolhas do combinador com os dados da pessoa e monta `npx create-rubrica@latest <pasta> --receita <código>`. O código usa `cli/src/recipe.ts`, o mesmo módulo que o CLI usa para ler. Tudo acontece no navegador.
+
+O combinador publica as escolhas em `src/lib/combinatorStore.ts`, e a seção se inscreve ali (recebe o estado atual mesmo que o combinador tenha iniciado antes). O formato da receita e o que não pode mudar nele estão em [Manutenção do CLI](../docs/cli/manutencao.md#a-receita-do-site).
+
 ## Rodar
 
 Precisa das dependências da raiz do repositório (o build dos previews usa o app e o CLI):

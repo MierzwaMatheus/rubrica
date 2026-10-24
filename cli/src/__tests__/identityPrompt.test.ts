@@ -189,6 +189,50 @@ describe("identityPrompt", () => {
     expect(select).not.toHaveBeenCalled();
   });
 
+  it("onlyMissing com tudo preenchido: nenhuma pergunta", async () => {
+    const prompts = answer();
+    const result = await identityPrompt(
+      { authorName: "Ana", siteName: "Site", siteUrl: "https://a.dev", siteDescription: "d", authorEmail: "a@a.dev", twitterHandle: "a", lang: "en-US" },
+      { askLang: false, onlyMissing: true }
+    );
+    expect(prompts.order()).toEqual([]);
+    expect(result).toEqual({ authorName: "Ana", siteName: "Site", siteUrl: "https://a.dev", siteDescription: "d", authorEmail: "a@a.dev", twitterHandle: "a", lang: "en-US" });
+  });
+
+  it("onlyMissing pergunta só o obrigatório que faltou; opcionais ficam vazios e o nome do site vira o nome", async () => {
+    const prompts = answer({ authorEmail: "ana@a.dev" });
+    const result = await identityPrompt({ authorName: "Ana", siteUrl: "https://a.dev" }, { askLang: false, onlyMissing: true });
+    expect(prompts.order()).toEqual(["authorEmail"]);
+    expect(result).toMatchObject({ siteName: "Ana", siteDescription: "", twitterHandle: "", authorEmail: "ana@a.dev", lang: "pt-BR" });
+  });
+
+  it("onlyMissing pergunta nome e endereço quando faltam", async () => {
+    const prompts = answer();
+    await identityPrompt({ authorEmail: "a@a.dev" }, { askLang: false, onlyMissing: true });
+    expect(prompts.order()).toEqual(["authorName", "siteUrl"]);
+  });
+
+  it("onlyMissing sem defaults pergunta só os obrigatórios", async () => {
+    const prompts = answer();
+    await identityPrompt(undefined, { askLang: false, onlyMissing: true });
+    expect(prompts.order()).toEqual(["authorName", "siteUrl", "authorEmail"]);
+  });
+
+  it("onlyMissing trata valor inválido como faltando", async () => {
+    const prompts = answer();
+    await identityPrompt({ authorName: "Ana", siteUrl: "ana", authorEmail: "ana" }, { askLang: false, onlyMissing: true });
+    expect(prompts.order()).toEqual(["siteUrl", "authorEmail"]);
+  });
+
+  it("onlyMissing normaliza o que veio pronto", async () => {
+    answer();
+    const result = await identityPrompt(
+      { authorName: " Ana ", siteUrl: "a.dev/", authorEmail: " A@A.dev", twitterHandle: "@ana" },
+      { askLang: false, onlyMissing: true }
+    );
+    expect(result).toMatchObject({ authorName: "Ana", siteUrl: "https://a.dev", authorEmail: "a@a.dev", twitterHandle: "ana" });
+  });
+
   it("cancelar em qualquer pergunta chama cancel e lança erro", async () => {
     answer();
     vi.mocked(isCancel).mockReturnValueOnce(true);

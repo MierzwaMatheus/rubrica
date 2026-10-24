@@ -99,7 +99,7 @@ describe("runSetup — Ciclo 1: .env.local e detectProject", () => {
     });
 
     expect(cancel).toHaveBeenCalledWith(
-      expect.stringContaining("npx convex dev")
+      expect.stringContaining("npx create-rubrica setup")
     );
   });
 
@@ -553,7 +553,7 @@ describe("runSetup — Ciclo 7: prompts de admin (validações)", () => {
     expect(senhaCall).toBeDefined();
     const { validate } = senhaCall![0] as { validate: (v: string) => string | undefined };
     expect(validate("curta")).toBeTruthy();
-    expect(validate("senha12caracteres")).toBeUndefined();
+    expect(validate("Senha12caracteres")).toBeUndefined();
   });
 
   it("validate de confirmação de senha rejeita quando diferente", async () => {
@@ -647,7 +647,7 @@ describe("runSetup — Ciclo 8: setupAdmin execFileSync e outro()", () => {
     await runSetup(deps);
 
     // Rodar o setup de novo é válido: o admin existente é mantido e o seed continua.
-    expect(log.warn).toHaveBeenCalledWith(expect.stringMatching(/já configurado/i));
+    expect(log.warn).toHaveBeenCalledWith(expect.stringMatching(/já tinha um admin/i));
     expect(cancel).not.toHaveBeenCalled();
   });
 

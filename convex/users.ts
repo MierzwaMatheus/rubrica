@@ -1,5 +1,5 @@
 import { v } from 'convex/values';
-import { mutation, query, action, internalMutation } from './_generated/server';
+import { mutation, query, action, internalAction, internalMutation, internalQuery } from './_generated/server';
 import { requireRole, getUserRole } from './auth';
 import { logAudit } from './audit';
 import { getAuthUserId, createAccount, modifyAccountCredentials } from '@convex-dev/auth/server';
@@ -154,15 +154,20 @@ export const getMustChangePassword = query({
   },
 });
 
+/** Regras de senha do painel (troca de senha e `npx create-rubrica senha`). */
+function assertStrongPassword(password: string): void {
+  if (password.length < 12) throw new Error('A senha deve ter no mínimo 12 caracteres');
+  if (!/[A-Z]/.test(password)) throw new Error('A senha deve conter ao menos uma letra maiúscula');
+  if (!/[a-z]/.test(password)) throw new Error('A senha deve conter ao menos uma letra minúscula');
+  if (!/[0-9]/.test(password)) throw new Error('A senha deve conter ao menos um número');
+}
+
 export const changePassword = action({
   args: {
     newPassword: v.string(),
   },
   handler: async (ctx, args) => {
-    if (args.newPassword.length < 12) throw new Error('A senha deve ter no mínimo 12 caracteres');
-    if (!/[A-Z]/.test(args.newPassword)) throw new Error('A senha deve conter ao menos uma letra maiúscula');
-    if (!/[a-z]/.test(args.newPassword)) throw new Error('A senha deve conter ao menos uma letra minúscula');
-    if (!/[0-9]/.test(args.newPassword)) throw new Error('A senha deve conter ao menos um número');
+    assertStrongPassword(args.newPassword);
 
     const actorData = await ctx.runQuery(internal.auth.requireAuthQuery, {});
 
@@ -285,5 +290,60 @@ export const bootstrapRootUser = mutation({
     });
 
     return { userId };
+  },
+});
+
+// ---- Troca de senha pelo terminal (`npx create-rubrica senha`) --------------
+// Funções internas: só quem tem acesso ao projeto no Convex (o dono, logado no CLI)
+// consegue chamar. É a saída para quem esqueceu a senha do painel.
+
+export const findPasswordAccount = internalQuery({
+  args: { email: v.string() },
+  handler: async (ctx, { email }) => {
+    const account = await ctx.db
+      .query('authAccounts')
+      .withIndex('providerAndAccountId', (q) => q.eq('provider', 'password').eq('providerAccountId', email))
+      .unique();
+    return account ? { accountId: account._id, userId: account.userId } : null;
+  },
+});
+
+export const afterPasswordReset = internalMutation({
+  args: { accountId: v.string(), userId: v.id('users') },
+  handler: async (ctx, { accountId, userId }) => {
+    // Quem errou a senha demais fica bloqueado mesmo com a senha certa: destrava.
+    const limits = await ctx.db
+      .query('authRateLimits')
+      .withIndex('identifier', (q) => q.eq('identifier', accountId))
+      .collect();
+    for (const limit of limits) await ctx.db.delete(limit._id);
+
+    const roleDoc = await ctx.db
+      .query('userRoles')
+      .withIndex('by_userId', (q) => q.eq('userId', userId))
+      .unique();
+    if (roleDoc) await ctx.db.patch(roleDoc._id, { mustChangePassword: false });
+
+    await logAudit(ctx, {
+      eventType: 'auth.password_reset',
+      actorType: 'system',
+      targetType: 'user',
+      targetId: userId,
+      metadata: { via: 'cli' },
+      success: true,
+    });
+  },
+});
+
+export const resetPasswordInternal = internalAction({
+  args: { email: v.string(), password: v.string() },
+  handler: async (ctx, args): Promise<{ email: string }> => {
+    const email = args.email.trim().toLowerCase();
+    assertStrongPassword(args.password);
+    const account = await ctx.runQuery(internal.users.findPasswordAccount, { email });
+    if (!account) throw new Error(`Nenhum usuário com o e-mail ${email}`);
+    await modifyAccountCredentials(ctx, { provider: 'password', account: { id: email, secret: args.password } });
+    await ctx.runMutation(internal.users.afterPasswordReset, account);
+    return { email };
   },
 });

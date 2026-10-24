@@ -16,10 +16,12 @@ vi.mock("@clack/prompts", () => ({
   isCancel: vi.fn(() => false),
   cancel: vi.fn(),
   log: { info: vi.fn(), warn: vi.fn(), success: vi.fn(), step: vi.fn() },
+  note: vi.fn(),
   spinner: vi.fn(() => ({ start: vi.fn(), stop: vi.fn() })),
 }));
 
-import { select, multiselect, confirm, outro, isCancel, cancel, log } from "@clack/prompts";
+import { select, multiselect, confirm, outro, isCancel, cancel, log, note } from "@clack/prompts";
+import type { Recipe } from "../recipe.js";
 
 const IDENTITY = {
   siteName: "Ana",
@@ -223,15 +225,14 @@ describe("create — backend no mesmo fluxo", () => {
     expect(confirm).toHaveBeenCalledWith(expect.objectContaining({ message: expect.stringMatching(/painel/), initialValue: true }));
   });
 
-  it("aceitando, conecta o Convex na pasta do projeto e roda o setup lá", async () => {
+  it("aceitando, roda o setup na pasta do projeto, que cria o projeto no Convex", async () => {
     quick();
     vi.mocked(confirm).mockResolvedValueOnce(true);
     const deps = makeDeps();
     await runCreate("ana", deps);
-    expect(deps.exec).toHaveBeenCalledWith("npx convex dev --once", "/projects/ana");
-    expect(deps.setup).toHaveBeenCalledWith({ cwd: "/projects/ana", nextStep: "cd ana && npm run dev" });
-    const order = vi.mocked(deps.exec).mock.calls.map((c) => c[0]);
-    expect(order.indexOf("npm install")).toBeLessThan(order.indexOf("npx convex dev --once"));
+    expect(deps.setup).toHaveBeenCalledWith({ cwd: "/projects/ana", nextStep: "cd ana && npm run dev", newProject: "ana" });
+    expect(vi.mocked(deps.exec).mock.calls.some((c) => String(c[0]).includes("convex"))).toBe(false);
+    expect(vi.mocked(deps.exec).mock.invocationCallOrder.at(-1)!).toBeLessThan(vi.mocked(deps.setup).mock.invocationCallOrder[0]);
     expect(outro).not.toHaveBeenCalled(); // o setup fecha com os próximos passos
   });
 
@@ -240,23 +241,134 @@ describe("create — backend no mesmo fluxo", () => {
     const deps = makeDeps({ userAgent: "pnpm/9.0.0" });
     await runCreate("ana", deps);
     expect(deps.setup).not.toHaveBeenCalled();
-    expect(deps.exec).not.toHaveBeenCalledWith("npx convex dev --once", expect.anything());
     const msg = vi.mocked(outro).mock.calls[0][0] as string;
     expect(msg).toMatch(/cd ana/);
     expect(msg).toMatch(/npx create-rubrica setup/);
     expect(msg).toMatch(/pnpm run dev/);
   });
+});
 
-  it("se o Convex falhar, não roda o setup e diz como continuar depois", async () => {
-    quick();
+describe("create — com receita do site", () => {
+  const FULL: Recipe = {
+    layout: "zine",
+    scheme: "riso",
+    colorMode: "dark",
+    colorModeToggle: false,
+    texture: "paper",
+    fontSans: "Fraunces",
+    fontMono: "Space Mono",
+    plugins: ["blog", "about"],
+    identity: { authorName: "Ana", siteUrl: "https://ana.dev", authorEmail: "ana@ana.dev" },
+  };
+
+  it("mostra o resumo e pede confirmação antes de baixar", async () => {
     vi.mocked(confirm).mockResolvedValueOnce(true);
-    const exec = vi.fn(async (cmd: string) => {
-      if (cmd.startsWith("npx convex")) throw new Error("login cancelado");
-    });
-    const deps = makeDeps({ exec });
+    const deps = makeDeps({ recipe: FULL });
     await runCreate("ana", deps);
-    expect(deps.setup).not.toHaveBeenCalled();
-    expect(vi.mocked(outro).mock.calls[0][0]).toMatch(/npx create-rubrica setup/);
+    expect(note).toHaveBeenCalledWith(expect.stringContaining("Layout: Zine\nCores: Riso"), expect.stringMatching(/site/i));
+    expect(confirm).toHaveBeenNthCalledWith(1, expect.objectContaining({ message: expect.stringMatching(/Criar com essas escolhas/), initialValue: true }));
+    expect(vi.mocked(confirm).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(deps.download).mock.invocationCallOrder[0]);
+  });
+
+  it("recusando o resumo, cancela sem baixar nada", async () => {
+    vi.mocked(confirm).mockResolvedValueOnce(false);
+    const deps = makeDeps({ recipe: FULL });
+    await expect(runCreate("ana", deps)).rejects.toThrow("cancelado");
+    expect(cancel).toHaveBeenCalled();
+    expect(deps.download).not.toHaveBeenCalled();
+  });
+
+  it("receita completa: nenhuma pergunta de modo, layout, aparência ou plugins", async () => {
+    vi.mocked(confirm).mockResolvedValueOnce(true);
+    const deps = makeDeps({ recipe: FULL });
+    await runCreate("ana", deps);
+    expect(select).not.toHaveBeenCalled();
+    expect(multiselect).not.toHaveBeenCalled();
+    expect(deps.applyLayout).toHaveBeenCalledWith("zine", expect.anything(), expect.anything());
+    expect(deps.applyTheme).toHaveBeenCalledWith({ preset: "riso" }, expect.any(String), expect.anything());
+    expect(deps.applyAppearance).toHaveBeenCalledWith({ colorMode: "dark", colorModeToggle: false, texture: "paper" }, expect.any(String), expect.anything());
+    expect(deps.applyFont).toHaveBeenCalledWith({ fontSans: "Fraunces", fontMono: "Space Mono" }, expect.anything(), expect.anything());
+    const record = vi.mocked(deps.applyPlugins).mock.calls[0][0] as Record<string, boolean>;
+    expect(Object.entries(record).filter(([, on]) => on).map(([k]) => k)).toEqual(["blog", "about"]);
+  });
+
+  it("a identidade da receita vai para o prompt, que só pergunta o que faltar", async () => {
+    vi.mocked(confirm).mockResolvedValueOnce(true);
+    const deps = makeDeps({ recipe: FULL });
+    await runCreate("ana", deps);
+    expect(deps.identityPrompt).toHaveBeenCalledWith(
+      { siteUrl: "https://ana.dev", authorName: "Ana", authorEmail: "ana@ana.dev" },
+      { askLang: false, onlyMissing: true }
+    );
+  });
+
+  it("sem endereço na receita, sugere o da Vercel", async () => {
+    vi.mocked(confirm).mockResolvedValueOnce(true);
+    const deps = makeDeps({ recipe: { layout: "zine", plugins: [], identity: { authorName: "Ana" } } });
+    await runCreate("ana", deps);
+    expect(deps.identityPrompt).toHaveBeenCalledWith({ siteUrl: "https://ana.vercel.app", authorName: "Ana" }, expect.anything());
+  });
+
+  it("só o layout: o resto da aparência vem do recomendado e os plugins são perguntados", async () => {
+    vi.mocked(confirm).mockResolvedValueOnce(true);
+    vi.mocked(select).mockResolvedValueOnce("simple");
+    const deps = makeDeps({ recipe: { layout: "desktop" } });
+    await runCreate("ana", deps);
+    expect(select).toHaveBeenCalledTimes(1); // só o pacote de plugins
+    expect(deps.applyTheme).toHaveBeenCalledWith({ preset: "sorbet" }, expect.any(String), expect.anything());
+    expect(deps.applyAppearance).toHaveBeenCalledWith({ colorMode: "light", colorModeToggle: true, texture: "grain" }, expect.any(String), expect.anything());
+  });
+
+  it("aparência parcial: usa o que veio e completa com o recomendado do layout", async () => {
+    vi.mocked(confirm).mockResolvedValueOnce(true);
+    const deps = makeDeps({ recipe: { layout: "desktop", scheme: "riso", plugins: [] } });
+    await runCreate("ana", deps);
+    expect(deps.applyTheme).toHaveBeenCalledWith({ preset: "riso" }, expect.any(String), expect.anything());
+    expect(deps.applyFont).toHaveBeenCalledWith({ fontSans: "Instrument Sans", fontMono: "IBM Plex Mono" }, expect.anything(), expect.anything());
+  });
+
+  it("sem layout na receita, pergunta o layout (e não o modo)", async () => {
+    vi.mocked(confirm).mockResolvedValueOnce(true);
+    vi.mocked(select).mockResolvedValueOnce("bento");
+    const deps = makeDeps({ recipe: { plugins: [] } });
+    await runCreate("ana", deps);
+    expect(select).toHaveBeenCalledTimes(1);
+    expect((vi.mocked(select).mock.calls[0][0] as { message: string }).message).toBe("Layout");
+    expect(deps.applyLayout).toHaveBeenCalledWith("bento", expect.anything(), expect.anything());
+  });
+
+  it("layout sem fonte mono ignora a mono da receita", async () => {
+    vi.mocked(confirm).mockResolvedValueOnce(true);
+    const deps = makeDeps({ recipe: { layout: "swiss", fontMono: "Space Mono", plugins: [] } });
+    await runCreate("ana", deps);
+    expect(deps.applyFont).toHaveBeenCalledWith({ fontSans: "Archivo", fontMono: "" }, expect.anything(), expect.anything());
+  });
+
+  it("não pergunta se quer configurar o painel: roda o setup no modo do site, com profissão e especialidades", async () => {
+    vi.mocked(confirm).mockResolvedValueOnce(true);
+    const deps = makeDeps({ recipe: { ...FULL, identity: { ...FULL.identity, profession: "Designer", specialties: "UX" } } });
+    await runCreate("ana", deps);
+    expect(confirm).toHaveBeenCalledTimes(1); // só o resumo
+    expect(deps.setup).toHaveBeenCalledWith({
+      cwd: "/projects/ana",
+      nextStep: "cd ana && npm run dev",
+      newProject: "ana",
+      site: { profession: "Designer", specialties: "UX" },
+    });
+  });
+
+  it("receita sem profissão: o setup roda no modo do site sem cargo", async () => {
+    vi.mocked(confirm).mockResolvedValueOnce(true);
+    const deps = makeDeps({ recipe: FULL });
+    await runCreate("ana", deps);
+    expect(deps.setup).toHaveBeenCalledWith(expect.objectContaining({ site: { profession: undefined, specialties: undefined } }));
+  });
+
+  it("receita vazia segue o fluxo normal (pergunta o modo)", async () => {
+    quick();
+    await runCreate("ana", makeDeps({ recipe: {} }));
+    expect(note).not.toHaveBeenCalled();
+    expect((vi.mocked(select).mock.calls[0][0] as { message: string }).message).toMatch(/montar o site/);
   });
 });
 

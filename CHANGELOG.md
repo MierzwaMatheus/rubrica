@@ -14,6 +14,11 @@ CLI mais simples para quem não é da área técnica.
 - `setup` conecta o Convex sozinho quando falta o `.env.local`, **não pergunta de novo** o endereço do site e já preenche o e-mail do admin. Telegram e Vercel ficam atrás de um sim/não, e as perguntas não mostram mais nomes de variável de ambiente.
 - `config` → Identidade abre as perguntas com os valores salvos, em vez de pedir tudo de novo.
 - Guia de [manutenção do CLI](./docs/cli/manutencao.md): o que mudar no CLI quando entra layout, esquema, fonte ou plugin novo.
+- **Do site direto para o terminal:** a seção "Crie o seu" do site monta um comando com `--receita`, que leva o visual escolhido no combinador, os plugins e a identidade. O CLI mostra um resumo, confirma e só pergunta o que faltar. Também há opções legíveis (`--layout`, `--esquema`, `--modo`, `--textura`, `--fonte`, `--mono`, `--plugins`, `--alternancia`).
+- Vindo do site, o terminal só pede **a senha do painel**: o projeto é criado no Convex sem as perguntas dele, e profissão e especialidades vêm do formulário. Telegram e Vercel ficam para um `setup` posterior.
+- **`npx create-rubrica senha`**: troca a senha do painel pelo terminal, no site publicado ou no do computador, e libera o login bloqueado por tentativas erradas.
+- Rodar o `setup` de novo não pede mais a senha quando o painel já tem admin.
+- A senha do admin no `setup` segue as mesmas regras do painel (maiúscula, minúscula e número, além dos 12 caracteres).
 
 ## 1.1.0 — 2026-10-24
 

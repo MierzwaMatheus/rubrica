@@ -1,0 +1,234 @@
+---
+import { PLUGIN_PRESETS } from "../../../cli/src/plugins";
+---
+
+<section id="criar" class="section create">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Crie o seu</p>
+      <h2 class="display">Gostou? Leve para o seu computador.</h2>
+      <p>
+        O visual que você montou no combinador já vai junto. Preencha os seus dados e cole o comando num terminal: ele
+        baixa o Rubrica, instala tudo, conecta o banco de dados (login pelo navegador, conta gratuita) e cria o seu
+        painel. Só a senha do painel é pedida lá.
+      </p>
+    </div>
+
+    <form class="card" id="cs-form" novalidate aria-label="Seus dados para criar o site">
+      <fieldset class="grp">
+        <legend>O que o site vai ter</legend>
+        <div class="presets">
+          {
+            PLUGIN_PRESETS.map((p, i) => (
+              <button type="button" class="preset" data-preset={p.id} aria-pressed={i === 0 ? "true" : "false"}>
+                <span class="nm">{p.label}</span>
+                <span class="ht">{p.hint}</span>
+              </button>
+            ))
+          }
+        </div>
+        <p class="help">Dá para ligar e desligar cada parte depois, no painel.</p>
+      </fieldset>
+
+      <div class="fields">
+        <label>
+          <span class="lbl">Seu nome</span>
+          <input name="authorName" autocomplete="name" placeholder="Ana Souza" />
+        </label>
+        <label>
+          <span class="lbl">Nome do site <i>opcional</i></span>
+          <input name="siteName" placeholder="Igual ao seu nome" />
+        </label>
+        <label>
+          <span class="lbl">Endereço do site</span>
+          <input name="siteUrl" inputmode="url" autocomplete="url" placeholder="meusite.com" />
+          <small data-hint="siteUrl" aria-live="polite"></small>
+          <small class="note">Ainda não tem? Deixe em branco: o terminal sugere um endereço gratuito da Vercel.</small>
+        </label>
+        <label>
+          <span class="lbl">Seu e-mail <i>não aparece no site</i></span>
+          <input name="authorEmail" type="email" autocomplete="email" placeholder="nome@meusite.com" />
+          <small data-hint="authorEmail" aria-live="polite"></small>
+        </label>
+        <label class="wide">
+          <span class="lbl">Em uma frase, o que você faz? <i>opcional</i></span>
+          <input name="siteDescription" placeholder="Designer de produto e ilustradora." />
+        </label>
+        <label>
+          <span class="lbl">Perfil no X <i>opcional</i></span>
+          <input name="twitterHandle" placeholder="@seuperfil" />
+        </label>
+      </div>
+
+      <div class="out">
+        <p class="lbl">Cole no terminal</p>
+        <div class="cmd">
+          <code id="cs-cmd"></code>
+          <button class="copy" type="button" id="cs-copy" data-copy="">Copiar</button>
+        </div>
+        <p class="meta">
+          Cria a pasta <b id="cs-folder"></b>. <span id="cs-missing"></span>
+        </p>
+        <p class="meta">
+          Precisa do <a href="https://nodejs.org/pt/download" target="_blank" rel="noopener">Node.js 20 ou mais novo</a>.
+          Nada do que você digita aqui sai do seu navegador: o comando é montado nesta página.
+        </p>
+      </div>
+    </form>
+  </div>
+</section>
+
+<script>
+  import { initRecipeForm } from "../lib/recipeForm";
+  initRecipeForm();
+</script>
+
+<style>
+  .create {
+    border-bottom: 1px solid var(--line);
+  }
+  .card {
+    display: grid;
+    gap: 28px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: clamp(18px, 3vw, 32px);
+  }
+  .grp {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 10px;
+    min-width: 0;
+  }
+  legend,
+  .lbl {
+    padding: 0;
+    font-family: var(--f-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  legend {
+    margin-bottom: 10px;
+  }
+  .lbl i {
+    font-style: normal;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--ink-3);
+    opacity: 0.85;
+  }
+  .lbl i::before {
+    content: "· ";
+  }
+  .help,
+  .note,
+  .meta {
+    font-size: 13px;
+    color: var(--ink-3);
+  }
+  .presets {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+    gap: 10px;
+  }
+  .preset {
+    display: grid;
+    gap: 4px;
+    text-align: left;
+    padding: 14px 16px;
+    border: 1px solid var(--line-strong);
+    border-radius: 12px;
+    background: transparent;
+    color: var(--ink);
+    cursor: pointer;
+    font: inherit;
+  }
+  .preset:hover {
+    border-color: var(--ink);
+  }
+  .preset[aria-pressed="true"] {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+  .preset .nm {
+    font-weight: 600;
+    font-size: 15px;
+  }
+  .preset .ht {
+    font-size: 13px;
+    opacity: 0.8;
+  }
+  .fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 20px;
+  }
+  .fields label {
+    display: grid;
+    gap: 7px;
+    align-content: start;
+    min-width: 0;
+  }
+  .fields .wide {
+    grid-column: span 1;
+  }
+  input {
+    font: 400 15px/1.3 var(--f-body);
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--line-strong);
+    border-radius: 8px;
+    padding: 10px 12px;
+    min-width: 0;
+    width: 100%;
+  }
+  input:hover {
+    border-color: var(--ink-3);
+  }
+  input[aria-invalid="true"] {
+    border-color: var(--terracota);
+  }
+  [data-hint] {
+    font-size: 13px;
+    color: var(--terracota-ink);
+  }
+  [data-hint]:empty {
+    display: none;
+  }
+  .out {
+    display: grid;
+    gap: 10px;
+    padding-top: 22px;
+    border-top: 1px solid var(--line);
+  }
+  .out .cmd {
+    display: flex;
+    border-radius: 12px;
+    align-items: flex-start;
+  }
+  .out .cmd code {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-all;
+    max-height: 7.5em;
+    overflow-y: auto;
+    line-height: 1.5;
+    padding-block: 3px;
+  }
+  .meta b {
+    font-family: var(--f-mono);
+    font-weight: 500;
+    color: var(--ink);
+  }
+  @media (max-width: 640px) {
+    .fields {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

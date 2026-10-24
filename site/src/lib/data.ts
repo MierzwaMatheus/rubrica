@@ -65,10 +65,13 @@ export const FEATURES = [
 ];
 
 export const STEPS = [
-  { title: "Crie o projeto", code: COMMAND, text: "O assistente pergunta layout, esquema de cores, modo, textura, fontes, plugins e identidade." },
-  { title: "Suba o backend", code: "npx convex dev", text: "Deixe rodando num terminal: é o banco e as funções do site." },
-  { title: "Configure o ambiente", code: "npx create-rubrica setup", text: "Com o Convex no ar, o setup cria as chaves e as variáveis." },
-  { title: "Rode e publique", code: "pnpm dev", text: "Edite tudo pelo painel admin e publique na Vercel com domínio próprio." },
+  {
+    title: "Crie o projeto",
+    code: COMMAND,
+    text: "Monte no combinador e copie o comando pronto em \"Crie o seu\", ou rode este e responda às perguntas. Ele instala tudo, conecta o banco de dados e cria o painel admin.",
+  },
+  { title: "Abra o site", code: "npm run dev", text: "Na pasta do projeto. O painel fica em /login, com o e-mail e a senha que você definiu." },
+  { title: "Publique", code: "npx create-rubrica update", text: "Edite tudo pelo painel e publique na Vercel com domínio próprio. O update traz as versões novas sem apagar o que você personalizou." },
 ];
 
 export function layoutLabel(id: string): string {

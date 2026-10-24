@@ -1,5 +1,5 @@
 ---
-import { LAYOUTS, SCHEMES, SANS_FONTS, MONO_FONTS, TEXTURES, MOODS, PAGES, COMMAND } from "../lib/data";
+import { LAYOUTS, SCHEMES, SANS_FONTS, MONO_FONTS, TEXTURES, MOODS, PAGES } from "../lib/data";
 
 const newLayouts = LAYOUTS.filter((l) => !l.legacy);
 const legacyLayouts = LAYOUTS.filter((l) => l.legacy);
@@ -147,10 +147,7 @@ const config = {
             <p class="eyebrow">Respostas para o create-rubrica</p>
             <dl id="cb-answers"></dl>
           </div>
-          <div class="cmd">
-            <code>{COMMAND}</code>
-            <button class="copy" type="button" data-copy={COMMAND}>Copiar</button>
-          </div>
+          <a class="btn" href="#criar">Criar o meu com essas escolhas</a>
         </div>
       </div>
     </div>

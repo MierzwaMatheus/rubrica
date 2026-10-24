@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { unflattenTranslations, serializeTranslations, validateEnv } from "../../scripts/export-i18n";
+import { unflattenTranslations, serializeTranslations, validateEnv, mergeTranslations } from "../../scripts/export-i18n";
 
 describe("unflattenTranslations", () => {
   it("converte chave simples em objeto aninhado", () => {
@@ -103,5 +103,36 @@ describe("validateEnv", () => {
       VITE_CONVEX_URL: "https://fallback.convex.cloud",
     });
     expect(url).toBe("https://primary.convex.cloud");
+  });
+});
+
+describe("mergeTranslations", () => {
+  // O build da Vercel roda o export: sem textos no banco (plugin de tradução desligado),
+  // as traduções do repositório não podem sumir.
+  const base = { nav: { home: "Início", blog: "Blog" }, common: { save: "Salvar" } };
+
+  it("sem nada no banco, mantém as traduções do repositório", () => {
+    expect(mergeTranslations(base, {})).toEqual(base);
+  });
+
+  it("o que veio do banco vale por cima, o resto continua", () => {
+    expect(mergeTranslations(base, { nav: { home: "Home" } })).toEqual({
+      nav: { home: "Home", blog: "Blog" },
+      common: { save: "Salvar" },
+    });
+  });
+
+  it("chaves novas do banco entram", () => {
+    expect(mergeTranslations(base, { extra: { x: "y" } })).toMatchObject({ extra: { x: "y" } });
+  });
+
+  it("valor vazio no banco não apaga a tradução do repositório", () => {
+    expect(mergeTranslations(base, { nav: { home: "" } }).nav).toEqual({ home: "Início", blog: "Blog" });
+  });
+
+  it("não altera os objetos de entrada", () => {
+    const copy = JSON.parse(JSON.stringify(base));
+    mergeTranslations(base, { nav: { home: "Home" } });
+    expect(base).toEqual(copy);
   });
 });

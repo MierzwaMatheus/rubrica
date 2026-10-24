@@ -42,6 +42,25 @@ export function unflattenTranslations(
   return result;
 }
 
+type Tree = { [key: string]: string | Tree };
+
+/**
+ * Traduções do repositório como base, com os textos do banco (siteTexts) por cima.
+ * Sem o plugin de tradução, o banco vem vazio: sem a base, o build apagaria tudo.
+ */
+export function mergeTranslations(base: Tree, overrides: Tree): Tree {
+  const result: Tree = { ...base };
+  for (const [key, value] of Object.entries(overrides)) {
+    const current = result[key];
+    if (typeof value === "object" && value !== null) {
+      result[key] = mergeTranslations(typeof current === "object" && current !== null ? current : {}, value);
+    } else if (value) {
+      result[key] = value;
+    }
+  }
+  return result;
+}
+
 // main() só executa quando rodado diretamente via tsx (não durante testes)
 if (!process.env.VITEST) {
   const { config } = await import("dotenv");
@@ -69,8 +88,18 @@ if (!process.env.VITEST) {
   );
 
   const translationsDir = join(process.cwd(), "src/i18n/translations");
-  writeFileSync(join(translationsDir, "pt-BR.ts"), serializeTranslations(ptBRObj, "ptBR"), "utf-8");
-  writeFileSync(join(translationsDir, "en-US.ts"), serializeTranslations(enUSObj, "enUS"), "utf-8");
+  const { ptBR: basePtBR } = await import("../src/i18n/translations/pt-BR");
+  const { enUS: baseEnUS } = await import("../src/i18n/translations/en-US");
+  writeFileSync(
+    join(translationsDir, "pt-BR.ts"),
+    serializeTranslations(mergeTranslations(basePtBR as Tree, ptBRObj as Tree), "ptBR"),
+    "utf-8"
+  );
+  writeFileSync(
+    join(translationsDir, "en-US.ts"),
+    serializeTranslations(mergeTranslations(baseEnUS as Tree, enUSObj as Tree), "enUS"),
+    "utf-8"
+  );
 
   console.log(`✓ pt-BR.ts (${rows.length} keys)`);
   console.log(`✓ en-US.ts (${rows.filter((r) => r.enUS).length} keys)`);

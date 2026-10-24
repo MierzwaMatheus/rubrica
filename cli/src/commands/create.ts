@@ -1,4 +1,4 @@
-import { outro, select, confirm, isCancel, cancel, log } from "@clack/prompts";
+import { outro, select, confirm, isCancel, cancel, log, note } from "@clack/prompts";
 import * as nodeFsPromises from "node:fs/promises";
 import { identityPrompt as defaultIdentityPrompt } from "../prompts/identityPrompt.js";
 import { downloadRelease as defaultDownloadRelease, getLatestVersion as defaultGetLatestVersion } from "../utils/download.js";
@@ -16,6 +16,7 @@ import { pluginsPrompt } from "../prompts/pluginsPrompt.js";
 import { pluginsRecord } from "../plugins.js";
 import { recommendedAppearance } from "../layouts.js";
 import { packageManagerFromUserAgent } from "../utils/packageManager.js";
+import { recipeSummary, type Recipe } from "../recipe.js";
 import { runSetup as defaultRunSetup } from "./setup.js";
 
 // ---- Tipos -----------------------------------------------------------------
@@ -52,6 +53,8 @@ export interface RunCreateDeps {
   setup?: (opts: { cwd: string; nextStep: string }) => Promise<void>;
   /** `npm_config_user_agent`: diz se o create veio do pnpm ou do npm. */
   userAgent?: string;
+  /** Escolhas que vieram do site (`--receita`) ou das opções legíveis. Já validadas. */
+  recipe?: Recipe;
 }
 
 /** Endereço que a Vercel dá a um projeto com esse nome: bom padrão para quem ainda não tem domínio. */
@@ -124,8 +127,22 @@ export async function runCreate(
 
   const projectDir = `${deps.projectsDir}/${projectName}`;
 
+  const recipe = deps.recipe ?? {};
+  const fromRecipe = Object.keys(recipe).length > 0;
+
+  // Com receita: mostra o que veio do site e confirma antes de baixar. Sem pergunta de modo:
+  // o que faltar da aparência vem do recomendado do layout, como no rápido.
+  if (fromRecipe) {
+    note(recipeSummary(recipe).join("\n"), "Escolhas que vieram do site");
+    const ok = await confirm({ message: "Criar com essas escolhas? (o que faltar eu pergunto)", initialValue: true });
+    if (ok !== true) {
+      cancel("Operação cancelada.");
+      throw new Error("Prompt cancelado pelo usuário.");
+    }
+  }
+
   // Modo: o rápido só pergunta layout, plugins e identidade; o resto vem do layout.
-  const mode = await select({
+  const mode = fromRecipe ? "quick" : await select({
     message: "Como você quer montar o site?",
     initialValue: "quick",
     options: [
@@ -140,7 +157,7 @@ export async function runCreate(
   await download(projectDir, version);
 
   // Layout (antes de remover templates/)
-  const layout = await layoutPrompt();
+  const layout = recipe.layout ?? (await layoutPrompt());
   assertNotCancelled(layout);
 
   await applyLayoutFn(
@@ -159,10 +176,15 @@ export async function runCreate(
     ({ fontSans, fontMono } = await fontPrompts(layout));
   } else {
     const rec = recommendedAppearance(layout);
-    themeChoice = rec.theme;
-    appearance = { colorMode: rec.colorMode, colorModeToggle: rec.colorModeToggle, texture: rec.texture };
-    fontSans = rec.fontSans;
-    fontMono = rec.fontMono;
+    themeChoice = recipe.scheme ?? rec.theme;
+    appearance = {
+      colorMode: recipe.colorMode ?? rec.colorMode,
+      colorModeToggle: recipe.colorModeToggle ?? rec.colorModeToggle,
+      texture: recipe.texture ?? rec.texture,
+    };
+    fontSans = recipe.fontSans ?? rec.fontSans;
+    // Layout sem mono (rec.fontMono vazio) não carrega fonte mono, venha o que vier.
+    fontMono = rec.fontMono === "" ? "" : (recipe.fontMono ?? rec.fontMono);
   }
 
   await applyThemeFn(
@@ -185,7 +207,7 @@ export async function runCreate(
   );
 
   // Plugins: pacote pronto ou um por um
-  const plugins = pluginsRecord(await pluginsPrompt());
+  const plugins = pluginsRecord(recipe.plugins ?? (await pluginsPrompt()));
 
   await applyPluginsFn(
     plugins,
@@ -195,8 +217,8 @@ export async function runCreate(
 
   // Identidade. Sem domínio ainda, o endereço da Vercel é um bom ponto de partida.
   const identity = await doIdentityPrompt(
-    { siteUrl: suggestedSiteUrl(projectName) },
-    { askLang: custom }
+    { siteUrl: suggestedSiteUrl(projectName), ...recipe.identity },
+    fromRecipe ? { askLang: false, onlyMissing: true } : { askLang: custom }
   );
 
   await applyIndexHtmlFn(

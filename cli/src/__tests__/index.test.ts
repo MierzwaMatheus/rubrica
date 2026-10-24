@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 vi.mock("@clack/prompts", () => ({
   intro: vi.fn(),
   outro: vi.fn(),
+  log: { warn: vi.fn() },
 }));
 
 vi.mock("../commands/create.js", () => ({
@@ -20,6 +21,8 @@ vi.mock("../commands/update.js", () => ({
 vi.mock("../commands/setup.js", () => ({
   runSetup: vi.fn().mockResolvedValue(undefined),
 }));
+
+import { encodeRecipe } from "../recipe.js";
 
 // Importar após mocks
 const { runCli } = await import("../index.js");
@@ -66,6 +69,51 @@ describe("runCli — roteamento de comandos", () => {
   it("`create-rubrica <nome>` (formato do pnpm create) cria o projeto", async () => {
     await runCli(["node", "create-rubrica", "meu-portfolio"], "/projetos");
     expect(vi.mocked(runCreate)).toHaveBeenCalledWith("meu-portfolio", { projectsDir: "/projetos" });
+  });
+});
+
+describe("runCli — receita e opções do create", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    process.exitCode = undefined;
+  });
+
+  it("`create-rubrica <nome> --receita <código>` passa a receita ao create", async () => {
+    const code = encodeRecipe({ layout: "zine" });
+    await runCli(["node", "create-rubrica", "ana", "--receita", code], "/p");
+    expect(vi.mocked(runCreate)).toHaveBeenCalledWith("ana", { projectsDir: "/p", recipe: { layout: "zine" } });
+  });
+
+  it("`rubrica create <nome>` com opções legíveis", async () => {
+    await runCli(["node", "rubrica", "create", "ana", "--layout", "zine", "--sem-alternancia"], "/p");
+    expect(vi.mocked(runCreate)).toHaveBeenCalledWith("ana", { projectsDir: "/p", recipe: { layout: "zine", colorModeToggle: false } });
+  });
+
+  it("mostra os avisos antes de começar", async () => {
+    const { log } = await import("@clack/prompts");
+    await runCli(["node", "create-rubrica", "ana", "--layout", "xpto"], "/p");
+    expect(vi.mocked(log.warn)).toHaveBeenCalledWith(expect.stringContaining("xpto"));
+    expect(vi.mocked(runCreate)).toHaveBeenCalledWith("ana", { projectsDir: "/p" });
+  });
+
+  it("opções sem o nome da pasta: mostra o uso e não cria", async () => {
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    await runCli(["node", "rubrica", "create", "--layout", "zine"], "/p");
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringMatching(/Uso:/));
+    expect(vi.mocked(runCreate)).not.toHaveBeenCalled();
+    expect(process.exitCode).toBe(1);
+    errorSpy.mockRestore();
+    process.exitCode = undefined;
+  });
+
+  it("receita inválida: explica, não cria e sai com erro", async () => {
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    await runCli(["node", "create-rubrica", "ana", "--receita", "!!"], "/p");
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringMatching(/receita não é válida/));
+    expect(vi.mocked(runCreate)).not.toHaveBeenCalled();
+    expect(process.exitCode).toBe(1);
+    errorSpy.mockRestore();
+    process.exitCode = undefined;
   });
 });
 

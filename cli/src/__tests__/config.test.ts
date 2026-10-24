@@ -225,6 +225,47 @@ describe("runConfig — identidade", () => {
   });
 });
 
+describe("runConfig — identidade sem redigitar", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("abre as perguntas de identidade já preenchidas com o que está salvo", async () => {
+    const identity = { siteName: "Ana", siteUrl: "https://ana.dev", siteDescription: "d", authorName: "Ana", authorEmail: "ana@ana.dev", twitterHandle: "", lang: "en-US" };
+    const state = { version: "1.0.0", layout: "cyberpunk", theme: "neon", fontSans: "Inter", fontMono: "", plugins: {}, identity };
+    vi.mocked(multiselect).mockResolvedValueOnce(["identity"]);
+    const identityPromptMock = vi.fn().mockResolvedValue(identity);
+    await runConfig({
+      cwd: "/project",
+      detectProject: vi.fn().mockResolvedValue("/project/rubrica.json"),
+      readState: vi.fn().mockResolvedValue(state),
+      writeState: vi.fn().mockResolvedValue(undefined),
+      identityPrompt: identityPromptMock,
+      applyRubricalConfig: vi.fn().mockResolvedValue(undefined),
+      applyIndexHtml: vi.fn().mockResolvedValue(undefined),
+      fs: makeFsModule(Volume.fromJSON({ "/project/rubrica.json": JSON.stringify(state) })),
+    });
+    expect(identityPromptMock).toHaveBeenCalledWith(identity);
+  });
+});
+
+describe("runConfig — plugins com nomes legíveis", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("a lista mostra nome e descrição do plugin, não o id", async () => {
+    const state = { version: "1.0.0", layout: "cyberpunk", theme: "neon", fontSans: "Inter", fontMono: "", plugins: { blog: true } };
+    vi.mocked(multiselect).mockResolvedValueOnce(["plugins"]).mockResolvedValueOnce(["blog"]);
+    await runConfig({
+      cwd: "/project",
+      detectProject: vi.fn().mockResolvedValue("/project/rubrica.json"),
+      readState: vi.fn().mockResolvedValue(state),
+      writeState: vi.fn().mockResolvedValue(undefined),
+      applyPlugins: vi.fn().mockResolvedValue(undefined),
+      fs: makeFsModule(Volume.fromJSON({ "/project/rubrica.json": JSON.stringify(state) })),
+    });
+    const opts = vi.mocked(multiselect).mock.calls[1][0] as { options: Array<{ value: string; label: string }> };
+    expect(opts.options.find((o) => o.value === "contact-wizard")!.label).toMatch(/^Contato — /);
+  });
+});
+
 // ---- Ciclo 5: Re-configuração de Aparência ----------------------------------
 
 describe("runConfig — aparência", () => {

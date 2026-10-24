@@ -9,6 +9,8 @@ vi.mock("@clack/prompts", () => ({
   outro: vi.fn(),
   text: vi.fn().mockResolvedValue("https://meusite.com"),
   password: vi.fn().mockResolvedValue("senha12caracteres"),
+  // Integrações opcionais (Telegram, Vercel): "sim" mantém a sequência de perguntas destes testes.
+  confirm: vi.fn().mockResolvedValue(true),
   spinner: vi.fn(() => ({ start: vi.fn(), stop: vi.fn() })),
   isCancel: vi.fn(() => false),
   cancel: vi.fn(),
@@ -47,7 +49,7 @@ const BASE_PLUGINS = {
 describe("setup E2E — Ciclo 1: sem .env.local", () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it("sem .env.local → cancel chamado com mensagem clara e execSync nunca chamado", async () => {
+  it("sem .env.local → tenta conectar o Convex; sem sucesso, cancela com mensagem clara e não roda mais nada", async () => {
     const vol = Volume.fromJSON({
       "/project/rubrica.json": JSON.stringify({
         version: "1.0.0",
@@ -75,7 +77,8 @@ describe("setup E2E — Ciclo 1: sem .env.local", () => {
     expect(cancel).toHaveBeenCalledWith(
       expect.stringContaining("npx convex dev")
     );
-    expect(execFileSyncMock).not.toHaveBeenCalled();
+    expect(execFileSyncMock).toHaveBeenCalledTimes(1);
+    expect(execFileSyncMock).toHaveBeenCalledWith("npx", ["convex", "dev", "--once"], expect.objectContaining({ cwd: "/project" }));
   });
 });
 

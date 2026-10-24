@@ -1,4 +1,4 @@
-import { outro, text, password, spinner, isCancel, cancel, log } from "@clack/prompts";
+import { outro, text, password, confirm, spinner, isCancel, cancel, log } from "@clack/prompts";
 import * as nodeFsPromises from "node:fs/promises";
 import * as path from "node:path";
 import * as nodeCrypto from "node:crypto";
@@ -6,6 +6,7 @@ import { execFileSync as defaultExecFileSync } from "node:child_process";
 import { detectProject as defaultDetectProject } from "../utils/detectProject.js";
 import { generateJwtKeys as defaultGenerateJwtKeys } from "../utils/generateJwtKeys.js";
 import { readState as defaultReadState } from "../state/readState.js";
+import { normalizeUrl, validateUrl, normalizeEmail, validateEmail } from "../utils/normalize.js";
 
 // ---- Tipos ------------------------------------------------------------------
 
@@ -25,6 +26,8 @@ export interface RunSetupDeps {
   randomBytes?: (size: number) => Buffer;
   execSync?: (cmd: string, opts?: object) => Buffer; // mantido para compatibilidade com testes existentes
   execFileSync?: (file: string, args: string[], opts?: object) => Buffer;
+  /** Última linha do resumo final. O create passa `cd <projeto> && <pm> run dev`. */
+  nextStep?: string;
 }
 
 // ---- Helpers ----------------------------------------------------------------
@@ -72,17 +75,28 @@ export async function runSetup(deps: RunSetupDeps = {}): Promise<void> {
     return;
   }
 
-  // 2. Ler .env.local
+  // Todo comando do Convex roda na pasta do projeto: o create chama o setup de fora dela.
+  const convex = (...args: string[]) => execFileSync("npx", ["convex", ...args], { stdio: "pipe", cwd });
+  const setEnv = (key: string, value: string) => convex("env", "set", "--", key, value);
+
+  // 2. Ler .env.local. Sem ele, o projeto ainda não foi ligado ao Convex: conecta agora
+  // (login e criação do projeto pelo navegador) em vez de mandar abrir outro terminal.
   const envPath = path.join(cwd, ".env.local");
+  const readEnv = async () => parseEnvFile(await fs.readFile(envPath, "utf-8"));
   let envVars: Record<string, string> = {};
   try {
-    const envContent = await fs.readFile(envPath, "utf-8");
-    envVars = parseEnvFile(envContent);
+    envVars = await readEnv();
   } catch {
-    cancel(
-      "Arquivo .env.local não encontrado. Rode npx convex dev primeiro para criá-lo."
-    );
-    return;
+    log.info("Conectando o projeto ao Convex (o backend do site). Se pedir, faça login no navegador.");
+    try {
+      execFileSync("npx", ["convex", "dev", "--once"], { stdio: "inherit", cwd });
+      envVars = await readEnv();
+    } catch {
+      cancel(
+        "Não deu para conectar ao Convex. Rode npx convex dev nesta pasta, espere terminar e rode o setup de novo."
+      );
+      return;
+    }
   }
 
   // 3. Validar vars obrigatórias
@@ -99,7 +113,13 @@ export async function runSetup(deps: RunSetupDeps = {}): Promise<void> {
     return;
   }
 
-  const siteUrlDefault = envVars["VITE_CONVEX_SITE_URL"];
+  // Endereço HTTP do Convex (webhooks), não o do site.
+  const convexSiteUrl = envVars["VITE_CONVEX_SITE_URL"];
+
+  // O rubrica.json traz o que o create já perguntou: nada disso é perguntado de novo.
+  const state = await readState(cwd, fs);
+  const plugins = state.plugins;
+  const identity = (state.identity ?? {}) as Partial<Record<string, string>>;
 
   // 4. Gerar JWT keys
   const s = spinner();
@@ -108,91 +128,72 @@ export async function runSetup(deps: RunSetupDeps = {}): Promise<void> {
   s.stop("Chaves JWT geradas.");
 
   // 5. Setar JWT_PRIVATE_KEY e JWKS no Convex
-  execFileSync("npx", ["convex", "env", "set", "--", "JWT_PRIVATE_KEY", JWT_PRIVATE_KEY], {
-    stdio: "pipe",
-  });
-  execFileSync("npx", ["convex", "env", "set", "--", "JWKS", JWKS], {
-    stdio: "pipe",
-  });
+  setEnv("JWT_PRIVATE_KEY", JWT_PRIVATE_KEY);
+  setEnv("JWKS", JWKS);
 
-  // 6. Prompt e set de SITE_URL
-  const siteUrl = await text({
-    message: "URL pública do site (SITE_URL no Convex):",
-    initialValue: siteUrlDefault,
-    validate: (v) => {
-      if (!v || (!v.startsWith("http://") && !v.startsWith("https://")))
-        return "URL deve começar com http:// ou https://";
-    },
-  });
-
-  if (isCancel(siteUrl)) {
-    cancel("Setup cancelado.");
-    return;
+  // 6. SITE_URL: o endereço do create; só pergunta se ele não estiver salvo.
+  let siteUrl = normalizeUrl(identity.siteUrl ?? "");
+  if (siteUrl) {
+    log.info(`Endereço do site: ${siteUrl} (para mudar: npx create-rubrica config)`);
+  } else {
+    const answer = await text({
+      message: "Endereço do site (ex: meusite.com — não precisa do https://)",
+      initialValue: "",
+      validate: validateUrl,
+    });
+    if (isCancel(answer)) {
+      cancel("Setup cancelado.");
+      return;
+    }
+    siteUrl = normalizeUrl(answer as string);
   }
+  setEnv("SITE_URL", siteUrl);
 
-  execFileSync("npx", ["convex", "env", "set", "--", "SITE_URL", siteUrl as string], {
-    stdio: "pipe",
-  });
-
-  // 7. Ler rubrica.json para vars condicionais por plugin
-  const state = await readState(cwd, fs);
-  const plugins = state.plugins;
+  /** Pergunta opcional: grava a variável só se a pessoa digitou algo. */
+  const optional = async (message: string, key: string) => {
+    const value = await text({ message, initialValue: "" });
+    if (!isCancel(value) && value && (value as string).trim()) setEnv(key, (value as string).trim());
+  };
+  const wants = async (message: string) => (await confirm({ message, initialValue: false })) === true;
 
   // 8. Telegram (contact-wizard ou testimonials-intake)
   if (plugins["contact-wizard"] || plugins["testimonials-intake"]) {
-    const telegramToken = await text({
-      message: "TELEGRAM_BOT_TOKEN (Enter para pular):",
-      initialValue: "",
-    });
-    if (!isCancel(telegramToken) && telegramToken && (telegramToken as string).trim()) {
-      execFileSync("npx", ["convex", "env", "set", "--", "TELEGRAM_BOT_TOKEN", telegramToken as string], { stdio: "pipe" });
-    }
-
-    const telegramChatId = await text({
-      message: "TELEGRAM_ADMIN_CHAT_ID (Enter para pular):",
-      initialValue: "",
-    });
-    if (!isCancel(telegramChatId) && telegramChatId && (telegramChatId as string).trim()) {
-      execFileSync("npx", ["convex", "env", "set", "--", "TELEGRAM_ADMIN_CHAT_ID", telegramChatId as string], { stdio: "pipe" });
+    if (await wants("Quer receber um aviso no Telegram a cada novo contato ou depoimento? (dá para configurar depois)")) {
+      await optional("Token do bot do Telegram (quem cria é o @BotFather; Enter para pular):", "TELEGRAM_BOT_TOKEN");
+      await optional("Id da conversa que recebe os avisos (Enter para pular):", "TELEGRAM_ADMIN_CHAT_ID");
     }
   }
 
   // 9. Playground — gerar PLAYGROUND_KEY_PEPPER silenciosamente
   if (plugins["playground"]) {
     const pepper = randomBytes(32).toString("hex");
-    execFileSync("npx", ["convex", "env", "set", "--", "PLAYGROUND_KEY_PEPPER", pepper], { stdio: "pipe" });
+    setEnv("PLAYGROUND_KEY_PEPPER", pepper);
   }
 
   // 10. AI (ai-resumes, i18n ou playground)
   if (plugins["ai-resumes"] || plugins["i18n"] || plugins["playground"]) {
-    const openrouterKey = await text({
-      message: "OPENROUTER_API_KEY (Enter para pular):",
-      initialValue: "",
-    });
-    if (!isCancel(openrouterKey) && openrouterKey && (openrouterKey as string).trim()) {
-      execFileSync("npx", ["convex", "env", "set", "--", "OPENROUTER_API_KEY", openrouterKey as string], { stdio: "pipe" });
-    }
+    await optional("Chave do OpenRouter, usada nos recursos de IA (openrouter.ai/keys; Enter para pular):", "OPENROUTER_API_KEY");
   }
 
   // 11. Payments (Asaas: PIX, boleto e cartão)
   if (plugins["payments"]) {
     const asaasKey = await text({
-      message: "ASAAS_API_KEY — chave da API do Asaas, sandbox ou produção (Enter para pular):",
+      message: "Chave da API do Asaas, de testes ou de produção (Enter para pular):",
       initialValue: "",
     });
     if (!isCancel(asaasKey) && asaasKey && (asaasKey as string).trim()) {
       const key = (asaasKey as string).trim();
-      execFileSync("npx", ["convex", "env", "set", "--", "ASAAS_API_KEY", key], { stdio: "pipe" });
+      setEnv("ASAAS_API_KEY", key);
 
       // Token que o Asaas manda em cada webhook; o Convex recusa chamadas sem ele.
       const webhookToken = randomBytes(32).toString("hex");
-      execFileSync("npx", ["convex", "env", "set", "--", "ASAAS_WEBHOOK_TOKEN", webhookToken], { stdio: "pipe" });
+      setEnv("ASAAS_WEBHOOK_TOKEN", webhookToken);
 
       const env = key.startsWith("$aact_prod_") ? "produção" : "sandbox (testes)";
       log.info(
         `Asaas configurado em ${env}. Falta cadastrar o webhook no painel do Asaas\n` +
         `(Integrações → Webhooks → Adicionar), com os eventos de cobrança ligados:\n\n` +
-        `  URL:   ${siteUrlDefault.replace(/\/+$/, "")}/webhooks/asaas\n` +
+        `  URL:   ${convexSiteUrl.replace(/\/+$/, "")}/webhooks/asaas\n` +
         `  Token: ${webhookToken}\n\n` +
         `Sem o webhook, os pagamentos nunca aparecem como pagos.`
       );
@@ -200,20 +201,19 @@ export async function runSetup(deps: RunSetupDeps = {}): Promise<void> {
   }
 
   // 12. Prompts de admin (email + senha)
-  const adminEmail = await text({
-    message: "Email do usuário root:",
-    validate: (v) => {
-      if (!v.includes("@") || !v.includes("."))
-        return "Email inválido — deve conter @ e pelo menos um ponto";
-    },
+  const adminEmailAnswer = await text({
+    message: "E-mail para entrar no painel admin:",
+    initialValue: normalizeEmail(identity.authorEmail ?? ""),
+    validate: validateEmail,
   });
-  if (isCancel(adminEmail)) {
+  if (isCancel(adminEmailAnswer)) {
     cancel("Setup cancelado.");
     return;
   }
+  const adminEmail = normalizeEmail(adminEmailAnswer as string);
 
   const adminPassword = await password({
-    message: "Senha do usuário root (mínimo 12 caracteres):",
+    message: "Senha do painel admin (mínimo 12 caracteres):",
     validate: (v) => {
       if (v.length < 12) return "Senha deve ter pelo menos 12 caracteres";
     },
@@ -237,8 +237,8 @@ export async function runSetup(deps: RunSetupDeps = {}): Promise<void> {
   try {
     execFileSync(
       "npx",
-      ["convex", "run", "seed:setupAdmin", JSON.stringify({ email: adminEmail as string, password: adminPassword as string })],
-      { stdio: "pipe" }
+      ["convex", "run", "seed:setupAdmin", JSON.stringify({ email: adminEmail, password: adminPassword as string })],
+      { stdio: "pipe", cwd }
     );
   } catch (err: unknown) {
     const e = err as { stdout?: Buffer; stderr?: Buffer; message?: string };
@@ -259,7 +259,7 @@ export async function runSetup(deps: RunSetupDeps = {}): Promise<void> {
     execFileSync(
       "npx",
       ["convex", "run", "seed:seedAll", JSON.stringify({ enabledPlugins })],
-      { stdio: "pipe" }
+      { stdio: "pipe", cwd }
     );
   } catch (err: unknown) {
     const output =
@@ -270,8 +270,7 @@ export async function runSetup(deps: RunSetupDeps = {}): Promise<void> {
   }
 
   // Seed de identidade no Convex (siteConfig + contactInfo) a partir do rubrica.json
-  const identity = state.identity as Record<string, string> | undefined;
-  if (identity?.siteName) {
+  if (identity.siteName) {
     try {
       execFileSync(
         "npx",
@@ -279,7 +278,7 @@ export async function runSetup(deps: RunSetupDeps = {}): Promise<void> {
           items: [
             { key: "site_title", value: identity.siteName },
             { key: "site_name", value: identity.siteName },
-            { key: "site_url", value: identity.siteUrl || "" },
+            { key: "site_url", value: siteUrl },
             { key: "site_description", value: identity.siteDescription || "" },
             { key: "author_name", value: identity.authorName || "" },
             { key: "author_email", value: identity.authorEmail || "" },
@@ -287,7 +286,7 @@ export async function runSetup(deps: RunSetupDeps = {}): Promise<void> {
             { key: "lang", value: identity.lang || "pt-BR" },
           ],
         })],
-        { stdio: "pipe" }
+        { stdio: "pipe", cwd }
       );
     } catch {
       // não crítico — configurável pelo admin
@@ -302,7 +301,7 @@ export async function runSetup(deps: RunSetupDeps = {}): Promise<void> {
             email: identity.authorEmail || "",
             showEmail: false,
           })],
-          { stdio: "pipe" }
+          { stdio: "pipe", cwd }
         );
       } catch {
         // não crítico
@@ -311,20 +310,9 @@ export async function runSetup(deps: RunSetupDeps = {}): Promise<void> {
   }
 
   // 13. Vercel — sempre presentes (opcionais)
-  const vercelHookUrl = await text({
-    message: "VERCEL_DEPLOY_HOOK_URL (Enter para pular):",
-    initialValue: "",
-  });
-  if (!isCancel(vercelHookUrl) && vercelHookUrl && (vercelHookUrl as string).trim()) {
-    execFileSync("npx", ["convex", "env", "set", "--", "VERCEL_DEPLOY_HOOK_URL", vercelHookUrl as string], { stdio: "pipe" });
-  }
-
-  const vercelWebhookSecret = await text({
-    message: "VERCEL_WEBHOOK_SECRET (Enter para pular):",
-    initialValue: "",
-  });
-  if (!isCancel(vercelWebhookSecret) && vercelWebhookSecret && (vercelWebhookSecret as string).trim()) {
-    execFileSync("npx", ["convex", "env", "set", "--", "VERCEL_WEBHOOK_SECRET", vercelWebhookSecret as string], { stdio: "pipe" });
+  if (await wants("O site vai ficar na Vercel e você quer o botão de publicar no painel? (dá para configurar depois)")) {
+    await optional("Link do Deploy Hook da Vercel (Settings → Git → Deploy Hooks; Enter para pular):", "VERCEL_DEPLOY_HOOK_URL");
+    await optional("Segredo do webhook da Vercel (Enter para pular):", "VERCEL_WEBHOOK_SECRET");
   }
 
   // 14. Personalização do portfolio
@@ -362,14 +350,14 @@ export async function runSetup(deps: RunSetupDeps = {}): Promise<void> {
       execFileSync(
         "npx",
         ["convex", "run", "homeContent:set", JSON.stringify({ key: "hero_tags", value: tags })],
-        { stdio: "pipe" }
+        { stdio: "pipe", cwd }
       );
     } catch {
       // não crítico
     }
 
     if (professionStr) {
-      const name = (adminEmail as string).split("@")[0];
+      const name = identity.authorName || adminEmail.split("@")[0];
       const aiContext = specialtiesStr
         ? `${name} é ${professionStr} com especialidade em ${specialtiesStr}. Entrega projetos com qualidade e comprometimento.`
         : `${name} é ${professionStr}. Entrega projetos com qualidade e comprometimento.`;
@@ -378,7 +366,7 @@ export async function runSetup(deps: RunSetupDeps = {}): Promise<void> {
         execFileSync(
           "npx",
           ["convex", "run", "contactInfo:updateInternal", JSON.stringify({ proposalAiContext: aiContext })],
-          { stdio: "pipe" }
+          { stdio: "pipe", cwd }
         );
       } catch {
         // não crítico
@@ -387,6 +375,6 @@ export async function runSetup(deps: RunSetupDeps = {}): Promise<void> {
   }
 
   outro(
-    `Setup concluído!\n\n  Admin criado: ${adminEmail as string}\n  Acesse: /login\n\n  Próximo passo: pnpm dev`
+    `Pronto!\n\n  Admin: ${adminEmail}\n  O painel fica em /login\n\n  Para abrir o site:\n  ${deps.nextStep ?? "pnpm dev"}`
   );
 }

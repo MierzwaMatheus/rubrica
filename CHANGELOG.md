@@ -2,9 +2,9 @@
 
 O que mudou em cada versão do Rubrica (template e CLI `create-rubrica`). Detalhes de cada uma nas [notas da release](https://github.com/MierzwaMatheus/rubrica/releases). Para atualizar um projeto existente, veja [Atualizando o seu Rubrica](./docs/atualizacao.md).
 
-## Próxima versão
+## 1.4.0 — 2026-10-24
 
-**`npx create-rubrica publicar`** coloca o site no ar na Vercel sem copiar nada à mão, e o template passa a funcionar quando publicado a partir de um projeto do CLI.
+`npx create-rubrica publicar` coloca o site no ar na Vercel sem copiar nada à mão, e o template passa a funcionar quando publicado a partir de um projeto do CLI.
 
 **Vindo da 1.3:**
 - Atualize com `npx create-rubrica@latest update`. Ele traz a pasta `domain/` (sem ela o `npm run build` falha), o `public/color-mode.js` e o `build:i18n` corrigido.

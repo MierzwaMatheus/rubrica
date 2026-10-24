@@ -1,0 +1,33 @@
+{
+  "brand": "Rubrica",
+  "tagline": "Assine com a sua cara.",
+  "brief": "Template open-source de portfólio para devs, designers e freelancers. A marca precisa parecer assinada à mão — autoral, editorial e profissional — e funcionar do favicon ao README.",
+  "adjectives": ["autoral", "editorial", "artesanal", "profissional"],
+  "criteria": "Fiel ao logo original (r caligráfico + floreio terracota), vetorial, com versões positiva, negativa, reduzida e favicon legível em 16 px.",
+  "industry": "software",
+  "mockups": ["readme", "website", "favicon-tab", "app-icon", "social", "business-card"],
+  "nav": ["Portfólio", "Blog", "Currículo"],
+  "brand_color": "#C4664A",
+  "greyscale": false,
+  "final": true,
+  "designer": "Rubrica",
+  "concepts": [
+    {
+      "name": "Assinatura",
+      "symbol": "../logo/svg/rubrica-simbolo-positivo.svg",
+      "lockup": "../logo/svg/rubrica-horizontal-positivo.svg",
+      "stacked": "../logo/svg/rubrica-vertical-positivo.svg",
+      "avatar": "../logo/svg/rubrica-favicon-terracota.svg",
+      "symbol_on_tile": "../logo/svg/rubrica-simbolo-reduzido-creme.svg",
+      "lockup_on_dark": "../logo/svg/rubrica-horizontal-negativo.svg",
+      "tile_color": "#C4664A",
+      "idea": "Um r caligráfico atravessado pelo floreio em terracota — a rubrica, o traço que só você faz.",
+      "rationale": [
+        "Rubrica vem do latim 'terra vermelha': o floreio terracota carrega o significado do nome",
+        "O gesto à mão traduz 'Assine com a sua cara' — a base é coletiva, a assinatura é sua",
+        "Monograma só com o r garante leitura no favicon em 16 px"
+      ]
+    }
+  ],
+  "recommendation": "Usar a versão horizontal no cabeçalho e README, o símbolo em capas e redes, a versão reduzida abaixo de 160 px e o monograma no favicon."
+}

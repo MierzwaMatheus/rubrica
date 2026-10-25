@@ -315,7 +315,7 @@ O repositório já vem com a skill **`rubrica`** para Claude Code, Codex e OpenC
   ```bash
   python3 .agents/skills/rubrica/scripts/rubrica.py login --email voce@exemplo.com
   ```
-- A skill usa o Convex do `VITE_CONVEX_URL` do `.env.local`. Para mexer em outro (ex.: produção), defina `RUBRICA_CONVEX_URL`.
+- Por padrão, a skill mexe no site do computador (o Convex do `.env.local`). Depois do `npx create-rubrica publicar`, o login pergunta se você quer entrar no site publicado ou no do computador, e o agente usa `--producao` para mexer no site no ar. Para outro Convex qualquer, defina `RUBRICA_CONVEX_URL`.
 - Onde ela mora: `.agents/skills/rubrica/` (lido pelo Codex e pelo OpenCode) e o atalho `.claude/skills/rubrica` (lido pelo Claude Code). Requer Python 3.8+.
 
 Para escrever conteúdo novo com calma, há skills estrategistas que entrevistam você, escrevem em pt-BR e en-US e entregam um plano que a `rubrica` aplica depois do seu "ok". Todas começam pela sua voz: na primeira vez, o agente manda você para a [entrevista de voz](https://userubrica.vercel.app/voz), onde você responde falando ou digitando (uns 20 minutos, nada sai do navegador) e cola o resultado na conversa.

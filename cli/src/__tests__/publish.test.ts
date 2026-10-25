@@ -36,6 +36,8 @@ interface Opts {
   state?: object;
   key?: string;
   processEnv?: Record<string, string>;
+  /** Conteúdo que o `vercel env pull` grava; null = o comando falha. */
+  prodEnv?: string | null;
 }
 
 /** Tira o prefixo `--yes vercel@latest [--global-config X]` das chamadas da Vercel. */
@@ -84,6 +86,11 @@ function makeDeps(opts: Opts = {}) {
         return Buffer.from(opts.domains ?? DOMAINS);
       }
       if (v[0] === "deploy") return Buffer.from("https://ana-site-abc123.vercel.app\n");
+      if (v[0] === "env" && v[1] === "pull") {
+        if (opts.prodEnv === null) throw new Error("sem acesso");
+        vol.writeFileSync(`/p/${v[2]}`, opts.prodEnv ?? 'SITE_URL="https://ana-site.vercel.app"\nVITE_CONVEX_URL="https://happy-otter-123.convex.cloud"\n');
+        return Buffer.from("");
+      }
       return Buffer.from("");
     }
     if (key === "convex deployment token create rubrica-vercel --prod") return Buffer.from(`${opts.key ?? DEPLOY_KEY}\n`);
@@ -496,9 +503,47 @@ describe("publicar — detalhes", () => {
   });
 });
 
+const PUBLISHED = { ...STATE, producao: { convexUrl: "https://happy-otter-123.convex.cloud", siteUrl: "https://ana-site.vercel.app" } };
+const savedState = (vol: ReturnType<typeof makeDeps>["vol"]) =>
+  JSON.parse(vol.readFileSync("/p/rubrica.json", "utf-8") as string) as Record<string, unknown>;
+
+describe("publicar — endereço de produção no rubrica.json", () => {
+  it("na primeira vez, grava o Convex e o endereço de produção, sem perder o resto", async () => {
+    const { deps, vol } = makeDeps();
+    await runPublish(deps);
+    const state = savedState(vol);
+    expect(state.producao).toEqual({ convexUrl: "https://happy-otter-123.convex.cloud", siteUrl: "https://ana-site.vercel.app" });
+    expect(state.identity).toEqual(STATE.identity);
+    expect(state.plugins).toEqual(STATE.plugins);
+  });
+
+  it("publicando de novo um projeto da 1.4 (sem o endereço), recupera da Vercel e grava", async () => {
+    const { deps, vol } = makeDeps({ linked: true });
+    await runPublish(deps);
+    expect(vercelCalls(deps)).toContainEqual(expect.arrayContaining(["env", "pull", "--environment=production"]));
+    expect(savedState(vol).producao).toEqual({ convexUrl: "https://happy-otter-123.convex.cloud", siteUrl: "https://ana-site.vercel.app" });
+    expect(vercelCalls(deps).some((v) => v[0] === "deploy")).toBe(true);
+  });
+
+  it("o arquivo puxado da Vercel não sobrescreve o .env.local do computador", async () => {
+    const { deps, vol } = makeDeps({ linked: true });
+    await runPublish(deps);
+    const pull = vercelCalls(deps).find((v) => v[0] === "env" && v[1] === "pull")!;
+    expect(pull[2]).not.toBe(".env.local");
+    expect(vol.readFileSync("/p/.env.local", "utf-8")).toContain("dev:x");
+  });
+
+  it("se a Vercel não devolver o endereço, publica do mesmo jeito", async () => {
+    const { deps, vol } = makeDeps({ linked: true, prodEnv: null });
+    await runPublish(deps);
+    expect(savedState(vol).producao).toBeUndefined();
+    expect(vercelCalls(deps).some((v) => v[0] === "deploy")).toBe(true);
+  });
+});
+
 describe("publicar — de novo", () => {
   it("projeto já ligado: confirma e só publica de novo", async () => {
-    const { deps } = makeDeps({ linked: true });
+    const { deps } = makeDeps({ linked: true, state: PUBLISHED });
     await runPublish(deps);
     expect(confirm).toHaveBeenCalledWith(expect.objectContaining({ message: expect.stringMatching(/de novo/) }));
     expect(vercelCalls(deps).map((v) => v[0])).toEqual(["whoami", "api", "deploy"]);

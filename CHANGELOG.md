@@ -2,6 +2,27 @@
 
 O que mudou em cada versão do Rubrica (template e CLI `create-rubrica`). Detalhes de cada uma nas [notas da release](https://github.com/MierzwaMatheus/rubrica/releases). Para atualizar um projeto existente, veja [Atualizando o seu Rubrica](./docs/atualizacao.md).
 
+## 1.6.0 — 2026-10-25
+
+O site do Rubrica ganha versão em inglês, a página de novidades e a documentação, com três guias novos: começar, comandos do CLI e publicar.
+
+**Vindo da 1.5:**
+- Atualize com `npx create-rubrica@latest update` para receber a skill `rubrica-voz` que entende a entrevista em inglês. Não precisa de versão nova do CLI nem de publicar nada no Convex.
+
+### Site do Rubrica
+- **Em inglês**, em [userubrica.vercel.app/en](https://userubrica.vercel.app/en/), com seletor de idioma no topo. Combinador, "Crie o seu", layouts e esquemas, tudo traduzido. A página avisa que o CLI e o painel são em português.
+- **Novidades** em `/novidades` (e `/en/changelog`): este changelog no próprio site, com índice de versões.
+- **Documentação** em `/docs` (e `/en/docs`): o guia dos templates, os 13 layouts, os esquemas de cores, criar um layout e atualizar viram páginas do site, com navegação e índice. Os links do site deixam de mandar para o GitHub.
+
+### Guias novos
+- [Começando](./docs/guia/comecando.md): do zero ao site rodando no computador, e o que preencher em cada tela do painel.
+- [Comandos do CLI](./docs/guia/cli.md): todas as perguntas, opções e arquivos do `create`, e os outros comandos.
+- [Publicar o site](./docs/guia/publicar.md): a primeira publicação, o botão Publicar do painel, outro computador, domínio próprio e problemas comuns.
+- O README e o README do CLI ficaram mais curtos e apontam para esses guias.
+
+### Entrevista de voz em inglês
+- Em [/en/voice](https://userubrica.vercel.app/en/voice), com o ditado em inglês e as respostas salvas à parte das em português. A skill `rubrica-voz` reconhece a entrevista em inglês e observa a voz no idioma das respostas.
+
 ## 1.5.0 — 2026-10-25
 
 O botão **Publicar** do painel passa a funcionar sem GitHub, o agente de IA entra no site publicado, e o `publicar` fica seguro em outro computador.

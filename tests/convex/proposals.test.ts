@@ -722,3 +722,72 @@ describe("convex/proposals · resetPassword", () => {
     expect(doc!.password).toBeUndefined();
   });
 });
+
+describe("convex/proposals · desconto e brinde", () => {
+  let ctx: MockCtx;
+  beforeEach(() => {
+    ctx = createMockCtx();
+    getAuthUserId.mockReset();
+  });
+
+  const discounted = {
+    ...baseProposalArgs,
+    investmentValue: 4000,
+    originalValue: 5000,
+    giftItems: [{ scopeIndex: 1, value: 1000 }],
+  };
+
+  it("create stores the original value and gift items", async () => {
+    asRoot(ctx);
+    const id = await handler(create)(ctx, discounted);
+    const proposal = await ctx.db.get(id);
+    expect(proposal!.originalValue).toBe(5000);
+    expect(proposal!.giftItems).toEqual([{ scopeIndex: 1, value: 1000 }]);
+  });
+
+  it("create rejects an original value below the final value", async () => {
+    asRoot(ctx);
+    await expect(
+      handler(create)(ctx, { ...baseProposalArgs, originalValue: 4000 }),
+    ).rejects.toThrow("Valor original");
+  });
+
+  it("update clears the discount with null", async () => {
+    asRoot(ctx);
+    const id = await handler(create)(ctx, discounted);
+    await handler(update)(ctx, { id, originalValue: null, giftItems: [] });
+    const proposal = await ctx.db.get(id);
+    expect(proposal!.originalValue).toBeUndefined();
+    expect(proposal!.giftItems).toBeUndefined();
+  });
+
+  it("update validates against the stored values", async () => {
+    asRoot(ctx);
+    const id = await handler(create)(ctx, discounted);
+    // Tirar o item 1 do escopo deixa o brinde apontando para fora.
+    await expect(
+      handler(update)(ctx, { id, scope: ["Design"] }),
+    ).rejects.toThrow("escopo");
+    // Subir o valor final acima do original também não pode.
+    await expect(
+      handler(update)(ctx, { id, investmentValue: 6000 }),
+    ).rejects.toThrow("Valor original");
+  });
+
+  it("the acceptance snapshot keeps the discount", async () => {
+    asRoot(ctx);
+    await handler(create)(ctx, discounted);
+    await handler(_acceptInternal)(ctx, {
+      slug: "acme-2024",
+      clientName: "John",
+      clientDocument: "12345678900",
+      clientEmail: "john@x.com",
+      ipAddress: "1.1.1.1",
+      userAgent: "ua",
+    });
+    const snapshot = JSON.parse(ctx.db._all("proposalAcceptances")[0].contentSnapshot);
+    expect(snapshot.proposal.investmentValue).toBe(4000);
+    expect(snapshot.proposal.originalValue).toBe(5000);
+    expect(snapshot.proposal.giftItems).toEqual([{ scopeIndex: 1, value: 1000 }]);
+  });
+});

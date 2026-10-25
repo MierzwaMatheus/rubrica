@@ -135,3 +135,67 @@ describe("ProposalDialog — Ciclo 5: templateId enviado ao salvar", () => {
     );
   });
 });
+
+describe("ProposalDialog — desconto e brinde", () => {
+  beforeEach(() => {
+    mockUseQuery.mockReset();
+    mockUseMutation.mockReset();
+  });
+
+  const proposal = {
+    _id: "p1",
+    title: "Proposta",
+    clientName: "Cliente",
+    slug: "slug-existente",
+    createdAt: Date.now(),
+    objective: "",
+    deliveryDate: "",
+    investmentValue: 4000,
+    originalValue: 5000,
+    giftItems: [{ scopeIndex: 1, value: 1000 }],
+    scope: ["Site", "Logo"],
+    timeline: [],
+    paymentMethods: [],
+    conditions: [],
+  };
+
+  it("loads and saves the discount of an existing proposal", async () => {
+    const updateMock = vi.fn().mockResolvedValue(undefined);
+    setup(baseTemplates, proposal, updateMock);
+
+    expect(screen.getByRole("checkbox", { name: "Logo" })).toBeChecked();
+    fireEvent.click(screen.getByRole("button", { name: /salvar/i }));
+    await new Promise((r) => setTimeout(r, 50));
+
+    expect(updateMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        investmentValue: 4000,
+        originalValue: 5000,
+        giftItems: [{ scopeIndex: 1, value: 1000 }],
+      }),
+    );
+  });
+
+  it("clears the discount with null when the original value is emptied", async () => {
+    const updateMock = vi.fn().mockResolvedValue(undefined);
+    setup(baseTemplates, { ...proposal, giftItems: [] }, updateMock);
+
+    fireEvent.change(screen.getByLabelText(/Valor original \(antes/), { target: { value: "" } });
+    fireEvent.click(screen.getByRole("button", { name: /salvar/i }));
+    await new Promise((r) => setTimeout(r, 50));
+
+    expect(updateMock).toHaveBeenCalledWith(
+      expect.objectContaining({ originalValue: null, giftItems: [] }),
+    );
+  });
+
+  it("does not save when the discount is invalid", async () => {
+    const updateMock = vi.fn().mockResolvedValue(undefined);
+    setup(baseTemplates, { ...proposal, originalValue: 3000, giftItems: [] }, updateMock);
+
+    fireEvent.click(screen.getByRole("button", { name: /salvar/i }));
+    await new Promise((r) => setTimeout(r, 50));
+
+    expect(updateMock).not.toHaveBeenCalled();
+  });
+});

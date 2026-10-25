@@ -1,5 +1,6 @@
 import { DEFAULT_RESCISION_POLICY } from "@/constants/rescisionPolicy";
 import { interpolateTemplate, formatArrayAsList } from "@/utils/contractTemplate";
+import { summarizeDiscount, type GiftItem } from "../../convex/lib/proposalDiscount";
 
 export interface ProposalData {
   title?: string;
@@ -11,6 +12,10 @@ export interface ProposalData {
   timeline?: Array<{ step: string; period: string }>;
   delivery_date?: string;
   investment_value: number;
+  /** Valor antes do desconto. */
+  original_value?: number | null;
+  /** Itens do escopo que vão de brinde. */
+  gift_items?: GiftItem[] | null;
   payment_methods?: string[];
   conditions?: string[];
   rescision_policy?: string;
@@ -56,6 +61,34 @@ function formatDocument(doc: string): string {
   return doc;
 }
 
+function brl(value: number): string {
+  return `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+function discountOf(proposal: ProposalData) {
+  return summarizeDiscount({
+    investmentValue: proposal.investment_value,
+    originalValue: proposal.original_value,
+    giftItems: proposal.gift_items,
+  });
+}
+
+/** Itens do escopo, com os brindes marcados. */
+function scopeWithGifts(proposal: ProposalData, items: string[]): string[] {
+  const discount = discountOf(proposal);
+  return items.map((item, i) => {
+    const gift = discount.giftFor(i);
+    return gift ? `${item} (brinde, sem custo; valor original ${brl(gift.value)})` : item;
+  });
+}
+
+/** Frase do desconto para o contrato; vazia quando não há desconto. */
+function discountSentence(proposal: ProposalData): string {
+  const d = discountOf(proposal);
+  if (!d.hasDiscount) return '';
+  return `Sobre o valor original de ${brl(d.originalValue)} foi concedido desconto de ${brl(d.discountAmount)} (${d.discountPercent}%).`;
+}
+
 /**
  * Gera as formas de pagamento fixas baseadas no valor
  */
@@ -90,17 +123,20 @@ export function applyProposalToTemplate(
   const scopeItems = proposal.scope
     ? typeof proposal.scope === 'string' ? [proposal.scope] : proposal.scope
     : [];
+  const discount = discountOf(proposal);
   const vars: Record<string, string> = {
     client_name: acceptance.client_name,
     client_email: acceptance.client_email,
     client_role: acceptance.client_role ?? '',
     client_document: formatDocument(acceptance.client_document),
-    scope: formatArrayAsList(scopeItems),
+    scope: formatArrayAsList(scopeWithGifts(proposal, scopeItems)),
     conditions: formatArrayAsList(proposal.conditions ?? []),
     timeline: formatArrayAsList(
       (proposal.timeline ?? []).map(t => `${t.step} – ${t.period}`)
     ),
-    investment_value: `R$ ${proposal.investment_value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+    investment_value: brl(proposal.investment_value),
+    original_value: discount.hasDiscount ? brl(discount.originalValue) : '',
+    discount: discountSentence(proposal),
     accepted_at: new Date(acceptance.accepted_at).toLocaleDateString('pt-BR', { timeZone: 'UTC' }),
     objective: typeof proposal.objective === 'string' ? proposal.objective : (proposal.objective ?? []).join('\n\n'),
     delivery_date: proposal.delivery_date ? new Date(proposal.delivery_date).toLocaleDateString('pt-BR') : '',
@@ -144,7 +180,7 @@ ${typeof proposal.objective === 'string' ? proposal.objective : proposal.objecti
   if (proposal.scope) {
     const scopeText = typeof proposal.scope === 'string' 
       ? proposal.scope 
-      : proposal.scope.map((item) => `- ${item}`).join('\n');
+      : scopeWithGifts(proposal, proposal.scope).map((item) => `- ${item}`).join('\n');
     
     clauses.push(`### CLÁUSULA 2 – DO ESCOPO DOS SERVIÇOS
 
@@ -174,7 +210,7 @@ ${timelineText}${proposal.delivery_date ? `\n\nEntrega prevista: ${new Date(prop
 
   clauses.push(`### CLÁUSULA 4 – DO INVESTIMENTO E FORMAS DE PAGAMENTO
 
-O investimento total para a execução deste projeto é de **R$ ${proposal.investment_value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}**.
+O investimento total para a execução deste projeto é de **${brl(proposal.investment_value)}**.${discountSentence(proposal) ? ` ${discountSentence(proposal)}` : ''}
 
 **Formas de Pagamento:**
 

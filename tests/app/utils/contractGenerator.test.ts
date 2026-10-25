@@ -337,3 +337,44 @@ describe("contractGenerator · resolveTemplateContent", () => {
     expect(resolveTemplateContent({}, undefined)).toBeUndefined();
   });
 });
+
+describe("contractGenerator · desconto e brinde", () => {
+  const discounted = {
+    ...baseProposal,
+    scope: ["Site", "Logo"],
+    investment_value: 4000,
+    original_value: 5000,
+    gift_items: [{ scopeIndex: 1, value: 1000 }],
+  };
+
+  it("Cláusula 2: marks the gift item with its original value", () => {
+    const { clauses } = generateContractContent(discounted, baseAcceptance);
+    const scope = clauses.find((c) => c.includes("CLÁUSULA 2"))!;
+    expect(scope).toContain("- Site\n");
+    expect(scope).toContain("- Logo (brinde, sem custo; valor original R$ 1.000,00)");
+  });
+
+  it("Cláusula 4: states original value, discount and final value", () => {
+    const { clauses } = generateContractContent(discounted, baseAcceptance);
+    const investment = clauses.find((c) => c.includes("CLÁUSULA 4"))!;
+    expect(investment).toContain("R$ 4.000,00");
+    expect(investment).toContain("valor original de R$ 5.000,00");
+    expect(investment).toContain("desconto de R$ 1.000,00 (20%)");
+  });
+
+  it("Cláusula 4: unchanged when there is no discount", () => {
+    const { clauses } = generateContractContent(baseProposal, baseAcceptance);
+    const investment = clauses.find((c) => c.includes("CLÁUSULA 4"))!;
+    expect(investment).not.toContain("desconto de");
+  });
+
+  it("template: {{discount}} and gift marking in {{scope}}", () => {
+    const out = applyProposalToTemplate("{{scope}}\n{{discount}}", discounted, baseAcceptance);
+    expect(out).toContain("• Logo (brinde, sem custo; valor original R$ 1.000,00)");
+    expect(out).toContain("valor original de R$ 5.000,00");
+  });
+
+  it("template: {{discount}} is empty without discount", () => {
+    expect(applyProposalToTemplate("[{{discount}}]", baseProposal, baseAcceptance)).toBe("[]");
+  });
+});

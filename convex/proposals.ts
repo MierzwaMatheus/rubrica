@@ -8,6 +8,7 @@ import { getAuthUserId } from '@convex-dev/auth/server';
 import { requirePlugin, isPluginEnabled } from './plugins';
 import { softDeleteDoc, restoreDoc } from './lib/softDelete';
 import { escapeTgHtml } from './lib/security';
+import { validateDiscount } from './lib/proposalDiscount';
 
 async function hashPassword(password: string): Promise<string> {
   const salt = crypto.getRandomValues(new Uint8Array(16));
@@ -39,6 +40,7 @@ async function verifyPassword(password: string, stored: string): Promise<boolean
 const TEN_DAYS_MS = 10 * 24 * 60 * 60 * 1000;
 
 const timelineItemValidator = v.object({ step: v.string(), period: v.string() });
+const giftItemValidator = v.object({ scopeIndex: v.number(), value: v.number() });
 
 export const listAdmin = query({
   args: {
@@ -219,6 +221,8 @@ export const create = mutation({
     timeline: v.array(timelineItemValidator),
     deliveryDate: v.string(),
     investmentValue: v.number(),
+    originalValue: v.optional(v.number()),
+    giftItems: v.optional(v.array(giftItemValidator)),
     paymentMethods: v.array(v.string()),
     conditions: v.array(v.string()),
     conditionsTranslations: v.optional(
@@ -241,10 +245,13 @@ export const create = mutation({
       .unique();
     if (existing) throw new Error('Slug already in use');
 
+    validateDiscount({ ...args, scopeLength: args.scope.length });
+
     const now = Date.now();
     const hashedPassword = args.password ? await hashPassword(args.password) : undefined;
     const id = await ctx.db.insert('proposals', {
       ...args,
+      giftItems: args.giftItems?.length ? args.giftItems : undefined,
       password: hashedPassword,
       userId,
       version: 1,
@@ -331,6 +338,9 @@ export const update = mutation({
     timeline: v.optional(v.array(timelineItemValidator)),
     deliveryDate: v.optional(v.string()),
     investmentValue: v.optional(v.number()),
+    // null tira o desconto; [] tira os brindes.
+    originalValue: v.optional(v.union(v.number(), v.null())),
+    giftItems: v.optional(v.array(giftItemValidator)),
     paymentMethods: v.optional(v.array(v.string())),
     conditions: v.optional(v.array(v.string())),
     password: v.optional(v.string()),
@@ -346,7 +356,18 @@ export const update = mutation({
     if (!proposal) throw new Error('Proposal not found');
     if (proposal.isAccepted) throw new Error('Accepted proposals are immutable');
 
-    const { id, password: plainPassword, ...fields } = args;
+    const { id, password: plainPassword, originalValue, giftItems, ...fields } = args;
+
+    // Valida o desconto contra o estado final (o que vem no pedido + o que já está salvo).
+    const nextOriginal = originalValue === undefined ? proposal.originalValue : originalValue ?? undefined;
+    const nextGifts = giftItems === undefined ? proposal.giftItems : giftItems;
+    validateDiscount({
+      investmentValue: fields.investmentValue ?? proposal.investmentValue,
+      originalValue: nextOriginal,
+      giftItems: nextGifts,
+      scopeLength: (fields.scope ?? proposal.scope).length,
+    });
+
     const newVersion = proposal.version + 1;
     const hashedPassword = plainPassword ? await hashPassword(plainPassword) : undefined;
 
@@ -354,6 +375,8 @@ export const update = mutation({
 
     await ctx.db.patch(id, {
       ...fields,
+      ...(originalValue !== undefined ? { originalValue: originalValue ?? undefined } : {}),
+      ...(giftItems !== undefined ? { giftItems: giftItems.length ? giftItems : undefined } : {}),
       ...(hashedPassword !== undefined ? { password: hashedPassword } : {}),
       ...(templateChanged ? { templateSnapshot: undefined } : {}),
       version: newVersion,
@@ -537,6 +560,9 @@ export const _acceptInternal = internalMutation({
         title: proposal.title,
         objective: proposal.objective,
         investmentValue: proposal.investmentValue,
+        ...(proposal.originalValue !== undefined
+          ? { originalValue: proposal.originalValue, giftItems: proposal.giftItems ?? [] }
+          : {}),
         scope: proposal.scope,
         timeline: proposal.timeline,
         conditions: proposal.conditions,

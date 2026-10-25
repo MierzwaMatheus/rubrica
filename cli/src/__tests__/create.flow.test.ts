@@ -187,8 +187,42 @@ describe("create — instalação sem perguntas", () => {
     quick();
     const deps = makeDeps({ userAgent: "npm/10.0.0 node/v22" });
     await runCreate("ana", deps);
-    expect(deps.exec).toHaveBeenCalledWith("git init", "/projects/ana");
+    expect(deps.exec).toHaveBeenCalledWith("git init -b main", "/projects/ana");
     expect(deps.exec).toHaveBeenCalledWith("npm install", "/projects/ana");
+  });
+
+  it("git antigo (sem -b): inicia e troca a branch para main", async () => {
+    quick();
+    const exec = vi.fn(async (cmd: string) => {
+      if (cmd === "git init -b main") throw new Error("unknown switch `b'");
+    });
+    await runCreate("ana", makeDeps({ exec }));
+    const cmds = exec.mock.calls.map((c) => c[0]);
+    expect(cmds).toContain("git init");
+    expect(cmds).toContain("git symbolic-ref HEAD refs/heads/main");
+  });
+
+  it("faz o commit inicial com o projeto montado, antes de configurar o painel", async () => {
+    quick();
+    const order: string[] = [];
+    const exec = vi.fn(async (cmd: string) => void order.push(cmd));
+    const setup = vi.fn(async () => void order.push("setup"));
+    await runCreate("ana", makeDeps({ exec, setup }));
+    const add = order.indexOf("git add -A");
+    const commit = order.findIndex((c) => c.startsWith("git commit"));
+    expect(add).toBeGreaterThan(order.indexOf("npm install"));
+    expect(commit).toBeGreaterThan(add);
+    if (order.includes("setup")) expect(order.indexOf("setup")).toBeGreaterThan(commit);
+  });
+
+  it("sem nome e e-mail configurados no git, o commit inicial sai em nome do create-rubrica", async () => {
+    quick();
+    const exec = vi.fn(async (cmd: string) => {
+      if (cmd.startsWith("git commit")) throw new Error("Please tell me who you are");
+    });
+    await runCreate("ana", makeDeps({ exec }));
+    expect(exec.mock.calls.map((c) => c[0])).toContainEqual(expect.stringMatching(/^git -c user\.name="create-rubrica" -c user\.email="[^"]+" commit/));
+    expect(outro).toHaveBeenCalled();
   });
 
   it("instala com pnpm quando veio do pnpm create", async () => {
@@ -201,11 +235,12 @@ describe("create — instalação sem perguntas", () => {
   it("git init falhando (git não instalado) não impede o resto", async () => {
     quick();
     const exec = vi.fn(async (cmd: string) => {
-      if (cmd === "git init") throw new Error("git: command not found");
+      if (cmd.startsWith("git ")) throw new Error("git: command not found");
     });
     const deps = makeDeps({ exec });
     await runCreate("ana", deps);
     expect(exec).toHaveBeenCalledWith("npm install", "/projects/ana");
+    expect(exec.mock.calls.map((c) => c[0])).not.toContain("git add -A");
     expect(log.warn).toHaveBeenCalledWith(expect.stringMatching(/git/));
     expect(outro).toHaveBeenCalled();
   });

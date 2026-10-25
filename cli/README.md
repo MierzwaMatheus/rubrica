@@ -31,7 +31,7 @@ No personalizado, entram também:
 - **Fontes**: principal e mono (o layout sugere uma combinação)
 - **Idioma**: português ou inglês
 
-Depois ele inicia o git e instala as dependências sem perguntar: com pnpm se você rodou `pnpm create`, com npm nos outros casos. Por fim, oferece configurar o painel admin na hora. Aceitando, ele conecta o projeto ao Convex (login pelo navegador, conta gratuita) e já roda o `setup`.
+Depois ele inicia o git (na branch `main`, com um primeiro commit) e instala as dependências sem perguntar: com pnpm se você rodou `pnpm create`, com npm nos outros casos. Por fim, oferece configurar o painel admin na hora. Aceitando, ele conecta o projeto ao Convex (login pelo navegador, conta gratuita) e já roda o `setup`.
 
 ### Com as escolhas feitas no site
 

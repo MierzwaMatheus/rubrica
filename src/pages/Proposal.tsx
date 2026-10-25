@@ -33,7 +33,8 @@ function toLegacyProposal(p: any) {
     delivery_date: p.deliveryDate,
     investment_value: p.investmentValue,
     original_value: p.originalValue,
-    gift_items: p.giftItems,
+    scope_prices: p.scopePrices,
+    gift_indexes: p.giftIndexes,
     payment_methods: p.paymentMethods,
     conditions: p.conditions,
     rescision_policy: p.rescissionPolicy,
@@ -85,7 +86,8 @@ export default function Proposal() {
     () => summarizeDiscount({
       investmentValue: rawProposal?.investmentValue ?? 0,
       originalValue: rawProposal?.originalValue,
-      giftItems: rawProposal?.giftItems,
+      scopePrices: rawProposal?.scopePrices,
+      giftIndexes: rawProposal?.giftIndexes,
     }),
     [rawProposal],
   );
@@ -358,21 +360,28 @@ export default function Proposal() {
                   </h2>
                   <ul className="space-y-4">
                     {rawProposal.scope?.map((item: string, index: number) => {
-                      const gift = discount.giftFor(index);
+                      const price = discount.priceOf(index);
+                      const isGift = discount.isGift(index);
                       return (
                         <li key={index} className="flex items-start gap-3 text-foreground/90 group">
                           <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-neon-purple group-hover:scale-150 transition-transform" />
                           <span className="group-hover:text-foreground-strong transition-colors w-[95%]">
                             {item}
-                            {gift && (
+                            {price !== undefined && (
                               <span className="mt-1.5 flex flex-wrap items-center gap-2 text-sm">
-                                <Badge className="bg-neon-lime/10 text-neon-lime hover:bg-neon-lime/20 border-neon-lime/20">
-                                  Brinde
-                                </Badge>
-                                <span className="sr-only">Valor original:</span>
-                                <s className="text-foreground/50">{formatCurrency(gift.value)}</s>
-                                <span className="sr-only">Valor com desconto:</span>
-                                <span className="font-semibold text-neon-lime">{formatCurrency(0)}</span>
+                                {isGift ? (
+                                  <>
+                                    <Badge className="bg-neon-lime/10 text-neon-lime hover:bg-neon-lime/20 border-neon-lime/20">
+                                      Brinde
+                                    </Badge>
+                                    <span className="sr-only">Valor original:</span>
+                                    <s className="text-foreground/50">{formatCurrency(price)}</s>
+                                    <span className="sr-only">Valor com desconto:</span>
+                                    <span className="font-semibold text-neon-lime">{formatCurrency(0)}</span>
+                                  </>
+                                ) : (
+                                  <span className="text-foreground/65">{formatCurrency(price)}</span>
+                                )}
                               </span>
                             )}
                           </span>
@@ -457,8 +466,8 @@ export default function Proposal() {
                     {discount.hasDiscount && (
                       <p className="text-sm text-foreground/65 mb-3">
                         Desconto de {formatCurrency(discount.discountAmount)}
-                        {discount.gifts.length > 0 &&
-                          ` · ${discount.gifts.length === 1 ? "1 item de brinde" : `${discount.gifts.length} itens de brinde`}`}
+                        {discount.giftCount > 0 &&
+                          ` · ${discount.giftCount === 1 ? "1 item de brinde" : `${discount.giftCount} itens de brinde`}`}
                       </p>
                     )}
                     <Badge className="bg-neon-lime/10 text-neon-lime hover:bg-neon-lime/20 border-neon-lime/20">

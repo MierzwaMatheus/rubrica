@@ -141,7 +141,7 @@ export function ProposalDialog({ open, onOpenChange, proposal, onSave }: Proposa
         const investment = parseMoney(investmentValue) ?? 0;
         const discountMessage = discountError(discount, investmentValue, scopeItems.length);
         if (discountMessage) return toast.error(discountMessage);
-        const { originalValue, giftItems } = discountDraftToArgs(discount);
+        const { scopePrices, originalValue, giftIndexes } = discountDraftToArgs(discount, scopeItems.length);
 
         try {
             if (proposal) {
@@ -154,8 +154,9 @@ export function ProposalDialog({ open, onOpenChange, proposal, onSave }: Proposa
                     timeline: timelineItems,
                     deliveryDate: deliveryDate || "",
                     investmentValue: investment,
+                    scopePrices,
                     originalValue: originalValue ?? null,
-                    giftItems,
+                    giftIndexes,
                     paymentMethods: proposal.paymentMethods ?? [],
                     conditions: selectedConditions,
                     templateId,
@@ -173,8 +174,9 @@ export function ProposalDialog({ open, onOpenChange, proposal, onSave }: Proposa
                     timeline: timelineItems,
                     deliveryDate: deliveryDate || "",
                     investmentValue: investment,
+                    scopePrices,
                     originalValue,
-                    giftItems,
+                    giftIndexes,
                     paymentMethods: [],
                     conditions: selectedConditions,
                     rescissionPolicy: DEFAULT_RESCISION_POLICY,

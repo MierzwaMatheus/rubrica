@@ -723,7 +723,7 @@ describe("convex/proposals · resetPassword", () => {
   });
 });
 
-describe("convex/proposals · desconto e brinde", () => {
+describe("convex/proposals · preços, desconto e brinde", () => {
   let ctx: MockCtx;
   beforeEach(() => {
     ctx = createMockCtx();
@@ -733,16 +733,24 @@ describe("convex/proposals · desconto e brinde", () => {
   const discounted = {
     ...baseProposalArgs,
     investmentValue: 4000,
+    scopePrices: [4000, 1000],
     originalValue: 5000,
-    giftItems: [{ scopeIndex: 1, value: 1000 }],
+    giftIndexes: [1],
   };
 
-  it("create stores the original value and gift items", async () => {
+  it("create stores item prices, original value and gifts", async () => {
     asRoot(ctx);
     const id = await handler(create)(ctx, discounted);
     const proposal = await ctx.db.get(id);
+    expect(proposal!.scopePrices).toEqual([4000, 1000]);
     expect(proposal!.originalValue).toBe(5000);
-    expect(proposal!.giftItems).toEqual([{ scopeIndex: 1, value: 1000 }]);
+    expect(proposal!.giftIndexes).toEqual([1]);
+  });
+
+  it("create drops prices when no item has one", async () => {
+    asRoot(ctx);
+    const id = await handler(create)(ctx, { ...baseProposalArgs, scopePrices: [null, null] });
+    expect((await ctx.db.get(id))!.scopePrices).toBeUndefined();
   });
 
   it("create rejects an original value below the final value", async () => {
@@ -752,19 +760,20 @@ describe("convex/proposals · desconto e brinde", () => {
     ).rejects.toThrow("Valor original");
   });
 
-  it("update clears the discount with null", async () => {
+  it("update clears prices and discount", async () => {
     asRoot(ctx);
     const id = await handler(create)(ctx, discounted);
-    await handler(update)(ctx, { id, originalValue: null, giftItems: [] });
+    await handler(update)(ctx, { id, scopePrices: [], originalValue: null, giftIndexes: [] });
     const proposal = await ctx.db.get(id);
+    expect(proposal!.scopePrices).toBeUndefined();
     expect(proposal!.originalValue).toBeUndefined();
-    expect(proposal!.giftItems).toBeUndefined();
+    expect(proposal!.giftIndexes).toBeUndefined();
   });
 
   it("update validates against the stored values", async () => {
     asRoot(ctx);
     const id = await handler(create)(ctx, discounted);
-    // Tirar o item 1 do escopo deixa o brinde apontando para fora.
+    // Tirar um item do escopo sem mandar os preços deixa tudo desalinhado.
     await expect(
       handler(update)(ctx, { id, scope: ["Design"] }),
     ).rejects.toThrow("escopo");
@@ -774,7 +783,7 @@ describe("convex/proposals · desconto e brinde", () => {
     ).rejects.toThrow("Valor original");
   });
 
-  it("the acceptance snapshot keeps the discount", async () => {
+  it("the acceptance snapshot keeps prices and discount", async () => {
     asRoot(ctx);
     await handler(create)(ctx, discounted);
     await handler(_acceptInternal)(ctx, {
@@ -787,7 +796,8 @@ describe("convex/proposals · desconto e brinde", () => {
     });
     const snapshot = JSON.parse(ctx.db._all("proposalAcceptances")[0].contentSnapshot);
     expect(snapshot.proposal.investmentValue).toBe(4000);
+    expect(snapshot.proposal.scopePrices).toEqual([4000, 1000]);
     expect(snapshot.proposal.originalValue).toBe(5000);
-    expect(snapshot.proposal.giftItems).toEqual([{ scopeIndex: 1, value: 1000 }]);
+    expect(snapshot.proposal.giftIndexes).toEqual([1]);
   });
 });

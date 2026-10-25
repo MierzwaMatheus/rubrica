@@ -1,6 +1,6 @@
 import { DEFAULT_RESCISION_POLICY } from "@/constants/rescisionPolicy";
 import { interpolateTemplate, formatArrayAsList } from "@/utils/contractTemplate";
-import { summarizeDiscount, type GiftItem } from "../../convex/lib/proposalDiscount";
+import { summarizeDiscount } from "../../convex/lib/proposalDiscount";
 
 export interface ProposalData {
   title?: string;
@@ -12,10 +12,12 @@ export interface ProposalData {
   timeline?: Array<{ step: string; period: string }>;
   delivery_date?: string;
   investment_value: number;
+  /** Preço de cada item do escopo, na mesma ordem (null = sem preço). */
+  scope_prices?: (number | null)[] | null;
   /** Valor antes do desconto. */
   original_value?: number | null;
-  /** Itens do escopo que vão de brinde. */
-  gift_items?: GiftItem[] | null;
+  /** Índices dos itens do escopo que vão de brinde. */
+  gift_indexes?: number[] | null;
   payment_methods?: string[];
   conditions?: string[];
   rescision_policy?: string;
@@ -69,16 +71,19 @@ function discountOf(proposal: ProposalData) {
   return summarizeDiscount({
     investmentValue: proposal.investment_value,
     originalValue: proposal.original_value,
-    giftItems: proposal.gift_items,
+    scopePrices: proposal.scope_prices,
+    giftIndexes: proposal.gift_indexes,
   });
 }
 
-/** Itens do escopo, com os brindes marcados. */
+/** Itens do escopo com o preço de cada um e os brindes marcados. */
 function scopeWithGifts(proposal: ProposalData, items: string[]): string[] {
   const discount = discountOf(proposal);
   return items.map((item, i) => {
-    const gift = discount.giftFor(i);
-    return gift ? `${item} (brinde, sem custo; valor original ${brl(gift.value)})` : item;
+    const price = discount.priceOf(i);
+    if (price === undefined) return item;
+    if (discount.isGift(i)) return `${item} (brinde, sem custo; valor original ${brl(price)})`;
+    return `${item} (${brl(price)})`;
   });
 }
 

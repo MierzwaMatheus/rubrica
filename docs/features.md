@@ -164,7 +164,7 @@ Este é um portfólio profissional full-stack que combina uma interface pública
 - **Armazenamento de assinatura** no Convex Storage
 - **Geração de PDF do contrato** a partir do modelo de contrato, com a assinatura
 - Status visual (aprovada, pendente, expirada)
-- **Desconto**: valor original riscado, desconto em R$ e % e o valor final; itens de brinde com o badge "Brinde", o preço original riscado e R$ 0,00
+- **Preços e desconto**: preço ao lado de cada item do escopo (quando informado); valor original riscado, desconto em R$ e % e o valor final; itens de brinde com o badge "Brinde", o preço original riscado e R$ 0,00
 - **Banner de aceite** quando proposta foi aceita
 - **Política de rescisão** expansível com renderização markdown
 - **Sistema de sessões** para acesso seguro
@@ -233,7 +233,7 @@ Este é um portfólio profissional full-stack que combina uma interface pública
 - **Download de contrato** para propostas aceitas (regenera PDF com assinatura)
 - **Senha opcional** com geração aleatória (8 caracteres A-Z, a-z, 0-9) e botão de copiar
 - **Política de rescisão** editável com valor padrão
-- **Desconto e brinde** (opcionais): valor original antes do desconto e itens do escopo que vão sem custo, com o preço de cada um. O valor do projeto continua sendo o valor final (contrato e formas de pagamento). O contrato cita o desconto e marca os brindes, e o modelo de contrato ganha as variáveis `{{original_value}}` e `{{discount}}`
+- **Preços, desconto e brinde** (opcionais): preço de cada item do escopo, valor original antes do desconto (com sugestão pela soma dos itens) e itens marcados como brinde, que saem sem custo. O valor do projeto continua sendo o valor final (contrato e formas de pagamento). O contrato lista o preço dos itens, cita o desconto e marca os brindes, e o modelo de contrato ganha as variáveis `{{original_value}}` e `{{discount}}`
 - **Versionamento automático**: cria versão ao editar proposta não aceita
 
 #### 📜 Modelos de Contrato (`/admin/contracts`)

@@ -7,6 +7,7 @@ import {
   discountDraftToArgs,
   removeScopeFromDraft,
   emptyDiscountDraft,
+  type DiscountDraft,
 } from "@/components/admin/ProposalDiscountFields";
 
 describe("ProposalDiscountFields · helpers", () => {
@@ -20,29 +21,39 @@ describe("ProposalDiscountFields · helpers", () => {
 
   it("round-trips a stored proposal", () => {
     const draft = discountDraftFromProposal({
+      scopePrices: [4000.5, null],
       originalValue: 5000.5,
-      giftItems: [{ scopeIndex: 1, value: 1000 }],
+      giftIndexes: [0],
     });
-    expect(draft).toEqual({ originalValue: "5000,5", gifts: [{ scopeIndex: 1, value: "1000" }] });
-    expect(discountDraftToArgs(draft)).toEqual({
+    expect(draft).toEqual({ prices: ["4000,5", ""], originalValue: "5000,5", gifts: [0] });
+    expect(discountDraftToArgs(draft, 2)).toEqual({
+      scopePrices: [4000.5, null],
       originalValue: 5000.5,
-      giftItems: [{ scopeIndex: 1, value: 1000 }],
+      giftIndexes: [0],
     });
   });
 
-  it("an empty draft means no discount", () => {
+  it("aligns prices with the scope length", () => {
+    expect(discountDraftToArgs({ ...emptyDiscountDraft, prices: ["10"] }, 3).scopePrices).toEqual([10, null, null]);
+  });
+
+  it("an empty draft means no prices and no discount", () => {
     expect(discountDraftFromProposal(null)).toEqual(emptyDiscountDraft);
-    expect(discountDraftToArgs(emptyDiscountDraft)).toEqual({ originalValue: undefined, giftItems: [] });
+    expect(discountDraftToArgs(emptyDiscountDraft, 2)).toEqual({
+      scopePrices: [null, null],
+      originalValue: undefined,
+      giftIndexes: [],
+    });
   });
 
-  it("removing a scope item shifts the gifts", () => {
-    const draft = { originalValue: "5000", gifts: [{ scopeIndex: 0, value: "1" }, { scopeIndex: 2, value: "2" }] };
-    expect(removeScopeFromDraft(draft, 0).gifts).toEqual([{ scopeIndex: 1, value: "2" }]);
+  it("removing a scope item drops its price and shifts the gifts", () => {
+    const draft = { originalValue: "5000", prices: ["1", "2", "3"], gifts: [0, 2] };
+    expect(removeScopeFromDraft(draft, 0)).toEqual({ originalValue: "5000", prices: ["2", "3"], gifts: [1] });
   });
 });
 
 describe("ProposalDiscountFields · componente", () => {
-  function setup(draft = emptyDiscountDraft, investmentValue = "4000") {
+  function setup(draft: DiscountDraft = emptyDiscountDraft, investmentValue = "4000") {
     const onChange = vi.fn();
     render(
       <ProposalDiscountFields
@@ -55,25 +66,41 @@ describe("ProposalDiscountFields · componente", () => {
     return onChange;
   }
 
-  it("marks a scope item as gift", () => {
+  it("edits the price of an item", () => {
     const onChange = setup();
-    fireEvent.click(screen.getByRole("checkbox", { name: /Logo/ }));
-    expect(onChange).toHaveBeenCalledWith({ originalValue: "", gifts: [{ scopeIndex: 1, value: "" }] });
+    fireEvent.change(screen.getByLabelText("Preço de Logo"), { target: { value: "1000" } });
+    expect(onChange).toHaveBeenCalledWith({ originalValue: "", prices: ["", "1000"], gifts: [] });
   });
 
-  it("suggests the original value from the gifts", () => {
-    const onChange = setup({ originalValue: "", gifts: [{ scopeIndex: 1, value: "1000" }] });
+  it("marks a priced item as gift", () => {
+    const onChange = setup({ originalValue: "", prices: ["4000", "1000"], gifts: [] });
+    fireEvent.click(screen.getByRole("checkbox", { name: /Brinde: Logo/ }));
+    expect(onChange).toHaveBeenCalledWith({ originalValue: "", prices: ["4000", "1000"], gifts: [1] });
+  });
+
+  it("does not allow a gift on an item without price", () => {
+    setup();
+    expect(screen.getByRole("checkbox", { name: /Brinde: Logo/ })).toBeDisabled();
+  });
+
+  it("suggests the original value from the item prices", () => {
+    const onChange = setup({ originalValue: "", prices: ["4000", "1000"], gifts: [1] });
     fireEvent.click(screen.getByRole("button", { name: /usar R\$\s5\.000,00/i }));
-    expect(onChange).toHaveBeenCalledWith({ originalValue: "5000", gifts: [{ scopeIndex: 1, value: "1000" }] });
+    expect(onChange).toHaveBeenCalledWith({ originalValue: "5000", prices: ["4000", "1000"], gifts: [1] });
   });
 
   it("shows the discount summary", () => {
-    setup({ originalValue: "5000", gifts: [] });
+    setup({ originalValue: "5000", prices: [], gifts: [] });
     expect(screen.getByText(/Desconto de R\$\s1\.000,00 \(20%\)/)).toBeInTheDocument();
   });
 
+  it("warns when the items add up to a different total", () => {
+    setup({ originalValue: "", prices: ["3000", "500"], gifts: [] });
+    expect(screen.getByText(/soma dos itens/i)).toBeInTheDocument();
+  });
+
   it("shows the validation error", () => {
-    setup({ originalValue: "3000", gifts: [] });
+    setup({ originalValue: "3000", prices: [], gifts: [] });
     expect(screen.getByRole("alert")).toHaveTextContent("Valor original");
   });
 });

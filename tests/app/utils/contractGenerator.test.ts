@@ -341,16 +341,18 @@ describe("contractGenerator · resolveTemplateContent", () => {
 describe("contractGenerator · desconto e brinde", () => {
   const discounted = {
     ...baseProposal,
-    scope: ["Site", "Logo"],
+    scope: ["Site", "Logo", "Suporte"],
     investment_value: 4000,
+    scope_prices: [4000, 1000, null],
     original_value: 5000,
-    gift_items: [{ scopeIndex: 1, value: 1000 }],
+    gift_indexes: [1],
   };
 
-  it("Cláusula 2: marks the gift item with its original value", () => {
+  it("Cláusula 2: shows item prices and marks the gift item", () => {
     const { clauses } = generateContractContent(discounted, baseAcceptance);
     const scope = clauses.find((c) => c.includes("CLÁUSULA 2"))!;
-    expect(scope).toContain("- Site\n");
+    expect(scope).toContain("- Site (R$ 4.000,00)");
+    expect(scope).toContain("- Suporte\n");
     expect(scope).toContain("- Logo (brinde, sem custo; valor original R$ 1.000,00)");
   });
 

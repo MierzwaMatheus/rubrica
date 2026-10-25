@@ -48,7 +48,7 @@ function DownloadContractButton({ proposal }: { proposal: any }) {
         client_name: proposal.clientName, title: proposal.title,
         objective: proposal.objective, scope: proposal.scope,
         timeline: proposal.timeline, delivery_date: proposal.deliveryDate,
-        investment_value: proposal.investmentValue, original_value: proposal.originalValue, gift_items: proposal.giftItems,
+        investment_value: proposal.investmentValue, scope_prices: proposal.scopePrices, original_value: proposal.originalValue, gift_indexes: proposal.giftIndexes,
         payment_methods: proposal.paymentMethods,
         conditions: proposal.conditions, rescision_policy: proposal.rescissionPolicy,
       };
@@ -166,7 +166,7 @@ export default function AdminProposals() {
     const investment = parseMoney(investmentValue) ?? 0;
     const discountMessage = discountError(discount, investmentValue, scopeItems.length);
     if (discountMessage) return toast.error(discountMessage);
-    const { originalValue, giftItems } = discountDraftToArgs(discount);
+    const { scopePrices, originalValue, giftIndexes } = discountDraftToArgs(discount, scopeItems.length);
 
     try {
       if (editingProposal) {
@@ -179,8 +179,9 @@ export default function AdminProposals() {
           timeline: timelineItems,
           deliveryDate: deliveryDate || "",
           investmentValue: investment,
+          scopePrices,
           originalValue: originalValue ?? null,
-          giftItems,
+          giftIndexes,
           paymentMethods: editingProposal.paymentMethods ?? [],
           conditions: selectedConditions,
           password: password || undefined,
@@ -200,8 +201,9 @@ export default function AdminProposals() {
           timeline: timelineItems,
           deliveryDate: deliveryDate || "",
           investmentValue: investment,
+          scopePrices,
           originalValue,
-          giftItems,
+          giftIndexes,
           paymentMethods: [],
           conditions: selectedConditions,
           password: password || undefined,
@@ -387,11 +389,12 @@ export default function AdminProposals() {
         investmentValue: typeof jsonData.investment_value === 'number'
           ? jsonData.investment_value
           : parseFloat(String(jsonData.investment_value || 0).replace(',', '.')) || 0,
+        scopePrices: Array.isArray(jsonData.scope_prices) && jsonData.scope_prices.length === scope.length
+          ? jsonData.scope_prices.map((p: any) => (typeof p === 'number' ? p : null))
+          : undefined,
         originalValue: typeof jsonData.original_value === 'number' ? jsonData.original_value : undefined,
-        giftItems: Array.isArray(jsonData.gift_items)
-          ? jsonData.gift_items
-              .filter((g: any) => typeof g?.scope_index === 'number' && typeof g?.value === 'number')
-              .map((g: any) => ({ scopeIndex: g.scope_index, value: g.value }))
+        giftIndexes: Array.isArray(jsonData.gift_indexes)
+          ? jsonData.gift_indexes.filter((i: any) => typeof i === 'number')
           : undefined,
         paymentMethods: [],
         conditions: conditionsArr,

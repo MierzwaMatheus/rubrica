@@ -1,0 +1,729 @@
+---
+/*
+ * Entrevista de voz do Rubrica (/voz e /en/voice). Fora dos buscadores e sem link no menu:
+ * as skills rubrica-* mandam a pessoa para cá quando o perfil de voz ainda não existe.
+ * Nada sai do navegador: as respostas ficam no localStorage (uma chave por idioma) e
+ * viram um Markdown que a pessoa copia e cola no agente (ver lib/voz-textos.ts).
+ */
+import Base from "../layouts/Base.astro";
+import { HTML_LANG, route, type Lang } from "../i18n/routes";
+import { ROTEIRO, VERSAO } from "../lib/voz";
+import { UI } from "../lib/voz-textos";
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = UI[lang];
+const BLOCOS = ROTEIRO[lang];
+const outro: Lang = lang === "pt" ? "en" : "pt";
+const total = BLOCOS.reduce((n, b) => n + b.perguntas.length, 0);
+---
+
+<Base title={t.titulo} description={t.descricao} lang={lang} page="voz" noindex>
+  <main class="voz" data-versao={VERSAO} data-lang={lang}>
+    <header class="topo wrap">
+      <a href={route("home", lang)} class="logo" aria-label={t.logoAria}>
+        <img src="/img/marca/rubrica-horizontal-positivo.svg" alt="Rubrica" width="132" height="40" />
+      </a>
+      <div class="topo-dir">
+        <div class="progresso" aria-live="polite">
+          <span class="progresso-txt"><b data-respondidas>0</b> {t.de} {total}</span>
+          <span class="barra"><span data-barra></span></span>
+        </div>
+        <a class="outro-idioma" href={route("voz", outro)} hreflang={HTML_LANG[outro]} lang={HTML_LANG[outro]} aria-label={t.outroIdioma.aria}>
+          {t.outroIdioma.rotulo}
+        </a>
+      </div>
+    </header>
+
+    <section class="wrap abertura">
+      <p class="eyebrow">{t.eyebrow}</p>
+      <h1 class="display">{t.h1}</h1>
+      <p class="lead">{t.lead}</p>
+      <ul class="regras">
+        {
+          t.regras.map(([forte, resto]) => (
+            <li>
+              <b>{forte}</b> {resto}
+            </li>
+          ))
+        }
+      </ul>
+      <div class="ditado-config" data-ditado-config hidden>
+        <label for="idioma">{t.idiomaDitado}</label>
+        <select id="idioma" data-idioma>
+          <option value="pt-BR">Português (Brasil)</option>
+          <option value="pt-PT">Português (Portugal)</option>
+          <option value="en-US">English (US)</option>
+          <option value="es-ES">Español</option>
+        </select>
+      </div>
+      <p class="aviso-ditado" data-sem-ditado hidden>{t.semDitado}</p>
+    </section>
+
+    <form class="wrap blocos" data-form onsubmit="return false">
+      {
+        BLOCOS.map((b, bi) => (
+          <fieldset class="bloco" id={`bloco-${b.id}`}>
+            <legend>
+              <span class="bloco-num">{String(bi + 1).padStart(2, "0")}</span>
+              <span class="bloco-titulo display">{b.titulo}</span>
+            </legend>
+            <p class="bloco-intro">{b.intro}</p>
+            {b.perguntas.map((q) => (
+              <div class="pergunta" data-pergunta={q.id}>
+                <label for={`r-${q.id}`}>
+                  <span class="q-id">{q.id}</span>
+                  <span class="q-txt">{q.texto}</span>
+                  {q.opcional && <span class="q-opc">{t.opcional}</span>}
+                </label>
+                {q.dica && <p class="q-dica">{q.dica}</p>}
+                {q.tipo === "regua" ? (
+                  <div class="regua" role="radiogroup" aria-label={q.texto}>
+                    <span class="polo">{q.polos![0]}</span>
+                    {[1, 2, 3, 4, 5].map((n) => (
+                      <label class="regua-op">
+                        <input type="radio" name={q.id} value={String(n)} data-regua={q.id} />
+                        <span>{n}</span>
+                      </label>
+                    ))}
+                    <span class="polo">{q.polos![1]}</span>
+                  </div>
+                ) : (
+                  <>
+                    <textarea
+                      id={`r-${q.id}`}
+                      name={q.id}
+                      rows={q.tipo === "colar" ? 8 : 4}
+                      data-resposta={q.id}
+                      data-tipo={q.tipo}
+                      placeholder={t.placeholder[q.tipo as "aberta" | "colar" | "escrita"]}
+                    />
+                    <div class="q-acoes">
+                      {q.tipo === "aberta" && (
+                        <button type="button" class="mic" data-mic={q.id} hidden aria-pressed="false">
+                          <span class="mic-ponto" aria-hidden="true" />
+                          <span class="mic-txt">{t.falar}</span>
+                        </button>
+                      )}
+                      {q.tipo === "escrita" && <span class="so-digitar">{t.soDigitar}</span>}
+                      <span class="q-modo" data-modo={q.id} />
+                      <span class="q-conta" data-conta={q.id} />
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
+          </fieldset>
+        ))
+      }
+    </form>
+
+    <section class="wrap final" id="final">
+      <p class="eyebrow">{t.finalEyebrow}</p>
+      <h2 class="display">{t.finalH2}</h2>
+      <p class="lead">{t.finalLead}</p>
+      <p class="falta" data-falta hidden></p>
+      <div class="final-acoes">
+        <button type="button" class="btn" data-copiar>{t.copiar}</button>
+        <button type="button" class="btn ghost" data-baixar>{t.baixar}</button>
+        <button type="button" class="btn ghost limpar" data-limpar>{t.limpar}</button>
+      </div>
+      <p class="status" data-status aria-live="polite"></p>
+      <details class="previa">
+        <summary>{t.previa}</summary>
+        <pre data-previa></pre>
+      </details>
+    </section>
+  </main>
+
+  <script>
+    import type { Lang } from "../i18n/routes";
+    import { ROTEIRO, chaveArmazenamento } from "../lib/voz";
+    import { UI, gerarMarkdown, type EstadoVoz as Estado } from "../lib/voz-textos";
+
+    const lang = (document.querySelector<HTMLElement>("main.voz")!.dataset.lang ?? "pt") as Lang;
+    const t = UI[lang];
+    const CHAVE = chaveArmazenamento(lang);
+    const perguntas = ROTEIRO[lang].flatMap((b) => b.perguntas.map((q) => ({ ...q, bloco: b })));
+
+    function carregar(): Estado {
+      try {
+        const bruto = localStorage.getItem(CHAVE);
+        if (bruto) return { respostas: {}, modos: {}, idioma: t.ditadoPadrao, ...JSON.parse(bruto) };
+      } catch {
+        /* sem armazenamento: segue só na memória */
+      }
+      return { respostas: {}, modos: {}, idioma: t.ditadoPadrao };
+    }
+    const estado = carregar();
+    function salvar() {
+      try {
+        localStorage.setItem(CHAVE, JSON.stringify(estado));
+      } catch {
+        /* ignore */
+      }
+    }
+
+    const $ = <T extends Element>(sel: string) => document.querySelector<T>(sel);
+    const campo = (id: string) => $<HTMLTextAreaElement>(`[data-resposta="${id}"]`);
+
+    function palavras(texto: string) {
+      return texto.trim() ? texto.trim().split(/\s+/).length : 0;
+    }
+
+    function marcarModo(id: string, novo: "digitado" | "ditado" | "colado") {
+      const atual = estado.modos[id];
+      estado.modos[id] = !atual || atual === novo ? novo : "misto";
+    }
+
+    function atualizarPergunta(id: string) {
+      if (!campo(id)) return;
+      const n = palavras(estado.respostas[id] ?? "");
+      $(`[data-conta="${id}"]`)!.textContent = n ? t.palavras(n) : "";
+      $(`[data-modo="${id}"]`)!.textContent = n && estado.modos[id] ? t.modo[estado.modos[id]] : "";
+    }
+
+    function atualizarProgresso() {
+      const feitas = perguntas.filter((q) => (estado.respostas[q.id] ?? "").trim()).length;
+      $("[data-respondidas]")!.textContent = String(feitas);
+      $<HTMLElement>("[data-barra]")!.style.width = `${(feitas / perguntas.length) * 100}%`;
+      const obrigatoriasVazias = perguntas.filter((q) => !q.opcional && !(estado.respostas[q.id] ?? "").trim());
+      const falta = $<HTMLElement>("[data-falta]")!;
+      falta.hidden = obrigatoriasVazias.length === 0;
+      falta.textContent = t.falta(obrigatoriasVazias.map((q) => q.id));
+      $("[data-previa]")!.textContent = markdown();
+    }
+
+    const markdown = () => gerarMarkdown(lang, estado, new Date().toISOString().slice(0, 10));
+
+    // Campos: preencher com o que estava salvo e salvar ao digitar.
+    for (const q of perguntas) {
+      if (q.tipo === "regua") {
+        document.querySelectorAll<HTMLInputElement>(`[data-regua="${q.id}"]`).forEach((r) => {
+          r.checked = estado.respostas[q.id] === r.value;
+          r.addEventListener("change", () => {
+            estado.respostas[q.id] = r.value;
+            salvar();
+            atualizarProgresso();
+          });
+        });
+        continue;
+      }
+      const el = campo(q.id)!;
+      el.value = estado.respostas[q.id] ?? "";
+      el.addEventListener("input", (e) => {
+        estado.respostas[q.id] = el.value;
+        const tipoInput = (e as InputEvent).inputType ?? "";
+        marcarModo(q.id, q.tipo === "colar" || tipoInput === "insertFromPaste" ? "colado" : "digitado");
+        salvar();
+        atualizarPergunta(q.id);
+        atualizarProgresso();
+      });
+      atualizarPergunta(q.id);
+    }
+    atualizarProgresso();
+
+    // Ditado pela Web Speech API (Chrome, Edge, Safari).
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const idiomaSel = $<HTMLSelectElement>("[data-idioma]")!;
+    idiomaSel.value = estado.idioma;
+    idiomaSel.addEventListener("change", () => {
+      estado.idioma = idiomaSel.value;
+      salvar();
+      atualizarProgresso();
+    });
+
+    if (!SR) {
+      $<HTMLElement>("[data-sem-ditado]")!.hidden = false;
+    } else {
+      $<HTMLElement>("[data-ditado-config]")!.hidden = false;
+      let ativo: { id: string; rec: any; botao: HTMLButtonElement; parar: boolean } | null = null;
+
+      const desligar = () => {
+        if (!ativo) return;
+        ativo.parar = true;
+        ativo.rec.stop();
+        ativo.botao.setAttribute("aria-pressed", "false");
+        ativo.botao.querySelector(".mic-txt")!.textContent = t.falar;
+        ativo = null;
+      };
+
+      document.querySelectorAll<HTMLButtonElement>("[data-mic]").forEach((botao) => {
+        botao.hidden = false;
+        botao.addEventListener("click", () => {
+          const id = botao.dataset.mic!;
+          if (ativo?.id === id) return desligar();
+          desligar();
+          const el = campo(id)!;
+          const rec = new SR();
+          rec.lang = estado.idioma;
+          rec.continuous = true;
+          rec.interimResults = true;
+          // Pontuação inferida pelas pausas (Chrome recente). Sem ela, a transcrição vem sem pontuação.
+          if ("unspokenPunctuation" in rec) {
+            try {
+              rec.unspokenPunctuation = true;
+              estado.pontuacaoAuto = true;
+            } catch {
+              /* ignore */
+            }
+          }
+          let base = el.value.trim() ? el.value.trimEnd() + " " : "";
+          rec.onresult = (ev: any) => {
+            let final = "";
+            let parcial = "";
+            for (let i = ev.resultIndex; i < ev.results.length; i++) {
+              const trecho = ev.results[i][0].transcript;
+              if (ev.results[i].isFinal) final += trecho;
+              else parcial += trecho;
+            }
+            if (final) {
+              base += final.trim() + " ";
+              marcarModo(id, "ditado");
+            }
+            el.value = base + parcial;
+            estado.respostas[id] = el.value.trimEnd();
+            salvar();
+            atualizarPergunta(id);
+            atualizarProgresso();
+          };
+          rec.onerror = (ev: any) => {
+            if (ev.error === "not-allowed" || ev.error === "service-not-allowed") {
+              $("[data-status]")!.textContent = t.micBloqueado;
+              desligar();
+            }
+          };
+          // O Chrome encerra sozinho depois de um silêncio: recomeça enquanto o botão estiver ligado.
+          rec.onend = () => {
+            if (ativo && ativo.rec === rec && !ativo.parar) {
+              try {
+                rec.start();
+              } catch {
+                desligar();
+              }
+            }
+          };
+          ativo = { id, rec, botao, parar: false };
+          botao.setAttribute("aria-pressed", "true");
+          botao.querySelector(".mic-txt")!.textContent = t.parar;
+          rec.start();
+        });
+      });
+    }
+
+    // Copiar, baixar, apagar.
+    const status = $<HTMLElement>("[data-status]")!;
+    $("[data-copiar]")!.addEventListener("click", async () => {
+      const texto = markdown();
+      try {
+        await navigator.clipboard.writeText(texto);
+        status.textContent = t.copiado;
+      } catch {
+        const pre = $<HTMLElement>("[data-previa]")!;
+        (pre.closest("details") as HTMLDetailsElement).open = true;
+        const r = document.createRange();
+        r.selectNodeContents(pre);
+        getSelection()?.removeAllRanges();
+        getSelection()?.addRange(r);
+        status.textContent = t.copiarManual;
+      }
+    });
+    $("[data-baixar]")!.addEventListener("click", () => {
+      const url = URL.createObjectURL(new Blob([markdown()], { type: "text/markdown" }));
+      const a = Object.assign(document.createElement("a"), { href: url, download: t.arquivo });
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+    $("[data-limpar]")!.addEventListener("click", () => {
+      const botao = $<HTMLButtonElement>("[data-limpar]")!;
+      if (botao.dataset.confirmar !== "1") {
+        botao.dataset.confirmar = "1";
+        botao.textContent = t.limparConfirmar;
+        setTimeout(() => {
+          botao.dataset.confirmar = "";
+          botao.textContent = t.limpar;
+        }, 4000);
+        return;
+      }
+      estado.respostas = {};
+      estado.modos = {};
+      salvar();
+      for (const q of perguntas) {
+        const el = campo(q.id);
+        if (el) el.value = "";
+        document.querySelectorAll<HTMLInputElement>(`[data-regua="${q.id}"]`).forEach((r) => (r.checked = false));
+        atualizarPergunta(q.id);
+      }
+      atualizarProgresso();
+      botao.dataset.confirmar = "";
+      botao.textContent = t.limpar;
+      status.textContent = t.apagadas;
+    });
+  </script>
+</Base>
+
+<style>
+  .topo {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding-block: 14px;
+    background: color-mix(in srgb, var(--paper) 90%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+    max-width: none;
+  }
+  .topo-dir {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+  .outro-idioma {
+    font-family: var(--f-mono);
+    font-size: 12.5px;
+    color: var(--ink-3);
+    text-decoration: underline;
+    text-decoration-color: var(--line-strong);
+    text-underline-offset: 3px;
+  }
+  .outro-idioma:hover {
+    color: var(--ink);
+  }
+  .logo img {
+    display: block;
+    height: 34px;
+    width: auto;
+  }
+  .progresso {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--f-mono);
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+  .barra {
+    width: clamp(90px, 22vw, 220px);
+    height: 6px;
+    border-radius: 999px;
+    background: var(--paper-3);
+    overflow: hidden;
+  }
+  .barra span {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: var(--terracota);
+    transition: width 0.3s;
+  }
+
+  .abertura,
+  .final {
+    max-width: 820px;
+    padding-block: clamp(48px, 8vw, 96px) 24px;
+    display: grid;
+    gap: 18px;
+  }
+  .abertura h1 {
+    font-size: clamp(44px, 7vw, 80px);
+  }
+  .final h2 {
+    font-size: clamp(36px, 5vw, 56px);
+  }
+  .lead {
+    font-size: 18.5px;
+    color: var(--ink-2);
+    max-width: 62ch;
+  }
+  .regras {
+    margin: 6px 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 10px;
+  }
+  .regras li {
+    padding-left: 22px;
+    position: relative;
+    color: var(--ink-2);
+  }
+  .regras li::before {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 0.62em;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--salvia);
+  }
+  .regras b {
+    color: var(--ink);
+  }
+  .ditado-config {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 15px;
+    flex-wrap: wrap;
+  }
+  select {
+    font: inherit;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--line-strong);
+    background: var(--card);
+    color: var(--ink);
+  }
+  .aviso-ditado {
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    background: var(--terracota-wash);
+    color: var(--ink);
+    font-size: 15px;
+  }
+
+  .blocos {
+    max-width: 820px;
+    display: grid;
+    gap: clamp(40px, 6vw, 64px);
+    padding-block: 24px;
+  }
+  .bloco {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 22px;
+    min-width: 0;
+  }
+  legend {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    padding: 0;
+    margin-bottom: 4px;
+  }
+  .bloco-num {
+    font-family: var(--f-mono);
+    font-size: 13px;
+    color: var(--terracota-ink);
+  }
+  .bloco-titulo {
+    font-size: clamp(30px, 4vw, 42px);
+  }
+  .bloco-intro {
+    color: var(--ink-2);
+    margin-top: -10px;
+  }
+  .pergunta {
+    display: grid;
+    gap: 8px;
+    padding: 20px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--card);
+  }
+  .pergunta label {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    flex-wrap: wrap;
+    font-weight: 600;
+    font-size: 17px;
+    line-height: 1.4;
+  }
+  .q-id {
+    font-family: var(--f-mono);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink-3);
+  }
+  .q-txt {
+    flex: 1 1 260px;
+  }
+  .q-opc {
+    font-family: var(--f-mono);
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--salvia);
+  }
+  .q-dica {
+    font-size: 14.5px;
+    color: var(--ink-3);
+  }
+  textarea {
+    width: 100%;
+    min-height: 110px;
+    resize: vertical;
+    font: inherit;
+    font-size: 16px;
+    line-height: 1.55;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--line-strong);
+    background: var(--paper);
+    color: var(--ink);
+  }
+  textarea:focus {
+    outline: 2px solid var(--terracota);
+    outline-offset: 1px;
+  }
+  .q-acoes {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    font-family: var(--f-mono);
+    font-size: 12.5px;
+    color: var(--ink-3);
+  }
+  .mic {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--ink);
+    background: transparent;
+    color: var(--ink);
+    font: 600 14px/1 var(--f-body);
+    cursor: pointer;
+  }
+  .mic[hidden] {
+    display: none;
+  }
+  .mic-ponto {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--terracota);
+  }
+  .mic[aria-pressed="true"] {
+    background: var(--terracota-ink);
+    border-color: var(--terracota-ink);
+    color: var(--paper);
+  }
+  .mic[aria-pressed="true"] .mic-ponto {
+    background: var(--paper);
+    animation: pulso 1.1s ease-in-out infinite;
+  }
+  @keyframes pulso {
+    50% {
+      opacity: 0.25;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .mic[aria-pressed="true"] .mic-ponto {
+      animation: none;
+    }
+  }
+  .so-digitar {
+    color: var(--terracota-ink);
+  }
+  .regua {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 8px 6px;
+    max-width: 380px;
+    font-size: 14.5px;
+    color: var(--ink-2);
+  }
+  .polo {
+    grid-row: 1;
+    grid-column: 1 / 4;
+  }
+  .polo:last-child {
+    grid-column: 3 / 6;
+    text-align: right;
+  }
+  .regua-op {
+    grid-row: 2;
+    justify-self: center;
+  }
+  .regua-op {
+    position: relative;
+  }
+  .regua-op:nth-of-type(1) { grid-column: 1; }
+  .regua-op:nth-of-type(2) { grid-column: 2; }
+  .regua-op:nth-of-type(3) { grid-column: 3; }
+  .regua-op:nth-of-type(4) { grid-column: 4; }
+  .regua-op:nth-of-type(5) { grid-column: 5; }
+  .regua-op input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    cursor: pointer;
+  }
+  .regua-op span {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--line-strong);
+    background: var(--paper);
+    font: 600 15px/1 var(--f-mono);
+  }
+  .regua-op input:checked + span {
+    background: var(--terracota-ink);
+    border-color: var(--terracota-ink);
+    color: var(--paper);
+  }
+  .regua-op input:focus-visible + span {
+    outline: 2px solid var(--terracota);
+    outline-offset: 2px;
+  }
+  .q-modo:not(:empty) {
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--salvia-wash);
+    color: var(--salvia);
+  }
+
+  .final {
+    padding-bottom: clamp(64px, 10vw, 120px);
+  }
+  .final-acoes {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .limpar {
+    border-color: var(--line-strong);
+    color: var(--ink-3);
+  }
+  .falta {
+    font-size: 15px;
+    color: var(--terracota-ink);
+  }
+  .status {
+    min-height: 1.6em;
+    font-size: 15px;
+    color: var(--salvia);
+  }
+  .previa summary {
+    cursor: pointer;
+    color: var(--ink-2);
+  }
+  .previa pre {
+    margin-top: 12px;
+    max-height: 420px;
+    overflow: auto;
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    font: 13px/1.5 var(--f-mono);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+</style>

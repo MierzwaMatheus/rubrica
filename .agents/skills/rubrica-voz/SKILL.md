@@ -31,21 +31,21 @@ O método é o da skill `setup-writing-style` da Anthropic, reimplementado e ada
 
 ## Quando rodar
 - Uma estrategista abriu `.rubrica/perfil.md` e a seção `## Voz` não existe ou não tem amostras literais.
-- A pessoa colou um texto que começa com `<!-- rubrica-voz v1 -->` (a entrevista da página). Nesse caso, **pule a coleta** e vá direto à extração.
+- A pessoa colou um texto que começa com `<!-- rubrica-voz v1 -->` (a entrevista da página, em português ou em inglês). Nesse caso, **pule a coleta** e vá direto à extração.
 - A pessoa pediu para refazer a voz, ou corrigiu o tom tantas vezes que o perfil já não serve.
 
 ## 1. Coleta
 Mande a pessoa para a entrevista:
 
-> **Endereço da entrevista:** https://userubrica.vercel.app/voz
+> **Endereço da entrevista:** https://userubrica.vercel.app/voz (em inglês: https://userubrica.vercel.app/en/voice)
 
-Diga a ela, em poucas linhas: leva uns 20 minutos, dá para falar ou digitar, nada sai do navegador até ela copiar, e no fim o botão "Copiar para o agente" gera o texto para colar aqui. Peça para responder como falaria a um amigo, sem caprichar.
+Mande a versão no idioma em que a pessoa fala e escreve no dia a dia (na dúvida, pergunte). Diga a ela, em poucas linhas: leva uns 20 minutos, dá para falar ou digitar, nada sai do navegador até ela copiar, e no fim o botão "Copiar para o agente" ("Copy for your agent" na versão em inglês) gera o texto para colar aqui. Peça para responder como falaria a um amigo, sem caprichar.
 
-**Sem acesso à página** (offline, navegador sem ditado, a pessoa prefere a conversa): faça as perguntas de `references/roteiro.md` aqui, **um bloco por vez**, e monte o mesmo Markdown, com `modo: digitado` em todas. Peça os textos colados (E5) do mesmo jeito.
+**Sem acesso à página** (offline, navegador sem ditado, a pessoa prefere a conversa): faça as perguntas de `references/roteiro.md` aqui, **um bloco por vez**, e monte o mesmo Markdown, com `modo: digitado` em todas. Em inglês, faça as perguntas em inglês natural e monte o Markdown como em "Entrevista em inglês" (`references/roteiro.md`). Peça os textos colados (E5) do mesmo jeito.
 
 ## 2. Extração
 1. **Salvar.** Grave em `.rubrica/voz/aaaa-mm-dd-entrevista.md`, sem editar. Crie também `.rubrica/voz/aaaa-mm-dd-acompanhamento.md`: toda pergunta e resposta seguinte (acompanhamento, validação, permissões) vai para ele, literal. Os dois arquivos juntos são a fonte de verdade da Pilar.
-2. **Medir.** `python3 -I .agents/skills/rubrica-voz/scripts/voz_metricas.py .rubrica/voz/<arquivo>.md --json .rubrica/voz/<arquivo>.json`. O script separa o texto `escrito` (digitado e colado) do `ditado`, ignora os vetos (E3) na linha de base de marcas de IA e traz avisos.
+2. **Medir.** `python3 -I .agents/skills/rubrica-voz/scripts/voz_metricas.py .rubrica/voz/<arquivo>.md --json .rubrica/voz/<arquivo>.json`. O script separa o texto `escrito` (digitado e colado) do `ditado`, ignora os vetos (E3) na linha de base de marcas de IA e traz avisos. Em `resumo.idioma` diz em que idioma a pessoa respondeu: com `en`, as listas de palavras do script (de pt-BR) não valem, só as métricas de forma (o aviso diz quais). Os marcadores orais e as marcas de IA, aí, você tira lendo ("like", "you know", "so" no lugar de "tipo", "né", "aí").
 3. **Interpretar** com as regras de `references/extracao.md`:
    - ritmo e pontuação só do `escrito`;
    - vocabulário, histórias e opiniões de tudo;
@@ -69,7 +69,9 @@ Diga a ela, em poucas linhas: leva uns 20 minutos, dá para falar ou digitar, na
    - Registre o resultado na linha de proveniência do perfil ("calibrado em aaaa-mm-dd: escolheu a versão com perfil").
 3. **Teste final:** "você teria orgulho de ter escrito isso **e** quem te conhece acreditaria que foi você?". A primeira metade sozinha dá texto bonito de IA. A segunda sozinha dá transcrição.
 
-**Inglês.** O perfil é observado em pt-BR. Na versão en-US de qualquer texto, mantenha os traços **de estrutura** (pessoa gramatical, ritmo, abertura, humor, contrastes, vetos equivalentes) e escreva um inglês nativo. Não imite o nível de inglês da pessoa nem traduza literalmente as expressões dela: use o equivalente natural ("na mão" → "by hand").
+**Inglês.** O perfil é observado no idioma em que a pessoa respondeu: pt-BR na página `/voz`, inglês quando o Markdown traz `<!-- idioma: en -->` (página `/en/voice`). Registre esse idioma na linha de proveniência do perfil. Os trechos literais ficam no idioma original, sem tradução; a descrição dos traços segue em português, como o resto do perfil. O site continua com pt-BR e en-US em todo texto:
+- **Respondeu em pt-BR:** o pt-BR é a voz observada. Na versão en-US, mantenha os traços **de estrutura** (pessoa gramatical, ritmo, abertura, humor, contrastes, vetos equivalentes) e escreva um inglês nativo. Não imite o nível de inglês da pessoa nem traduza literalmente as expressões dela: use o equivalente natural ("na mão" → "by hand").
+- **Respondeu em inglês:** o en-US é a voz observada, com as expressões dela. O pt-BR segue a mesma regra no sentido contrário: traços de estrutura, português nativo, equivalente natural ("by hand" → "na mão"), sem traduzir expressão ao pé da letra.
 
 ## 4. Conteúdo pessoal da página Sobre
 Com o perfil aprovado, proponha o lado pessoal da página Sobre **na voz da pessoa** (campos, regras e exemplo de plano em `references/conteudo-pessoal.md`):

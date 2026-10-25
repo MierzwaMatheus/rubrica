@@ -1,6 +1,6 @@
 # Roteiro da entrevista de voz (v1)
 
-A fonte da verdade é `site/src/lib/voz.ts`, que gera a página https://userubrica.vercel.app/voz. Este arquivo espelha o roteiro para o agente usar quando a página não estiver acessível, e para saber para que serve cada resposta. Mudou o roteiro? Suba a versão nos dois lugares.
+A fonte da verdade é `site/src/lib/voz.ts`, que gera a página https://userubrica.vercel.app/voz. A versão em inglês (https://userubrica.vercel.app/en/voice) vem de `site/src/lib/voz.en.ts`, com as mesmas perguntas, ids, tipos e usos; só o texto muda. Este arquivo espelha o roteiro para o agente usar quando a página não estiver acessível, e para saber para que serve cada resposta. Mudou o roteiro? Suba a versão nos dois lugares.
 
 **Por que este formato** (`pesquisa.md` §5):
 - 13 perguntas obrigatórias, mais 4 opcionais e 4 réguas opcionais, uns 20 minutos. A pesquisa sugere de 10 a 12 abertas para a voz; as 5 da seção D (fora do trabalho) somam porque alimentam a página Sobre;
@@ -47,3 +47,10 @@ Respondida em aaaa-mm-dd. Idioma do ditado: pt-BR.
 <resposta, ou _(sem resposta)_>
 ```
 `modo` pode ser `digitado`, `ditado` (do navegador: pode ter palavra trocada e não ter pontuação), `colado` (texto que a pessoa já tinha escrito), `misto` (ditado e digitado na mesma resposta) ou `sem resposta`. As opcionais trazem `· opcional` no comentário. As réguas vêm como `4/5 (1 = sério, 5 = bem-humorado)`.
+
+## Entrevista em inglês
+A página `/en/voice` gera o mesmo formato. Muda só o texto (títulos, perguntas, nota para o agente, polos das réguas) e:
+- a 2ª linha é `<!-- idioma: en -->` (sem ela, a entrevista é em pt-BR);
+- resposta em branco vem como `_(no answer)_`.
+
+O comentário de cada pergunta continua em português, com as mesmas chaves e valores (`uso`, `tipo`, `opcional`, `modo: digitado | ditado | colado | misto | sem resposta`): é o que o script lê. Os ids são os mesmos da tabela acima.

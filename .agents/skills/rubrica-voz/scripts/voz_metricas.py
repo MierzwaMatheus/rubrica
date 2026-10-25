@@ -8,6 +8,10 @@ Formato esperado (gerado pela página):
     <!-- uso: voz, apresentacao · tipo: aberta · modo: ditado -->
     resposta...
 
+A versão em inglês (/en/voice) gera o mesmo formato, com `<!-- idioma: en -->` na 2ª
+linha e o vazio `_(no answer)_`. As listas de palavras daqui são de pt-BR: em inglês, as
+métricas de forma (frase, pontuação, emoji) valem; as de vocabulário, não (ver os avisos).
+
 Separa o texto **escrito** (modo digitado ou colado) do **ditado**: ritmo e pontuação só
 valem no escrito, porque o ditado do navegador vem sem pontuação confiável. Respostas
 "misto" entram só no total. Réguas (tipo: regua) saem à parte.
@@ -33,6 +37,9 @@ IDS_VETOS = {"E3"}
 A_GENTE = re.compile(r"(?<![\w])(\w+\s+)?a gente(?![\w])", re.I)
 NAO_PRONOME = {"muita", "pouca", "toda", "tanta", "essa", "esta", "aquela", "outra", "mais"}
 META = re.compile(r"<!--\s*(.*?)\s*-->")
+IDIOMA = re.compile(r"^<!--\s*idioma:\s*([\w-]+)\s*-->\s*$", re.M)
+# Resposta em branco: "_(sem resposta)_" na página em português, "_(no answer)_" na em inglês.
+VAZIO = {"_(sem resposta)_", "_(no answer)_"}
 
 VAZIAS = set("""a o as os um uma uns umas de do da dos das em no na nos nas por pelo pela
 pelos pelas para pra pro com sem sob sobre e ou mas que se não sim é foi era ser ter tem
@@ -88,7 +95,7 @@ def ler_entrevista(md):
         atual["linhas"].append(linha)
     for b in blocos:
         b["texto"] = "\n".join(b.pop("linhas")).strip()
-        if b["texto"] == "_(sem resposta)_":
+        if b["texto"] in VAZIO:
             b["texto"] = ""
     return blocos
 
@@ -195,8 +202,15 @@ def metricas(blocos):
     }
 
 
+def idioma_da_entrevista(md):
+    """'pt' (sem marcação, o padrão da página /voz) ou o valor de <!-- idioma: xx -->."""
+    m = IDIOMA.search(md.split("\n###", 1)[0])
+    return m.group(1).lower() if m else "pt"
+
+
 def analisar(md):
     blocos = ler_entrevista(md)
+    idioma = idioma_da_entrevista(md)
     reguas = {b["id"]: b["texto"].split("/")[0] for b in blocos if b["tipo"] == "regua" and b["texto"]}
     respostas = [b for b in blocos if b["tipo"] != "regua" and b["texto"]]
     vazias = [b["id"] for b in blocos if not b["texto"]]
@@ -204,6 +218,7 @@ def analisar(md):
     ditado = [b for b in respostas if b["modo"] == "ditado"]
     out = {
         "resumo": {
+            "idioma": idioma,
             "respondidas": [b["id"] for b in respostas], "sem_resposta": vazias,
             "modos": dict(Counter(b["modo"] for b in respostas)), "reguas": reguas,
         },
@@ -216,6 +231,12 @@ def analisar(md):
     total = out["total"]["palavras"]
     avisos = ["marcadores_orais é contagem bruta: 'aí', 'então', 'assim' e 'bom' também têm uso gramatical. "
               "Só vira traço o marcador que você confirmar lendo o escrito."]
+    if idioma != "pt":
+        avisos.append(f"Entrevista em '{idioma}': as listas deste script são de pt-BR. Ignore marcadores_orais, "
+                      "hesitacoes, intensificadores, linha_de_base_ia, nao_x_mas_y, pessoa_por_1000_palavras, "
+                      "tempo_verbal_pistas, pct_frases_comecam_com_*, expressoes_frequentes e "
+                      "palavras_de_conteudo_mais_usadas. Valem só as de forma (frases, pontuação, travessão, "
+                      "emoji, mattr_50, palavras). Tire vocabulário, pessoa gramatical e marcas de IA lendo.")
     if total < 2000:
         avisos.append(f"{total} palavras: abaixo de ~2.000, trate tudo como indício.")
     if not escrito:

@@ -154,3 +154,7 @@ Full guide: [Updating your Rubrica](../atualizacao.md).
 | Variable | What it's for |
 |---|---|
 | `RUBRICA_VERCEL_GLOBAL_CONFIG` | Picks the Vercel account when there's more than one on the computer: the account's config folder (it's the Vercel CLI's `--global-config`). |
+
+## With an AI agent
+
+The project ships with an `AGENTS.md` (and a `CLAUDE.md` for Claude Code) that teaches agents such as Claude Code, Codex and Cursor how to use the CLI: what they can run on their own (`update --dry-run` and, once you say ok, `update --yes`), what you run in your own terminal (`setup`, `config`, `publicar`, `senha`) and the step-by-step for updating Rubrica, including the `.rubrica-new` files. Ask "update Rubrica" and the agent follows that script.

@@ -79,7 +79,7 @@ A CLI designed for non-technical people: fewer questions, nothing asked twice, s
 - The panel password now follows the same rules everywhere: 12 or more characters, with uppercase, lowercase and a number. Old passwords still work; the rule applies to future changes.
 
 ### Straight from the site to the terminal
-- The site's **Make your own** section (**Crie o seu**), below the combiner, builds a command with `--receita`. It carries the chosen look, the plugins, the identity, the profession and the specialties. Nothing leaves the browser.
+- The site's **Create yours** section (**Crie o seu**), below the builder, builds a command with `--receita`. It carries the chosen look, the plugins, the identity, the profession and the specialties. Nothing leaves the browser.
 - With the recipe, the CLI shows a summary, confirms and only asks for what is missing. The project is created on Convex without Convex's questions, and the terminal asks for **only the panel password**. Telegram and Vercel are left for a later `setup`.
 - Readable options for those who prefer them: `--layout`, `--esquema`, `--modo`, `--textura`, `--fonte`, `--mono`, `--plugins`, `--alternancia`.
 

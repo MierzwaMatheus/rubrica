@@ -119,60 +119,26 @@ flowchart TB
 
 <br />
 
-## Pré-requisitos
-
-Antes de começar, você vai precisar de:
-
-- **Node.js 20+** e **git** instalados (pnpm é opcional: o CLI usa npm se você não tiver)
-- Conta no **[Convex](https://convex.dev)** _(gratuita)_ — backend, banco e storage. O CLI abre o login no navegador.
-- Conta no **[Vercel](https://vercel.com)** _(gratuita)_ — hospedagem do site
-- _(Só no caminho manual)_ Conta no **[GitHub](https://github.com)** — para o fork e o deploy contínuo
-- _(Só para as skills de IA)_ **Python 3.8+**
-- _(Opcional)_ Contas no **[OpenRouter](https://openrouter.ai)**, **[Asaas](https://asaas.com)** ou **[Telegram BotFather](https://t.me/BotFather)** — só se for usar as features opcionais
-
-<br />
-
 ## Começando
 
-O caminho mais curto é o CLI `create-rubrica`. Ele cria o projeto, prepara o banco, cria o seu login do painel e publica, sem copiar variável nenhuma.
+Precisa de **Node.js 20+** e **git**, e de contas gratuitas no **[Convex](https://convex.dev)** (banco de dados) e na **[Vercel](https://vercel.com)** (hospedagem). O CLI `create-rubrica` cria o projeto, prepara o banco, cria o seu login do painel e publica, sem copiar variável nenhuma.
 
-```mermaid
-flowchart LR
-    A["1 · Escolhe a cara<br/>no site"] --> B["2 · create<br/>cria o projeto"]
-    B --> C["3 · Preenche<br/>no /admin"]
-    C --> D["4 · Dá a sua<br/>cara ⚠️"]
-    D --> E["5 · publicar<br/>na Vercel"]
-    E --> F["6 · Domínio<br/>próprio"]
-
-    classDef step fill:#F5F2EA,stroke:#4D7C5F,stroke-width:2px,color:#1A1A18
-    classDef highlight fill:#C4664A,stroke:#1A1A18,stroke-width:2px,color:#F5F2EA
-    class A,B,C,E,F step
-    class D highlight
+```bash
+npx create-rubrica@latest meu-portfolio   # cria o projeto
+npm run dev                               # abre em http://localhost:3000 (painel em /login)
+npx create-rubrica publicar               # põe no ar na Vercel
 ```
 
-1. **Escolha a cara no [site do Rubrica](https://userubrica.vercel.app).** No combinador, teste layout, cores, modo, textura e fontes no app funcionando. Na seção **Crie o seu**, preencha os seus dados e copie o comando pronto (nada sai do navegador).
-2. **Cole o comando no terminal.** Ele cria o projeto com as suas escolhas, conecta o Convex (login pelo navegador) e pede só a senha do painel:
-   ```bash
-   npx create-rubrica@latest meu-portfolio --receita <código-do-site>
-   ```
-   Sem o site, `npx create-rubrica@latest meu-portfolio` faz as mesmas perguntas no terminal (no modo **Rápido**, só layout, plugins e identidade).
-3. **Rode e preencha o conteúdo:** `npm run dev` (ou `pnpm dev`), entre em `http://localhost:3000/login` e siga para [o painel admin](#7--preencher-o-conteúdo-no-admin).
-4. **Dê a sua cara** ([veja onde mexer](#8--personalize-o-visual-não-pule)). Não é opcional: é o que separa o seu portfólio de "mais um".
-5. **Publique:** `npx create-rubrica publicar` cria o projeto na Vercel, prepara o banco de produção, cria o admin do site publicado e põe no ar. Rodar de novo só publica.
-6. **Domínio próprio:** [passo a passo](#10--domínio-próprio).
+Ou monte a aparência no [combinador do site](https://userubrica.vercel.app/#combinador) e copie de lá o comando pronto, com as suas escolhas.
 
-### Comandos do CLI
-
-Rode na pasta do projeto. Detalhes no [README do CLI](./cli/README.md).
-
-| Comando | Para quê |
+| Guia | O que tem |
 |---|---|
-| `npx create-rubrica@latest <pasta>` | Cria o projeto (aceita `--receita` do site e opções como `--layout` e `--esquema`) |
-| `npx create-rubrica setup` | Conecta o Convex, gera as chaves de login, cria o admin e os dados iniciais; liga Telegram e Vercel se você quiser |
-| `npx create-rubrica config` | Troca layout, cores, modo, textura, fontes, plugins e identidade depois de criado |
-| `npx create-rubrica publicar` | Põe o site no ar na Vercel (e publica de novo nas próximas vezes) |
-| `npx create-rubrica senha` | Troca a senha do painel e libera o login bloqueado, no site publicado ou no local |
-| `npx create-rubrica@latest update` | Traz a versão nova do Rubrica sem desfazer o que você personalizou |
+| [**Começando**](./docs/guia/comecando.md) | Do zero ao site rodando no computador, e o que preencher no painel |
+| [**Comandos do CLI**](./docs/guia/cli.md) | `create`, `setup`, `config`, `publicar`, `senha` e `update`, com todas as opções |
+| [**Publicar o site**](./docs/guia/publicar.md) | Vercel, o botão Publicar do painel, outro computador e domínio próprio |
+| [**Atualizando o seu Rubrica**](./docs/atualizacao.md) | Versões novas sem perder o que você personalizou |
+
+A documentação também está no [site do Rubrica](https://userubrica.vercel.app/docs), em português e inglês.
 
 <br />
 
@@ -359,15 +325,7 @@ A partir daqui, todo `git push` na branch principal dispara um deploy automátic
 
 ### 10 · Domínio próprio
 
-1. **Vercel → seu projeto → Settings → Domains → Add Domain**
-2. Adicione `seudominio.com` e `www.seudominio.com`
-3. **Configure o DNS** no seu registrador (Registro.br, Cloudflare, GoDaddy…):
-   - Raiz (`seudominio.com`): registro **A** → `76.76.21.21`
-   - `www`: registro **CNAME** → `cname.vercel-dns.com`
-4. Aguarde a propagação (minutos a horas)
-5. O SSL é emitido automaticamente pela Vercel via Let's Encrypt
-6. **Atualize a `SITE_URL`** no Vercel para a URL final
-7. Force um redeploy para regenerar `sitemap.xml` e `rss.xml`
+Veja [Publicar o site → Domínio próprio](./docs/guia/publicar.md#domínio-próprio).
 
 <br />
 

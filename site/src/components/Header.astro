@@ -1,24 +1,38 @@
 ---
 import { REPO } from "../lib/data";
+import { route, useDict, type Lang, type PageRef } from "../i18n";
+import { docUrl } from "../lib/docs";
 
+interface Props {
+  lang: Lang;
+  page: PageRef;
+}
+const { lang, page } = Astro.props;
+const t = useDict(lang);
+const other: Lang = lang === "pt" ? "en" : "pt";
+const home = route("home", lang);
 const links = [
-  { href: "#combinador", label: "Combinador" },
-  { href: "#layouts", label: "Layouts" },
-  { href: "#esquemas", label: "Esquemas" },
-  { href: "#comecar", label: "Começar" },
+  { href: `${home}#combinador`, label: t.header.combinator },
+  { href: `${home}#layouts`, label: t.header.layouts },
+  { href: `${home}#esquemas`, label: t.header.schemes },
+  { href: `${home}#comecar`, label: t.header.start },
+  { href: docUrl("guia/comecando", lang), label: t.header.docs },
 ];
 ---
 
 <header class="hdr">
   <div class="wrap hdr-in">
-    <a href="/" class="logo" aria-label="Rubrica — início">
+    <a href={home} class="logo" aria-label={t.common.homeAria}>
       <img src="/img/marca/rubrica-horizontal-positivo.svg" alt="Rubrica" width="148" height="44" />
     </a>
-    <nav aria-label="Seções">
+    <nav aria-label={t.header.nav}>
       <ul>
         {links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
       </ul>
     </nav>
+    <a class="lang" href={route(page, other)} hreflang={other === "pt" ? "pt-BR" : "en"} aria-label={t.header.switchAria}>
+      {t.header.switchLabel}
+    </a>
     <a class="btn gh" href={REPO} target="_blank" rel="noopener">GitHub</a>
   </div>
 </header>
@@ -65,11 +79,19 @@ const links = [
     padding: 9px 16px;
     font-size: 14px;
   }
+  .lang {
+    font-size: 14px;
+    color: var(--ink-2);
+    text-underline-offset: 3px;
+  }
+  .lang:hover {
+    color: var(--terracota-ink);
+  }
   @media (max-width: 760px) {
     nav {
       display: none;
     }
-    .gh {
+    .lang {
       margin-left: auto;
     }
   }

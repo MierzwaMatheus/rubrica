@@ -8,8 +8,15 @@ import { publishChoice } from "./combinatorStore";
 interface Config {
   layouts: { id: string; label: string; recommended: { scheme: string; mode: Mode; texture: string }; fonts: { sans: string[]; mono: string } }[];
   schemes: { id: string; label: string }[];
-  moods: { id: string; name: string; layout: string; scheme: string; mode: Mode; texture: string; sans: string; mono: string }[];
+  moods: { id: string; layout: string; scheme: string; mode: Mode; texture: string; sans: string; mono: string }[];
   pages: { path: string; label: string }[];
+  /** Textos montados aqui no navegador, no idioma da página. */
+  i18n: {
+    rows: Record<"layout" | "scheme" | "mode" | "toggle" | "texture" | "sans" | "mono" | "yes" | "no", string>;
+    light: string;
+    dark: string;
+    textures: Record<string, string>;
+  };
 }
 type Mode = "light" | "dark" | "system";
 
@@ -27,7 +34,6 @@ interface State {
 
 const DESKTOP_W = 1280;
 const MOBILE_W = 390;
-const TEXTURE_LABEL: Record<string, string> = { none: "Nenhuma", grain: "Grão de filme", paper: "Papel", scanlines: "Scanlines" };
 
 export function initCombinator(): void {
   const cfgEl = document.getElementById("cb-config");
@@ -111,14 +117,15 @@ export function initCombinator(): void {
     stage!.dataset.device = state.device;
     openLink.href = src();
 
+    const tx = cfg.i18n;
     const rows: [string, string][] = [
-      ["Layout", label(cfg.layouts, state.layout)],
-      ["Esquema", label(cfg.schemes, state.scheme)],
-      ["Modo", state.mode === "dark" ? "Escuro" : "Claro"],
-      ["Botão de modo", state.toggle ? "Sim" : "Não"],
-      ["Textura", TEXTURE_LABEL[state.texture] ?? state.texture],
-      ["Fonte principal", state.sans],
-      ["Fonte mono", state.mono],
+      [tx.rows.layout, label(cfg.layouts, state.layout)],
+      [tx.rows.scheme, label(cfg.schemes, state.scheme)],
+      [tx.rows.mode, state.mode === "dark" ? tx.dark : tx.light],
+      [tx.rows.toggle, state.toggle ? tx.rows.yes : tx.rows.no],
+      [tx.rows.texture, tx.textures[state.texture] ?? state.texture],
+      [tx.rows.sans, state.sans],
+      [tx.rows.mono, state.mono],
     ];
     answers.replaceChildren(
       ...rows.map(([dt, dd]) => {

@@ -1,25 +1,22 @@
 ---
-import { SCHEMES, REPO } from "../lib/data";
+import { SCHEMES } from "../lib/data";
+import { fill, useDict, type Lang } from "../i18n";
+import { docUrl } from "../lib/docs";
 
-const roles = [
-  ["bg", "fundo"],
-  ["surface", "cartão"],
-  ["text", "texto"],
-  ["primary", "primária"],
-  ["accent", "acento"],
-  ["accent2", "acento 2"],
-] as const;
+interface Props {
+  lang: Lang;
+}
+const d = useDict(Astro.props.lang);
+const t = d.schemes;
+const roles = (["bg", "surface", "text", "primary", "accent", "accent2"] as const).map((r) => [r, t.roles[r]] as const);
 ---
 
 <section id="esquemas" class="section schemes-sec">
   <div class="wrap">
     <div class="section-head">
-      <p class="eyebrow">Esquemas de cores</p>
-      <h2 class="display">Quinze paletas, cada uma em claro e escuro.</h2>
-      <p>
-        Qualquer esquema funciona com qualquer layout. O site pode abrir no claro, no escuro ou seguir o sistema de
-        quem visita, e mostrar um botão para alternar. Clique numa paleta para aplicá-la no combinador.
-      </p>
+      <p class="eyebrow">{t.eyebrow}</p>
+      <h2 class="display">{t.title}</h2>
+      <p>{t.intro}</p>
     </div>
     <ul class="list">
       {
@@ -28,11 +25,11 @@ const roles = [
             <button type="button" class="scheme" data-cb-scheme={s.id}>
               <span class="top">
                 <span class="name">{s.label}</span>
-                <span class="hint">{s.hint}</span>
+                <span class="hint">{d.catalog.schemeHints[s.id]}</span>
               </span>
               {(["light", "dark"] as const).map((mode) => (
-                <span class="strip" aria-label={`${mode === "light" ? "Modo claro" : "Modo escuro"} de ${s.label}`}>
-                  <span class="mode">{mode === "light" ? "claro" : "escuro"}</span>
+                <span class="strip" aria-label={fill(t.stripAria, { mode: t[mode], name: s.label })}>
+                  <span class="mode">{t[mode]}</span>
                   {roles.map(([r, label]) => (
                     <i style={`background:${s[mode][r]}`} title={`${label}: ${s[mode][r]}`} />
                   ))}
@@ -44,8 +41,8 @@ const roles = [
       }
     </ul>
     <p class="more">
-      Os 11 papéis de cor de cada esquema, as texturas e as cores do painel admin estão em{" "}
-      <a href={`${REPO}/blob/main/docs/templates/cores.md`} target="_blank" rel="noopener">Esquemas de cores</a>.
+      {t.moreBefore}{" "}
+      <a href={docUrl("templates/cores", Astro.props.lang)}>{t.moreLink}</a>.
     </p>
   </div>
 </section>

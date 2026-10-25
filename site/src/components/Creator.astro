@@ -1,6 +1,12 @@
 ---
+import { useDict, type Lang } from "../i18n";
+
+interface Props {
+  lang: Lang;
+}
+const t = useDict(Astro.props.lang).creator;
 const links = [
-  { href: "https://www.mmlo.com.br", label: "mmlo.com.br", note: "o portfólio dele, feito com o Rubrica" },
+  { href: "https://www.mmlo.com.br", label: "mmlo.com.br", note: t.portfolioNote },
   { href: "https://github.com/MierzwaMatheus", label: "GitHub", note: "@MierzwaMatheus" },
 ];
 ---
@@ -10,22 +16,14 @@ const links = [
     <div class="mark">
       <picture>
         <source srcset="/img/matheus.webp" type="image/webp" />
-        <img src="/img/matheus.jpg" alt="Matheus Mierzwa de perfil, de boné e óculos, em fundo escuro" width="720" height="720" loading="lazy" decoding="async" />
+        <img src="/img/matheus.jpg" alt={t.photoAlt} width="720" height="720" loading="lazy" decoding="async" />
       </picture>
     </div>
     <div class="text">
-      <p class="eyebrow">Quem fez</p>
+      <p class="eyebrow">{t.eyebrow}</p>
       <h2 class="display">Matheus Mierzwa</h2>
-      <p class="role">AI Enablement Lead e Tech Lead de Front-End</p>
-      <p>
-        Matheus constrói sistemas de ponta a ponta, da arquitetura à produção, e lidera os times que usam esses
-        sistemas. Na InBot, empresa de IA conversacional, fundou e lidera a área de AI Enablement e é o Tech Lead de
-        front-end de um monorepo multiproduto.
-      </p>
-      <p>
-        O Rubrica nasceu do mesmo jeito que ele trabalha: documento antes do código, testado por quem vai usar e fácil
-        de manter depois do lançamento. Presença profissional não é luxo, é o mínimo que o seu trabalho merece.
-      </p>
+      <p class="role">{t.role}</p>
+      {t.bio.map((p) => <p>{p}</p>)}
       <ul class="links">
         {
           links.map((l) => (

@@ -27,7 +27,8 @@ jobs:
       - name: Typecheck
         run: pnpm exec tsc --noEmit
       - name: Testes
-        run: pnpm exec vitest run
+        # tests/site importa o site (Astro), cujas dependências só o job do site instala.
+        run: pnpm exec vitest run --exclude "tests/site/**"
       - name: Testes das skills (Python)
         run: |
           python3 -m unittest discover -s .agents/skills/rubrica/tests
@@ -75,6 +76,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm install --frozen-lockfile
         working-directory: site
+      - name: Testes do site
+        run: pnpm exec vitest run tests/site
       - name: Previews e build
         run: pnpm build:full
         working-directory: site

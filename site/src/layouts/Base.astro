@@ -1,23 +1,33 @@
 ---
 import "../styles/global.css";
+import { HTML_LANG, LANGS, route, type Lang, type PageRef } from "../i18n/routes";
 
 interface Props {
   title: string;
   description: string;
+  /** Idioma da página. */
+  lang: Lang;
+  /** Qual página é esta: liga as versões em português e em inglês (hreflang). */
+  page: PageRef;
   /** Página fora dos buscadores (ex.: a entrevista de voz). */
   noindex?: boolean;
 }
-const { title, description, noindex = false } = Astro.props;
+const { title, description, lang, page, noindex = false } = Astro.props;
+const abs = (path: string) => new URL(path, Astro.site).href;
 ---
 
 <!doctype html>
-<html lang="pt-BR">
+<html lang={HTML_LANG[lang]}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{title}</title>
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex, nofollow, noarchive" />}
+    <link rel="canonical" href={abs(route(page, lang))} />
+    {LANGS.map((l) => <link rel="alternate" hreflang={HTML_LANG[l]} href={abs(route(page, l))} />)}
+    <link rel="alternate" hreflang="x-default" href={abs(route(page, "pt"))} />
+    <meta property="og:locale" content={HTML_LANG[lang].replace("-", "_")} />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />

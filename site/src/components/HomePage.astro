@@ -1,0 +1,56 @@
+---
+import Base from "../layouts/Base.astro";
+import Header from "./Header.astro";
+import Hero from "./Hero.astro";
+import Combinator from "./Combinator.astro";
+import CreateYours from "./CreateYours.astro";
+import Layouts from "./Layouts.astro";
+import Schemes from "./Schemes.astro";
+import Features from "./Features.astro";
+import Start from "./Start.astro";
+import Creator from "./Creator.astro";
+import Footer from "./Footer.astro";
+import { useDict, type Lang } from "../i18n";
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useDict(lang);
+---
+
+<Base title={t.meta.homeTitle} description={t.meta.homeDescription} lang={lang} page="home">
+  <Header lang={lang} page="home" />
+  <main data-copy-labels={JSON.stringify(t.common)}>
+    <Hero lang={lang} />
+    <Combinator lang={lang} />
+    <CreateYours lang={lang} />
+    <Layouts lang={lang} />
+    <Schemes lang={lang} />
+    <Features lang={lang} />
+    <Start lang={lang} />
+    <Creator lang={lang} />
+  </main>
+  <Footer lang={lang} />
+</Base>
+
+<script>
+  // Botões "Copiar" da página inteira, com os rótulos no idioma da página.
+  const labels = JSON.parse(document.querySelector("main")?.dataset.copyLabels || "{}") as Record<string, string>;
+  document.addEventListener("click", async (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>("[data-copy]");
+    if (!btn) return;
+    const text = btn.dataset.copy ?? "";
+    try {
+      await navigator.clipboard.writeText(text);
+      btn.textContent = labels.copied;
+    } catch {
+      const range = document.createRange();
+      range.selectNodeContents(btn.previousElementSibling ?? btn);
+      getSelection()?.removeAllRanges();
+      getSelection()?.addRange(range);
+      btn.textContent = labels.selected;
+    }
+    setTimeout(() => (btn.textContent = labels.copy), 1600);
+  });
+</script>

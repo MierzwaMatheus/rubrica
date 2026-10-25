@@ -80,6 +80,56 @@ class VozMetricasTeste(unittest.TestCase):
     def test_avisa_corpus_pequeno(self):
         self.assertTrue(any("abaixo de ~2.000" in a for a in self.r["avisos"]))
 
+    def test_entrevista_em_portugues_por_padrao(self):
+        self.assertEqual(self.r["resumo"]["idioma"], "pt")
+        self.assertFalse(any("listas deste script são de pt-BR" in a for a in self.r["avisos"]))
+
+
+MD_EN = """<!-- rubrica-voz v1 -->
+<!-- idioma: en -->
+# Voice interview
+
+> For the agent: ...
+
+## Getting started
+
+### A1. How do you explain what you do?
+<!-- uso: voz, apresentacao · tipo: aberta · modo: ditado -->
+
+i basically make computers do the boring stuff people do by hand
+
+### B1. A project you're proud of
+<!-- uso: voz, case · tipo: aberta · modo: sem resposta -->
+
+_(no answer)_
+
+## To wrap up
+
+### F1. Formal or casual?
+<!-- uso: voz · tipo: regua -->
+
+_(no answer)_
+
+### F2. Serious or playful?
+<!-- uso: voz · tipo: regua -->
+
+4/5 (1 = serious, 5 = playful)
+"""
+
+
+class VozMetricasInglesTeste(unittest.TestCase):
+    def setUp(self):
+        self.r = voz_metricas.analisar(MD_EN)
+
+    def test_le_o_idioma_e_o_vazio_em_ingles(self):
+        self.assertEqual(self.r["resumo"]["idioma"], "en")
+        self.assertEqual(self.r["resumo"]["respondidas"], ["A1"])
+        self.assertEqual(self.r["resumo"]["sem_resposta"], ["B1", "F1"])
+        self.assertEqual(self.r["resumo"]["reguas"], {"F2": "4"})
+
+    def test_avisa_que_as_listas_sao_de_pt_br(self):
+        self.assertTrue(any("listas deste script são de pt-BR" in a for a in self.r["avisos"]))
+
 
 if __name__ == "__main__":
     unittest.main()

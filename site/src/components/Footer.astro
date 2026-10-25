@@ -1,12 +1,19 @@
 ---
 import { REPO } from "../lib/data";
+import { route, useDict, type Lang } from "../i18n";
+import { docUrl } from "../lib/docs";
 
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useDict(lang);
 const links = [
-  { href: REPO, label: "Repositório" },
-  { href: `${REPO}/blob/main/docs/templates/README.md`, label: "Guia dos templates" },
-  { href: `${REPO}/blob/main/docs/templates/cores.md`, label: "Esquemas de cores" },
-  { href: `${REPO}/blob/main/CHANGELOG.md`, label: "Novidades" },
-  { href: "https://www.npmjs.com/package/create-rubrica", label: "create-rubrica no npm" },
+  { href: REPO, label: t.footer.repo },
+  { href: docUrl("templates", lang), label: t.footer.templates },
+  { href: docUrl("templates/cores", lang), label: t.footer.colors },
+  { href: route("changelog", lang), label: t.footer.changelog },
+  { href: "https://www.npmjs.com/package/create-rubrica", label: t.footer.npm },
 ];
 ---
 
@@ -14,11 +21,16 @@ const links = [
   <div class="wrap in">
     <img src="/img/marca/rubrica-horizontal-positivo.svg" alt="Rubrica" width="148" height="44" />
     <ul>
-      {links.map((l) => <li><a href={l.href} target="_blank" rel="noopener">{l.label}</a></li>)}
+      {
+        links.map((l) => {
+          const external = l.href.startsWith("http");
+          return <li><a href={l.href} target={external ? "_blank" : undefined} rel={external ? "noopener" : undefined}>{l.label}</a></li>;
+        })
+      }
     </ul>
     <p class="fine">
-      Código aberto sob{" "}<a href={`${REPO}/blob/main/LICENSE`} target="_blank" rel="noopener">GPL-3.0</a>. Feito por
-      Matheus Mierzwa.
+      {t.footer.licenseBefore}{" "}<a href={`${REPO}/blob/main/LICENSE`} target="_blank" rel="noopener">GPL-3.0</a>.
+      {t.footer.madeBy}
     </p>
   </div>
 </footer>

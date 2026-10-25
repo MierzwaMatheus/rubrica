@@ -1,20 +1,22 @@
 ---
-import { FEATURES } from "../lib/data";
+import { useDict, type Lang } from "../i18n";
+
+interface Props {
+  lang: Lang;
+}
+const t = useDict(Astro.props.lang).features;
 ---
 
 <section id="recursos" class="section">
   <div class="wrap feat">
     <div class="section-head">
-      <p class="eyebrow">O que vem pronto</p>
-      <h2 class="display">A base técnica é coletiva. A identidade é sua.</h2>
-      <p>
-        Começar um portfólio do zero dá trabalho demais, e os construtores prontos deixam todo mundo com a mesma cara.
-        O Rubrica fica no meio do caminho: o sistema inteiro já resolvido, para você cuidar do conteúdo e da marca.
-      </p>
+      <p class="eyebrow">{t.eyebrow}</p>
+      <h2 class="display">{t.title}</h2>
+      <p>{t.intro}</p>
     </div>
     <dl class="list">
       {
-        FEATURES.map((f) => (
+        t.items.map((f) => (
           <div class="item">
             <dt>{f.title}</dt>
             <dd>{f.text}</dd>

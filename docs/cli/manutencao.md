@@ -36,7 +36,7 @@ O site (`site/`) monta o comando `npx create-rubrica@latest <pasta> --receita <c
 - **`RECIPE_VERSION`**: suba quando o formato mudar de um jeito que um CLI antigo leria errado. O CLI que recebe uma versão maior avisa para rodar com `@latest` e aproveita o que entende.
 - **Validação**: `sanitizeRecipe` confere cada campo contra `LAYOUTS`, `SCHEMES`, as fontes e `PLUGINS`. O que não existe vira aviso e o `create` pergunta. Layout, esquema, fonte ou plugin novo entra na receita sem mudar nada aqui: basta estar no registro.
 - **Campo novo na identidade**: acrescente a chave em `IDENTITY_KEYS`, a limpeza em `sanitizeRecipe` e o campo no formulário do site (`site/src/components/CreateYours.astro` e `site/src/lib/recipeForm.ts`).
-- **Opção legível nova** (`--algo`): `cli/src/args.ts`, e a tabela de opções do `cli/README.md`.
+- **Opção legível nova** (`--algo`): `cli/src/args.ts`, e a tabela de opções de `docs/guia/cli.md` (e do `cli.en.md`).
 - **Do site, o terminal só pede a senha.** O `create` chama o `setup` com `site` (profissão e especialidades da receita) e `newProject` (o nome da pasta). Com `site`, o `setup` não pergunta integrações, e-mail (se veio válido) nem profissão. Com `newProject` e sem `.env.local`, ele roda `convex dev --once --configure new --project <pasta> --dev-deployment cloud` e grava `convex.json` com `aiFiles.enabled: false`, o que tira as perguntas do Convex. Pergunta nova no `setup` precisa decidir o que acontece nesse modo; o padrão é não perguntar.
 
 ## Publicar (`npx create-rubrica publicar`)
@@ -69,14 +69,14 @@ O `npx create-rubrica senha` chama a função **interna** `users:resetPasswordIn
 2. Adicione a entrada em `LAYOUTS` (`cli/src/layouts.ts`): `id`, `label`, `hint` (uma frase para leigos: para quem é e como é), `legacy: false`, `copy`, `remove`, `pages`, `fonts` e `recommended`. O modo rápido usa `fonts.sans[0]`, `fonts.mono` (vazio = o layout não usa mono) e `recommended`.
 3. As fontes e o esquema recomendados precisam existir em `fonts.ts` e `schemes.ts`. Se forem novos, veja as seções abaixo.
 4. Atualize a contagem em `cli/src/__tests__/layouts.test.ts` ("os 5 originais e os N novos").
-5. Docs: `docs/templates/<id>.md` com as imagens em `docs/templates/img/<id>/`, a tabela de `docs/templates/README.md`, a lista de layouts de `cli/README.md` e a contagem no `README.md` da raiz.
+5. Docs: `docs/templates/<id>.md` com as imagens em `docs/templates/img/<id>/`, a tabela de `docs/templates/README.md`, os ids da opção `--layout` em `docs/guia/cli.md` (e no `cli.en.md`) e a contagem no `README.md` da raiz. Cada doc publicado no site tem a versão em inglês ao lado (`<nome>.en.md`): atualize as duas.
 
 ## Novo esquema de cores
 
 1. Adicione a entrada em `SCHEMES` (`cli/src/themes/schemes.ts`), com os 11 papéis em `#RRGGBB` nos modos `light` e `dark`.
 2. Os testes de `schemes.test.ts` conferem o contraste: texto sobre fundo ≥ 4,5 e primária sobre fundo ≥ 3, nos dois modos. Atualize a contagem ("tem os N esquemas").
 3. Para ser o recomendado de algum layout, troque o `recommended.scheme` dele em `layouts.ts`.
-4. Docs: a seção do esquema em `docs/templates/cores.md` e as contagens em `docs/templates/README.md`, `cli/README.md` e `README.md`.
+4. Docs: a seção do esquema em `docs/templates/cores.md` e as contagens em `docs/templates/README.md` e `README.md` (e nos `.en.md` dos docs).
 
 ## Nova fonte
 

@@ -1,0 +1,281 @@
+---
+/*
+ * Novidades do Rubrica: o CHANGELOG.md da raiz, lido no build. A página muda a cada
+ * publicação do site, sem chamar o GitHub no navegador.
+ */
+import Base from "../layouts/Base.astro";
+import Header from "./Header.astro";
+import Footer from "./Footer.astro";
+import { REPO } from "../lib/data";
+import { formatDates, parseChangelog } from "../lib/changelog";
+import { rewriteDoc } from "../lib/docs";
+import { imageUrl } from "../lib/docsContent";
+import { renderMarkdown } from "../lib/markdown";
+import { useDict, type Lang } from "../i18n";
+import changelogPt from "../../../CHANGELOG.md?raw";
+import changelogEn from "../../../CHANGELOG.en.md?raw";
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const d = useDict(lang);
+const t = d.changelog;
+const { intro, versions } = parseChangelog(lang === "en" ? changelogEn : changelogPt);
+const file = lang === "en" ? "CHANGELOG.en.md" : "CHANGELOG.md";
+const html = (md: string) => renderMarkdown(rewriteDoc(md, { from: file, lang, repo: REPO, asset: imageUrl })).html;
+const isSingle = (version: string) => /^\d+\.\d+\.\d+$/.test(version);
+---
+
+<Base title={d.meta.changelogTitle} description={d.meta.changelogDescription} lang={lang} page="changelog">
+  <Header lang={lang} page="changelog" />
+  <main class="wrap nov">
+    <section class="abertura">
+      <p class="eyebrow">{t.eyebrow}</p>
+      <h1 class="display">{t.title}</h1>
+      <div class="lead" set:html={html(intro)} />
+    </section>
+
+    <div class="grade">
+      <nav class="indice" aria-label={t.versions}>
+        <p class="eyebrow">{t.versions}</p>
+        <ol>
+          {
+            versions.map((v) => (
+              <li>
+                <a href={`#${v.id}`}>
+                  <span class="num">{v.version}</span>
+                  <span class="dia">{v.date.slice(0, 10)}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+      </nav>
+
+      <div class="versoes">
+        {
+          versions.map((v, i) => (
+            <article id={v.id} class="versao">
+              <header>
+                <h2 class="display">{v.version}</h2>
+                <p class="meta">
+                  {v.date && <time datetime={v.date.slice(0, 10)}>{formatDates(v.date, lang)}</time>}
+                  {i === 0 && <span class="tag">{t.latest}</span>}
+                  {isSingle(v.version) && (
+                    <a href={`${REPO}/releases/tag/v${v.version}`} target="_blank" rel="noopener">
+                      {t.releaseNotes}
+                    </a>
+                  )}
+                </p>
+              </header>
+              <div class="corpo" set:html={html(v.body)} />
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </main>
+  <Footer lang={lang} />
+</Base>
+
+<style>
+  .nov {
+    padding-block: clamp(48px, 8vw, 96px) clamp(64px, 9vw, 112px);
+  }
+  .abertura {
+    display: grid;
+    gap: 16px;
+    max-width: 760px;
+    margin-bottom: clamp(40px, 6vw, 72px);
+  }
+  .abertura h1 {
+    font-size: clamp(44px, 7vw, 84px);
+  }
+  .lead {
+    color: var(--ink-2);
+    font-size: 18px;
+    max-width: 62ch;
+  }
+
+  .grade {
+    display: grid;
+    grid-template-columns: 200px minmax(0, 1fr);
+    gap: clamp(32px, 5vw, 72px);
+    align-items: start;
+  }
+
+  .indice {
+    position: sticky;
+    top: 92px;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+  .indice ol {
+    list-style: none;
+    margin: 12px 0 0;
+    padding: 0;
+    border-left: 1px solid var(--line);
+  }
+  .indice a {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 5px 0 5px 14px;
+    margin-left: -1px;
+    border-left: 2px solid transparent;
+    text-decoration: none;
+    font-size: 14px;
+  }
+  .indice a:hover,
+  .indice a.atual {
+    border-left-color: var(--terracota);
+  }
+  .indice a.atual .num {
+    color: var(--terracota-ink);
+  }
+  .num {
+    font-weight: 600;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  .dia {
+    font-family: var(--f-mono);
+    font-size: 11.5px;
+    color: var(--ink-3);
+    white-space: nowrap;
+  }
+
+  .versao {
+    padding-block: 36px;
+    border-top: 1px solid var(--line);
+    scroll-margin-top: 84px;
+  }
+  .versao:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+  .versao header {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .versao h2 {
+    font-size: clamp(40px, 5vw, 56px);
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 16px;
+    font-family: var(--f-mono);
+    font-size: 13px;
+    color: var(--ink-3);
+  }
+  .meta a {
+    color: var(--terracota-ink);
+  }
+  .tag {
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: var(--salvia-wash);
+    color: var(--salvia);
+    font-size: 11.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .corpo {
+    max-width: 72ch;
+    color: var(--ink-2);
+  }
+  .corpo :global(p),
+  .corpo :global(ul),
+  .corpo :global(ol) {
+    margin: 0 0 14px;
+  }
+  .corpo :global(> p:first-child) {
+    font-size: 18px;
+    color: var(--ink);
+  }
+  .corpo :global(h3) {
+    margin: 28px 0 10px;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .corpo :global(ul) {
+    padding-left: 20px;
+  }
+  .corpo :global(li) {
+    margin-bottom: 6px;
+  }
+  .corpo :global(li::marker) {
+    color: var(--terracota);
+  }
+  .corpo :global(strong) {
+    color: var(--ink);
+  }
+  .corpo :global(code),
+  .lead :global(code) {
+    font-family: var(--f-mono);
+    font-size: 0.86em;
+    padding: 1px 6px;
+    border-radius: 5px;
+    background: var(--paper-2);
+    color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+  .corpo :global(a),
+  .lead :global(a) {
+    color: var(--terracota-ink);
+  }
+
+  @media (max-width: 860px) {
+    .grade {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .indice {
+      position: static;
+      max-height: none;
+    }
+    .indice ol {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      border-left: 0;
+      padding-bottom: 6px;
+    }
+    .indice a {
+      padding: 6px 12px;
+      margin: 0;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+    }
+    .indice a:hover {
+      border-color: var(--terracota);
+    }
+    .dia {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  // Destaca no índice a versão que está na tela.
+  const links = new Map(
+    [...document.querySelectorAll<HTMLAnchorElement>(".indice a")].map((a) => [a.hash.slice(1), a]),
+  );
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        links.forEach((a) => a.classList.remove("atual"));
+        links.get(e.target.id)?.classList.add("atual");
+      }
+    },
+    { rootMargin: "-90px 0px -70% 0px" },
+  );
+  document.querySelectorAll(".versao").forEach((el) => observer.observe(el));
+</script>

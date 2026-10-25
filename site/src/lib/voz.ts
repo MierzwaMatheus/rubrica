@@ -1,16 +1,20 @@
 /*
- * Roteiro da entrevista de voz (página /voz). A skill rubrica-voz lê o Markdown que
- * esta página gera: os ids e o campo "uso" de cada pergunta fazem parte do contrato.
+ * Roteiro da entrevista de voz (páginas /voz e /en/voice). A skill rubrica-voz lê o
+ * Markdown que a página gera: os ids e o campo "uso" de cada pergunta fazem parte do contrato.
  * Mudou uma pergunta de sentido? Suba a VERSAO e atualize
- * .agents/skills/rubrica-voz/references/roteiro.md.
+ * .agents/skills/rubrica-voz/references/roteiro.md e a versão em inglês (voz.en.ts), que
+ * tem as mesmas perguntas, na mesma ordem, com os mesmos ids, tipo, uso e opcional
+ * (tests/site/voz.test.ts confere). O Markdown é montado em voz-textos.ts.
  *
  * Base: .agents/skills/rubrica-voz/references/pesquisa.md (seção 5). Comece fácil e
  * concreto; misture explicação, história, opinião e irritação; duas respostas
  * obrigatoriamente digitadas (o ditado não traz pontuação); "nunca usaria"; textos colados.
  */
 
+import type { Lang } from "../i18n/routes";
+import { BLOCOS_EN } from "./voz.en";
+
 export const VERSAO = "v1";
-export const TEMPO_ESTIMADO = "Uns 20 minutos";
 
 /** aberta: fala ou digita · escrita: só digitando · colar: textos prontos · regua: 1 a 5 */
 export type Tipo = "aberta" | "escrita" | "colar" | "regua";
@@ -207,3 +211,14 @@ export const BLOCOS: Bloco[] = [
     ],
   },
 ];
+
+/** Roteiro por idioma: só os textos mudam. */
+export const ROTEIRO: Record<Lang, Bloco[]> = { pt: BLOCOS, en: BLOCOS_EN };
+
+/**
+ * Chave do localStorage. A do português é a original (não perde respostas já salvas);
+ * a do inglês é separada para não misturar as respostas dos dois idiomas.
+ */
+export function chaveArmazenamento(lang: Lang): string {
+  return lang === "pt" ? `rubrica-voz-${VERSAO}` : `rubrica-voz-${lang}-${VERSAO}`;
+}

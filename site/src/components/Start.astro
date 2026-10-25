@@ -1,25 +1,30 @@
 ---
-import { STEPS, REPO } from "../lib/data";
+import { STEP_CODES, REPO } from "../lib/data";
+import { useDict, type Lang } from "../i18n";
+
+interface Props {
+  lang: Lang;
+}
+const d = useDict(Astro.props.lang);
+const t = d.start;
+const steps = t.steps.map((s, i) => ({ ...s, code: STEP_CODES[i] }));
 ---
 
 <section id="comecar" class="section start">
   <div class="wrap">
     <div class="section-head">
-      <p class="eyebrow">Começar</p>
-      <h2 class="display">Do terminal ao domínio próprio.</h2>
-      <p>
-        O CLI baixa a versão mais recente e aplica as suas escolhas. Depois, tudo se edita pelo painel admin, e o
-        <code>update</code> traz as versões novas sem apagar o que você personalizou.
-      </p>
+      <p class="eyebrow">{t.eyebrow}</p>
+      <h2 class="display">{t.title}</h2>
+      <p>{t.introBefore} <code>update</code> {t.introAfter}</p>
     </div>
     <ol class="steps">
       {
-        STEPS.map((s) => (
+        steps.map((s) => (
           <li>
             <h3>{s.title}</h3>
             <div class="cmd">
               <code>{s.code}</code>
-              <button class="copy" type="button" data-copy={s.code}>Copiar</button>
+              <button class="copy" type="button" data-copy={s.code}>{d.common.copy}</button>
             </div>
             <p>{s.text}</p>
           </li>
@@ -27,7 +32,7 @@ import { STEPS, REPO } from "../lib/data";
       }
     </ol>
     <p class="more">
-      Passo a passo completo, variáveis de ambiente e publicação na Vercel no{" "}
+      {t.moreBefore}{" "}
       <a href={`${REPO}#readme`} target="_blank" rel="noopener">README</a>.
     </p>
   </div>

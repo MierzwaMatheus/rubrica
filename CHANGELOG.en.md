@@ -2,6 +2,26 @@
 
 What changed in each version of Rubrica (template and `create-rubrica` CLI). Details for each one are in the [release notes](https://github.com/MierzwaMatheus/rubrica/releases). To update an existing project, see [Atualizando o seu Rubrica](./docs/atualizacao.md) (in Portuguese).
 
+## 1.7.0 — 2026-10-25
+
+Proposals with per-item prices, discounts and gifts. The skills now open an issue when Rubrica can't do what was asked, and projects get instructions for AI agents.
+
+**Coming from 1.6:**
+- Update with `npx create-rubrica@latest update`. No new CLI version is needed.
+- The backend changed (`convex/`): push it to your computer's Convex with `npx convex dev --once` and, for the live site, with `npx create-rubrica publicar`. The new fields are optional: existing proposals stay the same.
+- For the discount to show up in contracts from templates you already saved, add `{{discount}}` to the template at `/admin/contracts`.
+
+### Proposals
+- **Per-item price:** each scope item can have a price, shown next to it in the proposal and in the contract.
+- **Discount:** optional original value (before the discount). The proposal shows the original value struck through, the discount in R$ and %, and the final value. The admin suggests the original value from the sum of the items and warns when the sum doesn't add up.
+- **Gift:** mark a priced item as a gift. In the proposal it shows the "Brinde" badge, the price struck through and R$ 0,00.
+- The project value is still the final value, used in the contract and the payment options. The contract mentions the discount and the gifts, and contract templates get the `{{original_value}}` and `{{discount}}` variables.
+
+### Skills and agents
+- **Opening issues:** when someone asks for something Rubrica doesn't support, or something breaks, the skills decide whether it's a bug or a feature request, look for a similar issue and, once the person says ok, open it on Rubrica's GitHub (with `gh` or a prefilled link), without private data.
+- The `rubrica` skill knows how to handle proposal prices, discounts and gifts.
+- **`AGENTS.md` and `CLAUDE.md`** at the project root: they teach agents such as Claude Code, Codex and Cursor how to update Rubrica (including the `.rubrica-new` files), what they can run in the CLI and what stays with you. See "With an AI agent" in [CLI commands](./docs/guia/cli.md).
+
 ## 1.6.0 — 2026-10-25
 
 The Rubrica site gets an English version, a changelog page and the documentation, with three new guides: getting started, CLI commands and publishing.

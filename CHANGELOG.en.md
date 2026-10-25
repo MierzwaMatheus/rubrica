@@ -2,6 +2,27 @@
 
 What changed in each version of Rubrica (template and `create-rubrica` CLI). Details for each one are in the [release notes](https://github.com/MierzwaMatheus/rubrica/releases). To update an existing project, see [Atualizando o seu Rubrica](./docs/atualizacao.md) (in Portuguese).
 
+## 1.6.0 — 2026-10-25
+
+The Rubrica site gets an English version, a changelog page and the documentation, with three new guides: getting started, CLI commands and publishing.
+
+**Coming from 1.5:**
+- Update with `npx create-rubrica@latest update` to get the `rubrica-voz` skill that understands the interview in English. No new CLI version is needed, and nothing has to be pushed to Convex.
+
+### Rubrica site
+- **In English**, at [userubrica.vercel.app/en](https://userubrica.vercel.app/en/), with a language switch at the top. Builder, "Create yours", layouts and schemes, all translated. The page notes that the CLI and the admin panel are in Portuguese.
+- **Changelog** at `/en/changelog` (and `/novidades`): this changelog on the site itself, with a version index.
+- **Documentation** at `/en/docs` (and `/docs`): the template guide, the 13 layouts, the color schemes, creating a layout and updating become site pages, with navigation and an index. Links on the site no longer send you to GitHub.
+
+### New guides
+- [Getting started](./docs/guia/comecando.md): from zero to the site running on your computer, and what to fill in on each panel screen.
+- [CLI commands](./docs/guia/cli.md): every question, option and file of `create`, and the other commands.
+- [Publishing the site](./docs/guia/publicar.md): the first publish, the panel's Publish button, another computer, custom domain and common problems.
+- The README and the CLI README are shorter and point to these guides.
+
+### Voice interview in English
+- At [/en/voice](https://userubrica.vercel.app/en/voice), with dictation in English and answers saved apart from the Portuguese ones. The `rubrica-voz` skill recognizes the English interview and observes the voice in the language of the answers.
+
 ## 1.5.0 — 2026-10-25
 
 The admin panel's **Publish** button (**Publicar**) now works without GitHub, the AI agent can work on the published site, and `publicar` is safe to run on another computer.

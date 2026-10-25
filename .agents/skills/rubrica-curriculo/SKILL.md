@@ -80,3 +80,6 @@ Monte `plano.json` (formato em `../rubrica/references/plano.md`) com `"origem": 
 - `home` com `home_metrics`, se os números do topo mudarem (isso afeta também a home: avise).
 
 Depois passe para a skill `rubrica`: `$RB aplicar-plano .rubrica/planos/<pasta>/plano.json --verificar`, mostre a prévia, espere o "ok" e aplique. O currículo aparece no site no próximo `publicar-site`, que só roda a pedido.
+
+## Quando o Rubrica não faz
+Se a pessoa pedir algo que o Rubrica não suporta, ou algo quebrar (erro fora dos códigos conhecidos, comando que faz diferente do descrito), siga `../rubrica/references/issue.md`: você decide se é **bug** ou **pedido**, procura uma issue parecida, escreve o rascunho sem dados privados e, com o "ok" da pessoa, abre no GitHub do Rubrica com o `gh` ou entrega um link já preenchido.

@@ -93,3 +93,6 @@ As respostas profissionais (A1, B1 a B3, C1 a C3) ficam em `.rubrica/voz/` como 
 - Toda correção de tom ("eu não falaria assim") vira uma linha em `## Correções aprendidas` com data, e o traço correspondente é ajustado (ou criado como "declarado pela pessoa").
 - Muitas correções no mesmo sentido? Proponha refazer a extração com um texto colado novo.
 - As estrategistas releem o perfil antes de cada texto e colocam no contexto **os traços, os contrastes, os vetos e os trechos literais**. Quando der, prefira trechos de assuntos diferentes do pedido, porque o modelo copia o assunto em vez do jeito. Quando todos forem do mesmo tema (comum em quem fala só do trabalho), use-os assim mesmo e cuide de não reaproveitar as frases.
+
+## Quando o Rubrica não faz
+Se a pessoa pedir algo que o Rubrica não suporta, ou algo quebrar (erro fora dos códigos conhecidos, comando que faz diferente do descrito), siga `../rubrica/references/issue.md`: você decide se é **bug** ou **pedido**, procura uma issue parecida, escreve o rascunho sem dados privados e, com o "ok" da pessoa, abre no GitHub do Rubrica com o `gh` ou entrega um link já preenchido.

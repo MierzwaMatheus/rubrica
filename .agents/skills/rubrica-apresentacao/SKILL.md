@@ -81,3 +81,6 @@ Reescreva cada texto em en-US com os mesmos fatos e no ritmo natural do inglês:
 
 ### 8. Plano e aplicação ⏸
 Monte `plano.json` (formato em `../rubrica/references/plano.md`) com `"origem": "rubrica-apresentacao"` e os passos de `campos.md`: `textos`, `perfil` (`role` + `roleTranslations`), `home` (um passo por chave: `about_text`, `home_metrics`, `work_principles`, `availability_status`) e `config` (SEO). Depois passe para a skill `rubrica`: `$RB aplicar-plano .rubrica/planos/<pasta>/plano.json --verificar`, mostre a prévia, espere o "ok" e aplique. Os textos fixos valem na hora. Perfil, blocos da home e SEO entram no próximo `publicar-site`, que só roda a pedido. **`home_metrics` também é o topo do currículo:** avise a pessoa.
+
+## Quando o Rubrica não faz
+Se a pessoa pedir algo que o Rubrica não suporta, ou algo quebrar (erro fora dos códigos conhecidos, comando que faz diferente do descrito), siga `../rubrica/references/issue.md`: você decide se é **bug** ou **pedido**, procura uma issue parecida, escreve o rascunho sem dados privados e, com o "ok" da pessoa, abre no GitHub do Rubrica com o `gh` ou entrega um link já preenchido.

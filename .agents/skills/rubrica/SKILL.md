@@ -136,3 +136,6 @@ O site é gerado no build da Vercel. Depois de mudanças de conteúdo:
 - `remove` é exclusão reversível (vai para a lixeira; `--lixeira` mostra). `restore` exige papel root.
 - Não mexa em usuários e papéis (`users:*`), checkouts, pagamentos (Asaas) nem `proposals:resetPassword` sem pedido explícito e confirmação: mexem com acesso e dinheiro.
 - Esta skill é para **conteúdo**. Layout, componentes e estilos são código do repositório.
+
+## Quando o Rubrica não faz
+Se a pessoa pedir algo que o Rubrica não suporta, ou algo quebrar (erro fora dos códigos conhecidos, comando que faz diferente do descrito), siga `references/issue.md`: você decide se é **bug** ou **pedido**, procura uma issue parecida, escreve o rascunho sem dados privados e, com o "ok" da pessoa, abre no GitHub do Rubrica com o `gh` ou entrega um link já preenchido.

@@ -125,10 +125,46 @@ def ler_env(caminho):
 
 _CONVEX = None
 _AMBIENTE = None
+_PRODUCAO = False
 
 DESCRICAO_AMBIENTE = {"desenvolvimento": "de desenvolvimento", "local": "local (só nesta máquina)"}
 AVISO_DEV = ("Este Convex é {amb}: o site no ar não muda. Para mexer no site publicado, "
              "defina RUBRICA_CONVEX_URL com a URL do Convex de produção.")
+AVISO_DEV_COM_PRODUCAO = ("Este Convex é {amb}: o site no ar não muda. Para mexer no site publicado "
+                          "({url}), rode o comando com --producao.")
+AVISO_PRODUCAO = "Logado no site publicado. Nos próximos comandos, use --producao (ou RUBRICA_AMBIENTE=producao)."
+
+
+def pedir_producao():
+    """Os próximos comandos usam o Convex do site publicado (o que o `publicar` gravou)."""
+    global _PRODUCAO, _CONVEX, _AMBIENTE
+    _PRODUCAO = True
+    _CONVEX = None
+    _AMBIENTE = None
+
+
+def _quer_producao():
+    return _PRODUCAO or os.environ.get("RUBRICA_AMBIENTE", "").strip().lower() in ("producao", "produção", "prod")
+
+
+def url_producao():
+    """URL do Convex de produção gravada pelo `npx create-rubrica publicar` no rubrica.json, se houver."""
+    raiz = raiz_projeto()
+    if not raiz:
+        return None
+    try:
+        with open(os.path.join(raiz, "rubrica.json"), encoding="utf-8") as f:
+            url = ((json.load(f).get("producao") or {}).get("convexUrl") or "").strip()
+    except (OSError, ValueError, AttributeError):
+        return None
+    return url.rstrip("/") or None
+
+
+def aviso_dev(amb):
+    prod = url_producao()
+    if prod:
+        return AVISO_DEV_COM_PRODUCAO.format(amb=DESCRICAO_AMBIENTE[amb], url=prod)
+    return AVISO_DEV.format(amb=DESCRICAO_AMBIENTE[amb])
 
 
 def ambiente():
@@ -144,7 +180,8 @@ def _ambiente_do_deployment(dep):
 
 
 def convex():
-    """(url, origem) do Convex usado. Ordem: RUBRICA_CONVEX_URL, depois
+    """(url, origem) do Convex usado. Ordem: RUBRICA_CONVEX_URL; com --producao (ou
+    RUBRICA_AMBIENTE=producao), a produção gravada no rubrica.json pelo `publicar`; senão
     VITE_CONVEX_URL/CONVEX_URL do .env.local do projeto."""
     global _CONVEX, _AMBIENTE
     if _CONVEX:
@@ -158,6 +195,15 @@ def convex():
     if not raiz:
         raise Falha("Não achei o projeto Rubrica (nenhum rubrica.config.ts acima desta pasta). "
                     "Rode de dentro do projeto ou defina RUBRICA_PROJECT.", 3)
+    if _quer_producao():
+        prod = url_producao()
+        if not prod:
+            raise Falha("Este projeto ainda não tem o endereço do site publicado. Publique com "
+                        "`npx create-rubrica publicar` (ou rode de novo, se já publicou) ou defina "
+                        "RUBRICA_CONVEX_URL com a URL do Convex de produção.", 3)
+        _CONVEX = (prod, f"{raiz}/rubrica.json (site publicado)")
+        _AMBIENTE = "produção"
+        return _CONVEX
     vals = ler_env(os.path.join(raiz, ".env.local"))
     url = vals.get("VITE_CONVEX_URL") or vals.get("CONVEX_URL")
     if not url:
@@ -293,7 +339,7 @@ def avisar_ambiente():
     _AVISOU = True
     amb = ambiente()
     if amb in ("desenvolvimento", "local"):
-        sys.stderr.write(f"ℹ Gravando em {convex()[0]}. " + AVISO_DEV.format(amb=DESCRICAO_AMBIENTE[amb]) + "\n")
+        sys.stderr.write(f"ℹ Gravando em {convex()[0]}. " + aviso_dev(amb) + "\n")
 
 
 def chamar(tipo, caminho, args=None, _tentativa=0):
@@ -520,7 +566,33 @@ def resolver_capa(a, args):
 
 # ------------------------------------------------------------------ sessão: comandos
 
+def _escolher_site_no_login(a):
+    """Projeto já publicado e nada escolhido: pergunta se o login é no site publicado ou no do computador."""
+    if getattr(a, "producao", False):
+        pedir_producao()
+        return
+    if a.senha_stdin or os.environ.get("RUBRICA_CONVEX_URL") or os.environ.get("RUBRICA_AMBIENTE"):
+        return
+    prod = url_producao()
+    if not prod or not sys.stdin.isatty():
+        return
+    try:
+        dev = convex()[0]
+    except Falha:
+        dev = "sem .env.local"
+    sys.stderr.write("Em qual site você quer entrar?\n"
+                     f"  1. Site publicado ({prod})\n"
+                     f"  2. Site do computador ({dev})\n")
+    while True:
+        escolha = input("Escolha 1 ou 2: ").strip()
+        if escolha in ("1", "2"):
+            break
+    if escolha == "1":
+        pedir_producao()
+
+
 def c_login(a):
+    _escolher_site_no_login(a)
     email = a.email or input("E-mail do admin: ").strip()
     if a.senha_stdin:
         senha = sys.stdin.readline().rstrip("\n")
@@ -537,7 +609,8 @@ def c_login(a):
     gravar_sessao({"email": email, "token": t["token"], "refreshToken": t["refreshToken"]})
     papel = chamar("query", "users:getMyRole")
     saida({"ok": True, "conta": email, "convex": convex()[0], "ambiente": ambiente(),
-           "papel": (papel or {}).get("role") if isinstance(papel, dict) else papel})
+           "papel": (papel or {}).get("role") if isinstance(papel, dict) else papel,
+           **({"aviso": AVISO_PRODUCAO} if _quer_producao() else {})})
 
 
 def c_status(a):
@@ -545,8 +618,11 @@ def c_status(a):
     amb = ambiente()
     base = {"projeto": raiz_projeto(), "convex": url, "convexOrigem": origem, "ambiente": amb,
             "site": url_site()}
+    prod = url_producao()
+    if prod and prod != url:
+        base["producao"] = prod
     if amb in ("desenvolvimento", "local"):
-        base["aviso"] = AVISO_DEV.format(amb=DESCRICAO_AMBIENTE[amb])
+        base["aviso"] = aviso_dev(amb)
     elif amb == "desconhecido":
         base["aviso"] = ("Não deu para saber se este Convex é de produção ou de desenvolvimento "
                          "(sem CONVEX_DEPLOYMENT no .env.local). Confirme com a pessoa antes de gravar.")
@@ -1358,6 +1434,8 @@ def parser():
 
     def cmd(nome, fn, ajuda):
         sp = sub.add_parser(nome, help=ajuda)
+        sp.add_argument("--producao", action="store_true",
+                        help="usa o Convex do site publicado (gravado pelo npx create-rubrica publicar)")
         sp.set_defaults(fn=fn)
         return sp
 
@@ -1497,6 +1575,8 @@ def parser():
 
 def main():
     a = parser().parse_args()
+    if a.producao:
+        pedir_producao()
     try:
         a.fn(a)
     except Falha as e:

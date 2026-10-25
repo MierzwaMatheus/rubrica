@@ -28,6 +28,10 @@ jobs:
         run: pnpm exec tsc --noEmit
       - name: Testes
         run: pnpm exec vitest run
+      - name: Testes das skills (Python)
+        run: |
+          python3 -m unittest discover -s .agents/skills/rubrica/tests
+          python3 -m unittest discover -s .agents/skills/rubrica-voz/tests
 
   cli:
     name: CLI (tipos, testes e build)

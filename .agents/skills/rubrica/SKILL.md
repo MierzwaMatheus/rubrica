@@ -24,11 +24,10 @@ RB="python3 .agents/skills/rubrica/scripts/rubrica.py"
 
 O script acha sozinho o projeto (sobe até o `rubrica.config.ts`), o Convex (`VITE_CONVEX_URL` do `.env.local`) e o endereço do site.
 
-**Dev ou produção.** O `.env.local` costuma apontar para o Convex de **desenvolvimento**, e o site no ar usa o de **produção**. Mexer no de dev não muda o site publicado. Para trabalhar no site no ar, peça à pessoa a URL do Convex de produção (no painel do Convex, deployment *Production* → *Settings* → *URL*, ou a `VITE_CONVEX_URL` configurada na Vercel) e rode com ela:
+**Dev ou produção.** O `.env.local` aponta para o Convex de **desenvolvimento** (o site do computador), e o site no ar usa o de **produção**. Mexer no de dev não muda o site publicado. Quando a pessoa pedir algo no site, pergunte se é no site publicado ou no do computador, se não estiver claro.
 
-```bash
-export RUBRICA_CONVEX_URL="https://<deployment-de-producao>.convex.cloud"
-```
+- **Site publicado:** acrescente `--producao` a cada comando (`$RB status --producao`, `$RB textos --producao`...), ou `export RUBRICA_AMBIENTE=producao` uma vez. O endereço vem do `rubrica.json`, gravado pelo `npx create-rubrica publicar`. Se o `status` disser que o projeto não tem esse endereço, peça para a pessoa rodar o `publicar` de novo (ele recupera o endereço) ou use a URL do Convex de produção direto: `export RUBRICA_CONVEX_URL="https://<deployment-de-producao>.convex.cloud"`.
+- **Site do computador:** sem nada a mais. O `status` mostra em `producao` o endereço do site publicado, quando existe.
 
 Códigos de saída: `3` = projeto/Convex não encontrado, `4` = sem login, `5` = sem permissão (repasse à pessoa), `2` = bloqueado pela skill, `7` = rede. Os erros saem em português no stderr: mostre-os, não contorne.
 
@@ -60,7 +59,7 @@ O plano é aplicado do jeito que está. Se a pessoa quiser mudar algum texto, vo
    ```
    python3 .agents/skills/rubrica/scripts/rubrica.py login --email <email-do-admin>
    ```
-   (No Claude Code ela pode digitar `! ` antes do comando, no próprio prompt.) Depois confira com `$RB status`. A sessão renova sozinha e fica em `~/.config/rubrica-skill/`, uma por Convex; nunca mostre esse arquivo. `logout` apaga.
+   Se o projeto já foi publicado, o login pergunta se ela quer entrar no site publicado ou no do computador. Para ir direto ao publicado, acrescente `--producao`. (No Claude Code ela pode digitar `! ` antes do comando, no próprio prompt.) Depois confira com `$RB status` (com `--producao`, se ela entrou no publicado). A sessão renova sozinha e fica em `~/.config/rubrica-skill/`, uma por Convex; nunca mostre esse arquivo. `logout` apaga.
 
 ## Regras de escrita
 - **Leia antes de mudar** e mostre um plano curto (o que muda, antes → depois). Espere o "ok" da pessoa antes de gravar. Toda escrita devolve `antes`/`depois`: confirme com ela.

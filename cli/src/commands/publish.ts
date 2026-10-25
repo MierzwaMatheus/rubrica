@@ -31,6 +31,8 @@ const DEPLOY_KEY_NAME = "rubrica-vercel";
 /** Integrações do ambiente do computador que valem igual na produção. */
 const COPIED_ENV = ["TELEGRAM_BOT_TOKEN", "TELEGRAM_ADMIN_CHAT_ID", "OPENROUTER_API_KEY"];
 const VERCELIGNORE = ".env*\n!.env.example\nnode_modules\n.stryker-tmp\n";
+/** Onde o `vercel env pull` grava as variáveis de produção (dentro de .vercel/, fora do git e do .env.local). */
+const PROD_ENV_FILE = path.join(".vercel", ".env.production.local");
 
 function errorOutput(err: unknown): string {
   const e = err as { stdout?: Buffer; stderr?: Buffer; message?: string };
@@ -71,6 +73,32 @@ export async function runPublish(deps: RunPublishDeps = {}): Promise<void> {
   const setProdEnv = (key: string, value: string) => convex(["env", "set", "--prod", "--", key, value]);
   const runProd = (fn: string, args: unknown) => convex(["run", "--prod", fn, JSON.stringify(args)]);
   const exists = (p: string) => fs.access(path.join(cwd, p)).then(() => true, () => false);
+
+  /**
+   * Grava no rubrica.json onde está o site publicado. A skill `rubrica` usa esse endereço
+   * para entrar no site no ar (`--producao`). Não é segredo: a URL vai dentro do site.
+   */
+  const saveProduction = async (convexUrl: string, siteUrl: string) => {
+    const file = path.join(cwd, "rubrica.json");
+    try {
+      const current = JSON.parse(await fs.readFile(file, "utf-8")) as Record<string, unknown>;
+      await fs.writeFile(file, JSON.stringify({ ...current, producao: { convexUrl, siteUrl } }, null, 2) + "\n");
+    } catch {
+      // rubrica.json ilegível: a publicação segue; a skill pede RUBRICA_CONVEX_URL
+    }
+  };
+
+  /** Projetos publicados antes de o endereço ir para o rubrica.json: busca na Vercel. */
+  const productionConvexFromVercel = async (): Promise<string | null> => {
+    try {
+      vercel(["env", "pull", PROD_ENV_FILE, "--environment=production", "--yes"]);
+      const pulled = await fs.readFile(path.join(cwd, PROD_ENV_FILE), "utf-8");
+      const url = /^VITE_CONVEX_URL="?([^"\n]+)"?$/m.exec(pulled)?.[1]?.trim();
+      return url || null;
+    } catch {
+      return null;
+    }
+  };
 
   try {
     await detectProject(cwd);
@@ -136,6 +164,11 @@ export async function runPublish(deps: RunPublishDeps = {}): Promise<void> {
     if (again !== true) return void cancel(NOTHING);
     if (!ensureLogin()) return;
     const siteUrl = await productionUrl();
+    const known = (state.producao as { convexUrl?: string } | undefined)?.convexUrl;
+    if (!known) {
+      const convexUrl = await productionConvexFromVercel();
+      if (convexUrl) await saveProduction(convexUrl, siteUrl);
+    }
     if (!(await deploy(siteUrl, spinner()))) return;
     outro(`Publicado de novo!\n\n  ${siteUrl}`);
     return;
@@ -269,6 +302,7 @@ export async function runPublish(deps: RunPublishDeps = {}): Promise<void> {
   for (const [key, value, sensitive] of vercelEnv) {
     vercel(["env", "add", key, "production", "--value", value, "--yes", "--force", ...(sensitive ? ["--sensitive"] : [])]);
   }
+  await saveProduction(convexUrl, siteUrl);
 
   if (!(await deploy(siteUrl, s))) return;
 

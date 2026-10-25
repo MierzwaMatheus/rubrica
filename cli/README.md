@@ -105,9 +105,10 @@ Coloca o site no ar na [Vercel](https://vercel.com) (conta gratuita), sem copiar
 2. cria o projeto na Vercel com o nome da pasta e usa o endereço `<projeto>.vercel.app`;
 3. prepara o banco de produção no Convex: cria a chave de produção, envia o backend, gera as chaves de login e copia do ambiente do computador as integrações do Telegram e do OpenRouter, a profissão e o contexto da IA;
 4. cria o admin do site publicado (você escolhe a senha) e os dados iniciais;
-5. grava as variáveis na Vercel (`VITE_CONVEX_URL`, `CONVEX_URL`, `SITE_URL`, `CONVEX_DEPLOY_KEY`) e publica.
+5. grava as variáveis na Vercel (`VITE_CONVEX_URL`, `CONVEX_URL`, `SITE_URL`, `CONVEX_DEPLOY_KEY`) e publica;
+6. anota no `rubrica.json` (em `producao`) o endereço do Convex e do site publicados. É com ele que a skill `rubrica` do agente de IA entra no site no ar (`--producao`).
 
-Depois disso, rodar de novo só publica a versão atual do projeto. O que você cadastrou no painel do computador não vai junto: o site publicado começa com os dados de exemplo e é editado pelo painel dele. A chave de produção do Asaas e o webhook de pagamentos são configurados à parte. Domínio próprio: na Vercel, em Settings → Domains.
+Depois disso, rodar de novo só publica a versão atual do projeto. Projetos publicados antes da 1.5 ganham a anotação do item 6 na próxima vez que publicarem. O que você cadastrou no painel do computador não vai junto: o site publicado começa com os dados de exemplo e é editado pelo painel dele. A chave de produção do Asaas e o webhook de pagamentos são configurados à parte. Domínio próprio: na Vercel, em Settings → Domains.
 
 Tem mais de uma conta da Vercel no computador? Escolha qual usar com `RUBRICA_VERCEL_GLOBAL_CONFIG=<pasta de config da conta> npx create-rubrica publicar` (é o `--global-config` do CLI da Vercel).
 

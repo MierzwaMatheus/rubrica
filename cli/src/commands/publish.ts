@@ -46,6 +46,11 @@ const NOTHING = "Nada foi publicado.";
 const DEPLOY_KEY_NAME = "rubrica-vercel";
 /** Integrações do ambiente do computador que valem igual na produção. */
 const COPIED_ENV = ["TELEGRAM_BOT_TOKEN", "TELEGRAM_ADMIN_CHAT_ID", "OPENROUTER_API_KEY"];
+const INTEGRATION_NAME: Record<string, string> = {
+  TELEGRAM_BOT_TOKEN: "Telegram",
+  TELEGRAM_ADMIN_CHAT_ID: "Telegram",
+  OPENROUTER_API_KEY: "OpenRouter",
+};
 const VERCELIGNORE = ".env*\n!.env.example\nnode_modules\n.stryker-tmp\n";
 /** Onde o `vercel env pull` grava as variáveis de produção (dentro de .vercel/, fora do git e do .env.local). */
 const PROD_ENV_FILE = path.join(".vercel", ".env.production.local");
@@ -247,17 +252,39 @@ export async function runPublish(deps: RunPublishDeps = {}): Promise<void> {
     return true;
   };
 
-  // ---- Publicar de novo -------------------------------------------------------
-  if (await exists(path.join(".vercel", "project.json"))) {
-    const again = await confirm({ message: "Publicar de novo com as mudanças que você fez?", initialValue: true });
-    if (again !== true) return void cancel(NOTHING);
-    if (!ensureLogin()) return;
+  /** Valor de uma variável do Convex (do computador ou da produção); vazio se não existir. */
+  const convexEnv = (key: string, prod: boolean) => {
+    try {
+      return convex(["env", "get", ...(prod ? ["--prod"] : []), key]).trim();
+    } catch {
+      return "";
+    }
+  };
+
+  /** Integrações ligadas no computador depois da primeira publicação: leva as que faltam na produção. */
+  const syncIntegrations = () => {
+    const copied = new Set<string>();
+    for (const key of COPIED_ENV) {
+      const value = convexEnv(key, false);
+      if (!value || convexEnv(key, true)) continue;
+      try {
+        setProdEnv(key, value);
+        copied.add(INTEGRATION_NAME[key]);
+      } catch {
+        // segue sem essa integração
+      }
+    }
+    if (copied.size) log.info(`Levei para o site publicado o que você ligou no computador: ${[...copied].join(" e ")}.`);
+  };
+
+  const republish = async () => {
     const siteUrl = await productionUrl();
     const known = (state.producao as { convexUrl?: string } | undefined)?.convexUrl;
     if (!known) {
       const convexUrl = await productionConvexFromVercel();
       if (convexUrl) await saveProduction(convexUrl, siteUrl);
     }
+    syncIntegrations();
     if (!hasPublishButton()) {
       const setUp = await confirm({
         message: "O botão Publicar do painel ainda não está configurado. Configurar agora? (leva 1 minuto)",
@@ -267,7 +294,55 @@ export async function runPublish(deps: RunPublishDeps = {}): Promise<void> {
     }
     if (!(await deploy(siteUrl, spinner()))) return;
     outro(`Publicado de novo!\n\n  ${siteUrl}`);
-    return;
+  };
+
+  // ---- Publicar de novo -------------------------------------------------------
+  if (await exists(path.join(".vercel", "project.json"))) {
+    const again = await confirm({ message: "Publicar de novo com as mudanças que você fez?", initialValue: true });
+    if (again !== true) return void cancel(NOTHING);
+    if (!ensureLogin()) return;
+    return republish();
+  }
+
+  // ---- Já publicado, mas sem a pasta .vercel (outro computador, clone novo) ----
+  // A pasta .vercel fica fora do git. Sem esta checagem, o caminho da primeira vez geraria
+  // chaves de login novas (todo mundo sairia do painel) e regravaria os dados do painel.
+  let productionHasAdmin = false;
+  try {
+    productionHasAdmin = convex(["run", "--prod", "users:isSetupRequired"]).trim() === "false";
+  } catch {
+    productionHasAdmin = false; // produção ainda sem funções: nunca publicado
+  }
+  if (productionHasAdmin) {
+    const relink = await confirm({
+      message: "Este site já está publicado (o banco de produção já tem admin). Ligar este computador ao projeto da Vercel e publicar de novo?",
+      initialValue: true,
+    });
+    if (relink !== true) return void cancel(NOTHING);
+    if (!ensureLogin()) return;
+    // Confere o projeto antes de ligar: o `vercel link` com um nome que não existe cria um projeto vazio.
+    let vercelKeys: string[] = [];
+    try {
+      const { id } = JSON.parse(vercel(["api", `/v9/projects/${projectName}`])) as { id: string };
+      vercelKeys = (JSON.parse(vercel(["api", `/v10/projects/${id}/env`])) as { envs: Array<{ key: string }> }).envs.map((e) => e.key);
+    } catch {
+      vercelKeys = [];
+    }
+    if (!vercelKeys.includes("CONVEX_DEPLOY_KEY")) {
+      cancel(
+        `O site está publicado, mas não achei o projeto da Vercel "${projectName}" configurado para ele na sua conta. ` +
+          `Se o projeto tem outro nome na Vercel, troque o "name" do package.json para esse nome e rode de novo. ${NOTHING}`
+      );
+      return;
+    }
+    try {
+      vercel(["link", "--yes", "--project", projectName]);
+    } catch (err) {
+      cancel(`A Vercel não deixou ligar o projeto:\n${tail(errorOutput(err))}`);
+      return;
+    }
+    if (!(await exists(".vercelignore"))) await fs.writeFile(path.join(cwd, ".vercelignore"), VERCELIGNORE);
+    return republish();
   }
 
   // ---- Primeira vez -----------------------------------------------------------

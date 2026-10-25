@@ -268,11 +268,19 @@ export async function runCreate(
     fs as Parameters<typeof defaultWriteState>[2]
   );
 
-  // Git e dependências, sem perguntar. Sem git instalado, o projeto funciona do mesmo jeito.
+  // Git (sempre na branch main) e dependências, sem perguntar. Sem git instalado, o projeto funciona do mesmo jeito.
+  let hasGit = true;
   try {
-    await execFn("git init", projectDir);
+    await execFn("git init -b main", projectDir);
   } catch {
-    log.warn("Não deu para iniciar o git (ele está instalado?). O projeto funciona sem; dá para rodar `git init` depois.");
+    try {
+      // git anterior à 2.28 não conhece o -b
+      await execFn("git init", projectDir);
+      await execFn("git symbolic-ref HEAD refs/heads/main", projectDir);
+    } catch {
+      hasGit = false;
+      log.warn("Não deu para iniciar o git (ele está instalado?). O projeto funciona sem; dá para rodar `git init` depois.");
+    }
   }
   await execFn(`${packageManager} install`, projectDir);
 
@@ -280,6 +288,25 @@ export async function runCreate(
   await removeDir(`${projectDir}/cli`, fs);
   // O site público do Rubrica vive no repositório, mas não faz parte do portfólio.
   await removeDir(`${projectDir}/site`, fs);
+
+  // Commit inicial: a branch main passa a existir e o projeto já sai pronto para ir a um repositório.
+  if (hasGit) {
+    const message = '-m "Projeto criado com create-rubrica"';
+    try {
+      await execFn("git add -A", projectDir);
+      try {
+        await execFn(`git commit -q ${message}`, projectDir);
+      } catch {
+        // git sem nome e e-mail configurados
+        await execFn(
+          `git -c user.name="create-rubrica" -c user.email="create-rubrica@users.noreply.github.com" commit -q ${message}`,
+          projectDir
+        );
+      }
+    } catch {
+      log.warn("Não deu para fazer o primeiro commit. O projeto funciona do mesmo jeito.");
+    }
+  }
 
   const devCommand = `${packageManager} run dev`;
   const nextStep = `cd ${projectName} && ${devCommand}`;

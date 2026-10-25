@@ -816,7 +816,7 @@ describe("create — git init e package install", () => {
 
   it("executa git init sem perguntar", async () => {
     const { mockExec } = await callRunCreateWithExec("npm/10");
-    expect(mockExec).toHaveBeenCalledWith("git init", "/projects/meu-portfolio");
+    expect(mockExec).toHaveBeenCalledWith("git init -b main", "/projects/meu-portfolio");
   });
 
   it("instala com o gerenciador que rodou o create", async () => {

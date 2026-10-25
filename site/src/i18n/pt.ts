@@ -235,7 +235,8 @@ export const pt = {
   docs: {
     eyebrow: "Documentação",
     nav: "Documentação",
-    guide: "Guia",
+    start: "Começar",
+    look: "Aparência",
     layouts: "Layouts",
     onThisPage: "Nesta página",
     edit: "Editar no GitHub",

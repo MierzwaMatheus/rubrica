@@ -41,19 +41,21 @@ function load(repoPath: string): Doc {
 const ALL = [...files.keys()].filter(isPublishedDoc).sort().map(load);
 const bySlug = new Map(ALL.map((d) => [d.slug, d]));
 
-const GUIDE = ["templates", "templates/cores", "templates/criando-um-layout", "atualizacao"];
+const START = ["guia/comecando", "guia/cli", "guia/publicar", "atualizacao"];
+const LOOK = ["templates", "templates/cores", "templates/criando-um-layout"];
 const LAYOUT_SLUGS = LAYOUTS.map((l) => `templates/${l.id}`);
+const listed = new Set([...START, ...LOOK, ...LAYOUT_SLUGS]);
+const pick = (slugs: string[]) => slugs.map((s) => bySlug.get(s)).filter((d): d is Doc => Boolean(d));
 
-/** Docs na ordem da navegação: o guia primeiro, depois os layouts na ordem do CLI. */
-export const DOC_GROUPS: { key: "guide" | "layouts"; docs: Doc[] }[] = [
-  {
-    key: "guide",
-    docs: [...GUIDE, ...ALL.map((d) => d.slug).filter((s) => !GUIDE.includes(s) && !LAYOUT_SLUGS.includes(s))]
-      .map((s) => bySlug.get(s))
-      .filter((d): d is Doc => Boolean(d)),
-  },
-  { key: "layouts", docs: LAYOUT_SLUGS.map((s) => bySlug.get(s)).filter((d): d is Doc => Boolean(d)) },
+/** Docs na ordem da navegação; doc novo fora das listas entra no fim de "Começar". */
+export const DOC_GROUPS: { key: "start" | "look" | "layouts"; docs: Doc[] }[] = [
+  { key: "start", docs: pick([...START, ...ALL.map((d) => d.slug).filter((s) => !listed.has(s))]) },
+  { key: "look", docs: pick(LOOK) },
+  { key: "layouts", docs: pick(LAYOUT_SLUGS) },
 ];
+
+/** Primeira página da documentação. */
+export const FIRST_DOC = "guia/comecando";
 
 export const DOCS: Doc[] = DOC_GROUPS.flatMap((g) => g.docs);
 

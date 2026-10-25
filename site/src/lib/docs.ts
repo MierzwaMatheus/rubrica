@@ -9,7 +9,7 @@ import { route } from "../i18n/routes";
 /** Caminhos relativos à raiz do repositório, sempre com "/". */
 export function isPublishedDoc(repoPath: string): boolean {
   if (repoPath.endsWith(".en.md")) return false;
-  return repoPath === "docs/atualizacao.md" || /^docs\/templates\/[^/]+\.md$/.test(repoPath);
+  return repoPath === "docs/atualizacao.md" || /^docs\/(guia|templates)\/[^/]+\.md$/.test(repoPath);
 }
 
 /** docs/templates/cores.md → templates/cores; o README de uma pasta vira a pasta. */

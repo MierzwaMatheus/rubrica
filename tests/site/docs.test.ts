@@ -19,6 +19,7 @@ describe("isPublishedDoc", () => {
     expect(isPublishedDoc("docs/atualizacao.md")).toBe(true);
     expect(isPublishedDoc("docs/templates/README.md")).toBe(true);
     expect(isPublishedDoc("docs/templates/zine.md")).toBe(true);
+    expect(isPublishedDoc("docs/guia/publicar.md")).toBe(true);
   });
 
   it("deixa de fora a tradução, a manutenção e os docs internos", () => {
@@ -34,6 +35,7 @@ describe("docSlug e docUrl", () => {
     expect(docSlug("docs/templates/README.md")).toBe("templates");
     expect(docSlug("docs/templates/cores.md")).toBe("templates/cores");
     expect(docSlug("docs/atualizacao.md")).toBe("atualizacao");
+    expect(docSlug("docs/guia/cli.md")).toBe("guia/cli");
   });
 
   it("inglês fica em /en/docs", () => {
@@ -82,6 +84,9 @@ describe("rewriteDoc", () => {
 describe("docs publicados", () => {
   const published = [
     "docs/atualizacao.md",
+    ...readdirSync(path.join(ROOT, "docs/guia"))
+      .filter((f) => f.endsWith(".md") && !f.endsWith(".en.md"))
+      .map((f) => `docs/guia/${f}`),
     ...readdirSync(path.join(ROOT, "docs/templates"))
       .filter((f) => f.endsWith(".md") && !f.endsWith(".en.md"))
       .map((f) => `docs/templates/${f}`),

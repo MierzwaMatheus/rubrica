@@ -26,7 +26,7 @@ const { html, toc } = renderMarkdown(
 const paths = { pt: docUrl(doc.slug, "pt"), en: docUrl(doc.slug, "en") };
 const firstParagraph = doc.body[lang].match(/^(?:>\s*)?_?([^\n#<!|`].{20,}?)_?$/m)?.[1] ?? "";
 const description = firstParagraph.replace(/[*_`[\]]|\([^)]*\)/g, "").slice(0, 160) || t.titleSuffix;
-const groupLabel = { guide: t.guide, layouts: t.layouts };
+const groupLabel = { start: t.start, look: t.look, layouts: t.layouts };
 ---
 
 <Base title={`${doc.title[lang]} — ${t.titleSuffix}`} description={description} lang={lang} page={paths}>

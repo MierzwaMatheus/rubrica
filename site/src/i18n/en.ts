@@ -225,7 +225,8 @@ export const en: Dict = {
   docs: {
     eyebrow: "Documentation",
     nav: "Documentation",
-    guide: "Guide",
+    start: "Get started",
+    look: "Look and feel",
     layouts: "Layouts",
     onThisPage: "On this page",
     edit: "Edit on GitHub",

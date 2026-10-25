@@ -24,7 +24,7 @@ describe.each(["pt", "en"] as const)("dicionário %s", (lang) => {
   });
 
   it("não tem texto vazio, a não ser os avisos que só existem em inglês", () => {
-    const optional = new Set(["hero.languageNote", "combinator.previewNote"]);
+    const optional = new Set(["hero.languageNote", "combinator.previewNote", "docs.translationNote"]);
     const walk = (v: unknown, at: string): string[] =>
       typeof v === "string"
         ? v.trim() || optional.has(at) ? [] : [at]

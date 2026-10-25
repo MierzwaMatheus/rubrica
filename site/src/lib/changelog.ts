@@ -46,11 +46,6 @@ function toId(version: string): string {
   return `v${parts.join("-").toLowerCase()}`;
 }
 
-/** Links relativos do changelog (./docs/x.md) apontam para o arquivo no GitHub. */
-export function resolveLinks(md: string, repo: string): string {
-  return md.replace(/\]\((?![a-z][a-z0-9+.-]*:|#|\/)(?:\.\/)?([^)\s]+)\)/gi, `](${repo}/blob/main/$1)`);
-}
-
 const MONTHS_EN = [
   "January",
   "February",

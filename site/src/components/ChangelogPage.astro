@@ -3,12 +3,14 @@
  * Novidades do Rubrica: o CHANGELOG.md da raiz, lido no build. A página muda a cada
  * publicação do site, sem chamar o GitHub no navegador.
  */
-import { marked } from "marked";
 import Base from "../layouts/Base.astro";
 import Header from "./Header.astro";
 import Footer from "./Footer.astro";
 import { REPO } from "../lib/data";
-import { formatDates, parseChangelog, resolveLinks } from "../lib/changelog";
+import { formatDates, parseChangelog } from "../lib/changelog";
+import { rewriteDoc } from "../lib/docs";
+import { imageUrl } from "../lib/docsContent";
+import { renderMarkdown } from "../lib/markdown";
 import { useDict, type Lang } from "../i18n";
 import changelogPt from "../../../CHANGELOG.md?raw";
 import changelogEn from "../../../CHANGELOG.en.md?raw";
@@ -20,7 +22,8 @@ const { lang } = Astro.props;
 const d = useDict(lang);
 const t = d.changelog;
 const { intro, versions } = parseChangelog(lang === "en" ? changelogEn : changelogPt);
-const html = (md: string) => marked.parse(resolveLinks(md, REPO), { async: false });
+const file = lang === "en" ? "CHANGELOG.en.md" : "CHANGELOG.md";
+const html = (md: string) => renderMarkdown(rewriteDoc(md, { from: file, lang, repo: REPO, asset: imageUrl })).html;
 const isSingle = (version: string) => /^\d+\.\d+\.\d+$/.test(version);
 ---
 

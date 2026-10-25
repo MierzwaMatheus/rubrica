@@ -1,10 +1,11 @@
 ---
 import { REPO } from "../lib/data";
-import { route, useDict, type Lang, type PageKey } from "../i18n";
+import { route, useDict, type Lang, type PageRef } from "../i18n";
+import { docUrl } from "../lib/docs";
 
 interface Props {
   lang: Lang;
-  page: PageKey;
+  page: PageRef;
 }
 const { lang, page } = Astro.props;
 const t = useDict(lang);
@@ -15,6 +16,7 @@ const links = [
   { href: `${home}#layouts`, label: t.header.layouts },
   { href: `${home}#esquemas`, label: t.header.schemes },
   { href: `${home}#comecar`, label: t.header.start },
+  { href: docUrl("templates", lang), label: t.header.docs },
 ];
 ---
 

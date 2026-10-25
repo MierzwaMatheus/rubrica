@@ -1,6 +1,7 @@
 ---
-import { LAYOUTS, SCHEMES, REPO } from "../lib/data";
+import { LAYOUTS, SCHEMES } from "../lib/data";
 import { fill, useDict, type Lang } from "../i18n";
+import { docUrl } from "../lib/docs";
 
 interface Props {
   lang: Lang;
@@ -51,7 +52,7 @@ const groups = [
       ))
     }
     <p class="more">
-      {t.moreBefore}{" "}<a href={`${REPO}/blob/main/docs/templates/README.md`} target="_blank" rel="noopener">{t.moreLink}</a>.
+      {t.moreBefore}{" "}<a href={docUrl("templates", Astro.props.lang)}>{t.moreLink}</a>.
     </p>
   </div>
 </section>

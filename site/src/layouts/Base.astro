@@ -1,6 +1,6 @@
 ---
 import "../styles/global.css";
-import { HTML_LANG, LANGS, route, type Lang, type PageKey } from "../i18n/routes";
+import { HTML_LANG, LANGS, route, type Lang, type PageRef } from "../i18n/routes";
 
 interface Props {
   title: string;
@@ -8,7 +8,7 @@ interface Props {
   /** Idioma da página. */
   lang: Lang;
   /** Qual página é esta: liga as versões em português e em inglês (hreflang). */
-  page: PageKey;
+  page: PageRef;
   /** Página fora dos buscadores (ex.: a entrevista de voz). */
   noindex?: boolean;
 }

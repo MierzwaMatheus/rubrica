@@ -1,6 +1,7 @@
 ---
-import { SCHEMES, REPO } from "../lib/data";
+import { SCHEMES } from "../lib/data";
 import { fill, useDict, type Lang } from "../i18n";
+import { docUrl } from "../lib/docs";
 
 interface Props {
   lang: Lang;
@@ -41,7 +42,7 @@ const roles = (["bg", "surface", "text", "primary", "accent", "accent2"] as cons
     </ul>
     <p class="more">
       {t.moreBefore}{" "}
-      <a href={`${REPO}/blob/main/docs/templates/cores.md`} target="_blank" rel="noopener">{t.moreLink}</a>.
+      <a href={docUrl("templates/cores", Astro.props.lang)}>{t.moreLink}</a>.
     </p>
   </div>
 </section>

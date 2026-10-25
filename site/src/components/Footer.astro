@@ -1,6 +1,7 @@
 ---
 import { REPO } from "../lib/data";
 import { route, useDict, type Lang } from "../i18n";
+import { docUrl } from "../lib/docs";
 
 interface Props {
   lang: Lang;
@@ -9,8 +10,8 @@ const { lang } = Astro.props;
 const t = useDict(lang);
 const links = [
   { href: REPO, label: t.footer.repo },
-  { href: `${REPO}/blob/main/docs/templates/README.md`, label: t.footer.templates },
-  { href: `${REPO}/blob/main/docs/templates/cores.md`, label: t.footer.colors },
+  { href: docUrl("templates", lang), label: t.footer.templates },
+  { href: docUrl("templates/cores", lang), label: t.footer.colors },
   { href: route("changelog", lang), label: t.footer.changelog },
   { href: "https://www.npmjs.com/package/create-rubrica", label: t.footer.npm },
 ];

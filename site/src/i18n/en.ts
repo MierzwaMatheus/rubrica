@@ -24,6 +24,7 @@ export const en: Dict = {
     layouts: "Layouts",
     schemes: "Schemes",
     start: "Get started",
+    docs: "Docs",
     switchLabel: "Português",
     switchAria: "Ler esta página em português",
   },
@@ -146,7 +147,7 @@ export const en: Dict = {
     light: "light",
     dark: "dark",
     moreBefore: "Every page of every layout is described in the",
-    moreLink: "template guide (in Portuguese)",
+    moreLink: "template guide",
   },
   schemes: {
     eyebrow: "Color schemes",
@@ -158,7 +159,7 @@ export const en: Dict = {
     dark: "dark",
     stripAria: "{name} in {mode} mode",
     moreBefore: "The 11 color roles of each scheme, the textures and the admin panel colors are in",
-    moreLink: "Color schemes (in Portuguese)",
+    moreLink: "Color schemes",
   },
   features: {
     eyebrow: "What comes ready",
@@ -220,6 +221,17 @@ export const en: Dict = {
     versions: "Versions",
     latest: "Latest",
     releaseNotes: "Release notes",
+  },
+  docs: {
+    eyebrow: "Documentation",
+    nav: "Documentation",
+    guide: "Guide",
+    layouts: "Layouts",
+    onThisPage: "On this page",
+    edit: "Edit on GitHub",
+    titleSuffix: "Rubrica documentation",
+    translationNote:
+      "Translated from the Portuguese original. Labels from the CLI and the admin panel stay in Portuguese, as you will see them.",
   },
   pages: { "/": "Home", "/curriculo": "Resume", "/portfolio": "Portfolio", "/sobre": "About", "/blog": "Blog" },
   catalog: {

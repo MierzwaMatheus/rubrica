@@ -17,6 +17,12 @@ export const ROUTES = {
 
 export type PageKey = keyof typeof ROUTES;
 
-export function route(page: PageKey, lang: Lang): string {
-  return ROUTES[page][lang];
+/** Endereço de uma página por idioma, para páginas fora de ROUTES (ex.: os docs). */
+export type Paths = Readonly<Record<Lang, string>>;
+
+/** Uma página fixa (chave de ROUTES) ou os endereços dela em cada idioma. */
+export type PageRef = PageKey | Paths;
+
+export function route(page: PageRef, lang: Lang): string {
+  return typeof page === "string" ? ROUTES[page][lang] : page[lang];
 }

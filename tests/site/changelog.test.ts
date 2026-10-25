@@ -2,9 +2,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { formatDates, parseChangelog, resolveLinks } from "../../site/src/lib/changelog";
-
-const REPO = "https://github.com/MierzwaMatheus/rubrica";
+import { formatDates, parseChangelog } from "../../site/src/lib/changelog";
 
 const SAMPLE = `# Changelog
 
@@ -71,19 +69,6 @@ describe("parseChangelog", () => {
       expect(v.body.length).toBeGreaterThan(0);
     }
     expect(new Set(versions.map((v) => v.id)).size).toBe(versions.length);
-  });
-});
-
-describe("resolveLinks", () => {
-  it("aponta links relativos para o arquivo no GitHub", () => {
-    expect(resolveLinks("[a](./docs/x.md) e [b](docs/y.md)", REPO)).toBe(
-      `[a](${REPO}/blob/main/docs/x.md) e [b](${REPO}/blob/main/docs/y.md)`,
-    );
-  });
-
-  it("mantém links absolutos e âncoras", () => {
-    const md = "[r](https://exemplo.com/a) [m](mailto:a@b.c) [s](#v1-0-0)";
-    expect(resolveLinks(md, REPO)).toBe(md);
   });
 });
 

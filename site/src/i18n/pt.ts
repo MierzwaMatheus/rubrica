@@ -32,6 +32,7 @@ export const pt = {
     layouts: "Layouts",
     schemes: "Esquemas",
     start: "Começar",
+    docs: "Docs",
     switchLabel: "English",
     switchAria: "Read this page in English",
   },
@@ -230,6 +231,17 @@ export const pt = {
     versions: "Versões",
     latest: "Mais recente",
     releaseNotes: "Notas da release",
+  },
+  docs: {
+    eyebrow: "Documentação",
+    nav: "Documentação",
+    guide: "Guia",
+    layouts: "Layouts",
+    onThisPage: "Nesta página",
+    edit: "Editar no GitHub",
+    titleSuffix: "Documentação do Rubrica",
+    /** Aviso só para quem lê em inglês; vazio em português. */
+    translationNote: "",
   },
   /** Nomes das páginas do preview. */
   pages: { "/": "Início", "/curriculo": "Currículo", "/portfolio": "Portfólio", "/sobre": "Sobre", "/blog": "Blog" } as Record<

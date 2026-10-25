@@ -2,6 +2,26 @@
 
 O que mudou em cada versão do Rubrica (template e CLI `create-rubrica`). Detalhes de cada uma nas [notas da release](https://github.com/MierzwaMatheus/rubrica/releases). Para atualizar um projeto existente, veja [Atualizando o seu Rubrica](./docs/atualizacao.md).
 
+## 1.7.0 — 2026-10-25
+
+Propostas com preço por item, desconto e brinde. As skills passam a abrir issue quando o Rubrica não faz o que foi pedido, e os projetos ganham instruções para agentes de IA.
+
+**Vindo da 1.6:**
+- Atualize com `npx create-rubrica@latest update`. Não precisa de versão nova do CLI.
+- O backend mudou (`convex/`): publique no Convex do computador com `npx convex dev --once` e, no site no ar, com `npx create-rubrica publicar`. Os campos novos são opcionais: as propostas existentes continuam iguais.
+- Para o desconto aparecer em contratos de modelos já salvos, acrescente `{{discount}}` ao modelo em `/admin/contracts`.
+
+### Propostas
+- **Preço por item:** cada item do escopo pode ter preço, mostrado ao lado dele na proposta e no contrato.
+- **Desconto:** campo opcional de valor original (antes do desconto). A proposta mostra o original riscado, o desconto em R$ e % e o valor final. O admin sugere o valor original pela soma dos itens e avisa quando a soma não fecha.
+- **Brinde:** marque um item com preço como brinde. Na proposta, ele aparece com o badge "Brinde", o preço riscado e R$ 0,00.
+- O valor do projeto continua sendo o valor final, usado no contrato e nas formas de pagamento. O contrato cita o desconto e os brindes, e os modelos de contrato ganham as variáveis `{{original_value}}` e `{{discount}}`.
+
+### Skills e agentes
+- **Abrir issue:** quando a pessoa pede algo que o Rubrica não suporta, ou algo quebra, as skills decidem se é bug ou pedido, procuram uma issue parecida e, com o "ok" da pessoa, abrem no GitHub do Rubrica (pelo `gh` ou por um link preenchido), sem dados privados.
+- A skill `rubrica` sabe mexer em preços, desconto e brinde das propostas.
+- **`AGENTS.md` e `CLAUDE.md`** na raiz do projeto: ensinam agentes como Claude Code, Codex e Cursor a atualizar o Rubrica (incluindo os arquivos `.rubrica-new`), o que eles podem rodar no CLI e o que fica com você. Veja "Com um agente de IA" em [Comandos do CLI](./docs/guia/cli.md).
+
 ## 1.6.0 — 2026-10-25
 
 O site do Rubrica ganha versão em inglês, a página de novidades e a documentação, com três guias novos: começar, comandos do CLI e publicar.

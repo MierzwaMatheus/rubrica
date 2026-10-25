@@ -68,3 +68,6 @@ Depois passe para a skill `rubrica`: `$RB aplicar-plano .rubrica/planos/<pasta>/
 ## Opcional: texto curto de divulgação
 
 Só se a pessoa pedir, escreva um texto curto para redes a partir do post final: gancho nas duas primeiras linhas, 3 ou 4 parágrafos de 1 ou 2 frases, a ação no fim e o link fora do corpo se a rede punir links. Passe pela `rubrica-pilar` e salve em `divulgacao.md`. Ele não entra no plano.
+
+## Quando o Rubrica não faz
+Se a pessoa pedir algo que o Rubrica não suporta, ou algo quebrar (erro fora dos códigos conhecidos, comando que faz diferente do descrito), siga `../rubrica/references/issue.md`: você decide se é **bug** ou **pedido**, procura uma issue parecida, escreve o rascunho sem dados privados e, com o "ok" da pessoa, abre no GitHub do Rubrica com o `gh` ou entrega um link já preenchido.

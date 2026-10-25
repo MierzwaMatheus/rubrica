@@ -84,3 +84,6 @@ Depois passe para a skill `rubrica`: `$RB aplicar-plano .rubrica/planos/<pasta>/
 
 ## Quando o resultado ainda não existe
 Se o projeto é recente e não há resultado medido, escreva o case com o que existe (escopo, decisões, entrega) e, se a pessoa confirmar que está medindo, diga isso no texto ("lançado em <mês>; resultados em medição"). Se não está, não fale de medição. Registre em `inventario.md` o que medir e quando voltar ao case.
+
+## Quando o Rubrica não faz
+Se a pessoa pedir algo que o Rubrica não suporta, ou algo quebrar (erro fora dos códigos conhecidos, comando que faz diferente do descrito), siga `../rubrica/references/issue.md`: você decide se é **bug** ou **pedido**, procura uma issue parecida, escreve o rascunho sem dados privados e, com o "ok" da pessoa, abre no GitHub do Rubrica com o `gh` ou entrega um link já preenchido.

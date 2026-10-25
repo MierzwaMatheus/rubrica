@@ -114,6 +114,16 @@ O corpo do post é **HTML**. Use só `h2 h3 p ul ol li strong em a code pre bloc
 - Capa de post: `--capa arquivo` ou `--imagem-id <id>`. Imagem no corpo: suba antes e use a `url` no HTML pt-BR e no en-US (alt traduzido).
 - Sempre escreva o `alt`, descritivo e sem "imagem de".
 
+## Propostas
+- `$RB listar propostas [--status all|accepted|pending]` / `$RB ler propostas <slug-ou-id>`. Alterar: `proposals:create` e `proposals:update` (`$RB funcoes --modulo proposals` mostra os `args`).
+- **Proposta aceita não muda** (o servidor recusa): para outra condição, crie uma proposta nova. Cada edição de uma pendente gera uma versão nova.
+- Valores em reais, como número (`4000`, `1250.5`). **`investmentValue` é sempre o valor final**: é o que vai para o contrato e para as formas de pagamento.
+- **Preço de cada item** (opcional): `scopePrices`, uma lista na mesma ordem e com o mesmo tamanho de `scope`, com `null` no item sem preço (`"scope": ["Site", "Logo"], "scopePrices": [4000, 1000]`). Mudou o `scope` (item novo, removido ou fora de ordem)? Mande o `scopePrices` realinhado na mesma chamada: o servidor recusa preços desalinhados. `[]` tira os preços.
+- **Desconto** (opcional): `originalValue`, o valor antes do desconto, maior que `investmentValue`. Na proposta aparece o original riscado, o desconto em R$ e % e o valor final. Para tirar, mande `originalValue: null` (com `giftIndexes: []`, se houver brinde).
+- **Brinde**: `giftIndexes`, as posições (a partir de 0) dos itens do `scope` que saem sem custo. Cada brinde precisa ter preço em `scopePrices` e de um `originalValue`, e a soma dos brindes não pode passar do desconto (`originalValue − investmentValue`). Na proposta, o item aparece com o badge "Brinde", o preço riscado e R$ 0,00.
+- Não invente preço nem desconto: valores vêm da pessoa. Ao propor um desconto, mostre a conta (original, desconto, final) e espere o "ok".
+- `proposals:resetPassword` fica fora (ver Limites).
+
 ## Contatos e o resto
 - `$RB painel`: números, contatos novos e depoimentos pendentes. Bom ponto de partida para "o que tem de novo".
 - `$RB listar <tipo>` / `$RB ler <tipo> <ref>`. Tipos: `posts projetos propostas contatos depoimentos envios curriculo servicos faq rotina checkouts imagens pastas home ia-resumos contratos usuarios`.
@@ -136,3 +146,6 @@ O site é gerado no build da Vercel. Depois de mudanças de conteúdo:
 - `remove` é exclusão reversível (vai para a lixeira; `--lixeira` mostra). `restore` exige papel root.
 - Não mexa em usuários e papéis (`users:*`), checkouts, pagamentos (Asaas) nem `proposals:resetPassword` sem pedido explícito e confirmação: mexem com acesso e dinheiro.
 - Esta skill é para **conteúdo**. Layout, componentes e estilos são código do repositório.
+
+## Quando o Rubrica não faz
+Se a pessoa pedir algo que o Rubrica não suporta, ou algo quebrar (erro fora dos códigos conhecidos, comando que faz diferente do descrito), siga `references/issue.md`: você decide se é **bug** ou **pedido**, procura uma issue parecida, escreve o rascunho sem dados privados e, com o "ok" da pessoa, abre no GitHub do Rubrica com o `gh` ou entrega um link já preenchido.

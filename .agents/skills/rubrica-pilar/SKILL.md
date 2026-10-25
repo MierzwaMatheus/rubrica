@@ -120,3 +120,6 @@ Veredito: APROVADO | AJUSTADO | REPROVADO
 - **REPROVADO:** sobrou resto de chat ou placeholder, algum fato está ✖ e não pôde ser corrigido pela fonte, algum fato "?" continua no texto, ou a tradução diverge nos fatos. O texto não segue para o plano até isso ser resolvido com o autor.
 - **AJUSTADO:** houve correções, e a skill que chamou mostra o relatório ao autor junto do texto.
 - **APROVADO:** nada a corrigir.
+
+## Quando o Rubrica não faz
+Se a pessoa pedir algo que o Rubrica não suporta, ou algo quebrar (erro fora dos códigos conhecidos, comando que faz diferente do descrito), siga `../rubrica/references/issue.md`: você decide se é **bug** ou **pedido**, procura uma issue parecida, escreve o rascunho sem dados privados e, com o "ok" da pessoa, abre no GitHub do Rubrica com o `gh` ou entrega um link já preenchido.

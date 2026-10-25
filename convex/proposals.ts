@@ -8,6 +8,7 @@ import { getAuthUserId } from '@convex-dev/auth/server';
 import { requirePlugin, isPluginEnabled } from './plugins';
 import { softDeleteDoc, restoreDoc } from './lib/softDelete';
 import { escapeTgHtml } from './lib/security';
+import { validateDiscount } from './lib/proposalDiscount';
 
 async function hashPassword(password: string): Promise<string> {
   const salt = crypto.getRandomValues(new Uint8Array(16));
@@ -39,6 +40,7 @@ async function verifyPassword(password: string, stored: string): Promise<boolean
 const TEN_DAYS_MS = 10 * 24 * 60 * 60 * 1000;
 
 const timelineItemValidator = v.object({ step: v.string(), period: v.string() });
+const scopePricesValidator = v.array(v.union(v.number(), v.null()));
 
 export const listAdmin = query({
   args: {
@@ -219,6 +221,9 @@ export const create = mutation({
     timeline: v.array(timelineItemValidator),
     deliveryDate: v.string(),
     investmentValue: v.number(),
+    scopePrices: v.optional(scopePricesValidator),
+    originalValue: v.optional(v.number()),
+    giftIndexes: v.optional(v.array(v.number())),
     paymentMethods: v.array(v.string()),
     conditions: v.array(v.string()),
     conditionsTranslations: v.optional(
@@ -241,10 +246,14 @@ export const create = mutation({
       .unique();
     if (existing) throw new Error('Slug already in use');
 
+    validateDiscount({ ...args, scopeLength: args.scope.length });
+
     const now = Date.now();
     const hashedPassword = args.password ? await hashPassword(args.password) : undefined;
     const id = await ctx.db.insert('proposals', {
       ...args,
+      scopePrices: args.scopePrices?.some((p) => p !== null) ? args.scopePrices : undefined,
+      giftIndexes: args.giftIndexes?.length ? args.giftIndexes : undefined,
       password: hashedPassword,
       userId,
       version: 1,
@@ -331,6 +340,10 @@ export const update = mutation({
     timeline: v.optional(v.array(timelineItemValidator)),
     deliveryDate: v.optional(v.string()),
     investmentValue: v.optional(v.number()),
+    // null tira o desconto; [] tira os preços ou os brindes.
+    scopePrices: v.optional(scopePricesValidator),
+    originalValue: v.optional(v.union(v.number(), v.null())),
+    giftIndexes: v.optional(v.array(v.number())),
     paymentMethods: v.optional(v.array(v.string())),
     conditions: v.optional(v.array(v.string())),
     password: v.optional(v.string()),
@@ -346,7 +359,20 @@ export const update = mutation({
     if (!proposal) throw new Error('Proposal not found');
     if (proposal.isAccepted) throw new Error('Accepted proposals are immutable');
 
-    const { id, password: plainPassword, ...fields } = args;
+    const { id, password: plainPassword, scopePrices, originalValue, giftIndexes, ...fields } = args;
+
+    // Valida preços e desconto contra o estado final (o que vem no pedido + o que já está salvo).
+    const nextPrices = scopePrices === undefined ? proposal.scopePrices : scopePrices.length ? scopePrices : undefined;
+    const nextOriginal = originalValue === undefined ? proposal.originalValue : originalValue ?? undefined;
+    const nextGifts = giftIndexes === undefined ? proposal.giftIndexes : giftIndexes;
+    validateDiscount({
+      investmentValue: fields.investmentValue ?? proposal.investmentValue,
+      originalValue: nextOriginal,
+      scopePrices: nextPrices,
+      giftIndexes: nextGifts,
+      scopeLength: (fields.scope ?? proposal.scope).length,
+    });
+
     const newVersion = proposal.version + 1;
     const hashedPassword = plainPassword ? await hashPassword(plainPassword) : undefined;
 
@@ -354,6 +380,11 @@ export const update = mutation({
 
     await ctx.db.patch(id, {
       ...fields,
+      ...(scopePrices !== undefined
+        ? { scopePrices: scopePrices.some((p) => p !== null) ? scopePrices : undefined }
+        : {}),
+      ...(originalValue !== undefined ? { originalValue: originalValue ?? undefined } : {}),
+      ...(giftIndexes !== undefined ? { giftIndexes: giftIndexes.length ? giftIndexes : undefined } : {}),
       ...(hashedPassword !== undefined ? { password: hashedPassword } : {}),
       ...(templateChanged ? { templateSnapshot: undefined } : {}),
       version: newVersion,
@@ -537,6 +568,10 @@ export const _acceptInternal = internalMutation({
         title: proposal.title,
         objective: proposal.objective,
         investmentValue: proposal.investmentValue,
+        ...(proposal.scopePrices !== undefined ? { scopePrices: proposal.scopePrices } : {}),
+        ...(proposal.originalValue !== undefined
+          ? { originalValue: proposal.originalValue, giftIndexes: proposal.giftIndexes ?? [] }
+          : {}),
         scope: proposal.scope,
         timeline: proposal.timeline,
         conditions: proposal.conditions,

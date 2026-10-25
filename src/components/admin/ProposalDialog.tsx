@@ -12,6 +12,16 @@ import { Id } from "../../../convex/_generated/dataModel";
 import { X } from "lucide-react";
 import { toast } from "sonner";
 import { DEFAULT_RESCISION_POLICY } from "@/constants/rescisionPolicy";
+import {
+    ProposalDiscountFields,
+    emptyDiscountDraft,
+    discountDraftFromProposal,
+    discountDraftToArgs,
+    discountError,
+    removeScopeFromDraft,
+    parseMoney,
+    type DiscountDraft,
+} from "@/components/admin/ProposalDiscountFields";
 
 interface ProposalDialogProps {
     open: boolean;
@@ -37,6 +47,7 @@ export function ProposalDialog({ open, onOpenChange, proposal, onSave }: Proposa
     const [objective, setObjective] = useState("");
     const [deliveryDate, setDeliveryDate] = useState("");
     const [investmentValue, setInvestmentValue] = useState("");
+    const [discount, setDiscount] = useState<DiscountDraft>(emptyDiscountDraft);
 
     const [templateId, setTemplateId] = useState<Id<"contractTemplates"> | undefined>(undefined);
 
@@ -66,6 +77,7 @@ export function ProposalDialog({ open, onOpenChange, proposal, onSave }: Proposa
                 setDeliveryDate(proposal.deliveryDate || "");
                 setInvestmentValue(proposal.investmentValue?.toString().replace('.', ',') || "");
                 setScopeItems(Array.isArray(proposal.scope) ? proposal.scope : []);
+                setDiscount(discountDraftFromProposal(proposal));
                 setTimelineItems(Array.isArray(proposal.timeline) ? proposal.timeline : []);
                 setTemplateId(proposal.templateId ?? undefined);
 
@@ -104,6 +116,7 @@ export function ProposalDialog({ open, onOpenChange, proposal, onSave }: Proposa
         setTimelineItems([]);
         setDeliveryDate("");
         setInvestmentValue("");
+        setDiscount(emptyDiscountDraft);
         setConditions([
             { text: "Revisões: até 2 rodadas incluídas por etapa. Alterações fora do escopo serão orçadas.", checked: true },
             { text: "Garantia: correções de falhas por até 30 dias após entrega.", checked: true },
@@ -125,7 +138,10 @@ export function ProposalDialog({ open, onOpenChange, proposal, onSave }: Proposa
         if (!clientName || !slug) return alert("Preencha os campos obrigatórios.");
 
         const selectedConditions = conditions.filter(c => c.checked).map(c => c.text);
-        const investment = parseFloat(investmentValue.replace(',', '.')) || 0;
+        const investment = parseMoney(investmentValue) ?? 0;
+        const discountMessage = discountError(discount, investmentValue, scopeItems.length);
+        if (discountMessage) return toast.error(discountMessage);
+        const { scopePrices, originalValue, giftIndexes } = discountDraftToArgs(discount, scopeItems.length);
 
         try {
             if (proposal) {
@@ -138,6 +154,9 @@ export function ProposalDialog({ open, onOpenChange, proposal, onSave }: Proposa
                     timeline: timelineItems,
                     deliveryDate: deliveryDate || "",
                     investmentValue: investment,
+                    scopePrices,
+                    originalValue: originalValue ?? null,
+                    giftIndexes,
                     paymentMethods: proposal.paymentMethods ?? [],
                     conditions: selectedConditions,
                     templateId,
@@ -155,6 +174,9 @@ export function ProposalDialog({ open, onOpenChange, proposal, onSave }: Proposa
                     timeline: timelineItems,
                     deliveryDate: deliveryDate || "",
                     investmentValue: investment,
+                    scopePrices,
+                    originalValue,
+                    giftIndexes,
                     paymentMethods: [],
                     conditions: selectedConditions,
                     rescissionPolicy: DEFAULT_RESCISION_POLICY,
@@ -186,6 +208,7 @@ export function ProposalDialog({ open, onOpenChange, proposal, onSave }: Proposa
 
     const handleRemoveScopeItem = (index: number) => {
         setScopeItems(scopeItems.filter((_, i) => i !== index));
+        setDiscount(removeScopeFromDraft(discount, index));
     };
 
     const handleAddTimelineItem = () => {
@@ -347,6 +370,14 @@ export function ProposalDialog({ open, onOpenChange, proposal, onSave }: Proposa
                                 placeholder="0,00"
                                 value={investmentValue}
                                 onChange={(e) => setInvestmentValue(e.target.value)}
+                            />
+                        </div>
+                        <div className="mt-2">
+                            <ProposalDiscountFields
+                                scopeItems={scopeItems}
+                                investmentValue={investmentValue}
+                                draft={discount}
+                                onChange={setDiscount}
                             />
                         </div>
                     </div>

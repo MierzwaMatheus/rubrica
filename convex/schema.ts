@@ -363,6 +363,11 @@ export default defineSchema({
     timelineTranslations: v.optional(v.any()),
     deliveryDate: v.string(),
     investmentValue: v.number(),
+    // Preço de cada item do escopo (mesma ordem; null = sem preço), valor antes
+    // do desconto e itens que vão de brinde.
+    scopePrices: v.optional(v.array(v.union(v.number(), v.null()))),
+    originalValue: v.optional(v.number()),
+    giftIndexes: v.optional(v.array(v.number())),
     paymentMethods: v.array(v.string()),
     conditions: v.array(v.string()),
     conditionsTranslations: i18nStringArray,

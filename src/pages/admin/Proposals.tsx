@@ -17,6 +17,16 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Id } from "../../../convex/_generated/dataModel";
 import { DEFAULT_RESCISION_POLICY } from "@/constants/rescisionPolicy";
+import {
+  ProposalDiscountFields,
+  emptyDiscountDraft,
+  discountDraftFromProposal,
+  discountDraftToArgs,
+  discountError,
+  removeScopeFromDraft,
+  parseMoney,
+  type DiscountDraft,
+} from "@/components/admin/ProposalDiscountFields";
 import { toast } from "sonner";
 import { printContractPDF } from "@/utils/contractPDF";
 import { useIsRoot } from "@/hooks/useIsRoot";
@@ -38,7 +48,8 @@ function DownloadContractButton({ proposal }: { proposal: any }) {
         client_name: proposal.clientName, title: proposal.title,
         objective: proposal.objective, scope: proposal.scope,
         timeline: proposal.timeline, delivery_date: proposal.deliveryDate,
-        investment_value: proposal.investmentValue, payment_methods: proposal.paymentMethods,
+        investment_value: proposal.investmentValue, scope_prices: proposal.scopePrices, original_value: proposal.originalValue, gift_indexes: proposal.giftIndexes,
+        payment_methods: proposal.paymentMethods,
         conditions: proposal.conditions, rescision_policy: proposal.rescissionPolicy,
       };
       const legacyAcceptance = {
@@ -114,6 +125,7 @@ export default function AdminProposals() {
   const [objective, setObjective] = useState("");
   const [deliveryDate, setDeliveryDate] = useState("");
   const [investmentValue, setInvestmentValue] = useState("");
+  const [discount, setDiscount] = useState<DiscountDraft>(emptyDiscountDraft);
 
   // Scope & Timeline
   const [scopeItems, setScopeItems] = useState<string[]>([]);
@@ -151,7 +163,10 @@ export default function AdminProposals() {
     }
 
     const selectedConditions = conditions.filter(c => c.checked).map(c => c.text);
-    const investment = parseFloat(investmentValue.replace(',', '.')) || 0;
+    const investment = parseMoney(investmentValue) ?? 0;
+    const discountMessage = discountError(discount, investmentValue, scopeItems.length);
+    if (discountMessage) return toast.error(discountMessage);
+    const { scopePrices, originalValue, giftIndexes } = discountDraftToArgs(discount, scopeItems.length);
 
     try {
       if (editingProposal) {
@@ -164,6 +179,9 @@ export default function AdminProposals() {
           timeline: timelineItems,
           deliveryDate: deliveryDate || "",
           investmentValue: investment,
+          scopePrices,
+          originalValue: originalValue ?? null,
+          giftIndexes,
           paymentMethods: editingProposal.paymentMethods ?? [],
           conditions: selectedConditions,
           password: password || undefined,
@@ -183,6 +201,9 @@ export default function AdminProposals() {
           timeline: timelineItems,
           deliveryDate: deliveryDate || "",
           investmentValue: investment,
+          scopePrices,
+          originalValue,
+          giftIndexes,
           paymentMethods: [],
           conditions: selectedConditions,
           password: password || undefined,
@@ -210,6 +231,7 @@ export default function AdminProposals() {
     setTimelineItems([]);
     setDeliveryDate("");
     setInvestmentValue("");
+    setDiscount(emptyDiscountDraft);
     setConditions([
       { text: "Revisões: até 2 rodadas incluídas por etapa. Alterações fora do escopo serão orçadas.", checked: true },
       { text: "Garantia: correções de falhas por até 30 dias após entrega.", checked: true },
@@ -250,6 +272,7 @@ export default function AdminProposals() {
 
   const handleRemoveScopeItem = (index: number) => {
     setScopeItems(scopeItems.filter((_, i) => i !== index));
+    setDiscount(removeScopeFromDraft(discount, index));
   };
 
   const handleAddTimelineItem = () => {
@@ -288,6 +311,7 @@ export default function AdminProposals() {
     setDeliveryDate(proposal.deliveryDate || "");
     setInvestmentValue(proposal.investmentValue?.toString().replace('.', ',') || "");
     setScopeItems(Array.isArray(proposal.scope) ? proposal.scope : []);
+    setDiscount(discountDraftFromProposal(proposal));
     setTimelineItems(Array.isArray(proposal.timeline) ? proposal.timeline : []);
 
     const savedConditions: string[] = proposal.conditions || [];
@@ -365,6 +389,13 @@ export default function AdminProposals() {
         investmentValue: typeof jsonData.investment_value === 'number'
           ? jsonData.investment_value
           : parseFloat(String(jsonData.investment_value || 0).replace(',', '.')) || 0,
+        scopePrices: Array.isArray(jsonData.scope_prices) && jsonData.scope_prices.length === scope.length
+          ? jsonData.scope_prices.map((p: any) => (typeof p === 'number' ? p : null))
+          : undefined,
+        originalValue: typeof jsonData.original_value === 'number' ? jsonData.original_value : undefined,
+        giftIndexes: Array.isArray(jsonData.gift_indexes)
+          ? jsonData.gift_indexes.filter((i: any) => typeof i === 'number')
+          : undefined,
         paymentMethods: [],
         conditions: conditionsArr,
         password: jsonData.password?.trim() || undefined,
@@ -690,6 +721,14 @@ export default function AdminProposals() {
                         placeholder="0,00"
                         value={investmentValue}
                         onChange={(e) => setInvestmentValue(e.target.value)}
+                      />
+                    </div>
+                    <div className="mt-2">
+                      <ProposalDiscountFields
+                        scopeItems={scopeItems}
+                        investmentValue={investmentValue}
+                        draft={discount}
+                        onChange={setDiscount}
                       />
                     </div>
                   </div>

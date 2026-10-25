@@ -135,3 +135,73 @@ describe("ProposalDialog — Ciclo 5: templateId enviado ao salvar", () => {
     );
   });
 });
+
+describe("ProposalDialog — preços, desconto e brinde", () => {
+  beforeEach(() => {
+    mockUseQuery.mockReset();
+    mockUseMutation.mockReset();
+  });
+
+  const proposal = {
+    _id: "p1",
+    title: "Proposta",
+    clientName: "Cliente",
+    slug: "slug-existente",
+    createdAt: Date.now(),
+    objective: "",
+    deliveryDate: "",
+    investmentValue: 4000,
+    scopePrices: [4000, 1000],
+    originalValue: 5000,
+    giftIndexes: [1],
+    scope: ["Site", "Logo"],
+    timeline: [],
+    paymentMethods: [],
+    conditions: [],
+  };
+
+  it("loads and saves prices and discount of an existing proposal", async () => {
+    const updateMock = vi.fn().mockResolvedValue(undefined);
+    setup(baseTemplates, proposal, updateMock);
+
+    expect(screen.getByLabelText("Preço de Site")).toHaveValue("4000");
+    expect(screen.getByRole("checkbox", { name: "Brinde: Logo" })).toBeChecked();
+    fireEvent.click(screen.getByRole("button", { name: /salvar/i }));
+    await new Promise((r) => setTimeout(r, 50));
+
+    expect(updateMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        investmentValue: 4000,
+        scopePrices: [4000, 1000],
+        originalValue: 5000,
+        giftIndexes: [1],
+      }),
+    );
+  });
+
+  it("removing a scope item drops its price and gift", async () => {
+    const updateMock = vi.fn().mockResolvedValue(undefined);
+    setup(baseTemplates, { ...proposal, originalValue: 4500, giftIndexes: [] , scopePrices: [3500, 1000]}, updateMock);
+
+    // O primeiro botão de remover é o do item "Site".
+    const removeButtons = screen.getAllByRole("button").filter((b) => b.className.includes("text-red-400"));
+    fireEvent.click(removeButtons[0]);
+    fireEvent.change(screen.getByLabelText(/Valor original \(antes/), { target: { value: "" } });
+    fireEvent.click(screen.getByRole("button", { name: /salvar/i }));
+    await new Promise((r) => setTimeout(r, 50));
+
+    expect(updateMock).toHaveBeenCalledWith(
+      expect.objectContaining({ scope: ["Logo"], scopePrices: [1000], originalValue: null, giftIndexes: [] }),
+    );
+  });
+
+  it("does not save when the discount is invalid", async () => {
+    const updateMock = vi.fn().mockResolvedValue(undefined);
+    setup(baseTemplates, { ...proposal, originalValue: 3000, giftIndexes: [] }, updateMock);
+
+    fireEvent.click(screen.getByRole("button", { name: /salvar/i }));
+    await new Promise((r) => setTimeout(r, 50));
+
+    expect(updateMock).not.toHaveBeenCalled();
+  });
+});

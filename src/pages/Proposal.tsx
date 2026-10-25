@@ -18,6 +18,7 @@ import { ContractModal } from "@/components/ContractModal";
 import { generatePaymentMethods } from "@/utils/contractGenerator";
 import { printContractPDF } from "@/utils/contractPDF";
 import { useSiteConfig } from "@/hooks/useSiteConfig";
+import { summarizeDiscount } from "../../convex/lib/proposalDiscount";
 
 // Build a snake_case adapter so existing utils (contractGenerator, ContractModal) still work
 function toLegacyProposal(p: any) {
@@ -31,6 +32,9 @@ function toLegacyProposal(p: any) {
     timeline: p.timeline,
     delivery_date: p.deliveryDate,
     investment_value: p.investmentValue,
+    original_value: p.originalValue,
+    scope_prices: p.scopePrices,
+    gift_indexes: p.giftIndexes,
     payment_methods: p.paymentMethods,
     conditions: p.conditions,
     rescision_policy: p.rescissionPolicy,
@@ -78,6 +82,15 @@ export default function Proposal() {
 
   // Adapt to legacy snake_case for utils
   const proposal: any = useMemo(() => toLegacyProposal(rawProposal), [rawProposal]);
+  const discount = useMemo(
+    () => summarizeDiscount({
+      investmentValue: rawProposal?.investmentValue ?? 0,
+      originalValue: rawProposal?.originalValue,
+      scopePrices: rawProposal?.scopePrices,
+      giftIndexes: rawProposal?.giftIndexes,
+    }),
+    [rawProposal],
+  );
 
   const acceptanceDataRaw: any = useQuery(
     api.proposals.getAcceptanceByToken,
@@ -346,12 +359,35 @@ export default function Proposal() {
                     Escopo dos Serviços
                   </h2>
                   <ul className="space-y-4">
-                    {rawProposal.scope?.map((item: string, index: number) => (
-                      <li key={index} className="flex items-start gap-3 text-foreground/90 group">
-                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-neon-purple group-hover:scale-150 transition-transform" />
-                        <span className="group-hover:text-foreground-strong transition-colors w-[95%]">{item}</span>
-                      </li>
-                    ))}
+                    {rawProposal.scope?.map((item: string, index: number) => {
+                      const price = discount.priceOf(index);
+                      const isGift = discount.isGift(index);
+                      return (
+                        <li key={index} className="flex items-start gap-3 text-foreground/90 group">
+                          <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-neon-purple group-hover:scale-150 transition-transform" />
+                          <span className="group-hover:text-foreground-strong transition-colors w-[95%]">
+                            {item}
+                            {price !== undefined && (
+                              <span className="mt-1.5 flex flex-wrap items-center gap-2 text-sm">
+                                {isGift ? (
+                                  <>
+                                    <Badge className="bg-neon-lime/10 text-neon-lime hover:bg-neon-lime/20 border-neon-lime/20">
+                                      Brinde
+                                    </Badge>
+                                    <span className="sr-only">Valor original:</span>
+                                    <s className="text-foreground/50">{formatCurrency(price)}</s>
+                                    <span className="sr-only">Valor com desconto:</span>
+                                    <span className="font-semibold text-neon-lime">{formatCurrency(0)}</span>
+                                  </>
+                                ) : (
+                                  <span className="text-foreground/65">{formatCurrency(price)}</span>
+                                )}
+                              </span>
+                            )}
+                          </span>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </CardContent>
               </Card>
@@ -414,9 +450,26 @@ export default function Proposal() {
                     </p>
                   </div>
                   <div className="text-center">
+                    {discount.hasDiscount && (
+                      <div className="flex items-center justify-center gap-3 mb-1">
+                        <span className="sr-only">Valor original:</span>
+                        <s className="text-xl md:text-2xl text-foreground/50">{formatCurrency(discount.originalValue)}</s>
+                        <Badge className="bg-neon-purple/10 text-neon-purple hover:bg-neon-purple/20 border-neon-purple/20">
+                          −{discount.discountPercent}%
+                        </Badge>
+                      </div>
+                    )}
+                    {discount.hasDiscount && <span className="sr-only">Valor com desconto:</span>}
                     <div className="text-5xl md:text-6xl font-bold text-foreground-strong tracking-tighter mb-2">
                       {formatCurrency(rawProposal.investmentValue)}
                     </div>
+                    {discount.hasDiscount && (
+                      <p className="text-sm text-foreground/65 mb-3">
+                        Desconto de {formatCurrency(discount.discountAmount)}
+                        {discount.giftCount > 0 &&
+                          ` · ${discount.giftCount === 1 ? "1 item de brinde" : `${discount.giftCount} itens de brinde`}`}
+                      </p>
+                    )}
                     <Badge className="bg-neon-lime/10 text-neon-lime hover:bg-neon-lime/20 border-neon-lime/20">
                       Pagamento Facilitado
                     </Badge>

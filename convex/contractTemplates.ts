@@ -101,7 +101,7 @@ const DEFAULT_TEMPLATE_CONTENT = `**CONTRATADA:** {{contractor_name}}, inscrito 
 
 ### CLÁUSULA 4 – DO INVESTIMENTO E FORMAS DE PAGAMENTO
 
-O investimento total para a execução deste projeto é de **{{investment_value}}**.
+O investimento total para a execução deste projeto é de **{{investment_value}}**. {{discount}}
 
 **Formas de Pagamento:**
 

@@ -58,6 +58,8 @@ const TEMPLATE_VARIABLES = [
   { key: "timeline", label: "Cronograma" },
   { key: "delivery_date", label: "Data de entrega" },
   { key: "investment_value", label: "Valor" },
+  { key: "original_value", label: "Valor original" },
+  { key: "discount", label: "Desconto" },
   { key: "payment_methods", label: "Pagamento" },
   { key: "conditions", label: "Condições" },
   { key: "rescission_policy", label: "Rescisão" },

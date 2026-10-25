@@ -30,6 +30,9 @@ function toLegacyProposal(p: any) {
     timeline: p.timeline,
     delivery_date: p.deliveryDate,
     investment_value: p.investmentValue,
+    original_value: p.originalValue,
+    scope_prices: p.scopePrices,
+    gift_indexes: p.giftIndexes,
     payment_methods: p.paymentMethods,
     conditions: p.conditions,
     rescision_policy: p.rescissionPolicy,
@@ -298,6 +301,11 @@ export default function ProposalAccept() {
                 </div>
                 <div>
                   <span className="text-foreground/65">Valor Total:</span>
+                  {rawProposal.originalValue > rawProposal.investmentValue && (
+                    <s className="ml-2 text-foreground/50" aria-label={`Valor original: ${formatCurrency(rawProposal.originalValue)}`}>
+                      {formatCurrency(rawProposal.originalValue)}
+                    </s>
+                  )}
                   <span className="ml-2 text-foreground-strong font-bold">{formatCurrency(rawProposal.investmentValue)}</span>
                 </div>
                 <div className="md:col-span-2">

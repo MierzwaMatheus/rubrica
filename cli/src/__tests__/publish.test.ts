@@ -46,8 +46,8 @@ interface Opts {
   vercelEnvKeys?: string[];
   /** `users:isSetupRequired --prod` falha (produção sem funções: nunca publicado). */
   prodOffline?: boolean;
-  /** Não existe projeto com o nome do package.json na Vercel. */
-  vercelProjectMissing?: boolean;
+  /** Já existe na Vercel um projeto com o nome do package.json. */
+  vercelProject?: boolean;
 }
 
 /** Tira o prefixo `--yes vercel@latest [--global-config X]` das chamadas da Vercel. */
@@ -93,7 +93,7 @@ function makeDeps(opts: Opts = {}) {
         return Buffer.from("");
       }
       if (v[0] === "api" && v[1] === "/v9/projects/ana-site") {
-        if (opts.vercelProjectMissing) throw new Error("Project not found (404)");
+        if (!opts.vercelProject) throw new Error("Project not found (404)");
         return Buffer.from(JSON.stringify({ id: "prj_1", name: "ana-site" }));
       }
       if (v[0] === "api" && v[1].includes("/env")) {
@@ -654,7 +654,7 @@ describe("publicar — botão Publicar do painel (token da Vercel)", () => {
 
 describe("publicar — site já publicado, mas sem a pasta .vercel (outro computador, clone novo)", () => {
   it("não refaz a primeira vez: liga o projeto da Vercel e só publica", async () => {
-    const { deps } = makeDeps({ adminExists: true, state: PUBLISHED, prodConvexEnv: { VERCEL_TOKEN: "x" } });
+    const { deps } = makeDeps({ adminExists: true, vercelProject: true, state: PUBLISHED, prodConvexEnv: { VERCEL_TOKEN: "x" } });
     await runPublish(deps);
     expect(confirm).toHaveBeenCalledWith(expect.objectContaining({ message: expect.stringMatching(/já está publicado/) }));
     expect(vercelCalls(deps)).toContainEqual(["link", "--yes", "--project", "ana-site"]);
@@ -667,14 +667,14 @@ describe("publicar — site já publicado, mas sem a pasta .vercel (outro comput
   });
 
   it("o projeto com esse nome na Vercel não é o do site: para sem ligar nem publicar", async () => {
-    const { deps } = makeDeps({ adminExists: true, vercelEnvKeys: [] });
+    const { deps } = makeDeps({ adminExists: true, vercelProject: true, vercelEnvKeys: [] });
     await runPublish(deps);
     expect(cancel).toHaveBeenCalledWith(expect.stringMatching(/projeto da Vercel/));
     expect(vercelCalls(deps).some((v) => v[0] === "link" || v[0] === "deploy")).toBe(false);
   });
 
   it("não existe projeto com esse nome na Vercel: para sem criar um vazio", async () => {
-    const { deps } = makeDeps({ adminExists: true, vercelProjectMissing: true });
+    const { deps } = makeDeps({ adminExists: true });
     await runPublish(deps);
     expect(cancel).toHaveBeenCalledWith(expect.stringMatching(/projeto da Vercel/));
     expect(vercelCalls(deps).some((v) => v[0] === "link" || v[0] === "deploy")).toBe(false);
@@ -685,6 +685,33 @@ describe("publicar — site já publicado, mas sem a pasta .vercel (outro comput
     await runPublish(deps);
     expect(convexCalls(deps)).toContain("convex deploy");
     expect(convexCalls(deps).some((c) => c.includes("JWT_PRIVATE_KEY"))).toBe(true);
+  });
+});
+
+describe("publicar — computador ligado a outro Convex (não ao do site no ar)", () => {
+  const nothingWritten = (deps: Deps) => {
+    expect(vercelCalls(deps).some((v) => ["link", "env", "deploy"].includes(v[0]))).toBe(false);
+    expect(convexCalls(deps).some((c) => /deploy|env set|seed|setupAdmin|token create/.test(c))).toBe(false);
+  };
+
+  it("o rubrica.json diz que o site está publicado em outro banco: para sem tocar em nada", async () => {
+    const { deps } = makeDeps({ state: PUBLISHED });
+    await runPublish(deps);
+    expect(cancel).toHaveBeenCalledWith(expect.stringMatching(/happy-otter-123.*npx convex dev --configure existing/s));
+    nothingWritten(deps);
+  });
+
+  it("já existe na Vercel um site com este nome: para sem trocar o banco dele", async () => {
+    const { deps } = makeDeps({ vercelProject: true });
+    await runPublish(deps);
+    expect(cancel).toHaveBeenCalledWith(expect.stringMatching(/Já existe um site publicado na Vercel/));
+    nothingWritten(deps);
+  });
+
+  it("projeto da Vercel com o mesmo nome, mas sem site configurado (vazio): segue a primeira vez", async () => {
+    const { deps } = makeDeps({ vercelProject: true, vercelEnvKeys: [] });
+    await runPublish(deps);
+    expect(vercelCalls(deps).at(-1)).toEqual(["deploy", "--prod", "--yes"]);
   });
 });
 

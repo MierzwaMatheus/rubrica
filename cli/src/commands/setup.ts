@@ -102,6 +102,23 @@ export async function runSetup(deps: RunSetupDeps = {}): Promise<void> {
     log.info("Conectando o projeto ao Convex (o backend do site). Se pedir, faça login no navegador.");
     try {
       const args = ["convex", "dev", "--once"];
+      // Clone de um site já publicado (o rubrica.json vai no git com o endereço de produção):
+      // liga a um projeto existente do Convex, para não criar um banco novo e vazio.
+      let publishedConvex = "";
+      try {
+        const saved = JSON.parse(await fs.readFile(path.join(cwd, "rubrica.json"), "utf-8")) as { producao?: { convexUrl?: string } };
+        publishedConvex = saved.producao?.convexUrl ?? "";
+      } catch {
+        publishedConvex = "";
+      }
+      if (publishedConvex && !deps.newProject) {
+        const name = /^https:\/\/([^.]+)\./.exec(publishedConvex)?.[1] ?? publishedConvex;
+        log.info(
+          `Este site já está publicado, com o banco de produção ${name}. ` +
+            "Na próxima pergunta do Convex, escolha o projeto onde ele está (o mesmo time e projeto de quem publicou)."
+        );
+        args.push("--configure", "existing");
+      }
       if (deps.newProject) {
         // Projeto novo: cria no Convex sem perguntar (nome, nuvem) e desliga a pergunta
         // dos arquivos de IA do Convex. Quem quiser: `npx convex ai-files install`.

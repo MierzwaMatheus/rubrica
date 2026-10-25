@@ -88,6 +88,20 @@ describe("setup — conexão com o Convex", () => {
     expect(cancel).not.toHaveBeenCalled();
   });
 
+  it("clone de um site já publicado: conecta a um projeto existente do Convex e diz qual é", async () => {
+    const published = { ...makeState(), producao: { convexUrl: "https://prod-onca-456.convex.cloud", siteUrl: "https://ana.vercel.app" } };
+    const deps = makeDeps({ env: null, connectWritesEnv: true, state: published as ReturnType<typeof makeState> });
+    deps.vol.writeFileSync("/p/rubrica.json", JSON.stringify(published));
+    vi.mocked(text).mockResolvedValueOnce("ana@ana.dev");
+    await runSetup(deps);
+    expect(deps.execFileSync).toHaveBeenCalledWith(
+      "npx",
+      ["convex", "dev", "--once", "--configure", "existing"],
+      expect.objectContaining({ cwd: "/p", stdio: "inherit" })
+    );
+    expect(log.info).toHaveBeenCalledWith(expect.stringMatching(/já está publicado.*prod-onca-456/s));
+  });
+
   it("se a conexão não criar o .env.local, para dizendo como tentar de novo", async () => {
     const deps = makeDeps({ env: null });
     await runSetup(deps);

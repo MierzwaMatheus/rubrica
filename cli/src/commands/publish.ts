@@ -346,6 +346,18 @@ export async function runPublish(deps: RunPublishDeps = {}): Promise<void> {
   }
 
   // ---- Primeira vez -----------------------------------------------------------
+  // Trava: este computador pode estar ligado a outro projeto do Convex (clone novo em que o
+  // setup criou um banco novo). Seguir aqui trocaria o banco do site no ar por um vazio.
+  const otherDatabase = (where: string) =>
+    `${where} Este computador está ligado a outro projeto do Convex, e seguir trocaria o banco do site no ar por um vazio. ` +
+    "Para ligar ao projeto certo: apague o .env.local, rode npx convex dev --configure existing, escolha o projeto do site e rode o publicar de novo. " +
+    NOTHING;
+  const publishedConvex = (state.producao as { convexUrl?: string } | undefined)?.convexUrl;
+  if (publishedConvex) {
+    cancel(otherDatabase(`O rubrica.json diz que o site já está publicado, com o banco ${publishedConvex}.`));
+    return;
+  }
+
   note(
     [
       "1. Entrar na sua conta da Vercel (navegador, conta gratuita)",
@@ -364,6 +376,17 @@ export async function runPublish(deps: RunPublishDeps = {}): Promise<void> {
   if (go !== true) return void cancel(NOTHING);
 
   if (!ensureLogin()) return;
+
+  try {
+    const { id } = JSON.parse(vercel(["api", `/v9/projects/${projectName}`])) as { id: string };
+    const keys = (JSON.parse(vercel(["api", `/v10/projects/${id}/env`])) as { envs: Array<{ key: string }> }).envs.map((e) => e.key);
+    if (keys.includes("CONVEX_DEPLOY_KEY")) {
+      cancel(otherDatabase(`Já existe um site publicado na Vercel com o nome ${projectName}.`));
+      return;
+    }
+  } catch {
+    // projeto ainda não existe na Vercel: segue
+  }
 
   const s = spinner();
   s.start("Criando o projeto na Vercel...");

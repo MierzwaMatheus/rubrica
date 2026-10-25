@@ -1,5 +1,6 @@
 import { action } from "./_generated/server";
 import { internal, api } from "./_generated/api";
+import { triggerVercelBuild, vercelDeployEnv } from "./lib/vercelDeploy";
 
 export const trigger = action({
   args: {},
@@ -43,20 +44,15 @@ export const trigger = action({
       }
     }
 
-    const webhookUrl = process.env.VERCEL_DEPLOY_HOOK_URL;
-    if (!webhookUrl) {
-      console.warn("[deploy] VERCEL_DEPLOY_HOOK_URL not set");
-      return { ok: false };
-    }
+    const result = await triggerVercelBuild(vercelDeployEnv(process.env));
+    if (!result.ok) console.warn("[deploy]", result.statusCode ?? "", result.message ?? "");
 
-    const res = await fetch(webhookUrl, { method: "POST" });
-
-    if (res.ok) {
+    if (result.ok) {
       await ctx.runMutation(internal.publishStatus.setPublished, {
         triggeredBy: userId,
       });
     }
 
-    return { ok: res.ok, statusCode: res.status };
+    return result;
   },
 });

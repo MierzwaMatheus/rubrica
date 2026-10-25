@@ -15,10 +15,12 @@ export function PublishStatus() {
     setIsPending(true);
     try {
       const result = await triggerDeploy({});
-      if ((result as any)?.skipped) {
-        toast.info((result as any).message ?? "Deploy ignorado");
+      if (result?.skipped) {
+        toast.info(result.message ?? "Deploy ignorado");
+      } else if (!result?.ok) {
+        toast.error(result?.message ?? "Não deu para publicar. Tente de novo em alguns minutos.");
       } else {
-        toast.success("Deploy iniciado com sucesso!");
+        toast.success("Publicação iniciada! O site atualiza em alguns minutos.");
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : "Erro desconhecido";

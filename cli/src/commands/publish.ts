@@ -2,7 +2,7 @@ import { outro, note, text, password, confirm, isCancel, cancel, spinner, log } 
 import * as nodeFsPromises from "node:fs/promises";
 import * as path from "node:path";
 import * as nodeCrypto from "node:crypto";
-import { execFileSync as defaultExecFileSync } from "node:child_process";
+import { execFileSync as defaultExecFileSync, spawn } from "node:child_process";
 import { detectProject as defaultDetectProject } from "../utils/detectProject.js";
 import { generateJwtKeys as defaultGenerateJwtKeys } from "../utils/generateJwtKeys.js";
 import { readState as defaultReadState } from "../state/readState.js";
@@ -24,6 +24,22 @@ export interface RunPublishDeps {
   execFileSync?: (file: string, args: string[], opts?: { cwd?: string; stdio?: string; env?: Record<string, string | undefined> }) => Buffer;
   /** Ambiente do processo (para testes). `RUBRICA_VERCEL_GLOBAL_CONFIG` escolhe a conta da Vercel. */
   processEnv?: Record<string, string | undefined>;
+  fetch?: (url: string, init?: RequestInit) => Promise<Response>;
+  /** Abre uma página no navegador (sem esperar). */
+  openUrl?: (url: string) => void;
+}
+
+/** Abre a página no navegador padrão; se não der, a pessoa usa o link mostrado no terminal. */
+function defaultOpenUrl(url: string): void {
+  const [cmd, args] =
+    process.platform === "darwin" ? ["open", [url]] :
+    process.platform === "win32" ? ["cmd", ["/c", "start", "", url]] :
+    ["xdg-open", [url]];
+  try {
+    spawn(cmd, args as string[], { stdio: "ignore", detached: true }).on("error", () => undefined).unref();
+  } catch {
+    // sem navegador: o link está na tela
+  }
 }
 
 const NOTHING = "Nada foi publicado.";
@@ -33,6 +49,7 @@ const COPIED_ENV = ["TELEGRAM_BOT_TOKEN", "TELEGRAM_ADMIN_CHAT_ID", "OPENROUTER_
 const VERCELIGNORE = ".env*\n!.env.example\nnode_modules\n.stryker-tmp\n";
 /** Onde o `vercel env pull` grava as variáveis de produção (dentro de .vercel/, fora do git e do .env.local). */
 const PROD_ENV_FILE = path.join(".vercel", ".env.production.local");
+const TOKEN_PAGE = "https://vercel.com/account/settings/tokens";
 
 function errorOutput(err: unknown): string {
   const e = err as { stdout?: Buffer; stderr?: Buffer; message?: string };
@@ -59,6 +76,8 @@ export async function runPublish(deps: RunPublishDeps = {}): Promise<void> {
   const generateJwtKeys = deps.generateJwtKeys ?? defaultGenerateJwtKeys;
   const randomBytes = deps.randomBytes ?? ((n: number) => nodeCrypto.randomBytes(n));
   const processEnv = deps.processEnv ?? process.env;
+  const fetchFn = deps.fetch ?? ((url: string, init?: RequestInit) => fetch(url, init));
+  const openUrl = deps.openUrl ?? defaultOpenUrl;
   const exec =
     deps.execFileSync ??
     ((file: string, args: string[], opts?: object) =>
@@ -145,6 +164,76 @@ export async function runPublish(deps: RunPublishDeps = {}): Promise<void> {
     }
   };
 
+  /**
+   * Botão "Publicar" do painel. Sem GitHub não existe Deploy Hook, então o painel refaz o
+   * último deploy de produção pela API da Vercel, com um token da pessoa. A Vercel não deixa
+   * o CLI criar tokens: a pessoa cria na página de tokens (uma vez só) e cola aqui.
+   */
+  const configurePublishButton = async (): Promise<void> => {
+    const project = JSON.parse(await fs.readFile(path.join(cwd, ".vercel", "project.json"), "utf-8")) as {
+      projectId: string;
+      orgId?: string;
+    };
+    const teamId = project.orgId?.startsWith("team_") ? project.orgId : undefined;
+    note(
+      [
+        "Para o botão Publicar do painel funcionar, a Vercel precisa de uma chave sua.",
+        "É uma vez só. A página de tokens vai abrir no navegador:",
+        "",
+        "1. Em Create Token, dê o nome Rubrica",
+        "2. Em Scope, escolha a conta onde o site está",
+        "3. Em Expiration, escolha No Expiration",
+        "4. Clique em Create, copie o token e cole aqui",
+        "",
+        `Se a página não abrir: ${TOKEN_PAGE}`,
+      ].join("\n"),
+      "Botão Publicar do painel"
+    );
+    openUrl(TOKEN_PAGE);
+    for (;;) {
+      const answer = await password({ message: "Cole o token da Vercel (Enter para pular):" });
+      if (isCancel(answer)) return;
+      const token = String(answer ?? "").trim();
+      if (!token) {
+        log.info("Sem o token, o botão Publicar do painel não funciona. Para configurar depois, rode npx create-rubrica publicar de novo.");
+        return;
+      }
+      let accepted = false;
+      try {
+        const res = await fetchFn(`https://api.vercel.com/v9/projects/${project.projectId}${teamId ? `?teamId=${teamId}` : ""}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        accepted = res.ok;
+      } catch {
+        accepted = false;
+      }
+      if (!accepted) {
+        log.warn("A Vercel não aceitou esse token para este projeto. Confira se copiou o token inteiro e se o Scope é a conta onde o site está.");
+        continue;
+      }
+      try {
+        setProdEnv("VERCEL_TOKEN", token);
+        setProdEnv("VERCEL_PROJECT_ID", project.projectId);
+        if (teamId) setProdEnv("VERCEL_TEAM_ID", teamId);
+      } catch (err) {
+        log.warn(`Não deu para gravar o token no Convex de produção:\n${tail(errorOutput(err))}`);
+        return;
+      }
+      log.success("Botão Publicar do painel configurado.");
+      return;
+    }
+  };
+
+  /** O Convex de produção já sabe publicar (token ou Deploy Hook)? */
+  const hasPublishButton = () =>
+    ["VERCEL_TOKEN", "VERCEL_DEPLOY_HOOK_URL"].some((key) => {
+      try {
+        return convex(["env", "get", "--prod", key]).trim() !== "";
+      } catch {
+        return false;
+      }
+    });
+
   const deploy = async (siteUrl: string, s: ReturnType<typeof spinner>) => {
     s.start("Publicando na Vercel (leva uns 2 minutos)...");
     try {
@@ -169,6 +258,13 @@ export async function runPublish(deps: RunPublishDeps = {}): Promise<void> {
       const convexUrl = await productionConvexFromVercel();
       if (convexUrl) await saveProduction(convexUrl, siteUrl);
     }
+    if (!hasPublishButton()) {
+      const setUp = await confirm({
+        message: "O botão Publicar do painel ainda não está configurado. Configurar agora? (leva 1 minuto)",
+        initialValue: true,
+      });
+      if (setUp === true) await configurePublishButton();
+    }
     if (!(await deploy(siteUrl, spinner()))) return;
     outro(`Publicado de novo!\n\n  ${siteUrl}`);
     return;
@@ -181,7 +277,8 @@ export async function runPublish(deps: RunPublishDeps = {}): Promise<void> {
       `2. Criar o projeto ${projectName} na Vercel`,
       "3. Preparar o banco de dados de produção no Convex",
       "4. Criar o admin do site publicado (você escolhe a senha)",
-      "5. Publicar",
+      "5. Ligar o botão Publicar do painel (você cria uma chave na Vercel)",
+      "6. Publicar",
       "",
       "O que você cadastrou no painel do computador não vai junto: o site publicado",
       "começa com os dados de exemplo, e você edita pelo painel dele.",
@@ -303,6 +400,7 @@ export async function runPublish(deps: RunPublishDeps = {}): Promise<void> {
     vercel(["env", "add", key, "production", "--value", value, "--yes", "--force", ...(sensitive ? ["--sensitive"] : [])]);
   }
   await saveProduction(convexUrl, siteUrl);
+  await configurePublishButton();
 
   if (!(await deploy(siteUrl, s))) return;
 

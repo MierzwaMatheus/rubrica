@@ -260,7 +260,8 @@ npx convex env set NOME_DA_VAR valor
 | `ASAAS_WEBHOOK_TOKEN` | Confirmação dos pagamentos (o mesmo token cadastrado no webhook do Asaas) |
 | `TELEGRAM_BOT_TOKEN` | Notificações no Telegram |
 | `TELEGRAM_ADMIN_CHAT_ID` | Chat onde as notificações chegam |
-| `VERCEL_DEPLOY_HOOK_URL` | Botão "Publicar" do admin |
+| `VERCEL_TOKEN`, `VERCEL_PROJECT_ID`, `VERCEL_TEAM_ID` | Botão "Publicar" do admin sem GitHub (o `npx create-rubrica publicar` configura) |
+| `VERCEL_DEPLOY_HOOK_URL` | Botão "Publicar" do admin em projeto ligado ao GitHub (tem preferência sobre o token) |
 | `VERCEL_WEBHOOK_SECRET` | Webhook de notificação de deploy |
 
 ### 5 · Rodar em desenvolvimento
@@ -483,6 +484,7 @@ rubrica/
 | `convex deploy` falha no Vercel | Falta `CONVEX_DEPLOY_KEY` nas env vars do Vercel |
 | Login não funciona / bootstrap não aparece | `BOOTSTRAP_ALLOWED` removido antes de criar o primeiro usuário — sete de novo, crie e remova |
 | Plugin desativado ainda aparece em produção | Falta um redeploy para regenerar `public/data/plugins.json` |
+| Botão "Publicar" do admin diz que não está configurado ou que o token não vale | Rode `npx create-rubrica publicar` na pasta do projeto: ele pede um token novo da Vercel |
 | Notificações Telegram não chegam | Você ainda não enviou `/start` para o seu bot |
 | Cliente pagou e o checkout não vira "pago" | Webhook do Asaas não cadastrado, com token diferente do `ASAAS_WEBHOOK_TOKEN` ou cadastrado na conta errada (sandbox × produção) |
 | "Pagamentos não configurados" no checkout | Falta `ASAAS_API_KEY` no Convex |

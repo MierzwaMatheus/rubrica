@@ -89,7 +89,7 @@ Rode dentro da pasta do projeto (ou de qualquer subpasta).
 npx create-rubrica setup
 ```
 
-Configura o backend Convex. Se o projeto ainda não estiver ligado ao Convex (sem `.env.local`), ele conecta sozinho: abre o login no navegador e cria o projeto, sem precisar deixar o `npx convex dev` rodando em outro terminal.
+Configura o backend Convex. Se o projeto ainda não estiver ligado ao Convex (sem `.env.local`), ele conecta sozinho: abre o login no navegador e cria o projeto, sem precisar deixar o `npx convex dev` rodando em outro terminal. Num clone de um site que já foi publicado (o `rubrica.json` traz o endereço de produção), ele não cria projeto: pede para você escolher o projeto do Convex onde o site está e mostra qual é o banco de produção dele.
 
 Depois gera as chaves de autenticação, grava o endereço do site que você informou no `create`, cria o usuário admin (o e-mail já vem preenchido) e popula os dados iniciais. As integrações são opcionais e só aparecem para os plugins ligados: o Telegram e a Vercel começam com uma pergunta de sim/não; OpenRouter e Asaas pedem a chave, e dá para pular com Enter. Com a chave do Asaas, ele também gera o token do webhook e mostra a URL e o token para cadastrar no painel do Asaas. Pode ser rodado de novo: o admin existente é mantido (sem pedir a senha de novo; para trocá-la, use o `senha`) e o seed só cria o que falta.
 
@@ -105,10 +105,11 @@ Coloca o site no ar na [Vercel](https://vercel.com) (conta gratuita), sem copiar
 2. cria o projeto na Vercel com o nome da pasta e usa o endereço `<projeto>.vercel.app`;
 3. prepara o banco de produção no Convex: cria a chave de produção, envia o backend, gera as chaves de login e copia do ambiente do computador as integrações do Telegram e do OpenRouter, a profissão e o contexto da IA;
 4. cria o admin do site publicado (você escolhe a senha) e os dados iniciais;
-5. grava as variáveis na Vercel (`VITE_CONVEX_URL`, `CONVEX_URL`, `SITE_URL`, `CONVEX_DEPLOY_KEY`) e publica;
-6. anota no `rubrica.json` (em `producao`) o endereço do Convex e do site publicados. É com ele que a skill `rubrica` do agente de IA entra no site no ar (`--producao`).
+5. liga o botão **Publicar** do painel: abre a página de tokens da Vercel, você cria um token (nome Rubrica, sem validade) e cola no terminal, sem ele aparecer na tela. O CLI confere se o token acessa o projeto e grava no Convex de produção. Sem GitHub, a Vercel não oferece Deploy Hook, então o painel usa esse token para refazer o último deploy de produção, e o build busca o conteúdo novo. Dá para pular com Enter;
+6. grava as variáveis na Vercel (`VITE_CONVEX_URL`, `CONVEX_URL`, `SITE_URL`, `CONVEX_DEPLOY_KEY`) e publica;
+7. anota no `rubrica.json` (em `producao`) o endereço do Convex e do site publicados. É com ele que a skill `rubrica` do agente de IA entra no site no ar (`--producao`).
 
-Depois disso, rodar de novo só publica a versão atual do projeto. Projetos publicados antes da 1.5 ganham a anotação do item 6 na próxima vez que publicarem. O que você cadastrou no painel do computador não vai junto: o site publicado começa com os dados de exemplo e é editado pelo painel dele. A chave de produção do Asaas e o webhook de pagamentos são configurados à parte. Domínio próprio: na Vercel, em Settings → Domains.
+Depois disso, rodar de novo só publica a versão atual do projeto: o build da Vercel envia junto as mudanças do backend para o Convex de produção. Antes de publicar, ele leva para a produção o Telegram e o OpenRouter que você tenha ligado no computador depois da primeira vez (só os que faltam lá). Em outro computador ou num clone novo (a pasta `.vercel` fica fora do git), ele percebe que o site já está publicado, liga a pasta ao mesmo projeto da Vercel e só publica: não gera chaves de login novas nem regrava os dados do painel. E, se este computador estiver ligado a outro projeto do Convex (não ao do site no ar), ele para antes de gravar qualquer coisa, para não trocar o banco do site por um vazio. Projetos publicados antes da 1.5 ganham a anotação do item 7 na próxima vez que publicarem, e o `publicar` oferece ligar o botão Publicar quando ele ainda não está configurado. Mudança de código (layout, componentes) vai ao ar pelo `publicar`; o botão do painel publica o conteúdo. O que você cadastrou no painel do computador não vai junto: o site publicado começa com os dados de exemplo e é editado pelo painel dele. A chave de produção do Asaas e o webhook de pagamentos são configurados à parte. Domínio próprio: na Vercel, em Settings → Domains.
 
 Tem mais de uma conta da Vercel no computador? Escolha qual usar com `RUBRICA_VERCEL_GLOBAL_CONFIG=<pasta de config da conta> npx create-rubrica publicar` (é o `--global-config` do CLI da Vercel).
 

@@ -38,6 +38,16 @@ interface Opts {
   processEnv?: Record<string, string>;
   /** Conteúdo que o `vercel env pull` grava; null = o comando falha. */
   prodEnv?: string | null;
+  /** Variáveis já gravadas no Convex de produção (env get --prod). */
+  prodConvexEnv?: Record<string, string>;
+  /** Tokens que a Vercel aceita para o projeto. */
+  validTokens?: string[];
+  /** Variáveis que o projeto já tem na Vercel (api .../env). */
+  vercelEnvKeys?: string[];
+  /** `users:isSetupRequired --prod` falha (produção sem funções: nunca publicado). */
+  prodOffline?: boolean;
+  /** Já existe na Vercel um projeto com o nome do package.json. */
+  vercelProject?: boolean;
 }
 
 /** Tira o prefixo `--yes vercel@latest [--global-config X]` das chamadas da Vercel. */
@@ -53,10 +63,11 @@ function makeDeps(opts: Opts = {}) {
     "/p/package.json": JSON.stringify({ name: "ana-site" }),
   };
   if (opts.env !== null) files["/p/.env.local"] = opts.env ?? "CONVEX_DEPLOYMENT=dev:x\nVITE_CONVEX_URL=https://x.convex.cloud\n";
-  if (opts.linked) files["/p/.vercel/project.json"] = JSON.stringify({ projectId: "prj_1", projectName: "ana-site" });
+  if (opts.linked) files["/p/.vercel/project.json"] = JSON.stringify({ projectId: "prj_1", orgId: "team_1", projectName: "ana-site" });
   if (opts.vercelignore) files["/p/.vercelignore"] = opts.vercelignore;
   const vol = Volume.fromJSON(files);
   let loggedIn = opts.loggedIn === undefined ? true : opts.loggedIn === true;
+  let pushed = false;
 
   const execFileSync = vi.fn((_file: string, args: string[], _o?: { cwd?: string; env?: Record<string, string | undefined>; stdio?: string }) => {
     const key = args.join(" ");
@@ -78,8 +89,16 @@ function makeDeps(opts: Opts = {}) {
       }
       if (v[0] === "link") {
         vol.mkdirSync("/p/.vercel", { recursive: true });
-        vol.writeFileSync("/p/.vercel/project.json", JSON.stringify({ projectId: "prj_1", projectName: "ana-site" }));
+        vol.writeFileSync("/p/.vercel/project.json", JSON.stringify({ projectId: "prj_1", orgId: "team_1", projectName: "ana-site" }));
         return Buffer.from("");
+      }
+      if (v[0] === "api" && v[1] === "/v9/projects/ana-site") {
+        if (!opts.vercelProject) throw new Error("Project not found (404)");
+        return Buffer.from(JSON.stringify({ id: "prj_1", name: "ana-site" }));
+      }
+      if (v[0] === "api" && v[1].includes("/env")) {
+        const keys = opts.vercelEnvKeys ?? ["VITE_CONVEX_URL", "CONVEX_URL", "SITE_URL", "CONVEX_DEPLOY_KEY"];
+        return Buffer.from(JSON.stringify({ envs: keys.map((key) => ({ key })) }));
       }
       if (v[0] === "api") {
         if (opts.domains === null) throw new Error("api fora do ar");
@@ -93,13 +112,18 @@ function makeDeps(opts: Opts = {}) {
       }
       return Buffer.from("");
     }
+    if (key === "convex deploy") pushed = true;
     if (key === "convex deployment token create rubrica-vercel --prod") return Buffer.from(`${opts.key ?? DEPLOY_KEY}\n`);
+    if (args[1] === "env" && args[2] === "get" && args[3] === "--prod") return Buffer.from((opts.prodConvexEnv ?? {})[args[4]] ?? "");
     if (args[1] === "env" && args[2] === "get") return Buffer.from((opts.devEnv ?? {})[args[3]] ?? "");
     if (key === "convex run contactInfo:get") {
       if (opts.devContact === null) throw new Error("offline");
       return Buffer.from(opts.devContact ?? "null");
     }
-    if (key === "convex run --prod users:isSetupRequired") return Buffer.from(opts.adminExists ? "false\n" : "true\n");
+    if (key === "convex run --prod users:isSetupRequired") {
+      if (opts.prodOffline && !pushed) throw new Error("Could not find function users:isSetupRequired");
+      return Buffer.from(opts.adminExists ? "false\n" : "true\n");
+    }
     return Buffer.from("");
   });
 
@@ -118,6 +142,12 @@ function makeDeps(opts: Opts = {}) {
       randomBytes: vi.fn().mockReturnValue(Buffer.alloc(32, 7)),
       execFileSync,
       processEnv: opts.processEnv ?? {},
+      fetch: vi.fn(async (_url: string, init?: RequestInit) => {
+        const auth = (init?.headers as Record<string, string> | undefined)?.Authorization ?? "";
+        const ok = (opts.validTokens ?? ["tok_certo"]).some((t) => auth === `Bearer ${t}`);
+        return new Response(ok ? "{}" : '{"error":{}}', { status: ok ? 200 : 403 });
+      }),
+      openUrl: vi.fn(),
     },
   };
 }
@@ -128,11 +158,17 @@ const vercelCalls = (deps: Deps) => calls(deps).map(vercelArgs).filter((v): v is
 const convexCalls = (deps: Deps) => calls(deps).filter((a) => a[0] === "convex").map((a) => a.join(" "));
 const indexOf = (deps: Deps, pred: (a: string[]) => boolean) => calls(deps).findIndex(pred);
 
+/** Senha do admin nas perguntas de senha; o token da Vercel na pergunta do token. */
+function answerToken(...tokens: string[]) {
+  vi.mocked(password).mockImplementation((async (o: { message: string }) =>
+    /token da Vercel/.test(o.message) ? (tokens.length > 1 ? tokens.shift()! : tokens[0]) : "SenhaForte2026") as never);
+}
+
 beforeEach(() => {
   vi.clearAllMocks();
   for (const prompt of [confirm, password, text]) vi.mocked(prompt).mockReset();
   vi.mocked(confirm).mockResolvedValue(true);
-  vi.mocked(password).mockResolvedValue("SenhaForte2026");
+  answerToken("tok_certo");
 });
 
 describe("publicar — primeira vez", () => {
@@ -141,7 +177,9 @@ describe("publicar — primeira vez", () => {
     vi.mocked(confirm).mockResolvedValueOnce(false);
     await runPublish(deps);
     expect(note).toHaveBeenCalledWith(expect.stringMatching(/Vercel.*admin/s), expect.any(String));
-    expect(deps.execFileSync).not.toHaveBeenCalled();
+    // só a consulta (de leitura) que descobre se o site já foi publicado
+    expect(convexCalls(deps)).toEqual(["convex run --prod users:isSetupRequired"]);
+    expect(vercelCalls(deps)).toEqual([]);
     expect(cancel).toHaveBeenCalledWith("Nada foi publicado.");
   });
 
@@ -279,7 +317,8 @@ describe("publicar — primeira vez", () => {
   it("produção que já tem admin: não pede senha", async () => {
     const { deps } = makeDeps({ adminExists: true });
     await runPublish(deps);
-    expect(password).not.toHaveBeenCalled();
+    const asked = vi.mocked(password).mock.calls.map(([o]) => (o as { message: string }).message);
+    expect(asked.every((m) => /token da Vercel/.test(m))).toBe(true);
     expect(convexCalls(deps).some((c) => c.includes("seed:setupAdmin"))).toBe(false);
   });
 
@@ -438,7 +477,7 @@ describe("publicar — detalhes", () => {
     const { deps } = makeDeps({ fail: { "link --yes": "Project name taken" } });
     await runPublish(deps);
     expect(cancel).toHaveBeenCalledWith(expect.stringContaining("Project name taken"));
-    expect(convexCalls(deps)).toEqual([]);
+    expect(convexCalls(deps)).toEqual(["convex run --prod users:isSetupRequired"]);
   });
 
   it("falha ao criar a chave de produção: para e mostra o erro", async () => {
@@ -541,13 +580,171 @@ describe("publicar — endereço de produção no rubrica.json", () => {
   });
 });
 
+describe("publicar — botão Publicar do painel (token da Vercel)", () => {
+  it("na primeira vez, abre a página de tokens, confere o token e grava no Convex de produção", async () => {
+    const { deps } = makeDeps();
+    await runPublish(deps);
+    expect(deps.openUrl).toHaveBeenCalledWith("https://vercel.com/account/settings/tokens");
+    expect(note).toHaveBeenCalledWith(expect.stringMatching(/No Expiration/), expect.stringMatching(/Publicar/));
+    const [url, init] = deps.fetch.mock.calls[0];
+    expect(url).toBe("https://api.vercel.com/v9/projects/prj_1?teamId=team_1");
+    expect((init!.headers as Record<string, string>).Authorization).toBe("Bearer tok_certo");
+    const sets = convexCalls(deps).filter((c) => c.startsWith("convex env set --prod -- VERCEL_"));
+    expect(sets).toEqual([
+      "convex env set --prod -- VERCEL_TOKEN tok_certo",
+      "convex env set --prod -- VERCEL_PROJECT_ID prj_1",
+      "convex env set --prod -- VERCEL_TEAM_ID team_1",
+    ]);
+  });
+
+  it("configura o botão antes de publicar", async () => {
+    const { deps } = makeDeps();
+    await runPublish(deps);
+    const token = indexOf(deps, (a) => a.join(" ").includes("VERCEL_TOKEN"));
+    const deploy = indexOf(deps, (a) => vercelArgs(a)?.[0] === "deploy");
+    expect(token).toBeGreaterThan(-1);
+    expect(token).toBeLessThan(deploy);
+  });
+
+  it("token recusado: avisa e pergunta de novo", async () => {
+    answerToken("tok_errado", "tok_certo");
+    const { deps } = makeDeps();
+    await runPublish(deps);
+    expect(log.warn).toHaveBeenCalledWith(expect.stringMatching(/não aceitou/));
+    expect(convexCalls(deps)).toContain("convex env set --prod -- VERCEL_TOKEN tok_certo");
+    expect(convexCalls(deps).some((c) => c.includes("tok_errado"))).toBe(false);
+  });
+
+  it("Enter vazio pula: publica sem o botão e diz como configurar depois", async () => {
+    answerToken("");
+    const { deps } = makeDeps();
+    await runPublish(deps);
+    expect(convexCalls(deps).some((c) => c.includes("VERCEL_TOKEN"))).toBe(false);
+    expect(log.info).toHaveBeenCalledWith(expect.stringContaining("npx create-rubrica publicar"));
+    expect(vercelCalls(deps).some((v) => v[0] === "deploy")).toBe(true);
+  });
+
+  it("o token nunca aparece nas mensagens", async () => {
+    const { deps } = makeDeps();
+    await runPublish(deps);
+    const shown = [note, outro, cancel, log.info, log.warn, log.success]
+      .flatMap((fn) => vi.mocked(fn).mock.calls.flat())
+      .map(String);
+    expect(shown.some((m) => m.includes("tok_certo"))).toBe(false);
+  });
+
+  it("publicando de novo sem o botão configurado: oferece configurar", async () => {
+    const { deps } = makeDeps({ linked: true, state: PUBLISHED });
+    await runPublish(deps);
+    expect(confirm).toHaveBeenCalledWith(expect.objectContaining({ message: expect.stringMatching(/botão Publicar/) }));
+    expect(convexCalls(deps)).toContain("convex env set --prod -- VERCEL_TOKEN tok_certo");
+  });
+
+  it("publicando de novo com token ou Deploy Hook já no Convex: não pergunta", async () => {
+    const cases: Record<string, string>[] = [{ VERCEL_TOKEN: "x" }, { VERCEL_DEPLOY_HOOK_URL: "https://hook" }];
+    for (const prodConvexEnv of cases) {
+      vi.mocked(confirm).mockClear();
+      const { deps } = makeDeps({ linked: true, state: PUBLISHED, prodConvexEnv });
+      await runPublish(deps);
+      expect(vi.mocked(confirm).mock.calls.some(([o]) => /botão Publicar/.test((o as { message: string }).message))).toBe(false);
+      expect(deps.openUrl).not.toHaveBeenCalled();
+    }
+  });
+});
+
+describe("publicar — site já publicado, mas sem a pasta .vercel (outro computador, clone novo)", () => {
+  it("não refaz a primeira vez: liga o projeto da Vercel e só publica", async () => {
+    const { deps } = makeDeps({ adminExists: true, vercelProject: true, state: PUBLISHED, prodConvexEnv: { VERCEL_TOKEN: "x" } });
+    await runPublish(deps);
+    expect(confirm).toHaveBeenCalledWith(expect.objectContaining({ message: expect.stringMatching(/já está publicado/) }));
+    expect(vercelCalls(deps)).toContainEqual(["link", "--yes", "--project", "ana-site"]);
+    const convex = convexCalls(deps);
+    for (const forbidden of ["JWT_PRIVATE_KEY", "JWKS", "seed:", "setBatchInternal", "contactInfo:updateInternal", "deployment token create"]) {
+      expect(convex.some((c) => c.includes(forbidden))).toBe(false);
+    }
+    expect(vercelCalls(deps).some((v) => v[0] === "env" && v[1] === "add")).toBe(false);
+    expect(vercelCalls(deps).at(-1)).toEqual(["deploy", "--prod", "--yes"]);
+  });
+
+  it("o projeto com esse nome na Vercel não é o do site: para sem ligar nem publicar", async () => {
+    const { deps } = makeDeps({ adminExists: true, vercelProject: true, vercelEnvKeys: [] });
+    await runPublish(deps);
+    expect(cancel).toHaveBeenCalledWith(expect.stringMatching(/projeto da Vercel/));
+    expect(vercelCalls(deps).some((v) => v[0] === "link" || v[0] === "deploy")).toBe(false);
+  });
+
+  it("não existe projeto com esse nome na Vercel: para sem criar um vazio", async () => {
+    const { deps } = makeDeps({ adminExists: true });
+    await runPublish(deps);
+    expect(cancel).toHaveBeenCalledWith(expect.stringMatching(/projeto da Vercel/));
+    expect(vercelCalls(deps).some((v) => v[0] === "link" || v[0] === "deploy")).toBe(false);
+  });
+
+  it("produção sem funções (nunca publicado): segue a primeira vez normalmente", async () => {
+    const { deps } = makeDeps({ prodOffline: true });
+    await runPublish(deps);
+    expect(convexCalls(deps)).toContain("convex deploy");
+    expect(convexCalls(deps).some((c) => c.includes("JWT_PRIVATE_KEY"))).toBe(true);
+  });
+});
+
+describe("publicar — computador ligado a outro Convex (não ao do site no ar)", () => {
+  const nothingWritten = (deps: Deps) => {
+    expect(vercelCalls(deps).some((v) => ["link", "env", "deploy"].includes(v[0]))).toBe(false);
+    expect(convexCalls(deps).some((c) => /deploy|env set|seed|setupAdmin|token create/.test(c))).toBe(false);
+  };
+
+  it("o rubrica.json diz que o site está publicado em outro banco: para sem tocar em nada", async () => {
+    const { deps } = makeDeps({ state: PUBLISHED });
+    await runPublish(deps);
+    expect(cancel).toHaveBeenCalledWith(expect.stringMatching(/happy-otter-123.*npx convex dev --configure existing/s));
+    nothingWritten(deps);
+  });
+
+  it("já existe na Vercel um site com este nome: para sem trocar o banco dele", async () => {
+    const { deps } = makeDeps({ vercelProject: true });
+    await runPublish(deps);
+    expect(cancel).toHaveBeenCalledWith(expect.stringMatching(/Já existe um site publicado na Vercel/));
+    nothingWritten(deps);
+  });
+
+  it("projeto da Vercel com o mesmo nome, mas sem site configurado (vazio): segue a primeira vez", async () => {
+    const { deps } = makeDeps({ vercelProject: true, vercelEnvKeys: [] });
+    await runPublish(deps);
+    expect(vercelCalls(deps).at(-1)).toEqual(["deploy", "--prod", "--yes"]);
+  });
+});
+
+describe("publicar — de novo, integrações", () => {
+  it("leva para a produção o Telegram e o OpenRouter ligados no computador depois da primeira vez", async () => {
+    const { deps } = makeDeps({
+      linked: true,
+      state: PUBLISHED,
+      devEnv: { TELEGRAM_BOT_TOKEN: "tg-dev", OPENROUTER_API_KEY: "or-dev" },
+      prodConvexEnv: { VERCEL_TOKEN: "x", OPENROUTER_API_KEY: "or-prod" },
+    });
+    await runPublish(deps);
+    const sets = convexCalls(deps).filter((c) => c.startsWith("convex env set --prod"));
+    expect(sets).toEqual(["convex env set --prod -- TELEGRAM_BOT_TOKEN tg-dev"]);
+    expect(log.info).toHaveBeenCalledWith(expect.stringMatching(/Telegram/));
+    const shown = vi.mocked(log.info).mock.calls.flat().map(String);
+    expect(shown.some((m) => m.includes("tg-dev"))).toBe(false);
+  });
+
+  it("nada novo no computador: não grava nada", async () => {
+    const { deps } = makeDeps({ linked: true, state: PUBLISHED, prodConvexEnv: { VERCEL_TOKEN: "x" } });
+    await runPublish(deps);
+    expect(convexCalls(deps).some((c) => c.startsWith("convex env set"))).toBe(false);
+  });
+});
+
 describe("publicar — de novo", () => {
   it("projeto já ligado: confirma e só publica de novo", async () => {
-    const { deps } = makeDeps({ linked: true, state: PUBLISHED });
+    const { deps } = makeDeps({ linked: true, state: PUBLISHED, prodConvexEnv: { VERCEL_TOKEN: "x" } });
     await runPublish(deps);
     expect(confirm).toHaveBeenCalledWith(expect.objectContaining({ message: expect.stringMatching(/de novo/) }));
     expect(vercelCalls(deps).map((v) => v[0])).toEqual(["whoami", "api", "deploy"]);
-    expect(convexCalls(deps)).toEqual([]);
+    expect(convexCalls(deps).every((c) => c.startsWith("convex env get"))).toBe(true);
     expect(vi.mocked(outro).mock.calls[0][0]).toContain("https://ana-site.vercel.app");
   });
 

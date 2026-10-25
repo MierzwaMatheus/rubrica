@@ -2,6 +2,32 @@
 
 O que mudou em cada versão do Rubrica (template e CLI `create-rubrica`). Detalhes de cada uma nas [notas da release](https://github.com/MierzwaMatheus/rubrica/releases). Para atualizar um projeto existente, veja [Atualizando o seu Rubrica](./docs/atualizacao.md).
 
+## 1.5.0 — 2026-10-25
+
+O botão **Publicar** do painel passa a funcionar sem GitHub, o agente de IA entra no site publicado, e o `publicar` fica seguro em outro computador.
+
+**Vindo da 1.4:**
+- Atualize com `npx create-rubrica@latest update` e rode `npx create-rubrica@latest publicar`. Ele anota no `rubrica.json` o endereço do site publicado e oferece ligar o botão Publicar do painel (você cria um token na Vercel e cola no terminal, uma vez só).
+- Versione o `rubrica.json` junto com o projeto: é por ele que o `setup` e o `publicar` reconhecem, num outro computador, que o site já está no ar.
+
+### Botão Publicar do painel
+- **Sem GitHub.** A Vercel só cria Deploy Hook em projeto ligado ao GitHub, e o `publicar` envia pelo terminal. Agora o painel usa um token da Vercel para refazer o último deploy de produção: o build roda de novo e busca o conteúdo atualizado. Quem tem Deploy Hook continua usando o hook.
+- O `publicar` abre a página de tokens da Vercel, explica o que preencher, recebe o token sem mostrá-lo na tela, confere se ele acessa o projeto e grava no banco de produção.
+- O painel mostra o motivo quando a publicação não sai (botão não configurado, token vencido). Antes dizia "Deploy iniciado com sucesso!" mesmo com erro.
+
+### Agente de IA no site publicado
+- A skill `rubrica` ganha `--producao` (ou `RUBRICA_AMBIENTE=producao`) para mexer no site no ar. O padrão continua sendo o site do computador.
+- Num projeto já publicado, o login pergunta se você quer entrar no site publicado ou no do computador. O `status` mostra os dois endereços.
+
+### `publicar` e `setup` em outro computador
+- O `publicar` grava em `producao` no `rubrica.json` o endereço do banco e do site publicados (projetos da 1.4 ganham isso ao publicar de novo).
+- Sem a pasta `.vercel` (clone novo, outro computador), o `publicar` percebe que o site já está publicado, liga a pasta ao mesmo projeto da Vercel e só publica. Antes ele refazia a primeira vez: gerava chaves de login novas (todo mundo saía do painel) e regravava os dados do painel.
+- Se o computador estiver ligado a outro projeto do Convex, o `publicar` para antes de gravar qualquer coisa, para não trocar o banco do site no ar por um vazio. O `setup`, num clone de site publicado, liga a um projeto existente do Convex em vez de criar um novo.
+- Publicando de novo, o Telegram e o OpenRouter ligados no computador depois da primeira vez vão para a produção (só os que faltam lá).
+
+### `create`
+- O git começa na branch `main`, com um primeiro commit do projeto montado. Antes, o nome da branch dependia do computador (em geral `master`) e ela só passava a existir no primeiro commit da pessoa.
+
 ## 1.4.1 — 2026-10-24
 
 Layouts ajustados para telas largas (monitores de 1920px para cima). Nada muda em telas de até 1600px.

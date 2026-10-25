@@ -5,32 +5,37 @@
  */
 import { marked } from "marked";
 import Base from "../layouts/Base.astro";
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
+import Header from "./Header.astro";
+import Footer from "./Footer.astro";
 import { REPO } from "../lib/data";
 import { formatDates, parseChangelog, resolveLinks } from "../lib/changelog";
-import changelogMd from "../../../CHANGELOG.md?raw";
+import { useDict, type Lang } from "../i18n";
+import changelogPt from "../../../CHANGELOG.md?raw";
+import changelogEn from "../../../CHANGELOG.en.md?raw";
 
-const { intro, versions } = parseChangelog(changelogMd);
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const d = useDict(lang);
+const t = d.changelog;
+const { intro, versions } = parseChangelog(lang === "en" ? changelogEn : changelogPt);
 const html = (md: string) => marked.parse(resolveLinks(md, REPO), { async: false });
 const isSingle = (version: string) => /^\d+\.\d+\.\d+$/.test(version);
 ---
 
-<Base
-  title="Novidades — Rubrica"
-  description="O que mudou em cada versão do Rubrica: o template e o CLI create-rubrica."
->
-  <Header />
+<Base title={d.meta.changelogTitle} description={d.meta.changelogDescription} lang={lang} page="changelog">
+  <Header lang={lang} page="changelog" />
   <main class="wrap nov">
     <section class="abertura">
-      <p class="eyebrow">Novidades</p>
-      <h1 class="display">O que mudou em cada versão.</h1>
+      <p class="eyebrow">{t.eyebrow}</p>
+      <h1 class="display">{t.title}</h1>
       <div class="lead" set:html={html(intro)} />
     </section>
 
     <div class="grade">
-      <nav class="indice" aria-label="Versões">
-        <p class="eyebrow">Versões</p>
+      <nav class="indice" aria-label={t.versions}>
+        <p class="eyebrow">{t.versions}</p>
         <ol>
           {
             versions.map((v) => (
@@ -52,11 +57,11 @@ const isSingle = (version: string) => /^\d+\.\d+\.\d+$/.test(version);
               <header>
                 <h2 class="display">{v.version}</h2>
                 <p class="meta">
-                  {v.date && <time datetime={v.date.slice(0, 10)}>{formatDates(v.date)}</time>}
-                  {i === 0 && <span class="tag">Mais recente</span>}
+                  {v.date && <time datetime={v.date.slice(0, 10)}>{formatDates(v.date, lang)}</time>}
+                  {i === 0 && <span class="tag">{t.latest}</span>}
                   {isSingle(v.version) && (
                     <a href={`${REPO}/releases/tag/v${v.version}`} target="_blank" rel="noopener">
-                      Notas da release
+                      {t.releaseNotes}
                     </a>
                   )}
                 </p>
@@ -68,7 +73,7 @@ const isSingle = (version: string) => /^\d+\.\d+\.\d+$/.test(version);
       </div>
     </div>
   </main>
-  <Footer />
+  <Footer lang={lang} />
 </Base>
 
 <style>
@@ -209,7 +214,8 @@ const isSingle = (version: string) => /^\d+\.\d+\.\d+$/.test(version);
   .corpo :global(strong) {
     color: var(--ink);
   }
-  .corpo :global(code) {
+  .corpo :global(code),
+  .lead :global(code) {
     font-family: var(--f-mono);
     font-size: 0.86em;
     padding: 1px 6px;

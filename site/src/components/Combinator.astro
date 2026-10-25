@@ -1,5 +1,13 @@
 ---
 import { LAYOUTS, SCHEMES, SANS_FONTS, MONO_FONTS, TEXTURES, MOODS, PAGES } from "../lib/data";
+import { useDict, type Lang } from "../i18n";
+
+interface Props {
+  lang: Lang;
+}
+const d = useDict(Astro.props.lang);
+const t = d.combinator;
+const cat = d.catalog;
 
 const newLayouts = LAYOUTS.filter((l) => !l.legacy);
 const legacyLayouts = LAYOUTS.filter((l) => l.legacy);
@@ -8,26 +16,29 @@ const config = {
   layouts: LAYOUTS.map((l) => ({ id: l.id, label: l.label, recommended: l.recommended, fonts: l.fonts })),
   schemes: SCHEMES.map((s) => ({ id: s.id, label: s.label })),
   moods: MOODS,
-  pages: PAGES,
+  pages: PAGES.map((path) => ({ path, label: d.pages[path] })),
+  i18n: {
+    rows: t.rows,
+    light: t.light,
+    dark: t.dark,
+    textures: Object.fromEntries(TEXTURES.map((x) => [x.value, cat.textures[x.value].label])),
+  },
 };
 ---
 
 <section id="combinador" class="section combinator">
   <div class="wrap">
     <div class="section-head">
-      <p class="eyebrow">Combinador</p>
-      <h2 class="display">Monte o seu e veja funcionando.</h2>
-      <p>
-        O preview não é uma imagem: é o próprio Rubrica rodando com dados de exemplo, em cada um dos layouts. Troque
-        as peças, navegue pelas páginas e veja no celular.
-      </p>
+      <p class="eyebrow">{t.eyebrow}</p>
+      <h2 class="display">{t.title}</h2>
+      <p>{t.intro}{t.previewNote && <> {t.previewNote}</>}</p>
     </div>
 
     <div class="lab">
-      <form class="controls" id="cb-controls" aria-label="Escolhas do combinador">
+      <form class="controls" id="cb-controls" aria-label={t.controlsAria}>
         <fieldset class="grp">
-          <legend>Moods prontos</legend>
-          <p class="help">Uma combinação completa de layout, esquema, modo, textura e fontes.</p>
+          <legend>{t.moods}</legend>
+          <p class="help">{t.moodsHelp}</p>
           <div class="chips">
             {
               MOODS.map((m) => {
@@ -39,7 +50,7 @@ const config = {
                       <i style={`background:${s.primary}`} />
                       <i style={`background:${s.accent}`} />
                     </span>
-                    {m.name}
+                    {cat.moods[m.id]}
                   </button>
                 );
               })
@@ -48,24 +59,24 @@ const config = {
         </fieldset>
 
         <fieldset class="grp">
-          <legend>Layout</legend>
-          <p class="sub">Novos</p>
+          <legend>{t.layout}</legend>
+          <p class="sub">{t.newLayouts}</p>
           <div class="chips">
-            {newLayouts.map((l) => <button type="button" class="chip" data-layout={l.id} aria-pressed="false" title={l.hint}>{l.label}</button>)}
+            {newLayouts.map((l) => <button type="button" class="chip" data-layout={l.id} aria-pressed="false" title={cat.layoutHints[l.id]}>{l.label}</button>)}
           </div>
-          <p class="sub">Originais</p>
+          <p class="sub">{t.legacyLayouts}</p>
           <div class="chips">
-            {legacyLayouts.map((l) => <button type="button" class="chip" data-layout={l.id} aria-pressed="false" title={l.hint}>{l.label}</button>)}
+            {legacyLayouts.map((l) => <button type="button" class="chip" data-layout={l.id} aria-pressed="false" title={cat.layoutHints[l.id]}>{l.label}</button>)}
           </div>
         </fieldset>
 
         <fieldset class="grp">
-          <legend>Esquema de cores</legend>
-          <p class="help">A paleta: só as cores, com versão clara e escura.</p>
+          <legend>{t.scheme}</legend>
+          <p class="help">{t.schemeHelp}</p>
           <div class="schemes">
             {
               SCHEMES.map((s) => (
-                <button type="button" class="scheme" data-scheme={s.id} aria-pressed="false" title={s.hint}>
+                <button type="button" class="scheme" data-scheme={s.id} aria-pressed="false" title={cat.schemeHints[s.id]}>
                   <span class="sw" aria-hidden="true">
                     <i style={`background:${s.light.bg}`} />
                     <i style={`background:${s.light.primary}`} />
@@ -81,37 +92,37 @@ const config = {
 
         <div class="row2">
           <fieldset class="grp">
-            <legend>Modo</legend>
+            <legend>{t.mode}</legend>
             <div class="seg">
-              <button type="button" data-mode="light" aria-pressed="false">Claro</button>
-              <button type="button" data-mode="dark" aria-pressed="false">Escuro</button>
+              <button type="button" data-mode="light" aria-pressed="false">{t.light}</button>
+              <button type="button" data-mode="dark" aria-pressed="false">{t.dark}</button>
             </div>
           </fieldset>
           <fieldset class="grp">
-            <legend>Botão de modo</legend>
+            <legend>{t.toggle}</legend>
             <div class="seg">
-              <button type="button" data-toggle="1" aria-pressed="false">Mostrar</button>
-              <button type="button" data-toggle="0" aria-pressed="false">Esconder</button>
+              <button type="button" data-toggle="1" aria-pressed="false">{t.show}</button>
+              <button type="button" data-toggle="0" aria-pressed="false">{t.hide}</button>
             </div>
           </fieldset>
         </div>
 
         <fieldset class="grp">
-          <legend>Textura</legend>
+          <legend>{t.texture}</legend>
           <div class="seg wrap4">
-            {TEXTURES.map((t) => <button type="button" data-texture={t.value} aria-pressed="false" title={t.hint}>{t.label}</button>)}
+            {TEXTURES.map((x) => <button type="button" data-texture={x.value} aria-pressed="false" title={cat.textures[x.value].hint}>{cat.textures[x.value].label}</button>)}
           </div>
         </fieldset>
 
         <div class="row2">
           <label class="grp">
-            <span class="lbl">Fonte principal</span>
+            <span class="lbl">{t.sans}</span>
             <select id="cb-sans">
               {SANS_FONTS.map((f) => <option value={f.family}>{f.family}</option>)}
             </select>
           </label>
           <label class="grp">
-            <span class="lbl">Fonte mono</span>
+            <span class="lbl">{t.mono}</span>
             <select id="cb-mono">
               {MONO_FONTS.map((f) => <option value={f.family}>{f.family}</option>)}
             </select>
@@ -123,31 +134,31 @@ const config = {
         <div class="frame">
           <div class="bar">
             <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
-            <div class="tabs" role="tablist" aria-label="Página do preview">
-              {PAGES.map((p) => <button type="button" role="tab" data-page={p.path} aria-selected="false">{p.label}</button>)}
+            <div class="tabs" role="tablist" aria-label={t.pageTabs}>
+              {PAGES.map((p) => <button type="button" role="tab" data-page={p} aria-selected="false">{d.pages[p]}</button>)}
             </div>
             <div class="tools">
-              <div class="seg small" aria-label="Tamanho da tela">
-                <button type="button" data-device="desktop" aria-pressed="true">Desktop</button>
-                <button type="button" data-device="mobile" aria-pressed="false">Celular</button>
+              <div class="seg small" aria-label={t.screenSize}>
+                <button type="button" data-device="desktop" aria-pressed="true">{t.desktop}</button>
+                <button type="button" data-device="mobile" aria-pressed="false">{t.mobile}</button>
               </div>
-              <a id="cb-open" class="open" href="#" target="_blank" rel="noopener" aria-label="Abrir o preview em tela cheia">
+              <a id="cb-open" class="open" href="#" target="_blank" rel="noopener" aria-label={t.openFull}>
                 <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M9 2h5v5M14 2 7.5 8.5M12 9.5V14H2V4h4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
               </a>
             </div>
           </div>
           <div class="stage" id="cb-stage" data-device="desktop">
-            <iframe id="cb-frame" title="Preview do Rubrica com as escolhas do combinador" loading="lazy"></iframe>
-            <div class="loading" id="cb-loading" aria-hidden="true"><span>carregando o Rubrica…</span></div>
+            <iframe id="cb-frame" title={t.frameTitle} loading="lazy"></iframe>
+            <div class="loading" id="cb-loading" aria-hidden="true"><span>{t.loading}</span></div>
           </div>
         </div>
 
         <div class="answers">
           <div>
-            <p class="eyebrow">Respostas para o create-rubrica</p>
+            <p class="eyebrow">{t.answers}</p>
             <dl id="cb-answers"></dl>
           </div>
-          <a class="btn" href="#criar">Criar o meu com essas escolhas</a>
+          <a class="btn" href="#criar">{t.createCta}</a>
         </div>
       </div>
     </div>

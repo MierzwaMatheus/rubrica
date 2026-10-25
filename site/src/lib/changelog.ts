@@ -1,3 +1,5 @@
+import type { Lang } from "../i18n/routes";
+
 /**
  * Página /novidades: lê o CHANGELOG.md da raiz do repositório no build.
  * Cada "## <versão> — <data>" vira uma versão com âncora própria.
@@ -49,7 +51,22 @@ export function resolveLinks(md: string, repo: string): string {
   return md.replace(/\]\((?![a-z][a-z0-9+.-]*:|#|\/)(?:\.\/)?([^)\s]+)\)/gi, `](${repo}/blob/main/$1)`);
 }
 
-const MONTHS = [
+const MONTHS_EN = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+const MONTHS_PT = [
   "janeiro",
   "fevereiro",
   "março",
@@ -64,9 +81,11 @@ const MONTHS = [
   "dezembro",
 ];
 
-/** "2026-10-25" vira "25 de outubro de 2026"; o resto do texto fica igual. */
-export function formatDates(text: string): string {
+/** "2026-10-25" vira "25 de outubro de 2026" (ou "October 25, 2026"); o resto do texto fica igual. */
+export function formatDates(text: string, lang: Lang): string {
   return text.replace(/(\d{4})-(\d{2})-(\d{2})/g, (_, y: string, m: string, d: string) => {
-    return `${Number(d)} de ${MONTHS[Number(m) - 1]} de ${y}`;
+    const day = Number(d);
+    const month = Number(m) - 1;
+    return lang === "en" ? `${MONTHS_EN[month]} ${day}, ${y}` : `${day} de ${MONTHS_PT[month]} de ${y}`;
   });
 }

@@ -1,12 +1,18 @@
 ---
 import { REPO } from "../lib/data";
+import { route, useDict, type Lang } from "../i18n";
 
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useDict(lang);
 const links = [
-  { href: REPO, label: "Repositório" },
-  { href: `${REPO}/blob/main/docs/templates/README.md`, label: "Guia dos templates" },
-  { href: `${REPO}/blob/main/docs/templates/cores.md`, label: "Esquemas de cores" },
-  { href: "/novidades", label: "Novidades" },
-  { href: "https://www.npmjs.com/package/create-rubrica", label: "create-rubrica no npm" },
+  { href: REPO, label: t.footer.repo },
+  { href: `${REPO}/blob/main/docs/templates/README.md`, label: t.footer.templates },
+  { href: `${REPO}/blob/main/docs/templates/cores.md`, label: t.footer.colors },
+  { href: route("changelog", lang), label: t.footer.changelog },
+  { href: "https://www.npmjs.com/package/create-rubrica", label: t.footer.npm },
 ];
 ---
 
@@ -22,8 +28,8 @@ const links = [
       }
     </ul>
     <p class="fine">
-      Código aberto sob{" "}<a href={`${REPO}/blob/main/LICENSE`} target="_blank" rel="noopener">GPL-3.0</a>. Feito por
-      Matheus Mierzwa.
+      {t.footer.licenseBefore}{" "}<a href={`${REPO}/blob/main/LICENSE`} target="_blank" rel="noopener">GPL-3.0</a>.
+      {t.footer.madeBy}
     </p>
   </div>
 </footer>

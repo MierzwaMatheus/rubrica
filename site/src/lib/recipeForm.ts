@@ -11,6 +11,19 @@ import { onChoice, type CombinatorChoice } from "./combinatorStore";
 const FIELDS = ["authorName", "siteName", "siteUrl", "siteDescription", "authorEmail", "twitterHandle", "profession", "specialties"] as const;
 type Field = (typeof FIELDS)[number];
 
+/** Textos montados no navegador, no idioma da página (JSON em #cs-i18n). */
+interface FormText {
+  badUrl: string;
+  badEmail: string;
+  missingName: string;
+  missingUrl: string;
+  missingEmail: string;
+  and: string;
+  willAsk: string;
+  allSet: string;
+  siteNamePh: string;
+}
+
 export function initRecipeForm(): void {
   const form = document.getElementById("cs-form") as HTMLFormElement | null;
   const code = document.getElementById("cs-cmd");
@@ -18,6 +31,7 @@ export function initRecipeForm(): void {
   const folder = document.getElementById("cs-folder");
   const missing = document.getElementById("cs-missing");
   if (!form || !code || !copy || !folder || !missing) return;
+  const tx = JSON.parse(document.getElementById("cs-i18n")?.textContent || "{}") as FormText;
 
   let visual: CombinatorChoice | null = null;
   let preset = PLUGIN_PRESETS[0].id;
@@ -50,10 +64,10 @@ export function initRecipeForm(): void {
       if (value(f)) identity[f] = value(f);
     }
     const url = value("siteUrl");
-    hint("siteUrl", url && validateUrl(url) ? "Não parece um endereço (ex: meusite.com). O terminal vai perguntar de novo." : "");
+    hint("siteUrl", url && validateUrl(url) ? tx.badUrl : "");
     if (url && !validateUrl(url)) identity.siteUrl = normalizeUrl(url);
     const email = value("authorEmail");
-    hint("authorEmail", email && validateEmail(email) ? "Confira o e-mail (ex: nome@meusite.com). O terminal vai perguntar de novo." : "");
+    hint("authorEmail", email && validateEmail(email) ? tx.badEmail : "");
     if (email && !validateEmail(email)) identity.authorEmail = normalizeEmail(email);
     if (Object.keys(identity).length) recipe.identity = identity;
     return recipe;
@@ -66,15 +80,15 @@ export function initRecipeForm(): void {
     code!.textContent = command;
     copy!.dataset.copy = command;
     folder!.textContent = name;
-    input("siteName").placeholder = value("authorName") || "Igual ao seu nome";
+    input("siteName").placeholder = value("authorName") || tx.siteNamePh;
 
     const left: string[] = [];
-    if (!recipe.identity?.authorName) left.push("seu nome");
-    if (!recipe.identity?.siteUrl) left.push("o endereço");
-    if (!recipe.identity?.authorEmail) left.push("o e-mail");
+    if (!recipe.identity?.authorName) left.push(tx.missingName);
+    if (!recipe.identity?.siteUrl) left.push(tx.missingUrl);
+    if (!recipe.identity?.authorEmail) left.push(tx.missingEmail);
     missing!.textContent = left.length
-      ? `O terminal vai perguntar ${left.join(", ").replace(/, ([^,]*)$/, " e $1")}. O resto já vai no comando.`
-      : "Está tudo no comando: no terminal, você só faz o login no banco de dados (pelo navegador) e escolhe a senha do painel.";
+      ? tx.willAsk.replace("{list}", left.join(", ").replace(/, ([^,]*)$/, ` ${tx.and} $1`))
+      : tx.allSet;
 
     form!.querySelectorAll<HTMLButtonElement>("[data-preset]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.preset === preset)));
   }

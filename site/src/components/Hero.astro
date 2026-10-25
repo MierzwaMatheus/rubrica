@@ -1,27 +1,31 @@
 ---
 import { COMMAND, REPO, LAYOUTS, SCHEMES } from "../lib/data";
+import { useDict, type Lang } from "../i18n";
+
+interface Props {
+  lang: Lang;
+}
+const t = useDict(Astro.props.lang);
 ---
 
 <section class="hero">
   <div class="wrap hero-in">
     <div class="copy-col">
-      <p class="eyebrow">Portfólio profissional · open source</p>
-      <h1 class="display">Assine com a sua cara.</h1>
-      <p class="lede">
-        Home, portfólio, blog, currículo, propostas comerciais, painel admin e pagamentos já resolvidos. Você escolhe
-        a aparência, escreve o seu conteúdo e publica com domínio próprio.
-      </p>
+      <p class="eyebrow">{t.hero.eyebrow}</p>
+      <h1 class="display">{t.hero.title}</h1>
+      <p class="lede">{t.hero.lede}</p>
+      {t.hero.languageNote && <p class="lang-note">{t.hero.languageNote}</p>}
       <div class="cta">
         <div class="cmd">
           <code>{COMMAND}</code>
-          <button class="copy" type="button" data-copy={COMMAND}>Copiar</button>
+          <button class="copy" type="button" data-copy={COMMAND}>{t.common.copy}</button>
         </div>
-        <a class="btn ghost" href="#combinador">Montar o meu</a>
+        <a class="btn ghost" href="#combinador">{t.hero.build}</a>
       </div>
-      <ul class="facts" aria-label="O que vem no Rubrica">
-        <li><b>{LAYOUTS.length}</b> layouts</li>
-        <li><b>{SCHEMES.length}</b> esquemas de cores</li>
-        <li><b>claro e escuro</b> em todos</li>
+      <ul class="facts" aria-label={t.hero.factsAria}>
+        <li><b>{LAYOUTS.length}</b> {t.hero.layouts}</li>
+        <li><b>{SCHEMES.length}</b> {t.hero.schemes}</li>
+        <li><b>{t.hero.modes}</b> {t.hero.modesTail}</li>
         <li><a href={`${REPO}/blob/main/LICENSE`} target="_blank" rel="noopener">GPL-3.0</a></li>
       </ul>
     </div>
@@ -32,7 +36,7 @@ import { COMMAND, REPO, LAYOUTS, SCHEMES } from "../lib/data";
           src="/img/capa.jpg"
           width="1279"
           height="720"
-          alt="Uma caneta-tinteiro desenha o r do Rubrica com o floreio em terracota sobre papel envelhecido, ao lado de um ramo de folhas."
+          alt={t.hero.imageAlt}
         />
       </picture>
     </figure>
@@ -62,6 +66,13 @@ import { COMMAND, REPO, LAYOUTS, SCHEMES } from "../lib/data";
     font-size: clamp(17px, 1.5vw, 19.5px);
     color: var(--ink-2);
     max-width: 52ch;
+  }
+  .lang-note {
+    max-width: 52ch;
+    padding-left: 12px;
+    border-left: 2px solid var(--salvia);
+    font-size: 14.5px;
+    color: var(--ink-3);
   }
   .cta {
     display: flex;

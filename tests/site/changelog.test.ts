@@ -52,6 +52,14 @@ describe("parseChangelog", () => {
     expect(v.date).toBe("");
   });
 
+  it("o CHANGELOG.en.md tem as mesmas versões, na mesma ordem", () => {
+    const read = (f: string) => readFileSync(path.resolve(import.meta.dirname, "../..", f), "utf8");
+    const pt = parseChangelog(read("CHANGELOG.md")).versions;
+    const en = parseChangelog(read("CHANGELOG.en.md")).versions;
+    expect(en.map((v) => v.version)).toEqual(pt.map((v) => v.version));
+    expect(en.map((v) => v.date.slice(0, 10))).toEqual(pt.map((v) => v.date.slice(0, 10)));
+  });
+
   it("lê o CHANGELOG.md do repositório sem perder versões", () => {
     const md = readFileSync(path.resolve(import.meta.dirname, "../../CHANGELOG.md"), "utf8");
     const { versions } = parseChangelog(md);
@@ -81,10 +89,15 @@ describe("resolveLinks", () => {
 
 describe("formatDates", () => {
   it("escreve a data por extenso em pt-BR", () => {
-    expect(formatDates("2026-10-25")).toBe("25 de outubro de 2026");
+    expect(formatDates("2026-10-25", "pt")).toBe("25 de outubro de 2026");
   });
 
   it("formata cada data de uma faixa", () => {
-    expect(formatDates("2026-05-22 a 2026-05-23")).toBe("22 de maio de 2026 a 23 de maio de 2026");
+    expect(formatDates("2026-05-22 a 2026-05-23", "pt")).toBe("22 de maio de 2026 a 23 de maio de 2026");
+  });
+
+  it("escreve a data em inglês", () => {
+    expect(formatDates("2026-10-05", "en")).toBe("October 5, 2026");
+    expect(formatDates("2026-05-22 to 2026-05-23", "en")).toBe("May 22, 2026 to May 23, 2026");
   });
 });

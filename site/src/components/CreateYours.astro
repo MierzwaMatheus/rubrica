@@ -1,92 +1,98 @@
 ---
 import { PLUGIN_PRESETS } from "../../../cli/src/plugins";
+import { useDict, type Lang } from "../i18n";
+
+interface Props {
+  lang: Lang;
+}
+const d = useDict(Astro.props.lang);
+const t = d.create;
+const formText = { ...t.form, siteNamePh: t.siteNamePh };
 ---
 
 <section id="criar" class="section create">
   <div class="wrap">
     <div class="section-head">
-      <p class="eyebrow">Crie o seu</p>
-      <h2 class="display">Gostou? Leve para o seu computador.</h2>
-      <p>
-        O visual que você montou no combinador já vai junto. Preencha os seus dados e cole o comando num terminal: ele
-        baixa o Rubrica, instala tudo, cria o banco de dados (com login pelo navegador, conta gratuita) e monta o seu
-        painel. No terminal, você só escolhe a senha do painel.
-      </p>
+      <p class="eyebrow">{t.eyebrow}</p>
+      <h2 class="display">{t.title}</h2>
+      <p>{t.intro}</p>
     </div>
 
-    <form class="card" id="cs-form" novalidate aria-label="Seus dados para criar o site">
+    <form class="card" id="cs-form" novalidate aria-label={t.formAria}>
       <fieldset class="grp">
-        <legend>O que o site vai ter</legend>
+        <legend>{t.plugins}</legend>
         <div class="presets">
           {
             PLUGIN_PRESETS.map((p, i) => (
               <button type="button" class="preset" data-preset={p.id} aria-pressed={i === 0 ? "true" : "false"}>
-                <span class="nm">{p.label}</span>
-                <span class="ht">{p.hint}</span>
+                <span class="nm">{d.catalog.presets[p.id].label}</span>
+                <span class="ht">{d.catalog.presets[p.id].hint}</span>
               </button>
             ))
           }
         </div>
-        <p class="help">Dá para ligar e desligar cada parte depois, no painel.</p>
+        <p class="help">{t.pluginsHelp}</p>
       </fieldset>
 
       <div class="fields">
         <label>
-          <span class="lbl">Seu nome</span>
-          <input name="authorName" autocomplete="name" placeholder="Ana Souza" />
+          <span class="lbl">{t.authorName}</span>
+          <input name="authorName" autocomplete="name" placeholder={t.authorNamePh} />
         </label>
         <label>
-          <span class="lbl">Nome do site <i>opcional</i></span>
-          <input name="siteName" placeholder="Igual ao seu nome" />
+          <span class="lbl">{t.siteName} <i>{t.optional}</i></span>
+          <input name="siteName" placeholder={t.siteNamePh} />
         </label>
         <label>
-          <span class="lbl">Endereço do site</span>
-          <input name="siteUrl" inputmode="url" autocomplete="url" placeholder="meusite.com" />
+          <span class="lbl">{t.siteUrl}</span>
+          <input name="siteUrl" inputmode="url" autocomplete="url" placeholder={t.siteUrlPh} />
           <small data-hint="siteUrl" aria-live="polite"></small>
-          <small class="note">Ainda não tem? Deixe em branco: o terminal sugere um endereço gratuito da Vercel.</small>
+          <small class="note">{t.siteUrlNote}</small>
         </label>
         <label>
-          <span class="lbl">Seu e-mail <i>não aparece no site</i></span>
-          <input name="authorEmail" type="email" autocomplete="email" placeholder="nome@meusite.com" />
+          <span class="lbl">{t.email} <i>{t.emailPrivate}</i></span>
+          <input name="authorEmail" type="email" autocomplete="email" placeholder={t.emailPh} />
           <small data-hint="authorEmail" aria-live="polite"></small>
         </label>
         <label class="wide">
-          <span class="lbl">Em uma frase, o que você faz? <i>opcional</i></span>
-          <input name="siteDescription" placeholder="Designer de produto e ilustradora." />
+          <span class="lbl">{t.description} <i>{t.optional}</i></span>
+          <input name="siteDescription" placeholder={t.descriptionPh} />
         </label>
         <label>
-          <span class="lbl">Perfil no X <i>opcional</i></span>
-          <input name="twitterHandle" placeholder="@seuperfil" />
+          <span class="lbl">{t.twitter} <i>{t.optional}</i></span>
+          <input name="twitterHandle" placeholder={t.twitterPh} />
         </label>
         <label>
-          <span class="lbl">Profissão <i>opcional</i></span>
-          <input name="profession" placeholder="Fotógrafa, Designer UX, Advogada…" />
-          <small class="note">Aparece abaixo do seu nome no site.</small>
+          <span class="lbl">{t.profession} <i>{t.optional}</i></span>
+          <input name="profession" placeholder={t.professionPh} />
+          <small class="note">{t.professionNote}</small>
         </label>
         <label>
-          <span class="lbl">Especialidades <i>opcional</i></span>
-          <input name="specialties" placeholder="Retrato, Casamentos, Ensaios" />
-          <small class="note">Separadas por vírgula. A IA usa ao escrever as suas propostas.</small>
+          <span class="lbl">{t.specialties} <i>{t.optional}</i></span>
+          <input name="specialties" placeholder={t.specialtiesPh} />
+          <small class="note">{t.specialtiesNote}</small>
         </label>
       </div>
 
       <div class="out">
-        <p class="lbl">Cole no terminal</p>
+        <p class="lbl">{t.paste}</p>
         <div class="cmd">
           <code id="cs-cmd"></code>
-          <button class="copy" type="button" id="cs-copy" data-copy="">Copiar</button>
+          <button class="copy" type="button" id="cs-copy" data-copy="">{d.common.copy}</button>
         </div>
         <p class="meta">
-          Cria a pasta <b id="cs-folder"></b>. <span id="cs-missing"></span>
+          {t.folder} <b id="cs-folder"></b>. <span id="cs-missing"></span>
         </p>
         <p class="meta">
-          Precisa do <a href="https://nodejs.org/pt/download" target="_blank" rel="noopener">Node.js 20 ou mais novo</a>.
-          Nada do que você digita aqui sai do seu navegador: o comando é montado nesta página.
+          {t.nodeBefore} <a href={t.nodeUrl} target="_blank" rel="noopener">{t.nodeLink}</a>.
+          {t.nodeAfter}
         </p>
       </div>
     </form>
   </div>
 </section>
+
+<script type="application/json" id="cs-i18n" set:html={JSON.stringify(formText)} />
 
 <script>
   import { initRecipeForm } from "../lib/recipeForm";

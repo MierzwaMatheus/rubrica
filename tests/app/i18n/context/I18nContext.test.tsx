@@ -57,4 +57,21 @@ describe("I18nContext com DynamicTranslationsRepository", () => {
       expect(value).not.toBe("");
     });
   });
+
+  it("cai no texto do código quando a chave ainda não está no banco (chave nova de uma atualização)", async () => {
+    mockUseQuery.mockReturnValue([
+      { key: "home.greeting", ptBR: "Olá dinâmico", enUS: "Dynamic Hello" },
+    ]);
+    localStorage.setItem("locale", "en-US");
+
+    function NewKeyConsumer() {
+      const { t } = useI18n();
+      return <span data-testid="new">{t("portfolio.showOriginal")}</span>;
+    }
+    render(<NewKeyConsumer />, { wrapper });
+
+    await waitFor(() => {
+      expect(screen.getByTestId("new").textContent).toBe("Show original");
+    });
+  });
 });

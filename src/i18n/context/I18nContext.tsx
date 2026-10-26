@@ -41,10 +41,11 @@ export function I18nProvider({
   // Quando siteTextsRecords é undefined (loading) ou [] (vazio, ex.: plugin i18n
   // desabilitado), usa Static (pt-BR/en-US hardcoded) para evitar que t() retorne
   // a chave literal como fallback.
+  const staticRepository = useMemo(() => new StaticTranslationsRepository(), []);
   const resolvedRepository: TranslationsRepository = translationsRepository
     ?? (siteTextsRecords && siteTextsRecords.length > 0
       ? new DynamicTranslationsRepository(siteTextsRecords)
-      : new StaticTranslationsRepository());
+      : staticRepository);
 
   const [locale, setLocaleState] = useState<Locale>('en-US');
   const [isLoading, setIsLoading] = useState(true);
@@ -82,13 +83,17 @@ export function I18nProvider({
     localStorage.setItem('locale', newLocale);
   };
 
+  // Chave que ainda não está no banco (chegou numa atualização do Rubrica depois do
+  // setup): usa o texto do código em vez de mostrar a chave.
   const t = (key: string): string => {
-    const translation = resolvedRepository.getStaticTranslation(key, locale);
+    const translation = resolvedRepository.getStaticTranslation(key, locale)
+      || staticRepository.getStaticTranslation(key, locale);
     return translation || key;
   };
 
   const tValue = (key: string): any => {
-    return resolvedRepository.getStaticValue(key, locale);
+    return resolvedRepository.getStaticValue(key, locale)
+      ?? staticRepository.getStaticValue(key, locale);
   };
 
   return (

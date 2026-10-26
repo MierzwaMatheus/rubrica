@@ -2,6 +2,16 @@
 
 What changed in each version of Rubrica (template and `create-rubrica` CLI). Details for each one are in the [release notes](https://github.com/MierzwaMatheus/rubrica/releases). To update an existing project, see [Atualizando o seu Rubrica](./docs/atualizacao.md) (in Portuguese).
 
+## 1.8.1 — 2026-10-26
+
+Fix: new texts from an update showed up as raw keys on the site.
+
+**Coming from 1.8:**
+- Update with `npx create-rubrica@latest update`. No new CLI version is needed and nothing to push to Convex.
+
+### Fixes
+- After updating Rubrica, texts added in the new version (such as the testimonial translation notice and the "Show original" button from 1.8.0) showed up as `portfolio.showOriginal` instead of the text. The site now uses the default text while the key isn't in the database. Texts you edited in the admin still take precedence.
+
 ## 1.8.0 — 2026-10-26
 
 Case metric cards and the case testimonial now have an English version.

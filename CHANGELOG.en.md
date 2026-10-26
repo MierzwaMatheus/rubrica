@@ -2,6 +2,23 @@
 
 What changed in each version of Rubrica (template and `create-rubrica` CLI). Details for each one are in the [release notes](https://github.com/MierzwaMatheus/rubrica/releases). To update an existing project, see [Atualizando o seu Rubrica](./docs/atualizacao.md) (in Portuguese).
 
+## 1.8.0 — 2026-10-26
+
+Case metric cards and the case testimonial now have an English version.
+
+**Coming from 1.7:**
+- Update with `npx create-rubrica@latest update`. No new CLI version is needed.
+- The backend changed (`convex/`): push it to your computer's Convex with `npx convex dev --once` and, for the live site, with `npx create-rubrica publicar`. The new fields are optional: existing cases stay the same.
+- Cases you already saved stay in Portuguese on `/en/` until you open each project at `/admin/projects` and save it again. The translation happens then.
+
+### Cases
+- **Metrics in English:** when you save the project, the label and value of each card are translated. Numbers ("365", "7 GB → 400 MB") stay the same; text ("Entrada + saída") is translated. The card metric on the home and portfolio pages is translated too.
+- **Testimonial with its original language:** pick the language the person wrote the testimonial in (Portuguese or English). In the other language, the site shows the translation with a "Machine translation of the original" notice and a button to see the original.
+- The prompt for importing a case as JSON asks for the translated metrics and testimonial.
+
+### Skills
+- The `rubrica` and `rubrica-case` skills know how to translate the metrics and set the testimonial's original language.
+
 ## 1.7.0 — 2026-10-25
 
 Proposals with per-item prices, discounts and gifts. The skills now open an issue when Rubrica can't do what was asked, and projects get instructions for AI agents.

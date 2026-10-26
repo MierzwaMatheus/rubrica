@@ -2,6 +2,16 @@
 
 O que mudou em cada versão do Rubrica (template e CLI `create-rubrica`). Detalhes de cada uma nas [notas da release](https://github.com/MierzwaMatheus/rubrica/releases). Para atualizar um projeto existente, veja [Atualizando o seu Rubrica](./docs/atualizacao.md).
 
+## 1.8.1 — 2026-10-26
+
+Correção: textos novos de uma atualização apareciam como chave crua no site.
+
+**Vindo da 1.8:**
+- Atualize com `npx create-rubrica@latest update`. Não precisa de versão nova do CLI nem de publicar nada no Convex.
+
+### Correções
+- Depois de atualizar o Rubrica, textos que chegaram na versão nova (como o aviso de tradução do depoimento e o botão "Ver original", da 1.8.0) apareciam como `portfolio.showOriginal` no lugar do texto. Agora o site usa o texto padrão enquanto a chave não existe no banco. Os textos que você editou no admin continuam valendo.
+
 ## 1.8.0 — 2026-10-26
 
 Os cards de métricas e o depoimento do case passam a ter versão em inglês.

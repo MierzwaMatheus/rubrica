@@ -66,7 +66,7 @@ Escreva `case.md` com os campos de `references/campos.md`, nesta ordem de leitur
 Invoque a skill `rubrica-pilar` (com `/rubrica-pilar` no Claude Code) com o `case.md`, o `inventario.md` (para a checagem de fatos) e o `perfil.md`. Trate o veredito como em `estrategistas.md` §6. Depois mostre o case à pessoa e espere o "ok". Se ela pedir ajuste, ajuste e passe pela Pilar de novo.
 
 ### 7. Inglês
-Escreva a versão en-US de todos os campos de texto (título, descrição, categoria, os campos do case), reescrita como um nativo escreveria, com os mesmos fatos e números. Rode a `rubrica-pilar` em modo tradução. **Rótulos das métricas:** o Rubrica guarda cada métrica numa língua só (`metrics[].label`). Escreva os rótulos na língua principal do site e avise a pessoa que eles não mudam no `/en/`.
+Escreva a versão en-US de todos os campos de texto (título, descrição, categoria, os campos do case), reescrita como um nativo escreveria, com os mesmos fatos e números. Rode a `rubrica-pilar` em modo tradução. **Métricas:** traduza `label` e `value` de cada card em `caseStudyTranslations.enUS.metrics`, na mesma ordem (e repita os de pt em `.ptBR.metrics`). **Depoimento:** marque `lang` com a língua em que a pessoa escreveu e traduza fiel para a outra em `caseStudyTranslations.<outra>.testimonial`; o site avisa que é tradução e mostra o original num clique. Detalhes em `references/campos.md`.
 
 ### 8. Imagens
 Prints e telas só com permissão (etapa 2). Peça os arquivos, escreva o `alt` descritivo de cada um e inclua no plano como passos `imagem`. Os ids vão em `imageIds`. Num projeto existente, `imageIds` é substituído inteiro: mande os ids atuais **mais** os novos (ex.: `["<id-atual>", "{{print1.id}}"]`), a não ser que a pessoa queira tirar imagens.

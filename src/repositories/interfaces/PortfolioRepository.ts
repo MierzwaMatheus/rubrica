@@ -8,6 +8,10 @@ export interface CaseStudyTestimonial {
   text: string;
   author: string;
   role?: string;
+  /** Idioma em que o depoimento foi escrito. Sem valor, é pt-BR. */
+  lang?: "pt-BR" | "en-US";
+  /** Só na exibição: presente quando o texto mostrado é uma tradução. */
+  original?: { text: string; role?: string; lang: "pt-BR" | "en-US" };
 }
 
 export interface CaseStudyText {
@@ -18,6 +22,10 @@ export interface CaseStudyText {
   context?: string;
   decisions?: string;
   learnings?: string;
+  /** Cards de métrica no idioma, na mesma ordem de CaseStudy.metrics. */
+  metrics?: { label: string; value: string }[];
+  /** Tradução do depoimento para este idioma, quando ele não é o original. */
+  testimonial?: { text: string; role?: string };
 }
 
 export interface CaseStudy {

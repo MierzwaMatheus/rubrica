@@ -14,6 +14,8 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Pencil, Trash2, GripVertical, X, Upload, Copy, Check, Search, RotateCcw, ShieldAlert } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import { CASE_STUDY_AI_PROMPT } from "@/constants/caseStudyPrompt";
+import { metricFieldsToTranslate, buildTranslatedMetrics, type MetricText } from "@/utils/caseStudyMetrics";
+import { testimonialFieldsToTranslate, buildTranslatedTestimonial, testimonialTargetLocale, type TestimonialLocale, type TestimonialText } from "@/utils/caseStudyTestimonial";
 
 const ICON_SUGGESTIONS = [
   "Zap","Users","TrendingUp","Clock","BarChart2","Star","Globe","Code2",
@@ -133,7 +135,7 @@ interface Project {
     decisions?: string;
     learnings?: string;
     metrics: CaseStudyMetric[];
-    testimonial?: { text: string; author: string; role?: string };
+    testimonial?: { text: string; author: string; role?: string; lang?: TestimonialLocale };
   };
   caseStudyTranslations?: {
     ptBR?: CaseStudyTextFields;
@@ -152,6 +154,8 @@ type CaseStudyTextFields = {
   context?: string;
   decisions?: string;
   learnings?: string;
+  metrics?: MetricText[];
+  testimonial?: TestimonialText;
 };
 
 // Sortable Project Card Component
@@ -327,6 +331,7 @@ export default function AdminProjects() {
   const [testimonialText, setTestimonialText] = useState('');
   const [testimonialAuthor, setTestimonialAuthor] = useState('');
   const [testimonialRole, setTestimonialRole] = useState('');
+  const [testimonialLang, setTestimonialLang] = useState<TestimonialLocale>('pt-BR');
 
   // JSON import state
   const [isImportOpen, setIsImportOpen] = useState(false);
@@ -370,6 +375,7 @@ export default function AdminProjects() {
       setTestimonialText(cs?.testimonial?.text ?? '');
       setTestimonialAuthor(cs?.testimonial?.author ?? '');
       setTestimonialRole(cs?.testimonial?.role ?? '');
+      setTestimonialLang(cs?.testimonial?.lang ?? 'pt-BR');
     } else {
       setProjectImages([]);
       setSelectedTags([]);
@@ -387,6 +393,7 @@ export default function AdminProjects() {
       setTestimonialText('');
       setTestimonialAuthor('');
       setTestimonialRole('');
+      setTestimonialLang('pt-BR');
     }
     setIsDialogOpen(true);
   };
@@ -421,15 +428,37 @@ export default function AdminProjects() {
         longDescription: editingProject?.longDescriptionTranslations,
       };
 
-      const changedFields = editingProject
-        ? getChangedTranslatableFields(allFields, existingTranslations)
-        : allFields;
+      const previousMetrics = editingProject?.caseStudy?.metrics;
+      const previousEnMetrics = editingProject?.caseStudyTranslations?.enUS?.metrics;
+      const changedFields = {
+        ...(editingProject
+          ? getChangedTranslatableFields(allFields, existingTranslations)
+          : allFields),
+        ...metricFieldsToTranslate(metrics, previousMetrics, previousEnMetrics),
+      };
 
       let partialTranslated: Record<string, string> = {};
       if (Object.keys(changedFields).length > 0) {
         const toastId = toast.loading('Traduzindo conteúdo...');
         partialTranslated = await translateFields(changedFields);
         toast.dismiss(toastId);
+      }
+
+      // Depoimento: traduzido do idioma em que foi escrito para o outro
+      const testimonial = testimonialEnabled && testimonialText && testimonialAuthor
+        ? { text: testimonialText, author: testimonialAuthor, role: testimonialRole || undefined, lang: testimonialLang }
+        : undefined;
+      const testimonialTarget = testimonialTargetLocale(testimonialLang);
+      const targetKey = testimonialTarget === 'en-US' ? 'enUS' : 'ptBR';
+      const previousTestimonial = editingProject?.caseStudy?.testimonial;
+      const previousTestimonialT = editingProject?.caseStudyTranslations?.[targetKey]?.testimonial;
+      let translatedTestimonial: TestimonialText | undefined;
+      if (testimonial) {
+        const fields = testimonialFieldsToTranslate(testimonial, previousTestimonial, previousTestimonialT);
+        const fresh = Object.keys(fields).length > 0
+          ? await translateFields(fields, testimonialTarget, testimonialLang)
+          : {};
+        translatedTestimonial = buildTranslatedTestimonial(testimonial, fresh, previousTestimonial, previousTestimonialT);
       }
 
       const translated = {
@@ -458,9 +487,7 @@ export default function AdminProjects() {
         decisions: opt(caseStudyDecisions),
         learnings: opt(caseStudyLearnings),
         metrics,
-        testimonial: testimonialEnabled && testimonialText && testimonialAuthor
-          ? { text: testimonialText, author: testimonialAuthor, role: testimonialRole || undefined }
-          : undefined,
+        testimonial,
       } : undefined;
 
       const imageIds = projectImages.map((i) => i.id);
@@ -484,6 +511,7 @@ export default function AdminProjects() {
             problem: caseStudyProblem, solution: caseStudySolution, results: caseStudyResults,
             role: opt(caseStudyRole), context: opt(caseStudyContext),
             decisions: opt(caseStudyDecisions), learnings: opt(caseStudyLearnings),
+            testimonial: targetKey === 'ptBR' ? translatedTestimonial : undefined,
           },
           enUS: {
             problem: translated.caseStudyProblem, solution: translated.caseStudySolution, results: translated.caseStudyResults,
@@ -491,6 +519,8 @@ export default function AdminProjects() {
             context: caseStudyContext.trim() ? translated.caseStudyContext : undefined,
             decisions: caseStudyDecisions.trim() ? translated.caseStudyDecisions : undefined,
             learnings: caseStudyLearnings.trim() ? translated.caseStudyLearnings : undefined,
+            metrics: buildTranslatedMetrics(metrics, partialTranslated, previousMetrics, previousEnMetrics),
+            testimonial: targetKey === 'enUS' ? translatedTestimonial : undefined,
           },
         } : undefined,
         category: opt(category),
@@ -932,6 +962,19 @@ export default function AdminProjects() {
                           <div className="grid grid-cols-2 gap-2">
                             <Input value={testimonialAuthor} onChange={e => setTestimonialAuthor(e.target.value)} placeholder="Nome do autor" className="bg-foreground/5 border-foreground/10 text-foreground-strong" />
                             <Input value={testimonialRole} onChange={e => setTestimonialRole(e.target.value)} placeholder="Cargo / empresa" className="bg-foreground/5 border-foreground/10 text-foreground-strong" />
+                          </div>
+                          <div className="flex items-center gap-2 text-sm">
+                            <Label htmlFor="testimonial-lang" className="text-foreground/70">Idioma original</Label>
+                            <select
+                              id="testimonial-lang"
+                              value={testimonialLang}
+                              onChange={e => setTestimonialLang(e.target.value as TestimonialLocale)}
+                              className="rounded-md bg-foreground/5 border border-foreground/10 text-foreground-strong px-2 py-1"
+                            >
+                              <option value="pt-BR">Português</option>
+                              <option value="en-US">Inglês</option>
+                            </select>
+                            <span className="text-foreground/50 text-xs">No outro idioma, o site mostra uma tradução com aviso e botão para ver o original.</span>
                           </div>
                         </div>
                       )}

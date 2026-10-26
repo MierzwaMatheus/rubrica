@@ -35,7 +35,7 @@ Tudo o que a pessoa conta vira arquivo **na hora**, na pasta do trabalho: `inven
 - **Conta sobre dados que a pessoa deu** (somar os períodos das datas para chegar a "7 anos de experiência", contar itens de uma lista que ela mandou) é permitida: mostre a conta e peça o "ok" antes de usar. Arredondar uma impressão ("vinte e poucos" → "mais de 20") só com o "ok" dela.
 - **Número que a pessoa diz sem ter contado** ("100% dos clientes", "todo mundo", "metade"): é impressão, não dado. Pergunte se ela contou. Se não, escreva sem o número ("os tutores já falavam com a clínica pelo WhatsApp") ou como impressão dela, nunca como métrica.
 - **Taxa que já é porcentagem:** escreva "de 22% para 9%". Não derive "−59%" nem "13 pontos a menos" sem a pessoa ver e aprovar a conta.
-- **`value` das métricas não tem tradução** (`home_metrics`, `caseStudy.metrics`): use um formato que funcione nas duas línguas ("22% → 9%", "4/7", "3", "1200+"). "1.200" vira 1,2 em inglês.
+- **`value` das métricas da home não tem tradução** (`home_metrics`): use um formato que funcione nas duas línguas ("22% → 9%", "4/7", "3", "1200+"). "1.200" vira 1,2 em inglês. No case, `caseStudy.metrics` tem tradução de `label` e `value` em `caseStudyTranslations.<língua>.metrics`: lá dá para escrever "1.200" em pt e "1,200" em en.
 - Pendência: marque sem número, como `[confirmar: quantidade de sites]`, e resolva com a pessoa **antes** da Pilar. A Pilar reprova colchetes que ficarem no texto.
 
 ## 5. Campo sem material fica vazio

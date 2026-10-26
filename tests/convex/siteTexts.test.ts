@@ -91,17 +91,17 @@ describe("convex/siteTexts · seed", () => {
     getAuthUserId.mockResolvedValue(null);
   });
 
-  it("popula a tabela com todas as chaves dos arquivos de tradução (291 chaves)", async () => {
+  it("popula a tabela com todas as chaves dos arquivos de tradução (295 chaves)", async () => {
     await handler(seed)(ctx, {});
     const docs = ctx.db._all("siteTexts");
-    expect(docs.length).toBe(291);
+    expect(docs.length).toBe(295);
   });
 
   it("é idempotente — rodar duas vezes não duplica registros", async () => {
     await handler(seed)(ctx, {});
     await handler(seed)(ctx, {});
     const docs = ctx.db._all("siteTexts");
-    expect(docs.length).toBe(291);
+    expect(docs.length).toBe(295);
   });
 
   it("cada registro tem key em dot-notation e page igual ao primeiro segmento", async () => {
@@ -277,6 +277,6 @@ describe("convex/siteTexts · seed preserva textos personalizados", () => {
     const ctx = createMockCtx();
     ctx.db._seed("siteTexts", [{ key: "home.greeting", page: "home", ptBR: "Oi", enUS: "Hi", updatedAt: 1 }]);
     await handler(seed)(ctx, {});
-    expect(ctx.db._all("siteTexts").length).toBe(291);
+    expect(ctx.db._all("siteTexts").length).toBe(295);
   });
 });

@@ -28,14 +28,15 @@ Conferidos em `convex/schema.ts`, `convex/lib/caseStudy.ts` e `convex/projects.t
 | `context` | Antes: o estado inicial medido | não |
 | `decisions` | Decisões e trade-offs: um item por parágrafo | não |
 | `learnings` | Aprendizados | não |
-| `testimonial: {text, author, role?}` | depoimento, só com permissão e com nome e cargo | não |
+| `testimonial: {text, author, role?, lang?}` | depoimento, só com permissão e com nome e cargo. `lang` é a língua em que a pessoa escreveu (`"pt-BR"` ou `"en-US"`; sem valor, `pt-BR`) | não |
 
 - `metrics[].value` é o número ("4 min → 40 s", "−40%", "9/10"). `label` é o rótulo curto. `icon` é opcional, um nome de ícone Lucide em kebab-case ("timer", "trending-up").
-- **Os rótulos das métricas e o depoimento não têm tradução:** valem igual em `/` e em `/en/`. Escreva na língua principal do site e avise a pessoa.
+- **Métricas traduzidas:** em `caseStudyTranslations.ptBR.metrics` e `.enUS.metrics`, mande `[{label, value}]` na **mesma ordem e quantidade** de `caseStudy.metrics` (o `icon` fica só no `caseStudy`). Traduza o `label` e o `value` que tiver palavras ("Entrada + saída" → "Check-in + check-out"); número puro repete igual. Card sem tradução aparece na língua original.
+- **Depoimento:** o texto fica no `caseStudy.testimonial` na língua em que a pessoa escreveu, com `lang`. A tradução vai só na **outra** língua, em `caseStudyTranslations.<outra>.testimonial: {text, role?}` (o autor não se traduz). Na outra língua, o site mostra a tradução com um aviso de tradução automática e um botão para ver o original. Não reescreva nem "melhore" a fala da pessoa: traduza fiel.
 - Seções opcionais vazias não aparecem. Não preencha campo sem material.
 
 ## `caseStudyTranslations`
-`{ ptBR: {problem, solution, results, role?, context?, decisions?, learnings?}, enUS: {...} }`. Mande sempre os dois, com os mesmos campos preenchidos que o `caseStudy`.
+`{ ptBR: {problem, solution, results, role?, context?, decisions?, learnings?, metrics?, testimonial?}, enUS: {...} }`. Mande sempre os dois, com os mesmos campos preenchidos que o `caseStudy`. `metrics` vai nas duas línguas; `testimonial` só na língua que não é a original do depoimento.
 
 ## Atualização
 `projects:update` substitui o `caseStudy`, o `caseStudyTranslations` e o `imageIds` **inteiros** (no `imageIds`, mande as imagens atuais mais as novas). Não troque o `slug` de um projeto publicado sem a pessoa pedir: a URL antiga quebra. Leia o projeto (`ler projetos <id>`), monte o objeto completo (o que muda e o que fica) e use `ler: {funcao: "projects:getById", args: {id}}` no passo do plano para a prévia mostrar o antes.
@@ -53,7 +54,12 @@ Conferidos em `convex/schema.ts`, `convex/lib/caseStudy.ts` e `convex/projects.t
     "imageIds": ["<id-de-imagem-que-já-estava>", "{{print1.id}}"],
     "caseStudy": { "problem": "...", "solution": "...", "results": "...", "role": "...", "context": "...",
                    "decisions": "...", "learnings": "...",
-                   "metrics": [{ "value": "4 min → 40 s", "label": "tempo de build", "icon": "timer" }] },
-    "caseStudyTranslations": { "ptBR": { "...": "mesmos campos" }, "enUS": { "...": "mesmos campos" } }
+                   "metrics": [{ "value": "4 min → 40 s", "label": "tempo de build", "icon": "timer" }],
+                   "testimonial": { "text": "Deploy deixou de ser evento.", "author": "Ana Lima", "role": "CTO", "lang": "pt-BR" } },
+    "caseStudyTranslations": {
+      "ptBR": { "...": "mesmos campos", "metrics": [{ "value": "4 min → 40 s", "label": "tempo de build" }] },
+      "enUS": { "...": "mesmos campos", "metrics": [{ "value": "4 min → 40 s", "label": "build time" }],
+                "testimonial": { "text": "Deploying stopped being an event.", "role": "CTO" } }
+    }
   } }
 ```

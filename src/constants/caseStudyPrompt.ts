@@ -35,7 +35,7 @@ INSTRUÇÕES (siga em ordem)
 
 3. SLUG: Gere um slug URL-friendly a partir do nome do projeto: tudo minúsculo, palavras separadas por hífen, sem caracteres especiais. Ex: "meu-projeto-top".
 
-4. TRADUÇÕES: Todos os campos de texto narrativo (problem, solution, results, role, context, decisions, learnings, title, description, longDescription, category) devem aparecer em ptBR e enUS dentro dos objetos de tradução. Traduza naturalmente para inglês.
+4. TRADUÇÕES: Todos os campos de texto narrativo (problem, solution, results, role, context, decisions, learnings, title, description, longDescription, category) devem aparecer em ptBR e enUS dentro dos objetos de tradução. Traduza naturalmente para inglês. Em caseStudyTranslations.enUS.metrics, traduza label e value de cada métrica na mesma ordem de caseStudy.metrics (sem icon). Se houver testimonial, informe em "lang" o idioma em que ele foi escrito e ponha a tradução para o outro idioma em caseStudyTranslations.<outro idioma>.testimonial ({ "text", "role" }).
 
 5. SAÍDA: Retorne APENAS o JSON válido abaixo, sem markdown, sem código fenced, sem explicação fora do JSON.
 
@@ -72,7 +72,7 @@ SCHEMA DE SAÍDA OBRIGATÓRIO
   "longDescriptionTranslations": { "ptBR": "string", "enUS": "string" },
   "caseStudyTranslations": {
     "ptBR": { "problem": "string", "solution": "string", "results": "string", "role": "string", "context": "string", "decisions": "string", "learnings": "string" },
-    "enUS": { "problem": "string", "solution": "string", "results": "string", "role": "string", "context": "string", "decisions": "string", "learnings": "string" }
+    "enUS": { "problem": "string", "solution": "string", "results": "string", "role": "string", "context": "string", "decisions": "string", "learnings": "string", "metrics": [{ "label": "string", "value": "string" }] }
   }
 }
 

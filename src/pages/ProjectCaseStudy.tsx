@@ -20,6 +20,7 @@ import {
   GitBranch,
   GraduationCap,
   ArrowRight,
+  Languages,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -37,6 +38,7 @@ import { useTranslation } from "@/i18n/hooks/useTranslation";
 import { useProjectBySlug, usePortfolio } from "@/hooks/usePortfolio";
 import { nextCase } from "@/utils/portfolioContent";
 import { portfolioRepository } from "@/repositories/instances";
+import type { CaseStudyTestimonial } from "@/repositories/interfaces/PortfolioRepository";
 import { useContactWizard } from "@/contexts/ContactWizardContext";
 import { usePlugin } from "@/contexts/PluginsContext";
 import { MessageSquare } from "lucide-react";
@@ -318,19 +320,7 @@ export default function ProjectCaseStudy() {
         )}
 
         {/* Testimonial */}
-        {cs?.testimonial && (
-          <div className="border-l-4 border-neon-purple bg-foreground/5 rounded-r-xl p-6">
-            <h2 className="text-lg font-semibold text-foreground-strong mb-3 flex items-center gap-2">
-              <Quote className="h-5 w-5 text-neon-purple" />
-              {t("portfolio.testimonial")}
-            </h2>
-            <p className="text-foreground/90 italic leading-relaxed mb-3">"{cs.testimonial.text}"</p>
-            <p className="text-neon-purple font-medium">{cs.testimonial.author}</p>
-            {cs.testimonial.role && (
-              <p className="text-foreground/42 text-sm">{cs.testimonial.role}</p>
-            )}
-          </div>
-        )}
+        {cs?.testimonial && <CaseTestimonial testimonial={cs.testimonial} />}
 
         {/* CTA específico + próximo case */}
         {(wizardEnabled || next) && (
@@ -432,5 +422,46 @@ export default function ProjectCaseStudy() {
         )}
       </AnimatePresence>
     </>
+  );
+}
+
+/** Depoimento do case. Quando o texto é uma tradução, avisa e deixa ver o original. */
+function CaseTestimonial({ testimonial }: { testimonial: CaseStudyTestimonial }) {
+  const { t } = useTranslation();
+  const [showOriginal, setShowOriginal] = useState(false);
+  const original = testimonial.original;
+  const shown = original && showOriginal ? original : testimonial;
+
+  return (
+    <div className="border-l-4 border-neon-purple bg-foreground/5 rounded-r-xl p-6">
+      <h2 className="text-lg font-semibold text-foreground-strong mb-3 flex items-center gap-2">
+        <Quote className="h-5 w-5 text-neon-purple" />
+        {t("portfolio.testimonial")}
+      </h2>
+      <p
+        className="text-foreground/90 italic leading-relaxed mb-3"
+        lang={original && showOriginal ? original.lang : undefined}
+      >
+        "{shown.text}"
+      </p>
+      <p className="text-neon-purple font-medium">{testimonial.author}</p>
+      {shown.role && <p className="text-foreground/42 text-sm">{shown.role}</p>}
+      {original && (
+        <p className="mt-4 text-xs text-foreground/55 flex flex-wrap items-center gap-x-2 gap-y-1">
+          <Languages className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+          <span>
+            {t(original.lang === "en-US" ? "portfolio.testimonialTranslatedFromEn" : "portfolio.testimonialTranslatedFromPt")}
+          </span>
+          <button
+            type="button"
+            onClick={() => setShowOriginal(v => !v)}
+            aria-pressed={showOriginal}
+            className="underline underline-offset-2 text-neon-purple hover:text-neon-purple/80"
+          >
+            {t(showOriginal ? "portfolio.showTranslation" : "portfolio.showOriginal")}
+          </button>
+        </p>
+      )}
+    </div>
   );
 }

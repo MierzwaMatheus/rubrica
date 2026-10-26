@@ -1,3 +1,5 @@
+import { localizeMetrics } from "@/utils/caseStudyMetrics";
+import { localizeTestimonial } from "@/utils/caseStudyTestimonial";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useI18n } from "@/i18n/context/I18nContext";
@@ -85,6 +87,8 @@ function applyLocale(project: Project, locale: string): Project {
           context: caseStudyT?.context || project.case_study.context,
           decisions: caseStudyT?.decisions || project.case_study.decisions,
           learnings: caseStudyT?.learnings || project.case_study.learnings,
+          metrics: localizeMetrics(project.case_study.metrics ?? [], caseStudyT?.metrics),
+          testimonial: localizeTestimonial(project.case_study.testimonial, project.case_study_translations, locale),
         }
       : undefined,
     category:

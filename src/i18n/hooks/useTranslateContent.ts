@@ -6,7 +6,9 @@ export function useTranslateContent() {
   const [isTranslating, setIsTranslating] = useState(false);
 
   const translateFields = async (
-    fields: Record<string, string>
+    fields: Record<string, string>,
+    targetLocale = 'en-US',
+    sourceLocale = 'pt-BR'
   ): Promise<Record<string, string>> => {
     const toTranslate: { key: string; value: string }[] = [];
     const result: Record<string, string> = {};
@@ -25,8 +27,8 @@ export function useTranslateContent() {
     try {
       const translated = await translationService.translateBatch(
         toTranslate.map(({ value }) => value),
-        'en-US',
-        'pt-BR'
+        targetLocale,
+        sourceLocale
       );
       toTranslate.forEach(({ key }, i) => {
         result[key] = translated[i];

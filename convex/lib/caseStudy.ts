@@ -13,7 +13,11 @@ export const caseStudyValidator = v.object({
   decisions: v.optional(v.string()),  // decisões, trade-offs e caminhos descartados
   learnings: v.optional(v.string()),  // o que aprendi
   metrics: v.array(v.object({ label: v.string(), value: v.string(), icon: v.optional(v.string()) })),
-  testimonial: v.optional(v.object({ text: v.string(), author: v.string(), role: v.optional(v.string()) })),
+  testimonial: v.optional(v.object({
+    text: v.string(), author: v.string(), role: v.optional(v.string()),
+    // idioma em que foi escrito; sem valor, pt-BR
+    lang: v.optional(v.union(v.literal('pt-BR'), v.literal('en-US'))),
+  })),
 });
 
 const caseStudyText = v.object({
@@ -24,6 +28,10 @@ const caseStudyText = v.object({
   context: v.optional(v.string()),
   decisions: v.optional(v.string()),
   learnings: v.optional(v.string()),
+  // cards de métrica no idioma, na mesma ordem de caseStudy.metrics (o ícone fica lá)
+  metrics: v.optional(v.array(v.object({ label: v.string(), value: v.string(), icon: v.optional(v.string()) }))),
+  // tradução do depoimento para este idioma, quando ele não é o original
+  testimonial: v.optional(v.object({ text: v.string(), role: v.optional(v.string()) })),
 });
 
 export const caseStudyTranslationsValidator = v.object({

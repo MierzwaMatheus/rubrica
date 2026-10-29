@@ -18,6 +18,7 @@ import { recommendedAppearance } from "../layouts.js";
 import { packageManagerFromUserAgent } from "../utils/packageManager.js";
 import { recipeSummary, type Recipe } from "../recipe.js";
 import { runSetup as defaultRunSetup } from "./setup.js";
+import { track as defaultTrack, setTelemetry, pluginPreset, enabledPlugins } from "../telemetry.js";
 
 // ---- Tipos -----------------------------------------------------------------
 
@@ -60,6 +61,9 @@ export interface RunCreateDeps {
   userAgent?: string;
   /** Escolhas que vieram do site (`--receita`) ou das opções legíveis. Já validadas. */
   recipe?: Recipe;
+  /** `--sem-telemetria`: o projeto já nasce com a telemetria desligada. */
+  noTelemetry?: boolean;
+  track?: typeof defaultTrack;
 }
 
 /** Endereço que a Vercel dá a um projeto com esse nome: bom padrão para quem ainda não tem domínio. */
@@ -128,6 +132,7 @@ export async function runCreate(
   });
   const doIdentityPrompt = deps.identityPrompt ?? defaultIdentityPrompt;
   const setupFn = deps.setup ?? defaultRunSetup;
+  const trackFn = deps.track ?? defaultTrack;
   const packageManager = packageManagerFromUserAgent(deps.userAgent ?? process.env.npm_config_user_agent);
 
   const projectDir = `${deps.projectsDir}/${projectName}`;
@@ -267,6 +272,31 @@ export async function runCreate(
     },
     fs as Parameters<typeof defaultWriteState>[2]
   );
+
+  // Telemetria anônima: só as escolhas, nada da identidade (src/telemetry.ts).
+  if (deps.noTelemetry) {
+    await setTelemetry(projectDir, false, { fs }).catch(() => undefined);
+  } else {
+    const enabled = enabledPlugins(plugins);
+    await trackFn(
+      projectDir,
+      "criacao",
+      {
+        origem: fromRecipe ? "receita" : "interativo",
+        modo: custom ? "personalizado" : "rapido",
+        layout,
+        esquema: themeChoice,
+        modoCor: appearance.colorMode,
+        alternancia: appearance.colorModeToggle,
+        textura: appearance.texture,
+        fonte: fontSans,
+        mono: fontMono,
+        pacote: pluginPreset(enabled),
+        plugins: enabled,
+      },
+      { fs, packageManager, notice: (message) => log.info(message) }
+    );
+  }
 
   // Git (sempre na branch main) e dependências, sem perguntar. Sem git instalado, o projeto funciona do mesmo jeito.
   let hasGit = true;

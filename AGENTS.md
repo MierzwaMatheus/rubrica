@@ -23,6 +23,7 @@ Rode os comandos na raiz do projeto. Alguns são interativos e fazem perguntas q
 | `npx create-rubrica config` | Troca identidade, aparência, layout ou plugins padrão | A pessoa. Avise antes: trocar o **layout** sobrescreve os arquivos dele, e personalizações neles se perdem |
 | `npx create-rubrica publicar` | Põe o site no ar na Vercel, ou publica de novo depois de mudar o código | A pessoa, a pedido dela: publica em produção |
 | `npx create-rubrica senha` | Troca a senha do painel e libera o login bloqueado | Sempre a pessoa. A senha nunca passa pela conversa |
+| `npx create-rubrica telemetria [ligar\|desligar]` | Mostra, liga ou desliga a telemetria anônima do CLI neste projeto (grava no `rubrica.json`) | Você, a pedido da pessoa |
 
 Referência completa dos comandos e opções: [Comandos do CLI](https://userubrica.vercel.app/docs/guia/cli).
 

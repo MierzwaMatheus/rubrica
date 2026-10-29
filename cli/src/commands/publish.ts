@@ -9,6 +9,7 @@ import { readState as defaultReadState } from "../state/readState.js";
 import { normalizeEmail, validateEmail } from "../utils/normalize.js";
 import { validatePassword } from "../utils/password.js";
 import { seedPayloads } from "../utils/seedPayloads.js";
+import { track as defaultTrack } from "../telemetry.js";
 
 export interface RunPublishDeps {
   cwd?: string;
@@ -27,6 +28,7 @@ export interface RunPublishDeps {
   fetch?: (url: string, init?: RequestInit) => Promise<Response>;
   /** Abre uma página no navegador (sem esperar). */
   openUrl?: (url: string) => void;
+  track?: typeof defaultTrack;
 }
 
 /** Abre a página no navegador padrão; se não der, a pessoa usa o link mostrado no terminal. */
@@ -83,6 +85,8 @@ export async function runPublish(deps: RunPublishDeps = {}): Promise<void> {
   const processEnv = deps.processEnv ?? process.env;
   const fetchFn = deps.fetch ?? ((url: string, init?: RequestInit) => fetch(url, init));
   const openUrl = deps.openUrl ?? defaultOpenUrl;
+  const published = (caminho: "primeira" | "denovo" | "religar") =>
+    (deps.track ?? defaultTrack)(cwd, "publicacao", { caminho }, { fs, env: processEnv, notice: (message) => log.info(message) });
   const exec =
     deps.execFileSync ??
     ((file: string, args: string[], opts?: object) =>
@@ -277,7 +281,7 @@ export async function runPublish(deps: RunPublishDeps = {}): Promise<void> {
     if (copied.size) log.info(`Levei para o site publicado o que você ligou no computador: ${[...copied].join(" e ")}.`);
   };
 
-  const republish = async () => {
+  const republish = async (caminho: "denovo" | "religar") => {
     const siteUrl = await productionUrl();
     const known = (state.producao as { convexUrl?: string } | undefined)?.convexUrl;
     if (!known) {
@@ -293,6 +297,7 @@ export async function runPublish(deps: RunPublishDeps = {}): Promise<void> {
       if (setUp === true) await configurePublishButton();
     }
     if (!(await deploy(siteUrl, spinner()))) return;
+    await published(caminho);
     outro(`Publicado de novo!\n\n  ${siteUrl}`);
   };
 
@@ -301,7 +306,7 @@ export async function runPublish(deps: RunPublishDeps = {}): Promise<void> {
     const again = await confirm({ message: "Publicar de novo com as mudanças que você fez?", initialValue: true });
     if (again !== true) return void cancel(NOTHING);
     if (!ensureLogin()) return;
-    return republish();
+    return republish("denovo");
   }
 
   // ---- Já publicado, mas sem a pasta .vercel (outro computador, clone novo) ----
@@ -342,7 +347,7 @@ export async function runPublish(deps: RunPublishDeps = {}): Promise<void> {
       return;
     }
     if (!(await exists(".vercelignore"))) await fs.writeFile(path.join(cwd, ".vercelignore"), VERCELIGNORE);
-    return republish();
+    return republish("religar");
   }
 
   // ---- Primeira vez -----------------------------------------------------------
@@ -501,6 +506,7 @@ export async function runPublish(deps: RunPublishDeps = {}): Promise<void> {
   await configurePublishButton();
 
   if (!(await deploy(siteUrl, s))) return;
+  await published("primeira");
 
   outro(
     `Seu site está no ar!\n\n` +

@@ -11,6 +11,7 @@ import { getLatestVersion as defaultGetLatestVersion, downloadRelease as default
 import { buildPristine } from "../utils/pristine.js";
 import { planUpdate, applyPlan, formatPlan, NEW_SUFFIX } from "../utils/threeWayUpdate.js";
 import { checkRequiredEnv as defaultCheckRequiredEnv } from "../utils/checkRequiredEnv.js";
+import { track as defaultTrack } from "../telemetry.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -31,6 +32,7 @@ export interface RunUpdateDeps {
   getLatestVersion?: typeof defaultGetLatestVersion;
   downloadRelease?: typeof defaultDownloadRelease;
   checkRequiredEnv?: typeof defaultCheckRequiredEnv;
+  track?: typeof defaultTrack;
 }
 
 /** Versões antigas do CLI gravavam sempre "0.1.0" no rubrica.json, qualquer que fosse a versão baixada. */
@@ -187,6 +189,13 @@ export async function runUpdate(deps: RunUpdateDeps = {}): Promise<void> {
         missingVars.map((v) => `  • ${v.name} — ${v.description}`).join("\n")
       );
     }
+
+    await (deps.track ?? defaultTrack)(
+      projectDir,
+      "atualizacao",
+      { de: fromVersion, para: toVersion, conflitos: conflicts.length, arquivos: changed.length },
+      { notice: (message) => log.info(message) }
+    );
 
     outro(`Atualizado para ${toVersion}.\n\nPróximos passos:\n${steps.map((st, i) => `  ${i + 1}. ${st}`).join("\n")}`);
   } finally {

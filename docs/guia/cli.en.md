@@ -10,6 +10,7 @@
 | `npx create-rubrica publicar` | Puts the site online on Vercel, and publishes again the next times |
 | `npx create-rubrica senha` | Changes the panel password and unlocks a blocked login |
 | `npx create-rubrica@latest update` | Brings in the new version of Rubrica without undoing your customizations |
+| `npx create-rubrica telemetria` | Shows, turns on or turns off the project's anonymous telemetry |
 
 ## `create`
 
@@ -149,11 +150,23 @@ Updates the project to the latest version without undoing your customizations. T
 
 Full guide: [Updating your Rubrica](../atualizacao.md).
 
+## `telemetria`
+
+```bash
+npx create-rubrica telemetria            # shows whether it's on
+npx create-rubrica telemetria desligar   # turns it off for this project
+npx create-rubrica telemetria ligar      # turns it back on
+```
+
+The CLI sends, with no personal data, the choices made in the commands (layout, colors, plugins) so Rubrica knows what's used the most. The choice is stored in `rubrica.json`. For a single run, use `--sem-telemetria` on any command. What is and isn't sent: [CLI telemetry](telemetria.md).
+
 ## Environment variables
 
 | Variable | What it's for |
 |---|---|
 | `RUBRICA_VERCEL_GLOBAL_CONFIG` | Picks the Vercel account when there's more than one on the computer: the account's config folder (it's the Vercel CLI's `--global-config`). |
+| `RUBRICA_TELEMETRIA` | `0` turns telemetry off on any command. |
+| `DO_NOT_TRACK` | `1` turns telemetry off, as in other terminal tools. |
 
 ## With an AI agent
 

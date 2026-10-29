@@ -70,6 +70,8 @@ async function edit(file: string, fn: (s: string) => string) {
   await fs.writeFile(abs, fn(await fs.readFile(abs, "utf-8")));
 }
 
+const track = vi.fn(async () => undefined);
+
 function update(releases: Record<string, ReleaseFiles>, options = {}) {
   return runUpdate({
     cwd: projectDir,
@@ -77,6 +79,7 @@ function update(releases: Record<string, ReleaseFiles>, options = {}) {
     getLatestVersion: async () => "v0.4.0",
     downloadRelease: fakeDownload(releases),
     checkRequiredEnv: async () => [],
+    track,
   });
 }
 
@@ -121,6 +124,12 @@ describe("rubrica update", () => {
     expect(files["src/pages/Resume.tsx"]).toContain("Resume v2");
     expect(files["convex/schema.ts"]).toBe("export const schema = 2;\n");
     expect(files["src/novo.ts"]).toBeDefined();
+    expect(track).toHaveBeenLastCalledWith(
+      projectDir,
+      "atualizacao",
+      expect.objectContaining({ de: "0.3.17", para: "0.4.0", conflitos: 1 }),
+      expect.anything()
+    );
   });
 
   it("não apaga a identidade do rubrica.config.ts nem o nome do package.json", async () => {

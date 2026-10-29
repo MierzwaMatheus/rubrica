@@ -10,6 +10,7 @@ O `create-rubrica` cria, configura, publica e atualiza projetos do Rubrica. Prec
 | `npx create-rubrica publicar` | Põe o site no ar na Vercel, e publica de novo nas próximas vezes |
 | `npx create-rubrica senha` | Troca a senha do painel e libera o login bloqueado |
 | `npx create-rubrica@latest update` | Traz a versão nova do Rubrica sem desfazer as suas personalizações |
+| `npx create-rubrica telemetria` | Mostra, liga ou desliga a telemetria anônima do projeto |
 
 ## `create`
 
@@ -149,11 +150,23 @@ Atualiza o projeto para a versão mais recente sem desfazer as suas personaliza�
 
 Guia completo: [Atualizando o seu Rubrica](../atualizacao.md).
 
+## `telemetria`
+
+```bash
+npx create-rubrica telemetria            # mostra se está ligada
+npx create-rubrica telemetria desligar   # desliga neste projeto
+npx create-rubrica telemetria ligar      # liga de novo
+```
+
+O CLI manda, sem dados pessoais, as escolhas feitas nos comandos (layout, cores, plugins) para o Rubrica saber o que mais se usa. A escolha fica gravada no `rubrica.json`. Para uma execução só, use `--sem-telemetria` em qualquer comando. O que vai e o que não vai: [Telemetria do CLI](telemetria.md).
+
 ## Variáveis de ambiente
 
 | Variável | Para quê |
 |---|---|
 | `RUBRICA_VERCEL_GLOBAL_CONFIG` | Escolhe a conta da Vercel quando há mais de uma no computador: a pasta de configuração da conta (é o `--global-config` do CLI da Vercel). |
+| `RUBRICA_TELEMETRIA` | `0` desliga a telemetria em qualquer comando. |
+| `DO_NOT_TRACK` | `1` desliga a telemetria, como em outras ferramentas de terminal. |
 
 ## Com um agente de IA
 

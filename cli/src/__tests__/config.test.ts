@@ -914,3 +914,48 @@ describe("runConfig — projeto de versão antiga", () => {
     expect(vi.mocked(log.warn)).toHaveBeenCalledWith(expect.stringContaining("sem modo claro/escuro"));
   });
 });
+
+describe("runConfig — telemetria", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const state = { version: "1.0.0", layout: "cyberpunk", theme: "cyberpunk", fontSans: "Inter", fontMono: "JetBrains Mono", plugins: { blog: true, portfolio: true } };
+  const base = () => {
+    const vol = Volume.fromJSON({ "/project/rubrica.json": JSON.stringify(state) });
+    return {
+      cwd: "/project",
+      fs: makeFsModule(vol),
+      detectProject: vi.fn().mockResolvedValue("/project/rubrica.json"),
+      readState: vi.fn().mockResolvedValue(state),
+      writeState: vi.fn().mockResolvedValue(undefined),
+      applyPlugins: vi.fn().mockResolvedValue(undefined),
+      applyRubricalConfig: vi.fn().mockResolvedValue(undefined),
+      applyIndexHtml: vi.fn().mockResolvedValue(undefined),
+      track: vi.fn(async () => undefined),
+    };
+  };
+
+  it("plugins: manda a seção e os plugins ligados", async () => {
+    vi.mocked(multiselect).mockResolvedValueOnce(["plugins"]).mockResolvedValueOnce(["blog", "resume"]);
+    const deps = base();
+    await runConfig(deps);
+    expect(deps.track).toHaveBeenCalledWith("/project", "config", { secoes: ["plugins"], plugins: ["blog", "resume"] }, expect.anything());
+  });
+
+  it("identidade: manda só que ela mudou, nunca os valores", async () => {
+    vi.mocked(multiselect).mockResolvedValueOnce(["identity"]);
+    const identity = { siteName: "Novo Site", siteUrl: "https://novo.com", siteDescription: "d", authorName: "Autor", authorEmail: "a@b.com", twitterHandle: "", lang: "pt-BR" as const };
+    const deps = { ...base(), identityPrompt: vi.fn().mockResolvedValue(identity) };
+    await runConfig(deps);
+    const dados = (deps.track.mock.calls[0] as unknown as [string, string, object])[2];
+    expect(dados).toEqual({ secoes: ["identidade"] });
+  });
+
+  it("nada mudou: não manda nada", async () => {
+    vi.mocked(multiselect).mockResolvedValueOnce([]);
+    const deps = base();
+    await runConfig(deps);
+    expect(deps.track).not.toHaveBeenCalled();
+  });
+});

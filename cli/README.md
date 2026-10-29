@@ -24,6 +24,7 @@ Tirando o `create`, rode dentro da pasta do projeto.
 | `npx create-rubrica publicar` | Põe o site no ar na Vercel, e publica de novo nas próximas vezes |
 | `npx create-rubrica senha` | Troca a senha do painel e libera o login bloqueado |
 | `npx create-rubrica@latest update` | Traz a versão nova do Rubrica sem desfazer as suas personalizações |
+| `npx create-rubrica telemetria [ligar\|desligar]` | Mostra, liga ou desliga a telemetria anônima do projeto |
 
 ## Documentação
 
@@ -31,6 +32,7 @@ Tirando o `create`, rode dentro da pasta do projeto.
 - [Comandos do CLI](https://userubrica.vercel.app/docs/guia/cli): todas as perguntas, opções e arquivos gerados.
 - [Publicar o site](https://userubrica.vercel.app/docs/guia/publicar): Vercel, o botão Publicar do painel e domínio próprio.
 - [Atualizando o seu Rubrica](https://userubrica.vercel.app/docs/atualizacao).
+- [Telemetria do CLI](https://userubrica.vercel.app/docs/guia/telemetria): o que o CLI manda, sem dados pessoais, e como desligar.
 
 Também em inglês: [userubrica.vercel.app/en/docs](https://userubrica.vercel.app/en/docs).
 

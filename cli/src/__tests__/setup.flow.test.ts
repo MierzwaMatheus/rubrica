@@ -62,6 +62,7 @@ function makeDeps(opts: { state?: ReturnType<typeof makeState>; env?: string | n
     readState: vi.fn().mockResolvedValue(state),
     randomBytes: vi.fn().mockReturnValue(Buffer.alloc(32, 1)),
     execFileSync,
+    track: vi.fn(async (..._args: unknown[]) => undefined),
   };
 }
 
@@ -467,5 +468,38 @@ describe("setup — integrações só se a pessoa quiser", () => {
     await runSetup(deps);
     for (const m of messages()) expect(m).not.toMatch(/[A-Z]{3,}_[A-Z_]+/);
     expect(log.warn).not.toHaveBeenCalledWith(expect.stringMatching(/undefined/));
+  });
+});
+
+describe("setup — telemetria", () => {
+  it("diz quais integrações ligaram, sem mandar os valores", async () => {
+    const deps = makeDeps({ state: makeState({ "contact-wizard": true, "ai-resumes": true }), adminExists: true });
+    vi.mocked(confirm).mockResolvedValueOnce(true); // quer o Telegram
+    vi.mocked(text).mockImplementation(async (o) =>
+      /Token do bot/.test((o as { message: string }).message) ? "123:segredo" : ""
+    );
+    await runSetup(deps);
+
+    expect(deps.track).toHaveBeenCalledOnce();
+    const [dir, tipo, dados] = deps.track.mock.calls[0] as unknown as [string, string, Record<string, unknown>];
+    expect([dir, tipo]).toEqual(["/p", "setup"]);
+    expect(dados).toEqual({ veioDoCreate: false, adminNovo: false, telegram: true, openrouter: false, asaas: false, vercel: false });
+    expect(JSON.stringify(dados)).not.toContain("segredo");
+  });
+
+  it("marca quando veio do create e criou o admin", async () => {
+    const deps = makeDeps({ adminExists: false });
+    vi.mocked(text).mockImplementation(async (o) => ((o as { message: string }).message.startsWith("E-mail") ? "ana@ana.dev" : ""));
+    await runSetup({ ...deps, newProject: "ana" });
+    expect(deps.track.mock.calls[0][2]).toMatchObject({ veioDoCreate: true, adminNovo: true });
+  });
+
+  it("não manda nada quando o setup para no meio", async () => {
+    const deps = makeDeps({ env: null }); // sem .env.local e o Convex não conecta
+    deps.execFileSync.mockImplementation(() => {
+      throw new Error("sem rede");
+    });
+    await runSetup(deps);
+    expect(deps.track).not.toHaveBeenCalled();
   });
 });

@@ -148,6 +148,7 @@ function makeDeps(opts: Opts = {}) {
         return new Response(ok ? "{}" : '{"error":{}}', { status: ok ? 200 : 403 });
       }),
       openUrl: vi.fn(),
+      track: vi.fn(async () => undefined),
     },
   };
 }
@@ -769,5 +770,33 @@ describe("publicar — antes de começar", () => {
     await runPublish(deps);
     expect(cancel).toHaveBeenCalledWith(expect.stringContaining("npx create-rubrica setup"));
     expect(deps.execFileSync).not.toHaveBeenCalled();
+  });
+});
+
+describe("publicar — telemetria", () => {
+  const caminho = (deps: Deps) => deps.track.mock.calls.map((c) => (c as unknown as [string, string, { caminho: string }])[2].caminho);
+
+  it("primeira vez: manda 'primeira' depois de publicar", async () => {
+    const { deps } = makeDeps();
+    await runPublish(deps);
+    expect(deps.track).toHaveBeenCalledWith("/p", "publicacao", { caminho: "primeira" }, expect.anything());
+  });
+
+  it("de novo: manda 'denovo'", async () => {
+    const { deps } = makeDeps({ linked: true, state: PUBLISHED, prodConvexEnv: { VERCEL_TOKEN: "x" } });
+    await runPublish(deps);
+    expect(caminho(deps)).toEqual(["denovo"]);
+  });
+
+  it("outro computador: manda 'religar'", async () => {
+    const { deps } = makeDeps({ adminExists: true, vercelProject: true, state: PUBLISHED, prodConvexEnv: { VERCEL_TOKEN: "x" } });
+    await runPublish(deps);
+    expect(caminho(deps)).toEqual(["religar"]);
+  });
+
+  it("falha na Vercel: não manda nada", async () => {
+    const { deps } = makeDeps({ fail: { "deploy --prod": "erro de build" } });
+    await runPublish(deps);
+    expect(deps.track).not.toHaveBeenCalled();
   });
 });

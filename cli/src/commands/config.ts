@@ -19,6 +19,7 @@ import { layoutPrompt, schemePrompt, appearancePrompt, fontPrompts } from "../pr
 import { ALL_PLUGINS } from "../plugins.js";
 import { pluginOptions } from "../prompts/pluginsPrompt.js";
 import { tmpdir } from "node:os";
+import { track as defaultTrack, enabledPlugins } from "../telemetry.js";
 import type { RubricaLayout, RubricaState } from "../state/readState.js";
 
 // ---- Tipos ------------------------------------------------------------------
@@ -46,6 +47,7 @@ export interface RunConfigDeps {
   applyAppearance?: typeof defaultApplyAppearance;
   downloadRelease?: typeof defaultDownloadRelease;
   getLatestVersion?: typeof defaultGetLatestVersion;
+  track?: typeof defaultTrack;
 }
 
 async function existsIn(fs: { access: (p: string) => Promise<void> }, p: string): Promise<boolean> {
@@ -238,6 +240,28 @@ export async function runConfig(deps: RunConfigDeps = {}): Promise<void> {
   // Ciclo 8: persistir estado
   if (Object.keys(stateUpdate).length > 0) {
     await writeStateFn(projectDir, stateUpdate, fs as Parameters<typeof defaultWriteState>[2]);
+
+    // Telemetria: o que mudou e os valores novos, menos a identidade (só se ela mudou).
+    const secoes = [
+      stateUpdate.identity && "identidade",
+      stateUpdate.theme !== undefined && "aparencia",
+      stateUpdate.layout !== undefined && "layout",
+      stateUpdate.plugins && "plugins",
+    ].filter((s): s is string => Boolean(s));
+    const dados: Record<string, unknown> = { secoes };
+    if (stateUpdate.layout !== undefined) dados.layout = stateUpdate.layout;
+    if (stateUpdate.theme !== undefined) {
+      Object.assign(dados, {
+        esquema: stateUpdate.theme,
+        modoCor: stateUpdate.colorMode,
+        alternancia: stateUpdate.colorModeToggle,
+        textura: stateUpdate.texture,
+        fonte: stateUpdate.fontSans,
+        mono: stateUpdate.fontMono,
+      });
+    }
+    if (stateUpdate.plugins) dados.plugins = enabledPlugins(stateUpdate.plugins);
+    await (deps.track ?? defaultTrack)(projectDir, "config", dados, { fs, notice: (message) => log.info(message) });
   }
 
   outro("Configuração atualizada com sucesso!");

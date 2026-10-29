@@ -162,3 +162,22 @@ describe("runCli — flags do update", () => {
     expect(vi.mocked(runUpdate)).toHaveBeenCalledWith({ cwd: "/p", options: {} });
   });
 });
+
+describe("runCli — telemetria", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    delete process.env.RUBRICA_TELEMETRIA;
+  });
+
+  it("--sem-telemetria no create: some dos argumentos e o projeto nasce desligado", async () => {
+    await runCli(["node", "rubrica", "meu-projeto", "--sem-telemetria"], "/p");
+    expect(vi.mocked(runCreate)).toHaveBeenCalledWith("meu-projeto", { projectsDir: "/p", noTelemetry: true });
+    expect(process.env.RUBRICA_TELEMETRIA).toBe("0");
+  });
+
+  it("--sem-telemetria em outro comando desliga só nesta execução", async () => {
+    await runCli(["node", "rubrica", "publicar", "--sem-telemetria"], "/p");
+    expect(vi.mocked(runPublish)).toHaveBeenCalledOnce();
+    expect(process.env.RUBRICA_TELEMETRIA).toBe("0");
+  });
+});

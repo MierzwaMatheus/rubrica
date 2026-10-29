@@ -73,6 +73,7 @@ function makeDeps(overrides: Partial<Parameters<typeof runCreate>[1]> = {}) {
     identityPrompt: vi.fn(async () => IDENTITY),
     exec: vi.fn(async () => undefined),
     setup: vi.fn(async () => undefined),
+    track: vi.fn(async () => undefined),
     userAgent: "npm/10.0.0 node/v22.0.0",
     ...overrides,
   };
@@ -414,5 +415,38 @@ describe("suggestedSiteUrl", () => {
     ["ana", "https://ana.vercel.app"],
   ])("%s → %s", (name, url) => {
     expect(suggestedSiteUrl(name)).toBe(url);
+  });
+});
+
+describe("create — telemetria", () => {
+  it("manda as escolhas do modo rápido, sem nada da identidade", async () => {
+    quick("swiss", "freelancer");
+    const deps = makeDeps();
+    await runCreate("ana", deps);
+
+    expect(deps.track).toHaveBeenCalledOnce();
+    const [dir, tipo, dados] = vi.mocked(deps.track).mock.calls[0];
+    expect(dir).toBe("/projects/ana");
+    expect(tipo).toBe("criacao");
+    expect(dados).toMatchObject({ origem: "interativo", modo: "rapido", layout: "swiss", pacote: "freelancer" });
+    expect(dados.plugins).toEqual(expect.arrayContaining(PLUGIN_PRESETS[1].plugins));
+    expect(JSON.stringify(dados)).not.toContain("ana@ana.dev");
+    expect(JSON.stringify(dados)).not.toContain("ana.dev");
+    // O template traz pnpm-lock.yaml: o create diz qual gerenciador usou de fato.
+    expect(vi.mocked(deps.track).mock.calls[0][3]).toMatchObject({ packageManager: "npm" });
+  });
+
+  it("marca a origem quando veio do site", async () => {
+    const deps = makeDeps({ recipe: { layout: "zine", plugins: ["blog"] } });
+    vi.mocked(confirm).mockResolvedValueOnce(true);
+    await runCreate("ana", deps);
+    expect(vi.mocked(deps.track).mock.calls[0][2]).toMatchObject({ origem: "receita", layout: "zine", pacote: "custom" });
+  });
+
+  it("com --sem-telemetria não manda nada", async () => {
+    quick();
+    const deps = makeDeps({ noTelemetry: true });
+    await runCreate("ana", deps);
+    expect(deps.track).not.toHaveBeenCalled();
   });
 });

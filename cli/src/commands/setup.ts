@@ -9,6 +9,7 @@ import { readState as defaultReadState } from "../state/readState.js";
 import { normalizeUrl, validateUrl, normalizeEmail, validateEmail } from "../utils/normalize.js";
 import { validatePassword } from "../utils/password.js";
 import { seedPayloads } from "../utils/seedPayloads.js";
+import { track as defaultTrack } from "../telemetry.js";
 
 // ---- Tipos ------------------------------------------------------------------
 
@@ -40,6 +41,7 @@ export interface RunSetupDeps {
    * nem profissão e especialidades, que já vieram no formulário. Só a senha.
    */
   site?: { profession?: string; specialties?: string };
+  track?: typeof defaultTrack;
 }
 
 // ---- Helpers ----------------------------------------------------------------
@@ -89,7 +91,13 @@ export async function runSetup(deps: RunSetupDeps = {}): Promise<void> {
 
   // Todo comando do Convex roda na pasta do projeto: o create chama o setup de fora dela.
   const convex = (...args: string[]) => execFileSync("npx", ["convex", ...args], { stdio: "pipe", cwd });
-  const setEnv = (key: string, value: string) => convex("env", "set", "--", key, value);
+  // Quais variáveis foram gravadas: a telemetria diz só quais integrações ligaram, nunca os valores.
+  const envSet = new Set<string>();
+  const setEnv = (key: string, value: string) => {
+    const out = convex("env", "set", "--", key, value);
+    envSet.add(key);
+    return out;
+  };
 
   // 2. Ler .env.local. Sem ele, o projeto ainda não foi ligado ao Convex: conecta agora
   // (login e criação do projeto pelo navegador) em vez de mandar abrir outro terminal.
@@ -381,6 +389,20 @@ export async function runSetup(deps: RunSetupDeps = {}): Promise<void> {
       // não crítico: dá para editar no painel
     }
   }
+
+  await (deps.track ?? defaultTrack)(
+    cwd,
+    "setup",
+    {
+      veioDoCreate: deps.newProject !== undefined,
+      adminNovo: !adminExists,
+      telegram: envSet.has("TELEGRAM_BOT_TOKEN"),
+      openrouter: envSet.has("OPENROUTER_API_KEY"),
+      asaas: envSet.has("ASAAS_API_KEY"),
+      vercel: envSet.has("VERCEL_DEPLOY_HOOK_URL"),
+    },
+    { fs, notice: (message) => log.info(message) }
+  );
 
   if (fromSite) {
     log.info(

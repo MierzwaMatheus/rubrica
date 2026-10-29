@@ -6,8 +6,13 @@ import { runSetup } from "./commands/setup.js";
 import { parseCreateArgs } from "./args.js";
 import { runPassword } from "./commands/password.js";
 import { runPublish } from "./commands/publish.js";
+import { runTelemetry } from "./commands/telemetry.js";
 
-export async function runCli(argv: string[], cwd: string): Promise<void> {
+export async function runCli(rawArgv: string[], cwd: string): Promise<void> {
+  // `--sem-telemetria` vale para qualquer comando: só nesta execução (no create, o projeto já nasce desligado).
+  const noTelemetry = rawArgv.includes("--sem-telemetria");
+  const argv = rawArgv.filter((a) => a !== "--sem-telemetria");
+  if (noTelemetry) process.env.RUBRICA_TELEMETRIA = "0";
   const [,, command, projectName] = argv;
 
   intro("Rubrica CLI");
@@ -17,7 +22,7 @@ export async function runCli(argv: string[], cwd: string): Promise<void> {
       console.error("Uso: rubrica create <nome-do-projeto>");
       process.exit(1);
     }
-    await create(argv.slice(3), cwd);
+    await create(argv.slice(3), cwd, noTelemetry);
   } else if (command === "config") {
     await runConfig({ cwd });
   } else if (command === "update") {
@@ -28,19 +33,22 @@ export async function runCli(argv: string[], cwd: string): Promise<void> {
     await runPassword({ cwd });
   } else if (command === "publicar") {
     await runPublish({ cwd });
+  } else if (command === "telemetria") {
+    await runTelemetry({ cwd, action: projectName });
   } else if (command && !command.startsWith("-")) {
     // `pnpm create rubrica <nome>` / `npx create-rubrica <nome>` chegam sem o "create".
-    await create(argv.slice(2), cwd);
+    await create(argv.slice(2), cwd, noTelemetry);
   } else {
     console.log(
       "Comandos disponíveis: create <nome-do-projeto> [--receita <código>] | config | setup | senha | publicar\n" +
-      "  update [--dry-run] [--from <versão>] [--to <versão>] [--yes]"
+      "  update [--dry-run] [--from <versão>] [--to <versão>] [--yes]\n" +
+      "  telemetria [ligar|desligar]   (em qualquer comando: --sem-telemetria)"
     );
   }
 }
 
 /** `<nome> [--receita <código>] [opções]`: a receita vem do site do Rubrica. */
-async function create(args: string[], cwd: string): Promise<void> {
+async function create(args: string[], cwd: string, noTelemetry = false): Promise<void> {
   let parsed;
   try {
     parsed = parseCreateArgs(args);
@@ -56,7 +64,11 @@ async function create(args: string[], cwd: string): Promise<void> {
   }
   for (const warning of parsed.warnings) log.warn(warning);
   const hasRecipe = Object.keys(parsed.recipe).length > 0;
-  await runCreate(parsed.projectName, hasRecipe ? { projectsDir: cwd, recipe: parsed.recipe } : { projectsDir: cwd });
+  await runCreate(parsed.projectName, {
+    projectsDir: cwd,
+    ...(hasRecipe && { recipe: parsed.recipe }),
+    ...(noTelemetry && { noTelemetry: true }),
+  });
 }
 
 export function parseUpdateOptions(args: string[]): UpdateOptions {

@@ -2,6 +2,22 @@
 
 O que mudou em cada versão do Rubrica (template e CLI `create-rubrica`). Detalhes de cada uma nas [notas da release](https://github.com/MierzwaMatheus/rubrica/releases). Para atualizar um projeto existente, veja [Atualizando o seu Rubrica](./docs/atualizacao.md).
 
+## 1.9.0 — 2026-10-29
+
+CLI 1.6.0: telemetria anônima dos comandos, para saber o que as pessoas mais usam.
+
+**Vindo da 1.8:**
+- Para ter o CLI novo, use `npx create-rubrica@latest`. Projetos existentes podem atualizar com `npx create-rubrica@latest update`: só documentação mudou no template, nada para publicar no Convex.
+- Não quer mandar nada? `npx create-rubrica telemetria desligar` na pasta do projeto, ou `RUBRICA_TELEMETRIA=0`.
+
+### CLI
+- **Telemetria anônima:** quando `create`, `setup`, `publicar`, `update` e `config` terminam bem, o CLI manda as escolhas feitas (layout, esquema, modo de cor, textura, fontes, pacote de plugins, integrações ligadas, versões). Nada de nome, e-mail, endereço do site, conteúdo, chaves ou IP. O projeto ganha um id aleatório no `rubrica.json`, e o CLI avisa na primeira vez.
+- **Comando `telemetria`:** `npx create-rubrica telemetria` mostra se está ligada; `ligar` e `desligar` gravam a escolha no projeto. `--sem-telemetria` desliga numa execução (no `create`, o projeto já nasce desligado). `DO_NOT_TRACK=1` também vale, e em CI o CLI nunca manda nada.
+- O envio dura no máximo 2 segundos e nunca quebra o comando.
+
+### Documentação
+- Página nova [Telemetria do CLI](https://userubrica.vercel.app/docs/guia/telemetria): o que vai, o que não vai e como desligar.
+
 ## 1.8.1 — 2026-10-26
 
 Correção: textos novos de uma atualização apareciam como chave crua no site.

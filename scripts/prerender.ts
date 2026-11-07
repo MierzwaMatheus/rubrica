@@ -19,6 +19,8 @@ import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from
 import { dirname, join, normalize, resolve } from "path";
 import { pathToFileURL } from "url";
 import { listPublicRoutes } from "./lib/publicRoutes";
+import { enhanceImages } from "./lib/enhanceImages";
+import { MANIFEST_NAME, type MediaManifest } from "./lib/media";
 import { localizedPath, type Locale } from "../src/i18n/localePath";
 import { PRERENDER_STATE_ID } from "../src/ssr/constants";
 import type { RenderResult } from "../src/entry-server";
@@ -67,7 +69,18 @@ function safeJson(value: unknown): string {
     .replace(/\u2029/g, "\\u2029");
 }
 
-function composePage(template: string, result: RenderResult, locale: Locale): string {
+/** Medidas das imagens baixadas no build (fetch-media). Sem o manifesto, as imagens ficam como vieram. */
+function readMediaManifest(): MediaManifest {
+  const path = join(DIST, "media", MANIFEST_NAME);
+  if (!existsSync(path)) return {};
+  try {
+    return JSON.parse(readFileSync(path, "utf-8")) as MediaManifest;
+  } catch {
+    return {};
+  }
+}
+
+function composePage(template: string, result: RenderResult, locale: Locale, media: MediaManifest): string {
   const h = result.helmet;
   const headTags = h
     ? [h.title, h.meta, h.link, h.script].map((part) => part.toString()).filter(Boolean).join("\n    ")
@@ -76,8 +89,9 @@ function composePage(template: string, result: RenderResult, locale: Locale): st
 
   return template
     .replace(/<html([^>]*)\slang="[^"]*"/, `<html$1 lang="${locale}"`)
-    .replace("</head>", `    ${headTags}\n  </head>`)
-    .replace('<div id="root"></div>', `<div id="root">${result.html}</div>\n    ${stateTag}`);
+    // Função no replace: o conteúdo pode ter "$&" ou "$'", que o replace com texto interpretaria.
+    .replace("</head>", () => `    ${headTags}\n  </head>`)
+    .replace('<div id="root"></div>', () => `<div id="root">${enhanceImages(result.html, media)}</div>\n    ${stateTag}`);
 }
 
 /** Modo de cor e alternância gravados pelo CLI no <html> do index.html. */
@@ -118,6 +132,7 @@ async function main() {
   };
 
   const routes = listPublicRoutes(join(DIST, "data"));
+  const media = readMediaManifest();
   const failures: string[] = [];
   let written = 0;
 
@@ -128,7 +143,7 @@ async function main() {
         const result = await render(urlPath, appearance);
         const file = outputFile(urlPath);
         mkdirSync(dirname(file), { recursive: true });
-        writeFileSync(file, composePage(template, result, locale), "utf-8");
+        writeFileSync(file, composePage(template, result, locale, media), "utf-8");
         written++;
       } catch (error) {
         failures.push(urlPath);

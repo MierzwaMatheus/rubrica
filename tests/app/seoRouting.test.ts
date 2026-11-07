@@ -38,3 +38,20 @@ describe("robots.txt", () => {
     expect(txt).not.toContain("Disallow: /blog");
   });
 });
+
+describe("rotas do app — código e vercel.json concordam", () => {
+  it("isAppRoute bate com os rewrites para app.html", async () => {
+    const { isAppRoute } = await import("@/lib/appRoutes");
+    const paths = ["/", "/admin", "/admin/blog", "/login", "/playground", "/proposta/abc", "/en/proposta/abc", "/checkout/x", "/payment-success/x", "/blog/x", "/sobre", "/administracao", "/en", "/en/blog"];
+    for (const p of paths) expect(isAppRoute(p), p).toBe(toApp(p));
+  });
+
+  it("seções de texto só do app", async () => {
+    const { isAppTextKey } = await import("@/lib/appRoutes");
+    expect(isAppTextKey("admin.blog.title")).toBe(true);
+    expect(isAppTextKey("proposals.clause1")).toBe(true);
+    expect(isAppTextKey("auth.login")).toBe(true);
+    expect(isAppTextKey("contactWizard.trigger")).toBe(false);
+    expect(isAppTextKey("home.hero.headline")).toBe(false);
+  });
+});

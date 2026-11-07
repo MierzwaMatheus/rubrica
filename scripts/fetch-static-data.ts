@@ -12,6 +12,7 @@ import { ConvexHttpClient } from 'convex/browser';
 import { api } from '../convex/_generated/api';
 import { countWords } from '../src/utils/readingTime';
 import { compactProject, projectIndexEntry } from './lib/portfolioIndex';
+import { isAppTextKey } from '../src/lib/appRoutes';
 import { writeFileSync, mkdirSync, rmSync } from 'fs';
 import { join } from 'path';
 
@@ -83,7 +84,10 @@ async function main() {
   write('site-config.json', siteConfig.map(({ key, value }) => ({ key, value })));
 
   const siteTexts = await client.query(api.siteTexts.getAll, {});
-  write('site-texts.json', siteTexts.map(({ key, ptBR, enUS }) => ({ key, ptBR, enUS })));
+  // Textos do painel, do login e das propostas à parte: as páginas públicas não os usam.
+  const texts = siteTexts.map(({ key, ptBR, enUS }) => ({ key, ptBR, enUS }));
+  write('site-texts.json', texts.filter((t) => !isAppTextKey(t.key)));
+  write('site-texts-app.json', texts.filter((t) => isAppTextKey(t.key)));
 
   // Blog listing
   const published = await client.query(api.posts.listAllPublished, {});

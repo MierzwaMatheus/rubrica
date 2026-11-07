@@ -10,6 +10,7 @@ import { DynamicTranslationsRepository } from '../implementations/DynamicTransla
 import { NoopTranslationService } from '../implementations/NoopTranslationService';
 import { CachedTranslationService } from '../implementations/CachedTranslationService';
 import { Locale, localeFromPath, localizedPath } from '../localePath';
+import { isAppRoute } from '@/lib/appRoutes';
 
 export type { Locale };
 
@@ -44,22 +45,32 @@ function useConvexSiteTexts(): SiteTextRecord[] | undefined {
  * Produção: textos do JSON gerado no build (como o resto do conteúdo publicado), para que
  * entrem no HTML pré-renderizado. Mudanças nos textos chegam ao site na próxima publicação.
  */
+async function fetchSiteTexts(file: string): Promise<SiteTextRecord[]> {
+  try {
+    const response = await fetch(`/data/${file}`);
+    if (!response.ok) return [];
+    const raw = await response.json();
+    return Array.isArray(raw) ? raw : [];
+  } catch {
+    return [];
+  }
+}
+
 function useStaticSiteTexts(): SiteTextRecord[] | undefined {
+  const [location] = useLocation();
   const { data } = useReactQuery({
     queryKey: ['siteTexts'],
-    queryFn: async (): Promise<SiteTextRecord[]> => {
-      try {
-        const response = await fetch('/data/site-texts.json');
-        if (!response.ok) return [];
-        const raw = await response.json();
-        return Array.isArray(raw) ? raw : [];
-      } catch {
-        return [];
-      }
-    },
+    queryFn: () => fetchSiteTexts('site-texts.json'),
     staleTime: Infinity,
   });
-  return data;
+  // Textos do painel, do login e das propostas: só nessas rotas (fora do HTML das páginas públicas).
+  const { data: appTexts } = useReactQuery({
+    queryKey: ['siteTexts', 'app'],
+    queryFn: () => fetchSiteTexts('site-texts-app.json'),
+    staleTime: Infinity,
+    enabled: isAppRoute(location),
+  });
+  return useMemo(() => (data && appTexts?.length ? [...data, ...appTexts] : data), [data, appTexts]);
 }
 
 const useSiteTexts = import.meta.env.PROD ? useStaticSiteTexts : useConvexSiteTexts;

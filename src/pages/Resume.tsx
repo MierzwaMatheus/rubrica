@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { sanitizeHtml } from "@/lib/sanitizeHtml";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import { SEO } from "@/components/SEO";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

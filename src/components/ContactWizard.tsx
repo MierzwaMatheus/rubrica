@@ -1,5 +1,5 @@
 import { useReducer, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m as motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { trackEvent } from "@/lib/analytics";
 import { useTranslation } from "@/i18n/hooks/useTranslation";

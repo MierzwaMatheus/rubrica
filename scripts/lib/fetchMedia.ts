@@ -10,6 +10,7 @@
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "fs";
 import { join, relative } from "path";
 import {
+  MANIFEST_NAME,
   MEDIA_VERSION,
   displayName,
   findStorageUrls,
@@ -17,13 +18,22 @@ import {
   kindFromContentType,
   rewriteStorageUrls,
   shareName,
+  smallName,
+  storageIdOf,
   withRetry,
   type MediaKind,
+  type MediaManifest,
 } from "./media";
 
 export interface ImageProcessor {
-  /** Redimensiona e converte uma imagem raster: WebP para a página e JPG para prévias de link. */
-  raster(input: Uint8Array): Promise<{ webp: Uint8Array; jpg: Uint8Array }>;
+  /**
+   * Redimensiona e converte uma imagem raster: WebP para a página (com uma versão menor para
+   * telas pequenas, quando a imagem é larga o bastante), JPG para prévias de link e as medidas
+   * do WebP.
+   */
+  raster(input: Uint8Array): Promise<{ webp: Uint8Array; small?: Uint8Array; jpg: Uint8Array; width: number; height: number }>;
+  /** Medidas de um arquivo copiado sem conversão (SVG, GIF), se der para ler. */
+  dimensions?(input: Uint8Array): Promise<{ width: number; height: number } | null>;
 }
 
 export interface FetchMediaOptions {
@@ -47,6 +57,13 @@ export interface FetchMediaSummary {
 
 /** Marca de "não é imagem" (vídeo, PDF): não pergunta de novo no próximo build. */
 const SKIP_SUFFIX = ".skip";
+/** Medidas da imagem, guardadas no cache ao lado dela. */
+const META_SUFFIX = ".meta.json";
+
+const isMeta = (name: string) => name.endsWith(META_SUFFIX);
+/** Arquivo que a página usa no src (nem a variante JPG, nem a versão menor, nem as medidas). */
+const isDisplay = (name: string) =>
+  !name.endsWith(".jpg") && !isMeta(name) && !name.endsWith(SKIP_SUFFIX) && name !== smallName(storageIdOf(name));
 
 function jsonFiles(dir: string): string[] {
   if (!existsSync(dir)) return [];
@@ -69,7 +86,7 @@ function cacheIndex(dir: string): Map<string, string[]> {
   const index = new Map<string, string[]>();
   for (const name of readdirSync(dir)) {
     if (name.endsWith(".tmp")) continue;
-    const id = name.split(".")[0];
+    const id = storageIdOf(name);
     index.set(id, [...(index.get(id) ?? []), name]);
   }
   return index;
@@ -123,12 +140,25 @@ export async function runFetchMedia(options: FetchMediaOptions): Promise<FetchMe
       if (kind === "copy") {
         const name = displayName(id, kind, contentType);
         writeAtomic(join(cacheDir, name), data);
-        index.set(id, [name]);
+        const size = (await processor.dimensions?.(data).catch(() => null)) ?? null;
+        const names = [name];
+        if (size) {
+          writeAtomic(join(cacheDir, `${id}${META_SUFFIX}`), JSON.stringify(size));
+          names.push(`${id}${META_SUFFIX}`);
+        }
+        index.set(id, names);
       } else {
-        const { webp, jpg } = await processor.raster(data);
+        const { webp, small, jpg, width, height } = await processor.raster(data);
+        const names = [displayName(id, kind), shareName(id)];
         writeAtomic(join(cacheDir, displayName(id, kind)), webp);
         writeAtomic(join(cacheDir, shareName(id)), jpg);
-        index.set(id, [displayName(id, kind), shareName(id)]);
+        if (small) {
+          writeAtomic(join(cacheDir, smallName(id)), small);
+          names.push(smallName(id));
+        }
+        writeAtomic(join(cacheDir, `${id}${META_SUFFIX}`), JSON.stringify({ width, height }));
+        names.push(`${id}${META_SUFFIX}`);
+        index.set(id, names);
       }
       summary.downloaded++;
     } catch (error) {
@@ -140,16 +170,25 @@ export async function runFetchMedia(options: FetchMediaOptions): Promise<FetchMe
   rmSync(outDir, { recursive: true, force: true });
   mkdirSync(outDir, { recursive: true });
   const localById = new Map<string, string>();
+  const manifest: MediaManifest = {};
   for (const id of urlById.keys()) {
     const names = index.get(id) ?? [];
     if (names.some((n) => n.endsWith(SKIP_SUFFIX))) {
       summary.skipped++;
       continue;
     }
-    if (names.length === 0) continue;
-    for (const name of names) copyFileSync(join(cacheDir, name), join(outDir, name));
-    localById.set(id, names.find((n) => !n.endsWith(".jpg")) ?? names[0]);
+    const display = names.find(isDisplay);
+    if (!display) continue;
+    for (const name of names) if (!isMeta(name)) copyFileSync(join(cacheDir, name), join(outDir, name));
+    localById.set(id, display);
+    const meta = names.find(isMeta);
+    if (meta) {
+      const { width, height } = JSON.parse(readFileSync(join(cacheDir, meta), "utf-8")) as { width: number; height: number };
+      const small = names.find((n) => n === smallName(id));
+      manifest[display] = { width, height, ...(small ? { small } : {}) };
+    }
   }
+  writeFileSync(join(outDir, MANIFEST_NAME), JSON.stringify(manifest));
 
   // 4. Troca as URLs nos JSON.
   for (const file of files) {
@@ -159,7 +198,7 @@ export async function runFetchMedia(options: FetchMediaOptions): Promise<FetchMe
 
   // 5. Tira do cache o que nenhum conteúdo cita mais (e versões antigas do processamento).
   for (const name of readdirSync(cacheDir)) {
-    if (!urlById.has(name.split(".")[0])) rmSync(join(cacheDir, name), { force: true });
+    if (!urlById.has(storageIdOf(name))) rmSync(join(cacheDir, name), { force: true });
   }
   for (const name of readdirSync(options.cacheDir)) {
     if (name !== MEDIA_VERSION) rmSync(join(options.cacheDir, name), { recursive: true, force: true });

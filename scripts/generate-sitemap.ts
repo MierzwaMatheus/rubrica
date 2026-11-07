@@ -13,6 +13,14 @@ const TODAY = new Date().toISOString().split("T")[0];
 
 const DATA_DIR = join(__dirname, "..", "public", "data");
 const OUTPUT_PATH = join(__dirname, "..", "public", "sitemap.xml");
+const ROBOTS_PATH = join(__dirname, "..", "public", "robots.txt");
+
+/** Rotas do app (painel, login, propostas, checkout): não são conteúdo para buscadores. */
+export const ROBOTS_DISALLOW = ["/admin", "/login", "/playground", "/proposta/", "/checkout/", "/payment-success/", "/en/proposta/", "/en/checkout/", "/en/payment-success/"];
+
+export function robotsTxt(siteUrl: string): string {
+  return ["User-agent: *", "Allow: /", ...ROBOTS_DISALLOW.map((p) => `Disallow: ${p}`), "", `Sitemap: ${siteUrl}/sitemap.xml`, ""].join("\n");
+}
 
 /** Cada página entra duas vezes (pt-BR e inglês), cada uma apontando para as duas versões. */
 function urlEntries(path: string, changefreq: string, priority: string, lastmod: string): string[] {
@@ -53,6 +61,9 @@ ${urls.join("\n")}
 
   writeFileSync(OUTPUT_PATH, xml, "utf-8");
   console.log(`[Sitemap] Successfully generated at ${OUTPUT_PATH} (${urls.length} URLs)`);
+  writeFileSync(ROBOTS_PATH, robotsTxt(SITE_URL), "utf-8");
+  console.log(`[Sitemap] robots.txt em ${ROBOTS_PATH}`);
 }
 
-generateSitemap();
+// Só roda como script (os testes importam robotsTxt).
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) generateSitemap();

@@ -10,9 +10,11 @@ const STORAGE_URL = /https:\/\/[a-z0-9-]+\.convex\.(?:cloud|site)\/api\/storage\
 export const PUBLIC_PREFIX = "/media/";
 
 /** Versão do processamento: mudar tamanho, formato ou qualidade troca a pasta do cache. */
-export const MEDIA_VERSION = "v1-webp1600q80-jpg1200q82";
+export const MEDIA_VERSION = "v2-webp1600+800q80-jpg1200q82";
 /** Largura máxima da imagem na página. */
 export const MAX_WIDTH = 1600;
+/** Versão menor, para telas pequenas (srcset). */
+export const SMALL_WIDTH = 800;
 /** Largura da variante para prévia de link (o tamanho que as redes recomendam para og:image). */
 export const SHARE_WIDTH = 1200;
 
@@ -45,6 +47,20 @@ export function displayName(storageId: string, kind: Exclude<MediaKind, "skip">,
 export function shareName(storageId: string): string {
   return `${storageId}.jpg`;
 }
+
+/** Nome da versão de 800px (srcset). */
+export function smallName(storageId: string): string {
+  return `${storageId}-${SMALL_WIDTH}.webp`;
+}
+
+/** storageId no começo do nome de um arquivo de mídia ("<uuid>.webp", "<uuid>-800.webp"...). */
+export function storageIdOf(fileName: string): string {
+  return fileName.slice(0, 36);
+}
+
+/** Medidas de cada imagem da página (nome do arquivo → largura, altura e se há a versão de 800px). */
+export type MediaManifest = Record<string, { width: number; height: number; small?: string }>;
+export const MANIFEST_NAME = "manifest.json";
 
 /** URLs do storage citadas num texto (o JSON inteiro), com o storageId de cada uma. */
 export function findStorageUrls(text: string): Map<string, string> {

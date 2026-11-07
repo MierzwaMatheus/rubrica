@@ -186,7 +186,7 @@ const NAV_ITEMS = NAV_ITEMS_KEYS
         {/* Footer Info */}
         <div className="mt-auto px-6 py-6 border-t border-foreground/10 bg-background/50">
           <div className="mb-6 space-y-3">
-            <p className="text-[10px] uppercase tracking-wider text-foreground/25 font-bold mb-2">
+            <p className="text-[10px] uppercase tracking-wider text-foreground/60 font-bold mb-2">
               {t("sidebar.contact")}
             </p>
 
@@ -282,6 +282,7 @@ const NAV_ITEMS = NAV_ITEMS_KEYS
               </span>
               <div className="flex items-center gap-2">
                 <Switch
+                  aria-label={t("sidebar.language")}
                   checked={locale === "en-US"}
                   onCheckedChange={handleLanguageChange}
                   className="data-[state=checked]:bg-neon-purple"
@@ -320,7 +321,7 @@ const NAV_ITEMS = NAV_ITEMS_KEYS
             {t("sidebar.downloadCV")}
           </Button>
 
-          <p className="text-center text-[10px] text-foreground-strong/20 font-mono mt-1">
+          <p className="text-center text-[10px] text-foreground-strong/60 font-mono mt-1">
             {t("sidebar.terminalHint")}
           </p>
         </div>
@@ -371,6 +372,7 @@ const NAV_ITEMS = NAV_ITEMS_KEYS
         <Sheet>
           <SheetTrigger asChild>
             <Button
+              aria-label={t("sidebar.menu")}
               variant="ghost"
               size="icon"
               className="text-foreground-strong hover:bg-foreground/10"

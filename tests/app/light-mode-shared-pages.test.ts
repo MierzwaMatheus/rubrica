@@ -25,6 +25,7 @@ const FILES = [
   "src/components/ContractModal.tsx",
   "src/components/Terminal.tsx",
   "src/components/TestimonialWizard.tsx",
+  "src/components/TestimonialWizardDialog.tsx",
   "src/components/ui/skeleton.tsx",
 ];
 

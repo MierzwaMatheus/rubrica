@@ -7,7 +7,7 @@
     "dev": "vite --host & npx convex dev",
     "build:i18n": "tsx scripts/export-i18n.ts",
     "build": "npx convex deploy && tsx scripts/fetch-static-data.ts && tsx scripts/fetch-media.ts && tsx scripts/generate-rss-feed.ts && tsx scripts/generate-sitemap.ts && npm run build:site",
-    "build:site": "vite build && vite build --ssr src/entry-server.tsx --outDir dist-server && tsx scripts/prerender.ts",
+    "build:site": "tsx scripts/fetch-fonts.ts && vite build && vite build --ssr src/entry-server.tsx --outDir dist-server && tsx scripts/prerender.ts",
     "preview": "vite preview --host",
     "check": "tsc --noEmit",
     "format": "prettier --write .",

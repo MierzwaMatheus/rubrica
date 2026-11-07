@@ -9,7 +9,6 @@ import {
   portfolioRepository,
   homeRepository,
 } from "@/repositories/instances";
-import { generateCV } from "@/utils/cvPDF";
 
 /**
  * Gera o PDF do currículo no idioma atual. Usado na barra lateral e na página de currículo.
@@ -29,7 +28,9 @@ export function useDownloadCV() {
     // A aba abre ainda no clique: aberta depois de esperar os dados, o navegador a bloquearia.
     const target = window.open("", "_blank");
     try {
-      const [resumeRaw, projectsRaw, aboutData] = await Promise.all([
+      const [{ generateCV }, resumeRaw, projectsRaw, aboutData] = await Promise.all([
+        // O gerador do PDF só carrega no clique.
+        import("@/utils/cvPDF"),
         queryClient.fetchQuery({ queryKey: ["resume", "items"], queryFn: () => resumeRepository.list(), staleTime: Infinity }),
         queryClient.fetchQuery({ queryKey: ["portfolio", "projects"], queryFn: () => portfolioRepository.list(), staleTime: Infinity }),
         queryClient.fetchQuery({ queryKey: ["home", "about"], queryFn: () => homeRepository.getAboutData(), staleTime: Infinity }),

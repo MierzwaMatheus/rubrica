@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams } from "wouter";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import { CheckCircle2, Clock, Calendar, DollarSign, Download, AlertTriangle, FileCheck, Lock, ChevronDown, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";

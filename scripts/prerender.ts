@@ -19,6 +19,8 @@ import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from
 import { dirname, join, normalize, resolve } from "path";
 import { pathToFileURL } from "url";
 import { listPublicRoutes } from "./lib/publicRoutes";
+import { enhanceImages } from "./lib/enhanceImages";
+import { MANIFEST_NAME, type MediaManifest } from "./lib/media";
 import { localizedPath, type Locale } from "../src/i18n/localePath";
 import { PRERENDER_STATE_ID } from "../src/ssr/constants";
 import type { RenderResult } from "../src/entry-server";
@@ -67,7 +69,18 @@ function safeJson(value: unknown): string {
     .replace(/\u2029/g, "\\u2029");
 }
 
-function composePage(template: string, result: RenderResult, locale: Locale): string {
+/** Medidas das imagens baixadas no build (fetch-media). Sem o manifesto, as imagens ficam como vieram. */
+function readMediaManifest(): MediaManifest {
+  const path = join(DIST, "media", MANIFEST_NAME);
+  if (!existsSync(path)) return {};
+  try {
+    return JSON.parse(readFileSync(path, "utf-8")) as MediaManifest;
+  } catch {
+    return {};
+  }
+}
+
+function composePage(template: string, result: RenderResult, locale: Locale, media: MediaManifest): string {
   const h = result.helmet;
   const headTags = h
     ? [h.title, h.meta, h.link, h.script].map((part) => part.toString()).filter(Boolean).join("\n    ")
@@ -76,8 +89,9 @@ function composePage(template: string, result: RenderResult, locale: Locale): st
 
   return template
     .replace(/<html([^>]*)\slang="[^"]*"/, `<html$1 lang="${locale}"`)
-    .replace("</head>", `    ${headTags}\n  </head>`)
-    .replace('<div id="root"></div>', `<div id="root">${result.html}</div>\n    ${stateTag}`);
+    // Função no replace: o conteúdo pode ter "$&" ou "$'", que o replace com texto interpretaria.
+    .replace("</head>", () => `    ${headTags}\n  </head>`)
+    .replace('<div id="root"></div>', () => `<div id="root">${enhanceImages(result.html, media)}</div>\n    ${stateTag}`);
 }
 
 /** Modo de cor e alternância gravados pelo CLI no <html> do index.html. */
@@ -101,8 +115,14 @@ async function main() {
     throw new Error("Rode `vite build` e `vite build --ssr src/entry-server.tsx --outDir dist-server` antes.");
   }
 
-  // Casca da SPA para as rotas não pré-renderizadas (antes de index.html virar a home).
+  // Casca da SPA para as rotas do app (antes de index.html virar a home).
   copyFileSync(templatePath, join(DIST, "app.html"));
+  // Endereço que não existe: a Vercel serve o 404.html com status 404 (antes, a casca da SPA
+  // respondia 200 e o buscador podia indexar uma página vazia). O app desenha o "não encontrado".
+  writeFileSync(
+    join(DIST, "404.html"),
+    readFileSync(templatePath, "utf-8").replace("</head>", '    <meta name="robots" content="noindex" />\n  </head>'),
+  );
   const template = stripPageHead(readFileSync(templatePath, "utf-8"));
   const appearance = readAppearance(template);
 
@@ -112,6 +132,7 @@ async function main() {
   };
 
   const routes = listPublicRoutes(join(DIST, "data"));
+  const media = readMediaManifest();
   const failures: string[] = [];
   let written = 0;
 
@@ -122,10 +143,15 @@ async function main() {
         const result = await render(urlPath, appearance);
         const file = outputFile(urlPath);
         mkdirSync(dirname(file), { recursive: true });
-        writeFileSync(file, composePage(template, result, locale), "utf-8");
+        writeFileSync(file, composePage(template, result, locale, media), "utf-8");
         written++;
       } catch (error) {
         failures.push(urlPath);
+        // Sem a página pronta, o endereço recebe a casca da SPA: continua funcionando (sem SEO)
+        // em vez de cair no 404.
+        const file = outputFile(urlPath);
+        mkdirSync(dirname(file), { recursive: true });
+        copyFileSync(join(DIST, "app.html"), file);
         console.error(`[prerender] falhou em ${urlPath}:`, error);
       }
     }
@@ -133,7 +159,7 @@ async function main() {
 
   console.log(`[prerender] ${written} páginas geradas (${routes.length} rotas × ${LOCALES.length} idiomas)`);
   if (failures.length > 0) {
-    // Página que falhou não é gravada: cai no app.html e funciona como SPA (sem o SEO).
+    // Página que falhou recebe a casca da SPA no próprio endereço: funciona, sem o SEO.
     // Só derruba o build se nada foi gerado, para não travar a publicação por uma página.
     console.warn(`[prerender] ${failures.length} páginas ficaram sem pré-renderização: ${failures.join(", ")}`);
     if (written === 0) throw new Error("[prerender] nenhuma página foi gerada");

@@ -1,7 +1,7 @@
 import { PageSkeleton } from "@/components/PageSkeleton";
 import { SEO } from "@/components/SEO";
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import {
   Terminal,
   Cpu,
@@ -358,7 +358,7 @@ export default function Home() {
             <div className="text-center mt-8 flex flex-col items-center gap-3">
               <Link
                 href="/depoimentos"
-                className="text-sm text-foreground/42 hover:text-foreground/90 transition-colors underline underline-offset-4"
+                className="text-sm text-foreground/65 hover:text-foreground/90 transition-colors underline underline-offset-4"
               >
                 {t("testimonials.viewAll")}
               </Link>

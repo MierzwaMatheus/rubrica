@@ -21,8 +21,7 @@ import { PublicRoute } from "./components/PublicRoute";
 import { QueryProvider } from "./providers/QueryProvider";
 import { ConvexClientProvider, convex } from "./providers/ConvexClientProvider";
 import { ConvexTranslationService } from "./i18n/implementations/ConvexTranslationService";
-import { Terminal } from "./components/Terminal";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, LazyMotion } from "framer-motion";
 import { useState, useEffect, useMemo, lazy, Suspense, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { sidebarRepository } from "@/repositories/instances";
@@ -31,9 +30,14 @@ import { ContactWizardProvider } from "./contexts/ContactWizardContext";
 import { ContactWizardModal } from "./components/ContactWizardModal";
 import { PluginsProvider } from "./contexts/PluginsContext";
 import { PluginRoute } from "./components/PluginRoute";
+import { PageSEO } from "./components/PageSEO";
+import { lazyRoute } from "./lib/lazyRoute";
+import { stripLocale } from "./i18n/localePath";
 import { ChangePasswordModal } from "./components/ChangePasswordModal";
 
 // Páginas carregadas sob demanda: o visitante baixa só a página que abriu.
+// O terminal só abre com a tecla ~: carrega na hora, fora do JavaScript de todas as páginas.
+const Terminal = lazy(() => import("./components/Terminal").then((m) => ({ default: m.Terminal })));
 const Login = lazy(() => import("./pages/Login"));
 const Dashboard = lazy(() => import("./pages/admin/Dashboard"));
 const AdminProjects = lazy(() => import("./pages/admin/Projects"));
@@ -47,21 +51,21 @@ const AdminPaymentLinks = lazy(() => import("./pages/admin/PaymentLinks"));
 const AdminAbout = lazy(() => import("./pages/admin/About"));
 const AdminAiResumes = lazy(() => import("./pages/admin/AiResumes"));
 const AdminLogs = lazy(() => import("./pages/admin/Logs"));
-const Resume = lazy(() => import("./pages/Resume"));
-const Portfolio = lazy(() => import("./pages/Portfolio"));
-const Blog = lazy(() => import("./pages/Blog"));
-const BlogPost = lazy(() => import("./pages/BlogPost"));
-const ProjectCaseStudy = lazy(() => import("./pages/ProjectCaseStudy"));
+const Resume = lazyRoute(() => import("./pages/Resume"));
+const Portfolio = lazyRoute(() => import("./pages/Portfolio"));
+const Blog = lazyRoute(() => import("./pages/Blog"));
+const BlogPost = lazyRoute(() => import("./pages/BlogPost"));
+const ProjectCaseStudy = lazyRoute(() => import("./pages/ProjectCaseStudy"));
 const Proposal = lazy(() => import("./pages/Proposal"));
 const ProposalAccept = lazy(() => import("./pages/ProposalAccept"));
-const About = lazy(() => import("./pages/About"));
+const About = lazyRoute(() => import("./pages/About"));
 const Checkout = lazy(() => import("./pages/Checkout"));
 const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
 const AdminContactRequests = lazy(() => import("./pages/admin/ContactRequests"));
 const AdminPlugins = lazy(() => import("./pages/admin/Plugins"));
 const AdminTestimonials = lazy(() => import("./pages/admin/Testimonials"));
 const AdminLgpdErasure = lazy(() => import("./pages/admin/LgpdErasure"));
-const TestimonialsPage = lazy(() => import("./pages/Testimonials"));
+const TestimonialsPage = lazyRoute(() => import("./pages/Testimonials"));
 const AdminSiteConfig = lazy(() => import("./pages/admin/SiteConfig"));
 const AdminContractTemplates = lazy(() => import("./pages/admin/ContractTemplates"));
 const AdminTextos = lazy(() => import("./pages/admin/Textos"));
@@ -75,6 +79,26 @@ const BlogPreview = lazy(() => import("./pages/playground/BlogPreview"));
 const BlogPostPreview = lazy(() => import("./pages/playground/BlogPostPreview"));
 const PaymentLinkDemo = lazy(() => import("./pages/playground/PaymentLinkDemo"));
 const AiCvDemo = lazy(() => import("./pages/playground/AiCvDemo"));
+
+/**
+ * Páginas públicas (pré-renderizadas) por caminho, sem o prefixo de idioma. O main.tsx carrega
+ * a da URL antes de hidratar (ver src/lib/lazyRoute.tsx).
+ */
+const PUBLIC_ROUTES: Array<[RegExp, { preload: () => Promise<unknown> }]> = [
+  [/^\/sobre$/, About],
+  [/^\/curriculo$/, Resume],
+  [/^\/portfolio$/, Portfolio],
+  [/^\/portfolio\/[^/]+$/, ProjectCaseStudy],
+  [/^\/blog$/, Blog],
+  [/^\/blog\/[^/]+$/, BlogPost],
+  [/^\/depoimentos$/, TestimonialsPage],
+];
+
+export function preloadRoute(pathname: string): Promise<unknown> {
+  const path = stripLocale(pathname);
+  const route = PUBLIC_ROUTES.find(([re]) => re.test(path));
+  return route ? route[1].preload() : Promise.resolve();
+}
 
 const translationService = new ConvexTranslationService(convex);
 
@@ -254,6 +278,7 @@ function Router() {
       <Switch>
         <Route path={"/"}>
           <PublicRoute>
+            <PageSEO page="home" />
             <Home />
           </PublicRoute>
         </Route>
@@ -261,6 +286,7 @@ function Router() {
         <Route path="/sobre">
           <PublicRoute>
             <PluginRoute pluginId="about">
+              <PageSEO page="about" />
               <About />
             </PluginRoute>
           </PublicRoute>
@@ -268,6 +294,7 @@ function Router() {
         <Route path="/curriculo">
           <PublicRoute>
             <PluginRoute pluginId="resume">
+              <PageSEO page="resume" />
               <Resume />
             </PluginRoute>
           </PublicRoute>
@@ -275,6 +302,7 @@ function Router() {
         <Route path="/portfolio">
           <PublicRoute>
             <PluginRoute pluginId="portfolio">
+              <PageSEO page="portfolio" />
               <Portfolio />
             </PluginRoute>
           </PublicRoute>
@@ -289,6 +317,7 @@ function Router() {
         <Route path="/blog">
           <PublicRoute>
             <PluginRoute pluginId="blog">
+              <PageSEO page="blog" />
               <Blog />
             </PluginRoute>
           </PublicRoute>
@@ -394,7 +423,9 @@ function AppContent() {
       <Router />
       <AnimatePresence>
         {terminalOpen && !isAdminRoute && (
-          <Terminal onClose={() => setTerminalOpen(false)} ownerInfo={ownerInfo} />
+          <Suspense fallback={null}>
+            <Terminal onClose={() => setTerminalOpen(false)} ownerInfo={ownerInfo} />
+          </Suspense>
         )}
       </AnimatePresence>
       <Analytics />
@@ -402,6 +433,9 @@ function AppContent() {
     </>
   );
 }
+
+/** Animações (framer-motion) carregadas à parte: os componentes usam `m`, o núcleo leve. */
+const loadMotionFeatures = () => import("./lib/motionFeatures").then((mod) => mod.default);
 
 /** "/en/" (Link para "/" dentro do inglês) vira "/en", a URL canônica da home em inglês. */
 const normalizeEnRoot = (to: string) => (to === `${EN_BASE}/` ? EN_BASE : to);
@@ -440,6 +474,7 @@ export interface AppProps {
 function App({ ssrPath, queryClient, helmetContext, appearance }: AppProps = {}) {
   return (
     <HelmetProvider context={helmetContext}>
+      <LazyMotion features={loadMotionFeatures}>
       <WouterRouter ssrPath={ssrPath}>
       <ErrorBoundary>
         <ConvexClientProvider>
@@ -467,6 +502,7 @@ function App({ ssrPath, queryClient, helmetContext, appearance }: AppProps = {})
         </ConvexClientProvider>
       </ErrorBoundary>
       </WouterRouter>
+      </LazyMotion>
     </HelmetProvider>
   );
 }

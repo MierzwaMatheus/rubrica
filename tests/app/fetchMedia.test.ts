@@ -66,7 +66,12 @@ describe("runFetchMedia", () => {
   let outDir: string;
   let cacheDir: string;
   const processor: ImageProcessor = {
-    raster: vi.fn(async (input: Uint8Array) => ({ webp: input, jpg: input })),
+    // Imagens "largas" (A) ganham a versão de 800px; as outras não.
+    raster: vi.fn(async (input: Uint8Array) => {
+      const wide = new TextDecoder().decode(input) === ID_A;
+      return { webp: input, jpg: input, width: wide ? 1600 : 640, height: wide ? 900 : 480, ...(wide ? { small: input } : {}) };
+    }),
+    dimensions: vi.fn(async () => ({ width: 24, height: 24 })),
   };
 
   /** Storage falso: guarda as requisições feitas. */
@@ -108,8 +113,13 @@ describe("runFetchMedia", () => {
 
     expect(summary).toMatchObject({ found: 4, cached: 0, downloaded: 3, skipped: 1, failed: [] });
     expect(readdirSync(outDir).sort()).toEqual(
-      [`${ID_A}.jpg`, `${ID_A}.webp`, `${ID_B}.jpg`, `${ID_B}.webp`, `${ID_SVG}.svg`].sort(),
+      [`${ID_A}.jpg`, `${ID_A}.webp`, `${ID_A}-800.webp`, `${ID_B}.jpg`, `${ID_B}.webp`, `${ID_SVG}.svg`, "manifest.json"].sort(),
     );
+    expect(JSON.parse(readFileSync(join(outDir, "manifest.json"), "utf-8"))).toEqual({
+      [`${ID_A}.webp`]: { width: 1600, height: 900, small: `${ID_A}-800.webp` },
+      [`${ID_B}.webp`]: { width: 640, height: 480 },
+      [`${ID_SVG}.svg`]: { width: 24, height: 24 },
+    });
     const blog = readFileSync(join(dataDir, "blog.json"), "utf-8");
     expect(blog).toContain(`/media/${ID_A}.webp`);
     expect(blog).toContain(url(ID_VIDEO)); // vídeo continua no storage
@@ -179,5 +189,15 @@ describe("runFetchMedia", () => {
     rmSync(dataDir, { recursive: true });
     const summary = await runFetchMedia({ dataDir, outDir, cacheDir, fetchImpl: fakeStorage({}).fetchImpl, processor, log: () => {} });
     expect(summary.found).toBe(0);
+  });
+});
+
+describe("media — nomes", () => {
+  it("storageId só de dígitos no último bloco não confunde a imagem com a versão de 800px", async () => {
+    const { smallName, storageIdOf } = await import("../../scripts/lib/media");
+    const id = "11111111-1111-1111-1111-111111111111";
+    expect(storageIdOf(`${id}.webp`)).toBe(id);
+    expect(storageIdOf(smallName(id))).toBe(id);
+    expect(`${id}.webp`).not.toBe(smallName(id));
   });
 });

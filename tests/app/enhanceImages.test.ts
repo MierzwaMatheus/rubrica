@@ -49,3 +49,15 @@ describe("enhanceImages", () => {
     expect(enhanceImages(html, manifest)).toBe(html);
   });
 });
+
+describe("enhanceImages — preload que o React põe no HTML", () => {
+  it("ganha imagesrcset/imagesizes para pré-carregar a mesma versão da <img>", () => {
+    const out = enhanceImages(`<link rel="preload" as="image" href="/media/${A}.webp"/><main><img src="/media/${A}.webp"/></main>`, manifest);
+    expect(out).toContain(`<link rel="preload" as="image" href="/media/${A}.webp" imagesrcset="/media/${A}-800.webp 800w, /media/${A}.webp 1600w" imagesizes="(max-width: 1024px) 100vw, 800px"/>`);
+  });
+
+  it("preload de outra coisa (fonte) ou sem versão menor fica igual", () => {
+    const html = `<link rel="preload" href="/fonts/x.woff2" as="font"/><link rel="preload" as="image" href="/media/${B}.webp"/>`;
+    expect(enhanceImages(html, manifest)).toBe(html);
+  });
+});

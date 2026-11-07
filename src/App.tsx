@@ -31,6 +31,8 @@ import { ContactWizardModal } from "./components/ContactWizardModal";
 import { PluginsProvider } from "./contexts/PluginsContext";
 import { PluginRoute } from "./components/PluginRoute";
 import { PageSEO } from "./components/PageSEO";
+import { lazyRoute } from "./lib/lazyRoute";
+import { stripLocale } from "./i18n/localePath";
 import { ChangePasswordModal } from "./components/ChangePasswordModal";
 
 // Páginas carregadas sob demanda: o visitante baixa só a página que abriu.
@@ -49,21 +51,21 @@ const AdminPaymentLinks = lazy(() => import("./pages/admin/PaymentLinks"));
 const AdminAbout = lazy(() => import("./pages/admin/About"));
 const AdminAiResumes = lazy(() => import("./pages/admin/AiResumes"));
 const AdminLogs = lazy(() => import("./pages/admin/Logs"));
-const Resume = lazy(() => import("./pages/Resume"));
-const Portfolio = lazy(() => import("./pages/Portfolio"));
-const Blog = lazy(() => import("./pages/Blog"));
-const BlogPost = lazy(() => import("./pages/BlogPost"));
-const ProjectCaseStudy = lazy(() => import("./pages/ProjectCaseStudy"));
+const Resume = lazyRoute(() => import("./pages/Resume"));
+const Portfolio = lazyRoute(() => import("./pages/Portfolio"));
+const Blog = lazyRoute(() => import("./pages/Blog"));
+const BlogPost = lazyRoute(() => import("./pages/BlogPost"));
+const ProjectCaseStudy = lazyRoute(() => import("./pages/ProjectCaseStudy"));
 const Proposal = lazy(() => import("./pages/Proposal"));
 const ProposalAccept = lazy(() => import("./pages/ProposalAccept"));
-const About = lazy(() => import("./pages/About"));
+const About = lazyRoute(() => import("./pages/About"));
 const Checkout = lazy(() => import("./pages/Checkout"));
 const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
 const AdminContactRequests = lazy(() => import("./pages/admin/ContactRequests"));
 const AdminPlugins = lazy(() => import("./pages/admin/Plugins"));
 const AdminTestimonials = lazy(() => import("./pages/admin/Testimonials"));
 const AdminLgpdErasure = lazy(() => import("./pages/admin/LgpdErasure"));
-const TestimonialsPage = lazy(() => import("./pages/Testimonials"));
+const TestimonialsPage = lazyRoute(() => import("./pages/Testimonials"));
 const AdminSiteConfig = lazy(() => import("./pages/admin/SiteConfig"));
 const AdminContractTemplates = lazy(() => import("./pages/admin/ContractTemplates"));
 const AdminTextos = lazy(() => import("./pages/admin/Textos"));
@@ -77,6 +79,26 @@ const BlogPreview = lazy(() => import("./pages/playground/BlogPreview"));
 const BlogPostPreview = lazy(() => import("./pages/playground/BlogPostPreview"));
 const PaymentLinkDemo = lazy(() => import("./pages/playground/PaymentLinkDemo"));
 const AiCvDemo = lazy(() => import("./pages/playground/AiCvDemo"));
+
+/**
+ * Páginas públicas (pré-renderizadas) por caminho, sem o prefixo de idioma. O main.tsx carrega
+ * a da URL antes de hidratar (ver src/lib/lazyRoute.tsx).
+ */
+const PUBLIC_ROUTES: Array<[RegExp, { preload: () => Promise<unknown> }]> = [
+  [/^\/sobre$/, About],
+  [/^\/curriculo$/, Resume],
+  [/^\/portfolio$/, Portfolio],
+  [/^\/portfolio\/[^/]+$/, ProjectCaseStudy],
+  [/^\/blog$/, Blog],
+  [/^\/blog\/[^/]+$/, BlogPost],
+  [/^\/depoimentos$/, TestimonialsPage],
+];
+
+export function preloadRoute(pathname: string): Promise<unknown> {
+  const path = stripLocale(pathname);
+  const route = PUBLIC_ROUTES.find(([re]) => re.test(path));
+  return route ? route[1].preload() : Promise.resolve();
+}
 
 const translationService = new ConvexTranslationService(convex);
 

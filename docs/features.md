@@ -464,7 +464,9 @@ Proposta aceita e pagamento confirmado usam a `internalAction` `convex/telegram.
 ### Vercel (Deploy)
 
 O `vercel.json` configura:
-- Rewrite para `app.html` (a casca da SPA) nas rotas que não foram pré-renderizadas: painel, login, propostas, checkout
+- Rewrite para `app.html` (a casca da SPA) só nas rotas do app: painel, login, playground, propostas e checkout (`src/lib/appRoutes.ts`). Qualquer outro endereço que não existe recebe o `404.html` com status 404
+- `trailingSlash: false`: `/blog/` redireciona para `/blog`
+- Cache de um ano (`immutable`) para `/media/` e `/fonts/`
 - Headers de segurança e Content-Security-Policy
 - Build command:
 
@@ -483,7 +485,7 @@ pnpm dev             # Vite (porta 3000) + Convex dev
 # Build
 pnpm build:i18n      # Regera src/i18n/translations a partir do Convex
 pnpm build           # convex deploy + dados estáticos + imagens + RSS + sitemap + build:site
-pnpm build:site      # vite build + pré-renderização das páginas públicas (usa os dados de public/data)
+pnpm build:site      # fontes + vite build + pré-renderização das páginas públicas (usa os dados de public/data)
 
 # Preview
 pnpm preview         # Preview do build de produção
@@ -695,11 +697,21 @@ Campos opcionais e aditivos (projetos antigos continuam válidos):
 
 Depois do `fetch-static-data`, `scripts/fetch-media.ts` baixa as imagens do storage do Convex citadas em `public/data` (capas, imagens dos cases e dos posts, avatares) para `public/media/<storageId>.webp`, até 1600px de largura, e troca as URLs nos JSON pelo caminho local. Cada imagem ganha também uma variante JPG de 1200px, usada no `og:image` (nem toda rede aceita WebP). SVG e GIF são copiados como vieram; vídeo e PDF continuam no storage. O `vercel.json` serve `/media/` com cache de um ano (`immutable`): o nome é o `storageId`, que nunca muda de conteúdo.
 
+Imagens largas ganham também uma versão de 800px. Na pré-renderização, cada `<img>` de `/media` recebe largura e altura (a página não pula quando a imagem carrega), `srcset`/`sizes` com as duas versões e, a primeira do conteúdo, `fetchpriority="high"` (`scripts/lib/enhanceImages.ts`, com as medidas de `public/media/manifest.json`). Se um componente trocar o `src` depois, o navegador tira o que o build acrescentou (`src/lib/mediaImages.ts`).
+
 Entre builds, o resultado fica em `node_modules/.cache/rubrica-media` (a Vercel preserva essa pasta): o build seguinte só baixa o que é novo. Uma imagem que falha não quebra o build, ela fica com a URL do storage.
+
+### Fontes no build
+
+`scripts/fetch-fonts.ts` baixa as fontes do Google Fonts citadas no `index.html` para `public/fonts` (com cache em `node_modules/.cache/rubrica-fonts`), e o plugin `selfHostedFonts` do `vite.config.ts` troca o link do Google pelo CSS embutido e um `preload` da fonte principal. A página não espera mais o CSS de outro domínio para aparecer. Se o download falhar, o link do Google continua.
 
 ### Pré-renderização
 
-Depois do `vite build`, `scripts/prerender.ts` gera `dist/<rota>/index.html` para cada rota pública nos dois idiomas (a lista sai de `public/data`, em `scripts/lib/publicRoutes.ts`, a mesma do sitemap). `src/entry-server.tsx` renderiza a rota até todas as queries do react-query terem dados e serializa o cache na página; no navegador, `src/main.tsx` hidrata esse HTML com os mesmos dados. Uma página que falha no build não é gravada e cai no `app.html` (SPA).
+Depois do `vite build`, `scripts/prerender.ts` gera `dist/<rota>/index.html` para cada rota pública nos dois idiomas (a lista sai de `public/data`, em `scripts/lib/publicRoutes.ts`, a mesma do sitemap). `src/entry-server.tsx` renderiza a rota até todas as queries do react-query terem dados e serializa o cache na página; no navegador, `src/main.tsx` hidrata esse HTML com os mesmos dados. Uma página que falha no build recebe a casca da SPA no próprio endereço: funciona, sem o SEO. O `generate-sitemap` também escreve o `robots.txt`.
+
+As páginas públicas são carregadas com `lazyRoute` (`src/lib/lazyRoute.tsx`) e o `main.tsx` carrega a da URL antes de hidratar: se o código da página chegasse durante a hidratação, uma atualização nesse intervalo (o tema aplicando a escolha salva, por exemplo) faria o React descartar o HTML do build e redesenhar o conteúdo.
+
+Cada rota fixa renderiza um `PageSEO` padrão (título, descrição, canonical e `hreflang`) antes da página; uma página com o seu próprio `<SEO>` o sobrepõe.
 
 O que vai serializado na página é o que ela renderiza: dados usados só num clique ficam de fora. O botão "Baixar CV" busca currículo, projetos e o "sobre" na hora (`useDownloadCV`), o índice do blog (`blog.json`) não leva o texto dos posts, só a contagem de palavras para o tempo de leitura (`reading_minutes`, calculado em `useBlogPosts`), e cada post tem o seu arquivo em `data/posts/`. Do mesmo jeito, o índice de projetos (`portfolio.json`, montado em `scripts/lib/portfolioIndex.ts`) leva o case só com as métricas, as imagens só com a URL e, no lugar da descrição longa, o tamanho dela; o projeto completo fica em `data/projects/<_id>.json`, lido pela página do case (`getBySlug`) e pelo modal do portfólio (`getById`).
 

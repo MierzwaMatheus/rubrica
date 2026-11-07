@@ -44,7 +44,24 @@ function enhanceTag(tag: string, manifest: MediaManifest, priority: boolean): st
   return tag.replace(/\s*(\/?)>$/, (_m, slash: string) => ` ${extra.join(" ")}${slash ? "/" : ""}>`);
 }
 
+/**
+ * O React 19 põe no HTML um <link rel="preload" as="image"> para as primeiras imagens. Ele é
+ * gerado sem o srcset (acrescentado depois, aqui), então pré-carregaria a versão de 1600px até
+ * no celular: ganha o imagesrcset/imagesizes, e o navegador escolhe a mesma da <img>.
+ */
+function enhancePreload(tag: string, manifest: MediaManifest): string {
+  const href = attr(tag, "href");
+  const name = href?.match(/^\/media\/([0-9a-f-]{36}\.[a-z0-9]+)$/)?.[1];
+  const info = name ? manifest[name] : undefined;
+  if (!info?.small || attr(tag, "imagesrcset")) return tag;
+  const extra = `imagesrcset="/media/${info.small} 800w, ${href} ${info.width}w" imagesizes="${MEDIA_SIZES}"`;
+  return tag.replace(/\s*(\/?)>$/, (_m, slash: string) => ` ${extra}${slash ? "/" : ""}>`);
+}
+
+const PRELOAD_IMAGE = /<link\b(?=[^>]*\brel="preload")(?=[^>]*\bas="image")[^>]*>/gi;
+
 export function enhanceImages(html: string, manifest: MediaManifest): string {
+  html = html.replace(PRELOAD_IMAGE, (tag) => enhancePreload(tag, manifest));
   // A primeira imagem dentro de <main> (fora da barra lateral e do cabeçalho) é a candidata a LCP.
   const mainAt = html.search(/<main\b/i);
   let prioritized = false;

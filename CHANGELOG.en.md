@@ -2,6 +2,24 @@
 
 What changed in each version of Rubrica (template and `create-rubrica` CLI). Details for each one are in the [release notes](https://github.com/MierzwaMatheus/rubrica/releases). To update an existing project, see [Atualizando o seu Rubrica](./docs/atualizacao.md) (in Portuguese).
 
+## 1.11.0 — 2026-11-07
+
+Content images come out of the build optimized and cached, and pages get much lighter.
+
+**Coming from 1.10:**
+- Update with `npx create-rubrica@latest update` and run `pnpm install` (or `npm install`): the build uses `sharp`, which is new. No new CLI version needed, nothing to push to Convex.
+- Customized `vercel.json`? Bring over from `.rubrica-new` the `/media/(.*)` block, which serves images with one-year caching.
+- The first publish after updating downloads and optimizes every image, so it takes a bit longer. Later ones only download new images.
+
+### Site
+- **Images optimized in the build:** covers, case study and post images and avatars are downloaded from Convex, resized to at most 1600px, converted to WebP and served by the site itself with one-year caching. Before, every visitor downloaded the original file from the storage, with no CDN caching. On a real site, images went from 26 MB to 7.3 MB, and a post cover from 841 KB to 116 KB.
+- **Link previews in JPG:** `og:image` uses a 1200px JPG version that every network accepts.
+- **Faster builds:** images are cached between publishes and only new ones are downloaded. Videos and PDFs stay on the storage.
+- **Lighter pages:** the blog list no longer carries every post's text (on a real site, `/blog` went from 1.3 MB to 233 KB), and the "Download CV" button only fetches the resume on click instead of loading it on every page.
+
+### Fixes
+- The resume PDF opens in a tab created right on click, so the browser doesn't block it as a popup.
+
 ## 1.10.0 — 2026-11-07
 
 Public pages come out of the build ready, with an English version under `/en`, and blog posts get SEO fields.

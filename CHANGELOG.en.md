@@ -2,6 +2,38 @@
 
 What changed in each version of Rubrica (template and `create-rubrica` CLI). Details for each one are in the [release notes](https://github.com/MierzwaMatheus/rubrica/releases). To update an existing project, see [Atualizando o seu Rubrica](./docs/atualizacao.md) (in Portuguese).
 
+## 1.10.0 — 2026-11-07
+
+Public pages come out of the build ready, with an English version under `/en`, and blog posts get SEO fields.
+
+**Coming from 1.9:**
+- Update with `npx create-rubrica@latest update`. No new CLI version needed.
+- The backend changed (`convex/`): push it to the local Convex with `npx convex dev --once` and, on the live site, with `npx create-rubrica publicar`. The new post fields are optional: existing posts stay the same.
+- Customized `vercel.json`? Bring over from `.rubrica-new` the rewrite change from `/index.html` to `/app.html`. Without it, the panel and login open with the home page's HTML and fail.
+- Customized the `build` script in `package.json`? It now ends with `npm run build:site`, which generates the pages.
+- The language now comes from the address: English lives under `/en/...`. The choice saved in the browser no longer switches the language on its own; visitors whose browser is in the other language see a prompt to switch.
+- The settings in `/admin/site-config` (colors, site title and description) now apply to the published site. Before, the live site used the ones in `rubrica.config.ts`. Check the panel before publishing.
+- Texts edited in `/admin/textos` show up on the site after publishing, like the rest of the content.
+
+### Site
+- **Pages ready in the build:** home, About, Resume, Portfolio, each case study, Blog, each post and Testimonials come out as HTML with each page's content, title, description and image. That's what Google and link previews (WhatsApp, LinkedIn) read. In the browser, the site still navigates without reloading the page. Panel, login, proposals and checkout work as before.
+- **English under `/en`:** every page exists in both languages, with the right canonical, `hreflang` and `<html lang>`, and the sitemap lists both versions.
+- **Post SEO:** each post has its own title, description, image and structured data (JSON-LD). Before, every post came out with the site's title.
+- **One `<h1>` per page:** the name in the sidebar (default and cyberpunk) is no longer every page's `<h1>`; the brutalist home, About and Testimonials got their own.
+
+### Blog
+- **SEO and sharing on posts:** title and description for Google, a share image and a preview of the search result, in `/admin/blog`. All optional: left blank, the site uses the title, subtitle and cover. English is translated on save.
+- **Stable slug:** the post address is suggested from the title only on creation and then only changes if you edit it; changing a published post's slug shows a warning, since it breaks links.
+
+### Skills
+- `rubrica`: `post-criar`, `post-editar` and `aplicar-plano` accept the post SEO fields.
+- `rubrica-blog`: the SEO step writes the Google description, and the plan carries the fields to the post.
+
+### Fixes
+- Editing a published post's title changed its address.
+- Two posts could end up with the same address when editing the slug.
+- The published site ignored the colors and SEO saved in `/admin/site-config`.
+
 ## 1.9.0 — 2026-10-29
 
 CLI 1.6.0: anonymous telemetry from the commands, to learn what people use the most.

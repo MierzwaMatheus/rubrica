@@ -2,6 +2,38 @@
 
 O que mudou em cada versão do Rubrica (template e CLI `create-rubrica`). Detalhes de cada uma nas [notas da release](https://github.com/MierzwaMatheus/rubrica/releases). Para atualizar um projeto existente, veja [Atualizando o seu Rubrica](./docs/atualizacao.md).
 
+## 1.10.0 — 2026-11-07
+
+As páginas públicas saem do build prontas, com versão em inglês em `/en`, e os posts do blog ganham campos de SEO.
+
+**Vindo da 1.9:**
+- Atualize com `npx create-rubrica@latest update`. Não precisa de versão nova do CLI.
+- O backend mudou (`convex/`): publique no Convex do computador com `npx convex dev --once` e, no site no ar, com `npx create-rubrica publicar`. Os campos novos dos posts são opcionais: os posts existentes continuam iguais.
+- Personalizou o `vercel.json`? Traga do `.rubrica-new` a troca do rewrite de `/index.html` para `/app.html`. Sem ela, o painel e o login abrem com o HTML da home e dão erro.
+- Personalizou o script `build` do `package.json`? Ele agora termina em `npm run build:site`, que gera as páginas.
+- O idioma passa a vir do endereço: o inglês fica em `/en/...`. A escolha salva no navegador não troca mais o idioma sozinha; quem tem o navegador no outro idioma vê um aviso para trocar.
+- As configurações de `/admin/site-config` (cores, título e descrição do site) passam a valer no site publicado. Antes, o site no ar usava as do `rubrica.config.ts`. Confira o painel antes de publicar.
+- Textos editados em `/admin/textos` aparecem no site depois de publicar, como o resto do conteúdo.
+
+### Site
+- **Páginas prontas no build:** home, Sobre, Currículo, Portfólio, cada case, Blog, cada post e Depoimentos saem como HTML com o conteúdo e o título, a descrição e a imagem de cada página. É o que o Google e as prévias de link (WhatsApp, LinkedIn) leem. No navegador, o site continua navegando sem recarregar a página. Painel, login, propostas e checkout funcionam como antes.
+- **Inglês em `/en`:** cada página existe nos dois idiomas, com canonical, `hreflang` e `<html lang>` certos, e o sitemap lista as duas versões.
+- **SEO dos posts:** cada post tem título, descrição, imagem e dados estruturados (JSON-LD) próprios. Antes, todo post saía com o título do site.
+- **Um `<h1>` por página:** o nome na sidebar (padrão e cyberpunk) deixou de ser o `<h1>` de todas as páginas; a home do brutalist, o Sobre e os Depoimentos ganharam o deles.
+
+### Blog
+- **SEO e compartilhamento no post:** título e descrição para o Google, imagem de compartilhamento e prévia do resultado na busca, em `/admin/blog`. Tudo opcional: em branco, o site usa título, subtítulo e capa. O inglês é traduzido ao salvar.
+- **Slug estável:** o endereço do post é sugerido pelo título só na criação e depois só muda se você editar; mudar o de um post publicado mostra um aviso, porque quebra links.
+
+### Skills
+- `rubrica`: `post-criar`, `post-editar` e `aplicar-plano` aceitam os campos de SEO do post.
+- `rubrica-blog`: a etapa de SEO escreve a descrição para o Google, e o plano já leva os campos ao post.
+
+### Correções
+- Editar o título de um post publicado mudava o endereço dele.
+- Dois posts podiam ficar com o mesmo endereço ao editar o slug.
+- O site publicado ignorava as cores e o SEO salvos em `/admin/site-config`.
+
 ## 1.9.0 — 2026-10-29
 
 CLI 1.6.0: telemetria anônima dos comandos, para saber o que as pessoas mais usam.

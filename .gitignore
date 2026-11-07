@@ -119,6 +119,7 @@ reports/
 public/data/
 public/media/
 public/sitemap.xml
+public/robots.txt
 src/data/
 /public/rss.xml
 /cli/rubrica layouts

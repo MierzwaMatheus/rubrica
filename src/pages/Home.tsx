@@ -1,7 +1,7 @@
 import { PageSkeleton } from "@/components/PageSkeleton";
 import { SEO } from "@/components/SEO";
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import {
   Terminal,
   Cpu,

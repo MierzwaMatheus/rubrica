@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { SEO } from "@/components/SEO";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import { Code, HelpCircle } from "lucide-react";
 import { useTranslation } from "@/i18n/hooks/useTranslation";
 import { useI18n } from "@/i18n/context/I18nContext";

@@ -2,7 +2,7 @@ import { PageSkeleton } from "@/components/PageSkeleton";
 import { SEO } from "@/components/SEO";
 import { useState, useEffect } from "react";
 import { useRoute, Link } from "wouter";
-import { motion, AnimatePresence } from "framer-motion";
+import { m as motion, AnimatePresence } from "framer-motion";
 import * as LucideIcons from "lucide-react";
 import {
   ArrowLeft,

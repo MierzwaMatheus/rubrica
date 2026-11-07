@@ -1,7 +1,7 @@
 import { PageSkeleton } from "@/components/PageSkeleton";
 import { SEO } from "@/components/SEO";
 import { useState, useEffect, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m as motion, AnimatePresence } from "framer-motion";
 import {
   FolderOpen,
   ExternalLink,

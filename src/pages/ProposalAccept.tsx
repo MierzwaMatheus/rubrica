@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams, useLocation } from "wouter";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import { CheckCircle2, AlertTriangle, FileText, Scale, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

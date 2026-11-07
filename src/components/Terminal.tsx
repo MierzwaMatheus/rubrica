@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import { useLocation } from "wouter";
 import { X } from "lucide-react";
 import { useBlogPosts } from "@/hooks/useBlog";

@@ -21,8 +21,7 @@ import { PublicRoute } from "./components/PublicRoute";
 import { QueryProvider } from "./providers/QueryProvider";
 import { ConvexClientProvider, convex } from "./providers/ConvexClientProvider";
 import { ConvexTranslationService } from "./i18n/implementations/ConvexTranslationService";
-import { Terminal } from "./components/Terminal";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, LazyMotion } from "framer-motion";
 import { useState, useEffect, useMemo, lazy, Suspense, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { sidebarRepository } from "@/repositories/instances";
@@ -34,6 +33,8 @@ import { PluginRoute } from "./components/PluginRoute";
 import { ChangePasswordModal } from "./components/ChangePasswordModal";
 
 // Páginas carregadas sob demanda: o visitante baixa só a página que abriu.
+// O terminal só abre com a tecla ~: carrega na hora, fora do JavaScript de todas as páginas.
+const Terminal = lazy(() => import("./components/Terminal").then((m) => ({ default: m.Terminal })));
 const Login = lazy(() => import("./pages/Login"));
 const Dashboard = lazy(() => import("./pages/admin/Dashboard"));
 const AdminProjects = lazy(() => import("./pages/admin/Projects"));
@@ -394,7 +395,9 @@ function AppContent() {
       <Router />
       <AnimatePresence>
         {terminalOpen && !isAdminRoute && (
-          <Terminal onClose={() => setTerminalOpen(false)} ownerInfo={ownerInfo} />
+          <Suspense fallback={null}>
+            <Terminal onClose={() => setTerminalOpen(false)} ownerInfo={ownerInfo} />
+          </Suspense>
         )}
       </AnimatePresence>
       <Analytics />
@@ -402,6 +405,9 @@ function AppContent() {
     </>
   );
 }
+
+/** Animações (framer-motion) carregadas à parte: os componentes usam `m`, o núcleo leve. */
+const loadMotionFeatures = () => import("./lib/motionFeatures").then((mod) => mod.default);
 
 /** "/en/" (Link para "/" dentro do inglês) vira "/en", a URL canônica da home em inglês. */
 const normalizeEnRoot = (to: string) => (to === `${EN_BASE}/` ? EN_BASE : to);
@@ -440,6 +446,7 @@ export interface AppProps {
 function App({ ssrPath, queryClient, helmetContext, appearance }: AppProps = {}) {
   return (
     <HelmetProvider context={helmetContext}>
+      <LazyMotion features={loadMotionFeatures}>
       <WouterRouter ssrPath={ssrPath}>
       <ErrorBoundary>
         <ConvexClientProvider>
@@ -467,6 +474,7 @@ function App({ ssrPath, queryClient, helmetContext, appearance }: AppProps = {})
         </ConvexClientProvider>
       </ErrorBoundary>
       </WouterRouter>
+      </LazyMotion>
     </HelmetProvider>
   );
 }

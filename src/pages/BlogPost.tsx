@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, ArrowLeft, ArrowRight, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import { useI18n } from "@/i18n/context/I18nContext";
 import { useTranslation } from "@/i18n/hooks/useTranslation";
 import { useBlogPost } from "@/hooks/useBlog";

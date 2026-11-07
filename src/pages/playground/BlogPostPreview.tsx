@@ -1,7 +1,7 @@
 import DOMPurify from "dompurify";
 import { useMemo } from "react";
 import { useParams, useLocation } from "wouter";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import { Clock, ArrowLeft, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

@@ -1,5 +1,5 @@
 import { useLocation } from "wouter";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import { Home, Terminal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";

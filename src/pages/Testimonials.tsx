@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import { useQuery } from "convex/react";
 import { useQuery as useReactQuery } from "@tanstack/react-query";
 import type { FunctionReturnType } from "convex/server";

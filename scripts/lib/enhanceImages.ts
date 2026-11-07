@@ -7,6 +7,10 @@
  * Só mexe em imagens baixadas no build (/media/<storageId>.webp) que estão no manifesto.
  * O React não renderiza esses atributos; se um componente trocar o src depois, o main.tsx
  * remove o srcset e as medidas antigas (ver src/lib/mediaImages.ts).
+ *
+ * Num build com o React de desenvolvimento, a hidratação avisa que esses atributos não batem
+ * ("This won't be patched up"): é esperado, eles ficam. Em produção o React não compara
+ * atributos na hidratação.
  */
 import type { MediaManifest } from "./media";
 

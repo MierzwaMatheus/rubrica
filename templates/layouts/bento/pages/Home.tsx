@@ -216,6 +216,7 @@ export default function BentoHome() {
             {contactInfo?.github_url && (
               <a
                 href={contactInfo.github_url}
+                aria-label="GitHub"
                 target="_blank"
                 rel="noreferrer"
                 style={{
@@ -228,12 +229,13 @@ export default function BentoHome() {
                   justifyContent: "center",
                 }}
               >
-                <Github size={15} />
+                <Github size={15} aria-hidden="true" />
               </a>
             )}
             {contactInfo?.linkedin_url && (
               <a
                 href={contactInfo.linkedin_url}
+                aria-label="LinkedIn"
                 target="_blank"
                 rel="noreferrer"
                 style={{
@@ -246,7 +248,7 @@ export default function BentoHome() {
                   justifyContent: "center",
                 }}
               >
-                <Linkedin size={15} />
+                <Linkedin size={15} aria-hidden="true" />
               </a>
             )}
           </div>

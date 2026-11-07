@@ -123,8 +123,8 @@ const NAV_ITEMS = NAV_ITEMS_KEYS
           )}
 
           <div className="w-full rounded-lg bg-[var(--text)]/5 border border-[var(--text)]/5 flex items-center justify-center px-4 py-3 backdrop-blur-sm">
-            <div className="text-xs text-center text-[var(--text)]/40 w-full">
-              <div className="font-[family-name:var(--font-mono)] text-[var(--accent)]/70 mb-1">
+            <div className="text-xs text-center text-[var(--text)]/65 w-full">
+              <div className="font-[family-name:var(--font-mono)] text-[var(--accent)] mb-1">
                 &lt;code&gt;
               </div>
               {isLoading ? (
@@ -139,7 +139,7 @@ const NAV_ITEMS = NAV_ITEMS_KEYS
                   </div>
                 </>
               )}
-              <div className="font-[family-name:var(--font-mono)] text-[var(--accent)]/70 mt-1">
+              <div className="font-[family-name:var(--font-mono)] text-[var(--accent)] mt-1">
                 &lt;/code&gt;
               </div>
             </div>
@@ -164,7 +164,7 @@ const NAV_ITEMS = NAV_ITEMS_KEYS
                         "flex items-center px-4 py-3 rounded-md text-sm font-medium transition-all duration-300 group relative overflow-hidden",
                         isActive
                           ? "text-[var(--text)] bg-[var(--text)]/5 border border-[var(--text)]/5"
-                          : "text-[var(--text)]/40 hover:text-[var(--text)] hover:bg-[var(--text)]/5"
+                          : "text-[var(--text)]/65 hover:text-[var(--text)] hover:bg-[var(--text)]/5"
                       )}
                     >
                       {isActive && (
@@ -206,7 +206,7 @@ const NAV_ITEMS = NAV_ITEMS_KEYS
                     href={`mailto:${contactInfo.email}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center text-xs text-[var(--text)]/40 hover:text-[var(--accent)] transition-colors group"
+                    className="flex items-center text-xs text-[var(--text)]/65 hover:text-[var(--accent)] transition-colors group"
                   >
                     <Mail className="mr-2 h-3 w-3 text-[var(--text)]/60 group-hover:text-[var(--accent)] transition-colors" />
                     <span className="truncate">{contactInfo.email}</span>
@@ -218,7 +218,7 @@ const NAV_ITEMS = NAV_ITEMS_KEYS
                     href={`https://wa.me/${contactInfo.phone.replace(/\D/g, "")}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center text-xs text-[var(--text)]/40 hover:text-[var(--accent)] transition-colors group"
+                    className="flex items-center text-xs text-[var(--text)]/65 hover:text-[var(--accent)] transition-colors group"
                   >
                     <svg
                       viewBox="0 0 24 24"
@@ -279,13 +279,14 @@ const NAV_ITEMS = NAV_ITEMS_KEYS
               <span
                 className={cn(
                   "text-xs font-medium transition-colors",
-                  locale === "pt-BR" ? "text-[var(--accent)]" : "text-[var(--text)]/40"
+                  locale === "pt-BR" ? "text-[var(--accent)]" : "text-[var(--text)]/65"
                 )}
               >
                 PT
               </span>
               <div className="flex items-center gap-2">
                 <Switch
+                  aria-label={t("sidebar.language")}
                   checked={locale === "en-US"}
                   onCheckedChange={handleLanguageChange}
                   className="data-[state=checked]:bg-[var(--primary)]"
@@ -294,7 +295,7 @@ const NAV_ITEMS = NAV_ITEMS_KEYS
               <span
                 className={cn(
                   "text-xs font-medium transition-colors",
-                  locale === "en-US" ? "text-[var(--accent)]" : "text-[var(--text)]/40"
+                  locale === "en-US" ? "text-[var(--accent)]" : "text-[var(--text)]/65"
                 )}
               >
                 EN
@@ -322,7 +323,7 @@ const NAV_ITEMS = NAV_ITEMS_KEYS
             {t("sidebar.downloadCV")}
           </Button>
 
-          <p className="text-center text-[10px] text-[var(--text)]/20 font-[family-name:var(--font-mono)] mt-1">
+          <p className="text-center text-[10px] text-[var(--text)]/60 font-[family-name:var(--font-mono)] mt-1">
             Press <kbd className="px-1 py-0.5 rounded bg-[var(--text)]/10 text-[var(--text)]/40">~</kbd> for terminal
           </p>
         </div>
@@ -362,6 +363,7 @@ const NAV_ITEMS = NAV_ITEMS_KEYS
           <Sheet>
             <SheetTrigger asChild>
               <Button
+                aria-label={t("sidebar.menu")}
                 variant="ghost"
                 size="icon"
                 className="text-[var(--text)] hover:bg-[var(--text)]/10"

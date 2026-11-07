@@ -30,6 +30,7 @@ import { ContactWizardProvider } from "./contexts/ContactWizardContext";
 import { ContactWizardModal } from "./components/ContactWizardModal";
 import { PluginsProvider } from "./contexts/PluginsContext";
 import { PluginRoute } from "./components/PluginRoute";
+import { PageSEO } from "./components/PageSEO";
 import { ChangePasswordModal } from "./components/ChangePasswordModal";
 
 // Páginas carregadas sob demanda: o visitante baixa só a página que abriu.
@@ -255,6 +256,7 @@ function Router() {
       <Switch>
         <Route path={"/"}>
           <PublicRoute>
+            <PageSEO page="home" />
             <Home />
           </PublicRoute>
         </Route>
@@ -262,6 +264,7 @@ function Router() {
         <Route path="/sobre">
           <PublicRoute>
             <PluginRoute pluginId="about">
+              <PageSEO page="about" />
               <About />
             </PluginRoute>
           </PublicRoute>
@@ -269,6 +272,7 @@ function Router() {
         <Route path="/curriculo">
           <PublicRoute>
             <PluginRoute pluginId="resume">
+              <PageSEO page="resume" />
               <Resume />
             </PluginRoute>
           </PublicRoute>
@@ -276,6 +280,7 @@ function Router() {
         <Route path="/portfolio">
           <PublicRoute>
             <PluginRoute pluginId="portfolio">
+              <PageSEO page="portfolio" />
               <Portfolio />
             </PluginRoute>
           </PublicRoute>
@@ -290,6 +295,7 @@ function Router() {
         <Route path="/blog">
           <PublicRoute>
             <PluginRoute pluginId="blog">
+              <PageSEO page="blog" />
               <Blog />
             </PluginRoute>
           </PublicRoute>

@@ -86,7 +86,7 @@ export default function BlogPost() {
                 <header className="space-y-6">
                     <div className="flex flex-wrap gap-2">
                         {post.tags?.map((tag: string) => (
-                            <Badge key={tag} className="bg-neon-purple/10 text-neon-purple hover:bg-neon-purple/20 border-neon-purple/20">
+                            <Badge key={tag} className="bg-neon-purple/10 text-foreground-strong hover:bg-neon-purple/20 border-neon-purple/30">
                                 {tag}
                             </Badge>
                         ))}

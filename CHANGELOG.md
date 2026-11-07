@@ -2,6 +2,16 @@
 
 O que mudou em cada versão do Rubrica (template e CLI `create-rubrica`). Detalhes de cada uma nas [notas da release](https://github.com/MierzwaMatheus/rubrica/releases). Para atualizar um projeto existente, veja [Atualizando o seu Rubrica](./docs/atualizacao.md).
 
+## 1.13.1 — 2026-11-07
+
+A primeira visita aparece sem esperar as animações.
+
+**Vindo da 1.13.0:**
+- Atualize com `npx create-rubrica@latest update`. Não precisa de versão nova do CLI nem de publicar nada no Convex.
+
+### Velocidade
+- **Conteúdo visível de imediato:** as animações de entrada deixavam o título e o conteúdo invisíveis até o JavaScript carregar. Agora a página pré-renderizada já chega no estado final, e as animações continuam ao navegar entre páginas. Num site real, a home foi de 86 para 100 no Lighthouse (celular), com o LCP caindo de 4,1 s para 1,2 s; um post foi de 84 para 95.
+
 ## 1.13.0 — 2026-11-07
 
 Uma auditoria das páginas: SEO corrigido, a primeira visita mais rápida e acessibilidade nos 14 layouts.

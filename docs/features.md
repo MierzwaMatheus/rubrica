@@ -711,6 +711,8 @@ Depois do `vite build`, `scripts/prerender.ts` gera `dist/<rota>/index.html` par
 
 As páginas públicas são carregadas com `lazyRoute` (`src/lib/lazyRoute.tsx`) e o `main.tsx` carrega a da URL antes de hidratar: se o código da página chegasse durante a hidratação, uma atualização nesse intervalo (o tema aplicando a escolha salva, por exemplo) faria o React descartar o HTML do build e redesenhar o conteúdo.
 
+Na primeira visita, os componentes animados (framer-motion) já saem do build no estado final: `FirstPaintMotion` (`src/lib/firstPaintMotion.tsx`) dá `initial: false` a eles no build e na hidratação, então o conteúdo aparece sem esperar o JavaScript. As páginas abertas pela navegação continuam com as animações de entrada.
+
 Cada rota fixa renderiza um `PageSEO` padrão (título, descrição, canonical e `hreflang`) antes da página; uma página com o seu próprio `<SEO>` o sobrepõe.
 
 O que vai serializado na página é o que ela renderiza: dados usados só num clique ficam de fora. O botão "Baixar CV" busca currículo, projetos e o "sobre" na hora (`useDownloadCV`), o índice do blog (`blog.json`) não leva o texto dos posts, só a contagem de palavras para o tempo de leitura (`reading_minutes`, calculado em `useBlogPosts`), e cada post tem o seu arquivo em `data/posts/`. Do mesmo jeito, o índice de projetos (`portfolio.json`, montado em `scripts/lib/portfolioIndex.ts`) leva o case só com as métricas, as imagens só com a URL e, no lugar da descrição longa, o tamanho dela; o projeto completo fica em `data/projects/<_id>.json`, lido pela página do case (`getBySlug`) e pelo modal do portfólio (`getById`).

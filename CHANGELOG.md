@@ -2,6 +2,24 @@
 
 O que mudou em cada versão do Rubrica (template e CLI `create-rubrica`). Detalhes de cada uma nas [notas da release](https://github.com/MierzwaMatheus/rubrica/releases). Para atualizar um projeto existente, veja [Atualizando o seu Rubrica](./docs/atualizacao.md).
 
+## 1.11.0 — 2026-11-07
+
+As imagens do conteúdo saem do build otimizadas e em cache, e as páginas ficam bem mais leves.
+
+**Vindo da 1.10:**
+- Atualize com `npx create-rubrica@latest update` e rode `pnpm install` (ou `npm install`): o build usa o `sharp`, que é novo. Não precisa de versão nova do CLI nem de publicar nada no Convex.
+- Personalizou o `vercel.json`? Traga do `.rubrica-new` o bloco `/media/(.*)`, que serve as imagens com cache de um ano.
+- A primeira publicação depois de atualizar baixa e otimiza todas as imagens, então demora um pouco mais. As seguintes só baixam as imagens novas.
+
+### Site
+- **Imagens otimizadas no build:** capas, imagens dos cases e dos posts e avatares são baixados do Convex, reduzidos para até 1600px, convertidos para WebP e servidos pelo próprio site, com cache de um ano. Antes, cada visitante baixava o arquivo original do storage, sem cache de CDN. Num site real, as imagens caíram de 26 MB para 7,3 MB, e a capa de um post, de 841 KB para 116 KB.
+- **Prévias de link com JPG:** o `og:image` usa uma versão JPG de 1200px, que toda rede aceita.
+- **Builds mais rápidos:** as imagens ficam em cache entre as publicações, e só as novas são baixadas. Vídeos e PDFs continuam no storage.
+- **Páginas mais leves:** a lista do blog não carrega mais o texto de todos os posts (num site real, `/blog` caiu de 1,3 MB para 233 KB), e o botão "Baixar CV" só busca o currículo no clique, em vez de carregá-lo em todas as páginas.
+
+### Correções
+- O PDF do currículo abre numa aba criada já no clique, então o navegador não o bloqueia como pop-up.
+
 ## 1.10.0 — 2026-11-07
 
 As páginas públicas saem do build prontas, com versão em inglês em `/en`, e os posts do blog ganham campos de SEO.

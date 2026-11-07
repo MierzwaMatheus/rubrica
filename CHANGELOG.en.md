@@ -2,6 +2,38 @@
 
 What changed in each version of Rubrica (template and `create-rubrica` CLI). Details for each one are in the [release notes](https://github.com/MierzwaMatheus/rubrica/releases). To update an existing project, see [Atualizando o seu Rubrica](./docs/atualizacao.md) (in Portuguese).
 
+## 1.13.0 — 2026-11-07
+
+A page audit: SEO fixed, faster first visits and accessibility across the 14 layouts.
+
+**Coming from 1.12:**
+- Update with `npx create-rubrica@latest update`. No new CLI version needed, nothing to push to Convex.
+- Customized `vercel.json`? Bring over from `.rubrica-new` the new `rewrites` (only app routes go to `app.html`), `trailingSlash: false` and the `/fonts/` cache. Without the new rewrites, addresses that don't exist keep answering 200.
+- Customized the sidebar? Compare with `.rubrica-new`: the mobile menu button and the language switch got names for screen readers, and some text got more contrast.
+- Customized `index.html`? Remove `maximum-scale=1` from the `viewport`: it blocked zooming.
+
+### SEO
+- **Addresses that don't exist answer 404.** Before, they answered 200 with an empty page Google could index.
+- **`robots.txt`:** generated in the build, with the sitemap address and the panel blocked. Before, the address returned the site's page.
+- **No duplicate addresses:** `/blog/` redirects to `/blog`.
+- **A title on every page:** the brutalist, swiss, bento, magazine, zine, blueprint and chat layouts had no title, description or canonical on their own pages. Now every fixed page gets a default the page can override.
+
+### Speed
+- **The first visit keeps the build's HTML.** The page content (the whole post, cover included) was thrown away and rendered again right after loading. Now the page code arrives first and nothing is redone.
+- **Images sized for the screen:** phones download an 800px version instead of the 1600px one; images carry width and height so the page doesn't jump as they load, and the main one gets priority.
+- **Fonts served by the site itself:** the page no longer waits for Google Fonts to show up.
+- **Main JavaScript 19% smaller:** animations, the contact and testimonial wizards, the terminal and the CV generator load only when used.
+- **Panel and proposal texts** are no longer in public pages.
+
+### Accessibility
+- **Zoom allowed on phones.**
+- **Names for screen readers:** the mobile menu button, the language switch and the bento layout's GitHub and LinkedIn links.
+- **Contrast:** more readable text in the default sidebar and home, and in post tags.
+
+### Fixes
+- A post containing `$&` or `$'` (code, for example) could come out corrupted in the build.
+- An image whose id ended in digits only could be swapped for the smaller version.
+
 ## 1.12.0 — 2026-11-07
 
 The project list gets much lighter: pages that show projects no longer carry every case study's full text.

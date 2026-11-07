@@ -2,6 +2,38 @@
 
 O que mudou em cada versão do Rubrica (template e CLI `create-rubrica`). Detalhes de cada uma nas [notas da release](https://github.com/MierzwaMatheus/rubrica/releases). Para atualizar um projeto existente, veja [Atualizando o seu Rubrica](./docs/atualizacao.md).
 
+## 1.13.0 — 2026-11-07
+
+Uma auditoria das páginas: SEO corrigido, a primeira visita mais rápida e acessibilidade nos 14 layouts.
+
+**Vindo da 1.12:**
+- Atualize com `npx create-rubrica@latest update`. Não precisa de versão nova do CLI nem de publicar nada no Convex.
+- Personalizou o `vercel.json`? Traga do `.rubrica-new` os `rewrites` novos (só as rotas do app vão para o `app.html`), o `trailingSlash: false` e o cache de `/fonts/`. Sem os rewrites novos, endereço que não existe continua respondendo 200.
+- Personalizou a barra lateral? Compare com o `.rubrica-new`: o botão do menu mobile e a chave de idioma ganharam nome para leitores de tela, e alguns textos ganharam contraste.
+- Personalizou o `index.html`? Tire o `maximum-scale=1` do `viewport`: ele bloqueava o zoom.
+
+### SEO
+- **Endereço que não existe responde 404.** Antes respondia 200 com uma página vazia, que o Google podia indexar.
+- **`robots.txt`:** gerado no build, com o endereço do sitemap e o painel bloqueado. Antes, o endereço devolvia a página do site.
+- **Sem endereços duplicados:** `/blog/` redireciona para `/blog`.
+- **Título em todas as páginas:** os layouts brutalist, swiss, bento, magazine, zine, blueprint e chat saíam sem título, descrição e canonical nas próprias páginas. Agora toda página fixa tem um padrão, que a página pode sobrepor.
+
+### Velocidade
+- **A primeira visita aproveita o HTML do build.** O conteúdo da página (o post inteiro, com a capa) era descartado e redesenhado logo depois de carregar. Agora o código da página chega antes, e nada é refeito.
+- **Imagens do tamanho da tela:** o celular baixa uma versão de 800px em vez da de 1600px; as imagens vêm com largura e altura, então a página não pula quando elas carregam, e a principal tem prioridade.
+- **Fontes servidas pelo próprio site:** a página não espera mais o Google Fonts para aparecer.
+- **JavaScript principal 19% menor:** as animações, os assistentes de contato e depoimento, o terminal e o gerador de CV carregam só quando são usados.
+- **Textos do painel e das propostas** saem das páginas públicas.
+
+### Acessibilidade
+- **Zoom liberado no celular.**
+- **Nomes para leitores de tela:** o botão do menu mobile, a chave de idioma e os links do GitHub e LinkedIn do layout bento.
+- **Contraste:** textos mais legíveis na barra lateral e na home padrão, e nas tags dos posts.
+
+### Correções
+- O conteúdo de um post com `$&` ou `$'` (código, por exemplo) podia sair corrompido no build.
+- Uma imagem cujo identificador terminava só com números podia ser trocada pela versão menor.
+
 ## 1.12.0 — 2026-11-07
 
 A lista de projetos fica bem mais leve: as páginas que mostram projetos não carregam mais o texto inteiro de cada case.

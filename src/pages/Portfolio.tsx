@@ -33,18 +33,30 @@ import {
 import { Link } from "wouter";
 import { useI18n } from "@/i18n/context/I18nContext";
 import { useTranslation } from "@/i18n/hooks/useTranslation";
-import { usePortfolio } from "@/hooks/usePortfolio";
+import { usePortfolio, applyLocale } from "@/hooks/usePortfolio";
+import { useQuery } from "@tanstack/react-query";
 import { portfolioRepository } from "@/repositories/instances";
 import { Project } from "@/repositories/interfaces/PortfolioRepository";
 import { listCategories, filterByCategory, hasCaseStudy } from "@/utils/portfolioContent";
 
 export default function Portfolio() {
   const { t } = useTranslation();
-  const { isLoading: i18nLoading } = useI18n();
+  const { isLoading: i18nLoading, locale } = useI18n();
   const { projects, isLoading } = usePortfolio(portfolioRepository);
   // null = todas as categorias
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  // A lista não leva a descrição longa: o modal busca o projeto completo ao abrir.
+  const { data: selectedDetail } = useQuery({
+    queryKey: ["portfolio", "detail", selectedProject?.id],
+    queryFn: () => portfolioRepository.getById(String(selectedProject!.id)),
+    enabled: !!selectedProject,
+    staleTime: Infinity,
+  });
+  const selectedLongDescription =
+    selectedDetail && String(selectedDetail.id) === String(selectedProject?.id)
+      ? applyLocale(selectedDetail, locale).long_description
+      : "";
   const [expandedImage, setExpandedImage] = useState<{
     url: string;
     index: number;
@@ -309,7 +321,9 @@ export default function Portfolio() {
                           </div>
 
                           <DialogDescription className="text-foreground/90 text-base leading-relaxed whitespace-pre-line">
-                            {project.long_description || project.description}
+                            {(String(selectedProject?.id) === String(project.id) && selectedLongDescription) ||
+                              project.long_description ||
+                              project.description}
                           </DialogDescription>
 
                           <div className="space-y-3 pt-4 border-t border-foreground/5">

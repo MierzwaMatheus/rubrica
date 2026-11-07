@@ -209,8 +209,10 @@ Este é um portfólio profissional full-stack que combina uma interface pública
 
 #### ✍️ Gerenciamento de Blog (`/admin/blog`)
 - CRUD de posts com editor TipTap
-- Tags, destaque, status (rascunho/publicado), slug automático, imagem de capa
-- **Tradução automática** via OpenRouter
+- Tags, destaque, status (rascunho/publicado), imagem de capa
+- Slug sugerido a partir do título no post novo; depois, só muda se for editado (com aviso em post publicado, porque quebra links)
+- **SEO e compartilhamento** (opcionais): título e descrição para o Google, imagem de compartilhamento e prévia do resultado na busca. Em branco, o site usa título, subtítulo e capa
+- **Tradução automática** via OpenRouter (inclui os textos de SEO)
 
 #### 👤 Gerenciamento de Currículo (`/admin/resume`)
 - CRUD por tipo: experiência, educação, cursos, habilidades (com grupo), soft skills, idiomas, voluntariado

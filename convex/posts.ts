@@ -7,6 +7,37 @@ import { getAuthUserId } from '@convex-dev/auth/server';
 import { logAudit } from './audit';
 import { requirePlugin, isPluginEnabled } from './plugins';
 import { softDeleteDoc, restoreDoc } from './lib/softDelete';
+import { assertValidSlug } from './lib/slug';
+import type { QueryCtx } from './_generated/server';
+import type { Doc, Id } from './_generated/dataModel';
+
+const i18nArg = v.optional(v.object({ 'ptBR': v.string(), 'enUS': v.optional(v.string()) }));
+
+/** Campos de SEO do post (todos opcionais). */
+const seoArgs = {
+  seoTitle: v.optional(v.string()),
+  seoTitleTranslations: i18nArg,
+  seoDescription: v.optional(v.string()),
+  seoDescriptionTranslations: i18nArg,
+  ogImageId: v.optional(v.id('imageMetadata')),
+  ogImageUrl: v.optional(v.string()),
+};
+
+/** URL de uma imagem da biblioteca; sem ela (ou se foi apagada), a URL externa informada. */
+async function resolveImage(ctx: QueryCtx, id: Id<'imageMetadata'> | undefined, fallback: string | undefined) {
+  if (!id) return fallback;
+  const img = await ctx.db.get(id);
+  return img ? ((await ctx.storage.getUrl(img.storageId)) ?? fallback) : fallback;
+}
+
+/** Post com as URLs da capa e da imagem de compartilhamento resolvidas. */
+async function withImageUrls(ctx: QueryCtx, post: Doc<'posts'>) {
+  return {
+    ...post,
+    imageUrl: await resolveImage(ctx, post.imageId, post.imageUrl),
+    ogImageUrl: await resolveImage(ctx, post.ogImageId, post.ogImageUrl),
+  };
+}
 
 export const listAllPublished = query({
   args: {},
@@ -18,16 +49,7 @@ export const listAllPublished = query({
       .order('desc')
       .collect()).filter((p) => p.deletedAt === undefined);
 
-    return Promise.all(
-      posts.map(async (post) => ({
-        ...post,
-        imageUrl: post.imageId
-          ? await ctx.db
-              .get(post.imageId)
-              .then((img) => (img ? ctx.storage.getUrl(img.storageId) : post.imageUrl))
-          : post.imageUrl,
-      })),
-    );
+    return Promise.all(posts.map((post) => withImageUrls(ctx, post)));
   },
 });
 
@@ -53,16 +75,7 @@ export const listPublished = query({
 
     return {
       ...filtered,
-      page: await Promise.all(
-        filtered.page.map(async (post) => ({
-          ...post,
-          imageUrl: post.imageId
-            ? await ctx.db
-                .get(post.imageId)
-                .then((img) => (img ? ctx.storage.getUrl(img.storageId) : post.imageUrl))
-            : post.imageUrl,
-        })),
-      ),
+      page: await Promise.all(filtered.page.map((post) => withImageUrls(ctx, post))),
     };
   },
 });
@@ -78,16 +91,7 @@ export const listAdmin = query({
       .take(args.limit ?? 200);
     const posts = args.includeDeleted ? all : all.filter((p) => p.deletedAt === undefined).slice(0, args.limit ?? 50);
 
-    return Promise.all(
-      posts.map(async (post) => ({
-        ...post,
-        imageUrl: post.imageId
-          ? await ctx.db
-              .get(post.imageId)
-              .then((img) => (img ? ctx.storage.getUrl(img.storageId) : post.imageUrl))
-          : post.imageUrl,
-      })),
-    );
+    return Promise.all(posts.map((post) => withImageUrls(ctx, post)));
   },
 });
 
@@ -101,13 +105,7 @@ export const getBySlug = query({
       .unique();
     if (!post || post.deletedAt !== undefined) return null;
 
-    const imageUrl = post.imageId
-      ? await ctx.db
-          .get(post.imageId)
-          .then((img) => (img ? ctx.storage.getUrl(img.storageId) : post.imageUrl))
-      : post.imageUrl;
-
-    return { ...post, imageUrl };
+    return withImageUrls(ctx, post);
   },
 });
 
@@ -144,11 +142,13 @@ export const create = mutation({
     featured: v.boolean(),
     status: v.union(v.literal('draft'), v.literal('published')),
     readTime: v.optional(v.string()),
+    ...seoArgs,
   },
   handler: async (ctx, args) => {
     await requirePlugin(ctx, 'blog');
     await requireRole(ctx, ['root', 'admin', 'content-editor', 'blog-editor']);
     const userId = await getAuthUserId(ctx);
+    assertValidSlug(args.slug);
 
     const existing = await ctx.db
       .query('posts')
@@ -190,13 +190,27 @@ export const update = mutation({
     tags: v.optional(v.array(v.string())),
     featured: v.optional(v.boolean()),
     readTime: v.optional(v.string()),
+    ...seoArgs,
+    /** Remove a imagem de compartilhamento (o cliente não envia `undefined`). */
+    clearOgImage: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     await requirePlugin(ctx, 'blog');
     const { userId } = await requireRole(ctx, ['root', 'admin', 'content-editor', 'blog-editor']);
     const existing = await ctx.db.get(args.id);
-    const { id, ...fields } = args;
-    await ctx.db.patch(id, { ...fields, updatedAt: Date.now() });
+    // Slug novo: formato válido e livre. Manter o atual é sempre permitido
+    // (posts antigos podem ter slugs fora do padrão).
+    if (args.slug !== undefined && args.slug !== existing?.slug) {
+      assertValidSlug(args.slug);
+      const taken = await ctx.db
+        .query('posts')
+        .withIndex('by_slug', (q) => q.eq('slug', args.slug!))
+        .unique();
+      if (taken && taken._id !== args.id) throw new Error('Slug already in use');
+    }
+    const { id, clearOgImage, ...fields } = args;
+    const ogImage = clearOgImage ? { ogImageId: undefined, ogImageUrl: undefined } : {};
+    await ctx.db.patch(id, { ...fields, ...ogImage, updatedAt: Date.now() });
     const post = await ctx.db.get(id);
     if (post?.status === 'published') await markPendingChanges(ctx);
     await logAudit(ctx, { eventType: 'admin.update', actorType: 'user', actorId: userId, targetType: 'post', targetId: id, metadata: { label: existing?.title }, success: true });

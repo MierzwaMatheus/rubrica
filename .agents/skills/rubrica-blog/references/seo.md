@@ -15,6 +15,8 @@ O SEO serve para o post ser encontrado por quem procura o assunto. Ele nunca pod
 4. **Estrutura:**
    - **Título** com a palavra-chave principal, até ~60 caracteres. O Rubrica guarda título e subtítulo em campos separados: o título não leva dois-pontos com subtítulo dentro.
    - **Subtítulo** de uma frase que complementa o título (ângulo e promessa), com uma palavra-chave secundária quando couber naturalmente.
+   - **Descrição para o Google** (sempre): até ~155 caracteres, com a palavra-chave principal e o motivo para clicar. É o texto que aparece no resultado da busca e na prévia do link; sem ela, o site usa o subtítulo.
+   - **Título para o Google** (só se precisar): quando o título do post é longo ou criativo demais para a busca, um título de até ~60 caracteres com a palavra-chave. Sem ele, o site usa o título do post.
    - **3 a 6 seções (`h2`)**, cada uma com uma secundária ou variação, em ordem lógica.
    - As perguntas que o texto precisa responder.
 5. **Recomendações:** links internos (posts e páginas do site), links externos de autoridade, slug sugerido (kebab-case, sem acento, curto).
@@ -28,6 +30,8 @@ O SEO serve para o post ser encontrado por quem procura o assunto. Ele nunca pod
 ## Intenção de busca
 ## Título sugerido (até ~60 caracteres)
 ## Subtítulo sugerido
+## Descrição para o Google (até ~155 caracteres)
+## Título para o Google (opcional)
 ## Estrutura de seções (h2)
 1. ...
 ## Perguntas para responder

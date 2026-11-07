@@ -50,7 +50,7 @@ Uma pasta por plano: `aaaa-mm-dd-<tipo>-<assunto>`. Os caminhos dentro do plano 
 | `perfil` | `dados: {campo: valor}` (mudou `role`, mande `roleTranslations`) | `contactInfo:update` | — |
 | `home` | `chave`, `valor` (mesmo formato do `home-definir`) | `homeContent:set` | — |
 | `imagem` | `arquivo`, `alt` (obrigatório), `nome?`, `tags?`, `pasta?` | biblioteca de imagens | `id`, `storageId`, `url` |
-| `post-criar` | `titulo`, `enTitulo`, `slug`, `arquivo`, `enArquivo`, `subtitulo?`, `enSubtitulo?`, `tags?` (lista, ou texto separado por vírgulas), `destaque?`, `imagemId?`, `leitura?` | `posts:create`, sempre rascunho | `id`, `slug` |
+| `post-criar` | `titulo`, `enTitulo`, `slug`, `arquivo`, `enArquivo`, `subtitulo?`, `enSubtitulo?`, `tags?` (lista, ou texto separado por vírgulas), `destaque?`, `imagemId?`, `leitura?`, `seoTitulo?`, `enSeoTitulo?`, `seoDescricao?`, `enSeoDescricao?`, `ogImagemId?` | `posts:create`, sempre rascunho | `id`, `slug` |
 | `mutation` | `funcao`, `args`, `ler?: {funcao, args}` | qualquer mutation permitida | `resultado` (o que a mutation devolveu) |
 
 `ler` é uma query que mostra o estado atual na prévia (ex.: `projects:getById` antes de um `projects:update`). Use sempre que a mutation alterar algo que já existe.

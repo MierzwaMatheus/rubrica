@@ -910,7 +910,27 @@ def exigir_ingles(a, pares):
                     + ". Traduza e passe junto, ou use --so-pt para gravar só em português.")
 
 
-PARES_POST = (("titulo", "en-titulo"), ("subtitulo", "en-subtitulo"), ("arquivo", "en-arquivo"))
+PARES_POST = (("titulo", "en-titulo"), ("subtitulo", "en-subtitulo"), ("arquivo", "en-arquivo"),
+              ("seo_titulo", "en-seo-titulo"), ("seo_descricao", "en-seo-descricao"))
+
+
+def aplicar_seo_post(a, args, editar=False):
+    """Campos de SEO do post (opcionais). Vazios, o site usa título, subtítulo e capa."""
+    for campo, pt, en in (("seoTitle", a.seo_titulo, a.en_seo_titulo),
+                          ("seoDescription", a.seo_descricao, a.en_seo_descricao)):
+        if en and pt is None:
+            raise Falha(f"A versão em inglês de {campo} exige a versão em português junto.")
+        if pt is not None:
+            args[campo] = pt
+            args[campo + "Translations"] = {"ptBR": pt, "enUS": en or ""}
+    if a.og_imagem_id:
+        args["ogImageId"] = a.og_imagem_id
+    elif a.og_imagem_url:
+        args["ogImageUrl"] = a.og_imagem_url
+    if editar and a.sem_og_imagem:
+        if a.og_imagem_id or a.og_imagem_url:
+            raise Falha("--sem-og-imagem não combina com --og-imagem-id/--og-imagem-url.")
+        args["clearOgImage"] = True
 
 
 def c_post_criar(a):
@@ -931,6 +951,7 @@ def c_post_criar(a):
         args["subtitleTranslations"] = {"ptBR": a.subtitulo or "", "enUS": a.en_subtitulo}
     if a.en_arquivo:
         args["contentTranslations"] = {"ptBR": conteudo, "enUS": ler_arquivo(a.en_arquivo)}
+    aplicar_seo_post(a, args)
     capa = resolver_capa(a, args)
     novo = chamar("mutation", "posts:create", args)
     saida({"ok": True, "id": novo, "status": "draft", "slug": a.slug,
@@ -963,6 +984,7 @@ def c_post_editar(a):
         if "content" not in args:
             raise Falha("--en-arquivo exige --arquivo junto.")
         args["contentTranslations"] = {"ptBR": args["content"], "enUS": ler_arquivo(a.en_arquivo)}
+    aplicar_seo_post(a, args, editar=True)
     capa = resolver_capa(a, args)
     if len(args) == 1:
         raise Falha("Nada para editar: passe ao menos um campo.")
@@ -1240,7 +1262,8 @@ def _validar_estrutura_plano(plano, base):
                 erros.append(f"{onde}: slug precisa ser kebab-case sem acentos ({p['slug']!r})")
             if not so_pt:
                 faltam = [en for pt, en in (("titulo", "enTitulo"), ("arquivo", "enArquivo"),
-                                            ("subtitulo", "enSubtitulo")) if p.get(pt) and not p.get(en)]
+                                            ("subtitulo", "enSubtitulo"), ("seoTitulo", "enSeoTitulo"),
+                                            ("seoDescricao", "enSeoDescricao")) if p.get(pt) and not p.get(en)]
                 if faltam:
                     erros.append(f"{onde}: faltou a versão em inglês: {', '.join(faltam)}")
         elif acao == "mutation":
@@ -1347,6 +1370,12 @@ def _executar_passo(p, base, so_pt, refs):
             args["contentTranslations"] = {"ptBR": conteudo,
                                            "enUS": _trocar_no_arquivo(
                                                ler_arquivo(_caminho_plano(base, p["enArquivo"])), refs)}
+        for campo, pt, en in (("seoTitle", "seoTitulo", "enSeoTitulo"), ("seoDescription", "seoDescricao", "enSeoDescricao")):
+            if p.get(pt):
+                args[campo] = p[pt]
+                args[campo + "Translations"] = {"ptBR": p[pt], "enUS": p.get(en) or ""}
+        if p.get("ogImagemId"):
+            args["ogImageId"] = r(p["ogImagemId"])
         return {"id": chamar("mutation", "posts:create", args), "slug": p["slug"]}
     valor = chamar("mutation", p["funcao"], r(p.get("args") or {}))
     return {"resultado": valor} if valor is not None else {}
@@ -1518,6 +1547,12 @@ def parser():
     sp.add_argument("--en-titulo")
     sp.add_argument("--en-subtitulo")
     sp.add_argument("--en-arquivo", help="HTML do corpo em inglês")
+    sp.add_argument("--seo-titulo", help="título para o Google (vazio: usa o título do post)")
+    sp.add_argument("--en-seo-titulo")
+    sp.add_argument("--seo-descricao", help="descrição para o Google, até ~160 caracteres (vazio: usa o subtítulo)")
+    sp.add_argument("--en-seo-descricao")
+    sp.add_argument("--og-imagem-id", help="imagem de compartilhamento: id da biblioteca (vazio: usa a capa)")
+    sp.add_argument("--og-imagem-url", help="imagem de compartilhamento: URL externa")
     sp.add_argument("--so-pt", action="store_true")
 
     sp = cmd("post-editar", c_post_editar, "edita campos de um post")
@@ -1536,6 +1571,13 @@ def parser():
     sp.add_argument("--en-titulo")
     sp.add_argument("--en-arquivo")
     sp.add_argument("--en-subtitulo")
+    sp.add_argument("--seo-titulo", help="título para o Google (vazio: usa o título do post)")
+    sp.add_argument("--en-seo-titulo")
+    sp.add_argument("--seo-descricao", help="descrição para o Google, até ~160 caracteres (vazio: usa o subtítulo)")
+    sp.add_argument("--en-seo-descricao")
+    sp.add_argument("--og-imagem-id", help="imagem de compartilhamento: id da biblioteca (vazio: usa a capa)")
+    sp.add_argument("--og-imagem-url", help="imagem de compartilhamento: URL externa")
+    sp.add_argument("--sem-og-imagem", action="store_true", help="remove a imagem de compartilhamento (volta a usar a capa)")
     sp.add_argument("--so-pt", action="store_true")
 
     for nome in ("post-publicar", "post-despublicar"):

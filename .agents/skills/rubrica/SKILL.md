@@ -107,7 +107,8 @@ O corpo do post é **HTML**. Use só `h2 h3 p ul ol li strong em a code pre bloc
 2. Mostre o plano: título, slug (kebab-case), subtítulo, tags, destaque. Espere o "ok".
 3. Escreva o HTML pt-BR e o en-US em arquivos temporários e rode:
    `$RB post-criar --titulo "..." --en-titulo "..." --slug ... --arquivo corpo.html --en-arquivo corpo-en.html [--subtitulo --en-subtitulo] [--tags "a,b"] [--destaque] [--capa capa.png --capa-alt "..." | --imagem-id <id>] [--leitura "5 min"]`. Sempre nasce **rascunho**.
-4. Editar: `$RB post-editar <id> [--titulo --en-titulo] [--arquivo --en-arquivo] [--tags] [--capa | --imagem-id]` (`--tags` substitui todas).
+4. Editar: `$RB post-editar <id> [--titulo --en-titulo] [--arquivo --en-arquivo] [--tags] [--capa | --imagem-id] [--slug]` (`--tags` substitui todas). Mudar o `--slug` de post publicado quebra os links já compartilhados: só com pedido explícito.
+   - **SEO (opcional, nos dois comandos):** `--seo-titulo --en-seo-titulo` (até ~60 caracteres), `--seo-descricao --en-seo-descricao` (até ~160), `--og-imagem-id <id>` ou `--og-imagem-url` (imagem de compartilhamento, 1200×630). Vazios, o site usa título, subtítulo e capa. `post-editar --sem-og-imagem` volta a usar a capa.
 5. `post-publicar <id>` / `post-despublicar <id>` só quando a pessoa pedir.
 
 ## Imagens

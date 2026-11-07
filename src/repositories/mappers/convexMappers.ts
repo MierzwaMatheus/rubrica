@@ -102,6 +102,13 @@ export function mapBlogPost(c: any): BlogPost {
       c.subtitleTranslations ?? c.subtitle_translations
     ),
     content_translations: mapTranslations(c.contentTranslations ?? c.content_translations),
+    seo_title: c.seoTitle ?? c.seo_title ?? "",
+    seo_title_translations: mapTranslations(c.seoTitleTranslations ?? c.seo_title_translations),
+    seo_description: c.seoDescription ?? c.seo_description ?? "",
+    seo_description_translations: mapTranslations(
+      c.seoDescriptionTranslations ?? c.seo_description_translations
+    ),
+    og_image: c.ogImageUrl ?? c.og_image ?? "",
   } as BlogPost;
 }
 

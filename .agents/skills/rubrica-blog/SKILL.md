@@ -61,7 +61,7 @@ Depois da sua revisão, invoque a skill `rubrica-pilar` (com `/rubrica-pilar` no
 Monte `plano.json` com `"origem": "rubrica-blog"`, o `convex` do `status` e, nesta ordem:
 1. `imagem` com `id: "capa"`, só se a pessoa entregou o arquivo da capa (com `alt` em pt-BR descritivo);
 2. `imagem` para cada imagem do corpo, e use `{{id.url}}` no `src` dos dois HTML;
-3. `post-criar` com `titulo`/`enTitulo`, `subtitulo`/`enSubtitulo`, `slug` (kebab-case, sem acento), `arquivo: "corpo.html"`, `enArquivo: "corpo-en.html"`, `tags`, `leitura` (ex.: "8 min", cerca de 200 palavras por minuto) e, só se houver o passo `capa`, `imagemId: "{{capa.id}}"`. `tags` é uma lista (`["React", "Convex"]`).
+3. `post-criar` com `titulo`/`enTitulo`, `subtitulo`/`enSubtitulo`, `slug` (kebab-case, sem acento), `arquivo: "corpo.html"`, `enArquivo: "corpo-en.html"`, `tags`, `leitura` (ex.: "8 min", cerca de 200 palavras por minuto), `seoDescricao`/`enSeoDescricao` (a descrição para o Google do `seo.md`, nos dois idiomas), `seoTitulo`/`enSeoTitulo` só se o `seo.md` sugerir um título para o Google diferente do título e, só se houver o passo `capa`, `imagemId: "{{capa.id}}"`. `tags` é uma lista (`["React", "Convex"]`).
 
 Depois passe para a skill `rubrica`: `$RB aplicar-plano .rubrica/planos/<pasta>/plano.json --verificar`, mostre a prévia, espere o "ok" ⏸ e aplique. O post nasce **rascunho**. Publicar (`post-publicar`) e reconstruir o site (`publicar-site`) só se a pessoa pedir.
 

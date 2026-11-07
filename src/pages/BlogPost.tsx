@@ -54,17 +54,17 @@ export default function BlogPost() {
     return (
         <>
             <SEO
-                title={post.title}
-                description={post.subtitle}
-                image={post.image}
+                title={post.seo_title || post.title}
+                description={post.seo_description || post.subtitle}
+                image={post.og_image || post.image}
                 url={`/blog/${post.slug || slug}`}
                 type="article"
                 publishedTime={publishedIso}
                 jsonLd={{
                     "@type": "BlogPosting",
                     headline: post.title,
-                    description: post.subtitle,
-                    image: post.image || undefined,
+                    description: post.seo_description || post.subtitle,
+                    image: post.og_image || post.image || undefined,
                     datePublished: publishedIso,
                     keywords: post.tags?.join(", "),
                     inLanguage: locale,

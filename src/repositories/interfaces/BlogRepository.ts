@@ -13,6 +13,12 @@ export interface BlogPost {
   title_translations?: Record<string, string>;
   subtitle_translations?: Record<string, string>;
   content_translations?: Record<string, string>;
+  /** SEO (opcionais): vazios, a página usa título, subtítulo e capa. */
+  seo_title?: string;
+  seo_title_translations?: Record<string, string>;
+  seo_description?: string;
+  seo_description_translations?: Record<string, string>;
+  og_image?: string;
 }
 
 export interface BlogRepository {

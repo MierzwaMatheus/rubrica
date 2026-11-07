@@ -64,7 +64,7 @@ beforeEach(() => {
 });
 
 describe("Sidebar — Ciclo A: fallbacks de nome neutros", () => {
-  it("exibe contactInfo.name no h1 quando disponível", () => {
+  it("exibe contactInfo.name quando disponível", () => {
     render(<Sidebar />);
     expect(screen.getAllByText("João Silva").length).toBeGreaterThan(0);
   });
@@ -165,5 +165,12 @@ describe("Sidebar — Ciclo D: sem crash com contactInfo null", () => {
     render(<Sidebar />);
     // Skeletons existem — apenas verifica que não crasha
     expect(document.body).toBeTruthy();
+  });
+});
+
+describe("Sidebar — SEO", () => {
+  it("não usa <h1> (o título principal é o de cada página)", () => {
+    render(<Sidebar />);
+    expect(screen.queryByRole("heading", { level: 1 })).toBeNull();
   });
 });

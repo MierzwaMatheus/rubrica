@@ -60,6 +60,11 @@ export function useProjectBySlug(repository: PortfolioRepository, slug: string |
 export function applyLocale(project: Project, locale: string): Project {
   const caseStudyT = project.case_study_translations?.[locale]
     ?? project.case_study_translations?.["pt-BR"];
+  const longDescription =
+    project.long_description_translations?.[locale] ||
+    project.long_description_translations?.["pt-BR"] ||
+    project.long_description ||
+    "";
 
   return {
     ...project,
@@ -73,11 +78,13 @@ export function applyLocale(project: Project, locale: string): Project {
       project.description_translations?.["pt-BR"] ||
       project.description ||
       "",
-    long_description:
-      project.long_description_translations?.[locale] ||
-      project.long_description_translations?.["pt-BR"] ||
-      project.long_description ||
-      "",
+    long_description: longDescription,
+    // Sem o texto (índice do build), vale o tamanho calculado no build.
+    long_description_length:
+      longDescription.length ||
+      project.long_description_chars?.[locale] ||
+      project.long_description_chars?.["pt-BR"] ||
+      0,
     case_study: project.case_study
       ? {
           ...project.case_study,

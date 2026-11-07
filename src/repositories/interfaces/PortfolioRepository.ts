@@ -61,10 +61,18 @@ export interface Project {
   title_translations?: Record<string, string>;
   description_translations?: Record<string, string>;
   long_description_translations?: Record<string, string>;
+  /** Tamanho da descrição longa por idioma (o índice do build não leva o texto). */
+  long_description_chars?: Record<string, number>;
+  /** Tamanho da descrição longa no idioma da página (preenchido por applyLocale). */
+  long_description_length?: number;
   order_index?: number;
 }
 
 export interface PortfolioRepository {
+  /** Lista dos projetos. Em produção vem do índice enxuto: case só com as métricas e sem a descrição longa. */
   list(): Promise<Project[]>;
+  /** Projeto completo (página do case). */
   getBySlug(slug: string): Promise<Project | null>;
+  /** Projeto completo pelo id (modal do portfólio, que mostra a descrição longa). */
+  getById(id: string): Promise<Project | null>;
 }

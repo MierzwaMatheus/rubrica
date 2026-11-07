@@ -18,7 +18,22 @@ export class StaticPortfolioRepository implements PortfolioRepository {
   }
 
   async getBySlug(slug: string): Promise<Project | null> {
-    const all = await this.list();
-    return all.find((p) => p.slug === slug) ?? null;
+    const fromIndex = (await this.list()).find((p) => p.slug === slug);
+    if (!fromIndex) return null;
+    return (await this.getById(String(fromIndex.id))) ?? fromIndex;
+  }
+
+  /**
+   * Projeto completo, do arquivo próprio gerado no build (o índice não leva os textos do case
+   * nem a descrição longa). Dados antigos, sem o arquivo: cai no item do índice.
+   */
+  async getById(id: string): Promise<Project | null> {
+    try {
+      const response = await fetch(`/data/projects/${encodeURIComponent(id)}.json`);
+      if (response.ok) return mapProject(await response.json());
+    } catch {
+      // segue para o índice
+    }
+    return (await this.list()).find((p) => String(p.id) === id) ?? null;
   }
 }

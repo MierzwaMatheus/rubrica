@@ -11,7 +11,8 @@ config({ path: '.env.local' });
 import { ConvexHttpClient } from 'convex/browser';
 import { api } from '../convex/_generated/api';
 import { countWords } from '../src/utils/readingTime';
-import { writeFileSync, mkdirSync } from 'fs';
+import { compactProject, projectIndexEntry } from './lib/portfolioIndex';
+import { writeFileSync, mkdirSync, rmSync } from 'fs';
 import { join } from 'path';
 
 const CONVEX_URL = process.env.CONVEX_URL ?? process.env.VITE_CONVEX_URL;
@@ -46,9 +47,16 @@ async function main() {
   );
   write('home.json', homeMap);
 
-  // Projects
+  // Projects: índice enxuto (vai no HTML das páginas que listam projetos) e um arquivo
+  // completo por projeto, para a página do case e o modal do portfólio.
   const projects = await client.query(api.projects.list, {});
-  write('portfolio.json', projects);
+  write('portfolio.json', projects.map((p) => projectIndexEntry(p as Record<string, unknown>)));
+  const projectsDir = join(OUTPUT_DIR, 'projects');
+  rmSync(projectsDir, { recursive: true, force: true });
+  mkdirSync(projectsDir, { recursive: true });
+  for (const project of projects) {
+    write(`projects/${project._id}.json`, compactProject(project as Record<string, unknown>));
+  }
 
   // Resume
   const resumeItems = await client.query(api.resumeItems.listAll, {});

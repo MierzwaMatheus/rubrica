@@ -69,6 +69,9 @@ export function mapProject(c: any): Project {
     case_study_translations: mapTranslationsObj(c.caseStudyTranslations ?? c.case_study_translations),
     category: c.category ?? undefined,
     category_translations: mapTranslations(c.categoryTranslations ?? c.category_translations),
+    long_description_chars: c.longDescriptionChars
+      ? { "pt-BR": c.longDescriptionChars.ptBR, "en-US": c.longDescriptionChars.enUS ?? c.longDescriptionChars.ptBR }
+      : c.long_description_chars,
   } as Project;
 }
 

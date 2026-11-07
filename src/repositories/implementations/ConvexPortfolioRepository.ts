@@ -18,4 +18,9 @@ export class ConvexPortfolioRepository implements PortfolioRepository {
     const data = await client.query(api.projects.getBySlug, { slug });
     return data ? mapProject(data) : null;
   }
+
+  /** No Convex, a lista já vem completa. */
+  async getById(id: string): Promise<Project | null> {
+    return (await this.list()).find((p) => String(p.id) === id) ?? null;
+  }
 }

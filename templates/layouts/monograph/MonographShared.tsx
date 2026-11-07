@@ -164,7 +164,9 @@ export function bookOrder(projects: Project[]): Project[] {
 /** Numeral e página de cada projeto no sumário, pela ordem do livro. */
 export function projectFolios(projects: Project[]): Map<Project["id"], { n: number; page: number }> {
   const ordered = bookOrder(projects);
-  const pages = folios(ordered.map((p) => (p.long_description?.length ?? 0) + (p.description?.length ?? 0)));
+  const pages = folios(
+    ordered.map((p) => (p.long_description_length ?? p.long_description?.length ?? 0) + (p.description?.length ?? 0)),
+  );
   return new Map(ordered.map((p, i) => [p.id, { n: i + 1, page: pages[i] }]));
 }
 

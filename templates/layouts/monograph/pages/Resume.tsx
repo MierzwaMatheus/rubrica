@@ -4,7 +4,7 @@
  * versalete. Cada bloco some quando está vazio.
  */
 import { useState } from "react";
-import DOMPurify from "dompurify";
+import { sanitizeHtml } from "@/lib/sanitizeHtml";
 import { Download } from "lucide-react";
 import { SEO } from "@/components/SEO";
 import { useResume } from "@/hooks/useResume";
@@ -47,7 +47,7 @@ function Entry({ title, org, period, html }: { title?: string; org?: string; per
           <h3 className="mn-cv-role">{title}</h3>
           {org ? <p className="mn-cv-org">{org}</p> : null}
         </div>
-        {html ? <div className="mn-rich" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }} /> : null}
+        {html ? <div className="mn-rich" dangerouslySetInnerHTML={{ __html: sanitizeHtml(html) }} /> : null}
       </MnMain>
       {period ? (
         <MnNote className="mn-n--date">

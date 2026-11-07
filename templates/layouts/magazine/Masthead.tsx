@@ -39,7 +39,7 @@ function NavItems({ location }: { location: string }) {
           location === item.href ||
           (item.href !== "/" && location.startsWith(item.href));
         return (
-          <Link key={item.key} href={item.href}>
+          <Link key={item.key} href={item.href} asChild>
             <a
               className={cn(
                 "text-[11px] font-mono tracking-[0.18em] uppercase pb-1.5 transition-colors",
@@ -116,7 +116,7 @@ export function Masthead() {
             </VisuallyHidden>
             <nav className="flex flex-col gap-1 pb-4">
               {NAV_ITEMS_KEYS.filter((item) => !item.pluginId || isEnabled(item.pluginId)).map((item) => (
-                <Link key={item.key} href={item.href}>
+                <Link key={item.key} href={item.href} asChild>
                   <a className="block text-sm font-mono tracking-widest uppercase py-3 border-b border-[var(--text)]/10 text-[var(--text)]/80 hover:text-[var(--text)] transition-colors">
                     {NAV_LABELS[item.key] ?? item.key}
                   </a>

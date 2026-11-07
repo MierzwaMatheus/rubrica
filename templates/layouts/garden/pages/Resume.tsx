@@ -1,5 +1,5 @@
 import { useState } from "react";
-import DOMPurify from "dompurify";
+import { sanitizeHtml } from "@/lib/sanitizeHtml";
 import { Download } from "lucide-react";
 import { useResume } from "@/hooks/useResume";
 import { useHome } from "@/hooks/useHome";
@@ -29,7 +29,7 @@ function itemText(content: unknown): string {
 
 function Rich({ html }: { html?: string }) {
   if (!html) return null;
-  return <div className="gd-rich" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }} />;
+  return <div className="gd-rich" dangerouslySetInnerHTML={{ __html: sanitizeHtml(html) }} />;
 }
 
 export default function GardenResume() {

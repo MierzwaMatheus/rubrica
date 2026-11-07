@@ -1,5 +1,6 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext } from 'react';
 import { useQuery } from 'convex/react';
+import { useQuery as useReactQuery } from '@tanstack/react-query';
 import { api } from '../../convex/_generated/api';
 import { PLUGIN_REGISTRY, PluginId } from '../../convex/pluginRegistry';
 
@@ -27,17 +28,21 @@ function resolveStates(raw: Record<string, boolean> | undefined): PluginStates {
   return result;
 }
 
+/** Produção: estados do JSON gerado no build (via react-query, para entrar na pré-renderização). */
 function StaticPluginsProvider({ children }: { children: React.ReactNode }) {
-  const [states, setStates] = useState<PluginStates>(defaultStates);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    fetch('/data/plugins.json')
-      .then(r => r.ok ? r.json() : null)
-      .then((raw: Record<string, boolean> | null) => setStates(resolveStates(raw ?? undefined)))
-      .catch(() => setStates(defaultStates()))
-      .finally(() => setIsLoading(false));
-  }, []);
+  const { data, isLoading } = useReactQuery({
+    queryKey: ['plugins'],
+    queryFn: async (): Promise<Record<string, boolean> | null> => {
+      try {
+        const r = await fetch('/data/plugins.json');
+        return r.ok ? await r.json() : null;
+      } catch {
+        return null;
+      }
+    },
+    staleTime: Infinity,
+  });
+  const states = data === undefined ? defaultStates() : resolveStates(data ?? undefined);
 
   const isEnabled = (id: PluginId): boolean => states[id] ?? true;
 

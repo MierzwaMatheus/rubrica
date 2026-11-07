@@ -1,5 +1,5 @@
 import { useState } from "react";
-import DOMPurify from "dompurify";
+import { sanitizeHtml } from "@/lib/sanitizeHtml";
 import { motion } from "framer-motion";
 import { SEO } from "@/components/SEO";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -68,7 +68,7 @@ export default function Resume() {
           <CardContent>
             <div
               className="text-foreground/90 leading-relaxed prose dark:prose-invert prose-headings:text-foreground-strong prose-strong:text-foreground-strong prose-ul:text-foreground/90 prose-li:text-foreground/90 max-w-none [&_ul]:list-disc [&_ul]:list-outside [&_ul]:space-y-2 [&_ul]:ml-6 [&_ul]:pl-0 [&_li]:pl-2"
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content.description) }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(content.description) }}
             />
           </CardContent>
         </Card>
@@ -79,8 +79,8 @@ export default function Resume() {
   return (
     <>
       <SEO
-        title="Currículo"
-        description="Minha trajetória profissional, formação acadêmica, habilidades técnicas e certificações em desenvolvimento de software."
+        title={t("seo.resumeTitle")}
+        description={t("seo.resumeDescription")}
         url="/curriculo"
       />
       <div className="max-w-4xl mx-auto space-y-12">
@@ -259,7 +259,7 @@ export default function Resume() {
                               <div
                                 className="text-foreground/90 leading-relaxed prose dark:prose-invert prose-headings:text-foreground-strong prose-strong:text-foreground-strong prose-ul:text-foreground/90 prose-li:text-foreground/90 max-w-none [&_ul]:list-disc [&_ul]:list-outside [&_ul]:space-y-2 [&_ul]:ml-6 [&_ul]:pl-0 [&_li]:pl-2"
                                 dangerouslySetInnerHTML={{
-                                  __html: DOMPurify.sanitize(content.description),
+                                  __html: sanitizeHtml(content.description),
                                 }}
                               />
                             </CardContent>

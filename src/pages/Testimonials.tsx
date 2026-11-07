@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useQuery } from "convex/react";
+import { useQuery as useReactQuery } from "@tanstack/react-query";
+import type { FunctionReturnType } from "convex/server";
 import { api } from "../../convex/_generated/api";
 import { MessageSquare, Quote, Star } from "lucide-react";
 import { SEO } from "@/components/SEO";
@@ -47,9 +49,37 @@ function SkeletonCard() {
   );
 }
 
+type TestimonialList = FunctionReturnType<typeof api.testimonials.list>;
+
+/** Desenvolvimento: depoimentos ao vivo do Convex. */
+function useConvexTestimonials(): TestimonialList | undefined {
+  return useQuery(api.testimonials.list, {});
+}
+
+/** Produção: os mesmos depoimentos, do JSON gerado no build (entram no HTML pré-renderizado). */
+function useStaticTestimonials(): TestimonialList | undefined {
+  const { data } = useReactQuery({
+    queryKey: ["testimonials", "all"],
+    queryFn: async (): Promise<TestimonialList> => {
+      try {
+        const response = await fetch("/data/about.json");
+        if (!response.ok) return [];
+        const raw = await response.json();
+        return Array.isArray(raw?.testimonials) ? raw.testimonials : [];
+      } catch {
+        return [];
+      }
+    },
+    staleTime: Infinity,
+  });
+  return data;
+}
+
+const useTestimonialsList = import.meta.env.PROD ? useStaticTestimonials : useConvexTestimonials;
+
 export default function TestimonialsPage() {
   const { locale, t } = useI18n();
-  const testimonials = useQuery(api.testimonials.list, {});
+  const testimonials = useTestimonialsList();
   const testimonialsIntakeEnabled = usePlugin("testimonials-intake");
   const [wizardOpen, setWizardOpen] = useState(false);
 
@@ -68,7 +98,7 @@ export default function TestimonialsPage() {
     <>
       <SEO
         title={t("testimonials.title")}
-        description="Veja o que clientes e colegas dizem sobre o meu trabalho."
+        description={t("seo.testimonialsDescription")}
         url="/depoimentos"
       />
       <motion.div
@@ -79,10 +109,10 @@ export default function TestimonialsPage() {
       >
         {/* Header */}
         <motion.section variants={item}>
-          <h2 className="text-2xl font-bold text-foreground-strong mb-3 flex items-center">
+          <h1 className="text-2xl font-bold text-foreground-strong mb-3 flex items-center">
             <MessageSquare className="w-5 h-5 text-neon-purple mr-3" />
             {t("testimonials.title")}
-          </h2>
+          </h1>
           <p className="text-foreground/65 text-sm">
             {t("testimonials.subtitle")}
             {!isLoading && resolved.length > 0 && (

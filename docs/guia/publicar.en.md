@@ -42,6 +42,14 @@ When to use each path:
 - **You changed the code** (layout, components, colors in `src/index.css`, a new version of Rubrica): `npx create-rubrica publicar`.
 - **You changed the content** in the published site's panel: the panel's **Publicar** button.
 
+## What the build generates
+
+Every public page comes out of the build as ready HTML, with its content and its own title, description and image: home, About, Resume, Portfolio, each case study, Blog, each post and Testimonials. That's what Google and link previews (WhatsApp, LinkedIn) read. In the browser, the site still navigates without reloading the page.
+
+Every page exists in both languages: Portuguese at the regular address (`/blog/my-post`) and English under `/en` (`/en/blog/my-post`). The address sets the language: the language switch changes the URL, and visitors whose browser is in the other language see a prompt to switch, without being redirected.
+
+The panel, login, proposals and checkout aren't generated in the build: they keep working as before.
+
 ## The panel's Publicar button
 
 The site is generated in the build: new posts, projects and texts only show up after publishing. The panel's **Publicar** button reruns the build without you opening the terminal.

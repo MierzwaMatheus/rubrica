@@ -1,4 +1,15 @@
 export const ptBR = {
+  seo: {
+    aboutTitle: "Sobre Mim",
+    aboutDescription: "Conheça minha trajetória, dia-a-dia e respostas para perguntas frequentes sobre meu trabalho como desenvolvedor.",
+    portfolioTitle: "Portfólio de Projetos",
+    portfolioDescription: "Confira meus projetos de desenvolvimento front-end e full-stack. Cases com React, TypeScript e tecnologias modernas.",
+    resumeTitle: "Currículo",
+    resumeDescription: "Minha trajetória profissional, formação acadêmica, habilidades técnicas e certificações em desenvolvimento de software.",
+    blogTitle: "Blog",
+    blogDescription: "Artigos sobre desenvolvimento web, React, TypeScript e tecnologia. Compartilhando conhecimento e experiências.",
+    testimonialsDescription: "Veja o que clientes e colegas dizem sobre o meu trabalho.",
+  },
   common: {
     loading: "Carregando...",
     error: "Erro ao carregar",

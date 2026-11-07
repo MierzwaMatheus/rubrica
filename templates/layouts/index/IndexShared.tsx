@@ -8,7 +8,7 @@
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
-import DOMPurify from "dompurify";
+import { sanitizeHtml } from "@/lib/sanitizeHtml";
 import { useI18n } from "@/i18n/context/I18nContext";
 import { highlightNumbers } from "@/utils/homeContent";
 
@@ -193,7 +193,7 @@ export function Highlighted({ text }: { text: string }) {
 
 /** HTML vindo do admin (descrições de experiência, formação), sempre sanitizado. */
 export function RichText({ html, className }: { html: string; className?: string }) {
-  const clean = useMemo(() => DOMPurify.sanitize(html ?? ""), [html]);
+  const clean = useMemo(() => sanitizeHtml(html ?? ""), [html]);
   if (!clean.trim()) return null;
   return <div className={["ix-rich", className].filter(Boolean).join(" ")} dangerouslySetInnerHTML={{ __html: clean }} />;
 }

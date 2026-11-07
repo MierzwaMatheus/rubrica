@@ -98,7 +98,7 @@ function PlaygroundSidebar() {
               }
 
               return (
-                <Link key={item.path} href={item.path!}>
+                <Link key={item.path} href={item.path!} asChild>
                   <a
                     className={cn(
                       "flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors",
@@ -118,7 +118,7 @@ function PlaygroundSidebar() {
 
           {/* Footer — em vez de "Sair", link para o portfólio */}
           <div className="pt-6 border-t border-foreground/10">
-            <Link href="/">
+            <Link href="/" asChild>
               <a className="flex items-center space-x-3 px-4 py-3 rounded-lg text-foreground/65 hover:text-foreground-strong hover:bg-foreground/5 transition-colors">
                 <ExternalLink className="w-5 h-5" />
                 <span>Voltar ao portfólio</span>

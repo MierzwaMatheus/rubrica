@@ -6,6 +6,12 @@ vi.mock("@/hooks/useSiteConfig", () => ({
   useSiteConfig: vi.fn(),
 }));
 
+// O idioma da página vem da URL (via useI18n); aqui ele é controlado pelo teste.
+const i18n = vi.hoisted(() => ({ locale: "pt-BR" as "pt-BR" | "en-US" }));
+vi.mock("@/i18n/context/I18nContext", () => ({
+  useI18n: () => ({ locale: i18n.locale }),
+}));
+
 import { useSiteConfig } from "@/hooks/useSiteConfig";
 import { SEO } from "@/components/SEO";
 
@@ -43,6 +49,7 @@ function renderSEO(props: Parameters<typeof SEO>[0]) {
 }
 
 beforeEach(() => {
+  i18n.locale = "pt-BR";
   mockUseSiteConfig.mockReturnValue(defaultConfig);
 });
 
@@ -69,12 +76,12 @@ describe("SEO", () => {
       expect(() => renderSEO({ title: "Página" })).not.toThrow();
     });
 
-    it("og:locale com lang vazio não gera erro", async () => {
+    it("og:locale segue o idioma da página mesmo com lang vazio na config", async () => {
       mockUseSiteConfig.mockReturnValue({ ...defaultConfig, lang: "" });
       renderSEO({ title: "Página" });
       await waitFor(() => {
         const meta = document.querySelector('meta[property="og:locale"]');
-        expect(meta?.getAttribute("content")).toBe("");
+        expect(meta?.getAttribute("content")).toBe("pt_BR");
       });
     });
   });
@@ -107,7 +114,7 @@ describe("SEO", () => {
   });
 
   describe("Ciclo 6 — og:locale", () => {
-    it("usa lang do useSiteConfig convertido para formato og:locale (pt-BR → pt_BR)", async () => {
+    it("usa o idioma da página no formato og:locale (pt-BR → pt_BR)", async () => {
       renderSEO({ title: "Página" });
       await waitFor(() => {
         const meta = document.querySelector('meta[property="og:locale"]');
@@ -115,21 +122,85 @@ describe("SEO", () => {
       });
     });
 
-    it("converte en-US para en_US no og:locale", async () => {
-      mockUseSiteConfig.mockReturnValue({ ...defaultConfig, lang: "en-US" });
+    it("converte en-US para en_US no og:locale e aponta o pt-BR como alternativo", async () => {
+      i18n.locale = "en-US";
       renderSEO({ title: "Página" });
       await waitFor(() => {
         const meta = document.querySelector('meta[property="og:locale"]');
         expect(meta?.getAttribute("content")).toBe("en_US");
+        const alt = document.querySelector('meta[property="og:locale:alternate"]');
+        expect(alt?.getAttribute("content")).toBe("pt_BR");
       });
     });
 
-    it("não contém pt_BR hardcoded — usa valor dinâmico", async () => {
-      mockUseSiteConfig.mockReturnValue({ ...defaultConfig, lang: "en-US" });
+    it("não contém pt_BR hardcoded — usa o idioma da página", async () => {
+      i18n.locale = "en-US";
       renderSEO({ title: "Página" });
       await waitFor(() => {
         const meta = document.querySelector('meta[property="og:locale"]');
         expect(meta?.getAttribute("content")).not.toBe("pt_BR");
+      });
+    });
+  });
+
+  describe("Idioma pela URL — canonical e hreflang", () => {
+    it("em pt-BR, o canonical é o caminho sem prefixo", async () => {
+      renderSEO({ title: "Post", url: "/blog/meu-post" });
+      await waitFor(() => {
+        expect(document.querySelector('link[rel="canonical"]')?.getAttribute("href")).toBe(
+          "https://exemplo.com/blog/meu-post",
+        );
+      });
+    });
+
+    it("em inglês, o canonical e o og:url levam o prefixo /en", async () => {
+      i18n.locale = "en-US";
+      renderSEO({ title: "Post", url: "/blog/meu-post" });
+      await waitFor(() => {
+        expect(document.querySelector('link[rel="canonical"]')?.getAttribute("href")).toBe(
+          "https://exemplo.com/en/blog/meu-post",
+        );
+        expect(document.querySelector('meta[property="og:url"]')?.getAttribute("content")).toBe(
+          "https://exemplo.com/en/blog/meu-post",
+        );
+      });
+    });
+
+    it("lista as duas versões em hreflang, com pt-BR como x-default", async () => {
+      renderSEO({ title: "Post", url: "/blog/meu-post" });
+      await waitFor(() => {
+        const alt = (lang: string) =>
+          document.querySelector(`link[rel="alternate"][hreflang="${lang}"]`)?.getAttribute("href");
+        expect(alt("pt-BR")).toBe("https://exemplo.com/blog/meu-post");
+        expect(alt("en")).toBe("https://exemplo.com/en/blog/meu-post");
+        expect(alt("x-default")).toBe("https://exemplo.com/blog/meu-post");
+      });
+    });
+
+    it("a home em inglês é /en (sem barra no fim)", async () => {
+      i18n.locale = "en-US";
+      renderSEO({ title: "Home", url: "/" });
+      await waitFor(() => {
+        expect(document.querySelector('link[rel="canonical"]')?.getAttribute("href")).toBe("https://exemplo.com/en");
+      });
+    });
+
+    it("põe o idioma da página no <html lang>", async () => {
+      i18n.locale = "en-US";
+      renderSEO({ title: "Página" });
+      await waitFor(() => {
+        expect(document.documentElement.getAttribute("lang")).toBe("en-US");
+      });
+    });
+
+    it("gera JSON-LD com @context quando recebe jsonLd", async () => {
+      renderSEO({ title: "Post", jsonLd: { "@type": "BlogPosting", headline: "Oi </script>" } });
+      await waitFor(() => {
+        const script = document.querySelector('script[type="application/ld+json"]');
+        expect(script).not.toBeNull();
+        const data = JSON.parse(script!.textContent!);
+        expect(data).toMatchObject({ "@context": "https://schema.org", "@type": "BlogPosting", headline: "Oi </script>" });
+        expect(script!.textContent).not.toContain("</script>");
       });
     });
   });

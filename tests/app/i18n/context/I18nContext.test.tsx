@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import { ReactNode } from "react";
+import { Router } from "wouter";
+import { memoryLocation } from "wouter/memory-location";
 
 const { mockUseQuery } = vi.hoisted(() => ({ mockUseQuery: vi.fn() }));
 
@@ -62,13 +64,19 @@ describe("I18nContext com DynamicTranslationsRepository", () => {
     mockUseQuery.mockReturnValue([
       { key: "home.greeting", ptBR: "Olá dinâmico", enUS: "Dynamic Hello" },
     ]);
-    localStorage.setItem("locale", "en-US");
-
     function NewKeyConsumer() {
       const { t } = useI18n();
       return <span data-testid="new">{t("portfolio.showOriginal")}</span>;
     }
-    render(<NewKeyConsumer />, { wrapper });
+    // O idioma vem da URL: em inglês, a página fica sob /en.
+    const { hook } = memoryLocation({ path: "/en/blog" });
+    render(
+      <Router hook={hook}>
+        <I18nProvider>
+          <NewKeyConsumer />
+        </I18nProvider>
+      </Router>,
+    );
 
     await waitFor(() => {
       expect(screen.getByTestId("new").textContent).toBe("Show original");

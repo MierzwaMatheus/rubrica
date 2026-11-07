@@ -182,7 +182,8 @@ export default function Home() {
           <div
             style={{ paddingLeft: 14, borderLeft: "2px solid var(--accent)" }}
           >
-            <div
+            {/* Título principal da página (um <h1> por página). */}
+            <h1
               style={{
                 fontSize: 22,
                 fontWeight: 700,
@@ -191,7 +192,7 @@ export default function Home() {
               }}
             >
               {t("home.hero.headline")}
-            </div>
+            </h1>
             <div style={{ opacity: 0.85, marginBottom: 8 }}>{contactRole}</div>
             <div style={{ opacity: 0.7, fontSize: 12, lineHeight: 1.6 }}>
               {aboutText}

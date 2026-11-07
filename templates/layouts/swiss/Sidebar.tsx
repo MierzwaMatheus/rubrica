@@ -38,7 +38,7 @@ function NavItems({ location }: { location: string }) {
       {items.map((item, i) => {
         const active = location === item.href || (item.href !== "/" && location.startsWith(item.href));
         return (
-          <Link key={item.key} href={item.href}>
+          <Link key={item.key} href={item.href} asChild>
             <a
               className={cn(
                 "flex items-baseline gap-3 px-4 py-3 text-sm font-semibold tracking-tight transition-colors border-r border-[var(--text)]/20",

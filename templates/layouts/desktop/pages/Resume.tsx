@@ -1,5 +1,5 @@
 import { useState } from "react";
-import DOMPurify from "dompurify";
+import { sanitizeHtml } from "@/lib/sanitizeHtml";
 import { Download } from "lucide-react";
 import { SEO } from "@/components/SEO";
 import { useResume } from "@/hooks/useResume";
@@ -137,7 +137,7 @@ export default function DesktopResume() {
                     {description && (
                       <div
                         className="dk-li-desc dk-li-full"
-                        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(description) }}
+                        dangerouslySetInnerHTML={{ __html: sanitizeHtml(description) }}
                       />
                     )}
                   </li>
@@ -224,7 +224,7 @@ export default function DesktopResume() {
                         {description && (
                           <div
                             className="dk-li-desc"
-                            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(description) }}
+                            dangerouslySetInnerHTML={{ __html: sanitizeHtml(description) }}
                           />
                         )}
                       </li>

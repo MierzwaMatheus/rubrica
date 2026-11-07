@@ -1,5 +1,5 @@
 import { Fragment, useState } from "react";
-import DOMPurify from "dompurify";
+import { sanitizeHtml } from "@/lib/sanitizeHtml";
 import { ChevronDown, Download } from "lucide-react";
 import { SEO } from "@/components/SEO";
 import { useResume } from "@/hooks/useResume";
@@ -84,7 +84,7 @@ function TimelineItem({ title, org, period, html }: { title: string; org?: strin
       <div>
         <h3 className="poster-tl-role">{title}</h3>
         {org && <span className="poster-tl-org">{org}</span>}
-        {html && <div className="poster-prose" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }} />}
+        {html && <div className="poster-prose" dangerouslySetInnerHTML={{ __html: sanitizeHtml(html) }} />}
       </div>
     </li>
   );

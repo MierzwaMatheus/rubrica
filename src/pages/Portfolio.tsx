@@ -107,8 +107,8 @@ export default function Portfolio() {
   return (
     <>
       <SEO
-        title="Portfólio de Projetos"
-        description="Confira meus projetos de desenvolvimento front-end e full-stack. Cases com React, TypeScript e tecnologias modernas."
+        title={t("seo.portfolioTitle")}
+        description={t("seo.portfolioDescription")}
         url="/portfolio"
       />
       <motion.div

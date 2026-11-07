@@ -69,6 +69,13 @@ async function main() {
   const pluginStates = await client.query(api.plugins.getPluginStates);
   write('plugins.json', pluginStates);
 
+  // Configuração pública do site (SEO, cores) e textos fixos, para entrarem no HTML pré-renderizado
+  const siteConfig = await client.query(api.siteConfig.getPublic, {});
+  write('site-config.json', siteConfig.map(({ key, value }) => ({ key, value })));
+
+  const siteTexts = await client.query(api.siteTexts.getAll, {});
+  write('site-texts.json', siteTexts.map(({ key, ptBR, enUS }) => ({ key, ptBR, enUS })));
+
   // Blog listing
   const published = await client.query(api.posts.listAllPublished, {});
 

@@ -472,7 +472,7 @@ O `vercel.json` configura:
 "buildCommand": "npm run build:i18n && npm run build"
 ```
 
-`build:i18n` regera as traduções da interface a partir do Convex; `build` roda `npx convex deploy`, busca os dados estáticos, gera RSS e sitemap e chama o `build:site` (`vite build`, o build de renderização em `src/entry-server.tsx` e a pré-renderização em `scripts/prerender.ts`). O site público só muda com um novo deploy, disparado pelo botão "Publicar" do admin (deploy hook da Vercel) — não há rebuild agendado.
+`build:i18n` regera as traduções da interface a partir do Convex; `build` roda `npx convex deploy`, busca os dados estáticos, baixa as imagens (`fetch-media`), gera RSS e sitemap e chama o `build:site` (`vite build`, o build de renderização em `src/entry-server.tsx` e a pré-renderização em `scripts/prerender.ts`). O site público só muda com um novo deploy, disparado pelo botão "Publicar" do admin (deploy hook da Vercel) — não há rebuild agendado.
 
 ## 📜 Scripts Disponíveis
 
@@ -482,7 +482,7 @@ pnpm dev             # Vite (porta 3000) + Convex dev
 
 # Build
 pnpm build:i18n      # Regera src/i18n/translations a partir do Convex
-pnpm build           # convex deploy + dados estáticos + RSS + sitemap + build:site
+pnpm build           # convex deploy + dados estáticos + imagens + RSS + sitemap + build:site
 pnpm build:site      # vite build + pré-renderização das páginas públicas (usa os dados de public/data)
 
 # Preview
@@ -690,6 +690,12 @@ Campos opcionais e aditivos (projetos antigos continuam válidos):
 - Envia **apenas os campos modificados** para tradução (otimização de tokens)
 - Textos fixos da interface ficam em `siteTexts`, editáveis em `/admin/textos` e exportados para `src/i18n/translations` no build (`build:i18n`)
 - **Idioma pela URL**: pt-BR na raiz e inglês sob `/en` (`src/i18n/localePath.ts`). O wouter usa a base `/en`, então os `<Link>` ganham o prefixo sem cada página saber do idioma
+
+### Imagens no build
+
+Depois do `fetch-static-data`, `scripts/fetch-media.ts` baixa as imagens do storage do Convex citadas em `public/data` (capas, imagens dos cases e dos posts, avatares) para `public/media/<storageId>.webp`, até 1600px de largura, e troca as URLs nos JSON pelo caminho local. Cada imagem ganha também uma variante JPG de 1200px, usada no `og:image` (nem toda rede aceita WebP). SVG e GIF são copiados como vieram; vídeo e PDF continuam no storage. O `vercel.json` serve `/media/` com cache de um ano (`immutable`): o nome é o `storageId`, que nunca muda de conteúdo.
+
+Entre builds, o resultado fica em `node_modules/.cache/rubrica-media` (a Vercel preserva essa pasta): o build seguinte só baixa o que é novo. Uma imagem que falha não quebra o build, ela fica com a URL do storage.
 
 ### Pré-renderização
 

@@ -117,6 +117,7 @@ reports/
 
 # Build generated files
 public/data/
+public/media/
 public/sitemap.xml
 src/data/
 /public/rss.xml

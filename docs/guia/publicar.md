@@ -50,6 +50,8 @@ Cada página existe nos dois idiomas: em português no endereço normal (`/blog/
 
 O painel, o login, as propostas e o checkout não são gerados no build: continuam funcionando como antes.
 
+As imagens do conteúdo (capas, cases, posts, avatares) também saem do build: são baixadas, reduzidas e convertidas para WebP, e servidas pelo próprio site, com cache longo. Nas publicações seguintes, só as imagens novas são baixadas.
+
 ## O botão Publicar do painel
 
 O site é gerado no build: posts, projetos e textos novos só aparecem depois de publicar. O botão **Publicar** do painel refaz o build sem você abrir o terminal.

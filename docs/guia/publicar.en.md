@@ -50,6 +50,8 @@ Every page exists in both languages: Portuguese at the regular address (`/blog/m
 
 The panel, login, proposals and checkout aren't generated in the build: they keep working as before.
 
+Content images (covers, case studies, posts, avatars) also come out of the build: they're downloaded, resized, converted to WebP and served by the site itself with long caching. On later publishes, only new images are downloaded.
+
 ## The panel's Publicar button
 
 The site is generated in the build: new posts, projects and texts only show up after publishing. The panel's **Publicar** button reruns the build without you opening the terminal.

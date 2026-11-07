@@ -30,6 +30,12 @@ export default defineConfig(({ mode }) => ({
     sourcemap: process.env.NODE_ENV !== "production",
   },
 
+  // Build de pré-renderização (src/entry-server.tsx): pacotes CommonJS sem exports
+  // nomeados no Node entram no bundle em vez de serem importados de node_modules.
+  ssr: {
+    noExternal: ["react-helmet-async"],
+  },
+
   server: {
     port: 3000,
     host: true,

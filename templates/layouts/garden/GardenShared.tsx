@@ -1,4 +1,5 @@
 import { Link, useLocation } from "wouter";
+import { useRenderNow } from "@/hooks/useRenderNow";
 import { useI18n } from "@/i18n/context/I18nContext";
 import { usePlugins } from "@/contexts/PluginsContext";
 import { usePortfolio } from "@/hooks/usePortfolio";
@@ -343,6 +344,7 @@ export function useBacklinks(exclude: string, limit = 3): Backlink[] {
   const { isEnabled } = usePlugins();
   const { projects } = usePortfolio(portfolioRepository);
   const { posts } = useBlogPosts(blogRepository);
+  const now = useRenderNow();
   const links: Backlink[] = [];
   const firstCase = projects.find(hasCaseStudy);
   if (isEnabled("portfolio") && firstCase?.slug) {
@@ -350,7 +352,7 @@ export function useBacklinks(exclude: string, limit = 3): Backlink[] {
   }
   const latest = posts[0];
   if (isEnabled("blog") && latest?.slug) {
-    const stage = postStage(latest);
+    const stage = postStage(latest, now);
     links.push({ href: `/blog/${latest.slug}`, title: latest.title, kind: tx.stage[stage], stage });
   }
   const names: Record<string, string> =

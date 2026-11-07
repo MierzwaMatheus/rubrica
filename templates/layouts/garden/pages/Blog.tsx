@@ -4,6 +4,7 @@ import { useBlogPosts } from "@/hooks/useBlog";
 import { useTranslation } from "@/i18n/hooks/useTranslation";
 import { blogRepository } from "@/repositories/instances";
 import { SEO } from "@/components/SEO";
+import { useRenderNow } from "@/hooks/useRenderNow";
 import {
   Crumb,
   SectionHead,
@@ -25,10 +26,10 @@ export default function GardenBlog() {
   const { t } = useTranslation();
   const tx = useGardenTexts();
   const { posts, isLoading } = useBlogPosts(blogRepository);
+  const now = useRenderNow();
 
   if (isLoading) return <div aria-busy="true" style={{ minHeight: "60vh" }} />;
 
-  const now = Date.now();
   const groups = STAGE_ORDER.map((stage) => ({
     stage,
     items: posts.filter((p) => postStage(p, now) === stage),

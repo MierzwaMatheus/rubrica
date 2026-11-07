@@ -76,6 +76,8 @@ export class CachedTranslationService implements TranslationService {
   }
   
   private loadCacheFromStorage() {
+    // Sem localStorage na pré-renderização (build): começa com o cache vazio.
+    if (typeof localStorage === 'undefined') return;
     try {
       const stored = localStorage.getItem('translation_cache');
       if (stored) {

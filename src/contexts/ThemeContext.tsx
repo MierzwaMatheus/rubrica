@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useLocation } from "wouter";
+import { isHydratingPrerender } from "@/ssr/hydration";
 
 /** Modo efetivo da página. */
 type Theme = "light" | "dark";
@@ -54,9 +55,21 @@ export function ThemeProvider({ children, defaultTheme, switchable }: ThemeProvi
   const setting = defaultTheme ?? fromHtml.mode;
   const canSwitch = switchable ?? fromHtml.toggle;
 
+  // Página pré-renderizada: começa igual ao build (sem escolha salva, sistema "escuro") e
+  // aplica a escolha e o tema do sistema logo depois. A cor certa já está na tela desde o
+  // início: o color-mode.js põe a classe no <html> antes de a página aparecer.
+  const [synced, setSynced] = useState(() => !isHydratingPrerender());
   // Escolha explícita de quem visita (só vale com a alternância ligada).
-  const [chosen, setChosen] = useState<Theme | null>(() => (canSwitch ? readSaved() : null));
-  const [system, setSystem] = useState<Theme>(systemTheme);
+  const [chosen, setChosen] = useState<Theme | null>(() => (canSwitch && synced ? readSaved() : null));
+  const [system, setSystem] = useState<Theme>(() => (synced ? systemTheme() : "dark"));
+
+  useEffect(() => {
+    if (synced) return;
+    if (canSwitch) setChosen(readSaved());
+    setSystem(systemTheme());
+    setSynced(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [location] = useLocation();
   const isAdmin = location.startsWith("/admin");
 
@@ -71,12 +84,14 @@ export function ThemeProvider({ children, defaultTheme, switchable }: ThemeProvi
   const theme: Theme = chosen ?? (setting === "system" ? system : setting);
 
   useEffect(() => {
+    // Antes de sincronizar, o tema ainda é o do build: não mexe na classe que o color-mode.js pôs.
+    if (!synced) return;
     const root = document.documentElement;
     // O painel admin foi desenhado para o modo escuro e não usa textura.
     root.classList.toggle("dark", isAdmin || theme === "dark");
     if (isAdmin) root.setAttribute("data-admin", "");
     else root.removeAttribute("data-admin");
-  }, [theme, isAdmin]);
+  }, [theme, isAdmin, synced]);
 
   const toggleTheme = canSwitch
     ? () => {

@@ -42,6 +42,14 @@ Quando usar cada caminho:
 - **Mudou o código** (layout, componentes, cores no `src/index.css`, uma versão nova do Rubrica): `npx create-rubrica publicar`.
 - **Mudou o conteúdo** no painel do site publicado: o botão **Publicar** do painel.
 
+## O que o build gera
+
+Cada página pública sai do build como HTML pronto, com o conteúdo e o título, a descrição e a imagem dela: home, Sobre, Currículo, Portfólio, cada case, Blog, cada post e Depoimentos. É isso que o Google e as prévias de link (WhatsApp, LinkedIn) leem. No navegador, o site continua navegando sem recarregar a página.
+
+Cada página existe nos dois idiomas: em português no endereço normal (`/blog/meu-post`) e em inglês sob `/en` (`/en/blog/meu-post`). O idioma vem do endereço: o seletor de idioma troca a URL, e quem chega com o navegador no outro idioma vê um aviso para trocar, sem ser redirecionado.
+
+O painel, o login, as propostas e o checkout não são gerados no build: continuam funcionando como antes.
+
 ## O botão Publicar do painel
 
 O site é gerado no build: posts, projetos e textos novos só aparecem depois de publicar. O botão **Publicar** do painel refaz o build sem você abrir o terminal.

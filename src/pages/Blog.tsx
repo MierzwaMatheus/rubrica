@@ -116,8 +116,8 @@ export default function Blog() {
   return (
     <>
       <SEO
-        title="Blog"
-        description="Artigos sobre desenvolvimento web, React, TypeScript e tecnologia. Compartilhando conhecimento e experiências."
+        title={t("seo.blogTitle")}
+        description={t("seo.blogDescription")}
         url="/blog"
       />
       <motion.div

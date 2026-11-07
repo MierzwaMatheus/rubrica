@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { isHydratingPrerender } from "@/ssr/hydration";
 import { Link, useLocation } from "wouter";
 import { Menu, X } from "lucide-react";
 import { ColorModeToggle } from "@/components/ColorModeToggle";
@@ -8,10 +9,16 @@ import { useI18n } from "@/i18n/context/I18nContext";
 import { useTranslation } from "@/i18n/hooks/useTranslation";
 import { isActivePath, useDesktopCopy, useDesktopNav } from "./DesktopShared";
 
-/** Hora real, atualizada a cada 15 segundos. */
-function useNow(): Date {
-  const [now, setNow] = useState(() => new Date());
+/**
+ * Hora real, atualizada a cada 15 segundos. Vazia no build e na hidratação: a hora do build
+ * não bate com a do navegador. Aparece logo depois, no efeito.
+ */
+function useNow(): Date | null {
+  const [now, setNow] = useState<Date | null>(() =>
+    typeof window === "undefined" || isHydratingPrerender() ? null : new Date(),
+  );
   useEffect(() => {
+    setNow(new Date());
     const id = window.setInterval(() => setNow(new Date()), 15_000);
     return () => window.clearInterval(id);
   }, []);
@@ -21,6 +28,7 @@ function useNow(): Date {
 function Clock() {
   const { locale } = useI18n();
   const now = useNow();
+  if (!now) return <time className="dk-clock" aria-hidden="true" />;
   const weekday = now.toLocaleDateString(locale, { weekday: "short" }).replace(/\.$/, "");
   const time = now.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
   return (

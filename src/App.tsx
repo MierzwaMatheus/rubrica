@@ -1,15 +1,19 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { Route, Switch, useLocation } from "wouter";
+import { Route, Switch, useLocation, Router as WouterRouter } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
-import { ThemeProvider } from "./contexts/ThemeContext";
+import { ThemeProvider, type ColorModeSetting } from "./contexts/ThemeContext";
 import { HelmetProvider } from "react-helmet-async";
 import Home from "./pages/Home";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeApplier } from "./components/ThemeApplier";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import { I18nProvider } from "./i18n/context/I18nContext";
+import { I18nProvider, useI18n } from "./i18n/context/I18nContext";
+import { routerBase, EN_BASE } from "./i18n/localePath";
+import type { QueryClient } from "@tanstack/react-query";
+import type { HelmetServerState } from "react-helmet-async";
+import { LocaleSuggestion } from "./components/LocaleSuggestion";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { Layout } from "./components/Layout";
@@ -19,7 +23,7 @@ import { ConvexClientProvider, convex } from "./providers/ConvexClientProvider";
 import { ConvexTranslationService } from "./i18n/implementations/ConvexTranslationService";
 import { Terminal } from "./components/Terminal";
 import { AnimatePresence } from "framer-motion";
-import { useState, useEffect, useMemo, lazy, Suspense } from "react";
+import { useState, useEffect, useMemo, lazy, Suspense, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { sidebarRepository } from "@/repositories/instances";
 import { PageSkeleton } from "./components/PageSkeleton";
@@ -399,31 +403,70 @@ function AppContent() {
   );
 }
 
-function App() {
+/** "/en/" (Link para "/" dentro do inglês) vira "/en", a URL canônica da home em inglês. */
+const normalizeEnRoot = (to: string) => (to === `${EN_BASE}/` ? EN_BASE : to);
+
+/**
+ * Rotas relativas ao idioma: em inglês, o wouter usa a base "/en", então `<Link href="/blog">`
+ * aponta para "/en/blog" sem cada página precisar saber do idioma.
+ */
+function LocaleRouter({ children }: { children: ReactNode }) {
+  const { locale } = useI18n();
   return (
-    <HelmetProvider>
+    <WouterRouter
+      base={routerBase(locale)}
+      hrefs={normalizeEnRoot}
+      aroundNav={(navigate, to, opts) => navigate(normalizeEnRoot(to), opts)}
+    >
+      {children}
+    </WouterRouter>
+  );
+}
+
+export interface AppProps {
+  /** Caminho renderizado no build (pré-renderização). No navegador, vem da barra de endereço. */
+  ssrPath?: string;
+  /** Cliente do react-query já com os dados da página (build e hidratação). */
+  queryClient?: QueryClient;
+  /** Recebe as tags do <head> geradas na pré-renderização. */
+  helmetContext?: { helmet?: HelmetServerState };
+  /**
+   * Modo de cor e alternância do <html> (gravados pelo CLI no index.html). Só no build: no
+   * navegador o ThemeProvider lê os atributos do próprio documento.
+   */
+  appearance?: { colorMode?: ColorModeSetting; colorToggle?: boolean };
+}
+
+function App({ ssrPath, queryClient, helmetContext, appearance }: AppProps = {}) {
+  return (
+    <HelmetProvider context={helmetContext}>
+      <WouterRouter ssrPath={ssrPath}>
       <ErrorBoundary>
         <ConvexClientProvider>
-          <QueryProvider>
+          <QueryProvider client={queryClient}>
             <ThemeApplier />
             <AuthProvider>
               <I18nProvider translationService={translationService}>
-                <ThemeProvider>
+                <LocaleRouter>
+                <ThemeProvider defaultTheme={appearance?.colorMode} switchable={appearance?.colorToggle}>
                   <TooltipProvider>
                     <Toaster />
                     <PluginsProvider>
                       <ContactWizardProvider>
                         <AppContent />
                         <ContactWizardModal />
+                        <LocaleSuggestion />
                       </ContactWizardProvider>
                     </PluginsProvider>
                   </TooltipProvider>
                 </ThemeProvider>
+                </LocaleRouter>
               </I18nProvider>
             </AuthProvider>
           </QueryProvider>
         </ConvexClientProvider>
       </ErrorBoundary>
+      </WouterRouter>
     </HelmetProvider>
   );
 }

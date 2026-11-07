@@ -1,4 +1,15 @@
 export const enUS = {
+  seo: {
+    aboutTitle: "About Me",
+    aboutDescription: "Get to know my journey, day-to-day and answers to frequently asked questions about my work as a developer.",
+    portfolioTitle: "Project Portfolio",
+    portfolioDescription: "Check out my front-end and full-stack development projects. Case studies with React, TypeScript and modern technologies.",
+    resumeTitle: "Resume",
+    resumeDescription: "My professional background, education, technical skills and certifications in software development.",
+    blogTitle: "Blog",
+    blogDescription: "Articles about web development, React, TypeScript and technology. Sharing knowledge and experience.",
+    testimonialsDescription: "See what clients and colleagues say about my work.",
+  },
   common: {
     loading: "Loading...",
     error: "Error loading",

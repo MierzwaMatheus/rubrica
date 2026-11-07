@@ -1,4 +1,4 @@
-import DOMPurify from "dompurify";
+import { sanitizeHtml } from "@/lib/sanitizeHtml";
 import { PageSkeleton } from "@/components/PageSkeleton";
 import { useRoute } from "wouter";
 import { Badge } from "@/components/ui/badge";
@@ -15,10 +15,11 @@ import { useHome } from "@/hooks/useHome";
 import { usePortfolio } from "@/hooks/usePortfolio";
 import { useContactWizard } from "@/contexts/ContactWizardContext";
 import { findRelatedCase } from "@/utils/relatedCase";
+import { SEO } from "@/components/SEO";
 
 export default function BlogPost() {
     const { t } = useTranslation();
-    const { isLoading: i18nLoading } = useI18n();
+    const { isLoading: i18nLoading, locale } = useI18n();
     const [match, params] = useRoute("/blog/:slug");
     const slug = params?.slug || '';
     const { post, isLoading } = useBlogPost(blogRepository, slug);
@@ -46,7 +47,30 @@ export default function BlogPost() {
         );
     }
 
+    const publishedIso = post.published_at && !Number.isNaN(new Date(post.published_at).getTime())
+        ? new Date(post.published_at).toISOString()
+        : undefined;
+
     return (
+        <>
+            <SEO
+                title={post.title}
+                description={post.subtitle}
+                image={post.image}
+                url={`/blog/${post.slug || slug}`}
+                type="article"
+                publishedTime={publishedIso}
+                jsonLd={{
+                    "@type": "BlogPosting",
+                    headline: post.title,
+                    description: post.subtitle,
+                    image: post.image || undefined,
+                    datePublished: publishedIso,
+                    keywords: post.tags?.join(", "),
+                    inLanguage: locale,
+                    author: sidebarContact?.name ? { "@type": "Person", name: sidebarContact.name } : undefined,
+                }}
+            />
             <motion.article
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -107,7 +131,7 @@ export default function BlogPost() {
 
                 <div
                     className="blog-content"
-                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }}
+                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
                 />
 
                 <PostFooter
@@ -120,6 +144,7 @@ export default function BlogPost() {
                     t={t}
                 />
             </motion.article>
+        </>
     );
 }
 

@@ -30,7 +30,7 @@ Este é um portfólio profissional full-stack que combina uma interface pública
 - **CMS Integrado**: gerenciamento completo de conteúdo, textos da interface e aparência
 - **Multi-role**: autenticação com diferentes níveis de permissão
 - **Sistema de plugins**: cada funcionalidade pode ser ligada ou desligada
-- **SEO Friendly**: meta tags por página, RSS e sitemap
+- **SEO Friendly**: cada página pública sai do build como HTML completo (conteúdo e meta tags), em pt-BR e em inglês (`/en/...`), com canonical, `hreflang`, JSON-LD, RSS e sitemap
 - **IA Integrada**: tradução automática, geração de currículo com ATS scoring e reescrita via OpenRouter
 - **Auditoria Completa**: log de todas as mutações administrativas
 - **Notificações Telegram**: alertas para o admin via bot Telegram
@@ -148,7 +148,7 @@ Este é um portfólio profissional full-stack que combina uma interface pública
 - Lista de posts publicados
 - Posts em destaque
 - Busca e filtros por tags
-- Visualização individual de posts (`/blog/:slug`)
+- Visualização individual de posts (`/blog/:slug`), com meta tags e JSON-LD (`BlogPosting`) próprios
 - RSS e sitemap gerados no build
 
 #### ⭐ Depoimentos (`/depoimentos`)
@@ -462,7 +462,7 @@ Proposta aceita e pagamento confirmado usam a `internalAction` `convex/telegram.
 ### Vercel (Deploy)
 
 O `vercel.json` configura:
-- Rewrites para SPA
+- Rewrite para `app.html` (a casca da SPA) nas rotas que não foram pré-renderizadas: painel, login, propostas, checkout
 - Headers de segurança e Content-Security-Policy
 - Build command:
 
@@ -470,7 +470,7 @@ O `vercel.json` configura:
 "buildCommand": "npm run build:i18n && npm run build"
 ```
 
-`build:i18n` regera as traduções da interface a partir do Convex; `build` roda `npx convex deploy`, busca os dados estáticos, gera RSS e sitemap e faz o `vite build`. O site público só muda com um novo deploy, disparado pelo botão "Publicar" do admin (deploy hook da Vercel) — não há rebuild agendado.
+`build:i18n` regera as traduções da interface a partir do Convex; `build` roda `npx convex deploy`, busca os dados estáticos, gera RSS e sitemap e chama o `build:site` (`vite build`, o build de renderização em `src/entry-server.tsx` e a pré-renderização em `scripts/prerender.ts`). O site público só muda com um novo deploy, disparado pelo botão "Publicar" do admin (deploy hook da Vercel) — não há rebuild agendado.
 
 ## 📜 Scripts Disponíveis
 
@@ -480,7 +480,8 @@ pnpm dev             # Vite (porta 3000) + Convex dev
 
 # Build
 pnpm build:i18n      # Regera src/i18n/translations a partir do Convex
-pnpm build           # convex deploy + dados estáticos + RSS + sitemap + vite build
+pnpm build           # convex deploy + dados estáticos + RSS + sitemap + build:site
+pnpm build:site      # vite build + pré-renderização das páginas públicas (usa os dados de public/data)
 
 # Preview
 pnpm preview         # Preview do build de produção
@@ -568,7 +569,8 @@ As roles ficam na collection `userRoles`. No backend, cada função administrati
 - **ContactWizard** / **TestimonialWizard**: wizards públicos
 - **ThemeApplier**: aplica as cores e fontes salvas no admin
 - **Terminal**: interface estilo terminal
-- **SEO**: meta tags por página
+- **SEO**: meta tags por página, canonical e `hreflang` por idioma, JSON-LD
+- **LocaleSuggestion**: sugere o outro idioma quando o navegador está nele (sem redirecionar)
 
 ## 🎨 Design System
 
@@ -685,6 +687,13 @@ Campos opcionais e aditivos (projetos antigos continuam válidos):
 - Integrada nas páginas administrativas de conteúdo (projetos, blog, currículo, home, sobre)
 - Envia **apenas os campos modificados** para tradução (otimização de tokens)
 - Textos fixos da interface ficam em `siteTexts`, editáveis em `/admin/textos` e exportados para `src/i18n/translations` no build (`build:i18n`)
+- **Idioma pela URL**: pt-BR na raiz e inglês sob `/en` (`src/i18n/localePath.ts`). O wouter usa a base `/en`, então os `<Link>` ganham o prefixo sem cada página saber do idioma
+
+### Pré-renderização
+
+Depois do `vite build`, `scripts/prerender.ts` gera `dist/<rota>/index.html` para cada rota pública nos dois idiomas (a lista sai de `public/data`, em `scripts/lib/publicRoutes.ts`, a mesma do sitemap). `src/entry-server.tsx` renderiza a rota até todas as queries do react-query terem dados e serializa o cache na página; no navegador, `src/main.tsx` hidrata esse HTML com os mesmos dados. Uma página que falha no build não é gravada e cai no `app.html` (SPA).
+
+Para o HTML do build bater com o navegador: nada de `<a>` dentro de `<Link>` (use `asChild`), HTML de conteúdo limpo com `sanitizeHtml` (`src/lib/sanitizeHtml.ts`, funciona sem DOM), dados públicos via react-query (não `useQuery` do Convex) e nada que dependa de `window` durante a renderização.
 
 ### Gerador de Currículo com IA (Pipeline 3 Etapas)
 

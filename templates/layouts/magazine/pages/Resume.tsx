@@ -1,4 +1,4 @@
-import DOMPurify from "dompurify";
+import { sanitizeHtml } from "@/lib/sanitizeHtml";
 import { useIsMobile } from "@/hooks/useMobile";
 import { useResume } from "@/hooks/useResume";
 import { useHome } from "@/hooks/useHome";
@@ -83,7 +83,7 @@ export default function Resume() {
                     {g.items.map((it, i) => <p key={i} style={{ fontSize: 13, lineHeight: 1.6, margin: "0 0 8px", opacity: 0.88 }}>{it}</p>)}
                   </div>
                 )) : c.items?.length ? c.items.map((it, i) => <p key={i} style={{ fontSize: 13, lineHeight: 1.6, margin: "0 0 8px", opacity: 0.88 }}>{it}</p>) : c.description ? (
-                  <div style={{ fontSize: 13.5, lineHeight: 1.65, opacity: 0.88, paddingLeft: 18 }} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(c.description) }} />
+                  <div style={{ fontSize: 13.5, lineHeight: 1.65, opacity: 0.88, paddingLeft: 18 }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(c.description) }} />
                 ) : null}
               </div>
             </article>
@@ -117,7 +117,7 @@ export default function Resume() {
                   <h4 style={{ fontFamily: "var(--font-sans)", fontSize: 22, margin: 0, fontWeight: 500 }}>{c.degree} {(c.institution ?? c.school) && <span style={{ fontStyle: "italic", opacity: 0.65 }}>· {c.institution ?? c.school}</span>}</h4>
                   <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, opacity: 0.6 }}>{c.period}</span>
                 </div>
-                {c.items?.length ? c.items.map((it, i) => <p key={i} style={{ fontSize: 12.5, lineHeight: 1.55, margin: "8px 0 0", opacity: 0.82 }}>{it}</p>) : c.description ? <div style={{ fontSize: 12.5, lineHeight: 1.55, marginTop: 8, opacity: 0.82, paddingLeft: 18 }} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(c.description) }} /> : null}
+                {c.items?.length ? c.items.map((it, i) => <p key={i} style={{ fontSize: 12.5, lineHeight: 1.55, margin: "8px 0 0", opacity: 0.82 }}>{it}</p>) : c.description ? <div style={{ fontSize: 12.5, lineHeight: 1.55, marginTop: 8, opacity: 0.82, paddingLeft: 18 }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(c.description) }} /> : null}
               </div>
             );
           })}

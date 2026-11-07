@@ -97,7 +97,7 @@ const narrativeSections = [
 
 export default function ProjectCaseStudy() {
   const { t } = useTranslation();
-  const { isLoading: i18nLoading } = useI18n();
+  const { isLoading: i18nLoading, locale } = useI18n();
   const [, params] = useRoute("/portfolio/:slug");
   const { project, isLoading } = useProjectBySlug(portfolioRepository, params?.slug);
   const { projects } = usePortfolio(portfolioRepository);
@@ -153,6 +153,17 @@ export default function ProjectCaseStudy() {
       <SEO
         title={`${project.title} — ${t("portfolio.caseStudy")}`}
         description={project.description}
+        url={`/portfolio/${project.slug ?? params?.slug ?? ""}`}
+        image={project.images?.[0]}
+        type="article"
+        jsonLd={{
+          "@type": "CreativeWork",
+          name: project.title,
+          description: project.description,
+          image: project.images?.[0],
+          keywords: project.tags?.join(", "),
+          inLanguage: locale,
+        }}
       />
 
       <motion.div

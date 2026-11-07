@@ -130,7 +130,7 @@ beforeEach(() => {
     t: (key: string) => key,
     tValue: (_key: string) => [],
   } as ReturnType<typeof useTranslation>);
-  mockUseI18n.mockReturnValue({ isLoading: false } as ReturnType<typeof useI18n>);
+  mockUseI18n.mockReturnValue({ isLoading: false, locale: "pt-BR" } as ReturnType<typeof useI18n>);
   mockUsePlugin.mockReturnValue(false);
 });
 

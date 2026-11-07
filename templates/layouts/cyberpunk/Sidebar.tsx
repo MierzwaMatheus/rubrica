@@ -168,7 +168,7 @@ const NAV_ITEMS = NAV_ITEMS_KEYS
               const isActive = location === item.href;
               return (
                 <li key={item.href}>
-                  <Link href={item.href}>
+                  <Link href={item.href} asChild>
                     <a
                       className={cn(
                         "flex items-center px-4 py-3 rounded-md text-sm font-medium transition-all duration-300 group relative overflow-hidden",

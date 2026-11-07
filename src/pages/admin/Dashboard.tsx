@@ -321,7 +321,7 @@ function AdminSidebar() {
                         return (
                           <Tooltip key={item.path}>
                             <TooltipTrigger asChild>
-                              <Link href={item.path}>
+                              <Link href={item.path} asChild>
                                 <a
                                   className={cn(
                                     "flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors",

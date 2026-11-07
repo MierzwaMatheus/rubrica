@@ -20,7 +20,7 @@ export function FloatingDock() {
         {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
           const active = location === href;
           return (
-            <Link key={href} href={href}>
+            <Link key={href} href={href} asChild>
               <a
                 className={cn(
                   "flex flex-col items-center gap-1 rounded-[18px] px-2.5 sm:px-3.5 py-2 text-[10.5px] font-semibold tracking-wide transition-colors",

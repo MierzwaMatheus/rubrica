@@ -8,6 +8,7 @@ vi.mock("@/hooks/usePortfolio", () => ({ usePortfolio: vi.fn() }));
 vi.mock("@/hooks/useHome", () => ({ useHome: vi.fn() }));
 vi.mock("@tanstack/react-query", () => ({
   useQuery: () => ({ data: undefined }),
+  useQueryClient: () => ({ fetchQuery: vi.fn() }),
 }));
 vi.mock("@/i18n/hooks/useTranslation", () => ({
   useTranslation: () => ({ t: (k: string) => k }),

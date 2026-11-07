@@ -19,6 +19,10 @@ export interface BlogPost {
   seo_description?: string;
   seo_description_translations?: Record<string, string>;
   og_image?: string;
+  /** Palavras por idioma, calculadas no build (o índice do blog não leva o texto). */
+  word_count?: Record<string, number>;
+  /** Minutos de leitura no idioma da página (preenchido pelos hooks do blog). */
+  reading_minutes?: number;
 }
 
 export interface BlogRepository {

@@ -70,7 +70,7 @@ export default function DesktopBlog() {
                           {post.title}
                         </span>
                         <span className="dk-note-meta dk-muted">
-                          {formatDate(post.published_at || post.created_at, locale)} · {readingMinutes(post.content)} {t("blog.readTime")}
+                          {formatDate(post.published_at || post.created_at, locale)} · {(post.reading_minutes ?? readingMinutes(post.content ?? ""))} {t("blog.readTime")}
                         </span>
                         {post.subtitle && <span className="dk-muted" style={{ fontSize: 12.5 }}>{shorten(post.subtitle, 80)}</span>}
                         {post.tags?.length > 0 && (
@@ -91,7 +91,7 @@ export default function DesktopBlog() {
                 )}
                 <p className="dk-note-meta dk-muted">
                   {open.featured && <>★ {t("blog.featured")} · </>}
-                  {formatDate(open.published_at || open.created_at, locale)} · {readingMinutes(open.content)} {t("blog.readTime")}
+                  {formatDate(open.published_at || open.created_at, locale)} · {(open.reading_minutes ?? readingMinutes(open.content ?? ""))} {t("blog.readTime")}
                 </p>
                 <h2>{open.title}</h2>
                 {open.subtitle && <p className="dk-desc">{open.subtitle}</p>}

@@ -18,7 +18,7 @@ function Meta({ post }: { post: BlogPost }) {
     <p className="zn-clip-meta">
       {date && <time dateTime={post.published_at || post.created_at}>{date}</time>}
       <span>
-        {readingMinutes(post.content)} {t("blog.readTime")}
+        {(post.reading_minutes ?? readingMinutes(post.content ?? ""))} {t("blog.readTime")}
       </span>
     </p>
   );

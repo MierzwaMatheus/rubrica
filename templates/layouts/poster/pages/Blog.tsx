@@ -66,7 +66,7 @@ export default function PosterBlog() {
                       <span className="poster-post-meta">
                         {date && <time dateTime={post.published_at || post.created_at}>{date}</time>}
                         {date && " · "}
-                        {readingMinutes(post.content)} {t("blog.readTime")}
+                        {(post.reading_minutes ?? readingMinutes(post.content ?? ""))} {t("blog.readTime")}
                       </span>
                       {post.tags?.length > 0 && (
                         <span className="poster-post-tags">

@@ -53,7 +53,7 @@ export default function BlueprintBlog() {
               <div className="bp-meta">
                 {isoDate(featured.published_at) && <time dateTime={isoDate(featured.published_at)}>{isoDate(featured.published_at)}</time>}
                 <span>
-                  {readingMinutes(featured.content)} {t("blog.readTime")}
+                  {(featured.reading_minutes ?? readingMinutes(featured.content ?? ""))} {t("blog.readTime")}
                 </span>
               </div>
               {(featured.tags?.length ?? 0) > 0 && (
@@ -104,7 +104,7 @@ export default function BlueprintBlog() {
                       )}
                     </td>
                     <td data-label={L.readingCol} className="bp-num">
-                      {readingMinutes(p.content)} min
+                      {(p.reading_minutes ?? readingMinutes(p.content ?? ""))} min
                     </td>
                   </tr>
                 );

@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useI18n } from "@/i18n/context/I18nContext";
+import { countWords, minutesFromWords } from "@/utils/readingTime";
 import {
   BlogRepository,
   BlogPost,
@@ -23,7 +24,7 @@ export function useBlogPosts(repository: BlogRepository) {
   const posts = useMemo(() => {
     if (!postsRaw) return [];
 
-    return postsRaw.map(post => ({
+    return postsRaw.map(post => withReadingMinutes({
       ...post,
       title:
         (post.title_translations?.[locale] &&
@@ -46,7 +47,7 @@ export function useBlogPosts(repository: BlogRepository) {
           post.content_translations["pt-BR"].trim()) ||
         post.content ||
         "",
-    }));
+    }, locale));
   }, [postsRaw, locale]);
 
   const featuredPosts = useMemo(() => {
@@ -67,6 +68,15 @@ function pickLocalized(
   fallback: string | undefined,
 ): string {
   return translations?.[locale]?.trim() || translations?.["pt-BR"]?.trim() || fallback?.trim() || "";
+}
+
+/**
+ * Minutos de leitura do post no idioma da página: da contagem de palavras do build quando
+ * existe (o índice do blog não leva o texto), senão do próprio texto (Convex, em desenvolvimento).
+ */
+function withReadingMinutes<T extends BlogPost>(post: T, locale: string): T {
+  const words = post.word_count?.[locale] ?? post.word_count?.["pt-BR"] ?? countWords(post.content);
+  return { ...post, reading_minutes: minutesFromWords(words) };
 }
 
 export function useBlogPost(repository: BlogRepository, slug: string) {

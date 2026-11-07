@@ -35,7 +35,7 @@ export default function IndexBlog() {
       header: copy.colReading,
       width: "96px",
       muted: true,
-      cell: (p) => <span className="ix-num">{copy.minutes(readingMinutes(p.content))}</span>,
+      cell: (p) => <span className="ix-num">{copy.minutes((p.reading_minutes ?? readingMinutes(p.content ?? "")))}</span>,
     },
   ];
 
@@ -68,7 +68,7 @@ export default function IndexBlog() {
           <article className="ix-feat">
             <div>
               <p className="ix-feat-meta">
-                {[formatDate(featured.published_at || featured.created_at, locale, "long"), `${readingMinutes(featured.content)} ${t("blog.readTime")}`].filter(Boolean).join(" · ")}
+                {[formatDate(featured.published_at || featured.created_at, locale, "long"), `${(featured.reading_minutes ?? readingMinutes(featured.content ?? ""))} ${t("blog.readTime")}`].filter(Boolean).join(" · ")}
               </p>
               <h3>
                 <Link href={`/blog/${featured.slug}`} data-umami-event="blog-featured">

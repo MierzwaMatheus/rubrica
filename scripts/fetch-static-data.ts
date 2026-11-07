@@ -10,6 +10,7 @@ config({ path: '.env.local' });
 
 import { ConvexHttpClient } from 'convex/browser';
 import { api } from '../convex/_generated/api';
+import { countWords } from '../src/utils/readingTime';
 import { writeFileSync, mkdirSync } from 'fs';
 import { join } from 'path';
 
@@ -79,7 +80,16 @@ async function main() {
   // Blog listing
   const published = await client.query(api.posts.listAllPublished, {});
 
-  const blogIndex = published.map(({ content: _content, ...rest }) => rest);
+  // O índice não leva o texto dos posts (cada post tem o seu arquivo em posts/): a lista só
+  // precisa da contagem de palavras para o tempo de leitura. Sem isso, a página /blog levava
+  // o conteúdo de todos os posts, nos dois idiomas, dentro do HTML.
+  const blogIndex = published.map(({ content, contentTranslations, ...rest }) => ({
+    ...rest,
+    wordCount: {
+      ptBR: countWords(contentTranslations?.ptBR ?? content),
+      enUS: countWords(contentTranslations?.enUS ?? contentTranslations?.ptBR ?? content),
+    },
+  }));
   write('blog.json', blogIndex);
 
   // Individual post files

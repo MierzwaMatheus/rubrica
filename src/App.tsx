@@ -32,6 +32,7 @@ import { PluginsProvider } from "./contexts/PluginsContext";
 import { PluginRoute } from "./components/PluginRoute";
 import { PageSEO } from "./components/PageSEO";
 import { lazyRoute } from "./lib/lazyRoute";
+import { FirstPaintMotion } from "./lib/firstPaintMotion";
 import { stripLocale } from "./i18n/localePath";
 import { ChangePasswordModal } from "./components/ChangePasswordModal";
 
@@ -475,6 +476,7 @@ function App({ ssrPath, queryClient, helmetContext, appearance }: AppProps = {})
   return (
     <HelmetProvider context={helmetContext}>
       <LazyMotion features={loadMotionFeatures}>
+      <FirstPaintMotion>
       <WouterRouter ssrPath={ssrPath}>
       <ErrorBoundary>
         <ConvexClientProvider>
@@ -502,6 +504,7 @@ function App({ ssrPath, queryClient, helmetContext, appearance }: AppProps = {})
         </ConvexClientProvider>
       </ErrorBoundary>
       </WouterRouter>
+      </FirstPaintMotion>
       </LazyMotion>
     </HelmetProvider>
   );

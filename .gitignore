@@ -118,6 +118,7 @@ reports/
 # Build generated files
 public/data/
 public/media/
+public/fonts/
 public/sitemap.xml
 public/robots.txt
 src/data/

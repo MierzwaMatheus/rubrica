@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 import { umamiScriptTag } from "./src/lib/umamiScript";
+import { selfHostedFonts } from "./scripts/lib/fonts";
 
 /** Injeta o script do Umami só quando ele está configurado (ver src/lib/umamiScript.ts). */
 function umami(env: Record<string, string>): Plugin {
@@ -16,7 +17,7 @@ function umami(env: Record<string, string>): Plugin {
 }
 
 export default defineConfig(({ mode }) => ({
-  plugins: [react(), tailwindcss(), umami(loadEnv(mode, process.cwd(), "VITE_"))],
+  plugins: [react(), tailwindcss(), umami(loadEnv(mode, process.cwd(), "VITE_")), selfHostedFonts(import.meta.dirname)],
 
   resolve: {
     alias: {

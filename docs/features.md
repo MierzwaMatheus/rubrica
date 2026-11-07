@@ -695,6 +695,8 @@ Campos opcionais e aditivos (projetos antigos continuam válidos):
 
 Depois do `vite build`, `scripts/prerender.ts` gera `dist/<rota>/index.html` para cada rota pública nos dois idiomas (a lista sai de `public/data`, em `scripts/lib/publicRoutes.ts`, a mesma do sitemap). `src/entry-server.tsx` renderiza a rota até todas as queries do react-query terem dados e serializa o cache na página; no navegador, `src/main.tsx` hidrata esse HTML com os mesmos dados. Uma página que falha no build não é gravada e cai no `app.html` (SPA).
 
+O que vai serializado na página é o que ela renderiza: dados usados só num clique ficam de fora. O botão "Baixar CV" busca currículo, projetos e o "sobre" na hora (`useDownloadCV`), e o índice do blog (`blog.json`) não leva o texto dos posts, só a contagem de palavras para o tempo de leitura (`reading_minutes`, calculado em `useBlogPosts`); cada post tem o seu arquivo em `data/posts/`.
+
 Para o HTML do build bater com o navegador: nada de `<a>` dentro de `<Link>` (use `asChild`), HTML de conteúdo limpo com `sanitizeHtml` (`src/lib/sanitizeHtml.ts`, funciona sem DOM), dados públicos via react-query (não `useQuery` do Convex) e nada que dependa de `window` durante a renderização.
 
 ### Gerador de Currículo com IA (Pipeline 3 Etapas)

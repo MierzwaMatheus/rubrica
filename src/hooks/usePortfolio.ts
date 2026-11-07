@@ -56,7 +56,8 @@ export function useProjectBySlug(repository: PortfolioRepository, slug: string |
   return { project, isLoading, error };
 }
 
-function applyLocale(project: Project, locale: string): Project {
+/** Projeto no idioma pedido (usado pelo hook e pela geração do PDF do currículo). */
+export function applyLocale(project: Project, locale: string): Project {
   const caseStudyT = project.case_study_translations?.[locale]
     ?? project.case_study_translations?.["pt-BR"];
 

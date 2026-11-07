@@ -109,6 +109,9 @@ export function mapBlogPost(c: any): BlogPost {
       c.seoDescriptionTranslations ?? c.seo_description_translations
     ),
     og_image: c.ogImageUrl ?? c.og_image ?? "",
+    word_count: c.wordCount
+      ? { "pt-BR": c.wordCount.ptBR, "en-US": c.wordCount.enUS ?? c.wordCount.ptBR }
+      : c.word_count,
   } as BlogPost;
 }
 

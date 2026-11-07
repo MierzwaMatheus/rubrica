@@ -74,7 +74,7 @@ export default function GardenBlog() {
                         <StageLabel stage={stage} />
                         {date && <time dateTime={post.published_at}>{date}</time>}
                         <span>
-                          {readingMinutes(post.content)} {t("blog.readTime")}
+                          {(post.reading_minutes ?? readingMinutes(post.content ?? ""))} {t("blog.readTime")}
                         </span>
                       </div>
                       <h3 className="gd-note-t">

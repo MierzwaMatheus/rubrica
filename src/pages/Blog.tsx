@@ -200,9 +200,7 @@ export default function Blog() {
                         </span>
                         <span className="flex items-center">
                           <Clock className="w-4 h-4 mr-1" />
-                          {Math.ceil(
-                            featuredPosts[0].content.split(" ").length / 200
-                          )}{" "}
+                          {featuredPosts[0].reading_minutes}{" "}
                           {t("blog.readTime")}
                         </span>
                       </div>
@@ -269,9 +267,7 @@ export default function Blog() {
                                 </span>
                                 <span className="flex items-center">
                                   <Clock className="w-4 h-4 mr-1" />
-                                  {Math.ceil(
-                                    post.content.split(" ").length / 200
-                                  )}{" "}
+                                  {post.reading_minutes}{" "}
                                   {t("blog.readTime")}
                                 </span>
                               </div>
@@ -406,7 +402,7 @@ export default function Blog() {
                         </span>
                         <span className="w-1 h-1 rounded-full bg-gray-600"></span>
                         <span>
-                          {Math.ceil(post.content.split(" ").length / 200)}{" "}
+                          {post.reading_minutes}{" "}
                           {t("blog.readTime")}
                         </span>
                       </div>

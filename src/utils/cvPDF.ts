@@ -192,7 +192,12 @@ export function generateCV(
   projects: Project[],
   locale: Locale,
   summary: string,
-  topProjectsCount = 3
+  topProjectsCount = 3,
+  /**
+   * Aba já aberta no clique (para os dados chegarem depois sem o navegador bloquear o
+   * pop-up). Sem ela, abre uma aba nova aqui.
+   */
+  target?: Window | null
 ): void {
   const L = LABELS[locale];
   const lang = locale === "pt-BR" ? "pt-BR" : "en-US";
@@ -354,6 +359,15 @@ export function generateCV(
 
 </body>
 </html>`;
+
+  if (target && !target.closed) {
+    target.document.open();
+    target.document.write(html);
+    target.document.close();
+    target.focus();
+    setTimeout(() => target.print(), 400);
+    return;
+  }
 
   const blob = new Blob([html], { type: "text/html;charset=utf-8" });
   const url = URL.createObjectURL(blob);

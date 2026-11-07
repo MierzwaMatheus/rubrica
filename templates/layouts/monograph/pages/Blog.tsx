@@ -40,7 +40,7 @@ export default function MonographBlog() {
       .join(" · ");
 
   const entry = (p: BlogPost, n: number, big = false) => {
-    const minutes = readingMinutes(p.content ?? "");
+    const minutes = (p.reading_minutes ?? readingMinutes(p.content ?? ""));
     return (
       <>
         <h3>

@@ -67,8 +67,8 @@ function BrutPrompt({
   );
 }
 
-function readingTime(content: string): string {
-  return Math.ceil(content.split(" ").length / 200) + " min";
+function readingTime(post: { reading_minutes?: number; content?: string }): string {
+  return (post.reading_minutes ?? Math.ceil((post.content ?? "").split(" ").length / 200)) + " min";
 }
 
 export default function Blog() {
@@ -144,7 +144,7 @@ export default function Blog() {
                       <span style={{ color: "var(--accent)" }}>#</span>{" "}
                       {featured.published_at.slice(0, 10)} ·{" "}
                       <span style={{ color: "var(--accent)" }}>⏱</span>{" "}
-                      {readingTime(featured.content)}
+                      {readingTime(featured)}
                     </div>
                     <h2
                       style={{
@@ -335,7 +335,7 @@ export default function Blog() {
                   color: "var(--accent)",
                 }}
               >
-                {readingTime(p.content)}
+                {readingTime(p)}
               </td>
             </tr>
           ))}

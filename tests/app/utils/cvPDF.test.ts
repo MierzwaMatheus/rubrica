@@ -224,3 +224,20 @@ describe("cvPDF · generateCV (HTML output)", () => {
     expect(lastBlobContents).toContain("Jane Doe");
   });
 });
+
+describe("cvPDF · aba aberta no clique", () => {
+  it("escreve o currículo na aba recebida em vez de abrir outra", () => {
+    const write = vi.fn();
+    const target = {
+      closed: false,
+      document: { open: vi.fn(), write, close: vi.fn() },
+      focus: vi.fn(),
+      print: vi.fn(),
+    } as unknown as Window;
+    const openSpy = vi.spyOn(window, "open");
+    generateCV(baseContact, [], [], "pt-BR", "", 3, target);
+    expect(openSpy).not.toHaveBeenCalled();
+    expect(write.mock.calls[0][0]).toContain("<html");
+    openSpy.mockRestore();
+  });
+});

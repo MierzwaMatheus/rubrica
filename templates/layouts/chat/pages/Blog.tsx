@@ -47,7 +47,7 @@ export default function ChatBlog() {
               {ordered.map((post, i) => {
                 const meta = [
                   formatChatDate(post.published_at || post.created_at, locale),
-                  `${readingMinutes(post.content ?? "")} ${t("blog.readTime")}`,
+                  `${(post.reading_minutes ?? readingMinutes(post.content ?? ""))} ${t("blog.readTime")}`,
                 ]
                   .filter(Boolean)
                   .join(" · ");

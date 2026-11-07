@@ -2,6 +2,7 @@ import { Helmet } from "react-helmet-async";
 import { useSiteConfig } from "@/hooks/useSiteConfig";
 import { useI18n } from "@/i18n/context/I18nContext";
 import { localizedPath } from "@/i18n/localePath";
+import { absoluteUrl, shareVariant } from "@/lib/mediaPath";
 
 /**
  * O Helmet só repassa o atributo com o nome do HTML (`hreflang`); o `hrefLang` do React
@@ -38,11 +39,8 @@ export function SEO({
 
   const fullTitle = !title || title === siteTitle ? siteTitle : `${title} | ${siteTitle}`;
   const metaDescription = description || defaultDescription;
-  const metaImage = image
-    ? image.startsWith("http")
-      ? image
-      : `${siteUrl}${image}`
-    : defaultImage;
+  // Prévia de link: endereço completo e, para imagens baixadas no build, a variante JPG.
+  const metaImage = absoluteUrl(shareVariant(image || defaultImage || ""), siteUrl);
   const { locale } = useI18n();
   const base = siteUrl.replace(/\/+$/, "");
   // `url` é o caminho em pt-BR; cada idioma tem a sua URL (/blog/x e /en/blog/x).
@@ -91,7 +89,11 @@ export function SEO({
       <meta property="twitter:creator" content={config.twitter_handle ? `@${config.twitter_handle}` : ""} />
       {jsonLd && (
         <script type="application/ld+json">
-          {JSON.stringify({ "@context": "https://schema.org", ...jsonLd }).replace(/</g, "\\u003c")}
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            ...jsonLd,
+            ...(typeof jsonLd.image === "string" ? { image: absoluteUrl(jsonLd.image, siteUrl) } : {}),
+          }).replace(/</g, "\\u003c")}
         </script>
       )}
     </Helmet>

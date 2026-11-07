@@ -20,6 +20,9 @@ import { toast } from "sonner";
 import { useTranslateContent } from "@/i18n/hooks/useTranslateContent";
 import { getChangedTranslatableFields } from "@/i18n/utils/hasTranslatableChanges";
 import { useIsRoot } from "@/hooks/useIsRoot";
+import { useSiteConfig } from "@/hooks/useSiteConfig";
+import { BlogSeoFields } from "@/components/admin/BlogSeoFields";
+import { slugify, isValidSlug } from "@/lib/slug";
 
 type Post = {
   _id: Id<"posts">;
@@ -39,6 +42,12 @@ type Post = {
   readTime?: string;
   publishedAt?: number;
   createdAt: number;
+  seoTitle?: string;
+  seoTitleTranslations?: { ptBR: string; enUS?: string };
+  seoDescription?: string;
+  seoDescriptionTranslations?: { ptBR: string; enUS?: string };
+  ogImageId?: Id<"imageMetadata">;
+  ogImageUrl?: string;
 };
 
 export default function AdminBlog() {
@@ -61,9 +70,22 @@ export default function AdminBlog() {
   const [previewImageId, setPreviewImageId] = useState<Id<"imageMetadata"> | undefined>(undefined);
   const [isPublished, setIsPublished] = useState(false);
   const [isFeatured, setIsFeatured] = useState(false);
+  // Campos acompanhados em tempo real (slug sugerido, prévia do Google).
+  const [titleDraft, setTitleDraft] = useState("");
+  const [subtitleDraft, setSubtitleDraft] = useState("");
+  const [slug, setSlug] = useState("");
+  const [slugTouched, setSlugTouched] = useState(false);
+  const [seoTitle, setSeoTitle] = useState("");
+  const [seoDescription, setSeoDescription] = useState("");
+  const [ogImageId, setOgImageId] = useState<Id<"imageMetadata"> | undefined>(undefined);
+  const [ogImageUrl, setOgImageUrl] = useState("");
+  const [ogImageCleared, setOgImageCleared] = useState(false);
+  const siteConfig = useSiteConfig();
 
   const pickedImageQuery = useQuery(api.images.getById, previewImageId ? { id: previewImageId } : "skip");
   const coverImageUrl = pickedImageQuery?.url ?? previewImage ?? null;
+  const pickedOgImageQuery = useQuery(api.images.getById, ogImageId ? { id: ogImageId } : "skip");
+  const ogImagePreview = pickedOgImageQuery?.url ?? (ogImageUrl || null);
 
   const { translateFields, isTranslating } = useTranslateContent();
   const posts = postsData ?? [];
@@ -71,6 +93,15 @@ export default function AdminBlog() {
 
   const handleOpenDialog = (post: Post | null = null) => {
     setEditingPost(post);
+    setTitleDraft(post ? getPostField(post, "title") : "");
+    setSubtitleDraft(post ? getPostField(post, "subtitle") : "");
+    setSlug(post?.slug ?? "");
+    setSlugTouched(false);
+    setSeoTitle(post?.seoTitleTranslations?.ptBR ?? post?.seoTitle ?? "");
+    setSeoDescription(post?.seoDescriptionTranslations?.ptBR ?? post?.seoDescription ?? "");
+    setOgImageId(post?.ogImageId);
+    setOgImageUrl(post?.ogImageUrl ?? "");
+    setOgImageCleared(false);
     if (post) {
       setPreviewImage(post.image?.url || post.imageUrl || "");
       setPreviewImageId(post.imageId);
@@ -94,17 +125,23 @@ export default function AdminBlog() {
     return ((post as any)[field] as string) || '';
   };
 
-  const slugify = (text: string) => {
-    return text
-      .toString()
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[̀-ͯ]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/[^\w\-]+/g, '')
-      .replace(/\-\-+/g, '-')
-      .replace(/^-+/, '')
-      .replace(/-+$/, '');
+  const handleTitleChange = (value: string) => {
+    setTitleDraft(value);
+    // Post novo: o slug acompanha o título até ser editado à mão. Post existente: nunca muda sozinho.
+    if (!editingPost && !slugTouched) setSlug(slugify(value));
+  };
+
+  const handleOgImagePicked = (id: string | string[]) => {
+    const picked = Array.isArray(id) ? id[0] : id;
+    setOgImageId(picked as Id<"imageMetadata">);
+    setOgImageUrl("");
+    setOgImageCleared(false);
+  };
+
+  const handleOgImageClear = () => {
+    setOgImageId(undefined);
+    setOgImageUrl("");
+    setOgImageCleared(true);
   };
 
   const handleImagePicked = (id: string | string[]) => {
@@ -124,18 +161,30 @@ export default function AdminBlog() {
     const contentPT = content || '';
 
     const tags = tagsStr.split(",").map(t => t.trim()).filter(t => t);
-    const slug = slugify(titlePT);
+    const finalSlug = slug.trim();
+    // Posts antigos podem ter slug fora do padrão: só valida slug novo ou alterado.
+    const slugChanged = !editingPost || finalSlug !== editingPost.slug;
+    if (slugChanged && !isValidSlug(finalSlug)) {
+      toast.error("Endereço (slug) inválido: use letras minúsculas, números e hífen.");
+      return;
+    }
+    const seoTitlePT = seoTitle.trim();
+    const seoDescriptionPT = seoDescription.trim();
 
     try {
       const allBlogFields: Record<string, string> = { title: titlePT };
       if (subtitlePT) allBlogFields.subtitle = subtitlePT;
       if (contentPT) allBlogFields.content = contentPT;
+      if (seoTitlePT) allBlogFields.seoTitle = seoTitlePT;
+      if (seoDescriptionPT) allBlogFields.seoDescription = seoDescriptionPT;
 
       const changedBlog = editingPost
         ? getChangedTranslatableFields(allBlogFields, {
             title: editingPost.titleTranslations,
             subtitle: editingPost.subtitleTranslations,
             content: editingPost.contentTranslations,
+            seoTitle: editingPost.seoTitleTranslations,
+            seoDescription: editingPost.seoDescriptionTranslations,
           })
         : allBlogFields;
 
@@ -150,6 +199,8 @@ export default function AdminBlog() {
         title: partialBlog.title ?? editingPost?.titleTranslations?.enUS ?? titlePT,
         subtitle: partialBlog.subtitle ?? editingPost?.subtitleTranslations?.enUS ?? subtitlePT,
         content: partialBlog.content ?? editingPost?.contentTranslations?.enUS ?? contentPT,
+        seoTitle: partialBlog.seoTitle ?? editingPost?.seoTitleTranslations?.enUS ?? seoTitlePT,
+        seoDescription: partialBlog.seoDescription ?? editingPost?.seoDescriptionTranslations?.enUS ?? seoDescriptionPT,
       };
 
       const baseData = {
@@ -157,7 +208,7 @@ export default function AdminBlog() {
         titleTranslations: { ptBR: titlePT, enUS: translated.title },
         subtitle: subtitlePT || undefined,
         subtitleTranslations: subtitlePT ? { ptBR: subtitlePT, enUS: translated.subtitle ?? subtitlePT } : undefined,
-        slug,
+        slug: finalSlug,
         content: contentPT,
         contentTranslations: contentPT ? { ptBR: contentPT, enUS: translated.content ?? contentPT } : undefined,
         imageId: previewImageId,
@@ -165,12 +216,20 @@ export default function AdminBlog() {
         tags,
         featured: isFeatured,
         readTime: undefined as string | undefined,
+        // Vazio limpa o campo (o cliente do Convex não envia `undefined`).
+        seoTitle: seoTitlePT,
+        seoTitleTranslations: { ptBR: seoTitlePT, enUS: seoTitlePT ? translated.seoTitle : "" },
+        seoDescription: seoDescriptionPT,
+        seoDescriptionTranslations: { ptBR: seoDescriptionPT, enUS: seoDescriptionPT ? translated.seoDescription : "" },
+        ogImageId,
+        ogImageUrl: !ogImageId && ogImageUrl ? ogImageUrl : undefined,
       };
 
       if (editingPost) {
         await updatePost({
           id: editingPost._id,
           ...baseData,
+          clearOgImage: ogImageCleared || undefined,
         });
         // Sync publish state if it changed
         if (status === "published" && editingPost.status !== "published") {
@@ -298,11 +357,11 @@ export default function AdminBlog() {
                     <div className="space-y-4">
                       <div className="space-y-2">
                         <Label htmlFor="title" className="text-foreground-strong">Título</Label>
-                        <Input name="title" id="title" defaultValue={editingPost ? getPostField(editingPost, 'title') : ''} className="bg-foreground/5 border-foreground/10 text-foreground-strong" style={{ wordBreak: 'break-all', overflowWrap: 'break-word' }} required />
+                        <Input name="title" id="title" defaultValue={editingPost ? getPostField(editingPost, 'title') : ''} onChange={(e) => handleTitleChange(e.target.value)} className="bg-foreground/5 border-foreground/10 text-foreground-strong" style={{ wordBreak: 'break-all', overflowWrap: 'break-word' }} required />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="subtitle" className="text-foreground-strong">Subtítulo</Label>
-                        <Input name="subtitle" id="subtitle" defaultValue={editingPost ? getPostField(editingPost, 'subtitle') : ''} className="bg-foreground/5 border-foreground/10 text-foreground-strong" style={{ wordBreak: 'break-all', overflowWrap: 'break-word' }} />
+                        <Input name="subtitle" id="subtitle" defaultValue={editingPost ? getPostField(editingPost, 'subtitle') : ''} onChange={(e) => setSubtitleDraft(e.target.value)} className="bg-foreground/5 border-foreground/10 text-foreground-strong" style={{ wordBreak: 'break-all', overflowWrap: 'break-word' }} />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="tags" className="text-foreground-strong">Tags (separadas por vírgula)</Label>
@@ -354,6 +413,27 @@ export default function AdminBlog() {
                     <Label className="text-foreground-strong">Conteúdo</Label>
                     <RichTextEditor content={content} onChange={setContent} />
                   </div>
+
+                  <BlogSeoFields
+                    slug={slug}
+                    onSlugChange={(value) => {
+                      setSlugTouched(true);
+                      setSlug(value);
+                    }}
+                    slugChangedOnPublished={!!editingPost && editingPost.status === "published" && slug !== editingPost.slug}
+                    seoTitle={seoTitle}
+                    onSeoTitleChange={setSeoTitle}
+                    seoDescription={seoDescription}
+                    onSeoDescriptionChange={setSeoDescription}
+                    ogImagePreview={ogImagePreview}
+                    onOgImagePick={handleOgImagePicked}
+                    onOgImageClear={handleOgImageClear}
+                    fallbackTitle={titleDraft}
+                    fallbackDescription={subtitleDraft}
+                    fallbackImage={coverImageUrl}
+                    siteUrl={siteConfig.site_url}
+                    siteTitle={siteConfig.site_title}
+                  />
                 </div>
               </div>
 

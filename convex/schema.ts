@@ -193,6 +193,13 @@ export default defineSchema({
     contentTranslations: i18nString,
     imageId: v.optional(v.id('imageMetadata')),
     imageUrl: v.optional(v.string()),
+    // SEO (opcionais): sem eles, a página usa título, subtítulo e capa do post.
+    seoTitle: v.optional(v.string()),
+    seoTitleTranslations: i18nString,
+    seoDescription: v.optional(v.string()),
+    seoDescriptionTranslations: i18nString,
+    ogImageId: v.optional(v.id('imageMetadata')),
+    ogImageUrl: v.optional(v.string()),
     tags: v.array(v.string()),
     featured: v.boolean(),
     status: v.union(v.literal('draft'), v.literal('published')),

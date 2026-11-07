@@ -141,6 +141,25 @@ class AplicarPlanoTeste(unittest.TestCase):
         self.rodar(self.plano(passos))
         self.assertEqual(self.cx.mutations[-1][1]["tags"], ["React", "Convex"])
 
+    def test_post_leva_campos_de_seo(self):
+        passos = [{"acao": "post-criar", "titulo": "T", "enTitulo": "T", "slug": "t",
+                   "arquivo": "corpo.html", "enArquivo": "corpo-en.html",
+                   "seoDescricao": "Descrição", "enSeoDescricao": "Description",
+                   "seoTitulo": "Título Google", "enSeoTitulo": "Google title"}]
+        self.rodar(self.plano(passos))
+        post = self.cx.mutations[-1][1]
+        self.assertEqual(post["seoDescription"], "Descrição")
+        self.assertEqual(post["seoDescriptionTranslations"], {"ptBR": "Descrição", "enUS": "Description"})
+        self.assertEqual(post["seoTitleTranslations"], {"ptBR": "Título Google", "enUS": "Google title"})
+
+    def test_seo_sem_ingles_e_recusado(self):
+        passos = [{"acao": "post-criar", "titulo": "T", "enTitulo": "T", "slug": "t",
+                   "arquivo": "corpo.html", "enArquivo": "corpo-en.html", "seoDescricao": "Só pt"}]
+        with self.assertRaises(rubrica.Falha) as e:
+            self.rodar(self.plano(passos))
+        self.assertIn("enSeoDescricao", str(e.exception))
+        self.assertEqual(self.cx.mutations, [])
+
     def test_falha_no_meio_salva_progresso_e_retomar_continua(self):
         caminho = self.plano(self.PASSOS)
         self.cx.falhar_em = "posts:create"

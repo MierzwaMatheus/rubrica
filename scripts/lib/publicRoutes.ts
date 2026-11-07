@@ -5,6 +5,7 @@
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 import { PLUGIN_REGISTRY, type PluginId } from "../../convex/pluginRegistry";
+import { isValidSlug } from "../../convex/lib/slug";
 
 export interface PublicRoute {
   /** Caminho em pt-BR (sem prefixo de idioma). */
@@ -14,9 +15,6 @@ export interface PublicRoute {
   /** Data da última mudança (AAAA-MM-DD), quando o conteúdo informa. */
   lastmod?: string;
 }
-
-/** Slug que vira pasta no build e URL sem escape. */
-const SAFE_SLUG = /^[a-z0-9][a-z0-9-]*$/i;
 
 function readJson<T>(dataDir: string, file: string, fallback: T): T {
   const path = join(dataDir, file);
@@ -52,7 +50,7 @@ export function listPublicRoutes(dataDir: string): PublicRoute[] {
     const projects = readJson<Array<{ slug?: string; updatedAt?: number }>>(dataDir, "portfolio.json", []);
     for (const project of projects) {
       if (!project.slug) continue;
-      if (!SAFE_SLUG.test(project.slug)) {
+      if (!isValidSlug(project.slug)) {
         console.warn(`[rotas] case ignorado, slug inválido: ${project.slug}`);
         continue;
       }
@@ -74,7 +72,7 @@ export function listPublicRoutes(dataDir: string): PublicRoute[] {
     );
     for (const post of posts) {
       if (post.status && post.status !== "published") continue;
-      if (!SAFE_SLUG.test(post.slug)) {
+      if (!isValidSlug(post.slug)) {
         console.warn(`[rotas] post ignorado, slug inválido: ${post.slug}`);
         continue;
       }

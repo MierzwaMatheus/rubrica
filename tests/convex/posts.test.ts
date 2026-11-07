@@ -425,3 +425,109 @@ describe("convex/posts · seed", () => {
     expect(ctx.db._all("posts").length).toBe(2);
   });
 });
+
+describe("convex/posts · slug", () => {
+  let ctx: MockCtx;
+  beforeEach(() => {
+    ctx = createMockCtx();
+    getAuthUserId.mockReset();
+  });
+
+  it("create rejeita slug com caracteres inválidos", async () => {
+    asEditor(ctx);
+    await expect(handler(create)(ctx, { ...baseArgs, slug: "Olá Mundo" })).rejects.toThrow("Invalid slug");
+    await expect(handler(create)(ctx, { ...baseArgs, slug: "../fora" })).rejects.toThrow("Invalid slug");
+    await expect(handler(create)(ctx, { ...baseArgs, slug: "" })).rejects.toThrow("Invalid slug");
+  });
+
+  it("update rejeita slug já usado por outro post", async () => {
+    asEditor(ctx);
+    await handler(create)(ctx, baseArgs);
+    const other = await handler(create)(ctx, { ...baseArgs, slug: "outro" });
+    await expect(handler(update)(ctx, { id: other, slug: "hello" })).rejects.toThrow("Slug already in use");
+  });
+
+  it("update aceita manter o próprio slug", async () => {
+    asEditor(ctx);
+    const id = await handler(create)(ctx, baseArgs);
+    await handler(update)(ctx, { id, slug: "hello", title: "Novo título" });
+    const post = await ctx.db.get(id);
+    expect(post!.slug).toBe("hello");
+    expect(post!.title).toBe("Novo título");
+  });
+
+  it("update rejeita slug com caracteres inválidos", async () => {
+    asEditor(ctx);
+    const id = await handler(create)(ctx, baseArgs);
+    await expect(handler(update)(ctx, { id, slug: "com espaço" })).rejects.toThrow("Invalid slug");
+  });
+});
+
+describe("convex/posts · campos de SEO", () => {
+  let ctx: MockCtx;
+  beforeEach(() => {
+    ctx = createMockCtx();
+    getAuthUserId.mockReset();
+  });
+
+  const seoArgs = {
+    seoTitle: "Título para o Google",
+    seoTitleTranslations: { ptBR: "Título para o Google", enUS: "Google title" },
+    seoDescription: "Descrição curta para a busca",
+    seoDescriptionTranslations: { ptBR: "Descrição curta para a busca", enUS: "Short search description" },
+    ogImageUrl: "https://i.com/og.png",
+  };
+
+  it("create grava os campos de SEO", async () => {
+    asEditor(ctx);
+    const id = await handler(create)(ctx, { ...baseArgs, ...seoArgs });
+    const post = await ctx.db.get(id);
+    expect(post).toMatchObject(seoArgs);
+  });
+
+  it("update altera e limpa os campos de SEO", async () => {
+    asEditor(ctx);
+    const id = await handler(create)(ctx, { ...baseArgs, ...seoArgs });
+    await handler(update)(ctx, { id, seoTitle: "Outro", seoDescription: undefined, seoDescriptionTranslations: undefined });
+    const post = await ctx.db.get(id);
+    expect(post!.seoTitle).toBe("Outro");
+    expect(post!.seoDescription).toBeUndefined();
+  });
+
+  it("getBySlug e listAllPublished resolvem a imagem de compartilhamento da biblioteca", async () => {
+    asEditor(ctx);
+    ctx.db._seed("imageMetadata", [{ _id: "img-og", storageId: "st-og" }]);
+    await handler(create)(ctx, { ...baseArgs, status: "published", ogImageId: "img-og" });
+    const bySlug = await handler(getBySlug)(ctx, { slug: "hello" });
+    expect(bySlug.ogImageUrl).toBe("https://example.com/st-og");
+    const [listed] = await handler(listAllPublished)(ctx, {});
+    expect(listed.ogImageUrl).toBe("https://example.com/st-og");
+  });
+
+  it("sem imagem da biblioteca, mantém a URL informada", async () => {
+    asEditor(ctx);
+    await handler(create)(ctx, { ...baseArgs, ogImageUrl: "https://i.com/og.png" });
+    const post = await handler(getBySlug)(ctx, { slug: "hello" });
+    expect(post.ogImageUrl).toBe("https://i.com/og.png");
+  });
+});
+
+describe("convex/posts · remover imagem de compartilhamento", () => {
+  let ctx: MockCtx;
+  beforeEach(() => {
+    ctx = createMockCtx();
+    getAuthUserId.mockReset();
+  });
+
+  it("clearOgImage apaga ogImageId e ogImageUrl sem mexer na capa", async () => {
+    asEditor(ctx);
+    ctx.db._seed("imageMetadata", [{ _id: "img-og", storageId: "st-og" }]);
+    const id = await handler(create)(ctx, { ...baseArgs, imageUrl: "https://i.com/capa.png", ogImageId: "img-og", ogImageUrl: "https://i.com/og.png" });
+    await handler(update)(ctx, { id, clearOgImage: true });
+    const post = await ctx.db.get(id);
+    expect(post!.ogImageId).toBeUndefined();
+    expect(post!.ogImageUrl).toBeUndefined();
+    expect(post!.imageUrl).toBe("https://i.com/capa.png");
+    expect(post).not.toHaveProperty("clearOgImage");
+  });
+});

@@ -61,6 +61,14 @@ export function useBlogPosts(repository: BlogRepository) {
   };
 }
 
+function pickLocalized(
+  translations: Record<string, string> | undefined,
+  locale: string,
+  fallback: string | undefined,
+): string {
+  return translations?.[locale]?.trim() || translations?.["pt-BR"]?.trim() || fallback?.trim() || "";
+}
+
 export function useBlogPost(repository: BlogRepository, slug: string) {
   const { locale } = useI18n();
 
@@ -102,6 +110,9 @@ export function useBlogPost(repository: BlogRepository, slug: string) {
           postRaw.content_translations["pt-BR"].trim()) ||
         postRaw.content ||
         "",
+      // SEO: no idioma da página; sem tradução, o texto em pt-BR; vazio, a página usa os padrões.
+      seo_title: pickLocalized(postRaw.seo_title_translations, locale, postRaw.seo_title),
+      seo_description: pickLocalized(postRaw.seo_description_translations, locale, postRaw.seo_description),
     };
   }, [postRaw, locale]);
 

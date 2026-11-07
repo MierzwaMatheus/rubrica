@@ -2,6 +2,19 @@
 
 What changed in each version of Rubrica (template and `create-rubrica` CLI). Details for each one are in the [release notes](https://github.com/MierzwaMatheus/rubrica/releases). To update an existing project, see [Atualizando o seu Rubrica](./docs/atualizacao.md) (in Portuguese).
 
+## 1.12.0 — 2026-11-07
+
+The project list gets much lighter: pages that show projects no longer carry every case study's full text.
+
+**Coming from 1.11:**
+- Update with `npx create-rubrica@latest update`. No new CLI version needed, nothing to push to Convex.
+- Publish again (`npx create-rubrica publicar` or the panel's Publicar button) so the build generates the new project files.
+
+### Site
+- **Slim project list:** the home, portfolio, case study pages and posts carried in their HTML the full text of every case study, each project's long description and the data of each library image. Now the list only carries what it shows (case study metrics and image addresses), and each full project lives in its own file, read by the case study page. On a real site, the list went from 153 KB to 33 KB, the home from 241 KB to 138 KB, and a case study page from 233 KB to 123 KB.
+- **Portfolio modal:** the long description is fetched when the modal opens. Until it arrives, the short description shows.
+- **Cyberpunk layout:** the sidebar's "Download CV" button also fetches the resume only on click.
+
 ## 1.11.0 — 2026-11-07
 
 Content images come out of the build optimized and cached, and pages get much lighter.

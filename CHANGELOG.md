@@ -2,6 +2,19 @@
 
 O que mudou em cada versão do Rubrica (template e CLI `create-rubrica`). Detalhes de cada uma nas [notas da release](https://github.com/MierzwaMatheus/rubrica/releases). Para atualizar um projeto existente, veja [Atualizando o seu Rubrica](./docs/atualizacao.md).
 
+## 1.12.0 — 2026-11-07
+
+A lista de projetos fica bem mais leve: as páginas que mostram projetos não carregam mais o texto inteiro de cada case.
+
+**Vindo da 1.11:**
+- Atualize com `npx create-rubrica@latest update`. Não precisa de versão nova do CLI nem de publicar nada no Convex.
+- Publique de novo (`npx create-rubrica publicar` ou o botão Publicar do painel) para o build gerar os arquivos novos dos projetos.
+
+### Site
+- **Lista de projetos enxuta:** a home, o portfólio, os cases e os posts levavam no HTML os textos completos de todos os cases, a descrição longa de cada projeto e os dados de cada imagem da biblioteca. Agora a lista leva só o que é mostrado nela (métricas do case e endereço das imagens), e cada projeto completo fica num arquivo próprio, lido pela página do case. Num site real, a lista caiu de 153 KB para 33 KB, a home de 241 KB para 138 KB, e a página de um case de 233 KB para 123 KB.
+- **Modal do portfólio:** a descrição longa é buscada quando o modal abre. Até ela chegar, aparece a descrição curta.
+- **Layout cyberpunk:** o botão "Baixar CV" da barra lateral também busca o currículo só no clique.
+
 ## 1.11.0 — 2026-11-07
 
 As imagens do conteúdo saem do build otimizadas e em cache, e as páginas ficam bem mais leves.

@@ -2,7 +2,7 @@
 
 Do zero ao seu site rodando no computador, com o painel pronto para preencher. Leva uns 10 minutos, quase todos esperando a instalação. O caminho é o mesmo para um site **pessoal** (portfólio) e para um site de **empresa**; só muda o tipo que você escolhe no início.
 
-> Já tem um site feito com o Rubrica v1? Não comece do zero: siga [Migrar da v1](./migrar.md).
+> Já tem um site feito com o Rubrica v1? Não comece do zero: siga [Migrar da v1](./migrar.md). Vai continuar na v1 por enquanto? A documentação dela está na [branch `v1` do GitHub](https://github.com/MierzwaMatheus/rubrica/tree/v1/docs).
 
 ## O que você precisa
 

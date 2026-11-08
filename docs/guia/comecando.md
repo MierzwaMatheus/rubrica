@@ -1,83 +1,76 @@
 # Começando
 
-Do zero ao seu portfólio rodando no computador, com o painel admin pronto para preencher. Leva uns 10 minutos, quase todos esperando a instalação.
+Do zero ao seu site rodando no computador, com o painel pronto para preencher. Leva uns 10 minutos, quase todos esperando a instalação. O caminho é o mesmo para um site **pessoal** (portfólio) e para um site de **empresa**; só muda o tipo que você escolhe no início.
+
+> Já tem um site feito com o Rubrica v1? Não comece do zero: siga [Migrar da v1](./migrar.md).
 
 ## O que você precisa
 
-- **Node.js 20 ou mais novo** e **git**. O pnpm é opcional: sem ele, o CLI usa o npm.
-- Uma conta no **[Convex](https://convex.dev)** (gratuita). É onde ficam o banco de dados e as imagens. Não precisa criar antes: o CLI abre o login no navegador na hora certa.
+- **Node.js 22.23 ou mais novo** e **git**. O pnpm é opcional: sem ele, o CLI usa o npm.
+- Uma conta no **[Convex](https://convex.dev)** (gratuita). É o backend: guarda o conteúdo, o login e as imagens. Não precisa criar antes: o CLI abre o login no navegador na hora certa.
 - Para publicar depois, uma conta na **[Vercel](https://vercel.com)** (gratuita). Veja [Publicar o site](./publicar.md).
-- Só se for usar as skills de IA: **Python 3.8 ou mais novo**.
 
-Pagamentos (Asaas), IA (OpenRouter) e avisos no Telegram são opcionais. Dá para ligar cada um depois.
+Pagamentos (Asaas), tradução com IA (OpenRouter), avisos no Telegram e por e-mail são opcionais. Dá para ligar cada um depois: veja [Integrações](./integracoes.md).
 
 ## 1. Escolha a aparência no site
 
-No [combinador](https://userubrica.vercel.app/#combinador), teste layout, esquema de cores, modo claro ou escuro, textura e fontes no Rubrica funcionando, com dados de exemplo. Depois, na seção **Crie o seu**, preencha o seu nome, o endereço do site e o e-mail, e copie o comando pronto. Nada do que você digita sai do navegador: o comando é montado na própria página.
+No [combinador](https://userubrica.vercel.app/#combinador), teste tema, esquema de cores e modo claro ou escuro no site de demonstração funcionando. Depois, na seção **Crie o seu**, escolha o tipo de site, preencha o nome, o endereço e o e-mail, e copie o comando pronto. Nada do que você digita sai do navegador: o comando é montado na própria página.
 
-Prefere decidir no terminal? Pule para o passo 2 sem o código: o CLI faz as mesmas perguntas.
+Prefere decidir no terminal? Pule para o passo 2 sem as opções: o CLI faz as mesmas perguntas.
 
 ## 2. Crie o projeto
 
-Cole o comando num terminal, na pasta onde quer criar o projeto:
+Cole o comando num terminal, na pasta onde quer criar o projeto. Ele tem este formato:
 
 ```bash
-npx create-rubrica@latest ana-souza --receita <código-do-site>
+npx create-rubrica@latest ana-souza --tipo pessoal --tema zine --esquema riso --modo claro
 ```
 
-Sem o código do site, rode só `npx create-rubrica@latest meu-portfolio` e responda às perguntas. No modo **Rápido** (o padrão), ele pergunta o layout, o que o site vai ter e a sua identidade; as cores, a textura e as fontes vêm combinadas com o layout.
+Ou rode só `npx create-rubrica@latest meu-site` e responda às perguntas: tipo de site, tema, nome, endereço, descrição, e-mail, idiomas, esquema de cores, modo e plugins. Todas as opções estão em [Comandos do CLI](./cli.md#create).
 
-O CLI então:
+O CLI cria a pasta, escreve os arquivos, instala as dependências e inicia o git. Um projeto novo tem pouco código seu: o site vem de dois pacotes, `@rubrica/core` e o tema escolhido (`@rubrica/theme-<nome>`).
 
-1. baixa a versão mais recente do Rubrica e aplica as suas escolhas;
-2. inicia o git na branch `main`, com um primeiro commit, e instala as dependências;
-3. conecta o projeto ao Convex (login pelo navegador, se for a primeira vez);
-4. gera as chaves de login, cria o seu usuário do painel e os dados iniciais.
-
-No terminal, você só escolhe a senha do painel: 12 ou mais caracteres, com maiúscula, minúscula e número.
-
-Todas as perguntas e opções estão em [Comandos do CLI](./cli.md).
-
-## 3. Abra o site
-
-```bash
-cd ana-souza
-npm run dev        # ou pnpm dev
-```
-
-O site abre em `http://localhost:3000`. O painel fica em `http://localhost:3000/login`, com o e-mail e a senha que você definiu.
-
-Pulou a configuração do painel no `create`? Rode `npx create-rubrica setup` na pasta do projeto antes do `npm run dev`.
-
-## 4. Preencha o conteúdo
-
-Tudo se edita pelo painel, sem tocar no código. O site começa com os dados de exemplo de um perfil fictício: troque pelos seus.
-
-| Tela do painel | O que você preenche |
+| Arquivo ou pasta | Para quê |
 |---|---|
-| `/admin/contact` | Nome, e-mail, telefone, foto e redes sociais |
-| `/admin/home` | Apresentação, números de destaque, disponibilidade, serviços e princípios de trabalho |
-| `/admin/projects` | Projetos do portfólio e estudos de caso |
-| `/admin/blog` | Posts |
-| `/admin/resume` | Currículo |
-| `/admin/about` | Rotina e perguntas frequentes da página Sobre |
-| `/admin/depoimentos` | Depoimentos |
-| `/admin/site-config` | **Site & Aparência:** identidade, SEO, fontes e as cores de cada modo |
-| `/admin/textos` | Os textos fixos do site, em português e inglês |
-| `/admin/plugins` | Liga e desliga partes do site (blog, propostas, pagamentos…) |
+| `astro.config.ts` | Configuração do site. Os trechos entre marcadores `rubrica:` são do CLI |
+| `rubrica.json` | Estado do projeto (tipo, tema, idiomas, plugins). O CLI mantém: não edite à mão |
+| `convex/` | Backend. Os arquivos de `convex/rubrica/` são gerados (uma linha cada) |
+| `src/blocks/` | Blocos próprios, se você criar |
+| `src/overrides/` | Componentes ejetados, se você ejetar |
+| `AGENTS.md`, `.mcp.json` | Instruções e configuração para agentes de IA |
 
-Também dá para pedir ao seu agente de IA (Claude Code, Codex ou OpenCode): o projeto já vem com a skill `rubrica`, que lê e altera o conteúdo do site, e com skills que escrevem a apresentação, os cases, o currículo e os posts com a sua voz. Veja a seção "Ou pelo seu agente de IA" do [README](../../README.md).
+## 3. Ligue o Convex e crie o seu login
 
-## 5. Dê a sua cara
+No fim do `create`, o CLI oferece rodar o `setup` (ou rode `npx create-rubrica setup` quando quiser). Ele:
 
-O Rubrica resolve a parte técnica. A identidade é com você, e é ela que separa o seu portfólio de "mais um":
+1. abre o login do Convex no navegador e cria um deployment de **desenvolvimento**;
+2. grava as chaves e variáveis que o backend precisa;
+3. pede o e-mail e a senha do seu usuário do painel, o `root`. **A senha é digitada ali, no terminal**;
+4. monta as páginas iniciais pela receita do tema (home, sobre, contato e o resto);
+5. pergunta, uma a uma, as integrações opcionais (Telegram, e-mail, OpenRouter, Asaas, botão Publicar). Pode pular todas.
 
-- **Cores e fontes pelo painel:** em **Site & Aparência**, troque as 4 cores principais de cada modo e as fontes. "Usar as cores do esquema" desfaz.
-- **Outro layout ou esquema:** `npx create-rubrica config` troca layout, esquema, modo, textura e fontes depois de criado. Veja os [templates](../templates/README.md) e os [esquemas de cores](../templates/cores.md).
-- **Favicon:** troque `public/favicon.ico` pelo seu.
-- **No código:** o esquema de cores fica em `src/index.css`; a estrutura do layout, em `src/components/` e `src/pages/`.
+## 4. Veja o site
+
+Abra dois terminais na pasta do projeto:
+
+```bash
+pnpm dev          # o site, em http://localhost:4321
+pnpm dev:convex   # o backend de desenvolvimento
+```
+
+O painel fica em `/admin`: entre com o e-mail e a senha do passo 3. Preencha a identidade, as páginas e o conteúdo (veja [Conteúdo e painel](./conteudo.md)). Para ver o site sem banco nenhum, `RUBRICA_FIXTURES=<pasta com site.json e pages.json> pnpm build`.
+
+## 5. Publique
+
+Quando estiver pronto, `npx create-rubrica publicar` põe o site no ar na Vercel, com um banco de **produção** separado do seu. Detalhes e outras hospedagens em [Publicar o site](./publicar.md).
+
+## Dois bancos, sempre
+
+O `.env.local` aponta para o Convex de **desenvolvimento**, o do seu computador. O site no ar usa o de **produção**, cujo endereço fica em `producao` no `rubrica.json`. Mexer no painel do computador não muda o site publicado. Comandos que publicam (`npx convex deploy`, `publicar`) gravam sempre em produção: só rode com a intenção de mudar o site no ar.
 
 ## Próximos passos
 
-- [Publicar o site](./publicar.md): pôr no ar na Vercel e ligar o seu domínio.
-- [Atualizando o seu Rubrica](../atualizacao.md): trazer as versões novas sem perder o que você personalizou.
+- [Conteúdo e painel](./conteudo.md): páginas com blocos, coleções e papéis
+- [Temas](./temas.md): trocar o tema, as cores e as fontes
+- [Idiomas](./idiomas.md): mais de um idioma
+- [Agentes](./agentes.md): editar o conteúdo com o Claude Code ou o Codex

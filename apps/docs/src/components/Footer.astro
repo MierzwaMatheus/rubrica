@@ -10,8 +10,8 @@ const { lang } = Astro.props;
 const t = useDict(lang);
 const links = [
   { href: REPO, label: t.footer.repo },
-  { href: docUrl("templates", lang), label: t.footer.templates },
-  { href: docUrl("templates/cores", lang), label: t.footer.colors },
+  { href: docUrl("guia/temas", lang), label: t.footer.templates },
+  { href: docUrl("guia/migrar", lang), label: t.footer.colors },
   { href: route("changelog", lang), label: t.footer.changelog },
   { href: "https://www.npmjs.com/package/create-rubrica", label: t.footer.npm },
 ];

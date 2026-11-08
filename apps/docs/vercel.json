@@ -1,12 +1,12 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "astro",
-  "installCommand": "cd .. && pnpm install --frozen-lockfile && cd site && pnpm install --frozen-lockfile",
+  "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
   "buildCommand": "pnpm build:full",
   "outputDirectory": "dist",
   "headers": [
     {
-      "source": "/previews/(.*)/assets/(.*)",
+      "source": "/previews/(.*)/_astro/(.*)",
       "headers": [
         {
           "key": "Cache-Control",

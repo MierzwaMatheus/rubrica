@@ -4,6 +4,14 @@
   "description": "Tema cyberpunk do Rubrica: layout do mmlo.com.br (sidebar com avatar grande, esquema neon, Chakra Petch).",
   "type": "module",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MierzwaMatheus/rubrica.git",
+    "directory": "packages/themes/cyberpunk"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     ".": "./src/index.tsx",
     "./styles.css": "./src/styles.css",

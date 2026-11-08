@@ -9,10 +9,6 @@ interface Props {
 const d = useDict(Astro.props.lang);
 const t = d.layouts;
 const schemeLabel = (id: string) => SCHEMES.find((s) => s.id === id)?.label ?? id;
-const groups = [
-  { title: t.newTitle, text: t.newText, items: LAYOUTS.filter((l) => !l.legacy) },
-  { title: t.legacyTitle, text: t.legacyText, items: LAYOUTS.filter((l) => l.legacy) },
-];
 ---
 
 <section id="layouts" class="section">
@@ -23,36 +19,28 @@ const groups = [
       <p>{t.intro}</p>
     </div>
 
-    {
-      groups.map((g) => (
-        <div class="group">
-          <div class="group-head">
-            <h3>{g.title}</h3>
-            <p>{g.text}</p>
-          </div>
-          <ul class="grid">
-            {g.items.map((l) => (
-              <li>
-                <a class="card" href="#combinador" data-cb-layout={l.id}>
-                  <span class="shot">
-                    <img src={`/img/layouts/${l.id}.jpg`} alt={fill(t.shotAlt, { name: l.label })} width="1280" height="800" loading="lazy" />
-                  </span>
-                  <span class="meta">
-                    <span class="name">{l.label}</span>
-                    <span class="hint">{d.catalog.layoutHints[l.id]}</span>
-                    <span class="rec">
-                      {schemeLabel(l.recommended.scheme)} · {l.recommended.mode === "dark" ? t.dark : t.light} · {l.fonts.sans[0]}
-                    </span>
-                  </span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))
-    }
+    <ul class="grid">
+      {
+        LAYOUTS.map((l) => (
+          <li>
+            <a class="card" href="#combinador" data-cb-layout={l.id}>
+              <span class="shot">
+                <img src={`/img/layouts/${l.id}.jpg`} alt={fill(t.shotAlt, { name: l.label })} width="1280" height="800" loading="lazy" />
+              </span>
+              <span class="meta">
+                <span class="name">{l.label}</span>
+                <span class="hint">{d.catalog.layoutHints[l.id]}</span>
+                <span class="rec">
+                  {schemeLabel(l.recommended.scheme)} · {l.recommended.mode === "dark" ? t.dark : t.light} · {l.fonts.sans[0]}
+                </span>
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
     <p class="more">
-      {t.moreBefore}{" "}<a href={docUrl("templates", Astro.props.lang)}>{t.moreLink}</a>.
+      {t.moreBefore}{" "}<a href={docUrl("guia/temas", Astro.props.lang)}>{t.moreLink}</a>.
     </p>
   </div>
 </section>

@@ -1,101 +1,75 @@
 # Publishing the site
 
-Puts your portfolio online on Vercel, with a production database separate from your computer's and a `<projeto>.vercel.app` address. Then you connect your domain. The Vercel and Convex accounts are free.
+The public site is a set of static files generated at **build time**: the build reads the content from the production Convex and writes every page. So the way to publish is the same on any host: **run the build again**.
+
+> Saving in the panel changes the database immediately, but the live site only changes at the next build. The panel's **Publish** button triggers that build.
+
+## Two databases
+
+| | Development | Production |
+|---|---|---|
+| Where it lives | In Convex, tied to `.env.local` | In Convex, address under `producao` in `rubrica.json` |
+| Who uses it | The site on your computer (`pnpm dev`) | The live site |
+| How to change content | Panel at `localhost:4321/admin` | Panel at `https://yoursite.com/admin` |
+
+Content from one does **not** go to the other. Production starts with the theme's initial pages.
+
+## Vercel: the automatic path
+
+Vercel is the official host; only it has publishing automated by the CLI. It needs a free account.
+
+```bash
+npx create-rubrica publicar
+```
+
+The first time, the command shows the plan and asks for confirmation before writing to production. It:
+
+1. signs in to your Vercel account (opens the browser);
+2. creates the project on Vercel;
+3. creates the **production** deployment on Convex, sends the backend, writes the login keys and variables;
+4. creates the production `root` user (you pick the password) and builds the initial pages;
+5. carries the integrations you turned on locally to production (Telegram, email, OpenRouter);
+6. writes the build variables on Vercel (`CONVEX_DEPLOY_KEY`, `CONVEX_URL`, `SITE_URL`...);
+7. configures the panel's **Publish** button (deploy hook);
+8. publishes.
+
+The Vercel build runs `convex deploy` and then `npm run build`, so **every build sends the current backend along** and generates the site from the production content. The command prints the site and panel (`/admin`) addresses at the end.
+
+After the first time, `npx create-rubrica publicar` just publishes again. If Vercel is connected to your GitHub repository, the usual way is **merging into the production branch**: Vercel builds on its own.
+
+### Custom domain
+
+On Vercel: Settings, Domains. Then tell Rubrica about the new address:
+
+```bash
+npx create-rubrica config --url mysite.com
+npx create-rubrica config --url mysite.com --producao   # also writes to the production database
+```
+
+The address goes into the canonical, sitemap, RSS, form CORS and the payment return.
+
+## Other hosts
+
+Netlify, Cloudflare Pages or any static hosting works: the output is neutral. The project already ships, from the same configuration, `vercel.json`, `public/_redirects` and `public/_headers` (redirects, security headers and cache). Netlify and Cloudflare Pages read the last two on their own.
+
+On the chosen host:
+
+| Setting | Value |
+|---|---|
+| Build command | `npm run build` |
+| Published folder | `dist` |
+| `CONVEX_URL` variable | The **production** Convex address (`https://<name>.convex.cloud`; it is in `producao.convexUrl` in `rubrica.json` once production is prepared) |
+| `SITE_URL` variable | The site address |
+
+The production backend must exist before the first build on another host. The simplest way is to run `npx create-rubrica publicar` once: it prepares the production Convex (backend, login keys, `root` and initial pages) together with Vercel, and you can switch the Vercel project off afterwards. If you prefer the host to send the backend on every build, use `npx convex deploy --cmd-url-env-var-name CONVEX_URL --cmd "npm run build"` as the build command, with the `CONVEX_DEPLOY_KEY` variable (as `vercel.json` does). Remember: `convex deploy` always publishes to production.
+
+The panel's **Publish** button triggers any host: create a **deploy hook** (Vercel: Settings, Git, Deploy Hooks; Netlify and Cloudflare: Build hooks) and save the URL in the Convex variable `RUBRICA_DEPLOY_HOOK_URL`. See [Integrations](./integracoes.md#publishing). Optionally, the end of the build can notify the panel at `/rubrica/publicacao/concluida`, so the "publishing" notice ends right away.
+
+When switching hosts, check that the domain and `SITE_URL` match, and that the `Content-Security-Policy` in `_headers` or `vercel.json` allows what your site uses (the analytics script, for example: `npx create-rubrica config --analytics <script> --analytics-id <id>` already adjusts both files).
 
 ## Before publishing
 
-- The project needs to be running on your computer. If it isn't yet, see [Getting started](./comecando.md).
-- Commit `rubrica.json` with the project. It's how `publicar` and `setup` recognize, on another computer, that the site is already online.
-
-## The first time
-
-In the project folder:
-
-```bash
-npx create-rubrica publicar
-```
-
-After you confirm, the CLI:
-
-1. logs in to your Vercel account (the login opens in the browser, if needed);
-2. creates the project on Vercel with the folder name and uses the `<projeto>.vercel.app` address;
-3. prepares the production database on Convex: it sends the backend, generates the login keys and copies from your computer the Telegram and OpenRouter integrations, the profession and the AI context;
-4. creates the admin of the published site (you choose the password) and the initial data;
-5. turns on the panel's **Publicar** (publish) button (see below);
-6. saves the variables on Vercel and publishes;
-7. writes to `rubrica.json`, under `producao`, the addresses of the published database and site.
-
-The published site starts with the sample data and is edited through its own panel, at `<seu-site>/login`. What you entered in the panel on your computer doesn't go with it: your computer and the live site have separate databases.
-
-## Publishing again
-
-Run the same command:
-
-```bash
-npx create-rubrica publicar
-```
-
-From then on, it only publishes the current version of the project: the Vercel build also sends the backend changes to the production database. Before that, it copies to production the Telegram and OpenRouter integrations you turned on on your computer after the first time (only the ones missing there).
-
-When to use each path:
-
-- **You changed the code** (layout, components, colors in `src/index.css`, a new version of Rubrica): `npx create-rubrica publicar`.
-- **You changed the content** in the published site's panel: the panel's **Publicar** button.
-
-## What the build generates
-
-Every public page comes out of the build as ready HTML, with its content and its own title, description and image: home, About, Resume, Portfolio, each case study, Blog, each post and Testimonials. That's what Google and link previews (WhatsApp, LinkedIn) read. In the browser, the site still navigates without reloading the page.
-
-Every page exists in both languages: Portuguese at the regular address (`/blog/my-post`) and English under `/en` (`/en/blog/my-post`). The address sets the language: the language switch changes the URL, and visitors whose browser is in the other language see a prompt to switch, without being redirected.
-
-The panel, login, proposals and checkout aren't generated in the build: they keep working as before.
-
-Content images (covers, case studies, posts, avatars) also come out of the build: they're downloaded, resized, converted to WebP and served by the site itself with long caching. On later publishes, only new images are downloaded.
-
-## The panel's Publicar button
-
-The site is generated in the build: new posts, projects and texts only show up after publishing. The panel's **Publicar** button reruns the build without you opening the terminal.
-
-On the first publish, the CLI opens Vercel's tokens page. Create a token named Rubrica, with no expiration, and paste it into the terminal (it doesn't show on screen). The CLI checks that the token can access the project and saves it in the production database. With it, the panel redeploys the latest production deployment, and the build fetches the new content.
-
-Skipped this step, or the panel says the button isn't configured or the token isn't valid? Run `npx create-rubrica publicar` again: it offers to turn on the button and asks for a new token.
-
-If your Vercel project is connected to GitHub, you can also use a Vercel Deploy Hook instead of the token.
-
-## On another computer
-
-In a fresh clone of the project (the `.vercel` folder stays out of git), `publicar` sees from `rubrica.json` that the site is already published, links the folder to the same Vercel project and just publishes. It doesn't generate new login keys or rewrite the panel data.
-
-If the computer is connected to another Convex project, not the one of the live site, `publicar` stops before writing anything, so it doesn't swap the site's database for an empty one. Run `npx create-rubrica setup` and pick the Convex project where the site lives.
-
-Have more than one Vercel account on the computer? Choose which one to use:
-
-```bash
-RUBRICA_VERCEL_GLOBAL_CONFIG=<pasta de config da conta> npx create-rubrica publicar
-```
-
-## Custom domain
-
-1. On Vercel, open the project and go to **Settings → Domains → Add Domain**.
-2. Add `seudominio.com` and `www.seudominio.com`.
-3. At your domain registrar (Registro.br, Cloudflare, GoDaddy…), set up the DNS:
-   - root (`seudominio.com`): an **A** record pointing to `76.76.21.21`;
-   - `www`: a **CNAME** record pointing to `cname.vercel-dns.com`.
-4. Wait for propagation (from minutes to a few hours). The HTTPS certificate is issued on its own.
-5. On Vercel, in **Settings → Environment Variables**, change `SITE_URL` to the final address.
-6. Publish again (`npx create-rubrica publicar`) to rebuild `sitemap.xml` and `rss.xml` with the new address.
-
-## Payments in production
-
-The Asaas production key and the payments webhook are set up separately: `publicar` doesn't copy the key from your computer, which is usually the sandbox one. See "Configurando os pagamentos (Asaas)" (in Portuguese) in the [README](../../README.md).
-
-## Common problems
-
-| Symptom | What to do |
-|---|---|
-| The Publicar button says it isn't configured or the token isn't valid | Run `npx create-rubrica publicar` and paste a new Vercel token |
-| I changed something in the panel and the site didn't change | Use the panel's **Publicar** button: the site is generated in the build |
-| A plugin that's off still shows on the site | Publish again: the plugin list is generated in the build |
-| `publicar` stopped saying the Convex project is a different one | Run `npx create-rubrica setup` and pick the Convex project of the live site |
-| I forgot the panel password of the live site | `npx create-rubrica senha` and pick the published site |
-| Broken images after switching databases | Images live in each environment's database: upload them again through the published site's panel |
+- `pnpm check`, `pnpm test` and `pnpm build` pass.
+- The site URL (`config --url`) is the final one.
+- `RUBRICA_IP_SALT` is set in production (`setup` and `publicar` write it; see [Integrations](./integracoes.md)).
+- The site forms need the site origin allowed in Convex: the site URL already counts, and `RUBRICA_ALLOWED_ORIGINS` accepts others.

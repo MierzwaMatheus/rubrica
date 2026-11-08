@@ -1,1 +1,0 @@
-import{r as o}from"./index-BRLZPcIY.js";function r(){return crypto.randomUUID?.()??Math.random().toString(36).slice(2)+Date.now().toString(36)}const e="playground_session_id";function s(){return o.useMemo(()=>{let t=sessionStorage.getItem(e);return t||(t=r(),sessionStorage.setItem(e,t)),t},[])}export{s as u};

@@ -1,173 +1,197 @@
 # Comandos do CLI
 
-O `create-rubrica` cria, configura, publica e atualiza projetos do Rubrica. Precisa de Node.js 20 ou mais novo e do git. Tirando o `create`, rode os comandos dentro da pasta do projeto (ou de qualquer subpasta).
+O `create-rubrica` cria, configura, publica, atualiza e migra o site. Dentro de um projeto, o mesmo CLI responde por `rubrica`: `npx rubrica <comando>` é igual a `npx create-rubrica <comando>`. Precisa de Node 22.23 ou mais novo e do `git`.
+
+```bash
+npx create-rubrica@latest <comando> [opções]
+npx create-rubrica --help       # lista os comandos
+npx create-rubrica --version
+```
+
+Rode os comandos na pasta do projeto (menos o `create`). Quando um comando precisa de uma resposta e não há terminal interativo, use as opções ou `--yes`. Em **qualquer** comando, `--sem-telemetria` desliga a [telemetria](./telemetria.md) só naquela execução.
 
 | Comando | Para quê |
 |---|---|
-| `npx create-rubrica@latest <pasta>` | Cria o projeto |
-| `npx create-rubrica setup` | Conecta o Convex, cria o admin e os dados iniciais; liga as integrações |
-| `npx create-rubrica config` | Troca identidade, aparência, layout ou plugins depois de criado |
-| `npx create-rubrica publicar` | Põe o site no ar na Vercel, e publica de novo nas próximas vezes |
-| `npx create-rubrica senha` | Troca a senha do painel e libera o login bloqueado |
-| `npx create-rubrica@latest update` | Traz a versão nova do Rubrica sem desfazer as suas personalizações |
-| `npx create-rubrica telemetria` | Mostra, liga ou desliga a telemetria anônima do projeto |
+| [`create`](#create) | Cria um site novo |
+| [`setup`](#setup) | Liga o Convex, cria o login e o conteúdo inicial |
+| [`config`](#config) | Muda identidade, tipo, tema, cores, idiomas, plugins ou analytics |
+| [`publicar`](#publicar) | Põe o site no ar na Vercel |
+| [`senha`](#senha) | Troca a senha do painel |
+| [`update`](#update) | Atualiza o núcleo e o tema |
+| [`ejetar`](#ejetar) | Copia o componente de um bloco para o projeto |
+| [`verificar`](#verificar) | Confere o projeto (o `pnpm test`) |
+| [`testar-tema`](#testar-tema) | Bateria de testes de um tema |
+| [`mcp`](#mcp) | Servidor MCP local para agentes |
+| [`migrar`](#migrar) | Leva um projeto da v1 para a v2 |
+| [`telemetria`](#telemetria) | Mostra, liga ou desliga a telemetria |
 
-## `create`
-
-```bash
-npx create-rubrica@latest meu-portfolio
-# ou
-pnpm create rubrica meu-portfolio
-```
-
-O assistente baixa a versão mais recente do template e pergunta o modo:
-
-- **Rápido** (padrão): você escolhe o layout; as cores, a textura e as fontes vêm combinadas com ele.
-- **Personalizado**: você escolhe também o esquema de cores, o modo claro/escuro, a textura, as fontes e o idioma.
-
-Nos dois modos, ele pergunta:
-
-- **Layout:** um dos 13 do [guia dos templates](../templates/README.md).
-- **O que o site vai ter:** um pacote pronto ("Completo", "Para vender serviços", "Só o portfólio") ou a lista de plugins para marcar um a um.
-- **Identidade:** seu nome, o nome do site, o endereço (sem `https://`; quem ainda não tem domínio pode deixar o `<projeto>.vercel.app` sugerido), uma frase sobre o que você faz, seu e-mail e o perfil no X (opcional).
-
-No personalizado, entram também:
-
-- **Esquema de cores:** um dos 15 [esquemas](../templates/cores.md), com o recomendado para o layout marcado.
-- **Modo de cor:** claro, escuro ou automático (segue o sistema de quem visita), e se a visita pode alternar.
-- **Textura:** nenhuma, grão de filme, papel ou scanlines.
-- **Fontes:** principal e mono.
-- **Idioma:** português ou inglês.
-
-Depois ele inicia o git (branch `main`, com um primeiro commit) e instala as dependências: com pnpm se você rodou `pnpm create`, com npm nos outros casos. Por fim, oferece configurar o painel na hora: aceitando, conecta o projeto ao Convex e roda o `setup`.
-
-### Com as escolhas feitas no site
-
-Na seção **Crie o seu** do [site do Rubrica](https://userubrica.vercel.app/#criar), você monta a aparência no combinador, preenche os seus dados e copia um comando com uma **receita**:
+## create
 
 ```bash
-npx create-rubrica@latest ana-souza --receita eyJ2IjoxLCJsIjoiZGVza3RvcCIs...
+npx create-rubrica@latest [create] <pasta> [opções]
 ```
 
-A receita leva a aparência, os plugins e a identidade num texto sem espaços nem acentos, que funciona colado em qualquer terminal (bash, PowerShell, cmd). O CLI mostra um resumo, pede confirmação e só pergunta o que faltar. Depois cria o projeto no Convex e roda o `setup` pedindo só a senha do painel. Telegram e Vercel ficam para um `setup` posterior.
+Gera o projeto: `@rubrica/core` e o tema, `astro.config.ts`, o `convex/` de reexportações, os arquivos de hospedagem (`vercel.json`, `public/_redirects`, `public/_headers`), o `AGENTS.md` e o `.mcp.json`. Instala as dependências, inicia o git e oferece rodar o `setup`. A pasta precisa estar vazia ou não existir. Sem opções, pergunta o que falta.
 
-Se algo da receita não existir nesta versão do CLI (um layout novo, por exemplo), ele avisa e pergunta só aquilo.
-
-### Opções
-
-As opções valem por cima da receita.
-
-| Opção | Valores |
+| Opção | Valor |
 |---|---|
-| `--receita <código>` | o código gerado pelo site |
-| `--layout <id>` | `cyberpunk`, `brutalist`, `swiss`, `bento`, `magazine`, `desktop`, `index`, `monograph`, `zine`, `blueprint`, `garden`, `chat`, `poster` |
-| `--esquema <id>` | um dos [esquemas de cores](../templates/cores.md) (`neon`, `riso`, `sumi`…) |
-| `--modo <modo>` | `claro`, `escuro` ou `automatico` |
-| `--alternancia` / `--sem-alternancia` | mostra ou esconde o botão para a visita alternar o modo |
-| `--textura <textura>` | `nenhuma`, `grao`, `papel` ou `scanlines` |
-| `--fonte <família>` / `--mono <família>` | nome da fonte, com hífens no lugar dos espaços (`--fonte instrument-sans`) |
-| `--plugins <lista>` | ids separados por vírgula (`blog,portfolio`), um pacote (`recommended`, `freelancer`, `simple`) ou `nenhum` |
+| `--tipo` | `pessoal` (padrão) ou `empresa` |
+| `--tema <id>` | `padrao`, `cyberpunk`, `brutalist`, `swiss`, `bento`, `magazine`, `desktop`, `index`, `monograph`, `zine`, `blueprint`, `garden`, `chat` ou `poster` |
+| `--nome <texto>` | Nome do site ou da empresa |
+| `--url <endereço>` | Endereço do site (`meusite.com`) |
+| `--descricao <texto>` | Descrição curta (SEO) |
+| `--autor <nome>` | Dono do site (pessoal) ou contato (empresa) |
+| `--email <e-mail>` | E-mail do login do painel e de contato |
+| `--idiomas <lista>` | Idiomas separados por vírgula (padrão `pt-BR`) |
+| `--idioma-principal <código>` | Idioma sem prefixo na URL (padrão: o primeiro) |
+| `--esquema <id>` | Esquema de cores (veja [Temas](./temas.md#esquemas-de-cor)) |
+| `--modo` | `escuro`, `claro` ou `automatico` |
+| `--plugins <lista>` | Plugins separados por vírgula, ou um pacote: `recommended`, `freelancer` ou `simple` (os dois últimos só no tipo pessoal) |
+| `--gerenciador` | `pnpm` ou `npm` (padrão: o que rodou o comando) |
+| `--local <pasta>` | Usa os pacotes de um clone do monorepo (`link:`), para testar versões não publicadas |
+| `--sem-instalar` | Não instala as dependências |
+| `--sem-git` | Não roda o `git init` |
+| `--sem-setup` | Não oferece o `setup` no fim |
+| `-y`, `--yes` | Não pergunta nada: usa as opções e os padrões |
 
-### Arquivos que saem com as suas escolhas
-
-| Arquivo | O que tem |
-|---|---|
-| `rubrica.json` | Estado do CLI: versão de origem, aparência, plugins, identidade e, depois do `publicar`, os endereços do site no ar. Versione junto com o projeto: o `update` e o `publicar` dependem dele. |
-| `rubrica.config.ts` | Identidade, SEO e RSS usados no build |
-| `src/index.css` | O esquema de cores (claro e escuro) e as fontes |
-| `index.html` | Meta tags, o link das fontes e a aparência (modo de cor, alternância e textura) |
-| `src/components/`, `src/pages/` | Os arquivos do layout escolhido |
-| `convex/pluginRegistry.ts` | Os plugins ligados por padrão |
-
-## `setup`
+## setup
 
 ```bash
 npx create-rubrica setup
 ```
 
-Configura o backend no Convex. Se o projeto ainda não estiver ligado ao Convex (sem `.env.local`), ele conecta sozinho: abre o login no navegador e cria o projeto. Num clone de um site que já foi publicado (o `rubrica.json` traz o endereço de produção), ele não cria projeto novo: pede para você escolher o projeto do Convex onde o site está.
+Interativo; **quem roda é você**, porque pede a senha e as chaves. Liga o projeto ao Convex de desenvolvimento, grava as chaves de login e as variáveis do backend, cria o usuário `root` (a senha é digitada ali, nunca passa por um agente), monta o conteúdo inicial pela receita do tema e pergunta as integrações (Telegram, e-mail, OpenRouter, Asaas, deploy hook). É seguro rodar de novo: ele só completa o que falta.
 
-Depois, gera as chaves de login, grava o endereço do site, cria o usuário admin e os dados iniciais. As integrações aparecem só para os plugins ligados:
-
-- **Telegram** e **Vercel** começam com uma pergunta de sim ou não.
-- **OpenRouter** (IA e tradução) e **Asaas** (pagamentos) pedem a chave; Enter pula. Com a chave do Asaas, ele também gera o token do webhook e mostra a URL e o token para cadastrar no painel do Asaas.
-
-Pode rodar de novo quando quiser: o admin existente é mantido e os dados iniciais só criam o que falta.
-
-## `config`
+## config
 
 ```bash
-npx create-rubrica config
+npx create-rubrica config [opções]
 ```
 
-Muda as escolhas feitas no `create`:
+Sem opções e num terminal, pergunta o que mudar. Com opções, muda direto:
 
-- **Identidade:** as perguntas vêm preenchidas com o que está salvo; atualiza `rubrica.config.ts`, as meta tags do `index.html` e o `rubrica.json`.
-- **Aparência:** esquema de cores, modo claro/escuro, alternância, textura e fontes.
-- **Layout:** troca o layout. Atenção: sobrescreve os arquivos do layout, e personalizações neles se perdem.
-- **Plugins:** quais vêm ligados por padrão.
+| Opção | O que muda |
+|---|---|
+| `--nome`, `--url`, `--descricao`, `--autor`, `--email` | Identidade |
+| `--tipo pessoal\|empresa` | Tipo do site (as páginas existentes ficam; blocos exclusivos do outro tipo deixam de aparecer) |
+| `--tema <id>` | Tema (troca o pacote, instala e atualiza o `astro.config.ts`) |
+| `--esquema <id>`, `--modo escuro\|claro\|automatico` | Cores |
+| `--idiomas <lista>`, `--idioma-principal <código>` | Idiomas ([Idiomas](./idiomas.md)) |
+| `--plugins <lista>` | Liga e desliga plugins: `+blog,-resume`. Sem sinal, liga |
+| `--analytics <script>`, `--analytics-id <id>` | Liga o Umami e libera a origem na CSP. `--analytics desligar` desliga |
+| `--producao` | Grava também no Convex de **produção** (pede confirmação) |
+| `--sem-instalar` | Não roda a instalação ao trocar de tema |
+| `-y`, `--yes` | Não pergunta |
 
-## `publicar`
+As mudanças vão para o `rubrica.json`, para o código (quando precisa) e para o Convex de **desenvolvimento**. O site publicado só muda com `--producao` e um novo `publicar`.
+
+## publicar
 
 ```bash
 npx create-rubrica publicar
 ```
 
-Põe o site no ar na Vercel. Na primeira vez, cria o projeto na Vercel, prepara o banco de produção, cria o admin do site publicado e liga o botão **Publicar** do painel. Depois, rodar de novo só publica. O passo a passo está em [Publicar o site](./publicar.md).
+**Quem roda é você, a pedido seu**: publica em **produção**. Na primeira vez, cria o projeto na Vercel e o banco de produção; depois, só publica de novo. Passo a passo em [Publicar o site](./publicar.md).
 
-## `senha`
+## senha
 
 ```bash
 npx create-rubrica senha
 ```
 
-Para quem esqueceu a senha do painel ou ficou bloqueado por tentativas erradas (o bloqueio também é liberado). Pergunta se a troca é no site publicado ou no do computador, o e-mail e a senha nova: 12 ou mais caracteres, com maiúscula, minúscula e número.
+Troca a senha do painel (esqueceu, ou o login ficou bloqueado). Pergunta se é no site publicado ou no do computador. **Sempre você roda**: a senha nunca passa por um agente.
 
-Só funciona com acesso ao projeto no Convex, ou seja, para o dono, na pasta do projeto e com o login do Convex feito.
-
-## `update`
+## update
 
 ```bash
-npx create-rubrica@latest update --dry-run   # mostra o que mudaria
-npx create-rubrica@latest update             # aplica
+npx create-rubrica@latest update [--dry-run] [--yes] [--para <versão>] [--forcar]
 ```
 
-Atualiza o projeto para a versão mais recente sem desfazer as suas personalizações. O CLI compara, arquivo por arquivo, a versão de onde o projeto saiu, a versão nova e o seu projeto:
-
-- arquivo que você não mexeu recebe a versão nova;
-- arquivo que você mexeu e o Rubrica não mudou fica como está;
-- quando os dois mudaram partes diferentes, as mudanças são mescladas;
-- quando os dois mudaram o mesmo trecho, o seu arquivo fica intacto e a versão nova é salva ao lado, como `<arquivo>.rubrica-new`.
-
-`.env*`, `rubrica.json` e os dados gerados no build (`public/data/`, RSS, sitemap) nunca são tocados.
-
-| Opção | Para que serve |
+| Opção | O que faz |
 |---|---|
-| `--dry-run` | Só mostra o plano |
-| `--to <versão>` | Atualiza para uma versão específica |
-| `--from <versão>` | Versão com que o projeto foi criado (projetos criados até a v0.3.18 gravavam sempre `0.1.0`) |
-| `--yes` | Aplica sem perguntar |
+| `--dry-run` | Mostra o plano sem gravar nada |
+| `-y`, `--yes` | Aplica sem pedir confirmação |
+| `--para <versão>` | Atualiza para uma versão específica do núcleo |
+| `--forcar` | Segue mesmo com mudanças sem commit no git |
 
-Guia completo: [Atualizando o seu Rubrica](../atualizacao.md).
+Sobe `@rubrica/core` e o tema, regenera o `convex/`, roda no desenvolvimento as migrações de dados da versão e avisa dos componentes ejetados cujo original mudou. Veja [Atualizar o Rubrica](./atualizar.md).
 
-## `telemetria`
+## ejetar
 
 ```bash
-npx create-rubrica telemetria            # mostra se está ligada
-npx create-rubrica telemetria desligar   # desliga neste projeto
-npx create-rubrica telemetria ligar      # liga de novo
+npx create-rubrica ejetar <bloco> [--forcar]
+npx create-rubrica ejetar --listar
 ```
 
-O CLI manda, sem dados pessoais, as escolhas feitas nos comandos (layout, cores, plugins) para o Rubrica saber o que mais se usa. A escolha fica gravada no `rubrica.json`. Para uma execução só, use `--sem-telemetria` em qualquer comando. O que vai e o que não vai: [Telemetria do CLI](telemetria.md).
+Copia o componente do bloco (do tema, ou do núcleo) para `src/overrides/` e passa a usar a cópia. `--forcar` copia de novo por cima; `--listar` mostra o que já foi ejetado e se o original mudou. Sem argumento, lista os blocos disponíveis.
 
-## Variáveis de ambiente
+## verificar
 
-| Variável | Para quê |
+```bash
+npx create-rubrica verificar
+```
+
+É o `pnpm test` do projeto. Confere se o `convex/` gerado bate com o núcleo instalado, se o tema do `rubrica.json` está instalado e no `astro.config.ts`, se os marcadores `rubrica:` do `astro.config.ts` estão no lugar e se os ejetados existem. Termina com erro se algo estiver fora.
+
+## testar-tema
+
+```bash
+npx create-rubrica testar-tema [tema] [opções]
+```
+
+A bateria de testes de tema (`@rubrica/theme-tester`): axe, SEO, JavaScript por página e Lighthouse, sobre os sites de demonstração. No monorepo: `pnpm testar-tema <tema>`.
+
+| Opção | O que faz |
 |---|---|
-| `RUBRICA_VERCEL_GLOBAL_CONFIG` | Escolhe a conta da Vercel quando há mais de uma no computador: a pasta de configuração da conta (é o `--global-config` do CLI da Vercel). |
-| `RUBRICA_TELEMETRIA` | `0` desliga a telemetria em qualquer comando. |
-| `DO_NOT_TRACK` | `1` desliga a telemetria, como em outras ferramentas de terminal. |
+| `--todos` | Todos os temas de `packages/themes/*` |
+| `--listar` | Lista os temas do monorepo |
+| `--site pessoal\|empresa` | Testa só um tipo de site |
+| `--sem-lighthouse` | Pula o Lighthouse |
+| `--so-lighthouse` | Roda só o Lighthouse |
+| `--js-kb <n>` | Limite de JavaScript (gzip) por página com ilha (padrão 120) |
+| `--lh-performance <n>`, `--lh-acessibilidade <n>`, `--lh-seo <n>` | Notas mínimas (padrão 90, 95 e 95) |
+| `--lh-execucoes <n>` | Máximo de execuções do Lighthouse por página (padrão 3) |
+| `--json <arquivo>` | Grava o relatório em JSON |
+| `--verbose` | Mostra também as verificações que passaram |
+| `--manter-dist` | Não apaga a pasta do build |
+| `--raiz <pasta>` | Raiz do monorepo |
 
-## Com um agente de IA
+Saída: `0` se tudo passou, `1` se algo falhou, `2` para erro de uso.
 
-O projeto vem com um `AGENTS.md` (e um `CLAUDE.md`, para o Claude Code) que ensina agentes como Claude Code, Codex e Cursor a usar o CLI: o que eles podem rodar sozinhos (o `update --dry-run` e, com o seu "ok", o `update --yes`), o que você roda no seu terminal (`setup`, `config`, `publicar`, `senha`) e o passo a passo para atualizar o Rubrica, incluindo os arquivos `.rubrica-new`. Peça "atualize o Rubrica" e o agente segue esse roteiro.
+## mcp
+
+```bash
+npx rubrica mcp                 # inicia o servidor (o .mcp.json faz isso)
+npx rubrica mcp login           # login no terminal (também: --email, --producao, --senha-stdin)
+npx rubrica mcp whoami          # projeto, banco, conta e papel
+npx rubrica mcp logout
+npx rubrica mcp --producao      # servidor apontando para o Convex de produção
+```
+
+Veja [Agentes de IA](./agentes.md). Sem banner: o `stdout` é o protocolo.
+
+## migrar
+
+```bash
+npx create-rubrica@latest migrar [--export <zip>] [--yes]
+npx create-rubrica@latest migrar --relatorio [--export <zip>] [--saida <arquivo>]
+npx create-rubrica@latest migrar dados --export <zip> [--saida <pasta>]
+npx create-rubrica@latest migrar conferir --v1 <url|pasta> [--v2 <pasta dist>]
+```
+
+| Forma | O que faz |
+|---|---|
+| `migrar` | Cria a branch `rubrica-v2`, troca o código, converte os dados (com `--export`), builda e grava o relatório |
+| `migrar --relatorio` | Só mostra: tema, personalizações e (com `--export`) o que os dados viram. Não grava nada |
+| `migrar dados` | Só a conversão dos dados (arquivo de import, pendentes, fixtures e relatório) |
+| `migrar conferir` | Compara título, `h1` e texto das páginas principais entre a v1 e a v2 |
+
+Outras opções: `--template-v1 <pasta>` (usa um clone do repositório como v1 de referência, sem internet), `--convex-url <endereço>` (endereço das imagens do Convex), `--local <pasta>` (pacotes do monorepo), `--sem-instalar` e `--sem-build`. Passo a passo em [Migrar da v1](./migrar.md). O comando **não grava no Convex**.
+
+## telemetria
+
+```bash
+npx create-rubrica telemetria [ligar|desligar]
+```
+
+Sem argumento, mostra se está ligada e por quê. Veja [Telemetria](./telemetria.md).

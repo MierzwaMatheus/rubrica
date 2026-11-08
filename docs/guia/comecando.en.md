@@ -1,83 +1,76 @@
 # Getting started
 
-From zero to your portfolio running on your computer, with the admin panel ready to fill in. It takes about 10 minutes, most of it waiting for the install.
+From zero to your site running on your computer, with the panel ready to fill in. It takes about 10 minutes, most of it waiting for the install. The path is the same for a **personal** site (portfolio) and for a **company** site; only the type you pick at the start changes.
+
+> Already have a site built with Rubrica v1? Don't start over: follow [Migrating from v1](./migrar.md).
 
 ## What you need
 
-- **Node.js 20 or newer** and **git**. pnpm is optional: without it, the CLI uses npm.
-- A **[Convex](https://convex.dev)** account (free). It holds the database and the images. You don't need to create it first: the CLI opens the login in the browser at the right moment.
+- **Node.js 22.23 or newer** and **git**. pnpm is optional: without it, the CLI uses npm.
+- A **[Convex](https://convex.dev)** account (free). It is the backend: it stores the content, the login and the images. You don't need to create it beforehand: the CLI opens the login in your browser at the right time.
 - To publish later, a **[Vercel](https://vercel.com)** account (free). See [Publishing the site](./publicar.md).
-- Only if you'll use the AI skills: **Python 3.8 or newer**.
 
-Payments (Asaas), AI (OpenRouter) and Telegram notifications are optional. You can turn each one on later.
+Payments (Asaas), AI translation (OpenRouter), Telegram and email alerts are optional. You can turn each one on later: see [Integrations](./integracoes.md).
 
-## 1. Pick the look on the site
+## 1. Pick the look on the website
 
-In the [builder](https://userubrica.vercel.app/#combinador), try layout, color scheme, light or dark mode, texture and fonts on a working Rubrica with sample data. Then, in the **Crie o seu** (create yours) section, fill in your name, the site address and your email, and copy the ready-made command. Nothing you type leaves the browser: the command is built on the page itself.
+In the [builder](https://userubrica.vercel.app/en/#combinador), try theme, color scheme and light or dark mode on the working demo site. Then, in the **Create yours** section, choose the site type, fill in the name, address and email, and copy the ready command. Nothing you type leaves the browser: the command is built on the page itself.
 
-Prefer to decide in the terminal? Skip to step 2 without the code: the CLI asks the same questions.
+Prefer to decide in the terminal? Skip to step 2 without the options: the CLI asks the same questions.
 
 ## 2. Create the project
 
-Paste the command into a terminal, in the folder where you want to create the project:
+Paste the command in a terminal, in the folder where you want the project. It looks like this:
 
 ```bash
-npx create-rubrica@latest ana-souza --receita <código-do-site>
+npx create-rubrica@latest ana-souza --tipo pessoal --tema zine --esquema riso --modo claro
 ```
 
-Without the code from the site, just run `npx create-rubrica@latest meu-portfolio` and answer the questions. In **Rápido** (quick) mode, the default, it asks for the layout, what the site will have and your identity; colors, texture and fonts come matched to the layout.
+Or just run `npx create-rubrica@latest my-site` and answer the questions: site type, theme, name, address, description, email, languages, color scheme, mode and plugins. All the options are in [CLI commands](./cli.md#create). The CLI itself and the panel are in Brazilian Portuguese for now, which is why the option names (`--tipo`, `--tema`) are in Portuguese.
 
-The CLI then:
+The CLI creates the folder, writes the files, installs the dependencies and starts git. A new project has little code of yours: the site comes from two packages, `@rubrica/core` and the chosen theme (`@rubrica/theme-<name>`).
 
-1. downloads the latest version of Rubrica and applies your choices;
-2. starts git on the `main` branch, with a first commit, and installs the dependencies;
-3. connects the project to Convex (login in the browser, if it's the first time);
-4. generates the login keys, creates your panel user and the initial data.
-
-In the terminal, you only choose the panel password: 12 or more characters, with uppercase, lowercase and a number.
-
-All questions and options are in [CLI commands](./cli.md).
-
-## 3. Open the site
-
-```bash
-cd ana-souza
-npm run dev        # or pnpm dev
-```
-
-The site opens at `http://localhost:3000`. The panel is at `http://localhost:3000/login`, with the email and password you set.
-
-Skipped the panel setup in `create`? Run `npx create-rubrica setup` in the project folder before `npm run dev`.
-
-## 4. Fill in the content
-
-Everything is edited in the panel, without touching the code. The site starts with the sample data of a fictional profile: replace it with yours.
-
-| Panel screen | What you fill in |
+| File or folder | What it is for |
 |---|---|
-| `/admin/contact` | Name, email, phone, photo and social networks |
-| `/admin/home` | Introduction, highlight numbers, availability, services and work principles |
-| `/admin/projects` | Portfolio projects and case studies |
-| `/admin/blog` | Posts |
-| `/admin/resume` | Resume |
-| `/admin/about` | Routine and FAQ for the About page |
-| `/admin/depoimentos` | Testimonials |
-| `/admin/site-config` | **Site & Aparência** (site & appearance): identity, SEO, fonts and the colors of each mode |
-| `/admin/textos` | The site's fixed texts, in Portuguese and English |
-| `/admin/plugins` | Turns parts of the site on and off (blog, proposals, payments…) |
+| `astro.config.ts` | Site configuration. The sections between `rubrica:` markers belong to the CLI |
+| `rubrica.json` | Project state (type, theme, languages, plugins). The CLI maintains it: don't edit by hand |
+| `convex/` | Backend. The files in `convex/rubrica/` are generated (one line each) |
+| `src/blocks/` | Your own blocks, if you create any |
+| `src/overrides/` | Ejected components, if you eject any |
+| `AGENTS.md`, `.mcp.json` | Instructions and configuration for AI agents |
 
-You can also ask your AI agent (Claude Code, Codex or OpenCode): the project comes with the `rubrica` skill, which reads and changes the site's content, and with skills that write the introduction, the case studies, the resume and the posts in your voice. See the "Ou pelo seu agente de IA" section (in Portuguese) of the [README](../../README.md).
+## 3. Connect Convex and create your login
 
-## 5. Make it yours
+At the end of `create`, the CLI offers to run `setup` (or run `npx create-rubrica setup` whenever you want). It:
 
-Rubrica handles the technical part. The identity is up to you, and it's what keeps your portfolio from being "just another one":
+1. opens the Convex login in the browser and creates a **development** deployment;
+2. writes the keys and variables the backend needs;
+3. asks for the email and password of your panel user, the `root`. **The password is typed there, in the terminal**;
+4. builds the initial pages from the theme recipe (home, about, contact and the rest);
+5. asks, one by one, about the optional integrations (Telegram, email, OpenRouter, Asaas, Publish button). You can skip them all.
 
-- **Colors and fonts in the panel:** in **Site & Aparência**, change the 4 main colors of each mode and the fonts. "Usar as cores do esquema" (use the scheme's colors) undoes it.
-- **Another layout or scheme:** `npx create-rubrica config` changes layout, scheme, mode, texture and fonts after the project is created. See the [templates](../templates/README.md) and the [color schemes](../templates/cores.md).
-- **Favicon:** replace `public/favicon.ico` with yours.
-- **In the code:** the color scheme is in `src/index.css`; the layout structure, in `src/components/` and `src/pages/`.
+## 4. See the site
+
+Open two terminals in the project folder:
+
+```bash
+pnpm dev          # the site, at http://localhost:4321
+pnpm dev:convex   # the development backend
+```
+
+The panel is at `/admin`: sign in with the email and password from step 3. Fill in the identity, the pages and the content (see [Content and panel](./conteudo.md)). To see the site without any database, `RUBRICA_FIXTURES=<folder with site.json and pages.json> pnpm build`.
+
+## 5. Publish
+
+When you are ready, `npx create-rubrica publicar` puts the site online on Vercel, with a **production** database separate from yours. Details and other hosts in [Publishing the site](./publicar.md).
+
+## Two databases, always
+
+`.env.local` points to the **development** Convex, the one on your computer. The live site uses the **production** one, whose address is under `producao` in `rubrica.json`. Changing the panel on your computer does not change the published site. Commands that publish (`npx convex deploy`, `publicar`) always write to production: only run them when you mean to change the live site.
 
 ## Next steps
 
-- [Publishing the site](./publicar.md): put it online on Vercel and connect your domain.
-- [Updating your Rubrica](../atualizacao.md): get new versions without losing what you customized.
+- [Content and panel](./conteudo.md): pages made of blocks, collections and roles
+- [Themes](./temas.md): switch the theme, colors and fonts
+- [Languages](./idiomas.md): more than one language
+- [AI agents](./agentes.md): edit the content with Claude Code or Codex

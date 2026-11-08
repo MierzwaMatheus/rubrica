@@ -4,6 +4,14 @@
   "description": "Tema Blueprint do Rubrica (layout blueprint da v1): folhas técnicas numeradas sobre papel quadriculado, com cotas, pranchas e carimbo.",
   "type": "module",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MierzwaMatheus/rubrica.git",
+    "directory": "packages/themes/blueprint"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     ".": "./src/index.tsx",
     "./styles.css": "./src/styles.css",

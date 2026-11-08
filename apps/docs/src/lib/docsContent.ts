@@ -1,13 +1,12 @@
 /**
  * Conteúdo dos docs publicados, lido do repositório no build (import.meta.glob).
- * As imagens de docs/templates/img entram no build como arquivos do site.
+ * As imagens de docs/guia/img entram no build como arquivos do site.
  */
-import { LAYOUTS } from "../../../cli/src/layouts";
 import type { Lang } from "../i18n/routes";
 import { docSlug, isPublishedDoc, splitTitle } from "./docs";
 
-const RAW = import.meta.glob("../../../docs/**/*.md", { query: "?raw", import: "default", eager: true }) as Record<string, string>;
-const IMAGES = import.meta.glob("../../../docs/templates/img/**/*.{jpg,jpeg,png,svg,webp,gif}", {
+const RAW = import.meta.glob("../../../../docs/**/*.md", { query: "?raw", import: "default", eager: true }) as Record<string, string>;
+const IMAGES = import.meta.glob("../../../../docs/guia/img/**/*.{jpg,jpeg,png,svg,webp,gif}", {
   query: "?url",
   import: "default",
   eager: true,
@@ -41,17 +40,17 @@ function load(repoPath: string): Doc {
 const ALL = [...files.keys()].filter(isPublishedDoc).sort().map(load);
 const bySlug = new Map(ALL.map((d) => [d.slug, d]));
 
-const START = ["guia/comecando", "guia/cli", "guia/publicar", "atualizacao"];
-const LOOK = ["templates", "templates/cores", "templates/criando-um-layout"];
-const LAYOUT_SLUGS = LAYOUTS.map((l) => `templates/${l.id}`);
-const listed = new Set([...START, ...LOOK, ...LAYOUT_SLUGS]);
+const START = ["guia/comecando", "guia/conteudo", "guia/publicar", "guia/integracoes", "guia/atualizar"];
+const LOOK = ["guia/temas", "guia/idiomas"];
+const ADVANCED = ["guia/agentes", "guia/migrar", "guia/cli", "guia/telemetria"];
+const listed = new Set([...START, ...LOOK, ...ADVANCED]);
 const pick = (slugs: string[]) => slugs.map((s) => bySlug.get(s)).filter((d): d is Doc => Boolean(d));
 
 /** Docs na ordem da navegação; doc novo fora das listas entra no fim de "Começar". */
 export const DOC_GROUPS: { key: "start" | "look" | "layouts"; docs: Doc[] }[] = [
   { key: "start", docs: pick([...START, ...ALL.map((d) => d.slug).filter((s) => !listed.has(s))]) },
   { key: "look", docs: pick(LOOK) },
-  { key: "layouts", docs: pick(LAYOUT_SLUGS) },
+  { key: "layouts", docs: pick(ADVANCED) },
 ];
 
 /** Primeira página da documentação. */

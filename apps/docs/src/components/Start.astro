@@ -1,5 +1,6 @@
 ---
-import { STEP_CODES, REPO } from "../lib/data";
+import { STEP_CODES } from "../lib/data";
+import { docUrl } from "../lib/docs";
 import { useDict, type Lang } from "../i18n";
 
 interface Props {
@@ -33,7 +34,7 @@ const steps = t.steps.map((s, i) => ({ ...s, code: STEP_CODES[i] }));
     </ol>
     <p class="more">
       {t.moreBefore}{" "}
-      <a href={`${REPO}#readme`} target="_blank" rel="noopener">README</a>.
+      <a href={docUrl("guia/comecando", Astro.props.lang)}>{d.docs.nav}</a>.
     </p>
   </div>
 </section>

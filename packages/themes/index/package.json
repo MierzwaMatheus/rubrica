@@ -4,6 +4,14 @@
   "description": "Tema Índice do Rubrica (layout \"index\" da v1): catálogo de museu, rótulos à esquerda e tabelas com imagem que surge no hover.",
   "type": "module",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MierzwaMatheus/rubrica.git",
+    "directory": "packages/themes/index"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     ".": "./src/index.tsx",
     "./styles.css": "./src/styles.css",

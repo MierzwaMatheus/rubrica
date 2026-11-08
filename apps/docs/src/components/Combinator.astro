@@ -1,5 +1,5 @@
 ---
-import { LAYOUTS, SCHEMES, SANS_FONTS, MONO_FONTS, TEXTURES, MOODS, PAGES } from "../lib/data";
+import { LAYOUTS, SCHEMES, SANS_FONTS, MONO_FONTS, MOODS, PAGES } from "../lib/data";
 import { useDict, type Lang } from "../i18n";
 
 interface Props {
@@ -9,8 +9,6 @@ const d = useDict(Astro.props.lang);
 const t = d.combinator;
 const cat = d.catalog;
 
-const newLayouts = LAYOUTS.filter((l) => !l.legacy);
-const legacyLayouts = LAYOUTS.filter((l) => l.legacy);
 const schemeById = Object.fromEntries(SCHEMES.map((s) => [s.id, s]));
 const config = {
   layouts: LAYOUTS.map((l) => ({ id: l.id, label: l.label, recommended: l.recommended, fonts: l.fonts })),
@@ -21,7 +19,6 @@ const config = {
     rows: t.rows,
     light: t.light,
     dark: t.dark,
-    textures: Object.fromEntries(TEXTURES.map((x) => [x.value, cat.textures[x.value].label])),
   },
 };
 ---
@@ -60,13 +57,8 @@ const config = {
 
         <fieldset class="grp">
           <legend>{t.layout}</legend>
-          <p class="sub">{t.newLayouts}</p>
           <div class="chips">
-            {newLayouts.map((l) => <button type="button" class="chip" data-layout={l.id} aria-pressed="false" title={cat.layoutHints[l.id]}>{l.label}</button>)}
-          </div>
-          <p class="sub">{t.legacyLayouts}</p>
-          <div class="chips">
-            {legacyLayouts.map((l) => <button type="button" class="chip" data-layout={l.id} aria-pressed="false" title={cat.layoutHints[l.id]}>{l.label}</button>)}
+            {LAYOUTS.map((l) => <button type="button" class="chip" data-layout={l.id} aria-pressed="false" title={cat.layoutHints[l.id]}>{l.label}</button>)}
           </div>
         </fieldset>
 
@@ -90,27 +82,11 @@ const config = {
           </div>
         </fieldset>
 
-        <div class="row2">
-          <fieldset class="grp">
-            <legend>{t.mode}</legend>
-            <div class="seg">
-              <button type="button" data-mode="light" aria-pressed="false">{t.light}</button>
-              <button type="button" data-mode="dark" aria-pressed="false">{t.dark}</button>
-            </div>
-          </fieldset>
-          <fieldset class="grp">
-            <legend>{t.toggle}</legend>
-            <div class="seg">
-              <button type="button" data-toggle="1" aria-pressed="false">{t.show}</button>
-              <button type="button" data-toggle="0" aria-pressed="false">{t.hide}</button>
-            </div>
-          </fieldset>
-        </div>
-
         <fieldset class="grp">
-          <legend>{t.texture}</legend>
-          <div class="seg wrap4">
-            {TEXTURES.map((x) => <button type="button" data-texture={x.value} aria-pressed="false" title={cat.textures[x.value].hint}>{cat.textures[x.value].label}</button>)}
+          <legend>{t.mode}</legend>
+          <div class="seg">
+            <button type="button" data-mode="light" aria-pressed="false">{t.light}</button>
+            <button type="button" data-mode="dark" aria-pressed="false">{t.dark}</button>
           </div>
         </fieldset>
 

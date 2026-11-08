@@ -4,6 +4,14 @@
   "description": "Tema Jardim Digital do Rubrica (layout garden da v1): notas com estágio de crescimento, barra lateral com mapa e coluna de leitura.",
   "type": "module",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MierzwaMatheus/rubrica.git",
+    "directory": "packages/themes/garden"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     ".": "./src/index.tsx",
     "./styles.css": "./src/styles.css",

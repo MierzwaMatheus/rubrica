@@ -4,6 +4,14 @@
   "description": "Tema Zine do Rubrica (layout \"zine\" da v1): fanzine de colagem com polaroides, fita adesiva, post-its, carimbos e letra à mão.",
   "type": "module",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MierzwaMatheus/rubrica.git",
+    "directory": "packages/themes/zine"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     ".": "./src/index.tsx",
     "./styles.css": "./src/styles.css",

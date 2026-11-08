@@ -1,41 +1,48 @@
 /*
  * Ponte dos previews do site público. Vai como o primeiro <script> do <head> de cada
- * build de layout (site/scripts/build-previews.ts) e roda antes do app do Rubrica.
+ * página do site de demonstração gerado para um tema (scripts/build-previews.ts).
  *
- * O app é o de verdade, com os dados de exemplo; a ponte só escolhe a aparência:
- * - na carga, lê da URL: page, mode (light|dark), toggle (0|1), scheme, sans, mono, texture;
+ * O site é o de verdade, com os dados de exemplo; a ponte só escolhe a aparência:
+ * - na carga, lê da URL: mode (light|dark), scheme, sans, mono. Sem parâmetros (a visita
+ *   seguiu um link dentro do preview), usa o que ficou guardado no sessionStorage;
  * - depois, recebe do site (postMessage, mesma origem) { type: "rubrica-preview", scheme,
- *   sans, mono, texture, page } e aplica sem recarregar. Trocar o modo recarrega o iframe.
+ *   sans, mono } e aplica sem recarregar;
+ * - avisa o site em qual página do preview a visita está.
  *
- * __SCHEMES__ e __FONTS__ são preenchidos no build com cli/src/themes/{schemes,fonts}.ts.
+ * __SCHEMES__, __FONTS__ e __PREFIX__ são preenchidos no build (scripts/build-previews.ts)
+ * com os esquemas do núcleo e as fontes do CLI.
  */
 (function () {
   var SCHEMES = __SCHEMES__;
   var FONTS = __FONTS__;
+  var PREFIX = "__PREFIX__";
+  var KEY = "rubrica-preview";
   var d = document.documentElement;
 
-  // Os previews não contam como visita: bloqueia os scripts de analytics da Vercel que o
-  // app injeta (no site publicado eles registrariam cada iframe como uma página vista).
-  var append = Node.prototype.appendChild;
-  Node.prototype.appendChild = function (node) {
-    if (node && node.tagName === "SCRIPT" && /\/_vercel\//.test(node.src || "")) return node;
-    return append.call(this, node);
-  };
-
   var params = new URLSearchParams(location.search);
-
-  // Modo e alternância: o script do index.html e o ThemeProvider leem estes valores.
-  var mode = params.get("mode");
-  if (mode === "light" || mode === "dark") {
-    d.setAttribute("data-color-mode", mode);
+  var saved = {};
+  try {
+    saved = JSON.parse(sessionStorage.getItem(KEY) || "{}");
+  } catch (e) {}
+  var state = {
+    mode: params.get("mode") || saved.mode,
+    scheme: params.get("scheme") || saved.scheme,
+    sans: params.get("sans") || saved.sans,
+    mono: params.get("mono") || saved.mono,
+  };
+  function save() {
     try {
-      localStorage.setItem("rubrica-color-mode", mode);
+      sessionStorage.setItem(KEY, JSON.stringify(state));
     } catch (e) {}
   }
-  d.setAttribute("data-color-toggle", params.get("toggle") === "0" ? "false" : "true");
 
-  // O build mora em /previews/<layout>/, mas o roteador do app espera as rotas na raiz.
-  history.replaceState(null, "", params.get("page") || "/");
+  // Modo: o script do núcleo (/_rubrica/color-mode.js) lê o localStorage; o atributo vale já.
+  if (state.mode === "light" || state.mode === "dark") {
+    d.setAttribute("data-color-mode", state.mode);
+    try {
+      localStorage.setItem("rubrica:color-mode", state.mode);
+    } catch (e) {}
+  }
 
   function styleTag(id) {
     var el = document.getElementById(id);
@@ -55,12 +62,15 @@
       .join("");
   }
 
-  // html:root e html:root.dark vencem :root e .dark do index.css pela especificidade.
+  // O escuro é o padrão do núcleo; o claro entra com data-color-mode="light". A
+  // especificidade (html:root[data-scheme]) vence os tokens do tema.
   function applyScheme(id) {
     var s = SCHEMES[id];
     if (!s) return;
+    state.scheme = id;
+    d.setAttribute("data-scheme", id);
     styleTag("rb-preview-scheme").textContent =
-      "html:root{" + block(s.light) + "}html:root.dark{" + block(s.dark) + "}";
+      "html:root[data-scheme]{" + block(s.dark) + '}html:root[data-scheme][data-color-mode="light"]{' + block(s.light) + "}";
   }
 
   function fontHref(families) {
@@ -73,11 +83,10 @@
     return "https://fonts.googleapis.com/css2?" + q + "&display=swap";
   }
 
-  var current = { sans: null, mono: null };
   function applyFonts(sans, mono) {
-    if (sans) current.sans = sans;
-    if (mono) current.mono = mono;
-    if (!current.sans && !current.mono) return;
+    if (sans) state.sans = sans;
+    if (mono) state.mono = mono;
+    if (!state.sans && !state.mono) return;
     var link = document.getElementById("rb-preview-fonts");
     if (!link) {
       link = document.createElement("link");
@@ -85,28 +94,17 @@
       link.rel = "stylesheet";
       document.head.appendChild(link);
     }
-    link.href = fontHref([current.sans, current.mono]);
+    link.href = fontHref([state.sans, state.mono]);
     styleTag("rb-preview-font-vars").textContent =
-      "html:root{" +
-      (current.sans ? '--font-sans:"' + current.sans + '",sans-serif;' : "") +
-      (current.mono ? '--font-mono:"' + current.mono + '",monospace;' : "") +
+      "html:root[data-theme-id]{" +
+      (state.sans ? '--rb-font-sans:"' + state.sans + '",sans-serif;--rb-font-display:"' + state.sans + '",sans-serif;' : "") +
+      (state.mono ? '--rb-font-mono:"' + state.mono + '",monospace;' : "") +
       "}";
   }
 
-  function applyTexture(t) {
-    if (t === "none" || t === "grain" || t === "paper" || t === "scanlines") d.setAttribute("data-texture", t);
-  }
-
-  function goTo(page) {
-    if (!page || page === location.pathname) return;
-    history.pushState(null, "", page);
-    dispatchEvent(new PopStateEvent("popstate"));
-    scrollTo(0, 0);
-  }
-
-  applyScheme(params.get("scheme"));
-  applyFonts(params.get("sans"), params.get("mono"));
-  applyTexture(params.get("texture"));
+  applyScheme(state.scheme);
+  applyFonts(state.sans, state.mono);
+  save();
 
   addEventListener("message", function (e) {
     if (e.origin !== location.origin) return;
@@ -114,17 +112,15 @@
     if (!m || m.type !== "rubrica-preview") return;
     if (m.scheme) applyScheme(m.scheme);
     if (m.sans || m.mono) applyFonts(m.sans, m.mono);
-    if (m.texture) applyTexture(m.texture);
-    if (m.page) goTo(m.page);
+    save();
   });
 
-  // Avisa o site quando a página interna muda (links clicados dentro do preview).
-  var push = history.pushState;
-  history.pushState = function () {
-    var r = push.apply(this, arguments);
+  // Avisa o site qual página do preview está aberta (ex.: /sobre), sem o prefixo do tema.
+  addEventListener("DOMContentLoaded", function () {
+    var page = location.pathname.indexOf(PREFIX) === 0 ? location.pathname.slice(PREFIX.length) : location.pathname;
+    page = "/" + page.replace(/^\/+|\/+$/g, "");
     try {
-      parent.postMessage({ type: "rubrica-preview-page", page: location.pathname }, location.origin);
+      parent.postMessage({ type: "rubrica-preview-page", page: page }, location.origin);
     } catch (e) {}
-    return r;
-  };
+  });
 })();

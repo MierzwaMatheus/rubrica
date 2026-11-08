@@ -4,6 +4,14 @@
   "description": "Tema Conversa do Rubrica (layout chat da v1): o site como uma conversa, com perguntas de quem visita e respostas em balões.",
   "type": "module",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MierzwaMatheus/rubrica.git",
+    "directory": "packages/themes/chat"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     ".": "./src/index.tsx",
     "./styles.css": "./src/styles.css",

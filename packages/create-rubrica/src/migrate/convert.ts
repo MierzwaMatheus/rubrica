@@ -229,11 +229,16 @@ const PRESENT = /atual|presente|present|hoje|now|current|o momento|em andamento/
 
 /** "jan/2020 – atual", "03/2019 - 12/2021", "2018 - 2020" → { start, end } no formato da v2. */
 export function parsePeriod(period: string): { start?: string; end?: string; ok: boolean } {
-  const parts = period.split(/\s+(?:-|–|—|a|até|to)\s+|\s*[–—]\s*|\s+-\s+/i).map((p) => p.trim()).filter(Boolean);
+  // "2015-2017": anos colados ao hífen, sem espaço.
+  const years = /^(\d{4})\s*-\s*(\d{4})$/.exec(period.trim());
+  const parts = years
+    ? [years[1]!, years[2]!]
+    : period.split(/\s+(?:-|–|—|a|até|to)\s+|\s*[–—]\s*|\s+-\s+/i).map((p) => p.trim()).filter(Boolean);
   const one = (p: string): string | undefined => {
     const numeric = /^(\d{1,2})[/.-](\d{4})$/.exec(p);
     if (numeric) return `${numeric[2]}-${numeric[1]!.padStart(2, "0")}`;
-    const named = /^([a-zç]{3})[a-zç]*\.?[\s/de]*(\d{4})$/i.exec(p.normalize("NFD").replace(/[̀-ͯ]/g, ""));
+    // "Jan 2025", "jan/2025", "janeiro de 2025", "Jan-2025".
+    const named = /^([a-zç]{3})[a-zç]*\.?[\s/de-]*(\d{4})$/i.exec(p.normalize("NFD").replace(/[̀-ͯ]/g, ""));
     if (named && MONTHS[named[1]!.toLowerCase()]) return `${named[2]}-${MONTHS[named[1]!.toLowerCase()]}`;
     const year = /^(\d{4})$/.exec(p);
     return year ? year[1] : undefined;

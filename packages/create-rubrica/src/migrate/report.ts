@@ -66,7 +66,7 @@ export function renderReport(input: ReportInput): string {
       out.push("");
     }
   } else {
-    out.push("## Dados", "", "Sem export da v1 ainda. Rode `npx convex export --path .rubrica/migracao/export-v1.zip` (no Convex de desenvolvimento) e depois `npx create-rubrica migrar dados --export .rubrica/migracao/export-v1.zip`.", "");
+    out.push("## Dados", "", "Sem export da v1 ainda. Rode `npx convex export --prod --include-file-storage --path .rubrica/migracao/export-v1.zip` (do banco com o conteúdo de verdade, em geral a produção; o export só lê) e depois `npx create-rubrica migrar dados --export .rubrica/migracao/export-v1.zip`.", "");
   }
 
   out.push("## Personalizações (comparando com a v1 de referência)", "");

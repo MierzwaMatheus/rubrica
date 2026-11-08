@@ -20,6 +20,11 @@ describe("ajudantes", () => {
   it("períodos do currículo", () => {
     expect(parsePeriod("jan/2020 – atual")).toEqual({ start: "2020-01", ok: true });
     expect(parsePeriod("2014 - 2018")).toEqual({ start: "2014", end: "2018", ok: true });
+    // Formatos de um portfólio real (mmlo): mês e ano com hífen, anos colados.
+    expect(parsePeriod("Jan-2025 - atual")).toEqual({ start: "2025-01", ok: true });
+    expect(parsePeriod("Nov-2024 - Jan-2025")).toEqual({ start: "2024-11", end: "2025-01", ok: true });
+    expect(parsePeriod("2022 - Nov-2024")).toEqual({ start: "2022", end: "2024-11", ok: true });
+    expect(parsePeriod("2015-2017")).toEqual({ start: "2015", end: "2017", ok: true });
     expect(parsePeriod("03/2016 - 12/2017")).toEqual({ start: "2016-03", end: "2017-12", ok: true });
     expect(parsePeriod("Mar 2019 - Present")).toEqual({ start: "2019-03", ok: true });
     expect(parsePeriod("setembro de 2021 a dezembro de 2022")).toEqual({ start: "2021-09", end: "2022-12", ok: true });

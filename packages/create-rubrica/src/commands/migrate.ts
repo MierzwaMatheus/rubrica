@@ -206,7 +206,7 @@ async function runReport(projectDir: string, values: Record<string, string>, dep
     nextSteps: [
       v1.version === LAST_V1 ? "A v1 está na última versão: dá para migrar." : `Atualize a v1 para a ${LAST_V1} antes (npx create-rubrica@1 update).`,
       "Faça commit de tudo e rode `npx create-rubrica@latest migrar` (cria a branch rubrica-v2; nada muda na branch atual).",
-      ...(values.export ? [] : ["Exporte os dados do Convex de desenvolvimento da v1 (`npx convex export --path .rubrica/migracao/export-v1.zip`) para ver no relatório o que eles viram."]),
+      ...(values.export ? [] : ["Exporte os dados da v1 do banco com o conteúdo de verdade, em geral a produção (`npx convex export --prod --include-file-storage --path .rubrica/migracao/export-v1.zip`; o export só lê) para ver no relatório o que eles viram."]),
     ],
   });
   if (values.saida) writeFileSync(resolve(deps.cwd, values.saida), report);
@@ -226,7 +226,7 @@ async function runCompare(values: Record<string, string>, deps: MigrateDeps): Pr
 }
 
 async function runData(projectDir: string, values: Record<string, string>, deps: MigrateDeps): Promise<DataOutputs> {
-  if (!values.export) throw new Cancelled(`Uso: npx create-rubrica migrar dados --export <arquivo.zip>. Para gerar o export: npx convex export --path ${WORK_DIR}/export-v1.zip`);
+  if (!values.export) throw new Cancelled(`Uso: npx create-rubrica migrar dados --export <arquivo.zip>. Para gerar o export (só lê; em geral da produção): npx convex export --prod --include-file-storage --path ${WORK_DIR}/export-v1.zip`);
   const raw = JSON.parse(readFileSync(join(projectDir, STATE_FILE), "utf-8")) as Record<string, unknown>;
   const migrated = raw.rubrica === 2 ? (raw as RubricaState) : null;
   const v1: V1RubricaJson = migrated ? (raw.v1 as V1RubricaJson | undefined) ?? { layout: migrated.migracao?.layoutV1 ?? "", version: migrated.migracao?.de } : readV1(projectDir);
@@ -317,6 +317,9 @@ async function runFull(projectDir: string, values: Record<string, string>, flags
   if (!flags.has("sem-instalar")) {
     s.start(`Instalando com o ${pm}...`);
     try {
+      // O node_modules da v1 pode ter pacotes soltos na raiz (ex.: um cookie 0.x) que o
+      // build da v2 pega no lugar dos certos: instala do zero.
+      rmSync(join(projectDir, "node_modules"), { recursive: true, force: true });
       runner(pm, ["install"], { cwd: projectDir });
       s.stop("Instalado.");
       const core = await loadInstalledCore(projectDir);
@@ -367,7 +370,7 @@ async function runFull(projectDir: string, values: Record<string, string>, flags
     ...(custom.error && { customizationsError: custom.error }),
     outputs: { ...(data?.files ?? {}), Relatório: join(outDir, "relatorio.md") },
     nextSteps: [
-      ...(data ? [] : [`Exporte os dados da v1 (no Convex de desenvolvimento dela, antes de trocar o .env.local): \`npx convex export --path ${WORK_DIR}/export-v1.zip\`, e rode \`npx create-rubrica migrar dados --export ${WORK_DIR}/export-v1.zip\`.`]),
+      ...(data ? [] : [`Exporte os dados da v1 do banco com o conteúdo de verdade, em geral a produção (o export só lê): \`npx convex export --prod --include-file-storage --path ${WORK_DIR}/export-v1.zip\`, e rode \`npx create-rubrica migrar dados --export ${WORK_DIR}/export-v1.zip\`.`]),
       `Build com os dados convertidos: ${build}. Compare com o site no ar: \`npx create-rubrica migrar conferir --v1 ${v1.identity?.siteUrl ?? "<url da v1>"} --v2 dist\`.`,
       ...importSteps(join(WORK_DIR), projectPackageManager(projectDir)),
       "Para cada personalização listada, siga a sugestão (bloco próprio, ejetar, tokens). Depois: pnpm check, pnpm test, commit na branch rubrica-v2.",
@@ -379,8 +382,28 @@ async function runFull(projectDir: string, values: Record<string, string>, flags
   outro(`Migração preparada na branch ${BRANCH}. Relatório: ${WORK_DIR}/relatorio.md\nO Convex não foi tocado: siga os próximos passos do relatório.`);
 }
 
+export const MIGRATE_HELP = `Uso: npx create-rubrica@latest migrar [opções]
+
+Leva um projeto da v1 (1.13.1) para a v2, numa branch nova (rubrica-v2). O Convex não é tocado.
+
+  --relatorio            só mostra o que vai acontecer (tema, personalizações, dados), sem gravar
+  --export <zip>         export da v1 (npx convex export --prod --include-file-storage --path .rubrica/migracao/export-v1.zip)
+  --yes, -y              não pede confirmação
+  --sem-instalar         não instala as dependências
+  --sem-build            não faz o build de conferência
+  --saida <pasta>        onde gravar os arquivos da migração (padrão: .rubrica/migracao)
+
+  migrar dados --export <zip>        só converte os dados (sem trocar o código)
+  migrar conferir --v1 <url> --v2 dist   compara título, h1 e texto das páginas
+
+Guia: https://userubrica.vercel.app/docs/guia/migrar`;
+
 export async function runMigrate(argv: string[], deps: MigrateDeps): Promise<void> {
   const out = deps.out ?? ((t: string) => console.log(t));
+  if (argv.includes("--help") || argv.includes("-h")) {
+    out(MIGRATE_HELP);
+    return;
+  }
   const args = parseArgs(argv, {
     values: ["export", "template-v1", "saida", "v1", "v2", "local", "convex-url"],
     flags: ["relatorio", "yes", "sem-instalar", "sem-build"],

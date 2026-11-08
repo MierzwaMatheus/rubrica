@@ -33,13 +33,13 @@ It shows the theme equivalent to your layout and the list of your project's **cu
 
 ### 2. Export the v1 data
 
-Run it in the project folder, **with `.env.local` still pointing to the v1 database**:
+Run it in the project folder. Export from the database that holds the real content, which is usually **production** (`--prod`). `--include-file-storage` brings the images along:
 
 ```bash
-npx convex export --path .rubrica/migracao/export-v1.zip
+npx convex export --prod --include-file-storage --path .rubrica/migracao/export-v1.zip
 ```
 
-The export is read-only: it doesn't change the v1 database.
+The export is read-only: it doesn't change the v1 database. If `.env.local` doesn't point to the v1 project, use `--deployment <name>` (the production deployment name is in the Convex dashboard) instead of `--prod`.
 
 ### 3. Migrate
 

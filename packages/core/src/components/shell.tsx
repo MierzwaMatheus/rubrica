@@ -1,6 +1,6 @@
 /** Casca e templates padrão do núcleo. Temas substituem o que quiserem. */
 import type { CaseTemplateProps, NotFoundProps, PostTemplateProps, ShellProps } from "../theme/contract";
-import { Html, Img, LinkButton } from "./primitives";
+import { Html, Img, LinkButton, Logo } from "./primitives";
 
 export function DefaultShell({ ctx, children, colorToggle, localeSwitcher }: ShellProps) {
   const { site } = ctx;
@@ -13,7 +13,7 @@ export function DefaultShell({ ctx, children, colorToggle, localeSwitcher }: She
       <header className="rb-header">
         <div className="rb-container rb-header__inner">
           <a className="rb-brand" href={ctx.href("/")}>
-            {site.name}
+            {site.logo ? <Logo logo={site.logo} priority /> : site.name}
           </a>
           <nav className="rb-nav" aria-label={ctx.t("nav.menu")}>
             <details className="rb-nav__mobile">

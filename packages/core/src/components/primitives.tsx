@@ -72,3 +72,18 @@ export function ColorToggleButton({ label, className }: { label: string; classNa
     </button>
   );
 }
+
+/**
+ * Logo do site. Com versão para fundo escuro, as duas vão no HTML e o CSS do núcleo
+ * mostra a certa conforme o modo de cor (sem JavaScript).
+ */
+export function Logo({ logo, className, priority }: { logo: NonNullable<import("../theme/contract").ResolvedSite["logo"]>; className?: string; priority?: boolean }) {
+  const cls = `rb-logo${className ? ` ${className}` : ""}`;
+  if (!logo.dark) return <Img image={logo} className={cls} priority={priority} />;
+  return (
+    <span className={`${cls} rb-logo--pair`}>
+      <Img image={logo} className="rb-logo__light" priority={priority} />
+      <Img image={{ ...logo.dark, alt: "" }} className="rb-logo__dark" priority={priority} />
+    </span>
+  );
+}

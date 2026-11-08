@@ -128,3 +128,14 @@ a { color: var(--rb-accent); }
 .rb-color-toggle { min-width: 44px; min-height: 44px; background: none; border: 1px solid var(--rb-border); color: var(--rb-fg); border-radius: var(--rb-radius); cursor: pointer; }
 .rb-color-toggle__icon::before { content: "☾"; }
 [data-color-mode="light"] .rb-color-toggle__icon::before { content: "☀"; }
+
+/* Logo com versão clara/escura: mostra a certa pelo modo de cor. */
+.rb-logo { display: inline-block; height: 2rem; width: auto; }
+.rb-logo img { height: 100%; width: auto; }
+.rb-logo--pair .rb-logo__dark { display: none; }
+[data-color-mode="dark"] .rb-logo--pair .rb-logo__light { display: none; }
+[data-color-mode="dark"] .rb-logo--pair .rb-logo__dark { display: inline; }
+@media (prefers-color-scheme: dark) {
+  [data-color-mode="system"] .rb-logo--pair .rb-logo__light { display: none; }
+  [data-color-mode="system"] .rb-logo--pair .rb-logo__dark { display: inline; }
+}

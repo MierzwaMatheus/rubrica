@@ -29,7 +29,7 @@ async function seedFixtures(t: T) {
       void id;
       await ctx.db.insert("posts", { ...post, published: true, createdAt: now } as never);
     }
-    for (const { id, ...project } of projectsFixture as RawProject[]) {
+    for (const { id, ...project } of projectsFixture as unknown as RawProject[]) {
       void id;
       await ctx.db.insert("projects", { ...project, published: true, createdAt: now } as never);
     }
@@ -40,10 +40,10 @@ async function seedFixtures(t: T) {
 }
 
 const fixtureSnapshot = (): SiteSnapshot => ({
-  site: siteFixture as SiteSettings,
+  site: siteFixture as unknown as SiteSettings,
   pages: pagesFixture as PageRecord[],
   texts: textsFixture as UiTexts,
-  collections: { ...emptyCollections(), posts: postsFixture as RawPost[], projects: projectsFixture as RawProject[] },
+  collections: { ...emptyCollections(), posts: postsFixture as RawPost[], projects: projectsFixture as unknown as RawProject[] },
 });
 
 const routes = (snapshot: SiteSnapshot) =>
@@ -66,7 +66,7 @@ describe("snapshot do build", () => {
     const snapshot = await t.query(api.rubrica.site.snapshot, {});
     expect(snapshot.site).toEqual(siteFixture);
     expect(snapshot.texts).toEqual(textsFixture);
-    expect(snapshot.pages.map((p) => p.path)).toEqual(["/", "/blog", "/novidades", "/portfolio", "/sobre"]);
+    expect(snapshot.pages.map((p) => p.path)).toEqual(fixtureSnapshot().pages.map((p) => p.path).sort());
     expect(Object.keys(snapshot.collections).sort()).toEqual(Object.keys(emptyCollections()).sort());
     const strip = ({ id, ...rest }: { id: string }) => (void id, rest);
     expect(snapshot.collections.posts.map(strip)).toEqual([...(postsFixture as RawPost[])].sort((a, b) => b.publishedAt - a.publishedAt).map(strip));

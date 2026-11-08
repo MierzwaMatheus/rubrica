@@ -14,7 +14,7 @@
  * - Ids dos documentos de tabelas 1:1 (usuários, posts, projetos…) são mantidos, para as
  *   referências (autor, papel, imagem) continuarem valendo depois do import.
  */
-import { isWhatsAppNumber, normalizeWhatsAppNumber, validateBlock, type Recipe, type RecipeBlock } from "@rubrica/core";
+import { defaultUiText, isWhatsAppNumber, normalizeWhatsAppNumber, validateBlock, type Locale, type Recipe, type RecipeBlock } from "@rubrica/core";
 import { blockIds, isLocalizedValue, localizeRecipeValue, navigationFromPages } from "@rubrica/core/seed";
 import { CORE_PLUGINS, V1_PLUGIN_RENAMES } from "@rubrica/core/plugins";
 import { CORE_BLOCKS } from "@rubrica/core/blocks";
@@ -442,7 +442,8 @@ function convertProjects(ctx: Ctx, docs: Doc[]): Doc[] {
     const links: Doc[] = [];
     if (str(d.demoLink)) links.push({ label: ctx.t("portfolio.liveDemo"), href: d.demoLink });
     if (str(d.githubLink)) links.push({ label: ctx.t("portfolio.code"), href: d.githubLink });
-    const tags = [...new Set([...(str(d.category) ? [d.category as string] : []), ...(d.tags ?? [])])];
+    // A categoria vai para o campo próprio (não repete como etiqueta, como na v1).
+    const tags = [...new Set((d.tags ?? []) as string[])];
     return compact({
       ...meta(d),
       slug,
@@ -486,14 +487,14 @@ function convertResume(ctx: Ctx, docs: Doc[]): Doc[] {
         // O grupo da v1 vai para o campo próprio e continua na etiqueta.
         return compact({ ...base, kind: "skill", title: loc(c.name, { enUS: en.name }), description: loc(c.level, { enUS: en.level }), group: str(c.group) ? loc(c.group, { enUS: en.group }) : undefined, tags: str(c.group) ? [c.group] : undefined });
       case "soft_skill":
-        return compact({ ...base, kind: "skill", title: loc(c.text, tr), tags: ["soft-skill"] });
+        return compact({ ...base, kind: "soft-skill", title: loc(c.text, tr) });
       case "course":
         return compact({ ...base, kind: "certification", title: loc(c.text, tr) });
       case "language":
         return compact({ ...base, kind: "language", title: loc(c.name, tr.enUS ? { enUS: typeof tr.enUS === "string" ? tr.enUS : tr.enUS.name } : undefined), description: str(c.level) ? loc(c.level) : undefined });
       case "volunteer":
-        if (str(c.text)) return compact({ ...base, kind: "experience", title: loc(c.text, tr), tags: ["voluntariado"] });
-        return compact({ ...base, kind: "experience", title: loc(c.role, { enUS: en.role }), organization: str(c.company), description: loc(c.description, { enUS: en.description }), tags: ["voluntariado"], ...period(c.period) });
+        if (str(c.text)) return compact({ ...base, kind: "volunteer", title: loc(c.text, tr) });
+        return compact({ ...base, kind: "volunteer", title: loc(c.role, { enUS: en.role }), organization: str(c.company), description: loc(c.description, { enUS: en.description }), ...period(c.period) });
       default:
         ctx.warnings.push(`Currículo: item do tipo desconhecido "${d.type}" ficou de fora.`);
         return null;
@@ -563,9 +564,10 @@ function convertSettings(ctx: Ctx, input: ConvertInput, plugins: Record<string, 
     if (!fromScheme) tokens[token] = hex;
   }
   if (ctx.config.get("theme_colors_per_mode") === true) ctx.warnings.push("As cores separadas por modo (claro/escuro) do painel da v1 não foram convertidas: ajuste em Aparência.");
+  // A ordem da sidebar da v1: GitHub, LinkedIn, Behance.
   const social = [
-    ["linkedin", contact?.linkedinUrl],
     ["github", contact?.githubUrl],
+    ["linkedin", contact?.linkedinUrl],
     ["behance", contact?.behanceUrl],
   ]
     .filter(([, url]) => str(url))
@@ -611,11 +613,61 @@ function convertSettings(ctx: Ctx, input: ConvertInput, plugins: Record<string, 
 }
 
 /** Campos de cada bloco das páginas fixas, a partir da v1. `null`: o bloco sai (sem conteúdo). */
-type Filler = (ctx: Ctx, plugins: Record<string, boolean>) => Doc | null;
+type Filler = (ctx: Ctx, plugins: Record<string, boolean>, recipe?: RecipeBlock[]) => Doc | null;
 
 const link = (label: Loc, href: string) => (hasText(label) ? { label, href } : undefined);
 
-const ABOUT_TEXT = (ctx: Ctx) => mapLoc(locAny(ctx.home.get("about_text")), toHtml);
+/** O "sobre" da home em HTML, com os números de resultado em negrito (a home e o Sobre da v1 destacavam). */
+const ABOUT_TEXT = (ctx: Ctx) =>
+  mapLoc(locAny(ctx.home.get("about_text")), (text) =>
+    /<(p|h[1-6]|ul|ol|div|blockquote)[\s>]/i.test(text)
+      ? text
+      : text
+          .split(/\n\s*\n/)
+          .map((p) => p.trim())
+          .filter(Boolean)
+          .map((p) => `<p>${highlightNumbersHtml(p).replace(/\n/g, "<br>")}</p>`)
+          .join(""),
+  );
+
+// Número seguido de uma unidade de resultado ("50 skills", "3 horas"), como o highlightNumbers
+// da v1 (src/utils/homeContent.ts): anos e versões soltas não entram, porque não têm unidade.
+const RESULT_UNITS = [
+  "skills", "automações", "áreas", "chamados", "horas", "minutos", "meses", "anos", "iniciativas", "pessoas", "times", "sistemas", "projetos",
+  "automations", "areas", "tickets", "hours", "minutes", "months", "years", "initiatives", "people", "teams", "systems", "projects",
+];
+const NUMBER_WITH_UNIT = new RegExp(`(?<![\\p{L}\\d.])~?\\d+(?:[.,]\\d+)*\\+?\\s(?:${RESULT_UNITS.join("|")})(?![\\p{L}])`, "gu");
+
+/** Escapa o texto e põe os números com unidade em <strong>, como a v1 destacava. */
+export function highlightNumbersHtml(text: string): string {
+  const escape = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  let out = "";
+  let last = 0;
+  for (const m of text.matchAll(NUMBER_WITH_UNIT)) {
+    out += escape(text.slice(last, m.index)) + `<strong>${escape(m[0])}</strong>`;
+    last = m.index! + m[0].length;
+  }
+  return out + escape(text.slice(last));
+}
+
+/** Resumo do currículo da v1: o primeiro parágrafo do "sobre" da home, com os números em negrito. */
+const RESUME_SUMMARY = (ctx: Ctx): Loc =>
+  mapLoc(locAny(ctx.home.get("about_text")), (text) => {
+    const first = text.split(/\n\s*\n/).map((p) => p.trim()).find(Boolean);
+    return first ? `<p>${highlightNumbersHtml(first)}</p>` : "";
+  });
+
+/** A receita da página abre com um cabeçalho (hero)? */
+const hasHeader = (recipe?: RecipeBlock[]) => recipe?.[0]?.type === "hero";
+/** Cabeçalho de página com o título e o apoio da v1 (`<prefixo>.title` e `.subtitle`). */
+const header = (ctx: Ctx, prefix: string): Doc => compact({ title: ctx.t(`${prefix}.title`), subtitle: hasText(ctx.t(`${prefix}.subtitle`)) ? ctx.t(`${prefix}.subtitle`) : undefined });
+
+/** Números da home (home_metrics): a v1 mostrava os mesmos na home e no currículo. */
+const HOME_METRICS: Filler = (ctx) => {
+  const metrics = (ctx.home.get("home_metrics") as Doc[] | undefined) ?? [];
+  if (!metrics.length) return null;
+  return { items: metrics.slice(0, 8).map((m) => ({ value: String(m.value), label: loc(m.label, m.labelTranslations) })) };
+};
 
 /** Por página e tipo de bloco (com a ocorrência quando o tipo repete na página). */
 export const SECTION_FILLERS: Record<string, Record<string, Filler | Filler[]>> = {
@@ -635,11 +687,7 @@ export const SECTION_FILLERS: Record<string, Record<string, Filler | Filler[]>> 
         showAvailability: availability?.available === true,
       });
     },
-    numeros: (ctx) => {
-      const metrics = (ctx.home.get("home_metrics") as Doc[] | undefined) ?? [];
-      if (!metrics.length) return null;
-      return { items: metrics.slice(0, 8).map((m) => ({ value: String(m.value), label: loc(m.label, m.labelTranslations) })) };
-    },
+    numeros: HOME_METRICS,
     cases: (ctx) => compact({ anchor: "cases", title: ctx.t("home.cases.title"), cta: link(ctx.t("home.cases.viewAll"), "/portfolio") }),
     texto: (ctx) => {
       const body = ABOUT_TEXT(ctx);
@@ -671,15 +719,36 @@ export const SECTION_FILLERS: Record<string, Record<string, Filler | Filler[]>> 
     "lista-itens": (ctx) => {
       const items = ((ctx.home.get("work_principles") as Doc[] | undefined) ?? []).filter((p) => str(p.title));
       if (!items.length) return null;
-      return { title: ctx.t("about.principles.title"), numbered: true, items: items.slice(0, 12).map((p) => compact({ title: loc(p.title, p.titleTranslations), body: loc(p.description, p.descriptionTranslations) })) };
+      return { title: ctx.t("about.principles.title"), numbered: false, items: items.slice(0, 12).map((p) => compact({ title: loc(p.title, p.titleTranslations), body: loc(p.description, p.descriptionTranslations) })) };
     },
     galeria: (ctx) => ({ title: ctx.t("about.dailyRoutine.title") }),
     faq: (ctx) => ({ title: ctx.t("about.faq.title") }),
   },
-  "/curriculo": { curriculo: (ctx) => ({ title: ctx.t("resume.title"), intro: ctx.t("resume.subtitle"), showDownload: true }) },
-  "/portfolio": { cases: (ctx) => ({ title: ctx.t("portfolio.title"), intro: ctx.t("portfolio.subtitle") }) },
-  "/blog": { "posts-recentes": (ctx) => ({ title: ctx.t("blog.title"), intro: ctx.t("blog.subtitle"), showTagFilter: true }) },
-  "/depoimentos": { depoimentos: (ctx, plugins) => compact({ title: ctx.t("testimonials.title"), intro: ctx.t("testimonials.subtitle"), allowSubmission: plugins["testimonials-intake"] !== false }) },
+  // A página da v1: título e apoio, o resumo (1º parágrafo do "sobre"), os números e o PDF no
+  // topo, depois o currículo. Numa receita sem o cabeçalho (hero), o título fica no currículo.
+  "/curriculo": {
+    hero: (ctx) => header(ctx, "resume"),
+    texto: (ctx) => {
+      const body = RESUME_SUMMARY(ctx);
+      return hasText(body) ? { body } : null;
+    },
+    numeros: HOME_METRICS,
+    curriculo: (ctx, _plugins, recipe) => (hasHeader(recipe) ? { showDownload: true } : { title: ctx.t("resume.title"), intro: ctx.t("resume.subtitle"), showDownload: true }),
+  },
+  // Páginas de lista: com um cabeçalho (hero) na receita, o título e o apoio da v1 vão para ele.
+  "/portfolio": {
+    hero: (ctx) => header(ctx, "portfolio"),
+    cases: (ctx, _p, recipe) => (hasHeader(recipe) ? {} : { title: ctx.t("portfolio.title"), intro: ctx.t("portfolio.subtitle") }),
+  },
+  "/blog": {
+    hero: (ctx) => header(ctx, "blog"),
+    "posts-recentes": (ctx, _p, recipe) => (hasHeader(recipe) ? { showTagFilter: true } : { title: ctx.t("blog.title"), intro: ctx.t("blog.subtitle"), showTagFilter: true }),
+  },
+  "/depoimentos": {
+    hero: (ctx) => header(ctx, "testimonials"),
+    depoimentos: (ctx, plugins, recipe) =>
+      compact({ ...(hasHeader(recipe) ? {} : { title: ctx.t("testimonials.title"), intro: ctx.t("testimonials.subtitle") }), allowSubmission: plugins["testimonials-intake"] !== false }),
+  },
 };
 
 /** Título e SEO de cada página fixa. */
@@ -717,6 +786,13 @@ export const UI_TEXT_MAP: Record<string, string> = {
   "resume.courses": "resume.certification",
   "resume.languages": "resume.language",
   "resume.downloadCV": "resume.download",
+  "resume.softSkills": "resume.soft-skill",
+  "resume.volunteer": "resume.volunteer",
+  "resume.showOlder": "resume.showOlder",
+  "resume.hideOlder": "resume.hideOlder",
+  "contactWizard.trigger": "sidebar.talk",
+  "sidebar.downloadCV": "sidebar.downloadCV",
+  "portfolio.screenshots": "case.gallery",
   "home.cases.read": "case.view",
   "blog.filterByTags": "blog.filter",
   "sidebar.language": "nav.language",
@@ -731,6 +807,21 @@ export const UI_TEXT_MAP: Record<string, string> = {
   "notFound.cta": "notFound.home",
   "portfolio.myRole": "case.role",
   "home.availability.label": "hero.available",
+};
+
+/**
+ * Rótulos da v1 que vêm mesmo sem personalização ("Habilidades", "Baixar CV (PDF)", "Fale
+ * comigo"), quando diferem do padrão da v2: o site migrado fica com as palavras da v1.
+ */
+const V1_LABELS = [
+  "resume.experience", "resume.education", "resume.skills", "resume.softSkills", "resume.courses", "resume.languages",
+  "resume.volunteer", "resume.downloadCV", "resume.showOlder", "resume.hideOlder",
+  "contactWizard.trigger", "sidebar.downloadCV", "testimonials.leaveTestimonial", "portfolio.screenshots", "blog.filterByTags",
+];
+
+/** Ajuste do texto da v1 ao formato da chave da v2 (a v2 mostra a contagem no próprio texto). */
+const UI_TEXT_ADAPT: Record<string, (s: string) => string> = {
+  "resume.showOlder": (s) => (s.includes("{count}") ? s : `${s} ({count})`),
 };
 
 /**
@@ -781,7 +872,7 @@ function buildPages(ctx: Ctx, input: ConvertInput, plugins: Record<string, boole
         dropped.push({ type: block.type, reason: "a v1 não tinha esta seção nesta página" });
         continue;
       }
-      const fields = fill(ctx, plugins);
+      const fields = fill(ctx, plugins, page.blocks);
       if (!fields) {
         dropped.push({ type: block.type, reason: "sem conteúdo na v1" });
         continue;
@@ -839,13 +930,27 @@ function buildUiTexts(ctx: Ctx, report: MigrationReport, now: number): Doc[] {
     const v2 = UI_TEXT_MAP[key];
     if (v2) {
       if (out.some((t) => t.key === v2)) continue;
-      out.push({ key: v2, value: ctx.t(key), updatedAt: now });
+      out.push({ key: v2, value: adaptText(key, ctx.t(key)), updatedAt: now });
       report.texts.ui.push({ v1: key, v2 });
     } else if (!key.startsWith("admin.")) {
       report.texts.unmapped.push({ key, pt: String(ctx.siteTexts.get(key)?.ptBR ?? ctx.projectTexts[key]?.pt ?? "").slice(0, 120) });
     }
   }
+  for (const key of V1_LABELS) {
+    const v2 = UI_TEXT_MAP[key]!;
+    if (out.some((t) => t.key === v2)) continue;
+    const value = adaptText(key, ctx.t(key));
+    if (!hasText(value)) continue;
+    if (Object.entries(value).every(([locale, text]) => text === defaultUiText(v2, locale as Locale))) continue;
+    out.push({ key: v2, value, updatedAt: now });
+    report.texts.ui.push({ v1: key, v2 });
+  }
   return out;
+}
+
+function adaptText(key: string, value: Loc): Loc {
+  const adapt = UI_TEXT_ADAPT[key];
+  return adapt ? mapLoc(value, adapt) : value;
 }
 
 export function convertV1(input: ConvertInput): ConvertResult {

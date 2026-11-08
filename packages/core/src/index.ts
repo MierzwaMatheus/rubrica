@@ -12,3 +12,17 @@ export { SCHEMES, SCHEME_TOKENS, DEFAULT_SCHEME_ID, getScheme, schemeCss, contra
 export type { ColorScheme, SchemeMode, SchemeRole } from "./theme/schemes";
 export { planFonts, fontWeights, KNOWN_FONTS } from "./theme/fonts";
 export type { FontPlan, PlannedFont } from "./theme/fonts";
+/** Itens de coleção já resolvidos no idioma (o que os blocos e templates recebem). */
+export type {
+  CaseSectionItem,
+  FaqItem,
+  PlanItem,
+  PostItem,
+  ProjectItem,
+  ResolvedSeo,
+  ResumeItem,
+  RoutineItem,
+  ServiceItem,
+  TeamItem,
+  TestimonialItem,
+} from "./render/collections";

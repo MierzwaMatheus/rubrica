@@ -13,6 +13,9 @@ export { CasesBlock, DepoimentosBlock, FaqBlock, PostsRecentesBlock, PrecosBlock
 export { ContatoBlock, LocalizacaoBlock } from "./blocks/contact";
 export { EquipeBlock, GaleriaBlock, ListaItensBlock, LogosClientesBlock, NumerosBlock, ServicosBlock } from "./blocks/lists";
 export { CurriculoBlock } from "./blocks/resume";
+/** Utilitários puros dos blocos padrão, para os temas não copiarem. */
+export { digits, formatDays, resolveFreeHref, safeId, shorten, tagFilterCss } from "./blocks/util";
+export type { TagFilterCssOptions } from "./blocks/util";
 
 /** Componentes padrão por tipo de bloco. Tipo sem entrada usa `GenericBlock`. */
 export const DEFAULT_BLOCKS: Partial<Record<string, BlockComponent>> = {

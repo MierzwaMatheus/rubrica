@@ -38,7 +38,4 @@ export function joinAsSentence(items: string[], locale: string): string {
   return new Intl.ListFormat(locale, { style: "long", type: "conjunction" }).format(items);
 }
 
-/** Só dígitos, para `wa.me` e `tel:`. */
-export function digits(value: string): string {
-  return value.replace(/\D+/g, "");
-}
+export { digits } from "@rubrica/core/components";

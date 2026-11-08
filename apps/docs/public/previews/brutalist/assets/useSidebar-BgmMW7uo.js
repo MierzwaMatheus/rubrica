@@ -1,1 +1,0 @@
-import{W as s,Y as c,r as e}from"./index-BRLZPcIY.js";function l(r){const{locale:n}=s(),{data:t,isLoading:a}=c({queryKey:["sidebar","contact"],queryFn:()=>r.getContactInfo(),staleTime:1/0}),o=e.useMemo(()=>t&&(t.role_translations?.[n]||t.role_translations?.["pt-BR"]||t.role)||"",[t,n]);return{contactInfo:e.useMemo(()=>t?{...t,role:o}:null,[t,o]),isLoading:a}}export{l as u};

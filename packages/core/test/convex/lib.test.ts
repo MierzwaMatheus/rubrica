@@ -151,6 +151,9 @@ describe("blocos da página", () => {
     expect(() => assertValidPagePath("/Sobre")).toThrow();
     expect(() => assertValidPagePath("/sobre/")).toThrow();
     expect(() => assertValidPagePath("/admin")).toThrow(/reservado/);
-    expect(() => assertValidPagePath("/blog/x", ["/blog"])).toThrow(/reservado/);
+    expect(() => assertValidPagePath("/en", ["/en"])).toThrow(/reservado/);
+    expect(() => assertValidPagePath("/en/sobre", ["/en"])).toThrow(/reservado/);
+    expect(() => assertValidPagePath("/blog", [], ["/blog"])).not.toThrow();
+    expect(() => assertValidPagePath("/blog/x", [], ["/blog"])).toThrow(/reservado/);
   });
 });

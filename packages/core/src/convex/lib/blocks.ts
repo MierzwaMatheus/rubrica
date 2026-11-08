@@ -69,8 +69,13 @@ export function preparePageBlocks(blocks: BlockInstance[], catalog: BlockCatalog
 const RESERVED = ["/admin", "/api", "/_rubrica", "/_astro", "/proposta", "/checkout", "/payment-success"];
 const PATH_SEGMENT = /^[a-z0-9][a-z0-9_-]*$/;
 
-/** Caminho de página sem idioma: "/" ou "/sobre", "/servicos/design". */
-export function assertValidPagePath(path: string, reserved: readonly string[] = []): void {
+/**
+ * Caminho de página sem idioma: "/" ou "/sobre", "/servicos/design".
+ * `reserved`: caminhos proibidos, com tudo abaixo deles (prefixos de idioma).
+ * `detailBases`: bases das páginas de detalhe (`/blog`, `/portfolio`): a base pode
+ * ser página (a lista), o que fica abaixo é do núcleo (`/blog/<slug>`).
+ */
+export function assertValidPagePath(path: string, reserved: readonly string[] = [], detailBases: readonly string[] = []): void {
   if (path === "/") return;
   if (!path.startsWith("/") || path.endsWith("/")) throw new Error(`Caminho inválido: "${path}". Use "/" ou "/nome-da-pagina".`);
   const segments = path.slice(1).split("/");
@@ -79,5 +84,8 @@ export function assertValidPagePath(path: string, reserved: readonly string[] = 
   }
   for (const r of [...RESERVED, ...reserved]) {
     if (path === r || path.startsWith(`${r}/`)) throw new Error(`O caminho "${path}" é reservado`);
+  }
+  for (const base of detailBases) {
+    if (path.startsWith(`${base}/`)) throw new Error(`O caminho "${path}" é reservado para as páginas de ${base}`);
   }
 }

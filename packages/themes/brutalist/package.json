@@ -1,0 +1,35 @@
+{
+  "name": "@rubrica/theme-brutalist",
+  "version": "2.0.0-alpha.0",
+  "description": "Tema Terminal Brutalista do Rubrica (layout brutalist da v1): monoespaçada, bordas retas e seções como linhas de comando.",
+  "type": "module",
+  "license": "MIT",
+  "exports": {
+    ".": "./src/index.tsx",
+    "./styles.css": "./src/styles.css",
+    "./fonts.json": "./src/fonts.json"
+  },
+  "files": [
+    "src"
+  ],
+  "rubrica": {
+    "contract": "^1"
+  },
+  "scripts": {
+    "check": "tsc --noEmit -p tsconfig.json"
+  },
+  "peerDependencies": {
+    "@rubrica/core": "workspace:^",
+    "react": "^19.2.0"
+  },
+  "devDependencies": {
+    "@rubrica/core": "workspace:^",
+    "@types/figlet": "^1.12.0",
+    "@types/react": "^19.2.0",
+    "react": "^19.2.1",
+    "typescript": "^5.9.0"
+  },
+  "dependencies": {
+    "figlet": "^1.12.0"
+  }
+}

@@ -56,7 +56,7 @@ h1, h2, h3, h4 { font-family: var(--rb-font-display); color: var(--rb-fg-strong)
 .mn-run__sec { font-style: italic; text-transform: none; letter-spacing: 0.02em; font-size: 13px; overflow: hidden; text-overflow: ellipsis; }
 .mn-run__tools { display: flex; align-items: center; gap: 14px; flex: none; }
 .mn-run__nav ul { display: flex; gap: 18px; list-style: none; margin: 0; padding: 0; }
-.mn-run__nav a { text-decoration: none; min-height: 44px; display: inline-flex; align-items: center; transition: color 0.15s ease; }
+.mn-run__nav a { text-decoration: none; min-height: 44px; display: inline-flex; align-items: center; }
 .mn-run__nav a:hover { color: var(--rb-fg); }
 .mn-run__nav a[aria-current="page"] { color: var(--rb-accent); text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 1px; }
 .mn-run .rb-locales { gap: 6px; }
@@ -122,7 +122,7 @@ h1, h2, h3, h4 { font-family: var(--rb-font-display); color: var(--rb-fg-strong)
 .mn-act {
   display: inline-flex; align-items: center; min-height: 44px; font-size: 12px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
   color: var(--rb-fg); text-decoration: underline; text-decoration-color: var(--rb-accent); text-decoration-thickness: 1px; text-underline-offset: 5px;
-  transition: color 0.15s ease, text-decoration-thickness 0.15s ease;
+ 
 }
 .mn-act:hover { color: var(--rb-accent); text-decoration-thickness: 2px; }
 .mn-fig.mn-fig--hero { max-width: var(--mn-read); margin: 0 auto; padding: 32px 24px 56px; }
@@ -132,7 +132,7 @@ h1, h2, h3, h4 { font-family: var(--rb-font-display); color: var(--rb-fg-strong)
 .mn-btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 8px; }
 .rb-button {
   border-radius: 0; font-family: var(--rb-font-sans); font-size: 12px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
-  justify-content: center; padding: 0.7rem 1.3rem; transition: background-color 0.15s ease, color 0.15s ease;
+  justify-content: center; padding: 0.7rem 1.3rem;
 }
 .rb-button--primary { background: var(--rb-accent); color: var(--rb-accent-fg); border-color: var(--rb-accent); }
 .rb-button--primary:hover { background: color-mix(in srgb, var(--rb-accent) 86%, var(--rb-fg)); }
@@ -194,7 +194,7 @@ h1, h2, h3, h4 { font-family: var(--rb-font-display); color: var(--rb-fg-strong)
 .mn-toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 26px; }
 .mn-entry { display: flex; flex-direction: column; gap: 6px; }
 .mn-entry :is(h3, h4) { margin: 0; font-size: inherit; font-weight: inherit; }
-.mn-entry-link { text-decoration: none; display: block; transition: color 0.15s ease; }
+.mn-entry-link { text-decoration: none; display: block; }
 .mn-entry-link:hover .mn-ld__t { color: var(--rb-accent); }
 .mn-entry-link:hover .mn-ld__dots { border-bottom-color: var(--rb-accent); }
 .mn-entry-sum { font-style: italic; color: var(--rb-muted); font-size: 16px; }
@@ -367,5 +367,5 @@ h1, h2, h3, h4 { font-family: var(--rb-font-display); color: var(--rb-fg-strong)
   html { scroll-behavior: smooth; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .mn-root *, .mn-root *::before, .mn-root *::after { transition: none !important; animation: none !important; }
+  .mn-root *, .mn-root *::before, .mn-root *::after { animation: none !important; }
 }

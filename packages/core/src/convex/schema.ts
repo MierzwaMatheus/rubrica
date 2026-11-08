@@ -127,6 +127,9 @@ export const rubricaTables = {
     createdAt: v.number(),
     createdBy: v.optional(v.id("users")),
     mustChangePassword: v.optional(v.boolean()),
+    /** Suspenso: o papel fica guardado, mas não vale até reativar. */
+    suspendedAt: v.optional(v.number()),
+    suspendedBy: v.optional(v.id("users")),
   })
     .index("by_userId", ["userId"])
     .index("by_role", ["role"]),

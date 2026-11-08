@@ -56,6 +56,7 @@ export function logUserAction(
 export const RATE_LIMITS = {
   password_change: { windowMs: 60 * 60 * 1000, perKey: 5, blockMs: 60 * 60 * 1000 },
   user_create: { windowMs: 60 * 60 * 1000, perKey: 20, blockMs: 60 * 60 * 1000 },
+  password_reset_admin: { windowMs: 60 * 60 * 1000, perKey: 20, blockMs: 60 * 60 * 1000 },
   media_upload: { windowMs: 60 * 60 * 1000, perKey: 300, blockMs: 60 * 60 * 1000 },
   proposal_password: { windowMs: 15 * 60 * 1000, perKey: 5, blockMs: 30 * 60 * 1000 },
   proposal_accept: { windowMs: 60 * 60 * 1000, perKey: 3, blockMs: 60 * 60 * 1000 },

@@ -3,7 +3,7 @@
  */
 import { v } from "convex/values";
 import { createAccount, getAuthUserId, modifyAccountCredentials } from "@convex-dev/auth/server";
-import { actionUserId, getUserRole, normalizeEmail, requireRole } from "./auth";
+import { actionUserId, activeRole, getRoleDoc, MUST_CHANGE_PASSWORD, normalizeEmail, requireRole } from "./auth";
 import { logAudit, logUserAction } from "./audit";
 import { action, internalAction, internalMutation, internalQuery, mutation, query, ref, type Id, type MutationCtx } from "./server";
 import { vRole } from "./validators";
@@ -37,15 +37,38 @@ const vAssignableRole = v.union(
   v.literal("comercial"),
 );
 
-async function roleDoc(ctx: MutationCtx, userId: Id<"users">) {
-  return ctx.db
-    .query("userRoles")
-    .withIndex("by_userId", (q) => q.eq("userId", userId))
-    .unique();
+const roleDoc = getRoleDoc;
+
+/** Roots que valem (suspenso não conta). */
+async function countRoots(ctx: MutationCtx): Promise<number> {
+  const roots = await ctx.db.query("userRoles").withIndex("by_role", (q) => q.eq("role", "root")).collect();
+  return roots.filter((r) => r.suspendedAt === undefined).length;
 }
 
-async function countRoots(ctx: MutationCtx): Promise<number> {
-  return (await ctx.db.query("userRoles").withIndex("by_role", (q) => q.eq("role", "root")).take(2)).length;
+/** Derruba todas as sessões do usuário (quem estava logado sai na próxima chamada). */
+async function revokeSessions(ctx: MutationCtx, userId: Id<"users">): Promise<number> {
+  const sessions = await ctx.db
+    .query("authSessions")
+    .withIndex("userId", (q) => q.eq("userId", userId))
+    .collect();
+  for (const session of sessions) {
+    const tokens = await ctx.db
+      .query("authRefreshTokens")
+      .withIndex("sessionId", (q) => q.eq("sessionId", session._id))
+      .collect();
+    for (const token of tokens) await ctx.db.delete(token._id);
+    await ctx.db.delete(session._id);
+  }
+  return sessions.length;
+}
+
+/** Destrava o login de quem errou a senha demais (o Convex Auth bloqueia por conta). */
+async function clearSignInLock(ctx: MutationCtx, accountId: string): Promise<void> {
+  const limits = await ctx.db
+    .query("authRateLimits")
+    .withIndex("identifier", (q) => q.eq("identifier", accountId))
+    .collect();
+  for (const limit of limits) await ctx.db.delete(limit._id);
 }
 
 async function upsertRole(
@@ -60,7 +83,9 @@ async function upsertRole(
 }
 
 const refs = {
-  actor: ref<"query", Record<string, never>, { userId: Id<"users">; email: string | null; role: Role | null }>("query", "users", "actor"),
+  actor: ref<"query", Record<string, never>, { userId: Id<"users">; email: string | null; role: Role | null; mustChangePassword: boolean }>("query", "users", "actor"),
+  passwordAccountOf: ref<"query", { userId: Id<"users"> }, { accountId: string; email: string } | null>("query", "users", "passwordAccountOf"),
+  afterAdminReset: ref<"mutation", { userId: Id<"users">; accountId: string; actorId: Id<"users"> }, null>("mutation", "users", "afterAdminReset"),
   assignRoleInternal: ref<"mutation", { userId: Id<"users">; role: Role; createdBy?: Id<"users">; mustChangePassword?: boolean }, null>(
     "mutation",
     "users",
@@ -93,16 +118,14 @@ export function usersFunctions() {
         if (!userId) return null;
         const user = await ctx.db.get(userId);
         if (!user) return null;
-        const role = await ctx.db
-          .query("userRoles")
-          .withIndex("by_userId", (q) => q.eq("userId", userId))
-          .unique();
+        const doc = await getRoleDoc(ctx, userId);
         return {
           userId,
           email: user.email ?? null,
           name: user.name ?? null,
-          role: role?.role ?? null,
-          mustChangePassword: role?.mustChangePassword ?? false,
+          role: activeRole(doc),
+          suspended: doc?.suspendedAt !== undefined,
+          mustChangePassword: doc?.mustChangePassword ?? false,
         };
       },
     }),
@@ -113,13 +136,19 @@ export function usersFunctions() {
         await requireRole(ctx, "users");
         const users = await ctx.db.query("users").take(200);
         return Promise.all(
-          users.map(async (user) => ({
-            userId: user._id,
-            email: user.email ?? null,
-            name: user.name ?? null,
-            createdAt: user._creationTime,
-            role: await getUserRole(ctx, user._id),
-          })),
+          users.map(async (user) => {
+            const doc = await getRoleDoc(ctx, user._id);
+            return {
+              userId: user._id,
+              email: user.email ?? null,
+              name: user.name ?? null,
+              createdAt: user._creationTime,
+              /** Papel guardado (também o do suspenso, que volta ao reativar). */
+              role: doc?.role ?? null,
+              suspended: doc?.suspendedAt !== undefined,
+              mustChangePassword: doc?.mustChangePassword ?? false,
+            };
+          }),
         );
       },
     }),
@@ -131,6 +160,7 @@ export function usersFunctions() {
         await actionUserId(ctx);
         const actor = await ctx.runQuery(refs.actor, {});
         if (actor.role !== "root") throw new Error("Sem permissão para esta ação");
+        if (actor.mustChangePassword) throw new Error(MUST_CHANGE_PASSWORD);
         await ctx.runMutation(refs.hitRateLimit, { type: "user_create", identifier: actor.userId });
         const email = normalizeEmail(args.email);
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("E-mail inválido");
@@ -164,7 +194,7 @@ export function usersFunctions() {
         if (args.userId === actorId) throw new Error("Você não pode mudar o próprio papel");
         if (!(await ctx.db.get(args.userId))) throw new Error("Usuário não encontrado");
         const current = await roleDoc(ctx, args.userId);
-        if (current?.role === "root" && args.role !== "root" && (await countRoots(ctx)) <= 1) {
+        if (current?.role === "root" && current.suspendedAt === undefined && args.role !== "root" && (await countRoots(ctx)) <= 1) {
           throw new Error("O site precisa de pelo menos um root");
         }
         await upsertRole(ctx, args.userId, args.role, { createdBy: actorId });
@@ -181,20 +211,9 @@ export function usersFunctions() {
         const user = await ctx.db.get(args.userId);
         if (!user) throw new Error("Usuário não encontrado");
         const role = await roleDoc(ctx, args.userId);
-        if (role?.role === "root" && (await countRoots(ctx)) <= 1) throw new Error("O site precisa de pelo menos um root");
+        if (role?.role === "root" && role.suspendedAt === undefined && (await countRoots(ctx)) <= 1) throw new Error("O site precisa de pelo menos um root");
         if (role) await ctx.db.delete(role._id);
-        const sessions = await ctx.db
-          .query("authSessions")
-          .withIndex("userId", (q) => q.eq("userId", args.userId))
-          .collect();
-        for (const session of sessions) {
-          const tokens = await ctx.db
-            .query("authRefreshTokens")
-            .withIndex("sessionId", (q) => q.eq("sessionId", session._id))
-            .collect();
-          for (const token of tokens) await ctx.db.delete(token._id);
-          await ctx.db.delete(session._id);
-        }
+        await revokeSessions(ctx, args.userId);
         const accounts = await ctx.db
           .query("authAccounts")
           .withIndex("userIdAndProvider", (q) => q.eq("userId", args.userId))
@@ -202,6 +221,64 @@ export function usersFunctions() {
         for (const account of accounts) await ctx.db.delete(account._id);
         await ctx.db.delete(args.userId);
         await logUserAction(ctx, actorId, "user.removed", { type: "user", id: args.userId }, { role: role?.role, email: user.email, name: user.name });
+      },
+    }),
+
+    /**
+     * Suspende: o papel fica guardado mas não vale, e as sessões caem. O histórico e os
+     * registros da pessoa ficam. Só root; ninguém suspende a si mesmo nem o último root.
+     */
+    suspend: mutation({
+      args: { userId: v.id("users") },
+      handler: async (ctx, args) => {
+        const { userId: actorId } = await requireRole(ctx, "users");
+        if (args.userId === actorId) throw new Error("Você não pode suspender a si mesmo");
+        const user = await ctx.db.get(args.userId);
+        if (!user) throw new Error("Usuário não encontrado");
+        const doc = await roleDoc(ctx, args.userId);
+        if (!doc) throw new Error("Este usuário não tem papel: não há o que suspender");
+        if (doc.suspendedAt !== undefined) return;
+        if (doc.role === "root" && (await countRoots(ctx)) <= 1) throw new Error("O site precisa de pelo menos um root");
+        await ctx.db.patch(doc._id, { suspendedAt: Date.now(), suspendedBy: actorId });
+        const sessions = await revokeSessions(ctx, args.userId);
+        await logUserAction(ctx, actorId, "user.suspended", { type: "user", id: args.userId }, { role: doc.role, email: user.email, sessions });
+      },
+    }),
+
+    /** Reativa um suspenso com o papel que ele tinha. Só root. */
+    reactivate: mutation({
+      args: { userId: v.id("users") },
+      handler: async (ctx, args) => {
+        const { userId: actorId } = await requireRole(ctx, "users");
+        const doc = await roleDoc(ctx, args.userId);
+        if (!doc) throw new Error("Usuário não encontrado");
+        if (doc.suspendedAt === undefined) return;
+        await ctx.db.patch(doc._id, { suspendedAt: undefined, suspendedBy: undefined });
+        const user = await ctx.db.get(args.userId);
+        await logUserAction(ctx, actorId, "user.reactivated", { type: "user", id: args.userId }, { role: doc.role, email: user?.email });
+      },
+    }),
+
+    /**
+     * Reinicia a senha de outra pessoa, sem e-mail: gera uma senha temporária (mostrada
+     * uma vez, para o root repassar), obriga a troca no próximo acesso, derruba as
+     * sessões abertas e destrava o login. Só root; a própria senha se troca em "Minha conta".
+     */
+    resetPassword: action({
+      args: { userId: v.id("users") },
+      handler: async (ctx, args): Promise<{ tempPassword: string; email: string }> => {
+        await actionUserId(ctx);
+        const actor = await ctx.runQuery(refs.actor, {});
+        if (actor.role !== "root") throw new Error("Sem permissão para esta ação");
+        if (actor.mustChangePassword) throw new Error(MUST_CHANGE_PASSWORD);
+        if (args.userId === actor.userId) throw new Error("Para trocar a sua senha, use Minha conta");
+        await ctx.runMutation(refs.hitRateLimit, { type: "password_reset_admin", identifier: actor.userId });
+        const account = await ctx.runQuery(refs.passwordAccountOf, { userId: args.userId });
+        if (!account) throw new Error("Este usuário não entra com senha");
+        const tempPassword = temporaryPassword();
+        await modifyAccountCredentials(ctx, { provider: "password", account: { id: account.email, secret: tempPassword } });
+        await ctx.runMutation(refs.afterAdminReset, { userId: args.userId, accountId: account.accountId, actorId: actor.userId });
+        return { tempPassword, email: account.email };
       },
     }),
 
@@ -230,7 +307,8 @@ export function usersFunctions() {
         if (!userId) throw new Error("Não autenticado");
         const user = await ctx.db.get(userId);
         if (!user) throw new Error("Usuário não encontrado");
-        return { userId, email: user.email ?? null, role: await getUserRole(ctx, userId) };
+        const doc = await getRoleDoc(ctx, userId);
+        return { userId, email: user.email ?? null, role: activeRole(doc), mustChangePassword: doc?.mustChangePassword ?? false };
       },
     }),
 
@@ -285,14 +363,33 @@ export function usersFunctions() {
       args: { accountId: v.string(), userId: v.id("users") },
       handler: async (ctx, { accountId, userId }) => {
         // Quem errou a senha demais fica bloqueado mesmo com a senha certa: destrava.
-        const limits = await ctx.db
-          .query("authRateLimits")
-          .withIndex("identifier", (q) => q.eq("identifier", accountId))
-          .collect();
-        for (const limit of limits) await ctx.db.delete(limit._id);
+        await clearSignInLock(ctx, accountId);
         const doc = await roleDoc(ctx, userId);
         if (doc) await ctx.db.patch(doc._id, { mustChangePassword: false });
         await logAudit(ctx, { eventType: "auth.password_reset", actorType: "system", targetType: "user", targetId: userId, metadata: { via: "cli" }, success: true });
+        return null;
+      },
+    }),
+
+    passwordAccountOf: internalQuery({
+      args: { userId: v.id("users") },
+      handler: async (ctx, { userId }) => {
+        const account = await ctx.db
+          .query("authAccounts")
+          .withIndex("userIdAndProvider", (q) => q.eq("userId", userId).eq("provider", "password"))
+          .unique();
+        return account ? { accountId: account._id as string, email: account.providerAccountId } : null;
+      },
+    }),
+
+    afterAdminReset: internalMutation({
+      args: { userId: v.id("users"), accountId: v.string(), actorId: v.id("users") },
+      handler: async (ctx, { userId, accountId, actorId }) => {
+        await clearSignInLock(ctx, accountId);
+        const doc = await roleDoc(ctx, userId);
+        if (doc) await ctx.db.patch(doc._id, { mustChangePassword: true });
+        const sessions = await revokeSessions(ctx, userId);
+        await logUserAction(ctx, actorId, "auth.password_reset", { type: "user", id: userId }, { via: "painel", sessions });
         return null;
       },
     }),

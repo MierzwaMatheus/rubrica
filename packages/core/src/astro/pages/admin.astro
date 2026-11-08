@@ -1,0 +1,34 @@
+---
+/**
+ * Painel (SPA em React) em /admin e /admin/<tela>. Rota do app: noindex, fora do
+ * sitemap, sem o CSS do tema; o CSS do painel só existe nesta página. O build estático
+ * gera uma página por tela conhecida (o id da entidade vai na query string).
+ */
+import "../../admin/styles/admin.css";
+import AdminRoot from "../../admin/AdminRoot";
+import { staticAdminPaths } from "../../admin/routes";
+import { CORE_PLUGINS } from "../../plugins/registry";
+
+export function getStaticPaths() {
+  return staticAdminPaths(CORE_PLUGINS).map((rest) => ({ params: { rest } }));
+}
+---
+
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Painel</title>
+    <script is:inline>
+      try {
+        var m = localStorage.getItem("rubrica:admin-theme");
+        document.documentElement.dataset.adminTheme = m === "dark" || m === "light" ? m : matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <AdminRoot client:only="react" />
+  </body>
+</html>

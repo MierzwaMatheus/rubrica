@@ -46,6 +46,7 @@ import { ref } from "./server";
 import { settingsFunctions, textsFunctions } from "./settings";
 import { siteFunctions } from "./site";
 import { testimonialIntakeFunctions } from "./testimonialIntake";
+import { translationFunctions } from "./translation";
 import { usersFunctions } from "./users";
 
 export function createRubrica(config: RubricaConfig = {}) {
@@ -77,6 +78,7 @@ export function createRubrica(config: RubricaConfig = {}) {
     testimonialIntake: once(() => testimonialIntakeFunctions(rt)),
     privacy: once(() => privacyFunctions(rt)),
     publish: once(publishFunctions),
+    translation: once(() => translationFunctions(rt)),
   };
 
   return {
@@ -160,6 +162,9 @@ export function createRubrica(config: RubricaConfig = {}) {
     get publish() {
       return modules.publish();
     },
+    get translation() {
+      return modules.translation();
+    },
   };
 }
 
@@ -187,6 +192,7 @@ export const RUBRICA_MODULES = [
   "testimonialIntake",
   "privacy",
   "publish",
+  "translation",
 ] as const satisfies readonly (keyof Rubrica)[];
 
 export type { RubricaConfig } from "./runtime";

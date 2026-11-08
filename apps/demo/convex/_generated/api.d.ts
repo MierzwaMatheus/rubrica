@@ -31,6 +31,7 @@ import type * as rubrica_team from "../rubrica/team.js";
 import type * as rubrica_testimonialIntake from "../rubrica/testimonialIntake.js";
 import type * as rubrica_testimonials from "../rubrica/testimonials.js";
 import type * as rubrica_texts from "../rubrica/texts.js";
+import type * as rubrica_translation from "../rubrica/translation.js";
 import type * as rubrica_users from "../rubrica/users.js";
 
   /**
@@ -64,6 +65,7 @@ import type * as rubrica_users from "../rubrica/users.js";
 "rubrica/testimonialIntake": typeof rubrica_testimonialIntake,
 "rubrica/testimonials": typeof rubrica_testimonials,
 "rubrica/texts": typeof rubrica_texts,
+"rubrica/translation": typeof rubrica_translation,
 "rubrica/users": typeof rubrica_users,
   }>;
   export declare const api: FilterApi<typeof fullApi, FunctionReference<any, "public">>;

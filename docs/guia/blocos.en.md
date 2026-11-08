@@ -45,7 +45,7 @@ Opening section: main title, supporting text, buttons and image. Carries the h1 
 - **Pairs well with:** [`numeros`](#numeros--números), [`logos-clientes`](#logos-clientes--logos-de-clientes), [`cases`](#cases--cases), [`servicos`](#servicos--serviços)
 - **Site type:** personal and company
 - **Plugin:** none: always available
-- **Variants:** themes: `blueprint` (`apresentacao`, `folha`); `monograph` (`folha-de-rosto`, `capitulo`)
+- **Variants:** themes: `blueprint` (`apresentacao`, `folha`); `cyberpunk` (`inicio`, `pagina`); `monograph` (`folha-de-rosto`, `capitulo`); `padrao` (`inicio`, `pagina`)
 
 | Field | Panel label | Type | Required | Translatable | Help and limits |
 |---|---|---|---|---|---|

@@ -45,7 +45,7 @@ Primeira dobra: título principal, apoio, botões e imagem. Leva o h1 quando é 
 - **Combina com:** [`numeros`](#numeros--números), [`logos-clientes`](#logos-clientes--logos-de-clientes), [`cases`](#cases--cases), [`servicos`](#servicos--serviços)
 - **Tipo de site:** pessoal e empresa
 - **Plugin:** nenhum: sempre disponível
-- **Variações:** temas: `blueprint` (`apresentacao`, `folha`); `monograph` (`folha-de-rosto`, `capitulo`)
+- **Variações:** temas: `blueprint` (`apresentacao`, `folha`); `cyberpunk` (`inicio`, `pagina`); `monograph` (`folha-de-rosto`, `capitulo`); `padrao` (`inicio`, `pagina`)
 
 | Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
 |---|---|---|---|---|---|

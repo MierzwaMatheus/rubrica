@@ -40,16 +40,18 @@ function load(repoPath: string): Doc {
 const ALL = [...files.keys()].filter(isPublishedDoc).sort().map(load);
 const bySlug = new Map(ALL.map((d) => [d.slug, d]));
 
-const START = ["guia/comecando", "guia/conteudo", "guia/plugins", "guia/empresa", "guia/publicar", "guia/integracoes", "guia/atualizar"];
+const START = ["guia/comecando", "guia/conteudo", "guia/blocos", "guia/plugins", "guia/empresa", "guia/publicar", "guia/integracoes", "guia/atualizar"];
 const LOOK = ["guia/temas", "guia/idiomas"];
+const EXTEND = ["guia/criar-bloco", "guia/criar-tema"];
 const ADVANCED = ["guia/agentes", "guia/variaveis", "guia/migrar", "guia/cli", "guia/telemetria"];
-const listed = new Set([...START, ...LOOK, ...ADVANCED]);
+const listed = new Set([...START, ...LOOK, ...EXTEND, ...ADVANCED]);
 const pick = (slugs: string[]) => slugs.map((s) => bySlug.get(s)).filter((d): d is Doc => Boolean(d));
 
 /** Docs na ordem da navegação; doc novo fora das listas entra no fim de "Começar". */
-export const DOC_GROUPS: { key: "start" | "look" | "layouts"; docs: Doc[] }[] = [
+export const DOC_GROUPS: { key: "start" | "look" | "extend" | "layouts"; docs: Doc[] }[] = [
   { key: "start", docs: pick([...START, ...ALL.map((d) => d.slug).filter((s) => !listed.has(s))]) },
   { key: "look", docs: pick(LOOK) },
+  { key: "extend", docs: pick(EXTEND) },
   { key: "layouts", docs: pick(ADVANCED) },
 ];
 

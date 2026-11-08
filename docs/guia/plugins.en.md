@@ -58,3 +58,94 @@ When creating a **personal** site, you can pick a bundle instead of ticking plug
 | `simple` | Just the portfolio: contact, projects, résumé and day to day |
 
 On a **company** site, the default is `recommended`. Bundles are only a starting point: afterwards, everything is turned on and off in the panel.
+
+## Create a plugin
+
+**In 2.0 there is no public API for third-party plugins.** Plugins stay in the core, with a single contract, and packaged plugins come later, on top of that same contract (decision 19 of the [RFC](../rfc/v2.md)). The `definePlugin` you see in the code is the **internal** contract: it is for people contributing to the monorepo, and a project's site and panel only read the core's plugins. The step-by-step guide to a core plugin is in [Contributing](../v2/contribuindo.md#adicionar-um-plugin-do-núcleo).
+
+What a project can do today, from the smallest effort to the largest:
+
+- **Turn on and combine the existing plugins**, in the panel or with `config`.
+- **Own block**, for a new site section with fields in the panel: [Create a block](./criar-bloco.md). An own block can depend on a core plugin (`plugin: "blog"`) and list one of its collections.
+- **Ejected component**, to change the markup of an existing block: [Eject a component](./criar-tema.md#eject-a-component).
+- **Your own Convex functions and tables**, to store and read data Rubrica doesn't model (below).
+
+### Your own Convex functions and tables
+
+The project's `convex/` mixes two kinds of file. Those starting with `// Gerado pelo Rubrica` (`convex/rubrica/*`, `auth.ts`, `http.ts` and `crons.ts`) belong to the CLI: `update` rewrites and deletes them. `schema.ts`, `auth.config.ts` and `rubrica.config.ts` are created once by the CLI and never touched again. **Any other file in `convex/` is yours**, and Convex deploys its functions along with the core's.
+
+For a new table, add it to `convex/schema.ts`, after the core's:
+
+<!-- exemplo: projeto/convex/schema.ts -->
+```ts
+import { defineSchema, defineTable } from "convex/server";
+import { v } from "convex/values";
+import { authTables } from "@convex-dev/auth/server";
+import { rubricaTables } from "@rubrica/core/convex/schema";
+
+// Login tables, the Rubrica core's and (after them) the project's own.
+export default defineSchema({
+  ...authTables,
+  ...rubricaTables,
+  signups: defineTable({
+    email: v.string(),
+    source: v.optional(v.string()),
+    createdAt: v.number(),
+  }).index("by_email", ["email"]),
+});
+```
+
+And the functions in a file of your own, outside `convex/rubrica/` (which belongs to the CLI):
+
+<!-- exemplo: projeto/convex/signups.ts -->
+```ts
+import { getAuthUserId } from "@convex-dev/auth/server";
+import { v } from "convex/values";
+import { can } from "@rubrica/core/convex/roles";
+import { internalMutation, query, type QueryCtx } from "./_generated/server";
+
+/** Saves a signup. Internal: runs through `npx convex run`, the Convex dashboard or another function. */
+export const add = internalMutation({
+  args: { email: v.string(), source: v.optional(v.string()) },
+  handler: async (ctx, { email, source }) => {
+    const normalized = email.trim().toLowerCase();
+    const existing = await ctx.db
+      .query("signups")
+      .withIndex("by_email", (q) => q.eq("email", normalized))
+      .unique();
+    if (existing) return existing._id;
+    return ctx.db.insert("signups", { email: normalized, source, createdAt: Date.now() });
+  },
+});
+
+/** Requires a login with a panel role that sees contacts (root, admin or comercial). */
+async function requireRole(ctx: QueryCtx) {
+  const userId = await getAuthUserId(ctx);
+  if (!userId) throw new Error("Log in first");
+  const role = await ctx.db
+    .query("userRoles")
+    .withIndex("by_userId", (q) => q.eq("userId", userId))
+    .unique();
+  if (!role || role.suspendedAt || role.mustChangePassword || !can(role.role, "contacts")) {
+    throw new Error("Not allowed");
+  }
+}
+
+/** Lists the signups, for people with the right role. */
+export const list = query({
+  args: {},
+  handler: async (ctx) => {
+    await requireRole(ctx);
+    return ctx.db.query("signups").order("desc").take(500);
+  },
+});
+```
+
+Deploy to your computer's Convex with `npx convex dev --once` (or keep `pnpm dev:convex` running) and test with `npx convex run signups:add '{"email":"ana@example.com"}'`. Production gets the functions on the next `publicar`.
+
+The limits, today:
+
+- The panel and the MCP don't show your own tables or functions: the data lives in the Convex dashboard and in whatever you build.
+- `http.ts` and `crons.ts` are generated, so there is no place yet for your own HTTP routes or scheduled jobs.
+- Personal-data export and deletion in the **Privacidade** screen only see the core's tables. If your table holds personal data, exporting and deleting it is on you.
+- Public functions (`query`, `mutation`) are open to any Convex client: check the login and the role, as above, or use internal ones.

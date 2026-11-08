@@ -19,29 +19,11 @@ As páginas da home, do sobre e do contato não são especiais: vêm montadas pe
 
 ### Catálogo de blocos
 
-| Bloco | Para quê |
-|---|---|
-| `hero` | Abertura da página: título, chamada, botões e foto. É o `h1` da página |
-| `texto` | Título e texto livre |
-| `numeros` | Números de destaque |
-| `lista-itens` | Lista com título e descrição (princípios, valores, etapas) |
-| `cases` | Projetos ou cases, vindos da coleção |
-| `servicos` | Serviços, da coleção |
-| `depoimentos` | Depoimentos aprovados, com o envio de novos |
-| `faq` | Perguntas frequentes |
-| `posts-recentes` | Últimos posts do blog |
-| `cta` | Chamada para ação com dois botões |
-| `contato` | Assistente de contato, canais e endereço |
-| `galeria` | Galeria de imagens (o dia a dia) |
-| `curriculo` | Currículo (só no tipo pessoal) |
-| `precos` | Planos e preços (só no tipo empresa) |
-| `equipe` | Pessoas da equipe (só no tipo empresa) |
-| `localizacao` | Endereço e mapa (só no tipo empresa) |
-| `logos-clientes` | Logos de clientes (só no tipo empresa) |
+O [catálogo de blocos](./blocos.md) lista todos os blocos, com para que serve cada um, os campos, as variações e o plugin de que dependem. Ele é gerado do código do núcleo, então está sempre em dia.
 
 Cada bloco que lista itens aponta para uma coleção com filtro, ordem e quantidade, em vez de copiar os itens. Alguns blocos têm **variações** com nome (por exemplo, `cases` em grade ou em lista); o painel mostra só as variações do tema em uso.
 
-Um bloco novo que o Rubrica lançar aparece em todos os temas com a versão padrão do núcleo, até o tema desenhar a dele. Precisa de um bloco que não existe? Veja [Blocos próprios e ejetados](./temas.md#blocos-próprios-e-componentes-ejetados).
+Um bloco novo que o Rubrica lançar aparece em todos os temas com a versão padrão do núcleo, até o tema desenhar a dele. Precisa de um bloco que não existe? Veja [Criar um bloco](./criar-bloco.md).
 
 ## Coleções
 

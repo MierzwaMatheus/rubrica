@@ -11,6 +11,7 @@
     "test": "pnpm -r --if-present test",
     "build": "pnpm -r --if-present build",
     "testar-tema": "node packages/theme-tester/bin/rubrica-testar-tema.js",
+    "docs:blocos": "pnpm --filter rubrica-site docs:blocos",
     "demo": "pnpm --filter @rubrica/demo dev",
     "changeset": "changeset"
   },

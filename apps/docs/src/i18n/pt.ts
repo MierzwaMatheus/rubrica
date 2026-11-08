@@ -226,6 +226,7 @@ export const pt = {
     nav: "Documentação",
     start: "Começar",
     look: "Aparência e idiomas",
+    extend: "Estender",
     layouts: "Avançado",
     onThisPage: "Nesta página",
     edit: "Editar no GitHub",

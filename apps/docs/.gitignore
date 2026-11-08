@@ -1,3 +1,5 @@
 # Gerados por scripts/build-previews.ts
 public/previews/
 dist/
+# Exemplos da documentação compilados por scripts/exemplos.ts (só ficam quando falha)
+.exemplos/

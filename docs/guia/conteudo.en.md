@@ -19,29 +19,11 @@ The home, about and contact pages are not special: they come built from the them
 
 ### Block catalog
 
-| Block | What it is for |
-|---|---|
-| `hero` | Page opening: title, subtitle, buttons and photo. It is the page `h1` |
-| `texto` | Title and free text |
-| `numeros` | Highlighted numbers |
-| `lista-itens` | List with title and description (principles, values, steps) |
-| `cases` | Projects or case studies, from the collection |
-| `servicos` | Services, from the collection |
-| `depoimentos` | Approved testimonials, with submission of new ones |
-| `faq` | Frequently asked questions |
-| `posts-recentes` | Latest blog posts |
-| `cta` | Call to action with two buttons |
-| `contato` | Contact assistant, channels and address |
-| `galeria` | Image gallery (day to day) |
-| `curriculo` | Résumé (personal type only) |
-| `precos` | Plans and pricing (company type only) |
-| `equipe` | Team members (company type only) |
-| `localizacao` | Address and map (company type only) |
-| `logos-clientes` | Client logos (company type only) |
+The [block catalog](./blocos.md) lists every block, with what it is for, its fields, its variants and the plugin it depends on. It is generated from the core's code, so it is always up to date.
 
 A block that lists items points to a collection with a filter, order and quantity, instead of copying the items. Some blocks have named **variants** (for example, `cases` as a grid or a list); the panel shows only the variants of the theme in use.
 
-When Rubrica ships a new block, it shows up in every theme with the core's default version until the theme draws its own. Need a block that doesn't exist? See [Own blocks and ejected components](./temas.md#own-blocks-and-ejected-components).
+When Rubrica ships a new block, it shows up in every theme with the core's default version until the theme draws its own. Need a block that doesn't exist? See [Create a block](./criar-bloco.md).
 
 ## Collections
 

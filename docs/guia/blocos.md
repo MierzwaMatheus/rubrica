@@ -1,0 +1,316 @@
+# Catálogo de blocos
+
+<!-- Gerado por apps/docs/scripts/blocos.ts a partir de packages/core. Não edite à mão: rode pnpm docs:blocos. -->
+
+Todos os blocos que o núcleo do Rubrica traz, com os campos de cada um. Um bloco é uma seção de página: você escolhe os blocos no editor de páginas do painel, e cada tema desenha o seu jeito de mostrar cada um.
+
+Esta página é gerada do código do núcleo. Os nomes dos campos (como `title`) são os que o MCP e os arquivos de dados usam; o rótulo é o que aparece no painel.
+
+**Variações** são desenhos com nome que um tema oferece para o bloco (por exemplo, `cases` em grade ou em lista). O painel mostra só as do tema em uso, e a primeira de cada lista é a padrão. Ao trocar de tema, uma variação que o tema novo não tem cai na padrão dele.
+
+Precisa de uma seção que não está aqui? Veja [Criar um bloco](./criar-bloco.md).
+
+## Os blocos
+
+| Bloco | Nome no painel | Para que serve | Tipo de site | Plugin |
+|---|---|---|---|---|
+| [`hero`](#hero--hero) | Hero | Primeira dobra: título principal, apoio, botões e imagem. Leva o h1 quando é o primeiro bloco da página. | pessoal e empresa | — |
+| [`texto`](#texto--texto) | Texto | Título e texto livre, com imagem opcional ao lado. | pessoal e empresa | — |
+| [`numeros`](#numeros--números) | Números | Números em destaque (anos de experiência, clientes, projetos). | pessoal e empresa | — |
+| [`lista-itens`](#lista-itens--lista-de-itens) | Lista de itens | Itens com título e texto: princípios de trabalho, valores, diferenciais, etapas. | pessoal e empresa | — |
+| [`cases`](#cases--cases) | Cases | Projetos ou cases da coleção, com link para a página de cada um. Mostra os destaques; sem nenhum, os primeiros da lista. Sem projetos, o bloco some. | pessoal e empresa | `portfolio` |
+| [`servicos`](#servicos--serviços) | Serviços | Serviços da coleção. | pessoal e empresa | — |
+| [`depoimentos`](#depoimentos--depoimentos) | Depoimentos | Depoimentos aprovados da coleção, com convite opcional para enviar um novo. Mostra os destaques; sem nenhum, os primeiros da lista. Sem depoimentos, o bloco some. | pessoal e empresa | `testimonials` |
+| [`faq`](#faq--perguntas-frequentes) | Perguntas frequentes | Perguntas e respostas da coleção. Gera JSON-LD FAQPage. | pessoal e empresa | — |
+| [`posts-recentes`](#posts-recentes--posts) | Posts | Posts do blog. Com quantidade vazia, lista todos (página do blog). | pessoal e empresa | `blog` |
+| [`cta`](#cta--chamada) | Chamada | Fechamento com um ou dois caminhos (ex.: "tenho um projeto" e "tenho uma vaga"). | pessoal e empresa | — |
+| [`contato`](#contato--contato) | Contato | Formulário ou assistente de contato, com os canais (e-mail, WhatsApp, redes). | pessoal e empresa | — |
+| [`galeria`](#galeria--galeria) | Galeria | Imagens com título e descrição: dia a dia, bastidores, espaço da empresa. | pessoal e empresa | `about` |
+| [`curriculo`](#curriculo--currículo) | Currículo | Experiência, formação e competências da coleção, com download em PDF. | só pessoal | `resume` |
+| [`precos`](#precos--preços) | Preços | Planos da coleção lado a lado, com destaque e botão de cada um. | só empresa | `pricing` |
+| [`equipe`](#equipe--equipe) | Equipe | Pessoas da coleção, com foto, cargo e redes. | só empresa | `team` |
+| [`localizacao`](#localizacao--localização) | Localização | Endereço, horário e mapa a partir dos dados da empresa. | só empresa | — |
+| [`logos-clientes`](#logos-clientes--logos-de-clientes) | Logos de clientes | Faixa de logos de clientes ou parceiros. | só empresa | — |
+
+## `hero` — Hero
+
+Primeira dobra: título principal, apoio, botões e imagem. Leva o h1 quando é o primeiro bloco da página.
+
+- **Tipo de site:** pessoal e empresa
+- **Plugin:** nenhum: sempre disponível
+- **Variações:** temas: `blueprint` (`apresentacao`, `folha`); `monograph` (`folha-de-rosto`, `capitulo`)
+
+| Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
+|---|---|---|---|---|---|
+| `eyebrow` | Sobretítulo | texto | não | sim | até 80 caracteres |
+| `title` | Título | texto | sim | sim | até 160 caracteres |
+| `subtitle` | Subtítulo | texto longo | não | sim | até 400 caracteres |
+| `primaryCta` | Botão principal | link | não | o rótulo | — |
+| `secondaryCta` | Botão secundário | link | não | o rótulo | — |
+| `image` | Imagem | imagem | não | o texto alternativo | — |
+| `tags` | Etiquetas | lista | não | — | até 8 itens; cada item: "Etiqueta" |
+| `tags[].label` | Texto | texto | sim | sim | até 40 caracteres |
+| `showAvailability` | Mostrar disponibilidade | sim ou não | não | — | padrão: não |
+
+## `texto` — Texto
+
+Título e texto livre, com imagem opcional ao lado.
+
+- **Tipo de site:** pessoal e empresa
+- **Plugin:** nenhum: sempre disponível
+- **Variações:** temas: `brutalist` (`simples`, `numerado`); `chat` (`mensagens`, `pergunta`); `magazine` (`coluna`, `ensaio`); `poster` (`declaracao`, `corrido`); `zine` (`carta`, `postit`)
+
+| Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
+|---|---|---|---|---|---|
+| `anchor` | Âncora | texto | não | não | Identificador para links na página (#contato). Opcional; até 40 caracteres |
+| `title` | Título | texto | não | sim | até 140 caracteres |
+| `body` | Texto | texto formatado | sim | sim | — |
+| `image` | Imagem | imagem | não | o texto alternativo | — |
+| `imagePosition` | Posição da imagem | opção | não | — | opções: `start` (Antes do texto), `end` (Depois do texto); padrão: `end` |
+
+## `numeros` — Números
+
+Números em destaque (anos de experiência, clientes, projetos).
+
+- **Tipo de site:** pessoal e empresa
+- **Plugin:** nenhum: sempre disponível
+- **Variações:** nenhuma: um desenho só em cada tema
+
+| Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
+|---|---|---|---|---|---|
+| `anchor` | Âncora | texto | não | não | Identificador para links na página (#contato). Opcional; até 40 caracteres |
+| `title` | Título | texto | não | sim | até 140 caracteres |
+| `intro` | Texto de apoio | texto longo | não | sim | até 400 caracteres |
+| `items` | Números | lista | sim | — | de 1 a 8 itens; cada item: "Número" |
+| `items[].value` | Valor | texto | sim | não | Ex.: 10+, 98%, R$ 2 mi; até 16 caracteres |
+| `items[].label` | Rótulo | texto | sim | sim | até 60 caracteres |
+| `items[].description` | Detalhe | texto | não | sim | até 140 caracteres |
+
+## `lista-itens` — Lista de itens
+
+Itens com título e texto: princípios de trabalho, valores, diferenciais, etapas.
+
+- **Tipo de site:** pessoal e empresa
+- **Plugin:** nenhum: sempre disponível
+- **Variações:** nenhuma: um desenho só em cada tema
+
+| Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
+|---|---|---|---|---|---|
+| `anchor` | Âncora | texto | não | não | Identificador para links na página (#contato). Opcional; até 40 caracteres |
+| `title` | Título | texto | não | sim | até 140 caracteres |
+| `intro` | Texto de apoio | texto longo | não | sim | até 400 caracteres |
+| `numbered` | Numerar itens | sim ou não | não | — | padrão: não |
+| `items` | Itens | lista | sim | — | de 1 a 12 itens; cada item: "Item" |
+| `items[].icon` | Ícone | texto | não | não | Nome de um ícone do Lucide (ex.: rocket); até 40 caracteres |
+| `items[].title` | Título | texto | sim | sim | até 100 caracteres |
+| `items[].body` | Texto | texto longo | não | sim | até 500 caracteres |
+
+## `cases` — Cases
+
+Projetos ou cases da coleção, com link para a página de cada um. Mostra os destaques; sem nenhum, os primeiros da lista. Sem projetos, o bloco some.
+
+- **Tipo de site:** pessoal e empresa
+- **Plugin:** `portfolio`: o bloco some com o plugin desligado
+- **Lista itens de:** `projects` (padrão ao criar: só os destaques, 3 itens, na ordem do painel)
+- **Variações:** componente padrão do núcleo: `grade`, `lista` · temas: `bento` (`grade`, `destaque`); `blueprint` (`grade`, `destaque`); `brutalist` (`grade`, `lista`); `chat` (`lista`, `destaque`); `cyberpunk` (`grade`, `lista`); `desktop` (`grade`, `lista`); `garden` (`grade`, `destaque`); `index` (`indice`, `destaque`, `grade`); `magazine` (`grade`, `lista`); `monograph` (`sumario`, `pranchas`); `padrao` (`grade`, `lista`); `poster` (`cartaz`, `catalogo`, `faixa`); `swiss` (`grade`, `lista`); `zine` (`grade`, `destaque`, `lista`)
+
+| Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
+|---|---|---|---|---|---|
+| `anchor` | Âncora | texto | não | não | Identificador para links na página (#contato). Opcional; até 40 caracteres |
+| `title` | Título | texto | não | sim | até 140 caracteres |
+| `intro` | Texto de apoio | texto longo | não | sim | até 400 caracteres |
+| `cta` | Link para ver todos | link | não | o rótulo | — |
+
+## `servicos` — Serviços
+
+Serviços da coleção.
+
+- **Tipo de site:** pessoal e empresa
+- **Plugin:** nenhum: sempre disponível
+- **Lista itens de:** `services` (padrão ao criar: na ordem do painel)
+- **Variações:** temas: `chat` (`lista`, `etiquetas`); `garden` (`canteiros`, `etiquetas`)
+
+| Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
+|---|---|---|---|---|---|
+| `anchor` | Âncora | texto | não | não | Identificador para links na página (#contato). Opcional; até 40 caracteres |
+| `title` | Título | texto | não | sim | até 140 caracteres |
+| `intro` | Texto de apoio | texto longo | não | sim | até 400 caracteres |
+| `cta` | Botão | link | não | o rótulo | — |
+
+## `depoimentos` — Depoimentos
+
+Depoimentos aprovados da coleção, com convite opcional para enviar um novo. Mostra os destaques; sem nenhum, os primeiros da lista. Sem depoimentos, o bloco some.
+
+- **Tipo de site:** pessoal e empresa
+- **Plugin:** `testimonials`: o bloco some com o plugin desligado
+- **Lista itens de:** `testimonials` (padrão ao criar: só os destaques, 6 itens, na ordem do painel)
+- **JavaScript:** pode montar uma ilha (a parte interativa, com JavaScript no navegador); o resto é HTML estático
+- **Variações:** nenhuma: um desenho só em cada tema
+
+| Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
+|---|---|---|---|---|---|
+| `anchor` | Âncora | texto | não | não | Identificador para links na página (#contato). Opcional; até 40 caracteres |
+| `title` | Título | texto | não | sim | até 140 caracteres |
+| `intro` | Texto de apoio | texto longo | não | sim | até 400 caracteres |
+| `allowSubmission` | Convidar a enviar depoimento | sim ou não | não | — | Mostra o botão do assistente de depoimento (precisa do plugin testimonials-intake); padrão: não |
+
+## `faq` — Perguntas frequentes
+
+Perguntas e respostas da coleção. Gera JSON-LD FAQPage.
+
+- **Tipo de site:** pessoal e empresa
+- **Plugin:** nenhum: sempre disponível
+- **Lista itens de:** `faq` (padrão ao criar: na ordem do painel)
+- **Variações:** nenhuma: um desenho só em cada tema
+
+| Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
+|---|---|---|---|---|---|
+| `anchor` | Âncora | texto | não | não | Identificador para links na página (#contato). Opcional; até 40 caracteres |
+| `title` | Título | texto | não | sim | até 140 caracteres |
+| `intro` | Texto de apoio | texto longo | não | sim | até 400 caracteres |
+
+## `posts-recentes` — Posts
+
+Posts do blog. Com quantidade vazia, lista todos (página do blog).
+
+- **Tipo de site:** pessoal e empresa
+- **Plugin:** `blog`: o bloco some com o plugin desligado
+- **Lista itens de:** `posts` (padrão ao criar: 3 itens, mais novos primeiro)
+- **Variações:** temas: `chat` (`lista`, `destaque`); `garden` (`notas`, `lista`); `index` (`indice`, `destaque`); `magazine` (`sumario`, `colunas`); `zine` (`recortes`, `destaque`)
+
+| Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
+|---|---|---|---|---|---|
+| `anchor` | Âncora | texto | não | não | Identificador para links na página (#contato). Opcional; até 40 caracteres |
+| `title` | Título | texto | não | sim | até 140 caracteres |
+| `intro` | Texto de apoio | texto longo | não | sim | até 400 caracteres |
+| `cta` | Link para o blog | link | não | o rótulo | — |
+| `showTagFilter` | Filtro por etiqueta | sim ou não | não | — | padrão: não |
+
+## `cta` — Chamada
+
+Fechamento com um ou dois caminhos (ex.: "tenho um projeto" e "tenho uma vaga").
+
+- **Tipo de site:** pessoal e empresa
+- **Plugin:** nenhum: sempre disponível
+- **Variações:** nenhuma: um desenho só em cada tema
+
+| Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
+|---|---|---|---|---|---|
+| `anchor` | Âncora | texto | não | não | Identificador para links na página (#contato). Opcional; até 40 caracteres |
+| `title` | Título | texto | sim | sim | até 140 caracteres |
+| `body` | Texto de apoio | texto longo | não | sim | até 400 caracteres |
+| `primary` | Botão principal | link | sim | o rótulo | — |
+| `secondary` | Botão secundário | link | não | o rótulo | — |
+
+## `contato` — Contato
+
+Formulário ou assistente de contato, com os canais (e-mail, WhatsApp, redes).
+
+- **Tipo de site:** pessoal e empresa
+- **Plugin:** nenhum: sempre disponível
+- **JavaScript:** pode montar uma ilha (a parte interativa, com JavaScript no navegador); o resto é HTML estático
+- **Variações:** nenhuma: um desenho só em cada tema
+
+| Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
+|---|---|---|---|---|---|
+| `anchor` | Âncora | texto | não | não | Identificador para links na página (#contato). Opcional; até 40 caracteres |
+| `title` | Título | texto | não | sim | até 140 caracteres |
+| `intro` | Texto de apoio | texto longo | não | sim | até 400 caracteres |
+| `mode` | Formato | opção | não | — | opções: `wizard` (Assistente em etapas), `form` (Formulário simples), `channels` (Só os canais, sem formulário); padrão: `wizard` |
+| `showChannels` | Mostrar canais de contato | sim ou não | não | — | padrão: sim |
+
+## `galeria` — Galeria
+
+Imagens com título e descrição: dia a dia, bastidores, espaço da empresa.
+
+- **Tipo de site:** pessoal e empresa
+- **Plugin:** `about`, dono da coleção `routine`: o bloco some com o plugin desligado
+- **Lista itens de:** `routine` (padrão ao criar: na ordem do painel)
+- **Variações:** nenhuma: um desenho só em cada tema
+
+| Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
+|---|---|---|---|---|---|
+| `anchor` | Âncora | texto | não | não | Identificador para links na página (#contato). Opcional; até 40 caracteres |
+| `title` | Título | texto | não | sim | até 140 caracteres |
+| `intro` | Texto de apoio | texto longo | não | sim | até 400 caracteres |
+
+## `curriculo` — Currículo
+
+Experiência, formação e competências da coleção, com download em PDF.
+
+- **Tipo de site:** só pessoal
+- **Plugin:** `resume`: o bloco some com o plugin desligado
+- **Lista itens de:** `resume` (padrão ao criar: na ordem do painel)
+- **JavaScript:** pode montar uma ilha (a parte interativa, com JavaScript no navegador); o resto é HTML estático
+- **Variações:** nenhuma: um desenho só em cada tema
+
+| Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
+|---|---|---|---|---|---|
+| `anchor` | Âncora | texto | não | não | Identificador para links na página (#contato). Opcional; até 40 caracteres |
+| `title` | Título | texto | não | sim | até 140 caracteres |
+| `intro` | Texto de apoio | texto longo | não | sim | até 400 caracteres |
+| `showDownload` | Botão de baixar PDF | sim ou não | não | — | padrão: sim |
+
+## `precos` — Preços
+
+Planos da coleção lado a lado, com destaque e botão de cada um.
+
+- **Tipo de site:** só empresa
+- **Plugin:** `pricing`, dono da coleção `plans`: o bloco some com o plugin desligado
+- **Lista itens de:** `plans` (padrão ao criar: na ordem do painel)
+- **Variações:** nenhuma: um desenho só em cada tema
+
+| Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
+|---|---|---|---|---|---|
+| `anchor` | Âncora | texto | não | não | Identificador para links na página (#contato). Opcional; até 40 caracteres |
+| `title` | Título | texto | não | sim | até 140 caracteres |
+| `intro` | Texto de apoio | texto longo | não | sim | até 400 caracteres |
+| `note` | Observação | texto longo | não | sim | Ex.: valores sem impostos; até 300 caracteres |
+
+## `equipe` — Equipe
+
+Pessoas da coleção, com foto, cargo e redes.
+
+- **Tipo de site:** só empresa
+- **Plugin:** `team`, dono da coleção `team`: o bloco some com o plugin desligado
+- **Lista itens de:** `team` (padrão ao criar: na ordem do painel)
+- **Variações:** nenhuma: um desenho só em cada tema
+
+| Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
+|---|---|---|---|---|---|
+| `anchor` | Âncora | texto | não | não | Identificador para links na página (#contato). Opcional; até 40 caracteres |
+| `title` | Título | texto | não | sim | até 140 caracteres |
+| `intro` | Texto de apoio | texto longo | não | sim | até 400 caracteres |
+
+## `localizacao` — Localização
+
+Endereço, horário e mapa a partir dos dados da empresa.
+
+- **Tipo de site:** só empresa
+- **Plugin:** nenhum: sempre disponível
+- **Variações:** nenhuma: um desenho só em cada tema
+
+| Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
+|---|---|---|---|---|---|
+| `anchor` | Âncora | texto | não | não | Identificador para links na página (#contato). Opcional; até 40 caracteres |
+| `title` | Título | texto | não | sim | até 140 caracteres |
+| `intro` | Texto de apoio | texto longo | não | sim | até 400 caracteres |
+| `showMap` | Mostrar mapa | sim ou não | não | — | padrão: sim |
+| `showHours` | Mostrar horário | sim ou não | não | — | padrão: sim |
+
+## `logos-clientes` — Logos de clientes
+
+Faixa de logos de clientes ou parceiros.
+
+- **Tipo de site:** só empresa
+- **Plugin:** nenhum: sempre disponível
+- **Variações:** nenhuma: um desenho só em cada tema
+
+| Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
+|---|---|---|---|---|---|
+| `anchor` | Âncora | texto | não | não | Identificador para links na página (#contato). Opcional; até 40 caracteres |
+| `title` | Título | texto | não | sim | até 140 caracteres |
+| `logos` | Logos | lista | sim | — | de 1 a 24 itens; cada item: "Logo" |
+| `logos[].name` | Nome | texto | sim | não | até 80 caracteres |
+| `logos[].image` | Logo | imagem | sim | o texto alternativo | — |
+| `logos[].href` | Link | texto | não | não | até 300 caracteres |

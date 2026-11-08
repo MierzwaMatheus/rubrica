@@ -41,6 +41,16 @@ describe("backend de demonstração do painel", () => {
     expect(() => s.act(api.users.remove as never, {})).toThrow(/Could not find public function/);
   });
 
+  it("WhatsApp e aviso: normaliza, confere e apaga como o backend", async () => {
+    const s = await store();
+    s.mutate(api.settings.update, { patch: { whatsapp: { number: "+55 (11) 91234-5678", floating: true } } });
+    expect((s.query(api.settings.get, {}) as { whatsapp?: { number: string } }).whatsapp?.number).toBe("5511912345678");
+    expect(() => s.mutate(api.settings.update, { patch: { whatsapp: { number: "123", floating: true } } })).toThrow(/WhatsApp inválido/);
+    expect(() => s.mutate(api.settings.update, { patch: { announcement: { enabled: true, text: {}, startsAt: "amanhã" } } })).toThrow(/sem texto/);
+    s.mutate(api.settings.update, { patch: {}, unset: ["whatsapp"] });
+    expect((s.query(api.settings.get, {}) as { whatsapp?: unknown }).whatsapp).toBeUndefined();
+  });
+
   it("respeita papéis: editor não mexe em configurações técnicas nem em usuários", async () => {
     const s = await store();
     s.signOut();

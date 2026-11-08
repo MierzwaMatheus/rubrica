@@ -20,6 +20,7 @@ import { can, type Permission, type Role } from "../../convex/lib/roles";
 import { assertValidPagePath, preparePageBlocks, validatePageBlocks } from "../../convex/lib/blocks";
 import { enabledPlugins, type PluginDefinition } from "../../plugins/contract";
 import { CORE_PLUGINS } from "../../plugins/registry";
+import { normalizeSiteWide, validateSiteWide } from "../../render/sitewide";
 import type { Backend } from "./backend";
 import { businessHandlers, createBusinessState, type DemoDoc } from "./demo-business";
 
@@ -308,7 +309,12 @@ export function createDemoStore(options: DemoOptions) {
       const me = require("settings");
       const patch = args.patch as Partial<SiteSettings>;
       if (me.role !== "root" && Object.keys(patch).some((k) => TECHNICAL.includes(k))) throw new Error("Tipo do site, URL, idiomas e tema só a agência (root) muda");
-      const next = { ...state.settings, ...patch } as SiteSettings;
+      const unset = (args.unset as string[] | undefined) ?? [];
+      const merged: Record<string, unknown> = { ...state.settings, ...patch };
+      for (const key of unset) if (!(key in patch)) delete merged[key];
+      // Mesma normalização e conferência do backend para o WhatsApp e a faixa de aviso.
+      const next = normalizeSiteWide(merged as unknown as SiteSettings);
+      validateSiteWide(next);
       try {
         defineLocales(next.locales);
       } catch (e) {

@@ -22,14 +22,12 @@ export const CHAT_TEXTS: Record<string, Tr> = {
   "chat.forwarded": tr("encaminhada", "forwarded", "reenviado"),
   "chat.featured": tr("destaque", "featured", "destacado"),
   "chat.readCase": tr("ler o case", "read the case", "leer el caso"),
-  "chat.readPost": tr("ler o texto", "read the post", "leer el texto"),
   "chat.cvIntro": tr("Deixo meu currículo completo aqui também:", "Here's my full résumé too:", "Te dejo también mi currículum completo:"),
   "chat.cvFile": tr("CV.pdf", "CV.pdf", "CV.pdf"),
   "chat.cvHint": tr("PDF · gerado na hora", "PDF · generated on the spot", "PDF · generado al momento"),
   "chat.filterAsk": tr("Só os de {tag}", "Just {tag}", "Solo los de {tag}"),
   "chat.testimonialsIntro": tr("Algumas mensagens que recebi:", "A few messages I got:", "Algunos mensajes que recibí:"),
   "chat.org.testimonialsIntro": tr("Algumas mensagens que recebemos:", "A few messages we got:", "Algunos mensajes que recibimos:"),
-  "chat.member": tr("Contato de {name}", "{name}'s contact", "Contacto de {name}"),
 
   // Perguntas de quem visita, por bloco (site pessoal).
   "chat.ask.numeros": tr("Me mostra uns números", "Show me some numbers", "Muéstrame unos números"),

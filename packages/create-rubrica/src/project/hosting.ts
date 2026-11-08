@@ -5,13 +5,22 @@
  * arquivos da pasta publicada; o Astro copia o `public/` para o `dist/`).
  *
  * Os padrões usam `*` no fim para "tudo abaixo" (`/_astro/*`); na Vercel viram `(.*)`.
+ * Reescritas (`rewrites`) usam `:parâmetro` (um segmento), que os três entendem.
  */
+import { appRewrites } from "@rubrica/core/plugins/app-routes";
+import { CORE_PLUGINS } from "@rubrica/core/plugins";
 
 export interface Redirect {
   from: string;
   to: string;
   /** 301 (permanente) ou 302. */
   status: 301 | 302;
+}
+
+/** Reescrita: serve `to` no endereço `from`, sem redirecionar (status 200). */
+export interface Rewrite {
+  from: string;
+  to: string;
 }
 
 export interface HeaderRule {
@@ -21,6 +30,8 @@ export interface HeaderRule {
 
 export interface HostingConfig {
   redirects: Redirect[];
+  /** Rotas do app (proposta, checkout): caminhos com parâmetro servidos pela página estática da rota. */
+  rewrites?: Rewrite[];
   headers: HeaderRule[];
 }
 
@@ -64,6 +75,7 @@ export interface HostingOptions {
 export function defaultHosting(options: HostingOptions = {}): HostingConfig {
   return {
     redirects: [],
+    rewrites: appRewrites(CORE_PLUGINS),
     headers: [
       {
         source: "/*",
@@ -135,6 +147,7 @@ export function vercelJson(config: HostingConfig): string {
     buildCommand: "npx convex deploy --cmd-url-env-var-name CONVEX_URL --cmd \"npm run build\"",
     trailingSlash: false,
     redirects: config.redirects.map((r) => ({ source: toVercel(r.from), destination: r.to, permanent: r.status === 301 })),
+    ...(config.rewrites?.length && { rewrites: config.rewrites.map((r) => ({ source: r.from, destination: r.to })) }),
     headers: config.headers.map((h) => ({ source: toVercel(h.source), headers: Object.entries(h.headers).map(([key, value]) => ({ key, value })) })),
   };
   return `${JSON.stringify(json, null, 2)}\n`;
@@ -144,7 +157,7 @@ const NOTE = "# Gerado pelo Rubrica (mesma configuração do vercel.json). Para 
 
 /** `_redirects` (Netlify, Cloudflare Pages). */
 export function redirectsFile(config: HostingConfig): string {
-  const lines = config.redirects.map((r) => `${r.from} ${r.to} ${r.status}`);
+  const lines = [...config.redirects.map((r) => `${r.from} ${r.to} ${r.status}`), ...(config.rewrites ?? []).map((r) => `${r.from} ${r.to} 200`)];
   return `${[NOTE, ...lines].join("\n")}\n`;
 }
 

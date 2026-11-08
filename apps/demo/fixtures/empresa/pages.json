@@ -332,6 +332,35 @@
         }
       },
       {
+        "id": "quem-somos-video",
+        "type": "video",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "O estúdio por dentro",
+            "en": "Inside the studio",
+            "es": "El estudio por dentro"
+          },
+          "url": "https://vimeo.com/76979871",
+          "caption": {
+            "pt-BR": "Um dia de trabalho no Meridiano",
+            "en": "A working day at Meridiano",
+            "es": "Un día de trabajo en Meridiano"
+          },
+          "poster": {
+            "url": "/img/routine-3.svg",
+            "width": 800,
+            "height": 600,
+            "alt": {
+              "pt-BR": "Mesa do estúdio",
+              "en": "Studio desk",
+              "es": "Mesa del estudio"
+            }
+          },
+          "aspect": "16:9"
+        }
+      },
+      {
         "id": "quem-somos-3",
         "type": "equipe",
         "visible": true,

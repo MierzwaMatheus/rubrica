@@ -28,6 +28,7 @@ const GROUPS: Record<string, string> = {
   pricing: "Preços",
   plans: "Planos",
   location: "Localização",
+  video: "Vídeo",
   contact: "Contato",
   contactForm: "Formulário de contato",
   testimonials: "Depoimentos",

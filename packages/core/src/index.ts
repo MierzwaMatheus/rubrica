@@ -3,6 +3,7 @@ export * from "./i18n";
 export { DEFAULT_UI_TEXTS, defaultUiText } from "./i18n/ui-texts";
 export * from "./blocks/fields";
 export * from "./blocks/define";
+export * from "./blocks/media";
 export * from "./content/types";
 export * from "./theme/contract";
 export { CORE_RECIPES, recipeFor } from "./theme/recipes";

@@ -242,6 +242,27 @@
         }
       },
       {
+        "id": "s-video",
+        "type": "video",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "Como eu trabalho, em 3 minutos",
+            "en": "How I work, in 3 minutes"
+          },
+          "intro": {
+            "pt-BR": "Uma conversa curta sobre pesquisa, protótipos e entregas pequenas.",
+            "en": "A short talk about research, prototypes and small releases."
+          },
+          "url": "https://www.youtube.com/watch?v=M7lc1UVf-VE",
+          "caption": {
+            "pt-BR": "Palestra sobre o meu processo de design",
+            "en": "Talk about my design process"
+          },
+          "aspect": "16:9"
+        }
+      },
+      {
         "id": "s2",
         "type": "lista-itens",
         "visible": true,

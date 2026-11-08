@@ -6,6 +6,10 @@
  */
 import { defineBlock } from "../define";
 import { field } from "../fields";
+import { parseVideoUrl } from "../media";
+
+/** Domínios que os blocos põem em iframe (a CSP do CLI lê daqui) e o parse dos endereços. */
+export { BLOCK_FRAME_SOURCES, EMBED_PROVIDERS, parseEmbedUrl, parseVideoUrl } from "../media";
 
 const heading = field.text({ label: "Título", maxLength: 140 });
 const intro = field.text({ label: "Texto de apoio", multiline: true, maxLength: 400 });
@@ -314,6 +318,50 @@ export const logosClientes = defineBlock({
   },
 });
 
+export const video = defineBlock({
+  type: "video",
+  label: "Vídeo",
+  description: "Vídeo do YouTube ou do Vimeo. Carrega leve: miniatura e botão de play, e o player só depois do clique.",
+  category: "comum",
+  interactive: true,
+  enhances: true,
+  islandWhen: (f) => parseVideoUrl(f.url) !== undefined,
+  fields: {
+    anchor,
+    title: heading,
+    intro,
+    url: field.text({
+      label: "Endereço do vídeo",
+      localized: false,
+      required: true,
+      maxLength: 300,
+      help: "Link do YouTube (youtube.com/watch?v=…, youtu.be/…, /shorts/…) ou do Vimeo (vimeo.com/123456789).",
+    }),
+    caption: field.text({
+      label: "Legenda",
+      maxLength: 200,
+      help: "Aparece abaixo do vídeo e dá nome ao botão de play e ao player para leitores de tela. Sem ela, vale o título.",
+    }),
+    poster: field.image({
+      label: "Miniatura própria",
+      help: "Opcional no YouTube (sem ela, usa a miniatura do vídeo). No Vimeo, sem imagem aparece só o botão de play.",
+    }),
+    aspect: field.select({
+      label: "Proporção",
+      options: [
+        { value: "16:9", label: "16:9 (paisagem)" },
+        { value: "4:3", label: "4:3" },
+        { value: "1:1", label: "1:1 (quadrado)" },
+        { value: "9:16", label: "9:16 (vertical, Shorts e Reels)" },
+      ],
+      default: "16:9",
+    }),
+  },
+  validate: (f) => (parseVideoUrl(f.url) ? [] : [{ path: "url", message: "Endereço do vídeo: use um link do YouTube ou do Vimeo" }]),
+  // Cheia com miniatura própria, curta com a do YouTube, Vimeo com e sem imagem.
+  sample: (_mode, i) => (i < 2 ? { url: "https://www.youtube.com/watch?v=M7lc1UVf-VE" } : { url: "https://vimeo.com/76979871", ...(i === 3 ? { poster: undefined } : {}) }),
+});
+
 export const CORE_BLOCKS = [
   hero,
   texto,
@@ -332,6 +380,7 @@ export const CORE_BLOCKS = [
   equipe,
   localizacao,
   logosClientes,
+  video,
 ] as const;
 
 export type CoreBlock = (typeof CORE_BLOCKS)[number];

@@ -33,8 +33,8 @@ function render(type: string, props: Partial<BlockProps> & Pick<BlockProps, "ctx
 }
 
 describe("blocos padrão", () => {
-  it("há componente padrão para os 17 blocos do catálogo", () => {
-    expect(CORE_BLOCKS).toHaveLength(17);
+  it("há componente padrão para os 18 blocos do catálogo", () => {
+    expect(CORE_BLOCKS).toHaveLength(18);
     for (const b of CORE_BLOCKS) expect(DEFAULT_BLOCKS[b.type], b.type).toBeTypeOf("function");
   });
 
@@ -108,7 +108,7 @@ describe("blocos padrão", () => {
 
   it("só os blocos interativos montam ilha, e só quando o recurso está ligado", async () => {
     const interactiveTypes = new Set(CORE_BLOCKS.filter((b) => b.interactive).map((b) => b.type));
-    expect([...interactiveTypes].sort()).toEqual(["contato", "curriculo", "depoimentos"]);
+    expect([...interactiveTypes].sort()).toEqual(["contato", "curriculo", "depoimentos", "video"]);
     for (const kind of ["pessoal", "empresa"] as const) {
       const site = await load(kind);
       for (const route of site.routes) {
@@ -130,7 +130,7 @@ describe("blocos padrão", () => {
   it("empresa: ilha de depoimento só com o plugin de envio ligado; contato só com o assistente", async () => {
     const site = await load("empresa");
     const flags = site.routes.flatMap((r) => (r.type === "page" ? r.page.blocks.filter((b) => b.interactive).map((b) => b.type) : []));
-    expect(new Set(flags)).toEqual(new Set(["contato"]));
+    expect(new Set(flags)).toEqual(new Set(["contato", "video"]));
   });
 
   it("FAQ sem JavaScript (details) e filtro de etiquetas sem ilha", async () => {
@@ -194,7 +194,9 @@ describe("receitas padrão", () => {
     for (const page of CORE_RECIPES.empresa) {
       const route = site.routes.find((r) => r.url === page.path && r.type === "page");
       if (route?.type !== "page") continue; // /blog não existe em es, mas existe em pt-BR
-      const types = route.page.blocks.map((b) => b.type).filter((t) => t !== "logos-clientes");
+      // Blocos opcionais que a demo mostra além da receita.
+      const extras = new Set(["logos-clientes", "video", "incorporacao", "linha-do-tempo", "comparativo-planos"]);
+      const types = route.page.blocks.map((b) => b.type).filter((t) => !extras.has(t));
       expect(types, page.path).toEqual(page.blocks.map((b) => b.type));
     }
   });
@@ -230,7 +232,7 @@ describe("fixtures", () => {
 
 describe("ilhas", () => {
   it("cada bloco interativo tem ilha registrada", () => {
-    for (const type of ["contato", "curriculo", "depoimentos"]) {
+    for (const type of ["contato", "curriculo", "depoimentos", "video"]) {
       const name = islandNameFor(type);
       expect(CORE_ISLANDS[name], name).toBeDefined();
       expect(ISLAND_META[name], name).toBeDefined();

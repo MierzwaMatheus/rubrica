@@ -17,6 +17,9 @@ import { resolvePreview } from "./resolve";
 
 const blocks = [...CORE_BLOCKS, ...(projectBlocks ?? []).filter((b) => !CORE_BLOCKS.some((c) => c.type === b.type))];
 
+/** Blocos cuja ilha só melhora o HTML estático: a prévia mostra a versão estática. */
+const enhancedOnly = new Set(blocks.filter((b) => b.enhances).map((b) => b.type));
+
 function componentFor(type: string): BlockComponent {
   return (projectComponents as Record<string, BlockComponent>)[type] ?? blockComponent(theme, type);
 }
@@ -184,7 +187,7 @@ export default function PreviewApp() {
               index={b.index}
               total={b.total}
               ctx={ctx}
-              island={b.interactive ? <div style={notice}>Parte interativa (formulário, envio): funciona no site publicado.</div> : undefined}
+              island={b.interactive && !enhancedOnly.has(b.type) ? <div style={notice}>Parte interativa (formulário, envio): funciona no site publicado.</div> : undefined}
             />
           </BlockBoundary>
         );

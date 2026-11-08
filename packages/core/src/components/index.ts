@@ -4,6 +4,7 @@ import { CasesBlock, DepoimentosBlock, FaqBlock, PostsRecentesBlock, PrecosBlock
 import { ContatoBlock, LocalizacaoBlock } from "./blocks/contact";
 import { EquipeBlock, GaleriaBlock, ListaItensBlock, LogosClientesBlock, NumerosBlock, ServicosBlock } from "./blocks/lists";
 import { CurriculoBlock } from "./blocks/resume";
+import { VideoBlock } from "./blocks/media";
 import { DefaultCase, DefaultNotFound, DefaultPost, DefaultShell } from "./shell";
 
 export * from "./primitives";
@@ -13,6 +14,8 @@ export { CasesBlock, DepoimentosBlock, FaqBlock, PostsRecentesBlock, PrecosBlock
 export { ContatoBlock, LocalizacaoBlock } from "./blocks/contact";
 export { EquipeBlock, GaleriaBlock, ListaItensBlock, LogosClientesBlock, NumerosBlock, ServicosBlock } from "./blocks/lists";
 export { CurriculoBlock } from "./blocks/resume";
+export { VideoBlock, VideoFrame, videoName, videoPoster, videoRatio } from "./blocks/media";
+export type { VideoFrameProps } from "./blocks/media";
 /** Utilitários puros dos blocos padrão, para os temas não copiarem. */
 export { digits, formatDays, resolveFreeHref, safeId, shorten, tagFilterCss } from "./blocks/util";
 export type { TagFilterCssOptions } from "./blocks/util";
@@ -36,6 +39,7 @@ export const DEFAULT_BLOCKS: Partial<Record<string, BlockComponent>> = {
   equipe: EquipeBlock,
   localizacao: LocalizacaoBlock,
   "logos-clientes": LogosClientesBlock,
+  video: VideoBlock,
 };
 
 /** Componente do bloco no tema, senão o padrão do núcleo, senão o genérico. */

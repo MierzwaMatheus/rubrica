@@ -9,7 +9,7 @@ v2: Rubrica stops being a template copied into your project and becomes a **core
 **Coming from 1.x:** it is not an update, it is a migration. Run `npx create-rubrica@latest migrar` in a project on 1.13.1, with a clean git state: it creates the `rubrica-v2` branch, swaps the code, converts the data and lists what you customized. **Nothing is written to Convex**: the import goes into a new development database, and production only with your "ok". Guide: [Migrating from v1](./docs/guia/migrar.md). v1 keeps receiving bug and security fixes for 6 months (`v1` branch); its documentation is in [`docs/v1`](./docs/v1/README.md).
 
 ### Security
-Three v1 flaws are fixed in v2. If you have a v1 site with proposals, it is worth migrating (or updating v1, which also gets the fix).
+Three v1 flaws are fixed in v2. v1 does not get a fix for them: if you have a v1 site with proposals, the fix is to migrate to v2.
 - **A password-protected proposal no longer leaks its content through the API.** In v1, whoever called the proposal's public query received the content without typing the password: only the page hid it. Now, without a valid session, the API returns only the state ("locked"), without the content.
 - **The wrong-password limit now really blocks.** A wrong attempt threw an error, which undid the attempt count, so the limit was never reached. Now the attempt is recorded and, past the limit, the proposal answers `TOO_MANY_ATTEMPTS`.
 - **A single default contract template.** v1 had two default templates (one in code and one in the database), and a proposal could use one different from what the panel showed. In v2 there is just one, the database one (marked as default); the text shipped in code only serves to create it when none exists yet.

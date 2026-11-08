@@ -9,7 +9,7 @@ A v2: o Rubrica deixa de ser um template copiado para o projeto e vira um **núc
 **Vindo da 1.x:** não é uma atualização, é uma migração. Rode `npx create-rubrica@latest migrar` num projeto na 1.13.1, com o git limpo: ele cria a branch `rubrica-v2`, troca o código, converte os dados e lista o que você personalizou. **Nada é gravado no Convex**: o import vai para um banco de desenvolvimento novo, e a produção só com o seu "ok". Guia: [Migrar da v1](./docs/guia/migrar.md). A v1 recebe correções de bug e de segurança por 6 meses (branch `v1`); a documentação dela está em [`docs/v1`](./docs/v1/README.md).
 
 ### Segurança
-Três falhas da v1 estão corrigidas na v2. Se você tem um site v1 com propostas, vale migrar (ou atualizar a v1, que também recebe a correção).
+Três falhas da v1 estão corrigidas na v2. A v1 não recebe correção para elas: se você tem um site v1 com propostas, a solução é migrar para a v2.
 - **Proposta com senha não vaza mais o conteúdo pela API.** Na v1, quem chamava a consulta pública da proposta recebia o conteúdo mesmo sem digitar a senha: só a página escondia. Agora, sem sessão válida, a API devolve só o estado ("bloqueada"), sem o conteúdo.
 - **O limite de senha errada agora bloqueia de verdade.** A tentativa errada lançava erro, o que desfazia a contagem de tentativas, e o limite nunca era atingido. Agora a tentativa é registrada e, passado o limite, a proposta responde `TOO_MANY_ATTEMPTS`.
 - **Um só modelo de contrato padrão.** A v1 tinha dois modelos padrão (um no código e um no banco), e a proposta podia usar um diferente do que o painel mostrava. Na v2 o padrão é um só, o do banco (marcado como padrão); o texto que vem no código serve apenas para criá-lo quando ainda não existe nenhum.

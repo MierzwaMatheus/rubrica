@@ -36,7 +36,7 @@ A v1 (branch `v1`) recebe correções de bug e de segurança por **6 meses**.
 - **O limite de senha errada não bloqueava.** A tentativa errada lançava erro e desfazia a própria contagem. Agora é registrada, e passado o limite a proposta responde `TOO_MANY_ATTEMPTS`.
 - **Havia dois modelos de contrato padrão** (um no código e um no banco), e a proposta podia usar um diferente do que o painel mostrava. Agora o padrão é um só, o do banco.
 
-Quem tem propostas com senha na v1 deve migrar ou aplicar a correção na `v1`.
+A v1 não recebe correção para essas falhas: quem tem propostas com senha na v1 deve migrar para a v2.
 
 ## O que há de novo
 
@@ -79,7 +79,7 @@ Rubrica stops being a template copied into your project and becomes a **core in 
 
 - **Start:** `npx create-rubrica@latest my-site --tipo pessoal --tema padrao` (or `--tipo empresa`).
 - **Coming from v1:** it is a migration, not an update. `npx create-rubrica@latest migrar` creates a `rubrica-v2` branch, swaps the code, converts the data into an import file and lists your customizations. It writes to no database: you import into a new development Convex, and production only with your explicit "ok". v1 keeps getting bug and security fixes for 6 months.
-- **Security:** three v1 flaws are fixed: a password-protected proposal leaked its content through the API; the wrong-password limit never blocked; and there were two default contract templates.
+- **Security:** three v1 flaws are fixed: a password-protected proposal leaked its content through the API; the wrong-password limit never blocked; and there were two default contract templates. v1 does not get a fix for them: migrate to v2.
 - **New:** pages made of blocks with a live preview, a company line (pricing, team, company data), 14 themes and 15 color schemes passing one test battery, several languages, agency and client roles, contacts and privacy tooling, a local MCP server for agents, and host-neutral output (Vercel official; Netlify and Cloudflare Pages files generated).
 - **Breaking:** no more template copy in the project, no SPA, no `playground` plugin, no Python skill script, Node 22.23+.
 

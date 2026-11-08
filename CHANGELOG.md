@@ -325,7 +325,7 @@ CLI pensado para quem não é da área técnica: menos perguntas, nada repetido,
 - Rodar o `setup` de novo não pede mais a senha quando o painel já tem admin.
 - **`npx create-rubrica senha`**: troca a senha do painel pelo terminal, no site publicado ou no do computador, e libera o login bloqueado por tentativas erradas.
 - `config` → Identidade abre as perguntas com os valores salvos, em vez de pedir tudo de novo.
-- Guia de [manutenção do CLI](./docs/cli/manutencao.md): o que mudar no CLI quando entra layout, esquema, fonte ou plugin novo, e as regras da receita.
+- Guia de [manutenção do CLI](./docs/v1/cli-manutencao.md): o que mudar no CLI quando entra layout, esquema, fonte ou plugin novo, e as regras da receita.
 
 ## 1.1.0 — 2026-10-24
 
@@ -336,7 +336,7 @@ CLI pensado para quem não é da área técnica: menos perguntas, nada repetido,
 - Cores trocadas antes pelo admin continuam valendo nos dois modos até a aparência ser salva de novo.
 
 ### 8 layouts novos
-- **Desktop Retrô**, **Índice**, **Monografia**, **Zine**, **Blueprint**, **Jardim Digital**, **Conversa** e **Pôster Cinético**, cada um com as 5 páginas (Início, Currículo, Portfólio, Sobre, Blog), funcionando no celular e nos dois modos. Veja o [guia dos templates](./docs/templates/README.md).
+- **Desktop Retrô**, **Índice**, **Monografia**, **Zine**, **Blueprint**, **Jardim Digital**, **Conversa** e **Pôster Cinético**, cada um com as 5 páginas (Início, Currículo, Portfólio, Sobre, Blog), funcionando no celular e nos dois modos. Veja o [guia dos templates](./docs/v1/templates/README.md).
 
 ### Esquemas de cores, modo claro/escuro e textura
 - **15 esquemas de cores**, cada um com modo claro e escuro e 11 papéis de cor: os 4 presets originais (agora também no outro modo), o Neon (o visual original) e 10 novos (Riso, Cianotipia, Tropicália, Azulejo, Sumi, Fósforo, Crepúsculo, Concreto, Sorbet, Alto Contraste). Os 5 layouts originais seguem usando só as 4 cores de sempre; os novos usam o esquema completo.

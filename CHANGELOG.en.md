@@ -325,7 +325,7 @@ A CLI designed for non-technical people: fewer questions, nothing asked twice, s
 - Running `setup` again no longer asks for the password when the panel already has an admin.
 - **`npx create-rubrica senha`**: changes the panel password from the terminal, on the published site or the one on your computer, and unlocks a login blocked by wrong attempts.
 - `config` → Identity (Identidade) opens the questions with the saved values, instead of asking for everything again.
-- [CLI maintenance](./docs/cli/manutencao.md) guide (in Portuguese): what to change in the CLI when a new layout, color scheme, font or plugin comes in, and the recipe rules.
+- [CLI maintenance](./docs/v1/cli-manutencao.md) guide (in Portuguese): what to change in the CLI when a new layout, color scheme, font or plugin comes in, and the recipe rules.
 
 ## 1.1.0 — 2026-10-24
 
@@ -336,7 +336,7 @@ A CLI designed for non-technical people: fewer questions, nothing asked twice, s
 - Colors changed earlier in the admin keep applying to both modes until the appearance is saved again.
 
 ### 8 new layouts
-- **Desktop Retrô**, **Índice**, **Monografia**, **Zine**, **Blueprint**, **Jardim Digital**, **Conversa** and **Pôster Cinético**, each with the 5 pages (Home, Resume, Portfolio, About, Blog), working on mobile and in both modes. See the [templates guide](./docs/templates/README.md) (in Portuguese).
+- **Desktop Retrô**, **Índice**, **Monografia**, **Zine**, **Blueprint**, **Jardim Digital**, **Conversa** and **Pôster Cinético**, each with the 5 pages (Home, Resume, Portfolio, About, Blog), working on mobile and in both modes. See the [templates guide](./docs/v1/templates/README.md) (in Portuguese).
 
 ### Color schemes, light/dark mode and texture
 - **15 color schemes**, each with light and dark modes and 11 color roles: the 4 original presets (now also in the other mode), Neon (the original look) and 10 new ones (Riso, Cianotipia, Tropicália, Azulejo, Sumi, Fósforo, Crepúsculo, Concreto, Sorbet, Alto Contraste). The 5 original layouts still use only the usual 4 colors; the new ones use the full scheme.

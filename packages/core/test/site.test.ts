@@ -59,6 +59,29 @@ describe("montagem do site", () => {
     expect(enTags.filter((t) => t.attrs?.hreflang).map((t) => t.attrs!.hreflang)).toEqual(["pt-BR", "en", "x-default"]);
   });
 
+  it("feed RSS e disponibilidade chegam ao contexto", async () => {
+    const s = await site();
+    expect(s.context("pt-BR", "/").feeds).toEqual({ rss: "/rss.xml" });
+    expect(s.context("en", "/en").feeds).toEqual({ rss: "/en/rss.xml" });
+    // A home da demo pessoal mostra a disponibilidade no hero.
+    expect(s.context("pt-BR", "/").site.availability).toBe(true);
+    const snapshot = await fixtureSource(fixtures).load();
+    const noBlog = buildSite({ snapshot: { ...snapshot, site: { ...snapshot.site, plugins: { ...snapshot.site.plugins, blog: false } }, pages: snapshot.pages.filter((p) => p.path !== "/") }, theme, blocks: CORE_BLOCKS, plugins: CORE_PLUGINS });
+    expect(noBlog.context("pt-BR", "/sobre").feeds).toEqual({});
+    expect(noBlog.context("pt-BR", "/sobre").site.availability).toBe(false);
+  });
+
+  it("resumo leve das coleções para a casca, no idioma", async () => {
+    const s = await site();
+    const pt = s.collections("pt-BR");
+    expect(pt.projects.map((p) => p.url)).toContain("/portfolio/app-banco");
+    expect(Object.keys(pt.projects[0]!).sort()).toEqual(expect.arrayContaining(["id", "title", "url", "tags", "featured"]));
+    expect(pt.projects[0]).not.toHaveProperty("sections");
+    expect(pt.posts.map((p) => p.url)).toContain("/blog/so-portugues");
+    expect(s.collections("en").posts.map((p) => p.url)).not.toContain("/en/blog/so-portugues");
+    expect(s.collections("pt-BR")).toBe(pt);
+  });
+
   it("textos de interface caem no idioma do núcleo", async () => {
     const s = await site();
     expect(s.context("en", "/en").t("blog.readingTime", { minutes: 3 })).toBe("3 min read");

@@ -157,12 +157,13 @@ export default function PreviewApp() {
   if (!result) return <div style={notice}>Carregando a prévia…</div>;
   if (!result.ok) return <div style={notice}>{result.message}</div>;
 
-  const { ctx, page } = result;
+  const { ctx, page, collections } = result;
   const { Shell } = templates(theme);
   return (
     <Shell
       ctx={ctx}
       pageType="page"
+      collections={collections}
       localeSwitcher={<LocaleLinks ctx={ctx} />}
       colorToggle={ctx.site.colorToggle ? <ColorToggleButton label={ctx.t("theme.toggle")} /> : undefined}
     >

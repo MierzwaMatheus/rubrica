@@ -28,7 +28,7 @@ const pageType = route.type;
 ---
 
 <Document route={route} ctx={ctx} settings={site.settings}>
-  <Shell ctx={ctx} pageType={pageType}>
+  <Shell ctx={ctx} pageType={pageType} collections={site.collections(route.locale)}>
     <LocaleLinks slot="localeSwitcher" ctx={ctx} />
     {ctx.site.colorToggle && <ColorToggleButton slot="colorToggle" label={ctx.t("theme.toggle")} />}
     {

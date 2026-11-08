@@ -45,6 +45,18 @@ export interface ResolvedSite {
   colorToggle: boolean;
   /** Logo resolvida (o `alt` já vem com o nome do site se faltar). `dark` para fundo escuro. */
   logo?: ResolvedImage & { dark?: ResolvedImage };
+  /**
+   * A home mostra a disponibilidade (algum hero visível dela com "Mostrar disponibilidade"),
+   * para a casca repetir o aviso (ex.: o status no cabeçalho do chat). O texto é
+   * `ctx.t("hero.available")`.
+   */
+  availability: boolean;
+}
+
+/** Feeds do site no idioma da página (caminhos com o prefixo do idioma). */
+export interface ResolvedFeeds {
+  /** RSS do blog: o do idioma, ou o do idioma principal se este não tem post. Sem blog, ausente. */
+  rss?: string;
 }
 
 export interface Alternate {
@@ -69,6 +81,8 @@ export interface RenderContext {
   href: (path: string) => string;
   /** Data formatada no idioma. */
   formatDate: (iso: string, style?: "long" | "short" | "month") => string;
+  /** Feeds (RSS) para o tema linkar. */
+  feeds: ResolvedFeeds;
 }
 
 export interface BlockProps<Fields = Record<string, unknown>, Item = unknown> {
@@ -91,10 +105,45 @@ export interface BlockProps<Fields = Record<string, unknown>, Item = unknown> {
 
 export type BlockComponent<Fields = any, Item = any> = ComponentType<BlockProps<Fields, Item>>;
 
+/** Projeto resumido para a casca (mapa do site, menu de projetos). */
+export interface ShellProjectSummary {
+  id: string;
+  title: string;
+  url: string;
+  category?: string;
+  tags: string[];
+  featured: boolean;
+}
+
+/** Post resumido para a casca. */
+export interface ShellPostSummary {
+  id: string;
+  title: string;
+  url: string;
+  /** ISO 8601. */
+  publishedAt: string;
+  tags: string[];
+  featured: boolean;
+}
+
+/**
+ * Resumo leve das coleções no idioma da página, para a casca (ex.: o mapa do jardim).
+ * Só título, endereço e marcadores: nada de texto longo nem imagem, e nada vai ao HTML se
+ * o tema não usar. Coleção com o plugin desligado vem vazia.
+ */
+export interface ShellCollections {
+  /** Na ordem do painel. */
+  projects: ShellProjectSummary[];
+  /** Mais novos primeiro. */
+  posts: ShellPostSummary[];
+}
+
 export interface ShellProps {
   ctx: RenderContext;
   /** Tipo da página, para a casca variar (ex.: sem hero no post). */
   pageType: "page" | "post" | "case" | "notFound";
+  /** Projetos e posts do idioma, resumidos. */
+  collections: ShellCollections;
   children: ReactNode;
   /** Ilhas que a casca pode posicionar: alternância de tema e seletor de idioma. */
   colorToggle?: ReactNode;

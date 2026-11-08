@@ -8,8 +8,8 @@ import type { PageRecord, SiteSettings } from "../../content/types";
 import type { SiteSnapshot } from "../../data/source";
 import { localizedPath, type Locale } from "../../i18n";
 import type { PluginDefinition } from "../../plugins/contract";
-import { buildSite, type ResolvedPage } from "../../render/site";
-import type { RenderContext, ThemeDefinition } from "../../theme/contract";
+import { buildSite, homeShowsAvailability, type ResolvedPage } from "../../render/site";
+import type { RenderContext, ShellCollections, ThemeDefinition } from "../../theme/contract";
 
 export interface PreviewInput {
   /** Snapshot publicado (`site.snapshot`): configurações, coleções e textos. */
@@ -25,7 +25,7 @@ export interface PreviewInput {
 }
 
 export type PreviewResult =
-  | { ok: true; page: ResolvedPage; ctx: RenderContext; url: string }
+  | { ok: true; page: ResolvedPage; ctx: RenderContext; url: string; collections: ShellCollections }
   | { ok: false; reason: "untranslated" | "error"; message: string };
 
 export function resolvePreview(input: PreviewInput): PreviewResult {
@@ -48,7 +48,16 @@ export function resolvePreview(input: PreviewInput): PreviewResult {
         message: `A página não existe em ${locale}: falta o título nesse idioma (decisão 28).`,
       };
     }
-    return { ok: true, page: route.page, ctx: built.context(locale, route.url, route.alternates), url: localizedPath(page.path, locale, site.locales) };
+    const ctx = built.context(locale, route.url, route.alternates);
+    // A disponibilidade vem da home publicada (ou do rascunho, se ele é a home).
+    ctx.site.availability = homeShowsAvailability(page.path === "/" ? [page] : input.snapshot.pages);
+    return {
+      ok: true,
+      page: route.page,
+      ctx,
+      url: localizedPath(page.path, locale, site.locales),
+      collections: built.collections(locale),
+    };
   } catch (e) {
     return { ok: false, reason: "error", message: (e as Error).message.replace("[rubrica] ", "") };
   }

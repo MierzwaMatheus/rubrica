@@ -68,14 +68,37 @@ function NavList({ ctx, className }: { ctx: ShellProps["ctx"]; className?: strin
 }
 
 /** Seletor de idioma sem JavaScript: links para a mesma página nos outros idiomas. */
-export function LocaleLinks({ ctx }: { ctx: ShellProps["ctx"] }) {
+/**
+ * Código curto do idioma para o seletor compacto: "pt-BR" → "PT", "en" → "EN". Se dois
+ * idiomas do seletor têm a mesma língua (pt-BR e pt-PT), mostra o código inteiro.
+ */
+export function localeCode(locale: string, all: readonly string[] = [locale]): string {
+  const base = (l: string) => l.split("-")[0]!.toLowerCase();
+  const clash = all.filter((l) => base(l) === base(locale)).length > 1;
+  return (clash ? locale : base(locale)).toUpperCase();
+}
+
+/**
+ * Seletor de idioma (links para a mesma página nos outros idiomas). `compact` mostra só o
+ * código ("EN") para cabeçalhos estreitos; o nome completo continua no nome acessível do
+ * link (leitor de tela), antes do código visível.
+ */
+export function LocaleLinks({ ctx, compact = false, className }: { ctx: ShellProps["ctx"]; compact?: boolean; className?: string }) {
   if (ctx.alternates.length < 2) return null;
+  const all = ctx.alternates.map((a) => a.locale);
   return (
-    <ul className="rb-locales" aria-label={ctx.t("nav.language")}>
+    <ul className={`rb-locales${compact ? " rb-locales--compact" : ""}${className ? ` ${className}` : ""}`} aria-label={ctx.t("nav.language")}>
       {ctx.alternates.map((a) => (
         <li key={a.locale}>
           <a href={a.href} hrefLang={a.locale} lang={a.locale} aria-current={a.current ? "true" : undefined}>
-            {a.label}
+            {compact ? (
+              <>
+                <span className="rb-sr-only">{a.label} </span>
+                {localeCode(a.locale, all)}
+              </>
+            ) : (
+              a.label
+            )}
           </a>
         </li>
       ))}

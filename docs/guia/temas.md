@@ -77,63 +77,11 @@ Cada tema traz as suas fontes (um papel de texto, um de código e um de título)
 
 ## Blocos próprios e componentes ejetados
 
-Do menor para o maior esforço (prefira sempre o menor):
+Quando o tema e a **Aparência** não bastam, há dois caminhos no próprio projeto, do menor para o maior esforço:
 
-1. **Configuração e tokens**, pelo painel ou pelo `config`.
-2. **Bloco próprio**, para uma seção que o catálogo não tem.
-3. **Componente ejetado**, quando o bloco existe mas você quer outra marcação.
-
-### Bloco próprio
-
-Fica em `src/blocks/`: uma definição (os campos, com `defineBlock`) e um componente React puro, registrados em `src/blocks/index.ts`. Ele aparece no editor de páginas como os do núcleo, com formulário e prévia. O passo a passo, com um exemplo completo, está em [Criar um bloco](./criar-bloco.md).
-
-### Ejetar um componente
-
-```bash
-npx create-rubrica ejetar hero     # copia o componente do bloco hero
-npx create-rubrica ejetar --listar # mostra o que já foi ejetado
-```
-
-O comando copia só aquele componente (do tema, ou do núcleo se o tema não tem) para `src/overrides/` e passa a usar a cópia. A partir daí o componente é **seu**: o `update` não mexe nele, mas avisa quando o original mudou desde a cópia, para você trazer a correção. `--forcar` copia de novo por cima.
-
-### Regras dos componentes
-
-Componentes de bloco e de tema são **React puro**: só props, sem estado, efeitos, contexto nem busca de dados. O Astro os transforma em HTML estático; o que precisa de JavaScript é uma ilha do núcleo. Além disso:
-
-- nada de texto fixo no componente: ou é campo do bloco, ou é texto de interface (`ctx.t("chave")`);
-- links internos por `ctx.href("/caminho")`, que já leva o prefixo do idioma;
-- o título do primeiro bloco é o `h1` da página; os outros usam `h2`, e itens usam `h3`.
-
-`npx create-rubrica verificar` confere os ejetados.
+1. **Bloco próprio**, para uma seção que o [catálogo](./blocos.md) não tem: uma definição com os campos e um componente React, em `src/blocks/`. Veja [Criar um bloco](./criar-bloco.md).
+2. **Componente ejetado**, quando o bloco existe e você quer outra marcação: `npx create-rubrica ejetar <bloco>` copia o componente para `src/overrides/`, e a cópia passa a ser sua. Veja [Ejetar um componente](./criar-tema.md#ejetar-um-componente).
 
 ## Criar um tema
 
-Um tema é um pacote que exporta, por padrão, `defineTheme({...})`, e a folha de estilo em `./styles.css`. Ele fornece:
-
-- **tokens** (cores, tipografia, espaçamento, raio) e o esquema e o modo padrão;
-- a **casca**: cabeçalho, navegação e rodapé (ou a "área de trabalho" do `desktop`);
-- um **componente por tipo de bloco**, só os que quiser trocar; os outros herdam a versão do núcleo;
-- **variações** com nome por bloco (por exemplo, `cases: ["grade", "lista"]`);
-- **receitas**: a lista padrão de blocos de cada página, usada ao criar um site e ao migrar;
-- opcionalmente, templates de post, de case e de 404.
-
-O contrato tem versão própria: o pacote declara `"rubrica": { "contract": "^1" }`. Bloco novo no núcleo é uma versão menor (o tema herda o padrão); mudar ou remover campo é uma versão maior, sempre com migração de dados.
-
-O modo mais curto de começar é copiar `packages/themes/padrao` do [repositório](https://github.com/MierzwaMatheus/rubrica) e trocar o que quiser. O guia do monorepo, com as regras completas, está em [`docs/v2/contribuindo.md`](https://github.com/MierzwaMatheus/rubrica/blob/main/docs/v2/contribuindo.md).
-
-### A bateria de testes
-
-Todo tema passa pela mesma bateria antes de entrar. Ela constrói os sites de demonstração (pessoal e empresa) com o tema, em todos os blocos e variações, e confere:
-
-- acessibilidade com o axe, sem violações;
-- um `h1` por página e o `<head>` completo (título, descrição, canonical, idiomas, dados estruturados);
-- limite de JavaScript por página (120 KB comprimido nas páginas com ilha; página sem ilha não leva JavaScript);
-- ilhas hidratando sem erro;
-- Lighthouse: performance 90 ou mais, acessibilidade e SEO 95 ou mais.
-
-```bash
-pnpm testar-tema meu-tema              # no monorepo
-npx create-rubrica testar-tema meu-tema
-```
-
-Opções úteis: `--site pessoal`, `--sem-lighthouse`, `--so-lighthouse`, `--json relatorio.json` e `--todos`. A lista completa está em [Comandos do CLI](./cli.md#testar-tema). Falhou algo, o tema não sai. A mesma bateria vale para temas de terceiros.
+Um tema novo é um pacote `@rubrica/theme-<id>`, feito no monorepo do Rubrica a partir do `padrao` e aprovado pela mesma bateria de testes de todos os temas (acessibilidade, SEO, JavaScript por página e Lighthouse). O contrato, a casca, os tokens, as variações, as receitas e o passo a passo estão em [Criar um tema](./criar-tema.md).

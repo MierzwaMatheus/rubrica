@@ -17,7 +17,7 @@
     },
     {
       "source": "/docs/templates/criando-um-layout",
-      "destination": "/docs/guia/temas#criar-um-tema",
+      "destination": "/docs/guia/criar-tema",
       "permanent": true
     },
     {
@@ -42,7 +42,7 @@
     },
     {
       "source": "/en/docs/templates/criando-um-layout",
-      "destination": "/en/docs/guia/temas#create-a-theme",
+      "destination": "/en/docs/guia/criar-tema",
       "permanent": true
     },
     {

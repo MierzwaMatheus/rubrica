@@ -77,63 +77,11 @@ Each theme brings its own fonts (one role for text, one for code and one for hea
 
 ## Own blocks and ejected components
 
-From least to most effort (always prefer the least):
+When the theme and **Aparência** aren't enough, there are two paths inside the project itself, from the smallest effort to the largest:
 
-1. **Configuration and tokens**, in the panel or with `config`.
-2. **Own block**, for a section the catalog doesn't have.
-3. **Ejected component**, when the block exists but you want other markup.
-
-### Own block
-
-It lives in `src/blocks/`: a definition (the fields, with `defineBlock`) and a pure React component, registered in `src/blocks/index.ts`. It shows up in the page editor like the core ones, with a form and a preview. The step-by-step guide, with a complete example, is in [Create a block](./criar-bloco.md).
-
-### Eject a component
-
-```bash
-npx create-rubrica ejetar hero     # copies the hero block component
-npx create-rubrica ejetar --listar # shows what has been ejected
-```
-
-The command copies only that component (from the theme, or from the core if the theme has none) into `src/overrides/` and starts using the copy. From then on the component is **yours**: `update` doesn't touch it, but warns when the original changed since the copy, so you can bring over the fix. `--forcar` copies again over the top.
-
-### Component rules
-
-Block and theme components are **pure React**: props only, no state, effects, context or data fetching. Astro turns them into static HTML; whatever needs JavaScript is a core island. In addition:
-
-- no fixed text in the component: it is either a block field or an interface text (`ctx.t("key")`);
-- internal links through `ctx.href("/path")`, which already carries the language prefix;
-- the first block's title is the page `h1`; the others use `h2`, and items use `h3`.
-
-`npx create-rubrica verificar` checks the ejected ones.
+1. **Own block**, for a section the [catalog](./blocos.md) doesn't have: a definition with the fields and a React component, in `src/blocks/`. See [Create a block](./criar-bloco.md).
+2. **Ejected component**, when the block exists and you want different markup: `npx create-rubrica ejetar <block>` copies the component to `src/overrides/`, and the copy becomes yours. See [Eject a component](./criar-tema.md#eject-a-component).
 
 ## Create a theme
 
-A theme is a package that exports `defineTheme({...})` by default, and the stylesheet at `./styles.css`. It provides:
-
-- **tokens** (colors, typography, spacing, radius) and the default scheme and mode;
-- the **shell**: header, navigation and footer (or the `desktop` theme's "desktop");
-- **one component per block type**, only the ones you want to replace; the others inherit the core's version;
-- named **variants** per block (for example, `cases: ["grade", "lista"]`);
-- **recipes**: the default list of blocks of each page, used when creating a site and when migrating;
-- optionally, post, case and 404 templates.
-
-The contract has its own version: the package declares `"rubrica": { "contract": "^1" }`. A new block in the core is a minor version (the theme inherits the default); changing or removing a field is a major version, always with a data migration.
-
-The shortest way to start is to copy `packages/themes/padrao` from the [repository](https://github.com/MierzwaMatheus/rubrica) and change what you want. The monorepo guide, with the complete rules, is in [`docs/v2/contribuindo.md`](https://github.com/MierzwaMatheus/rubrica/blob/main/docs/v2/contribuindo.md) (in Portuguese).
-
-### The test battery
-
-Every theme goes through the same battery before it ships. It builds the demo sites (personal and company) with the theme, across all blocks and variants, and checks:
-
-- accessibility with axe, no violations;
-- one `h1` per page and a complete `<head>` (title, description, canonical, languages, structured data);
-- a JavaScript limit per page (120 KB gzipped on pages with an island; a page without an island ships no JavaScript);
-- islands hydrating without errors;
-- Lighthouse: performance 90 or more, accessibility and SEO 95 or more.
-
-```bash
-pnpm testar-tema my-theme              # in the monorepo
-npx create-rubrica testar-tema my-theme
-```
-
-Useful options: `--site pessoal`, `--sem-lighthouse`, `--so-lighthouse`, `--json report.json` and `--todos`. The full list is in [CLI commands](./cli.md#testar-tema). If anything fails, the theme doesn't ship. The same battery applies to third-party themes.
+A new theme is a `@rubrica/theme-<id>` package, built in the Rubrica monorepo from `padrao` and approved by the same test battery as every theme (accessibility, SEO, JavaScript per page and Lighthouse). The contract, the shell, the tokens, variants, recipes and the step-by-step guide are in [Create a theme](./criar-tema.md).

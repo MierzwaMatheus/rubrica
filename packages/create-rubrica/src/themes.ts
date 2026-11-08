@@ -30,12 +30,18 @@ export interface ThemeSpec {
 }
 
 /** Temas com pacote publicado. */
-export const PORTED_THEMES = ["padrao", "cyberpunk"] as const;
+export const PORTED_THEMES = ["padrao", "cyberpunk", "bento", "chat", "desktop", "index", "magazine", "monograph"] as const;
 
 /** O que cada pacote de tema declara: `scheme` no `defineTheme` e `fonts.json` (`test/alignment.test.ts`). */
 export const THEME_PACKAGE_DEFAULTS: Record<(typeof PORTED_THEMES)[number], { scheme: string; fontSans: string; fontMono?: string }> = {
   padrao: { scheme: "neon", fontSans: "Chakra Petch", fontMono: "Chakra Petch" },
   cyberpunk: { scheme: "neon", fontSans: "Chakra Petch", fontMono: "Chakra Petch" },
+  bento: { scheme: "editorial-cream", fontSans: "Manrope", fontMono: "JetBrains Mono" },
+  chat: { scheme: "alto-contraste", fontSans: "Instrument Sans", fontMono: "IBM Plex Mono" },
+  desktop: { scheme: "sorbet", fontSans: "Instrument Sans", fontMono: "IBM Plex Mono" },
+  index: { scheme: "sumi", fontSans: "Instrument Sans", fontMono: "IBM Plex Mono" },
+  magazine: { scheme: "editorial-cream", fontSans: "IBM Plex Serif", fontMono: "JetBrains Mono" },
+  monograph: { scheme: "azulejo", fontSans: "Source Serif 4", fontMono: "IBM Plex Mono" },
 };
 
 const isPorted = (id: string): id is (typeof PORTED_THEMES)[number] => (PORTED_THEMES as readonly string[]).includes(id);

@@ -182,15 +182,48 @@ export async function createProject(options: CreateOptions, deps: CreateDeps = {
   writeFiles(dir, projectFiles({ name: options.name, state, deps: options.deps, packageManager: options.packageManager }));
   log.success(`Projeto criado em ${dir} (tema ${themePackage(state.tema)}, tipo ${state.tipo}).`);
 
+  // Git sempre na branch main. Sem git instalado, o projeto funciona do mesmo jeito.
+  let git = false;
   if (options.git && !existsSync(join(dir, ".git"))) {
     try {
-      runner("git", ["init", "-q"], { cwd: dir });
+      try {
+        runner("git", ["init", "-q", "-b", "main"], { cwd: dir });
+      } catch {
+        // git anterior à 2.28 não conhece o -b
+        runner("git", ["init", "-q"], { cwd: dir });
+        runner("git", ["symbolic-ref", "HEAD", "refs/heads/main"], { cwd: dir });
+      }
+      git = true;
     } catch {
       log.warn("Não deu para rodar o git init (o git está instalado?). Siga sem ele ou rode depois.");
     }
   }
 
-  if (!options.install) return;
+  if (options.install) await install(options, runner, deps);
+  if (git) firstCommit(dir, runner);
+}
+
+/**
+ * Commit inicial: a branch main passa a existir, o projeto já pode ir para um repositório
+ * e o `update` (que pede o git limpo) funciona desde o começo.
+ */
+function firstCommit(dir: string, runner: Runner): void {
+  const message = ["-m", "Projeto criado com create-rubrica"];
+  try {
+    runner("git", ["add", "-A"], { cwd: dir });
+    try {
+      runner("git", ["commit", "-q", ...message], { cwd: dir });
+    } catch {
+      // git sem nome e e-mail configurados
+      runner("git", ["-c", "user.name=create-rubrica", "-c", "user.email=create-rubrica@users.noreply.github.com", "commit", "-q", ...message], { cwd: dir });
+    }
+  } catch {
+    log.warn("Não deu para fazer o primeiro commit. O projeto funciona do mesmo jeito.");
+  }
+}
+
+async function install(options: CreateOptions, runner: Runner, deps: CreateDeps): Promise<void> {
+  const { dir } = options;
   const s = spinner();
   s.start(`Instalando as dependências com o ${options.packageManager} (leva um ou dois minutos)...`);
   try {

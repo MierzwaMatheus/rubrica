@@ -233,9 +233,16 @@ export interface Person {
 export interface Appearance {
   colorMode: "dark" | "light" | "system";
   colorToggle: boolean;
+  /**
+   * Esquema de cor (`theme/schemes.ts`): id de um dos esquemas do núcleo. Vale sobre os
+   * tokens do tema e sob `tokens`. Sem ele, vale o `scheme` do tema (se houver).
+   */
+  scheme?: string;
   /** Tokens do tema sobrescritos no painel (nome do token → valor CSS). */
   tokens?: Record<string, string>;
+  /** Família do Google Fonts para o texto (baixada no build e servida localmente). */
   fontSans?: string;
+  /** Família do Google Fonts para código e detalhes em monoespaçada. */
   fontMono?: string;
 }
 

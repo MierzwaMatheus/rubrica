@@ -145,6 +145,12 @@ export interface TokenDef {
   light?: string;
 }
 
+export interface ThemeFonts {
+  sans?: string;
+  mono?: string;
+  display?: string;
+}
+
 export interface ThemeDefinition {
   /** Identificador do pacote sem o escopo: `padrao`, `cyberpunk`. */
   id: string;
@@ -164,8 +170,17 @@ export interface ThemeDefinition {
   variants?: Partial<Record<string, VariantOption[]>>;
   /** Receitas por tipo de site (decisão 24). Sem receita, usa a do núcleo. */
   recipes?: Partial<Record<SiteKind, Recipe>>;
-  /** Fontes que o tema usa por padrão (Google Fonts), baixadas no build. */
-  fonts?: { sans?: string; mono?: string; display?: string };
+  /**
+   * Esquema de cor padrão do tema (id de `SCHEMES`), usado quando o site não escolhe um
+   * (`appearance.scheme`). Opcional: sem ele valem só os tokens da folha do tema.
+   */
+  scheme?: string;
+  /**
+   * Fontes que o tema usa por padrão (Google Fonts), baixadas no build. O build lê as
+   * mesmas famílias do `fonts.json` que o pacote do tema exporta em "./fonts.json" (o
+   * `index` do tema importa esse arquivo, então há uma fonte só).
+   */
+  fonts?: ThemeFonts;
 }
 
 export function defineTheme(theme: ThemeDefinition): ThemeDefinition {

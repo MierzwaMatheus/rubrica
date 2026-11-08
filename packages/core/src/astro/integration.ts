@@ -18,7 +18,8 @@ import { fixtureSource, type DataSource } from "../data/source";
 import type { ThemeFonts } from "../theme/contract";
 import { planFonts, type FontPlan } from "../theme/fonts";
 import tailwindcss from "@tailwindcss/vite";
-import { findConvexUrl } from "../data/convex";
+import { convexSource, findConvexUrl } from "../data/convex";
+import { devFsAllow, projectEnv } from "./env";
 import { enabledPlugins } from "../plugins/contract";
 import { CORE_PLUGINS } from "../plugins/registry";
 
@@ -65,6 +66,7 @@ const VIRTUAL = {
 } as const;
 
 const here = (p: string) => fileURLToPath(new URL(p, import.meta.url));
+const devFsAllowed = (root: string) => devFsAllow(root, here("../.."));
 
 /**
  * Fontes do tema: o pacote exporta `./fonts.json` (`{ sans, mono, display }`), que o
@@ -88,26 +90,28 @@ export function readThemeFonts(themeSpec: string, root: string): ThemeFonts | un
   return JSON.parse(readFileSync(file, "utf-8")) as ThemeFonts;
 }
 
-async function loadSource(source: SourceOption, abs: (p: string) => string): Promise<DataSource> {
+function loadSource(source: SourceOption, abs: (p: string) => string, convexUrl: string | undefined): DataSource {
   if ("fixtures" in source) return fixtureSource(abs(source.fixtures));
-  const { convexSource } = await import("../data/convex");
-  return convexSource(source.convex.url ?? null);
+  return convexSource(convexUrl ?? null);
 }
 
 export default function rubrica(options: RubricaOptions): AstroIntegration {
   return {
     name: "@rubrica/core",
     hooks: {
-      async "astro:config:setup"({ config, updateConfig, injectRoute }) {
+      async "astro:config:setup"({ config, command, updateConfig, injectRoute }) {
         const root = fileURLToPath(config.root);
         const abs = (p: string) => (isAbsolute(p) ? p : resolve(root, p));
         const spec = (s: string) => (s.startsWith(".") ? abs(s) : s);
         const source: SourceOption = options.source ?? { convex: {} };
+        // Endereço do Convex: o da opção, senão o do ambiente ou dos .env* do projeto.
+        const env = projectEnv(root, command === "dev" ? "development" : "production");
+        const convexUrl = "convex" in source ? findConvexUrl(source.convex.url, env) : undefined;
 
         const sourceCode =
           "fixtures" in source
             ? `import { fixtureSource } from "@rubrica/core/data";\nconst baseSource = fixtureSource(${JSON.stringify(abs(source.fixtures))});`
-            : `import { convexSource } from "@rubrica/core/data/convex";\nconst baseSource = convexSource(${JSON.stringify(source.convex.url ?? null)});`;
+            : `import { convexSource } from "@rubrica/core/data/convex";\nconst baseSource = convexSource(${JSON.stringify(convexUrl ?? null)});`;
         // Vitrine (só com fixtures): as páginas geradas do tema entram depois dos blocos do projeto.
         const showcase = "fixtures" in source && source.showcase === true;
         const exportSource = showcase
@@ -128,7 +132,7 @@ export default function rubrica(options: RubricaOptions): AstroIntegration {
 
         // Fontes: as famílias vêm do site (aparência) ou do tema. O Astro baixa do Google Fonts
         // no build e serve local; o <head> só recebe `<Font>` (ver Document.astro).
-        const snapshot = await (await loadSource(source, abs)).load();
+        const snapshot = await loadSource(source, abs, convexUrl).load();
         const fontPlan: FontPlan = planFonts(snapshot.site.appearance, readThemeFonts(options.theme, root));
 
         const modules: Record<string, string> = {
@@ -156,7 +160,7 @@ export default function rubrica(options: RubricaOptions): AstroIntegration {
             "fixtures" in source
               ? `export const adminBackend = { kind: "demo" };`
               : `export const adminBackend = ${JSON.stringify(
-                  findConvexUrl(source.convex.url, process.env) ? { kind: "convex", url: findConvexUrl(source.convex.url, process.env) } : { kind: "missing" },
+                  convexUrl ? { kind: "convex", url: convexUrl } : { kind: "missing" },
                 )};`,
           [VIRTUAL.islands]: [
             `import { CORE_ISLANDS } from "@rubrica/core/islands";`,
@@ -180,6 +184,7 @@ export default function rubrica(options: RubricaOptions): AstroIntegration {
             fallbacks: f.fallbacks,
           })),
           vite: {
+            ...(devFsAllowed(root) && { server: { fs: { allow: devFsAllowed(root)! } } }),
             plugins: [
               // Só processa CSS com `@import "tailwindcss"`: o do painel. O tema não usa.
               ...(options.admin === false ? [] : tailwindcss()),

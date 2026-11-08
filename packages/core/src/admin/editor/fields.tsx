@@ -12,7 +12,7 @@ import { api, isMissingFunction } from "../data/api";
 import { useAction } from "../data/backend";
 import { toast } from "../lib/toast";
 import { cn } from "../lib/utils";
-import { localeName } from "../panel";
+import { localeName } from "../lib/locale";
 import { Button } from "../ui/button";
 import { Input, Label, NativeSelect, Spinner, Textarea } from "../ui/form";
 import { Switch } from "../ui/tabs";
@@ -356,7 +356,7 @@ export function ImageControl({ def, value, onChange, path, errors }: ControlProp
           </div>
         </div>
       ) : (
-        <Button id={id} variant="outline" className="w-full border-dashed" onClick={() => setPicking(true)}>
+        <Button id={id} aria-label={`Escolher ${def.label.toLowerCase()}`} variant="outline" className="w-full border-dashed" onClick={() => setPicking(true)}>
           <ImagePlus /> Escolher imagem
         </Button>
       )}

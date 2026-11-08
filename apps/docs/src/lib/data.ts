@@ -36,9 +36,6 @@ export { SCHEMES };
 export const REPO = "https://github.com/MierzwaMatheus/rubrica";
 export const COMMAND = "npx create-rubrica@latest meu-site";
 
-/** Páginas que cada layout desenha (as rotas do app). Os nomes ficam no dicionário (i18n). */
-export const PAGES = ["/", "/curriculo", "/portfolio", "/sobre", "/blog"];
-
 export interface Mood {
   id: string;
   layout: string;

@@ -1,19 +1,24 @@
 /**
- * Combinador: controla o iframe com o build real de cada tema (public/previews/<tema>,
- * gerado pelo site de demonstração). Tema, página e modo recarregam o iframe; esquema e
- * fontes mudam ao vivo por postMessage (scripts/preview-bridge.js, que também guarda a
- * escolha para as páginas seguintes do preview).
+ * Combinador: controla o iframe com o build real de cada tema (public/previews/..., gerado
+ * pelo site de demonstração para cada tipo de site). Tipo, tema, página e modo recarregam o
+ * iframe; esquema e fontes mudam ao vivo por postMessage (scripts/preview-bridge.js, que
+ * também guarda a escolha para as páginas seguintes do preview). O preview abre no idioma
+ * da página (/en/... na página em inglês).
  */
-import { publishChoice } from "./combinatorStore";
+import { onRequest, publishChoice } from "./combinatorStore";
+import { previewBase, type SiteKind } from "./previews";
 
 interface Config {
+  /** Prefixo do idioma da página nas rotas do demo ("" ou "/en"). */
+  localePrefix: string;
+  kinds: { id: SiteKind; label: string }[];
   layouts: { id: string; label: string; recommended: { scheme: string; mode: Mode }; fonts: { sans: string[]; mono: string } }[];
   schemes: { id: string; label: string }[];
   moods: { id: string; layout: string; scheme: string; mode: Mode; sans: string; mono: string }[];
-  pages: { path: string; label: string }[];
+  pages: Record<SiteKind, { path: string; label: string }[]>;
   /** Textos montados aqui no navegador, no idioma da página. */
   i18n: {
-    rows: Record<"layout" | "scheme" | "mode" | "sans" | "mono", string>;
+    rows: Record<"kind" | "layout" | "scheme" | "mode" | "sans" | "mono", string>;
     light: string;
     dark: string;
   };
@@ -21,6 +26,7 @@ interface Config {
 type Mode = "light" | "dark" | "system";
 
 interface State {
+  kind: SiteKind;
   layout: string;
   scheme: string;
   mode: "light" | "dark";
@@ -48,6 +54,7 @@ export function initCombinator(): void {
 
   const first = cfg.moods[0];
   let state: State = {
+    kind: "pessoal",
     layout: first.layout,
     scheme: first.scheme,
     mode: first.mode === "dark" ? "dark" : "light",
@@ -68,11 +75,12 @@ export function initCombinator(): void {
       mono: state.mono,
     });
     const path = state.page === "/" ? "/" : `${state.page}/`;
-    return `/previews/${state.layout}${path}?${q}`;
+    return `${previewBase(state.kind, state.layout)}${cfg.localePrefix}${path}?${q}`;
   }
 
   /** O que exige recarregar o app (esquema e fontes mudam ao vivo). */
-  const reloadKey = () => `${state.layout}|${state.mode}|${state.page}`;
+  const reloadKey = () => `${state.kind}|${state.layout}|${state.mode}|${state.page}`;
+  const pagesOf = (kind: SiteKind) => cfg.pages[kind];
 
   function send(msg: Record<string, unknown>) {
     frame!.contentWindow?.postMessage({ type: "rubrica-preview", ...msg }, location.origin);
@@ -91,19 +99,23 @@ export function initCombinator(): void {
   }
 
   function renderControls() {
+    root.querySelectorAll<HTMLButtonElement>("[data-kind]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.kind === state.kind)));
     root.querySelectorAll<HTMLButtonElement>("[data-layout]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.layout === state.layout)));
     root.querySelectorAll<HTMLButtonElement>("[data-scheme]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.scheme === state.scheme)));
     root.querySelectorAll<HTMLButtonElement>("[data-mode]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === state.mode)));
     root.querySelectorAll<HTMLButtonElement>("[data-device]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.device === state.device)));
-    root.querySelectorAll<HTMLButtonElement>("[data-page]").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.page === state.page)));
+    root.querySelectorAll<HTMLButtonElement>("[data-page]").forEach((b) => {
+      b.hidden = b.dataset.pageKind !== state.kind;
+      b.setAttribute("aria-selected", String(!b.hidden && b.dataset.page === state.page));
+    });
     root.querySelectorAll<HTMLButtonElement>("[data-mood]").forEach((b) => {
       const m = cfg.moods.find((x) => x.id === b.dataset.mood)!;
       const on = m.layout === state.layout && m.scheme === state.scheme && m.mode === state.mode && m.sans === state.sans && m.mono === state.mono;
       b.setAttribute("aria-pressed", String(on));
     });
     // A seção "Crie o seu" monta o comando a partir destas escolhas.
-    const { layout, scheme, mode, sans, mono } = state;
-    publishChoice({ layout, scheme, mode, sans, mono });
+    const { kind, layout, scheme, mode, sans, mono } = state;
+    publishChoice({ kind, layout, scheme, mode, sans, mono });
     sansSel.value = state.sans;
     monoSel.value = state.mono;
     stage!.dataset.device = state.device;
@@ -111,6 +123,7 @@ export function initCombinator(): void {
 
     const tx = cfg.i18n;
     const rows: [string, string][] = [
+      [tx.rows.kind, label(cfg.kinds, state.kind)],
       [tx.rows.layout, label(cfg.layouts, state.layout)],
       [tx.rows.scheme, label(cfg.schemes, state.scheme)],
       [tx.rows.mode, state.mode === "dark" ? tx.dark : tx.light],
@@ -133,6 +146,8 @@ export function initCombinator(): void {
   function apply(patch: Partial<State>) {
     const before = state;
     state = { ...state, ...patch };
+    // Página que o outro tipo de site não tem: volta para o início.
+    if (!pagesOf(state.kind).some((p) => p.path === state.page)) state.page = "/";
     renderControls();
     fit();
     if (reloadKey() !== loadedKey) {
@@ -154,8 +169,11 @@ export function initCombinator(): void {
   addEventListener("message", (e) => {
     if (e.origin !== location.origin || e.source !== frame.contentWindow) return;
     const m = e.data as { type?: string; page?: string };
-    if (m?.type === "rubrica-preview-page" && typeof m.page === "string" && cfg.pages.some((x) => x.path === m.page)) {
-      state = { ...state, page: m.page };
+    if (m?.type !== "rubrica-preview-page" || typeof m.page !== "string") return;
+    // A ponte manda o caminho com o idioma (/en/sobre); as abas usam o caminho sem ele.
+    const page = m.page.replace(/^\/(?:en|es)(?=\/|$)/, "") || "/";
+    if (pagesOf(state.kind).some((x) => x.path === page)) {
+      state = { ...state, page };
       loadedKey = reloadKey();
       renderControls();
     }
@@ -165,7 +183,8 @@ export function initCombinator(): void {
     const b = (e.target as HTMLElement).closest("button");
     if (!b) return;
     const d = b.dataset;
-    if (d.mood) {
+    if (d.kind) apply({ kind: d.kind as SiteKind });
+    else if (d.mood) {
       const m = cfg.moods.find((x) => x.id === d.mood)!;
       apply({ layout: m.layout, scheme: m.scheme, mode: m.mode === "dark" ? "dark" : "light", sans: m.sans, mono: m.mono });
     } else if (d.layout) apply({ layout: d.layout });
@@ -174,6 +193,9 @@ export function initCombinator(): void {
     else if (d.page) apply({ page: d.page });
     else if (d.device) apply({ device: d.device as State["device"] });
   });
+  // "Crie o seu" também troca o tipo de site.
+  onRequest((patch) => apply(patch));
+
   sansSel.addEventListener("change", () => apply({ sans: sansSel.value }));
   monoSel.addEventListener("change", () => apply({ mono: monoSel.value }));
 

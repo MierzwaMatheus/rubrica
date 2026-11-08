@@ -1,5 +1,6 @@
 ---
-import { LAYOUTS, SCHEMES, SANS_FONTS, MONO_FONTS, MOODS, PAGES } from "../lib/data";
+import { LAYOUTS, SCHEMES, SANS_FONTS, MONO_FONTS, MOODS } from "../lib/data";
+import { PREVIEW_PAGES, SITE_KINDS } from "../lib/previews";
 import { useDict, type Lang } from "../i18n";
 
 interface Props {
@@ -10,11 +11,14 @@ const t = d.combinator;
 const cat = d.catalog;
 
 const schemeById = Object.fromEntries(SCHEMES.map((s) => [s.id, s]));
+const kindLabel = { pessoal: d.create.kindPersonal, empresa: d.create.kindCompany };
 const config = {
+  localePrefix: Astro.props.lang === "en" ? "/en" : "",
+  kinds: SITE_KINDS.map((id) => ({ id, label: kindLabel[id] })),
   layouts: LAYOUTS.map((l) => ({ id: l.id, label: l.label, recommended: l.recommended, fonts: l.fonts })),
   schemes: SCHEMES.map((s) => ({ id: s.id, label: s.label })),
   moods: MOODS,
-  pages: PAGES.map((path) => ({ path, label: d.pages[path] })),
+  pages: Object.fromEntries(SITE_KINDS.map((k) => [k, PREVIEW_PAGES[k].map((path) => ({ path, label: d.pages[path] }))])),
   i18n: {
     rows: t.rows,
     light: t.light,
@@ -28,11 +32,18 @@ const config = {
     <div class="section-head">
       <p class="eyebrow">{t.eyebrow}</p>
       <h2 class="display">{t.title}</h2>
-      <p>{t.intro}{t.previewNote && <> {t.previewNote}</>}</p>
+      <p>{t.intro}</p>
     </div>
 
     <div class="lab">
       <form class="controls" id="cb-controls" aria-label={t.controlsAria}>
+        <fieldset class="grp">
+          <legend>{d.create.kind}</legend>
+          <div class="seg">
+            {SITE_KINDS.map((k) => <button type="button" data-kind={k} aria-pressed={k === "pessoal" ? "true" : "false"}>{kindLabel[k]}</button>)}
+          </div>
+        </fieldset>
+
         <fieldset class="grp">
           <legend>{t.moods}</legend>
           <p class="help">{t.moodsHelp}</p>
@@ -111,7 +122,15 @@ const config = {
           <div class="bar">
             <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
             <div class="tabs" role="tablist" aria-label={t.pageTabs}>
-              {PAGES.map((p) => <button type="button" role="tab" data-page={p} aria-selected="false">{d.pages[p]}</button>)}
+              {
+                SITE_KINDS.flatMap((k) =>
+                  PREVIEW_PAGES[k].map((p) => (
+                    <button type="button" role="tab" data-page={p} data-page-kind={k} aria-selected="false" hidden={k !== "pessoal"}>
+                      {d.pages[p]}
+                    </button>
+                  )),
+                )
+              }
             </div>
             <div class="tools">
               <div class="seg small" aria-label={t.screenSize}>
@@ -335,6 +354,9 @@ const config = {
   .tabs button {
     border-color: transparent;
     padding: 5px 10px;
+  }
+  .tabs button[hidden] {
+    display: none;
   }
   .tabs button[aria-selected="true"] {
     background: var(--paper-2);

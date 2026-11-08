@@ -45,6 +45,10 @@ function listingHref(url: string): string {
 export function CyberpunkCase({ project, related, ctx }: CaseTemplateProps) {
   const hasContact = ctx.site.plugins["contact-wizard"] === true;
   const talkHref = ctx.site.kind === "empresa" ? ctx.href("/contato") : `${ctx.href("/")}#contato`;
+  // Como na v1: com seções de case, o resumo e o texto longo não aparecem (o case conta a história);
+  // a categoria não repete como etiqueta na capa.
+  const hasCase = project.sections.length > 0;
+  const tags = project.tags.filter((t) => t !== project.category);
   return (
     <article className="cp-case">
       <a className="cp-case__back" href={listingHref(project.url)}>
@@ -56,9 +60,9 @@ export function CyberpunkCase({ project, related, ctx }: CaseTemplateProps) {
         {project.cover && <Img image={{ ...project.cover, alt: "" }} className="cp-case__bg" priority sizes="(min-width: 1024px) 56rem, 100vw" />}
         <div className="cp-case__heroBody">
           <h1 className="cp-case__title">{project.title}</h1>
-          {project.tags.length > 0 && (
+          {tags.length > 0 && (
             <ul className="cp-case__tags">
-              {project.tags.map((t) => (
+              {tags.map((t) => (
                 <li key={t}>{t}</li>
               ))}
             </ul>
@@ -82,7 +86,7 @@ export function CyberpunkCase({ project, related, ctx }: CaseTemplateProps) {
         </div>
       </header>
 
-      {project.summary && <p className="cp-case__summary">{project.summary}</p>}
+      {!hasCase && project.summary && <p className="cp-case__summary">{project.summary}</p>}
 
       {project.role && (
         <section className="cp-case__card" data-tone="role">
@@ -94,7 +98,7 @@ export function CyberpunkCase({ project, related, ctx }: CaseTemplateProps) {
         </section>
       )}
 
-      {project.content && <Html html={project.content} className="rb-prose cp-case__content" />}
+      {!hasCase && project.content && <Html html={project.content} className="rb-prose cp-case__content" />}
 
       {project.sections.map((s, i) => {
         const { tone, icon } = caseTone(s.title);

@@ -9,6 +9,7 @@ import { AlertTriangle, ChevronDown, ChevronUp, Copy, Eye, EyeOff, GripVertical,
 import type { BlockDefinition } from "../../blocks/define";
 import type { FieldError } from "../../blocks/fields";
 import type { BlockInstance } from "../../content/types";
+import { variantsFor } from "../../theme/contract";
 import { cn } from "../lib/utils";
 import { usePanel } from "../panel";
 import { Button } from "../ui/button";
@@ -76,7 +77,7 @@ function BlockCard({ block, index, count, open, errors, onToggle, onChange, onMo
   const unavailable = blockUnavailableReason(def, panel.kind, panel.enabled);
   const missing = def ? missingTranslations(def.fields, block.fields, locales) : [];
   const missingIn = missingLocales(missing);
-  const variants = panel.theme.variants?.[block.type] ?? [];
+  const variants = variantsFor(panel.theme, block.type);
   const [over, setOver] = useState(false);
   const label = def?.label ?? block.type;
   const hasErrors = errors.length > 0;

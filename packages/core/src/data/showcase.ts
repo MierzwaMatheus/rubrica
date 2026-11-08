@@ -20,7 +20,7 @@ import type { BlockInstance, CollectionQuery, PageRecord, SiteSettings } from ".
 import { enabledPlugins } from "../plugins/contract";
 import { CORE_PLUGINS } from "../plugins/registry";
 import { recipeFor } from "../theme/recipes";
-import type { ThemeDefinition, VariantOption } from "../theme/contract";
+import { variantsFor, type ThemeDefinition, type VariantOption } from "../theme/contract";
 import { pagesFromRecipe } from "../convex/lib/seed";
 import type { DataSource } from "./source";
 
@@ -139,10 +139,22 @@ export function sampleFields(fields: FieldMap, c: SampleContext): Record<string,
   return out;
 }
 
-/** Variações a mostrar: as declaradas pelo tema; sem nenhuma, a padrão. */
-export function showcaseVariants(theme: Pick<ThemeDefinition, "variants">, type: string): VariantOption[] {
-  const declared = theme.variants?.[type];
-  return declared?.length ? declared : [{ value: "default", label: "Padrão" }];
+/** Variações a mostrar: as do bloco no tema (declaradas ou herdadas do núcleo); sem nenhuma, a padrão. */
+export function showcaseVariants(theme: Pick<ThemeDefinition, "variants" | "blocks">, type: string): VariantOption[] {
+  const options = variantsFor(theme, type);
+  return options.length ? options : [{ value: "default", label: "Padrão" }];
+}
+
+/**
+ * Exemplo do bloco (`sample`) com os textos traduzíveis em todos os idiomas: um objeto com
+ * a chave "*" vira `{ "pt-BR": ..., "en": ... }`. O resto passa como está.
+ */
+function localizeSample(value: unknown, locales: readonly Locale[]): any {
+  if (Array.isArray(value)) return value.map((v) => localizeSample(v, locales));
+  if (typeof value !== "object" || value === null) return value;
+  const obj = value as Record<string, unknown>;
+  if (typeof obj["*"] === "string") return localized(obj["*"], locales);
+  return Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, localizeSample(v, locales)]));
 }
 
 const selectCount = (fields: FieldMap) =>
@@ -151,7 +163,7 @@ const selectCount = (fields: FieldMap) =>
 const safe = (s: string) => s.replace(/[^a-z0-9-]/gi, "-");
 
 /** Instâncias de um bloco na vitrine: cheio, curto, uma por opção a mais das seleções e vazio. */
-export function showcaseBlocks(def: BlockDefinition, theme: Pick<ThemeDefinition, "variants">, locales: readonly Locale[]): BlockInstance[] {
+export function showcaseBlocks(def: BlockDefinition, theme: Pick<ThemeDefinition, "variants" | "blocks">, locales: readonly Locale[]): BlockInstance[] {
   const out: BlockInstance[] = [];
   const instances = Math.max(2, selectCount(def.fields));
   for (const variant of showcaseVariants(theme, def.type)) {
@@ -163,7 +175,7 @@ export function showcaseBlocks(def: BlockDefinition, theme: Pick<ThemeDefinition
         type: def.type,
         ...(variant.value !== "default" && { variant: variant.value }),
         visible: true,
-        fields: sampleFields(def.fields, { mode, instance: i, locales, uid }),
+        fields: { ...sampleFields(def.fields, { mode, instance: i, locales, uid }), ...localizeSample(def.sample?.(mode, i), locales) },
       };
       if (def.source) {
         const base = def.source.default;
@@ -189,7 +201,7 @@ export function showcaseBlocks(def: BlockDefinition, theme: Pick<ThemeDefinition
 }
 
 export interface ShowcaseInput {
-  theme: Pick<ThemeDefinition, "variants" | "recipes">;
+  theme: Pick<ThemeDefinition, "variants" | "recipes" | "blocks">;
   blocks: readonly BlockDefinition[];
   site: Pick<SiteSettings, "kind" | "locales" | "plugins">;
 }

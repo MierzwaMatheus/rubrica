@@ -28,6 +28,8 @@ export default defineTheme({
   description: "Notas com estágio de crescimento, barra lateral com mapa de ligações e coluna de leitura em serifa.",
   contract: "^1",
   scheme: "crepusculo",
+  // Textura que o layout da v1 recomendava (o site troca ou desliga em Aparência).
+  texture: "grain",
   fonts,
   tokens: {
     "rb-accent": { label: "Cor primária (botões, estágios, nó atual)", kind: "color", default: "#B788F2", light: "#6B2FA3" },

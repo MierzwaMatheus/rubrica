@@ -4,9 +4,11 @@
  * Desligue com RUBRICA_SKIP_E2E=1.
  */
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { createProject, resolveCreateOptions } from "../../src/commands/create";
+import { ejectBlock } from "../../src/commands/eject";
+import { readState } from "../../src/state";
 import { run } from "../../src/utils/exec";
 import { repo, tmp } from "../helpers";
 
@@ -44,6 +46,14 @@ describe.skipIf(skip)("create → install → build (ponta a ponta)", () => {
     expect(out).toMatch(/ok: \d+ exports/);
   }, 120_000);
 
+  it("ejeta um bloco (com arquivo local importado) e o projeto continua compilando", () => {
+    const { entry } = ejectBlock(dir, readState(dir), "cases");
+    expect(existsSync(join(dir, entry.arquivo))).toBe(true);
+    // marca na cópia, para conferir no HTML que o site usa a cópia
+    const file = join(dir, "src/overrides/cases/blocks/collections.tsx");
+    writeFileSync(file, readFileSync(file, "utf-8").replace('type="cases" variant={variant}>', 'type="cases" variant={variant}>\n      <span data-ejetado="sim" hidden />'));
+  });
+
   it("builda o site estático com os dados de exemplo", () => {
     run("pnpm", ["build"], { cwd: dir, env: { RUBRICA_FIXTURES: repo("apps/demo/fixtures/pessoal") } });
     const home = readFileSync(join(dir, "dist/index.html"), "utf-8");
@@ -52,6 +62,7 @@ describe.skipIf(skip)("create → install → build (ponta a ponta)", () => {
     expect(existsSync(join(dir, "dist/en/index.html"))).toBe(true);
     expect(existsSync(join(dir, "dist/_headers"))).toBe(true);
     expect(existsSync(join(dir, "dist/sitemap.xml"))).toBe(true);
+    expect(home).toContain('data-ejetado="sim"');
   }, 300_000);
 
   it("os tipos do projeto passam (pnpm check)", () => {

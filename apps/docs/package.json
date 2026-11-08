@@ -8,7 +8,9 @@
     "dev": "astro dev",
     "build": "astro build",
     "build:full": "pnpm previews && astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "docs:blocos": "tsx --tsconfig scripts/tsconfig.json scripts/blocos.ts",
+    "test": "tsx --tsconfig scripts/tsconfig.json --test scripts/*.test.ts"
   },
   "dependencies": {
     "astro": "7.4.1",

@@ -256,8 +256,9 @@ h2.rb-section__title::after { content: " */"; content: " */" / ""; color: var(--
 .rb-case__facts dd { margin: 0; }
 .rb-prose { color: var(--rb-fg); line-height: 1.75; }
 .rb-prose h1, .rb-prose h2, .rb-prose h3, .rb-prose h4 { color: var(--rb-fg-strong); margin-top: 2rem; }
-.rb-prose a { color: var(--rb-accent); text-decoration: none; }
-.rb-prose a:hover { text-decoration: underline; }
+/* Link no meio do texto precisa de mais que a cor para se distinguir (WCAG 1.4.1). */
+.rb-prose a { color: var(--rb-accent); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+.rb-prose a:hover { text-decoration-thickness: 2px; }
 .rb-prose blockquote { margin: 1.5rem 0; padding-left: 1rem; border-left: 4px solid var(--rb-accent); font-style: italic; color: var(--rb-muted); }
 .rb-prose :not(pre) > code { padding: 0.125rem 0.25rem; border-radius: 0.25rem; background: color-mix(in srgb, var(--rb-fg) 10%, transparent); font-size: 0.875em; }
 .rb-prose hr { border: 0; border-top: 1px solid var(--rb-hairline); margin-block: 2rem; }

@@ -51,6 +51,29 @@ export interface ResolvedSite {
    * `ctx.t("hero.available")`.
    */
   availability: boolean;
+  /**
+   * WhatsApp do site (`SiteSettings.whatsapp`), no idioma: `href` é o `wa.me` com a mensagem
+   * do idioma. O núcleo já desenha o botão flutuante quando `floating`; o tema pode usar o
+   * `href` onde quiser (ex.: um botão na casca).
+   */
+  whatsapp?: ResolvedWhatsApp;
+  /** Faixa de aviso no ar neste build e idioma. O núcleo a desenha antes da casca. */
+  announcement?: ResolvedAnnouncement;
+}
+
+export interface ResolvedWhatsApp {
+  /** Só dígitos, formato internacional. */
+  number: string;
+  href: string;
+  floating: boolean;
+  /** Texto visível do botão flutuante no idioma, quando há. */
+  label?: string;
+}
+
+export interface ResolvedAnnouncement {
+  text: string;
+  link?: ResolvedLink;
+  tone: "info" | "destaque";
 }
 
 /** Feeds do site no idioma da página (caminhos com o prefixo do idioma). */

@@ -39,7 +39,6 @@ body { font-family: var(--rb-font-sans); }
   font-family: var(--rb-font-sans);
 }
 .bp-app :focus-visible { outline: 2px dashed var(--rb-fg); outline-offset: 3px; }
-.bp-app a { color: inherit; }
 .bp-app .rb-skip:focus { background: var(--rb-fg); color: var(--rb-bg); font-family: var(--rb-font-mono); font-size: 0.75rem; }
 
 /* ---------- cabeçalho ---------- */

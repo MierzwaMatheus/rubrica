@@ -18,6 +18,7 @@
  * Valores padrão abaixo valem até o tema sobrescrever.
  */
 @import "./blocks.css";
+@import "./app.css";
 
 :root {
   --rb-bg: #0f1115;

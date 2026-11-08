@@ -52,6 +52,7 @@ export function createSidebarShell({ avatar = "md", barTalk = false }: SidebarOp
         : `tel:${(phone ?? "").replace(/[^\d+]/g, "")}`;
     const phoneIsWhatsapp = phoneHref.startsWith("https://wa.me/");
     const hasContact = site.plugins["contact-wizard"] === true;
+    const otherLocale = ctx.alternates.length === 2 ? ctx.alternates.find((a) => !a.current) : undefined;
     const hasResume = site.navigation.some((n) => /curr|resume/i.test(n.href));
     const talkHref = site.kind === "empresa" ? ctx.href("/contato") : `${ctx.href("/")}#contato`;
     const year = new Date().getUTCFullYear();
@@ -164,10 +165,24 @@ export function createSidebarShell({ avatar = "md", barTalk = false }: SidebarOp
             )}
 
             {site.colorToggle && colorToggle && <div className="rb-side__toggle">{colorToggle}</div>}
-            {/* Seletor compacto (PT · EN), como o da v1; com dois idiomas vira uma chave por CSS. */}
+            {/*
+              Seletor compacto (PT · EN), como o da v1. Com dois idiomas, uma chave entre os
+              códigos também leva ao outro idioma (link, sem JavaScript). Ela é só um atalho
+              de clique: o leitor de tela e o teclado usam os dois links da lista.
+            */}
             {localeSwitcher && ctx.alternates.length > 1 && (
               <div className="rb-side__locales">
                 <LocaleLinks ctx={ctx} compact />
+                {otherLocale && (
+                  <a
+                    className="rb-side__switch"
+                    href={otherLocale.href}
+                    hrefLang={otherLocale.locale}
+                    aria-hidden="true"
+                    tabIndex={-1}
+                    data-on={ctx.alternates[1]?.current ? "" : undefined}
+                  />
+                )}
               </div>
             )}
 

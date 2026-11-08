@@ -255,6 +255,7 @@ export const DEFAULT_UI_TEXTS: Record<string, Localized<string>> = {
   "video.play": { pt: "Reproduzir o vídeo", en: "Play the video", es: "Reproducir el video" },
   "video.watchOn": { pt: "Assistir no {provider}", en: "Watch on {provider}", es: "Ver en {provider}" },
   "video.player": { pt: "Vídeo: {title}", en: "Video: {title}", es: "Video: {title}" },
+  "embed.open": { pt: "Abrir no {provider}", en: "Open in {provider}", es: "Abrir en {provider}" },
   "resume.downloadError": { pt: "Não foi possível abrir o currículo. Permita pop-ups e tente de novo.", en: "Couldn't open the résumé. Allow pop-ups and try again.", es: "No se pudo abrir el CV. Permite las ventanas emergentes e inténtalo de nuevo." },
   "form.name": { pt: "Nome", en: "Name", es: "Nombre" },
   "form.email": { pt: "E-mail", en: "Email", es: "Correo" },

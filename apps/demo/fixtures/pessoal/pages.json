@@ -326,6 +326,27 @@
             "en": "FAQ"
           }
         }
+      },
+      {
+        "id": "s-agenda",
+        "type": "incorporacao",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "Vamos conversar?",
+            "en": "Shall we talk?"
+          },
+          "intro": {
+            "pt-BR": "Escolha um horário de 30 minutos na minha agenda.",
+            "en": "Pick a 30-minute slot in my calendar."
+          },
+          "url": "https://calendly.com/ana-souza-demo/30min",
+          "frameTitle": {
+            "pt-BR": "Agenda para marcar uma conversa com a Ana",
+            "en": "Calendar to book a call with Ana"
+          },
+          "height": 700
+        }
       }
     ]
   },

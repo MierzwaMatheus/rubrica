@@ -1,12 +1,13 @@
 /**
- * Vídeo: conteúdo de terceiros em iframe, só de endereços validados
+ * Vídeo e incorporação: conteúdo de terceiros em iframe, só de endereços validados
  * (`blocks/media.ts`). O vídeo carrega leve (miniatura e play; o player só no clique, pela
  * ilha `video`); sem JavaScript, a miniatura é um link para o vídeo no site do provedor.
  */
 import type { Ref } from "react";
 import type { ResolvedFields, ResolvedImage } from "../../blocks/fields";
-import type { video as videoDef } from "../../blocks/catalog";
+import type { incorporacao as incorporacaoDef, video as videoDef } from "../../blocks/catalog";
 import {
+  parseEmbedUrl,
   parseVideoUrl,
   VIDEO_IFRAME_ALLOW,
   VIDEO_IFRAME_SANDBOX,
@@ -20,6 +21,7 @@ import type { BlockProps } from "../../theme/contract";
 import { Section, SectionHeader } from "../primitives";
 
 type VideoFields = ResolvedFields<typeof videoDef.fields>;
+type IncorporacaoFields = ResolvedFields<typeof incorporacaoDef.fields>;
 type T = (key: string, vars?: Record<string, string | number>) => string;
 
 const RATIOS = new Set(["16:9", "4:3", "1:1", "9:16"]);
@@ -112,6 +114,39 @@ export function VideoBlock({ id, variant, fields, headingLevel, ctx, island }: B
         {island ?? <VideoFrame video={video} poster={videoPoster(fields, video)} name={videoName(fields, video)} ratio={videoRatio(fields.aspect)} mode="link" t={ctx.t} />}
         {fields.caption && <figcaption className="rb-video__caption">{fields.caption}</figcaption>}
       </figure>
+    </Section>
+  );
+}
+
+/** Iframe de um provedor permitido, com `sandbox` e `allow` do provedor e carregamento preguiçoso. */
+export function IncorporacaoBlock({ id, variant, fields, headingLevel, ctx }: BlockProps<IncorporacaoFields>) {
+  const embed = parseEmbedUrl(fields.url);
+  if (!embed) return null;
+  const { provider } = embed;
+  const height = fields.height ?? provider.height;
+  return (
+    <Section id={id} anchor={fields.anchor} type="incorporacao" variant={variant}>
+      <SectionHeader title={fields.title} intro={fields.intro} level={headingLevel} />
+      <div className="rb-embed" data-provider={provider.id} data-category={provider.category}>
+        <iframe
+          className="rb-embed__frame"
+          src={embed.src}
+          title={fields.frameTitle || fields.title || provider.label}
+          height={height}
+          loading="lazy"
+          referrerPolicy="strict-origin-when-cross-origin"
+          sandbox={provider.sandbox}
+          {...(provider.allow ? { allow: provider.allow } : {})}
+        />
+      </div>
+      {fields.showLink !== false && (
+        <p className="rb-embed__link">
+          <a href={embed.src} target="_blank" rel="noopener noreferrer">
+            {ctx.t("embed.open", { provider: provider.label })}
+            <span className="rb-sr-only"> {ctx.t("common.external")}</span>
+          </a>
+        </p>
+      )}
     </Section>
   );
 }

@@ -5,7 +5,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { fileURLToPath } from "node:url";
 import { fixtureSource } from "../src/data/source";
 import { buildSite, type BuiltSite } from "../src/render/site";
-import { CORE_BLOCKS, video } from "../src/blocks/catalog";
+import { CORE_BLOCKS, incorporacao, video } from "../src/blocks/catalog";
 import { validateBlock } from "../src/blocks/define";
 import { preparePageBlocks } from "../src/convex/lib/blocks";
 import { CORE_PLUGINS } from "../src/plugins/registry";
@@ -103,5 +103,34 @@ describe("vídeo", () => {
     const button = renderToStaticMarkup(createElement(VideoFrame, { video: parseVideoUrl(yt)!, name: "Palestra", ratio: "16-9", mode: "button", t }));
     expect(button).toContain('<button type="button"');
     expect(button).toContain("video.play");
+  });
+});
+
+describe("incorporação", () => {
+  it("iframe só do provedor permitido, preguiçoso, com título acessível, sandbox e referrer", async () => {
+    const { block, ctx } = await fixtureBlock("empresa", "/contato", "incorporacao");
+    const html = render("incorporacao", { ctx, ...block });
+    expect(html).toContain('src="https://calendly.com/meridiano-demo/conversa-inicial"');
+    expect(html).toContain('loading="lazy"');
+    expect(html).toContain('title="Agenda do Estúdio Meridiano para marcar uma conversa"');
+    expect(html).toContain('sandbox="allow-scripts allow-same-origin allow-forms');
+    expect(html).toMatch(/referrerpolicy="strict-origin-when-cross-origin"/i);
+    expect(html).toContain('height="700"');
+    expect(html).toContain("Abrir no Calendly");
+  });
+
+  it("endereço fora da lista: some no site e é recusado na gravação", async () => {
+    const ctx = (await load("empresa")).context("pt-BR", "/");
+    const fields = { title: { "pt-BR": "x" }, url: "https://example.com/form", frameTitle: { "pt-BR": "Formulário" } };
+    expect(render("incorporacao", { ctx, fields: { title: "x", url: fields.url, frameTitle: "Formulário" } })).toBe("");
+    expect(validateBlock(incorporacao, { fields })[0]!.message).toContain("Calendly");
+    expect(validateBlock(incorporacao, { fields: { ...fields, frameTitle: undefined } })[0]!.path).toBe("frameTitle");
+  });
+
+  it("altura padrão do provedor e link opcional", async () => {
+    const ctx = (await load("empresa")).context("pt-BR", "/");
+    const html = render("incorporacao", { ctx, fields: { url: "https://tally.so/embed/wA1bCd", frameTitle: "Formulário", showLink: false } });
+    expect(html).toContain('height="600"');
+    expect(html).not.toContain("rb-embed__link");
   });
 });

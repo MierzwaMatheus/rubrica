@@ -6,7 +6,7 @@
  */
 import { defineBlock } from "../define";
 import { field } from "../fields";
-import { parseVideoUrl } from "../media";
+import { EMBED_PROVIDERS, parseEmbedUrl, parseVideoUrl } from "../media";
 
 /** Domínios que os blocos põem em iframe (a CSP do CLI lê daqui) e o parse dos endereços. */
 export { BLOCK_FRAME_SOURCES, EMBED_PROVIDERS, parseEmbedUrl, parseVideoUrl } from "../media";
@@ -318,6 +318,8 @@ export const logosClientes = defineBlock({
   },
 });
 
+const embedLabels = EMBED_PROVIDERS.map((p) => p.label).join(", ");
+
 export const video = defineBlock({
   type: "video",
   label: "Vídeo",
@@ -362,6 +364,39 @@ export const video = defineBlock({
   sample: (_mode, i) => (i < 2 ? { url: "https://www.youtube.com/watch?v=M7lc1UVf-VE" } : { url: "https://vimeo.com/76979871", ...(i === 3 ? { poster: undefined } : {}) }),
 });
 
+export const incorporacao = defineBlock({
+  type: "incorporacao",
+  label: "Incorporação",
+  description: `Agenda, formulário, mapa ou player de outro serviço, por endereço, só dos provedores permitidos (${embedLabels}).`,
+  category: "comum",
+  fields: {
+    anchor,
+    title: heading,
+    intro,
+    url: field.text({
+      label: "Endereço da incorporação",
+      localized: false,
+      required: true,
+      maxLength: 2000,
+      help: `O link do "incorporar" (embed) do serviço: o endereço do src, não o código HTML. Provedores aceitos: ${embedLabels}.`,
+    }),
+    frameTitle: field.text({
+      label: "Título acessível",
+      required: true,
+      maxLength: 120,
+      help: "Descreve o conteúdo para leitores de tela (ex.: \"Agenda para marcar uma conversa\").",
+    }),
+    height: field.number({ label: "Altura (px)", integer: true, min: 150, max: 2000, help: "Opcional. Sem ela, vale a altura padrão do provedor." }),
+    showLink: field.boolean({ label: "Link para abrir em nova aba", default: true, help: "Mostra, abaixo, um link para abrir o serviço fora do site." }),
+  },
+  validate: (f) =>
+    parseEmbedUrl(f.url) ? [] : [{ path: "url", message: `Endereço da incorporação: use um link de incorporação de ${embedLabels}` }],
+  sample: (mode) => ({
+    url: mode === "curto" ? "https://www.google.com/maps/embed?pb=!1m18!1m12" : "https://calendly.com/exemplo/30min",
+    ...(mode === "cheio" ? { height: 700 } : {}),
+  }),
+});
+
 export const CORE_BLOCKS = [
   hero,
   texto,
@@ -381,6 +416,7 @@ export const CORE_BLOCKS = [
   localizacao,
   logosClientes,
   video,
+  incorporacao,
 ] as const;
 
 export type CoreBlock = (typeof CORE_BLOCKS)[number];

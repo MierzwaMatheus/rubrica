@@ -33,8 +33,8 @@ function render(type: string, props: Partial<BlockProps> & Pick<BlockProps, "ctx
 }
 
 describe("blocos padrão", () => {
-  it("há componente padrão para os 18 blocos do catálogo", () => {
-    expect(CORE_BLOCKS).toHaveLength(18);
+  it("há componente padrão para os 19 blocos do catálogo", () => {
+    expect(CORE_BLOCKS).toHaveLength(19);
     for (const b of CORE_BLOCKS) expect(DEFAULT_BLOCKS[b.type], b.type).toBeTypeOf("function");
   });
 

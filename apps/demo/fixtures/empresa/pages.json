@@ -587,6 +587,30 @@
         }
       },
       {
+        "id": "contato-agenda",
+        "type": "incorporacao",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "Prefere marcar uma conversa?",
+            "en": "Prefer to book a call?",
+            "es": "¿Prefieres agendar una llamada?"
+          },
+          "intro": {
+            "pt-BR": "Escolha um horário de 30 minutos com o nosso time.",
+            "en": "Pick a 30-minute slot with our team.",
+            "es": "Elige un horario de 30 minutos con nuestro equipo."
+          },
+          "url": "https://calendly.com/meridiano-demo/conversa-inicial",
+          "frameTitle": {
+            "pt-BR": "Agenda do Estúdio Meridiano para marcar uma conversa",
+            "en": "Meridiano Studio calendar to book a call",
+            "es": "Agenda del Estudio Meridiano para agendar una llamada"
+          },
+          "height": 700
+        }
+      },
+      {
         "id": "contato-1",
         "type": "localizacao",
         "visible": true,

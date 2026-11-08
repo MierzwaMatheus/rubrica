@@ -17,6 +17,8 @@ export default defineTheme({
   description: "O site como livro: cabeçalho corrido, folha de rosto, sumário, capitulares e notas na margem.",
   contract: "^1",
   scheme: "azulejo",
+  // Textura que o layout da v1 recomendava (o site troca ou desliga em Aparência).
+  texture: "paper",
   colorMode: "light",
   fonts,
   texts: TEXTS,

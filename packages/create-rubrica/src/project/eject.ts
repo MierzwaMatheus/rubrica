@@ -8,9 +8,9 @@
  * fica no `rubrica.json`: o `update` avisa quando o original mudar.
  */
 import { createHash } from "node:crypto";
-import { createRequire } from "node:module";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, join, relative, resolve, sep } from "node:path";
+import { findPackageDir } from "./introspect.js";
 
 export interface ComponentSource {
   /** Pacote de onde vem (`@rubrica/core` ou `@rubrica/theme-x`). */
@@ -34,13 +34,7 @@ function resolveLocal(fromFile: string, spec: string): string | null {
   return null;
 }
 
-function packageDir(projectDir: string, pkg: string): string | null {
-  try {
-    return dirname(createRequire(join(projectDir, "package.json")).resolve(`${pkg}/package.json`));
-  } catch {
-    return null;
-  }
-}
+const packageDir = findPackageDir;
 
 const readJson = (p: string) => JSON.parse(readFileSync(p, "utf-8")) as Record<string, unknown>;
 

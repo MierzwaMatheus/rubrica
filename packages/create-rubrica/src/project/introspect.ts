@@ -5,8 +5,8 @@
  * isso não dá para só importar.
  */
 import { createRequire } from "node:module";
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, mkdirSync, readFileSync, rmSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { pathToFileURL } from "node:url";
 import type { Recipe } from "@rubrica/core";
 import type { SiteKind } from "@rubrica/core";
@@ -69,10 +69,30 @@ export interface CoreMigration {
   args?: Record<string, unknown>;
 }
 
-export function installedVersion(projectDir: string, pkg: string): string | null {
+/**
+ * Pasta de um pacote instalado. Os temas não exportam o "./package.json", então,
+ * se o `require.resolve` recusar, procura `node_modules/<pacote>` subindo as pastas.
+ */
+export function findPackageDir(fromDir: string, pkg: string): string | null {
   try {
-    const req = createRequire(join(projectDir, "package.json"));
-    return (JSON.parse(readFileSync(req.resolve(`${pkg}/package.json`), "utf-8")) as { version: string }).version;
+    return dirname(createRequire(join(fromDir, "package.json")).resolve(`${pkg}/package.json`));
+  } catch {
+    let dir = fromDir;
+    for (;;) {
+      const candidate = join(dir, "node_modules", pkg);
+      if (existsSync(join(candidate, "package.json"))) return candidate;
+      const parent = dirname(dir);
+      if (parent === dir) return null;
+      dir = parent;
+    }
+  }
+}
+
+export function installedVersion(projectDir: string, pkg: string): string | null {
+  const dir = findPackageDir(projectDir, pkg);
+  if (!dir) return null;
+  try {
+    return (JSON.parse(readFileSync(join(dir, "package.json"), "utf-8")) as { version: string }).version;
   } catch {
     return null;
   }

@@ -114,7 +114,7 @@ export const pt = {
     paste: "Cole no terminal",
     folder: "Cria a pasta",
     nodeBefore: "Precisa do",
-    nodeLink: "Node.js 22.23 ou mais novo",
+    nodeLink: "Node.js 22.23.4 ou mais novo",
     nodeUrl: "https://nodejs.org/pt/download",
     nodeAfter: "Nada do que você digita aqui sai do seu navegador: o comando é montado nesta página.",
     /** Mensagens montadas no navegador (recipeForm.ts). */

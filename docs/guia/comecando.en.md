@@ -6,7 +6,7 @@ From zero to your site running on your computer, with the panel ready to fill in
 
 ## What you need
 
-- **Node.js 22.23 or newer** and **git**. pnpm is optional: without it, the CLI uses npm.
+- **Node.js 22.23.4 or newer** and **git**. pnpm is optional: without it, the CLI uses npm.
 - A **[Convex](https://convex.dev)** account (free). It is the backend: it stores the content, the login and the images. You don't need to create it beforehand: the CLI opens the login in your browser at the right time.
 - To publish later, a **[Vercel](https://vercel.com)** account (free). See [Publishing the site](./publicar.md).
 

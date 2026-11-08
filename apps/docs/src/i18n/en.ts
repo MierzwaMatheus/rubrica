@@ -106,7 +106,7 @@ export const en: Dict = {
     paste: "Paste in the terminal",
     folder: "Creates the folder",
     nodeBefore: "Requires",
-    nodeLink: "Node.js 22.23 or newer",
+    nodeLink: "Node.js 22.23.4 or newer",
     nodeUrl: "https://nodejs.org/en/download",
     nodeAfter: "Nothing you type here leaves your browser: the command is built on this page.",
     form: {

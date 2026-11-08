@@ -31,7 +31,8 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.32.2",
-    "ajv": "^8.17.1"
+    "ajv": "^8.17.1",
+    "convex": "^1.49.0"
   },
   "devDependencies": {
     "@auth/core": "^0.41.3",
@@ -39,7 +40,6 @@
     "@edge-runtime/vm": "^5.0.0",
     "@rubrica/core": "workspace:^",
     "@types/node": "^22.0.0",
-    "convex": "^1.49.0",
     "convex-test": "^0.0.67",
     "tsup": "^8.5.0",
     "tsx": "^4.20.0",

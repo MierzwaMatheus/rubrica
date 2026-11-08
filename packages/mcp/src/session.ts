@@ -23,8 +23,9 @@ export function configDir(env: Record<string, string | undefined> = process.env)
 
 /** Uma sessão por projeto e por Convex (dev e produção têm logins separados). */
 export function sessionPath(project: string, convexUrl: string, env: Record<string, string | undefined> = process.env): string {
-  const host = new URL(convexUrl).hostname.split(".")[0]!.replace(/[^a-z0-9-]/gi, "_");
-  return join(configDir(env), `${project}__${host}.json`);
+  const url = new URL(convexUrl);
+  const host = url.hostname.split(".")[0]!.replace(/[^a-z0-9-]/gi, "_");
+  return join(configDir(env), `${project}__${host}${url.port ? `-${url.port}` : ""}.json`);
 }
 
 export class SessionStore {

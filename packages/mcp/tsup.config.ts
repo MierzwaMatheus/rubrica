@@ -9,5 +9,5 @@ export default defineConfig({
   platform: "node",
   clean: true,
   noExternal: [/^@rubrica\//],
-  external: ["convex", "@convex-dev/auth", "@auth/core"],
+  external: ["convex"],
 });

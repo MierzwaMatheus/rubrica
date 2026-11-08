@@ -37,7 +37,7 @@ export function cleanErrorMessage(raw: string): string {
 }
 
 export function classifyError(message: string): ErrorKind {
-  if (/Could not find public function/i.test(message)) return "missing-function";
+  if (/Could not find (public )?(function|module)/i.test(message)) return "missing-function";
   if (/Não autenticado|Unauthenticated|InvalidAuthHeader|Could not verify OIDC/i.test(message)) return "auth";
   if (/Sem permissão/i.test(message)) return "forbidden";
   if (/ArgumentValidationError|Validator error|Object contains extra field|missing required field/i.test(message)) return "validation";

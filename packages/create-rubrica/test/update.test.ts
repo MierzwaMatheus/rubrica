@@ -88,6 +88,12 @@ describe("plano do update (puro)", () => {
     expect(text).toContain("hero: src/overrides/hero/index.tsx ↔ /x/basic.tsx");
     expect(text).not.toContain("minhas.ts");
   });
+
+  it("sem a lista do núcleo, não apaga nem cria módulos do convex/rubrica", () => {
+    const disk = { ...convexFiles(CORE_MODULES), ...convexOwnedFiles() };
+    const plan = planUpdate({ packages: [], modules: {}, convexOnDisk: disk, fromVersion: "2.0.0", migrations: [], ejected: [] });
+    expect(plan.convex).toMatchObject({ write: [], create: [], remove: [] });
+  });
 });
 
 describe("update --dry-run (projeto instalado)", () => {

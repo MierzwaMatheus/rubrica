@@ -59,6 +59,7 @@ Na hospedagem escolhida:
 | Comando de build | `npm run build` |
 | Pasta publicada | `dist` |
 | Variável `CONVEX_URL` | O endereço do Convex de **produção** (`https://<nome>.convex.cloud`, está em `producao.convexUrl` no `rubrica.json` depois que você preparar a produção) |
+| Variável `PUBLIC_RUBRICA_API` | O endereço HTTP do Convex de produção (`https://<nome>.convex.site`), para os formulários do site enviarem |
 | Variável `SITE_URL` | O endereço do site |
 
 O backend de produção precisa existir antes do primeiro build em outra hospedagem. O jeito mais simples é rodar `npx create-rubrica publicar` uma vez: ele prepara o Convex de produção (backend, chaves de login, `root` e páginas iniciais) junto com a Vercel, e você pode desligar o projeto da Vercel depois. Quem prefere que a hospedagem envie o backend a cada build usa `npx convex deploy --cmd-url-env-var-name CONVEX_URL --cmd "npm run build"` como comando de build, com a variável `CONVEX_DEPLOY_KEY` (como o `vercel.json` faz). Lembre: `convex deploy` publica sempre em produção.

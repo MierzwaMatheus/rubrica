@@ -95,6 +95,8 @@ export default defineTheme({
   description: "Cada seção é uma janela sobre a área de trabalho, com barra de menu e ícones: nostalgia e brincadeira.",
   contract: "^1",
   scheme: "sorbet",
+  // Textura que o layout da v1 recomendava (o site troca ou desliga em Aparência).
+  texture: "grain",
   colorMode: "light",
   fonts,
   tokens: {

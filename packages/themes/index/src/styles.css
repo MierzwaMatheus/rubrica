@@ -320,7 +320,8 @@ body { font-family: var(--rb-font-sans); -webkit-font-smoothing: antialiased; }
 @media (max-width: 899px) {
   .ix-prev { display: none; }
   .ix-s--index .ix-body, .ix-row--index .ix-body { min-height: 0; }
-  .ix-t, .ix-t tbody, .ix-t tr, .ix-t td, .ix-t caption { display: block; width: auto; }
+  /* A legenda fica de fora: ela é rb-sr-only, e `width: auto` com `nowrap` a esticaria até o fim do título. */
+  .ix-t, .ix-t tbody, .ix-t tr, .ix-t td { display: block; width: auto; }
   .ix-t thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
   .ix-t tbody tr { padding: 12px 8px; border-top: 1px solid var(--rb-border); }
   .ix-t tbody tr:last-child { border-bottom: 1px solid var(--rb-border); }

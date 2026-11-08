@@ -395,3 +395,9 @@ describe("textos e o resto", () => {
     expect(input.tables).toEqual(copy);
   });
 });
+
+describe("blocos das páginas", () => {
+  it("todo bloco tem fields (o schema exige, mesmo vazio)", () => {
+    for (const page of run().tables.pages as { blocks: { fields?: unknown }[] }[]) for (const b of page.blocks) expect(b.fields).toBeDefined();
+  });
+});

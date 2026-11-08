@@ -904,7 +904,8 @@ function buildPages(ctx: Ctx, input: ConvertInput, plugins: Record<string, boole
         path: page.path,
         title,
         seo: m.seo && Object.keys(m.seo).length ? m.seo : undefined,
-        blocks: kept.map((b, i) => compact({ id: ids[i], type: b.type, variant: b.variant, visible: true, fields: b.fields ?? {}, source: b.source })),
+        // `fields` é obrigatório no schema, mesmo vazio: fica fora do compact (que tira objetos vazios).
+        blocks: kept.map((b, i) => ({ ...compact({ id: ids[i], type: b.type, variant: b.variant, visible: true, source: b.source }), fields: b.fields ?? {} })),
         published: true,
         system: true,
         createdAt: now,

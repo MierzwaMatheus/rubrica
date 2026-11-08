@@ -85,16 +85,7 @@ From least to most effort (always prefer the least):
 
 ### Own block
 
-It lives in `src/blocks/`: a definition (the fields, with `defineBlock`) and a pure React component. Register both in `src/blocks/index.ts`:
-
-```ts
-import { defineBlock, field } from "@rubrica/core";
-
-export const blocks = [defineBlock({ type: "selo", label: "Badge", /* fields... */ })];
-export const components = { selo: "./src/blocks/Selo.tsx" };
-```
-
-The block shows up in the page editor like the core ones, with form and preview.
+It lives in `src/blocks/`: a definition (the fields, with `defineBlock`) and a pure React component, registered in `src/blocks/index.ts`. It shows up in the page editor like the core ones, with a form and a preview. The step-by-step guide, with a complete example, is in [Create a block](./criar-bloco.md).
 
 ### Eject a component
 

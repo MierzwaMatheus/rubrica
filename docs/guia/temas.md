@@ -85,16 +85,7 @@ Do menor para o maior esforço (prefira sempre o menor):
 
 ### Bloco próprio
 
-Fica em `src/blocks/`: uma definição (os campos, com `defineBlock`) e um componente React puro. Registre os dois em `src/blocks/index.ts`:
-
-```ts
-import { defineBlock, field } from "@rubrica/core";
-
-export const blocks = [defineBlock({ type: "selo", label: "Selo", /* campos... */ })];
-export const components = { selo: "./src/blocks/Selo.tsx" };
-```
-
-O bloco aparece no editor de páginas como os do núcleo, com formulário e prévia.
+Fica em `src/blocks/`: uma definição (os campos, com `defineBlock`) e um componente React puro, registrados em `src/blocks/index.ts`. Ele aparece no editor de páginas como os do núcleo, com formulário e prévia. O passo a passo, com um exemplo completo, está em [Criar um bloco](./criar-bloco.md).
 
 ### Ejetar um componente
 

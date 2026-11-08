@@ -219,3 +219,16 @@ describe("create --local", () => {
     expect(() => localDependencySpecs(repo(), "inexistente")).toThrow(/não existe/);
   });
 });
+
+describe("CSP do painel", () => {
+  it("libera o Google Fonts só no painel (prévia da Aparência) e o iframe da mesma origem", async () => {
+    const { contentSecurityPolicy } = await import("../src/project/hosting");
+    const site = contentSecurityPolicy();
+    const admin = contentSecurityPolicy(undefined, "admin");
+    expect(site).not.toContain("fonts.googleapis.com");
+    expect(site).toContain("frame-ancestors 'none'");
+    expect(admin).toContain("style-src 'self' 'unsafe-inline' https://fonts.googleapis.com");
+    expect(admin).toContain("font-src 'self' data: https://fonts.gstatic.com");
+    expect(admin).toContain("frame-ancestors 'self'");
+  });
+});

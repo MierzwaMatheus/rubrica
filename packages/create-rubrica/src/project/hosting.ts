@@ -49,20 +49,23 @@ export interface HostingConfig {
  * ilhas vem de `/_astro/` (self). Os formulários (contato e depoimento) falam com o
  * Convex (`*.convex.site`), e o painel com `*.convex.cloud` (inclusive por WebSocket).
  *
- * `frameAncestors` é `'none'` no site; no painel (`/admin*`) é `'self'`, porque a prévia ao
- * vivo (`/admin/preview`) é um iframe da mesma origem.
+ * No painel (`/admin*`, `scope: "admin"`), `frame-ancestors` é `'self'`, porque a prévia ao
+ * vivo (`/admin/preview`) é um iframe da mesma origem, e o Google Fonts fica liberado: a
+ * prévia carrega a fonte escolhida na Aparência antes do build (o site usa fontes próprias).
  *
  * Com o plugin `analytics`, a origem do script do Umami entra em script-src (o script) e
  * connect-src (os eventos vão para a mesma origem), como na v1.
  */
-export function contentSecurityPolicy(analyticsOrigin?: string, frameAncestors = "'none'"): string {
+export function contentSecurityPolicy(analyticsOrigin?: string, scope: "site" | "admin" = "site"): string {
   const extra = analyticsOrigin ? ` ${analyticsOrigin}` : "";
+  const admin = scope === "admin";
+  const frameAncestors = admin ? "'self'" : "'none'";
   return [
     "default-src 'self'",
     `script-src 'self' 'unsafe-inline'${extra}`,
-    "style-src 'self' 'unsafe-inline'",
+    `style-src 'self' 'unsafe-inline'${admin ? " https://fonts.googleapis.com" : ""}`,
     "img-src 'self' data: blob: https:",
-    "font-src 'self' data:",
+    `font-src 'self' data:${admin ? " https://fonts.gstatic.com" : ""}`,
     `connect-src 'self'${extra} https://*.convex.cloud wss://*.convex.cloud https://*.convex.site`,
     "frame-src 'self' https://www.google.com https://maps.google.com",
     `frame-ancestors ${frameAncestors}`,
@@ -108,7 +111,7 @@ export function defaultHosting(options: HostingOptions = {}): HostingConfig {
         headers: {
           ...common,
           "X-Frame-Options": "SAMEORIGIN",
-          "Content-Security-Policy": contentSecurityPolicy(options.analyticsOrigin, "'self'"),
+          "Content-Security-Policy": contentSecurityPolicy(options.analyticsOrigin, "admin"),
         },
       },
       // Arquivos com hash no nome: nunca mudam.

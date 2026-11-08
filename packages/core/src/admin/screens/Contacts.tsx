@@ -12,6 +12,7 @@ import { Link, useRouter } from "../lib/router";
 import { toast } from "../lib/toast";
 import { cn } from "../lib/utils";
 import { localeName, usePanel } from "../panel";
+import { contactDetail } from "../lib/labels";
 import { Button } from "../ui/button";
 import { Alert, Badge, Card, CardContent, CardDescription, CardHeader, CardTitle, Input, Label, Spinner, Textarea } from "../ui/form";
 import { Switch } from "../ui/tabs";
@@ -90,12 +91,15 @@ function Detail({ contact }: { contact: ContactDoc }) {
       <div className="rounded-lg border bg-card p-4 text-sm whitespace-pre-line">{contact.message}</div>
       {details.length > 0 && (
         <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 rounded-lg border bg-card p-4 text-sm">
-          {details.map(([k, v]) => (
-            <div key={k} className="contents">
-              <dt className="text-muted-foreground">{k}</dt>
-              <dd>{v}</dd>
-            </div>
-          ))}
+          {details.map(([k, v]) => {
+            const field = contactDetail(k, v);
+            return (
+              <div key={k} className="contents">
+                <dt className="text-muted-foreground">{field.label}</dt>
+                <dd>{field.value}</dd>
+              </div>
+            );
+          })}
         </dl>
       )}
       <p className="text-xs text-muted-foreground">

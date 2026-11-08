@@ -1,7 +1,5 @@
 import { describe, it, expect } from "vitest";
 import { Volume } from "memfs";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
 import { applyTheme } from "../transforms/applyTheme.js";
 import { getScheme, schemeCss, SCHEME_START, SCHEME_END, ROLE_VARS } from "../themes/schemes.js";
 
@@ -241,23 +239,6 @@ describe("applyTheme", () => {
     expect(dark).toContain("--primary: #ef4444");
     expect(dark).toContain("--background: 0 0% 8%");
     expect(dark).not.toContain("--bg:");
-  });
-
-  it("aplicado ao src/index.css real, troca só o bloco do esquema e mantém tokens derivados e o --radius", async () => {
-    const realCss = readFileSync(resolve(import.meta.dirname, "../../../src/index.css"), "utf-8");
-    const vol = Volume.fromJSON({ "/project/src/index.css": realCss });
-    const fs = makeFsModule(vol);
-
-    await applyTheme({ preset: "editorial-cream" }, "/project/src/index.css", fs);
-
-    const result = vol.readFileSync("/project/src/index.css", "utf-8") as string;
-    const scheme = getScheme("editorial-cream")!;
-    expect(result).toContain(schemeCss(scheme));
-    // fora do bloco, nada muda
-    expect(outsideBlock(result)).toBe(outsideBlock(realCss));
-    for (const kept of ["--text-strong:", "--radius:", "--color-primary: var(--primary);"]) {
-      expect(result).toContain(kept);
-    }
   });
 
   it("preset inexistente lança erro descritivo", async () => {

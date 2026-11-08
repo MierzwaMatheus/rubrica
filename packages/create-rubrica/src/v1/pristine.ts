@@ -1,15 +1,15 @@
 import * as nodeFsPromises from "node:fs/promises";
 import * as path from "node:path";
 import { downloadRelease as defaultDownloadRelease } from "./download.js";
-import { applyLayout } from "../transforms/applyLayout.js";
-import { applyTheme } from "../transforms/applyTheme.js";
-import { applyAppearance } from "../transforms/applyAppearance.js";
-import { applyFont } from "../transforms/applyFont.js";
-import { applyPlugins } from "../transforms/applyPlugins.js";
-import { applyIndexHtml } from "../transforms/applyIndexHtml.js";
-import { applyRubricalConfig } from "../transforms/applyRubricalConfig.js";
-import { indexHtmlInput, rubricaConfigInput } from "../transforms/identityInputs.js";
-import type { RubricaState } from "../state/readState.js";
+import { applyLayout } from "./transforms/applyLayout.js";
+import { applyTheme } from "./transforms/applyTheme.js";
+import { applyAppearance } from "./transforms/applyAppearance.js";
+import { applyFont } from "./transforms/applyFont.js";
+import { applyPlugins } from "./transforms/applyPlugins.js";
+import { applyIndexHtml } from "./transforms/applyIndexHtml.js";
+import { applyRubricalConfig } from "./transforms/applyRubricalConfig.js";
+import { indexHtmlInput, rubricaConfigInput } from "./transforms/identityInputs.js";
+import type { RubricaState } from "./state.js";
 
 export interface BuildPristineOptions {
   /** Diretório vazio onde a versão será montada. */

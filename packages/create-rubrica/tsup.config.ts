@@ -6,9 +6,11 @@ const { version } = JSON.parse(readFileSync(new URL("./package.json", import.met
 export default defineConfig({
   entry: ["src/index.ts"],
   format: ["esm"],
-  target: "node20",
+  target: "node22",
   banner: { js: "#!/usr/bin/env node" },
   // A telemetria manda a versão do CLI (src/telemetry.ts).
   define: { __CLI_VERSION__: JSON.stringify(version) },
+  // As partes puras do núcleo (receitas, plugins, idiomas) vão dentro do CLI.
+  noExternal: [/^@rubrica\/core/],
   clean: true,
 });

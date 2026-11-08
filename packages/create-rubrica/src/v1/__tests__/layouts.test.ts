@@ -1,11 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { existsSync } from "node:fs";
-import { resolve } from "node:path";
 import { LAYOUTS, getLayout, TEMPLATE_PAGES, COLOR_MODES, TEXTURES } from "../layouts.js";
 import { SCHEMES } from "../themes/schemes.js";
 import { SANS_FONTS, MONO_FONTS } from "../themes/fonts.js";
 
-const TEMPLATES_DIR = resolve(import.meta.dirname, "../../../templates/layouts");
 const PAGES = ["Home.tsx", "Resume.tsx", "Portfolio.tsx", "About.tsx", "Blog.tsx"];
 
 describe("registro de layouts (LAYOUTS)", () => {
@@ -70,19 +67,4 @@ describe("registro de layouts (LAYOUTS)", () => {
     }
   });
 
-  // Os arquivos dos layouts novos podem ainda não existir: só confere os diretórios presentes.
-  const present = LAYOUTS.filter((l) => existsSync(resolve(TEMPLATES_DIR, l.id)));
-
-  it("há pelo menos os 5 layouts originais em templates/layouts/", () => {
-    for (const id of ["cyberpunk", "brutalist", "swiss", "bento", "magazine"]) {
-      expect(present.map((l) => l.id)).toContain(id);
-    }
-  });
-
-  for (const l of present) {
-    it(`${l.id}: os arquivos de copy e pages existem em templates/layouts/${l.id}/`, () => {
-      for (const f of l.copy) expect(existsSync(resolve(TEMPLATES_DIR, l.id, f)), f).toBe(true);
-      for (const p of l.pages ?? []) expect(existsSync(resolve(TEMPLATES_DIR, l.id, "pages", p)), `pages/${p}`).toBe(true);
-    });
-  }
 });

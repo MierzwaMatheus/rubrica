@@ -1,4 +1,4 @@
-import type { RubricaIdentity } from "../state/readState.js";
+import type { RubricaIdentity } from "../state.js";
 import type { RubricalConfigInput } from "./applyRubricalConfig.js";
 import type { IndexHtmlData } from "./applyIndexHtml.js";
 

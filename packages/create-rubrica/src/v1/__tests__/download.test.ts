@@ -5,7 +5,7 @@ import { execFileSync } from "node:child_process";
 import { mkdtempSync, writeFileSync, rmSync, mkdirSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, dirname, basename } from "node:path";
-import { getLatestVersion, downloadRelease, GITHUB_REPO } from "../utils/download.js";
+import { getLatestVersion, downloadRelease, GITHUB_REPO } from "../download.js";
 
 const GITHUB_API = "https://api.github.com";
 

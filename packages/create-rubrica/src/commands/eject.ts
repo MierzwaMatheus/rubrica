@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { CORE_BLOCKS } from "@rubrica/core/blocks";
 import { parseArgs } from "../utils/args.js";
 import { writeFiles } from "../utils/fs.js";
-import { componentSegment, findComponentSource, hashText, planEject } from "../project/eject.js";
+import { componentSegment, findComponentSource, findCoreSource, hashText, planEject } from "../project/eject.js";
 import { ejectedSection, MARK, replaceSection } from "../project/files.js";
 import { findProjectDir, readState, writeState, type EjectedComponent, type RubricaState } from "../state.js";
 import { themePackage } from "../themes.js";
@@ -48,7 +48,9 @@ export function ejectBlock(projectDir: string, state: RubricaState, type: string
 /** Situação de cada componente ejetado em relação ao original instalado (decisão 20). */
 export function ejectedStatus(projectDir: string, state: RubricaState): EjectedStatus[] {
   return Object.entries(state.ejetados ?? {}).map(([tipo, entry]) => {
-    const source = findComponentSource(projectDir, entry.origem.startsWith("@rubrica/theme-") ? entry.origem : themePackage(state.tema), tipo);
+    // O original é o da origem registrada na ejeção: se o tema passou a implementar o bloco depois,
+    // o do núcleo continua sendo o original de quem ejetou do núcleo.
+    const source = entry.origem.startsWith("@rubrica/theme-") ? findComponentSource(projectDir, entry.origem, tipo) : findCoreSource(projectDir, tipo);
     const sameOrigin = source && source.pkg === entry.origem && source.component === entry.componente;
     const file = sameOrigin ? source.file : null;
     if (!file || !existsSync(file)) return { tipo, entry, status: "sumiu" as const };

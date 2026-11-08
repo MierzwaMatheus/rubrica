@@ -37,6 +37,16 @@ describe("auditSite", () => {
     expect(find(pages, "/")?.ok).toBe(true);
   });
 
+  it("confere o contraste também no modo claro quando há botão de alternar", async () => {
+    const style = `<style>[data-color-mode="light"] p{color:#bbb;background:#fff}</style>`;
+    const body = `<main><h1>Modos</h1><button data-rb-color-toggle>Tema</button><p>Texto claro demais no modo claro.</p></main>`;
+    const dir = await makeSite([{ path: "/", body, head: style }]);
+    dirs.push(dir);
+    const axe = find(await auditSite({ dist: dir }), "/")?.checks.find((c) => c.id === "axe");
+    expect(axe?.ok).toBe(false);
+    expect(axe?.details?.join("\n")).toMatch(/\(claro\).*color-contrast/);
+  });
+
   it("reprova <head> incompleto, lang errado e hreflang sem volta", async () => {
     const alt: [string, string][] = [["pt-BR", "/"], ["en", "/en"]];
     const dir = await makeSite([

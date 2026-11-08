@@ -16,6 +16,7 @@ Uso:
 Opções:
   --site <pessoal|empresa>   testa só um tipo de site
   --sem-lighthouse           pula o Lighthouse
+  --so-lighthouse            roda só o Lighthouse (pula axe, SEO e JavaScript por página)
   --js-kb <n>                limite de JavaScript (gzip) por página com ilha (padrão ${DEFAULT_LIMITS.jsKb})
   --lh-performance <n>       mínimo de performance (padrão ${DEFAULT_LIMITS.lighthouse.performance})
   --lh-acessibilidade <n>    mínimo de acessibilidade (padrão ${DEFAULT_LIMITS.lighthouse.accessibility})
@@ -38,6 +39,7 @@ export async function main(argv: string[]): Promise<number> {
       options: {
         site: { type: "string" },
         "sem-lighthouse": { type: "boolean" },
+        "so-lighthouse": { type: "boolean" },
         "js-kb": { type: "string" },
         "lh-performance": { type: "string" },
         "lh-acessibilidade": { type: "string" },
@@ -59,6 +61,10 @@ export async function main(argv: string[]): Promise<number> {
   if (values.help) {
     console.log(HELP);
     return 0;
+  }
+  if (values["sem-lighthouse"] && values["so-lighthouse"]) {
+    console.error("--sem-lighthouse e --so-lighthouse não combinam.");
+    return 2;
   }
   const root = values.raiz ?? findRepoRoot();
   if (values.listar) {
@@ -89,6 +95,7 @@ export async function main(argv: string[]): Promise<number> {
       limits,
       sites: values.site ? [values.site] : undefined,
       lighthouse: !values["sem-lighthouse"],
+      pages: !values["so-lighthouse"],
       lighthouseRuns: num(values["lh-execucoes"], 3),
       keepDist: values["manter-dist"] ?? false,
       log: (m) => console.error(`... ${m}`),

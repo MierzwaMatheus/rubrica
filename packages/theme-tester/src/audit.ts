@@ -50,9 +50,8 @@ interface AxeViolation {
   nodes: { target: unknown[]; failureSummary?: string }[];
 }
 
-async function runAxe(page: Page, source: string): Promise<CheckResult> {
-  await page.addScriptTag({ content: source });
-  const violations = (await page.evaluate(async (tags) => {
+async function axeViolations(page: Page): Promise<AxeViolation[]> {
+  return (await page.evaluate(async (tags) => {
     // @ts-expect-error axe é injetado na página
     const result = await window.axe.run(document, { runOnly: { type: "tag", values: tags } });
     return result.violations.map((v: AxeViolation) => ({
@@ -62,11 +61,35 @@ async function runAxe(page: Page, source: string): Promise<CheckResult> {
       nodes: v.nodes.map((n) => ({ target: n.target })),
     }));
   }, AXE_TAGS)) as AxeViolation[];
-  if (violations.length === 0) return { id: "axe", ok: true, message: "zero violações do axe (wcag2a, wcag2aa, wcag21aa)" };
-  const details = violations.flatMap((v) =>
-    v.nodes.slice(0, 4).map((n) => `[${v.id}${v.impact ? `, ${v.impact}` : ""}] ${v.help}: ${n.target.map((t) => (Array.isArray(t) ? t.join(" ") : String(t))).join(", ")}`),
-  );
-  return { id: "axe", ok: false, message: `${violations.length} regra(s) do axe violada(s)`, details };
+}
+
+/**
+ * axe no modo de cor atual e, se a página tem o botão de alternar, também no outro
+ * (contraste do claro e do escuro são tokens diferentes).
+ */
+async function runAxe(page: Page, source: string): Promise<CheckResult> {
+  await page.addScriptTag({ content: source });
+  const hasToggle = (await page.locator("[data-rb-color-toggle]").count()) > 0;
+  const original = await page.evaluate(() => document.documentElement.dataset.colorMode ?? "");
+  const modes = hasToggle ? ["dark", "light"] : [original || "padrão"];
+  const details: string[] = [];
+  let total = 0;
+  for (const mode of modes) {
+    if (hasToggle) await page.evaluate((m) => (document.documentElement.dataset.colorMode = m), mode);
+    const violations = await axeViolations(page);
+    total += violations.length;
+    for (const v of violations) {
+      for (const n of v.nodes.slice(0, 4)) {
+        const target = n.target.map((t) => (Array.isArray(t) ? t.join(" ") : String(t))).join(", ");
+        details.push(`${hasToggle ? `(${mode === "dark" ? "escuro" : "claro"}) ` : ""}[${v.id}${v.impact ? `, ${v.impact}` : ""}] ${v.help}: ${target}`);
+      }
+    }
+  }
+  if (hasToggle) await page.evaluate((m) => m ? (document.documentElement.dataset.colorMode = m) : delete document.documentElement.dataset.colorMode, original);
+  const scope = hasToggle ? ", claro e escuro" : "";
+  return total === 0
+    ? { id: "axe", ok: true, message: `zero violações do axe (wcag2a, wcag2aa, wcag21aa${scope})` }
+    : { id: "axe", ok: false, message: `${total} violação(ões) do axe`, details };
 }
 
 async function collectFacts(page: Page): Promise<{ head: HeadFacts; scripts: ScriptFact[]; islands: number }> {

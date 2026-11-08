@@ -17,6 +17,8 @@ export interface TestThemeOptions {
   sites?: (SiteKind | string)[];
   root?: string;
   lighthouse?: boolean;
+  /** Falso pula a auditoria de páginas (só Lighthouse). */
+  pages?: boolean;
   limits?: Limits;
   lighthouseRuns?: number;
   /** Mantém a pasta do build em vez de apagar. */
@@ -47,7 +49,7 @@ export async function testTheme(options: TestThemeOptions): Promise<FullReport> 
         base.buildError = build.error;
       } else {
         log(`Auditando as páginas (${kind})...`);
-        base.pages = await auditSite({ dist: build.dist, limits });
+        if (options.pages !== false) base.pages = await auditSite({ dist: build.dist, limits });
         if (options.lighthouse !== false) {
           const paths = (await readSitemap(build.dist)).map((e) => e.path);
           const lh = await runLighthouse({ dist: build.dist, paths, limits, ...(options.lighthouseRuns && { maxRuns: options.lighthouseRuns }), onProgress: log });

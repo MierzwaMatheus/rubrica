@@ -5,15 +5,19 @@ import { api } from "../data/api";
 import { useQuery } from "../data/backend";
 import { PageHeader } from "../Layout";
 import { Loading } from "../App";
-import { AUDIT_TARGETS, describeAudit, formatDateTime, timeAgo } from "../lib/format";
+import { auditTargetOptions, describeAudit } from "../lib/audit";
+import { formatDateTime, timeAgo } from "../lib/format";
 import { Input, NativeSelect } from "../ui/form";
+import { usePanel } from "../panel";
 
 export default function Activity() {
+  const { kind } = usePanel();
   const [target, setTarget] = useState("");
   const [search, setSearch] = useState("");
   const [limit, setLimit] = useState(100);
   const entries = useQuery(api.audit.recent, { limit, ...(target ? { targetType: target } : {}) });
   const shown = (entries ?? []).filter((e) => !search || `${e.eventType} ${describeAudit(e)} ${e.actorEmail ?? ""}`.toLowerCase().includes(search.toLowerCase()));
+  const targets = auditTargetOptions(kind);
   return (
     <>
       <PageHeader title="Atividades" description="O que foi feito no painel, por quem e quando. Os registros vencem com o tempo." />
@@ -22,9 +26,9 @@ export default function Activity() {
           <Input aria-label="Buscar atividades" placeholder="Buscar por pessoa ou ação" className="max-w-xs" value={search} onChange={(e) => setSearch(e.target.value)} />
           <NativeSelect aria-label="Filtrar por tipo" className="w-52" value={target} onChange={(e) => setTarget(e.target.value)}>
             <option value="">Todos os tipos</option>
-            {Object.entries(AUDIT_TARGETS).map(([k, v]) => (
-              <option key={k} value={k}>
-                {v[0]!.toUpperCase() + v.slice(1)}
+            {targets.map((t) => (
+              <option key={t.value} value={t.value}>
+                {t.label[0]!.toUpperCase() + t.label.slice(1)}
               </option>
             ))}
           </NativeSelect>

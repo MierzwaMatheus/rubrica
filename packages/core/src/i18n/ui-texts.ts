@@ -8,13 +8,11 @@ import type { Locale, Localized } from "./index";
 export const DEFAULT_UI_TEXTS: Record<string, Localized<string>> = {
   "nav.skip": { pt: "Pular para o conteúdo", en: "Skip to content", es: "Saltar al contenido" },
   "nav.menu": { pt: "Menu", en: "Menu", es: "Menú" },
-  "nav.close": { pt: "Fechar menu", en: "Close menu", es: "Cerrar menú" },
   "sidebar.contact": { pt: "Contato", en: "Contact", es: "Contacto" },
   "sidebar.talk": { pt: "Fale comigo", en: "Talk to me", es: "Hablemos" },
   "nav.language": { pt: "Idioma", en: "Language", es: "Idioma" },
   "theme.toggle": { pt: "Alternar tema claro e escuro", en: "Toggle light and dark theme", es: "Cambiar tema claro y oscuro" },
   "common.readMore": { pt: "Ler mais", en: "Read more", es: "Leer más" },
-  "common.seeAll": { pt: "Ver todos", en: "See all", es: "Ver todos" },
   "common.back": { pt: "Voltar", en: "Back", es: "Volver" },
   "blog.readingTime": { pt: "{minutes} min de leitura", en: "{minutes} min read", es: "{minutes} min de lectura" },
   "blog.publishedAt": { pt: "Publicado em {date}", en: "Published on {date}", es: "Publicado el {date}" },

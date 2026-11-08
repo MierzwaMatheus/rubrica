@@ -28,7 +28,7 @@ export const pt = {
   header: {
     nav: "Seções",
     combinator: "Combinador",
-    layouts: "Layouts",
+    layouts: "Temas",
     schemes: "Esquemas",
     start: "Começar",
     docs: "Docs",
@@ -55,7 +55,6 @@ export const pt = {
     title: "Monte o seu e veja funcionando.",
     intro:
       "O preview não é uma imagem: é o site de demonstração do Rubrica, gerado para cada um dos temas com dados de exemplo. Troque as peças, navegue pelas páginas e veja no celular.",
-    previewNote: "",
     controlsAria: "Escolhas do combinador",
     moods: "Moods prontos",
     moodsHelp: "Uma combinação completa de tema, esquema, modo e fontes.",
@@ -78,6 +77,7 @@ export const pt = {
     createCta: "Criar o meu com essas escolhas",
     /** Rótulos da lista de respostas, montada no navegador. */
     rows: {
+      kind: "Tipo",
       layout: "Tema",
       scheme: "Esquema",
       mode: "Modo",
@@ -184,7 +184,10 @@ export const pt = {
         title: "Crie o projeto",
         text: 'Monte no combinador e copie o comando pronto em "Crie o seu", ou rode este e responda às perguntas. Ele instala tudo, liga o Convex e cria o painel.',
       },
-      { title: "Abra o site", text: "Na pasta do projeto. O painel fica em /admin, com o e-mail e a senha que você definiu." },
+      {
+        title: "Abra o site",
+        text: "Na pasta do projeto (com pnpm, pnpm dev também serve). O painel fica em /admin, com o e-mail e a senha que você definiu.",
+      },
       {
         title: "Publique",
         text: "Coloca o site no ar na Vercel (conta gratuita), com o banco de produção. Depois, o update sobe as versões novas do núcleo e do tema.",
@@ -231,10 +234,18 @@ export const pt = {
     translationNote: "",
   },
   /** Nomes das páginas do preview. */
-  pages: { "/": "Início", "/curriculo": "Currículo", "/portfolio": "Portfólio", "/sobre": "Sobre", "/blog": "Blog" } as Record<
-    string,
-    string
-  >,
+  pages: {
+    "/": "Início",
+    "/curriculo": "Currículo",
+    "/portfolio": "Portfólio",
+    "/sobre": "Sobre",
+    "/blog": "Blog",
+    "/quem-somos": "Quem somos",
+    "/servicos": "Serviços",
+    "/precos": "Preços",
+    "/cases": "Cases",
+    "/contato": "Contato",
+  } as Record<string, string>,
   catalog: {
     layoutHints: fromCli(LAYOUTS, (l) => l.id),
     schemeHints: fromCli(SCHEMES, (s) => s.id),

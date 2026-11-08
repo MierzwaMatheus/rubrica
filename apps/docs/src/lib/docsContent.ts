@@ -40,9 +40,9 @@ function load(repoPath: string): Doc {
 const ALL = [...files.keys()].filter(isPublishedDoc).sort().map(load);
 const bySlug = new Map(ALL.map((d) => [d.slug, d]));
 
-const START = ["guia/comecando", "guia/conteudo", "guia/publicar", "guia/integracoes", "guia/atualizar"];
+const START = ["guia/comecando", "guia/conteudo", "guia/plugins", "guia/empresa", "guia/publicar", "guia/integracoes", "guia/atualizar"];
 const LOOK = ["guia/temas", "guia/idiomas"];
-const ADVANCED = ["guia/agentes", "guia/migrar", "guia/cli", "guia/telemetria"];
+const ADVANCED = ["guia/agentes", "guia/variaveis", "guia/migrar", "guia/cli", "guia/telemetria"];
 const listed = new Set([...START, ...LOOK, ...ADVANCED]);
 const pick = (slugs: string[]) => slugs.map((s) => bySlug.get(s)).filter((d): d is Doc => Boolean(d));
 

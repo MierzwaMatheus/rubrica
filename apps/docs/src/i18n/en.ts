@@ -21,7 +21,7 @@ export const en: Dict = {
   header: {
     nav: "Sections",
     combinator: "Builder",
-    layouts: "Layouts",
+    layouts: "Themes",
     schemes: "Schemes",
     start: "Get started",
     docs: "Docs",
@@ -48,7 +48,6 @@ export const en: Dict = {
     title: "Put yours together and see it running.",
     intro:
       "The preview is not a picture: it is the Rubrica demo site, built for each theme with sample data. Swap the pieces, browse the pages and check it on a phone.",
-    previewNote: "The sample content in the preview is in Portuguese.",
     controlsAria: "Builder choices",
     moods: "Ready-made moods",
     moodsHelp: "A full combination of theme, scheme, mode and fonts.",
@@ -70,6 +69,7 @@ export const en: Dict = {
     answers: "Choices for create-rubrica",
     createCta: "Create mine with these choices",
     rows: {
+      kind: "Type",
       layout: "Theme",
       scheme: "Scheme",
       mode: "Mode",
@@ -175,7 +175,10 @@ export const en: Dict = {
         title: "Create the project",
         text: 'Build it in the builder and copy the ready command in "Create yours", or run this one and answer the questions. It installs everything, connects Convex and creates the panel.',
       },
-      { title: "Open the site", text: "In the project folder. The panel is at /admin, with the email and password you set." },
+      {
+        title: "Open the site",
+        text: "In the project folder (with pnpm, pnpm dev works too). The panel is at /admin, with the email and password you set.",
+      },
       {
         title: "Publish",
         text: "Puts the site online on Vercel (free account), with the production database. After that, update brings new core and theme versions.",
@@ -221,7 +224,18 @@ export const en: Dict = {
     translationNote:
       "Translated from the Portuguese original. Labels from the CLI and the admin panel stay in Portuguese, as you will see them.",
   },
-  pages: { "/": "Home", "/curriculo": "Resume", "/portfolio": "Portfolio", "/sobre": "About", "/blog": "Blog" },
+  pages: {
+    "/": "Home",
+    "/curriculo": "Resume",
+    "/portfolio": "Portfolio",
+    "/sobre": "About",
+    "/blog": "Blog",
+    "/quem-somos": "About us",
+    "/servicos": "Services",
+    "/precos": "Pricing",
+    "/cases": "Case studies",
+    "/contato": "Contact",
+  },
   catalog: {
     layoutHints: {
       padrao: "side bar with profile photo, clean and neutral: works for any field",

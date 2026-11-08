@@ -12,7 +12,7 @@ Este guia leva um site feito com o Rubrica v1 para a v2. O comando `migrar` faz 
 - Os idiomas viram uma lista configurável (a v1 tinha português e inglês fixos).
 - O script Python da skill `rubrica` sai; entra o **MCP local**.
 
-A v1 continua recebendo correções de bug e de segurança por **6 meses** depois do lançamento da v2.
+A v1 continua recebendo correções de bug e de segurança por **6 meses** depois do lançamento da v2. Enquanto o seu site estiver nela, a documentação certa é a da [branch `v1` do GitHub](https://github.com/MierzwaMatheus/rubrica/tree/v1/docs): os guias deste site são da v2.
 
 ## Antes de começar
 

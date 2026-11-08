@@ -164,7 +164,7 @@ A documentação também está no [site do Rubrica](https://userubrica.vercel.ap
 
 ## Vem da v1?
 
-`npx create-rubrica@latest migrar` leva o site para a v2 numa branch nova, converte os dados (de um export do Convex) num arquivo de import e lista o que você personalizou, com a sugestão de cada item. Ele **não grava em banco nenhum**: o import vai para um Convex de desenvolvimento novo, e a produção só com o seu "ok". Guia completo: [Migrar da v1](./docs/guia/migrar.md). A v1 recebe correções de bug e segurança por 6 meses depois do lançamento da v2 (branch `v1`); a documentação dela está arquivada em [`docs/v1`](./docs/v1/README.md).
+`npx create-rubrica@latest migrar` leva o site para a v2 numa branch nova, converte os dados (de um export do Convex) num arquivo de import e lista o que você personalizou, com a sugestão de cada item. Ele **não grava em banco nenhum**: o import vai para um Convex de desenvolvimento novo, e a produção só com o seu "ok". Guia completo: [Migrar da v1](./docs/guia/migrar.md). A v1 recebe correções de bug e segurança por 6 meses depois do lançamento da v2 na [branch `v1`](https://github.com/MierzwaMatheus/rubrica/tree/v1), onde também fica a [documentação dela](https://github.com/MierzwaMatheus/rubrica/tree/v1/docs).
 
 <br />
 

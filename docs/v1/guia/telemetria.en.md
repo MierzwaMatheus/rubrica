@@ -44,4 +44,4 @@ The first time in each project, the CLI tells you telemetry exists and how to tu
 
 ## How it works
 
-Sending takes at most 2 seconds. Without internet, or with the collector down, the command carries on and nothing shows up on screen. The code that builds and sends the events is open: [`cli/src/telemetry.ts`](https://github.com/MierzwaMatheus/rubrica/blob/main/cli/src/telemetry.ts).
+Sending takes at most 2 seconds. Without internet, or with the collector down, the command carries on and nothing shows up on screen. The code that builds and sends the events is open: [`cli/src/telemetry.ts`](https://github.com/MierzwaMatheus/rubrica/blob/v1/cli/src/telemetry.ts).

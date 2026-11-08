@@ -73,7 +73,7 @@ The company line also has **company data** (legal name, tax id, address, hours, 
 
 ## Plugins
 
-Each optional feature is a plugin the panel turns on and off: contact assistant, proposals, contract templates, payments, blog, projects, résumé, day to day, testimonials, testimonial submission, AI translation, AI résumé per job, analytics (Umami), activity log and media library. The company type adds **pricing** and **team**. When off, the feature disappears from the site and from the panel menu. Plugins that need an external service key are in [Integrations](./integracoes.md).
+Each optional feature is a plugin the panel turns on and off: contact assistant, proposals, contract templates, payments, blog, projects, résumé, day to day, testimonials, testimonial submission, AI translation, AI résumé per job, analytics (Umami), activity log and media library. The company type adds **pricing** and **team**. When off, the feature disappears from the site and from the panel menu. Plugins that need an external service key are in [Integrations](./integracoes.md). What each one does, in which site type and how it starts is in [Plugins](./plugins.md).
 
 ## Roles
 

@@ -1,8 +1,8 @@
 # Getting started
 
-From zero to your site running on your computer, with the panel ready to fill in. It takes about 10 minutes, most of it waiting for the install. The path is the same for a **personal** site (portfolio) and for a **company** site; only the type you pick at the start changes.
+From zero to your site running on your computer, with the panel ready to fill in. It takes about 10 minutes, most of it waiting for the install. The path is the same for a **personal** site (portfolio) and for a **company** site; only the type you pick at the start changes. What is different on a company site is in [Company site](./empresa.md).
 
-> Already have a site built with Rubrica v1? Don't start over: follow [Migrating from v1](./migrar.md).
+> Already have a site built with Rubrica v1? Don't start over: follow [Migrating from v1](./migrar.md). Staying on v1 for now? Its documentation is on the [`v1` branch on GitHub](https://github.com/MierzwaMatheus/rubrica/tree/v1/docs).
 
 ## What you need
 

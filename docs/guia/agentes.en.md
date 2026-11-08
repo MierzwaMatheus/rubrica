@@ -66,7 +66,7 @@ In Claude Code, you can type `! npx rubrica mcp login` in the prompt itself. The
 
 There are also ready prompts (`montar-pagina`, `traduzir-conteudo`, `revisar-antes-de-publicar`) and read-only resources, like the writing guide and the block catalog.
 
-The complete reference of tools, roles and variables is in [`docs/v2/mcp.md`](https://github.com/MierzwaMatheus/rubrica/blob/v2/docs/v2/mcp.md) (in Portuguese).
+The complete reference of tools, roles and variables is in [`docs/v2/mcp.md`](https://github.com/MierzwaMatheus/rubrica/blob/main/docs/v2/mcp.md) (in Portuguese).
 
 ## Example: change the opening button in both languages
 

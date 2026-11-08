@@ -14,6 +14,8 @@ interface Props {
 }
 const { title, description, lang, page, noindex = false } = Astro.props;
 const abs = (path: string) => new URL(path, Astro.site).href;
+/** O Open Graph pede idioma e país (pt_BR, en_US). */
+const OG_LOCALE: Record<Lang, string> = { pt: "pt_BR", en: "en_US" };
 ---
 
 <!doctype html>
@@ -25,13 +27,19 @@ const abs = (path: string) => new URL(path, Astro.site).href;
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex, nofollow, noarchive" />}
     <link rel="canonical" href={abs(route(page, lang))} />
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
     {LANGS.map((l) => <link rel="alternate" hreflang={HTML_LANG[l]} href={abs(route(page, l))} />)}
     <link rel="alternate" hreflang="x-default" href={abs(route(page, "pt"))} />
-    <meta property="og:locale" content={HTML_LANG[lang].replace("-", "_")} />
+    <meta property="og:locale" content={OG_LOCALE[lang]} />
+    {LANGS.filter((l) => l !== lang).map((l) => <meta property="og:locale:alternate" content={OG_LOCALE[l]} />)}
     <meta property="og:type" content="website" />
+    <meta property="og:url" content={abs(route(page, lang))} />
+    <meta property="og:site_name" content="Rubrica" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content="/img/capa.jpg" />
+    <meta property="og:image" content={abs("/img/capa.jpg")} />
+    <meta property="og:image:width" content="1279" />
+    <meta property="og:image:height" content="720" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />

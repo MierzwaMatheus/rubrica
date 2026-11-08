@@ -4,7 +4,8 @@
  * nada é enviado a servidor nenhum. As opções são as do `create` (packages/create-rubrica).
  */
 import { normalizeUrl, validateUrl, normalizeEmail, validateEmail } from "../../../../packages/create-rubrica/src/utils/normalize";
-import { onChoice, type CombinatorChoice } from "./combinatorStore";
+import { onChoice, requestChoice, type CombinatorChoice } from "./combinatorStore";
+import type { SiteKind } from "./previews";
 
 const FIELDS = ["siteName", "siteUrl", "siteDescription", "authorEmail"] as const;
 type Field = (typeof FIELDS)[number];
@@ -20,6 +21,8 @@ interface FormText {
   willAsk: string;
   allSet: string;
   siteNamePh: string;
+  /** Idioma marcado de início: o da página. */
+  pageLocale: string;
 }
 
 interface Preset {
@@ -56,9 +59,9 @@ export function initRecipeForm(): void {
   const tx = JSON.parse(document.getElementById("cs-i18n")?.textContent || "{}") as FormText & { presets: Preset[] };
 
   let visual: CombinatorChoice | null = null;
-  let kind = "pessoal";
+  let kind: SiteKind = "pessoal";
   let preset = "recommended";
-  const locales = new Set<string>(["pt-BR"]);
+  const locales = new Set<string>([tx.pageLocale || "pt-BR"]);
 
   const input = (f: Field) => form.querySelector<HTMLInputElement>(`[name="${f}"]`)!;
   const value = (f: Field) => input(f).value.trim();
@@ -113,8 +116,15 @@ export function initRecipeForm(): void {
 
   onChoice((choice) => {
     visual = choice;
+    // O tipo de site é o mesmo do combinador (o preview mostra as páginas de cada tipo).
+    if (choice.kind !== kind) setKind(choice.kind);
     render();
   });
+
+  function setKind(next: SiteKind) {
+    kind = next;
+    if (!tx.presets.find((x) => x.id === preset)?.kinds.includes(kind)) preset = "recommended";
+  }
   form.addEventListener("input", render);
   form.addEventListener("submit", (e) => e.preventDefault());
   form.addEventListener("click", (e) => {
@@ -123,8 +133,9 @@ export function initRecipeForm(): void {
     const l = target.closest<HTMLButtonElement>("[data-locale]");
     const p = target.closest<HTMLButtonElement>("[data-preset]");
     if (k) {
-      kind = k.dataset.kind!;
-      if (!tx.presets.find((x) => x.id === preset)?.kinds.includes(kind)) preset = "recommended";
+      setKind(k.dataset.kind as SiteKind);
+      // O combinador troca o preview e devolve a escolha (onChoice acima).
+      requestChoice({ kind });
     } else if (l) {
       const code = l.dataset.locale!;
       // O primeiro idioma marcado é o principal; sempre fica ao menos um.

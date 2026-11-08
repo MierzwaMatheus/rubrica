@@ -36,9 +36,6 @@ export { SCHEMES };
 export const REPO = "https://github.com/MierzwaMatheus/rubrica";
 export const COMMAND = "npx create-rubrica@latest meu-site";
 
-/** Páginas que cada layout desenha (as rotas do app). Os nomes ficam no dicionário (i18n). */
-export const PAGES = ["/", "/curriculo", "/portfolio", "/sobre", "/blog"];
-
 export interface Mood {
   id: string;
   layout: string;
@@ -69,8 +66,11 @@ export const MOODS: Mood[] = [
   { id: "revista", layout: "magazine", scheme: "editorial-cream", mode: "light", sans: "Bodoni Moda", mono: "JetBrains Mono" },
 ];
 
-/** Comandos dos três passos de "Começar"; os textos ficam no dicionário (i18n). */
-export const STEP_CODES = [COMMAND, "pnpm dev", "npx create-rubrica publicar"];
+/**
+ * Comandos dos três passos de "Começar"; os textos ficam no dicionário (i18n). O `npx`
+ * cria o projeto com npm, e `npm run dev` funciona também num projeto com pnpm.
+ */
+export const STEP_CODES = [COMMAND, "npm run dev", "npx create-rubrica publicar"];
 
 export function layoutLabel(id: string): string {
   return LAYOUTS.find((l) => l.id === id)?.label ?? id;

@@ -12,7 +12,7 @@ This guide takes a site built with Rubrica v1 to v2. The `migrar` command does m
 - Languages become a configurable list (v1 had fixed Portuguese and English).
 - The `rubrica` skill's Python script goes away; the **local MCP** comes in.
 
-v1 keeps receiving bug and security fixes for **6 months** after v2 launches.
+v1 keeps receiving bug and security fixes for **6 months** after v2 launches. While your site is on it, the right documentation is the one on the [`v1` branch on GitHub](https://github.com/MierzwaMatheus/rubrica/tree/v1/docs): the guides on this site are for v2.
 
 ## Before you start
 

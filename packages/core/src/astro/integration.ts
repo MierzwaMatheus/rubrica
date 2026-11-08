@@ -19,6 +19,8 @@ import type { ThemeFonts } from "../theme/contract";
 import { planFonts, type FontPlan } from "../theme/fonts";
 import tailwindcss from "@tailwindcss/vite";
 import { findConvexUrl } from "../data/convex";
+import { enabledPlugins } from "../plugins/contract";
+import { CORE_PLUGINS } from "../plugins/registry";
 
 export type SourceOption =
   /** Pasta com site.json, pages.json, texts.json e collections/*.json. */
@@ -197,6 +199,12 @@ export default function rubrica(options: RubricaOptions): AstroIntegration {
         injectRoute({ pattern: "/sitemap.xml", entrypoint: here("./pages/sitemap.xml.ts"), prerender: true });
         injectRoute({ pattern: "/robots.txt", entrypoint: here("./pages/robots.txt.ts"), prerender: true });
         injectRoute({ pattern: "/_rubrica/color-mode.js", entrypoint: here("./pages/color-mode.js.ts"), prerender: true });
+        injectRoute({ pattern: "/manifest.webmanifest", entrypoint: here("./pages/manifest.webmanifest.ts"), prerender: true });
+        // RSS do blog: o do idioma principal e os dos outros idiomas com post traduzido.
+        if (enabledPlugins(CORE_PLUGINS, snapshot.site.kind, snapshot.site.plugins).has("blog")) {
+          injectRoute({ pattern: "/rss.xml", entrypoint: here("./pages/rss.xml.ts"), prerender: true });
+          injectRoute({ pattern: "/[prefix]/rss.xml", entrypoint: here("./pages/rss-locale.xml.ts"), prerender: true });
+        }
       },
     },
   };

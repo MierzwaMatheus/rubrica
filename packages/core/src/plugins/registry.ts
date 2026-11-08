@@ -145,6 +145,13 @@ export const CORE_PLUGINS: PluginDefinition[] = [
     defaultEnabled: { pessoal: false, empresa: false },
   }),
   definePlugin({
+    id: "analytics",
+    label: "Analytics (Umami)",
+    description: "Script do Umami nas páginas do site, com o endereço e o id das configurações. Sem cookies.",
+    kinds: [...both],
+    defaultEnabled: { pessoal: false, empresa: false },
+  }),
+  definePlugin({
     id: "audit-log",
     label: "Registro de atividades",
     description: "Histórico das ações no painel.",

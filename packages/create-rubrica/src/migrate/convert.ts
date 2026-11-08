@@ -109,6 +109,8 @@ export interface V1RubricaJson {
 
 export interface ConvertInput {
   tables: Record<string, Doc[]>;
+  /** Documentos de `_storage` do export (com o `internalId` que aparece nas URLs antigas). */
+  storage?: Doc[];
   /** `rubrica.json` da v1 (layout, esquema, fontes, identidade). */
   v1: V1RubricaJson;
   /** Tema da v2 (id) que o site vai usar. */
@@ -190,6 +192,15 @@ export function v1FullTitle(title: Loc, siteTitle: string | undefined): Loc {
 export function sameInBoth(value: Loc): Loc {
   const v = value[PT] ?? value[EN];
   return v ? { [PT]: v, [EN]: value[EN] ?? v } : value;
+}
+
+/**
+ * Menu como o da v1: Início, Currículo, Portfólio, Sobre e Blog, nessa ordem (a sidebar da
+ * v1). As outras páginas (depoimentos, privacidade) existem, mas não estavam no menu.
+ */
+const V1_NAV_ORDER = ["/", "/curriculo", "/portfolio", "/sobre", "/blog"];
+export function v1Navigation(items: Doc[]): Doc[] {
+  return V1_NAV_ORDER.map((href) => items.find((n) => n.href === href)).filter((n): n is Doc => !!n);
 }
 
 /** Valor que pode ser texto ou `{ ptBR, enUS }` (homeContent). */
@@ -281,10 +292,15 @@ class Ctx {
   config = new Map<string, unknown>();
   contact: Doc | undefined;
 
+  /** `internalId` (o UUID das URLs `/api/storage/<uuid>` da v1) → id do arquivo, que o import mantém. */
+  storageByUrlId = new Map<string, string>();
+
   constructor(
     readonly tables: Record<string, Doc[]>,
     readonly projectTexts: Record<string, { pt?: string; en?: string }> = {},
+    storage: Doc[] = [],
   ) {
+    for (const f of storage) if (typeof f.internalId === "string" && typeof f._id === "string") this.storageByUrlId.set(f.internalId, f._id);
     for (const f of tables.imageFolders ?? []) this.folders.set(f._id, f.path);
     for (const m of tables.imageMetadata ?? []) this.media.set(m._id, m);
     for (const t of tables.siteTexts ?? []) this.siteTexts.set(t.key, t);
@@ -299,12 +315,20 @@ class Ctx {
   }
 
   /** Imagem da biblioteca da v1 (id do imageMetadata), ou só a URL. */
+  /** Arquivo do export a partir de uma URL do storage da v1 (que deixa de existir com o banco velho). */
+  storageIdFromUrl(url?: string): string | undefined {
+    const m = /\/api\/storage\/([0-9a-f-]{36})/i.exec(str(url) ?? "");
+    return m ? this.storageByUrlId.get(m[1]!.toLowerCase()) : undefined;
+  }
+
   image(imageId?: string, url?: string): Doc | undefined {
     const m = imageId ? this.media.get(imageId) : undefined;
     if (!m && !str(url)) return undefined;
+    // Sem metadado, mas a URL é do storage da v1: aponta para o arquivo importado.
+    const fromUrl = m?.storageId ? undefined : this.storageIdFromUrl(url);
     return compact({
-      url: str(url) ?? "",
-      storageId: m?.storageId,
+      url: fromUrl ? "" : (str(url) ?? ""),
+      storageId: m?.storageId ?? fromUrl,
       alt: m?.altText ? loc(m.altText) : undefined,
       width: m?.width,
       height: m?.height,
@@ -574,7 +598,9 @@ function convertSettings(ctx: Ctx, input: ConvertInput, plugins: Record<string, 
           name: str(contact?.name) ?? id.authorName ?? "",
           jobTitle: contact ? loc(contact.role, contact.roleTranslations) : undefined,
           email: contact?.showEmail ? str(contact.email) : undefined,
-          photo: contact?.avatarStorageId || str(contact?.avatarUrl) ? compact({ url: str(contact?.avatarUrl) ?? "", storageId: contact?.avatarStorageId }) : undefined,
+          photo: contact?.avatarStorageId ? { url: "", storageId: contact.avatarStorageId } : ctx.image(undefined, str(contact?.avatarUrl)),
+          // A sidebar da v1 mostrava o telefone (com o ícone do WhatsApp) quando "mostrar" estava ligado.
+          whatsapp: contact?.showPhone ? str(contact.phone) : undefined,
         })
       : undefined,
     plugins,
@@ -599,7 +625,8 @@ export const SECTION_FILLERS: Record<string, Record<string, Filler | Filler[]>> 
       const availability = ctx.home.get("availability_status") as Doc | undefined;
       const title = ctx.t("home.hero.headline");
       return compact({
-        eyebrow: ctx.contact ? loc(ctx.contact.role, ctx.contact.roleTranslations) : undefined,
+        // O selo da v1 é o texto home.greeting ("whoami"), não o cargo (que aparece abaixo).
+        eyebrow: ctx.t("home.greeting"),
         title: hasText(title) ? title : loc(ctx.home.get("hero_title")),
         subtitle: ctx.t("home.hero.description"),
         primaryCta: plugins.portfolio !== false ? link(ctx.t("home.hero.ctaCases"), "#cases") : undefined,
@@ -672,7 +699,7 @@ export const SECTION_KEYS = new Set([
   "home.about.title", "home.skills.title", "home.testimonials.title", "home.cta.title", "home.cta.subtitle", "home.cta.project", "home.cta.job",
   "sidebar.contact", "blog.title", "blog.subtitle", "about.professional.title", "about.aboutMe.title", "about.aboutMe.text", "about.principles.title",
   "about.dailyRoutine.title", "about.faq.title", "resume.title", "resume.subtitle", "portfolio.title", "portfolio.subtitle", "testimonials.title",
-  "testimonials.subtitle", "navigation.home", "navigation.about", "navigation.resume", "navigation.portfolio", "navigation.blog",
+  "testimonials.subtitle", "home.greeting", "navigation.home", "navigation.about", "navigation.resume", "navigation.portfolio", "navigation.blog",
   "seo.aboutTitle", "seo.aboutDescription", "seo.resumeTitle", "seo.resumeDescription", "seo.portfolioTitle", "seo.portfolioDescription",
   "seo.blogTitle", "seo.blogDescription", "seo.testimonialsDescription", "portfolio.before", "portfolio.problem", "portfolio.solution",
   "portfolio.decisions", "portfolio.results", "portfolio.learnings", "portfolio.metrics", "portfolio.testimonial", "portfolio.liveDemo", "portfolio.code",
@@ -823,7 +850,7 @@ function buildUiTexts(ctx: Ctx, report: MigrationReport, now: number): Doc[] {
 
 export function convertV1(input: ConvertInput): ConvertResult {
   const t = input.tables;
-  const ctx = new Ctx(t, input.projectTexts);
+  const ctx = new Ctx(t, input.projectTexts, input.storage);
   const report: MigrationReport = { tables: [], pages: [], texts: { sectionKeys: 0, ui: [], unmapped: [] }, plugins: [], pending: [], dropped: [], unknownTables: [], warnings: ctx.warnings };
   const now = input.now ?? Date.now();
   const out: Record<string, Doc[]> = {};
@@ -865,7 +892,7 @@ export function convertV1(input: ConvertInput): ConvertResult {
   report.plugins = plugins.report;
   const settings = convertSettings(ctx, input, plugins.record);
   const pages = buildPages(ctx, input, plugins.record, report);
-  settings.navigation = navigationFromPages(pages as never) as Doc[];
+  settings.navigation = v1Navigation(navigationFromPages(pages as never) as Doc[]);
   put("siteSettings", "", [compact({ ...settings, updatedAt: now })]);
   put("pages", "", pages);
   put("uiTexts", "", buildUiTexts(ctx, report, now));

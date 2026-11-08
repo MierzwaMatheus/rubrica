@@ -113,3 +113,9 @@ export function pendingZip(result: ConvertResult, source: Snapshot): Uint8Array 
   const tableNumbers = Object.fromEntries(Object.keys(result.pending).filter((t) => source.tableNumbers[t] !== undefined).map((t) => [t, source.tableNumbers[t]!]));
   return snapshotZip({ tables: result.pending, tableNumbers, storage: {} });
 }
+
+/** Os documentos de `_storage` do export (id, tipo e o `internalId` das URLs antigas). */
+export function storageDocs(snapshot: Pick<Snapshot, "storage">): Doc[] {
+  const bytes = snapshot.storage["_storage/documents.jsonl"];
+  return bytes ? parseJsonl(strFromU8(bytes)) : [];
+}

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { CORE_RECIPES, validateBlock, type Recipe } from "@rubrica/core";
 import { CORE_BLOCKS } from "@rubrica/core/blocks";
-import { convertV1, loc, parsePeriod, sameInBoth, slugify, toHtml, v1FullTitle, V1_TEXTS } from "../src/migrate/convert";
+import { convertV1, loc, parsePeriod, sameInBoth, slugify, toHtml, v1FullTitle, v1Navigation, V1_TEXTS } from "../src/migrate/convert";
 import { IDS, PRINCIPIOS, V1_RUBRICA_JSON, v1Export } from "./fixtures/v1-export";
 
 const NOW = 1_800_000_000_000;
@@ -163,6 +163,30 @@ describe("configurações do site", () => {
     expect(withTexture("lava")).not.toHaveProperty("texture");
   });
 
+  it("foto da pessoa com URL do storage da v1 aponta para o arquivo importado; telefone vai para a sidebar", () => {
+    const { tables } = v1Export();
+    tables.contactInfo = [{ ...tables.contactInfo![0]!, avatarStorageId: undefined, avatarUrl: "https://velho-123.convex.cloud/api/storage/8003b0d9-bb6a-4759-beb6-caf538ade1f7", phone: "+55 11 98823-2537", showPhone: true }];
+    const storage = [{ _id: "kg2foto", internalId: "8003b0d9-bb6a-4759-beb6-caf538ade1f7" }];
+    const person = convertV1({ tables, storage, v1: V1_RUBRICA_JSON, theme: "cyberpunk", recipe: CORE_RECIPES.pessoal, now: NOW }).tables.siteSettings![0]!.person as Record<string, unknown>;
+    expect(person.photo).toEqual({ url: "", storageId: "kg2foto" });
+    expect(person.whatsapp).toBe("+55 11 98823-2537");
+    // Sem o arquivo no export, a URL antiga fica (melhor que nada).
+    const semArquivo = convertV1({ tables, v1: V1_RUBRICA_JSON, theme: "cyberpunk", recipe: CORE_RECIPES.pessoal, now: NOW }).tables.siteSettings![0]!.person as Record<string, unknown>;
+    expect((semArquivo.photo as { url: string }).url).toContain("/api/storage/");
+  });
+
+  it("menu na ordem da sidebar da v1, sem as páginas que não estavam nele", () => {
+    const items = ["/", "/sobre", "/curriculo", "/portfolio", "/blog", "/depoimentos"].map((href) => ({ href, label: { "pt-BR": href } }));
+    expect(v1Navigation(items).map((n) => n.href)).toEqual(["/", "/curriculo", "/portfolio", "/sobre", "/blog"]);
+    const nav = run().tables.siteSettings![0]!.navigation as { href: string }[];
+    expect(nav.map((n) => n.href)).not.toContain("/depoimentos");
+  });
+
+  it("o selo do hero é o home.greeting da v1 (whoami), não o cargo", () => {
+    const home = (run().tables.pages as { path: string; blocks: { type: string; fields: Record<string, unknown> }[] }[]).find((p) => p.path === "/")!;
+    expect(home.blocks.find((b) => b.type === "hero")!.fields.eyebrow).toEqual({ "pt-BR": "whoami", en: "whoami" });
+  });
+
   it("pessoa e redes do contactInfo", () => {
     expect(settings.person).toEqual({ name: "Bruna Lima", jobTitle: { "pt-BR": "Designer de produto", en: "Product designer" }, email: "contato@brunalima.design", photo: { url: "", storageId: IDS.storage[1] } });
     expect(settings.social).toEqual([{ network: "linkedin", url: "https://linkedin.com/in/brunalima" }, { network: "github", url: "https://github.com/brunalima" }]);
@@ -196,8 +220,9 @@ describe("configurações do site", () => {
   });
 
   it("menu a partir das páginas fixas, com os rótulos da v1", () => {
-    expect(settings.navigation.map((n: { href: string }) => n.href)).toEqual(["/", "/sobre", "/curriculo", "/portfolio", "/blog", "/depoimentos"]);
-    expect(settings.navigation[1].label).toEqual({ "pt-BR": "Sobre Mim", en: V1_TEXTS["navigation.about"]!.en });
+    // Ordem da sidebar da v1; depoimentos não estava no menu.
+    expect(settings.navigation.map((n: { href: string }) => n.href)).toEqual(["/", "/curriculo", "/portfolio", "/sobre", "/blog"]);
+    expect(settings.navigation[3].label).toEqual({ "pt-BR": "Sobre Mim", en: V1_TEXTS["navigation.about"]!.en });
   });
 });
 
@@ -219,7 +244,8 @@ describe("páginas pela receita, preenchidas com a v1", () => {
     expect(home.seo).toEqual({ title: { "pt-BR": "Bruna Lima · Designer de produto", en: "Bruna Lima · Designer de produto" } });
     const hero = block(home, "hero").fields;
     expect(hero.title).toEqual({ "pt-BR": "Desenho produtos que as pessoas entendem.", en: "I design products people understand." });
-    expect(hero.eyebrow).toEqual({ "pt-BR": "Designer de produto", en: "Product designer" });
+    // O selo é o home.greeting da v1; o cargo fica na pessoa.
+    expect(hero.eyebrow).toEqual({ "pt-BR": "whoami", en: "whoami" });
     expect(hero.subtitle).toEqual({ "pt-BR": V1_TEXTS["home.hero.description"]!.pt, en: V1_TEXTS["home.hero.description"]!.en });
     expect(hero.tags).toEqual([{ label: { "pt-BR": "Figma" } }, { label: { "pt-BR": "Pesquisa" } }]);
     expect(hero.showAvailability).toBe(true);

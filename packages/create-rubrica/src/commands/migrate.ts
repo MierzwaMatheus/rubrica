@@ -28,7 +28,7 @@ import { loadInstalledCore, loadThemeRecipe } from "../project/introspect.js";
 import { convertV1, type ConvertResult, type V1RubricaJson } from "../migrate/convert.js";
 import { readV1ProjectTexts, SAVED_TEXTS_FILE, type ReadTexts } from "../migrate/v1-translations.js";
 import { listCustomizations, type Customization } from "../migrate/customizations.js";
-import { importZip, pendingZip, readSnapshot } from "../migrate/snapshot.js";
+import { importZip, pendingZip, readSnapshot, storageDocs } from "../migrate/snapshot.js";
 import { toFixtures } from "../migrate/fixtures.js";
 import { renderReport, type ReportInput } from "../migrate/report.js";
 import { MAIN_PAGES, comparePage, fetchPage, formatComparison, readDistPage } from "../migrate/compare.js";
@@ -122,7 +122,7 @@ interface DataOutputs {
 /** Converte o export e grava import, pendentes, fixtures (na pasta `outDir`). */
 export function convertExport(exportPath: string, v1: V1RubricaJson, theme: string, recipe: Recipe, outDir: string, storageUrl?: (id: string) => string, texts?: ReadTexts): DataOutputs {
   const snapshot = readSnapshot(exportPath);
-  const result = convertV1({ tables: snapshot.tables, v1, theme, recipe, ...(texts?.texts && { projectTexts: texts.texts }) });
+  const result = convertV1({ tables: snapshot.tables, storage: storageDocs(snapshot), v1, theme, recipe, ...(texts?.texts && { projectTexts: texts.texts }) });
   result.report.warnings.push(...(texts?.warnings ?? []));
   mkdirSync(outDir, { recursive: true });
   const files: Record<string, string> = {};
@@ -200,7 +200,7 @@ async function runReport(projectDir: string, values: Record<string, string>, dep
   if (values.export) {
     const snapshot = readSnapshot(resolve(deps.cwd, values.export));
     const texts = readV1ProjectTexts(projectDir, resolve(projectDir, WORK_DIR));
-    data = convertV1({ tables: snapshot.tables, v1, theme: theme.tema, recipe: CORE_RECIPES.pessoal, ...(texts.texts && { projectTexts: texts.texts }) }).report;
+    data = convertV1({ tables: snapshot.tables, storage: storageDocs(snapshot), v1, theme: theme.tema, recipe: CORE_RECIPES.pessoal, ...(texts.texts && { projectTexts: texts.texts }) }).report;
     data.warnings.push(...texts.warnings);
   }
   const report = renderReport({

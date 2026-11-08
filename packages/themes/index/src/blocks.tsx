@@ -234,7 +234,8 @@ export function CasesBlock({ id, variant, fields, items, headingLevel, ctx }: Pr
     { key: "num", header: ctx.t("index.sheet"), width: "64px", num: true, cell: (_p, i) => catalogNumber(i + 1) },
     { key: "title", header: ctx.t("index.colProject"), title: true, width: "28%", cell: (p) => p.title },
     { key: "client", header: ctx.t("index.colClient"), muted: true, cell: (p) => [p.client, p.year].filter(Boolean).join(", ") || DASH },
-    { key: "field", header: ctx.t("index.colField"), muted: true, cell: (p) => p.tags.slice(0, 2).join(", ") || DASH },
+    // Área: a categoria do projeto; sem ela, as duas primeiras etiquetas (como antes).
+    { key: "field", header: ctx.t("index.colField"), muted: true, cell: (p) => p.category || p.tags.slice(0, 2).join(", ") || DASH },
     { key: "summary", header: ctx.t("index.colSummary"), width: "26%", cell: (p) => <span className="ix-clamp">{p.summary || DASH}</span> },
   ];
   const table = (rows: ProjectItem[]) => (
@@ -268,7 +269,7 @@ export function CasesBlock({ id, variant, fields, items, headingLevel, ctx }: Pr
       <section id={fields.anchor || `b-${id}`} className="rb-section rb-cases ix-stack" data-block="cases" data-variant={variant}>
         <IndexRow label={fields.title || ctx.t("index.featured")} level={headingLevel} aside={fields.intro}>
           <Ficha
-            meta={[ctx.t("index.featured"), `${ctx.t("index.sheet")} ${catalogNumber(1)}`, first.client].filter(Boolean).join(" · ")}
+            meta={[ctx.t("index.featured"), `${ctx.t("index.sheet")} ${catalogNumber(1)}`, first.category, first.client].filter(Boolean).join(" · ")}
             title={first.title}
             href={first.url}
             text={first.summary}
@@ -302,7 +303,7 @@ export function CasesBlock({ id, variant, fields, items, headingLevel, ctx }: Pr
                     </a>
                   </Heading>
                   {p.summary && <span className="ix-fig-d">{p.summary}</span>}
-                  {p.tags.length > 0 && <small>{p.tags.join(", ")}</small>}
+                  {(p.category || p.tags.length > 0) && <small>{[p.category, ...p.tags].filter(Boolean).join(", ")}</small>}
                 </figcaption>
               </figure>
             </li>

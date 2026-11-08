@@ -3,8 +3,14 @@
  * Tokens que todo tema define (em :root e para [data-color-mode="light"]):
  *   --rb-bg --rb-fg --rb-muted --rb-surface --rb-border --rb-accent --rb-accent-fg
  *   --rb-font-sans --rb-font-mono --rb-font-display --rb-radius --rb-container
+ * Tokens opcionais (os blocos padrão usam; valores padrão abaixo valem até o tema sobrescrever):
+ *   --rb-danger   texto de erro (contraste AA sobre --rb-bg e --rb-surface)
+ *   --rb-success  texto de confirmação (idem)
+ * Os blocos padrão (blocks.css) usam SÓ tokens --rb-*; sem cor fixa.
  * Valores padrão abaixo valem até o tema sobrescrever.
  */
+@import "./blocks.css";
+
 :root {
   --rb-bg: #0f1115;
   --rb-fg: #eef0f3;
@@ -13,6 +19,8 @@
   --rb-border: #2a2f3a;
   --rb-accent: #7cc4ff;
   --rb-accent-fg: #0b1220;
+  --rb-danger: #ff9a9a;
+  --rb-success: #7ee2a8;
   --rb-font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --rb-font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
   --rb-font-display: var(--rb-font-sans);
@@ -28,6 +36,8 @@
   --rb-border: #d9dde3;
   --rb-accent: #0b5cad;
   --rb-accent-fg: #ffffff;
+  --rb-danger: #b42318;
+  --rb-success: #0a6b3a;
   color-scheme: light;
 }
 @media (prefers-color-scheme: light) {
@@ -39,6 +49,8 @@
     --rb-border: #d9dde3;
     --rb-accent: #0b5cad;
     --rb-accent-fg: #ffffff;
+    --rb-danger: #b42318;
+    --rb-success: #0a6b3a;
     color-scheme: light;
   }
 }

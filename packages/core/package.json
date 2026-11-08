@@ -30,6 +30,8 @@
     "./convex/schema": "./src/convex/schema.ts",
     "./convex/roles": "./src/convex/lib/roles.ts",
     "./convex/validators": "./src/convex/validators.ts",
+    "./convex/commerce/validators": "./src/convex/commerce/validators.ts",
+    "./convex/commerce/discount": "./src/convex/commerce/lib/proposalDiscount.ts",
     "./seed": "./src/convex/lib/seed.ts"
   },
   "files": [

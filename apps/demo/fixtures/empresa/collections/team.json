@@ -17,7 +17,11 @@
       "url": "/img/team-1.svg",
       "width": 400,
       "height": 400,
-      "alt": "Paula Mendes"
+      "alt": {
+        "pt-BR": "Paula Mendes",
+        "en": "Paula Mendes",
+        "es": "Paula Mendes"
+      }
     },
     "links": [
       {
@@ -45,7 +49,11 @@
       "url": "/img/team-2.svg",
       "width": 400,
       "height": 400,
-      "alt": "Rafael Costa"
+      "alt": {
+        "pt-BR": "Rafael Costa",
+        "en": "Rafael Costa",
+        "es": "Rafael Costa"
+      }
     }
   },
   {
@@ -60,8 +68,7 @@
     "photo": {
       "url": "/img/team-3.svg",
       "width": 400,
-      "height": 400,
-      "alt": ""
+      "height": 400
     }
   }
 ]

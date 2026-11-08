@@ -11,7 +11,11 @@
       "url": "/img/cover-1.svg",
       "width": 800,
       "height": 500,
-      "alt": "Notebook com um site aberto"
+      "alt": {
+        "pt-BR": "Notebook com um site aberto",
+        "en": "Notebook com um site aberto",
+        "es": "Notebook com um site aberto"
+      }
     },
     "title": {
       "pt-BR": "Cinco sinais de um site que vende",

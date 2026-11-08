@@ -14,7 +14,10 @@
       "url": "/img/cover-1.svg",
       "width": 800,
       "height": 500,
-      "alt": "Telas do app de banco"
+      "alt": {
+        "pt-BR": "Telas do app de banco",
+        "en": "Telas do app de banco"
+      }
     },
     "title": {
       "pt-BR": "App de banco digital",
@@ -61,7 +64,10 @@
           "url": "/img/cover-2.svg",
           "width": 800,
           "height": 500,
-          "alt": "Gráfico de conclusão"
+          "alt": {
+            "pt-BR": "Gráfico de conclusão",
+            "en": "Gráfico de conclusão"
+          }
         }
       }
     ]
@@ -81,7 +87,10 @@
       "url": "/img/cover-2.svg",
       "width": 800,
       "height": 500,
-      "alt": "Painel de saúde"
+      "alt": {
+        "pt-BR": "Painel de saúde",
+        "en": "Painel de saúde"
+      }
     },
     "title": {
       "pt-BR": "Painel de saúde",
@@ -109,7 +118,10 @@
       "url": "/img/cover-3.svg",
       "width": 800,
       "height": 500,
-      "alt": "Biblioteca de componentes"
+      "alt": {
+        "pt-BR": "Biblioteca de componentes",
+        "en": "Biblioteca de componentes"
+      }
     },
     "title": {
       "pt-BR": "Sistema de design",

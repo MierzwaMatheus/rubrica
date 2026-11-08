@@ -23,7 +23,10 @@
       "url": "/img/cover-3.svg",
       "width": 800,
       "height": 500,
-      "alt": "Post-its numa parede"
+      "alt": {
+        "pt-BR": "Post-its numa parede",
+        "en": "Post-its numa parede"
+      }
     }
   },
   {

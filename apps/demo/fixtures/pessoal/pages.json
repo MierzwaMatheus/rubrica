@@ -60,7 +60,10 @@
             "url": "/img/hero.svg",
             "width": 800,
             "height": 600,
-            "alt": "Ilustração abstrata"
+            "alt": {
+              "pt-BR": "Ilustração abstrata",
+              "en": "Ilustração abstrata"
+            }
           }
         }
       },

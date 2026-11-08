@@ -14,7 +14,11 @@
       "url": "/img/cover-1.svg",
       "width": 800,
       "height": 500,
-      "alt": "Loja virtual de farmácia"
+      "alt": {
+        "pt-BR": "Loja virtual de farmácia",
+        "en": "Loja virtual de farmácia",
+        "es": "Loja virtual de farmácia"
+      }
     },
     "title": {
       "pt-BR": "Loja virtual para rede de farmácias",
@@ -55,7 +59,11 @@
       "url": "/img/cover-2.svg",
       "width": 800,
       "height": 500,
-      "alt": "Site de escola"
+      "alt": {
+        "pt-BR": "Site de escola",
+        "en": "Site de escola",
+        "es": "Site de escola"
+      }
     },
     "title": {
       "pt-BR": "Site de uma escola de idiomas",
@@ -81,7 +89,11 @@
       "url": "/img/cover-3.svg",
       "width": 800,
       "height": 500,
-      "alt": "Painel industrial"
+      "alt": {
+        "pt-BR": "Painel industrial",
+        "en": "Painel industrial",
+        "es": "Painel industrial"
+      }
     },
     "title": {
       "pt-BR": "Painel de produção",

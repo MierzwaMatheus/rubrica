@@ -86,7 +86,10 @@
       "url": "/img/avatar-1.svg",
       "width": 200,
       "height": 200,
-      "alt": "Retrato de Ana"
+      "alt": {
+        "pt-BR": "Retrato de Ana",
+        "en": "Retrato de Ana"
+      }
     }
   },
   "plugins": {}

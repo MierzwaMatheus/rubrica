@@ -9,7 +9,10 @@
       "url": "/img/avatar-2.svg",
       "width": 200,
       "height": 200,
-      "alt": "Carlos"
+      "alt": {
+        "pt-BR": "Carlos",
+        "en": "Carlos"
+      }
     },
     "role": {
       "pt-BR": "Gerente de produto",

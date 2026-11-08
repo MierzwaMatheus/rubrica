@@ -76,7 +76,11 @@
                 "url": "/img/logo-1.svg",
                 "width": 160,
                 "height": 48,
-                "alt": "Cliente 1"
+                "alt": {
+                  "pt-BR": "Cliente 1",
+                  "en": "Cliente 1",
+                  "es": "Cliente 1"
+                }
               },
               "href": "https://exemplo.dev/1"
             },
@@ -86,7 +90,11 @@
                 "url": "/img/logo-2.svg",
                 "width": 160,
                 "height": 48,
-                "alt": "Cliente 2"
+                "alt": {
+                  "pt-BR": "Cliente 2",
+                  "en": "Cliente 2",
+                  "es": "Cliente 2"
+                }
               }
             },
             {
@@ -95,7 +103,11 @@
                 "url": "/img/logo-3.svg",
                 "width": 160,
                 "height": 48,
-                "alt": "Cliente 3"
+                "alt": {
+                  "pt-BR": "Cliente 3",
+                  "en": "Cliente 3",
+                  "es": "Cliente 3"
+                }
               },
               "href": "/cases"
             },
@@ -104,8 +116,7 @@
               "image": {
                 "url": "/img/logo-4.svg",
                 "width": 160,
-                "height": 48,
-                "alt": ""
+                "height": 48
               }
             }
           ]

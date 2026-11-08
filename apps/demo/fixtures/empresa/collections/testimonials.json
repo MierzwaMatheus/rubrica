@@ -14,7 +14,11 @@
       "url": "/img/avatar-1.svg",
       "width": 200,
       "height": 200,
-      "alt": "Helena"
+      "alt": {
+        "pt-BR": "Helena",
+        "en": "Helena",
+        "es": "Helena"
+      }
     },
     "quote": {
       "pt-BR": "O Meridiano entendeu nosso negócio em uma semana.",

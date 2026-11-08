@@ -14,7 +14,10 @@
       "url": "/img/routine-1.svg",
       "width": 800,
       "height": 600,
-      "alt": "Mesa com caderno e café"
+      "alt": {
+        "pt-BR": "Mesa com caderno e café",
+        "en": "Mesa com caderno e café"
+      }
     },
     "tags": [
       "manhã"
@@ -34,7 +37,10 @@
       "url": "/img/routine-2.svg",
       "width": 800,
       "height": 600,
-      "alt": "Parede de pós-its"
+      "alt": {
+        "pt-BR": "Parede de pós-its",
+        "en": "Parede de pós-its"
+      }
     }
   },
   {
@@ -48,7 +54,10 @@
       "url": "/img/routine-3.svg",
       "width": 800,
       "height": 600,
-      "alt": "Parque ao fim do dia"
+      "alt": {
+        "pt-BR": "Parque ao fim do dia",
+        "en": "Parque ao fim do dia"
+      }
     },
     "tags": [
       "fim de tarde"

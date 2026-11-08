@@ -58,3 +58,94 @@ Na criação de um site **pessoal**, dá para escolher um pacote em vez de marca
 | `simple` | Só o portfólio: contato, projetos, currículo e dia a dia |
 
 No site de **empresa**, o padrão é o `recommended`. Os pacotes são só um ponto de partida: depois, tudo se liga e desliga pelo painel.
+
+## Criar um plugin
+
+**Na 2.0 não existe API pública para plugin de terceiros.** Os plugins continuam no núcleo, com um contrato único, e plugins em pacote ficam para depois, sobre o mesmo contrato (decisão 19 do [RFC](../rfc/v2.md)). O `definePlugin` que aparece no código é o contrato **interno**: serve a quem contribui no monorepo, e o site e o painel de um projeto só leem os plugins do núcleo. O passo a passo para criar um plugin do núcleo está em [Contribuindo](../v2/contribuindo.md#adicionar-um-plugin-do-núcleo).
+
+O que um projeto pode fazer hoje, do menor para o maior esforço:
+
+- **Ligar e combinar os plugins que existem**, pelo painel ou pelo `config`.
+- **Bloco próprio**, para uma seção nova no site, com campos no painel: [Criar um bloco](./criar-bloco.md). Um bloco próprio pode depender de um plugin do núcleo (`plugin: "blog"`) e listar uma coleção dele.
+- **Componente ejetado**, para mudar a marcação de um bloco que já existe: [Ejetar um componente](./criar-tema.md#ejetar-um-componente).
+- **Funções e tabelas próprias no Convex**, para guardar e ler dados que o Rubrica não modela (abaixo).
+
+### Funções e tabelas próprias no Convex
+
+O `convex/` do projeto mistura dois tipos de arquivo. Os que começam com `// Gerado pelo Rubrica` (o `convex/rubrica/*`, o `auth.ts`, o `http.ts` e o `crons.ts`) são do CLI: o `update` reescreve e apaga. O `schema.ts`, o `auth.config.ts` e o `rubrica.config.ts` o CLI cria uma vez e não mexe mais. **Qualquer outro arquivo em `convex/` é seu**, e o Convex publica as funções dele junto com as do núcleo.
+
+Para uma tabela nova, acrescente-a no `convex/schema.ts`, depois das do núcleo:
+
+<!-- exemplo: projeto/convex/schema.ts -->
+```ts
+import { defineSchema, defineTable } from "convex/server";
+import { v } from "convex/values";
+import { authTables } from "@convex-dev/auth/server";
+import { rubricaTables } from "@rubrica/core/convex/schema";
+
+// Tabelas do login, do núcleo do Rubrica e (depois delas) as do próprio projeto.
+export default defineSchema({
+  ...authTables,
+  ...rubricaTables,
+  inscricoes: defineTable({
+    email: v.string(),
+    origem: v.optional(v.string()),
+    criadaEm: v.number(),
+  }).index("by_email", ["email"]),
+});
+```
+
+E as funções num arquivo seu, fora de `convex/rubrica/` (que é do CLI):
+
+<!-- exemplo: projeto/convex/inscricoes.ts -->
+```ts
+import { getAuthUserId } from "@convex-dev/auth/server";
+import { v } from "convex/values";
+import { can } from "@rubrica/core/convex/roles";
+import { internalMutation, query, type QueryCtx } from "./_generated/server";
+
+/** Grava uma inscrição. Interna: roda por `npx convex run`, pelo painel do Convex ou por outra função. */
+export const adicionar = internalMutation({
+  args: { email: v.string(), origem: v.optional(v.string()) },
+  handler: async (ctx, { email, origem }) => {
+    const normalizado = email.trim().toLowerCase();
+    const existe = await ctx.db
+      .query("inscricoes")
+      .withIndex("by_email", (q) => q.eq("email", normalizado))
+      .unique();
+    if (existe) return existe._id;
+    return ctx.db.insert("inscricoes", { email: normalizado, origem, criadaEm: Date.now() });
+  },
+});
+
+/** Exige login com um papel do painel que veja contatos (root, admin ou comercial). */
+async function exigirPapel(ctx: QueryCtx) {
+  const userId = await getAuthUserId(ctx);
+  if (!userId) throw new Error("Faça login");
+  const papel = await ctx.db
+    .query("userRoles")
+    .withIndex("by_userId", (q) => q.eq("userId", userId))
+    .unique();
+  if (!papel || papel.suspendedAt || papel.mustChangePassword || !can(papel.role, "contacts")) {
+    throw new Error("Sem permissão para esta ação");
+  }
+}
+
+/** Lista as inscrições, para quem tem o papel certo. */
+export const listar = query({
+  args: {},
+  handler: async (ctx) => {
+    await exigirPapel(ctx);
+    return ctx.db.query("inscricoes").order("desc").take(500);
+  },
+});
+```
+
+Publique no Convex do computador com `npx convex dev --once` (ou deixe o `pnpm dev:convex` rodando) e teste com `npx convex run inscricoes:adicionar '{"email":"ana@exemplo.com"}'`. A produção recebe as funções no próximo `publicar`.
+
+Os limites, hoje:
+
+- O painel e o MCP não mostram tabelas nem funções próprias: os dados ficam no painel do Convex e no que você construir.
+- O `http.ts` e o `crons.ts` são gerados, então ainda não há lugar para rotas HTTP nem tarefas agendadas próprias.
+- A exportação e a exclusão de dados pessoais da tela **Privacidade** só enxergam as tabelas do núcleo. Se a tabela guarda dado pessoal, a responsabilidade de exportar e apagar é sua.
+- Funções públicas (`query`, `mutation`) ficam abertas para qualquer cliente do Convex: confira o login e o papel, como acima, ou use as internas.

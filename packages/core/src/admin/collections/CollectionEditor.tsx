@@ -120,7 +120,7 @@ function Editor({ config, doc }: { config: CollectionConfig; doc?: CollectionDoc
         const id = await create({ ...planCreate(next, config.docKeys), ...(slug ? { slug } : {}), published: config.defaultPublished });
         setErrors({ fields: [] });
         setBase(draft);
-        toast.success(`${cap(config.singular)} criado${config.feminine ? "a" : ""}.`);
+        toast.success(`${cap(config.singular)} criad${config.feminine ? "a" : "o"}.`);
         navigate(`${config.base}?id=${id}`, { replace: true, force: true });
         return true;
       }

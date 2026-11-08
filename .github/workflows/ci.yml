@@ -3,9 +3,9 @@ name: CI
 # Rubrica v2 (monorepo pnpm). A v1 vive na branch `v1`, com o próprio CI.
 on:
   pull_request:
-    branches: [v2]
+    branches: [main]
   push:
-    branches: [v2]
+    branches: [main]
 
 concurrency:
   group: ci-${{ github.ref }}

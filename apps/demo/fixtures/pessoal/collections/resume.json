@@ -52,6 +52,10 @@
     "kind": "skill",
     "title": {
       "pt-BR": "Figma"
+    },
+    "group": {
+      "pt-BR": "Ferramentas",
+      "en": "Tools"
     }
   },
   {
@@ -61,6 +65,10 @@
     "title": {
       "pt-BR": "Pesquisa qualitativa",
       "en": "Qualitative research"
+    },
+    "group": {
+      "pt-BR": "Pesquisa",
+      "en": "Research"
     }
   },
   {
@@ -70,6 +78,10 @@
     "title": {
       "pt-BR": "Prototipação",
       "en": "Prototyping"
+    },
+    "group": {
+      "pt-BR": "Ferramentas",
+      "en": "Tools"
     }
   },
   {

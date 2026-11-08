@@ -1,13 +1,14 @@
 /**
- * Fotografa o topo da home de cada layout a partir dos builds de preview
- * (site/public/previews), com a aparência recomendada do layout, e grava as miniaturas da
- * galeria em site/public/img/layouts/<layout>.jpg.
+ * Fotografa o topo da home de cada tema a partir dos builds de preview
+ * (public/previews, gerados por build-previews.ts), com a aparência que o pacote do tema
+ * declara, e grava as miniaturas da galeria em public/img/layouts/<tema>.jpg.
  *
- * Rode depois do build dos previews, com o site servido em algum endereço:
- *   node site/scripts/shot-thumbnails.mjs --base http://127.0.0.1:4800
+ * Rode depois de `pnpm previews`, com o site servido em algum endereço:
+ *   pnpm build && pnpm preview --port 4800 &
+ *   node scripts/shot-thumbnails.mjs --base http://127.0.0.1:4800
  *
  * Usa playwright-core (de node_modules ou de /tmp/rubrica-tools) e o Chromium do cache do
- * Playwright, como scripts/shot-layout.mjs.
+ * Playwright.
  */
 import { readFileSync, readdirSync, existsSync, mkdirSync } from "node:fs";
 import { homedir } from "node:os";
@@ -20,12 +21,14 @@ const args = process.argv.slice(2);
 const base = args[args.indexOf("--base") + 1] ?? "http://127.0.0.1:4800";
 
 function loadPlaywright() {
-  for (const dir of [SITE, join(SITE, ".."), "/tmp/rubrica-tools"]) {
-    try {
-      return createRequire(join(dir, "package.json"))("playwright-core");
-    } catch {}
+  for (const dir of [SITE, join(SITE, "..", "..", "packages", "theme-tester"), "/tmp/rubrica-tools"]) {
+    for (const name of ["playwright-core", "playwright"]) {
+      try {
+        return createRequire(join(dir, "package.json"))(name);
+      } catch {}
+    }
   }
-  throw new Error("playwright-core não encontrado (npm i playwright-core em /tmp/rubrica-tools)");
+  throw new Error("playwright não encontrado (pnpm install na raiz do monorepo)");
 }
 function chromePath() {
   if (process.env.CHROME_PATH) return process.env.CHROME_PATH;
@@ -34,11 +37,12 @@ function chromePath() {
   return join(cache, dirs.at(-1), "chrome-headless-shell-linux64", "chrome-headless-shell");
 }
 
-// Recomendações de cada layout, lidas do registro do CLI sem precisar de TypeScript.
-const registry = readFileSync(join(SITE, "..", "cli", "src", "layouts.ts"), "utf-8");
-const layouts = [...registry.matchAll(/id: "([a-z]+)",[\s\S]*?fonts: \{ sans: \["([^"]+)"[\s\S]*?mono: "([^"]*)" \},\s*recommended: \{ scheme: "([^"]+)", mode: "([^"]+)", texture: "([^"]+)" \}/g)].map(
-  ([, id, sans, mono, scheme, mode, texture]) => ({ id, sans, mono, scheme, mode, texture })
+// Aparência de cada tema, lida de THEME_PACKAGE_DEFAULTS (packages/create-rubrica/src/themes.ts).
+const registry = readFileSync(join(SITE, "..", "..", "packages", "create-rubrica", "src", "themes.ts"), "utf-8");
+const layouts = [...registry.matchAll(/^  ([a-z]+): \{ scheme: "([^"]+)", mode: "([^"]+)", fontSans: "([^"]+)"(?:, fontMono: "([^"]+)")? \},$/gm)].map(
+  ([, id, scheme, mode, sans, mono]) => ({ id, scheme, mode, sans, mono: mono ?? "IBM Plex Mono" })
 );
+if (layouts.length !== 14) throw new Error(`esperava 14 temas em themes.ts, achei ${layouts.length}`);
 
 const { chromium } = loadPlaywright();
 const out = join(SITE, "public", "img", "layouts");
@@ -46,8 +50,8 @@ mkdirSync(out, { recursive: true });
 const browser = await chromium.launch({ executablePath: chromePath() });
 const page = await browser.newPage({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1 });
 for (const l of layouts) {
-  const q = new URLSearchParams({ page: "/", mode: l.mode === "dark" ? "dark" : "light", toggle: "1", scheme: l.scheme, sans: l.sans, mono: l.mono || "IBM Plex Mono", texture: l.texture });
-  await page.goto(`${base}/previews/${l.id}/index.html?${q}`, { waitUntil: "networkidle" });
+  const q = new URLSearchParams({ mode: l.mode === "dark" ? "dark" : "light", scheme: l.scheme, sans: l.sans, mono: l.mono });
+  await page.goto(`${base}/previews/${l.id}/?${q}`, { waitUntil: "networkidle" });
   await page.evaluate(() => document.fonts.ready);
   await page.waitForTimeout(800);
   await page.screenshot({ path: join(out, `${l.id}.jpg`), type: "jpeg", quality: 78 });

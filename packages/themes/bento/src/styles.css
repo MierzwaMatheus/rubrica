@@ -103,7 +103,7 @@ code, pre { font-family: var(--rb-font-mono); }
 /* cartões na cor primária (o primeiro da fila, como na v1) */
 [data-accent], .bento-contact--accent { color: var(--rb-accent-fg); }
 [data-accent].rb-card, [data-accent].bento-card { background: var(--rb-accent); border-color: transparent; }
-[data-accent] .rb-card__title, [data-accent] .rb-card__text, [data-accent] .rb-card__meta, [data-accent] .rb-card__link, [data-accent] .rb-card__more { color: inherit; }
+[data-accent] .bento-case__meta, [data-accent] .rb-card__title, [data-accent] .rb-card__text, [data-accent] .rb-card__meta, [data-accent] .rb-card__link, [data-accent] .rb-card__more { color: inherit; }
 [data-accent] .rb-card__more::before, [data-accent] .rb-card__more::after { color: inherit; }
 .rb-tags li { border-radius: 999px; padding: 0.2rem 0.65rem; font-size: 0.75rem; background: var(--bento-chip); border-color: transparent; color: var(--rb-fg); }
 .rb-tags--large li { font-size: 0.8125rem; padding: 0.35rem 0.85rem; }

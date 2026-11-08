@@ -198,6 +198,16 @@ const empresa: Recipe = [
           body: tr("<p>A história da empresa, em poucos parágrafos: como começou e o que a move.</p>", "<p>The company story in a few paragraphs: how it started and what drives it.</p>", "<p>La historia de la empresa en pocos párrafos: cómo empezó y qué la mueve.</p>"),
         },
       },
+      {
+        type: "linha-do-tempo",
+        fields: {
+          title: tr("Nossa história", "Our story", "Nuestra historia"),
+          items: [
+            { date: tr("Ano 1", "Year 1", "Año 1"), title: tr("Como começou", "How it started", "Cómo empezó"), body: tr("O primeiro cliente e o que a empresa resolvia.", "The first client and the problem the company solved.", "El primer cliente y el problema que resolvía la empresa.") },
+            { date: tr("Hoje", "Today", "Hoy"), title: tr("Onde estamos", "Where we are", "Dónde estamos"), body: tr("O que a empresa faz agora e para quem.", "What the company does now and for whom.", "Lo que hace la empresa ahora y para quién.") },
+          ],
+        },
+      },
       { type: "numeros", fields: { title: tr("Em números", "By the numbers", "En números"), items: [{ value: "12", label: tr("anos de mercado", "years in business", "años en el mercado") }] } },
       {
         type: "lista-itens",
@@ -231,6 +241,16 @@ const empresa: Recipe = [
           title: tr("Planos e preços", "Plans and pricing", "Planes y precios"),
           intro: tr("Escolha o plano que cabe no seu momento.", "Pick the plan that fits where you are.", "Elige el plan que se ajusta a tu momento."),
           note: tr("Valores sem impostos.", "Prices exclude taxes.", "Valores sin impuestos."),
+        },
+      },
+      {
+        type: "comparativo-planos",
+        fields: {
+          title: tr("Compare os planos", "Compare the plans", "Compara los planes"),
+          rows: [
+            { label: tr("Suporte por e-mail", "Email support", "Soporte por correo") },
+            { label: tr("Atendimento prioritário", "Priority support", "Atención prioritaria") },
+          ],
         },
       },
       { type: "faq", fields: { title: tr("Dúvidas sobre os planos", "Questions about the plans", "Dudas sobre los planes") } },

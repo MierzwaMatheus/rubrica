@@ -195,7 +195,7 @@ describe("receitas padrão", () => {
       const route = site.routes.find((r) => r.url === page.path && r.type === "page");
       if (route?.type !== "page") continue; // /blog não existe em es, mas existe em pt-BR
       // Blocos opcionais que a demo mostra além da receita.
-      const extras = new Set(["logos-clientes", "video", "incorporacao", "linha-do-tempo", "comparativo-planos"]);
+      const extras = new Set(["logos-clientes", "video", "incorporacao"]);
       const types = route.page.blocks.map((b) => b.type).filter((t) => !extras.has(t));
       expect(types, page.path).toEqual(page.blocks.map((b) => b.type));
     }

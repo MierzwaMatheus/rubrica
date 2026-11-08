@@ -37,6 +37,7 @@ import {
 } from "./collections";
 import { mediaFunctions } from "./media";
 import { pagesFunctions } from "./pages";
+import { panelFunctions } from "./panel";
 import { resolveRuntime, type RubricaConfig } from "./runtime";
 import { ref } from "./server";
 import { settingsFunctions, textsFunctions } from "./settings";
@@ -68,6 +69,7 @@ export function createRubrica(config: RubricaConfig = {}) {
     routine: once(() => routineFunctions(rt)),
     plans: once(() => plansFunctions(rt)),
     team: once(() => teamFunctions(rt)),
+    panel: once(() => panelFunctions(rt)),
   };
 
   return {
@@ -137,6 +139,10 @@ export function createRubrica(config: RubricaConfig = {}) {
     get team() {
       return modules.team();
     },
+    /** Só do painel: validar página sem gravar, uso e substituição de imagens. */
+    get panel() {
+      return modules.panel();
+    },
   };
 }
 
@@ -160,6 +166,7 @@ export const RUBRICA_MODULES = [
   "routine",
   "plans",
   "team",
+  "panel",
 ] as const satisfies readonly (keyof Rubrica)[];
 
 export type { RubricaConfig } from "./runtime";

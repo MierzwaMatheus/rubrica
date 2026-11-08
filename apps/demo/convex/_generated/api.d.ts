@@ -16,6 +16,7 @@ import type * as rubrica_audit from "../rubrica/audit.js";
 import type * as rubrica_faq from "../rubrica/faq.js";
 import type * as rubrica_media from "../rubrica/media.js";
 import type * as rubrica_pages from "../rubrica/pages.js";
+import type * as rubrica_panel from "../rubrica/panel.js";
 import type * as rubrica_plans from "../rubrica/plans.js";
 import type * as rubrica_posts from "../rubrica/posts.js";
 import type * as rubrica_projects from "../rubrica/projects.js";
@@ -45,6 +46,7 @@ import type * as rubrica_users from "../rubrica/users.js";
 "rubrica/faq": typeof rubrica_faq,
 "rubrica/media": typeof rubrica_media,
 "rubrica/pages": typeof rubrica_pages,
+"rubrica/panel": typeof rubrica_panel,
 "rubrica/plans": typeof rubrica_plans,
 "rubrica/posts": typeof rubrica_posts,
 "rubrica/projects": typeof rubrica_projects,

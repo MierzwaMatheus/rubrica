@@ -9,7 +9,8 @@
   },
   "files": [
     "dist/index.js",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "keywords": [
     "portfolio",
@@ -20,7 +21,7 @@
     "rubrica"
   ],
   "author": "Matheus Mierzwa",
-  "license": "MIT",
+  "license": "GPL-3.0-only",
   "homepage": "https://github.com/MierzwaMatheus/rubrica",
   "repository": {
     "type": "git",

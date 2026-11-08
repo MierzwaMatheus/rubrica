@@ -3,7 +3,7 @@
   "version": "2.0.0-alpha.0",
   "description": "Bateria de testes de tema do Rubrica (axe, SEO, JavaScript por página, Lighthouse).",
   "type": "module",
-  "license": "MIT",
+  "license": "GPL-3.0-only",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MierzwaMatheus/rubrica.git",
@@ -18,7 +18,11 @@
   "exports": {
     ".": "./src/index.ts"
   },
-  "files": ["bin", "src"],
+  "files": [
+    "bin",
+    "src",
+    "LICENSE"
+  ],
   "engines": {
     "node": ">=22.23.4"
   },

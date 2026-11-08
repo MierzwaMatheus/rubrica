@@ -48,4 +48,4 @@ O `migrar` cria a branch `rubrica-v2`, troca o código, converte o export num ar
 
 ## Licença
 
-MIT
+GPL-3.0 (ver `LICENSE`)

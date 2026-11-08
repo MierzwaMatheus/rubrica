@@ -3,7 +3,7 @@
   "version": "2.0.0-alpha.0",
   "description": "Tema Swiss do Rubrica (layout \"swiss\" da v1): estilo tipográfico internacional, grade rígida de 12 colunas e tipografia forte.",
   "type": "module",
-  "license": "MIT",
+  "license": "GPL-3.0-only",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MierzwaMatheus/rubrica.git",
@@ -18,7 +18,8 @@
     "./fonts.json": "./src/fonts.json"
   },
   "files": [
-    "src"
+    "src",
+    "LICENSE"
   ],
   "rubrica": {
     "contract": "^1"

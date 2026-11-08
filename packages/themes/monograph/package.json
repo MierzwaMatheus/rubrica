@@ -3,7 +3,7 @@
   "version": "2.0.0-alpha.0",
   "description": "Tema monografia do Rubrica: o site como livro (cabeçalho corrido, tipografia de livro, notas na margem).",
   "type": "module",
-  "license": "MIT",
+  "license": "GPL-3.0-only",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MierzwaMatheus/rubrica.git",
@@ -17,8 +17,13 @@
     "./styles.css": "./src/styles.css",
     "./fonts.json": "./src/fonts.json"
   },
-  "files": ["src"],
-  "rubrica": { "contract": "^1" },
+  "files": [
+    "src",
+    "LICENSE"
+  ],
+  "rubrica": {
+    "contract": "^1"
+  },
   "scripts": {
     "check": "tsc --noEmit -p tsconfig.json"
   },

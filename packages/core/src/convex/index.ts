@@ -39,6 +39,7 @@ import { contactsFunctions } from "./contacts";
 import { addBusinessRoutes } from "./httpRoutes";
 import { mediaFunctions } from "./media";
 import { pagesFunctions } from "./pages";
+import { privacyFunctions } from "./privacy";
 import { resolveRuntime, type RubricaConfig } from "./runtime";
 import { ref } from "./server";
 import { settingsFunctions, textsFunctions } from "./settings";
@@ -73,6 +74,7 @@ export function createRubrica(config: RubricaConfig = {}) {
     team: once(() => teamFunctions(rt)),
     contacts: once(() => contactsFunctions(rt)),
     testimonialIntake: once(() => testimonialIntakeFunctions(rt)),
+    privacy: once(() => privacyFunctions(rt)),
   };
 
   return {
@@ -150,6 +152,9 @@ export function createRubrica(config: RubricaConfig = {}) {
     get testimonialIntake() {
       return modules.testimonialIntake();
     },
+    get privacy() {
+      return modules.privacy();
+    },
   };
 }
 
@@ -175,6 +180,7 @@ export const RUBRICA_MODULES = [
   "team",
   "contacts",
   "testimonialIntake",
+  "privacy",
 ] as const satisfies readonly (keyof Rubrica)[];
 
 export type { RubricaConfig } from "./runtime";
@@ -183,6 +189,7 @@ export { requireAuth, requireRole, getUserRole, MAX_FAILED_SIGN_INS_PER_HOUR } f
 export { logAudit, logUserAction, checkRateLimit, recordRateLimitAttempt, hitRateLimit, resetRateLimit, RATE_LIMITS } from "./audit";
 export { ROLES, PERMISSIONS, ROLE_LABELS, can, isRole, type Role, type Permission } from "./lib/roles";
 export { buildSnapshot } from "./site";
+export { CORE_PERSONAL_DATA_SOURCES, type PersonalDataSource } from "./personalData";
 export { MODULE_DIR } from "./server";
 export type { DataModel, Doc, Id, QueryCtx, MutationCtx, ActionCtx } from "./server";
 

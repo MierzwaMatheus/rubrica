@@ -48,6 +48,13 @@ import { siteFunctions } from "./site";
 import { testimonialIntakeFunctions } from "./testimonialIntake";
 import { translationFunctions } from "./translation";
 import { usersFunctions } from "./users";
+import { aiResumesFunctions } from "./commerce/aiResumes";
+import { asaasFunctions } from "./commerce/asaas";
+import { checkoutsFunctions } from "./commerce/checkouts";
+import { commerceFunctions } from "./commerce/commerce";
+import { contractTemplatesFunctions } from "./commerce/contractTemplates";
+import { addCommerceRoutes } from "./commerce/http";
+import { proposalsFunctions } from "./commerce/proposals";
 
 export function createRubrica(config: RubricaConfig = {}) {
   const rt = resolveRuntime(config);
@@ -79,6 +86,13 @@ export function createRubrica(config: RubricaConfig = {}) {
     privacy: once(() => privacyFunctions(rt)),
     publish: once(publishFunctions),
     translation: once(() => translationFunctions(rt)),
+    // Comercial (commerce/): propostas, contratos, pagamentos, currículos com IA.
+    commerce: once(() => commerceFunctions(rt)),
+    proposals: once(() => proposalsFunctions(rt)),
+    contractTemplates: once(() => contractTemplatesFunctions(rt)),
+    checkouts: once(() => checkoutsFunctions(rt)),
+    asaas: once(() => asaasFunctions(rt)),
+    aiResumes: once(() => aiResumesFunctions(rt)),
   };
 
   return {
@@ -93,6 +107,7 @@ export function createRubrica(config: RubricaConfig = {}) {
       const http = httpRouter();
       auth().auth.addHttpRoutes(http);
       addBusinessRoutes(http);
+      addCommerceRoutes(http);
       return http;
     },
     /** Para `convex/crons.ts`: `export default rubrica.crons;` */
@@ -100,6 +115,9 @@ export function createRubrica(config: RubricaConfig = {}) {
       const crons = cronJobs();
       crons.daily("rubrica: limpar registros e limites vencidos", { hourUTC: 6, minuteUTC: 0 }, ref("mutation", "audit", "cleanup"), {});
       crons.daily("rubrica: apagar contatos fora da retencao", { hourUTC: 6, minuteUTC: 10 }, ref("mutation", "contacts", "cleanup"), {});
+      crons.hourly("rubrica: vencer checkouts", { minuteUTC: 30 }, ref("mutation", "checkouts", "expireOldCheckouts"), {});
+      crons.daily("rubrica: limpar sessoes de proposta", { hourUTC: 3, minuteUTC: 0 }, ref("mutation", "proposals", "cleanupExpiredSessions"), {});
+      crons.daily("rubrica: limpar eventos de pagamento", { hourUTC: 3, minuteUTC: 15 }, ref("mutation", "checkouts", "cleanupPaymentEvents"), {});
       return crons;
     },
     get users() {
@@ -165,6 +183,24 @@ export function createRubrica(config: RubricaConfig = {}) {
     get translation() {
       return modules.translation();
     },
+    get commerce() {
+      return modules.commerce();
+    },
+    get proposals() {
+      return modules.proposals();
+    },
+    get contractTemplates() {
+      return modules.contractTemplates();
+    },
+    get checkouts() {
+      return modules.checkouts();
+    },
+    get asaas() {
+      return modules.asaas();
+    },
+    get aiResumes() {
+      return modules.aiResumes();
+    },
   };
 }
 
@@ -193,6 +229,12 @@ export const RUBRICA_MODULES = [
   "privacy",
   "publish",
   "translation",
+  "commerce",
+  "proposals",
+  "contractTemplates",
+  "checkouts",
+  "asaas",
+  "aiResumes",
 ] as const satisfies readonly (keyof Rubrica)[];
 
 export type { RubricaConfig } from "./runtime";
@@ -203,6 +245,15 @@ export { ROLES, PERMISSIONS, ROLE_LABELS, can, isRole, type Role, type Permissio
 export { buildSnapshot } from "./site";
 export { CORE_PERSONAL_DATA_SOURCES, type PersonalDataSource } from "./personalData";
 export { MODULE_DIR } from "./server";
+export { commerceTables } from "./commerce/schema";
+export {
+  proposalsPersonalData,
+  checkoutsPersonalData,
+  COMMERCE_PERSONAL_DATA,
+  exportCommercePersonalData,
+  eraseCommercePersonalData,
+  type CommercePersonalDataHandlers,
+} from "./commerce/personalData";
 export type { DataModel, Doc, Id, QueryCtx, MutationCtx, ActionCtx } from "./server";
 
 export type RubricaModule = (typeof RUBRICA_MODULES)[number];

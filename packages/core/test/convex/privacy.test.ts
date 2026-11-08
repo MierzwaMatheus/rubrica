@@ -41,7 +41,7 @@ describe("exportação e exclusão (LGPD)", () => {
 
     await expect(admin.mutation(api.rubrica.privacy.erase, { email: "maria@cliente.com", confirm: "outra@cliente.com" })).rejects.toThrow(/confirmação/);
     const result = await admin.mutation(api.rubrica.privacy.erase, { email: "maria@cliente.com", confirm: "MARIA@cliente.com" });
-    expect(result).toEqual({ total: 4, bySource: { contactRequests: 2, testimonialSubmissions: 2 } });
+    expect(result).toEqual({ total: 4, bySource: { contactRequests: 2, testimonialSubmissions: 2, proposals: 0, checkouts: 0 } });
     expect((await admin.query(api.rubrica.privacy.exportData, { email: "maria@cliente.com" })).total).toBe(0);
     expect(await admin.query(api.rubrica.testimonials.get, { id: testimonialId })).toBeNull();
     expect(await admin.query(api.rubrica.contacts.list, {})).toHaveLength(1);

@@ -33,6 +33,7 @@ import {
   vSeo,
 } from "./validators";
 import { businessTables } from "./businessTables";
+import { commerceTables } from "./commerce/schema";
 
 const collection = <F extends PropertyValidators>(fields: F) => ({ ...fields, ...lifecycleFields });
 
@@ -164,6 +165,8 @@ export const rubricaTables = {
 
   // ── Linha de empresa: contatos, depoimentos enviados, LGPD, publicação ──
   ...businessTables,
+  // ── Comercial (propostas, contratos, pagamentos, currículos com IA) ─────
+  ...commerceTables,
 };
 
 /** Tabelas de coleção, pelo nome usado no conteúdo (`CollectionName`). */

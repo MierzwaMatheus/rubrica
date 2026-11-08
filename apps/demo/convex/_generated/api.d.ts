@@ -12,8 +12,13 @@
   import type * as auth from "../auth.js";
 import type * as crons from "../crons.js";
 import type * as http from "../http.js";
+import type * as rubrica_aiResumes from "../rubrica/aiResumes.js";
+import type * as rubrica_asaas from "../rubrica/asaas.js";
 import type * as rubrica_audit from "../rubrica/audit.js";
+import type * as rubrica_checkouts from "../rubrica/checkouts.js";
+import type * as rubrica_commerce from "../rubrica/commerce.js";
 import type * as rubrica_contacts from "../rubrica/contacts.js";
+import type * as rubrica_contractTemplates from "../rubrica/contractTemplates.js";
 import type * as rubrica_faq from "../rubrica/faq.js";
 import type * as rubrica_media from "../rubrica/media.js";
 import type * as rubrica_pages from "../rubrica/pages.js";
@@ -21,6 +26,7 @@ import type * as rubrica_plans from "../rubrica/plans.js";
 import type * as rubrica_posts from "../rubrica/posts.js";
 import type * as rubrica_privacy from "../rubrica/privacy.js";
 import type * as rubrica_projects from "../rubrica/projects.js";
+import type * as rubrica_proposals from "../rubrica/proposals.js";
 import type * as rubrica_publish from "../rubrica/publish.js";
 import type * as rubrica_resume from "../rubrica/resume.js";
 import type * as rubrica_routine from "../rubrica/routine.js";
@@ -46,8 +52,13 @@ import type * as rubrica_users from "../rubrica/users.js";
     "auth": typeof auth,
 "crons": typeof crons,
 "http": typeof http,
+"rubrica/aiResumes": typeof rubrica_aiResumes,
+"rubrica/asaas": typeof rubrica_asaas,
 "rubrica/audit": typeof rubrica_audit,
+"rubrica/checkouts": typeof rubrica_checkouts,
+"rubrica/commerce": typeof rubrica_commerce,
 "rubrica/contacts": typeof rubrica_contacts,
+"rubrica/contractTemplates": typeof rubrica_contractTemplates,
 "rubrica/faq": typeof rubrica_faq,
 "rubrica/media": typeof rubrica_media,
 "rubrica/pages": typeof rubrica_pages,
@@ -55,6 +66,7 @@ import type * as rubrica_users from "../rubrica/users.js";
 "rubrica/posts": typeof rubrica_posts,
 "rubrica/privacy": typeof rubrica_privacy,
 "rubrica/projects": typeof rubrica_projects,
+"rubrica/proposals": typeof rubrica_proposals,
 "rubrica/publish": typeof rubrica_publish,
 "rubrica/resume": typeof rubrica_resume,
 "rubrica/routine": typeof rubrica_routine,

@@ -14,6 +14,7 @@
  * anonimizados em vez de apagados, e `erase` decide isso.
  */
 import { deleteDeliveries } from "./contacts";
+import { checkoutsPersonalData, proposalsPersonalData } from "./commerce/personalData";
 import type { PolicyEntry, Tri } from "./lib/privacyPolicy";
 import type { MutationCtx, ReaderCtx } from "./server";
 
@@ -115,9 +116,9 @@ export const testimonialSubmissionsSource: PersonalDataSource = {
 };
 
 /*
- * Fontes da parte comercial (propostas e pagamentos): por enquanto só o texto da
- * política. Quem criar as tabelas acrescenta `find` e `erase` aqui (ou substitui
- * estas entradas pelas do módulo, mantendo o `id`).
+ * Fontes da parte comercial (propostas e pagamentos): o texto da política fica
+ * aqui; `find` e `erase` vêm de `commerce/personalData.ts` (excluir = anonimizar
+ * o aceite e os dados do pagador).
  */
 export const proposalsPolicySource: PersonalDataSource = {
   id: "proposals",
@@ -170,8 +171,8 @@ export const paymentsPolicySource: PersonalDataSource = {
 export const CORE_PERSONAL_DATA_SOURCES: PersonalDataSource[] = [
   contactRequestsSource,
   testimonialSubmissionsSource,
-  proposalsPolicySource,
-  paymentsPolicySource,
+  { ...proposalsPolicySource, find: proposalsPersonalData.find, erase: proposalsPersonalData.erase },
+  { ...paymentsPolicySource, find: checkoutsPersonalData.find, erase: checkoutsPersonalData.erase },
 ];
 
 /** Fontes efetivas: as do projeto com o mesmo `id` substituem as do núcleo. */

@@ -8,7 +8,10 @@ import { readFileSync, rmSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { join } from "node:path";
 import { runMigrate } from "../../src/commands/migrate";
+import { strFromU8, unzipSync } from "fflate";
 import { comparePage, readDistPage } from "../../src/migrate/compare";
+import { parseJsonl, readSnapshot } from "../../src/migrate/snapshot";
+import { schemaErrors } from "../convex-validate";
 import { pristine, v1Project } from "../fixtures/v1-project";
 import { repo } from "../helpers";
 
@@ -54,6 +57,31 @@ describe.skipIf(process.env.RUBRICA_SKIP_E2E === "1")("migrar → install → bu
     }
     expect(readDistPage(join(dir, "dist"), "/sobre")).toContain("Fora do trabalho, pedalo.");
     expect(readDistPage(join(dir, "dist"), "/portfolio/app-de-agendamento")).toContain("Muitas faltas.");
+  });
+
+  it("o import da v2 leva os dados de negócio convertidos, válidos no schema, com os ids da v1", () => {
+    const work = join(dir, ".rubrica/migracao");
+    const files = unzipSync(readFileSync(join(work, "import-v2.zip")));
+    const table = (t: string) => parseJsonl(strFromU8(files[`${t}/documents.jsonl`]!));
+    const original = readSnapshot(exportZip);
+    for (const t of ["contactRequests", "testimonialSubmissions", "proposals", "proposalVersions", "proposalAcceptances", "contractTemplates", "checkouts", "aiResumes"]) {
+      expect(files[`${t}/documents.jsonl`], t).toBeDefined();
+      expect(schemaErrors(t, table(t)), t).toEqual([]);
+    }
+    expect(table("proposals").map((p) => p._id)).toEqual(original.tables.proposals!.map((p) => p._id));
+    expect(table("proposalAcceptances")[0]!.contentHash).toBe(original.tables.proposalAcceptances![0]!.contentHash);
+    expect(table("checkouts").find((c) => c.uniqueLink === "pago-123")?.status).toBe("paid");
+    expect(table("contactRequests")[0]!.consent).toMatchObject({ policyVersion: 0, ipHash: "v1:anterior-a-v2" });
+    expect(files["proposalSessions/documents.jsonl"]).toBeUndefined();
+    const tables = parseJsonl(strFromU8(files["_tables/documents.jsonl"]!));
+    expect(tables.find((t) => t.name === "aiResumes")?.id).toBe(original.tableNumbers.aiGeneratedResumes);
+    // Sem destino: o depoimento em vídeo e a versão ilegível, como estavam.
+    const pending = unzipSync(readFileSync(join(work, "pendentes-v1.zip")));
+    expect(Object.keys(pending).sort()).toEqual(["_tables/documents.jsonl", "proposalVersions/documents.jsonl", "testimonialSubmissions/documents.jsonl"]);
+    const report = readFileSync(join(work, "relatorio.md"), "utf-8");
+    expect(report).toContain("| aiResumes | aiGeneratedResumes | 1 |");
+    expect(report).toMatch(/Sem destino na v2[\s\S]*testimonialSubmissions[^\n]*vídeo/);
+    expect(report).toMatch(/webhooks\/asaas/);
   });
 
   it("a conferência compara uma página da v1 com a da v2", () => {

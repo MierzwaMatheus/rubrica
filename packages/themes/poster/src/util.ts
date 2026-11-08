@@ -1,47 +1,14 @@
-/** Auxiliares puros do tema (o núcleo não exporta os dele). */
+/** Auxiliares puros do tema (os genéricos vêm do núcleo). */
 import type { CSSProperties } from "react";
-import type { RenderContext } from "@rubrica/core";
+import { tagFilterCss as coreTagFilterCss } from "@rubrica/core/components";
 
-/** Só dígitos, para `wa.me` e `tel:`. */
-export const digits = (value: string) => value.replace(/\D+/g, "");
-
-/** Identificador seguro para `id` e seletores CSS. */
-export const safeId = (value: string) => value.replace(/[^a-zA-Z0-9_-]/g, "_");
+export { digits, formatDays, resolveFreeHref, safeId } from "@rubrica/core/components";
 
 /** Dois dígitos: 1 → "01". */
 export const pad2 = (n: number) => String(n).padStart(2, "0");
 
 /** Texto sem tags HTML, para medir um trecho. */
 export const plainText = (html: string) => html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
-
-/** Link do campo de texto livre (`href` de logos): interno ganha o prefixo do idioma. */
-export function resolveFreeHref(href: string | undefined, ctx: RenderContext): { href: string; external: boolean } | undefined {
-  if (!href) return undefined;
-  if (/^(https?:|\/\/)/i.test(href)) return { href, external: true };
-  if (/^(mailto:|tel:|#)/i.test(href)) return { href, external: false };
-  return { href: ctx.href(href), external: false };
-}
-
-const WEEKDAYS: Record<string, number> = { Mo: 1, Tu: 2, We: 3, Th: 4, Fr: 5, Sa: 6, Su: 0 };
-
-/** "Mo-Fr" (schema.org) → "seg. – sex." no idioma. Formato desconhecido volta como veio. */
-export function formatDays(days: string, locale: string): string {
-  const name = (code: string): string | undefined => {
-    const n = WEEKDAYS[code];
-    if (n === undefined) return undefined;
-    // 2024-01-07 foi um domingo.
-    return new Intl.DateTimeFormat(locale, { weekday: "short", timeZone: "UTC" }).format(new Date(Date.UTC(2024, 0, 7 + n)));
-  };
-  const parts = days.split(",").map((part) => {
-    const [a, b] = part.trim().split("-");
-    const first = a && name(a);
-    if (!first) return undefined;
-    if (!b) return first;
-    const last = name(b);
-    return last ? `${first} – ${last}` : undefined;
-  });
-  return parts.every(Boolean) ? parts.join(", ") : days;
-}
 
 // ---- tipografia gigante --------------------------------------------------------------
 
@@ -149,20 +116,14 @@ function decodeEntities(s: string): string {
 }
 
 /**
- * Regras CSS do filtro por etiqueta sem JavaScript: botões de opção antes da lista e uma
- * folha gerada esconde os itens sem a etiqueta marcada. `scope` e índices, nunca o texto.
+ * Regras CSS do filtro por etiqueta sem JavaScript (o do núcleo): botões de opção antes da
+ * lista e uma folha gerada esconde os itens sem a etiqueta marcada. `scope` e índices, nunca o texto.
  */
 export function tagFilterCss(scope: string, count: number): string {
-  const rules: string[] = [];
-  const on = "background:var(--rb-fg);color:var(--rb-bg);text-decoration:none";
-  const ring = "outline:3px solid var(--rb-fg);outline-offset:3px";
-  for (let i = 0; i < count; i++) {
-    const radio = `#${scope}-t${i}`;
-    rules.push(`${radio}:checked ~ .poster-rows > li:not([data-tags~="t${i}"]){display:none}`);
-    rules.push(`${radio}:checked ~ .poster-filter label[for="${scope}-t${i}"]{${on}}`);
-    rules.push(`${radio}:focus-visible ~ .poster-filter label[for="${scope}-t${i}"]{${ring}}`);
-  }
-  rules.push(`#${scope}-all:checked ~ .poster-filter label[for="${scope}-all"]{${on}}`);
-  rules.push(`#${scope}-all:focus-visible ~ .poster-filter label[for="${scope}-all"]{${ring}}`);
-  return rules.join("\n");
+  return coreTagFilterCss(scope, count, {
+    items: ".poster-rows > li",
+    filter: ".poster-filter",
+    checked: "background:var(--rb-fg);color:var(--rb-bg);text-decoration:none",
+    focus: "outline:3px solid var(--rb-fg);outline-offset:3px",
+  });
 }

@@ -92,5 +92,27 @@
       }
     }
   },
-  "plugins": {}
+  "plugins": {},
+  "whatsapp": {
+    "number": "5511900000000",
+    "floating": true,
+    "message": {
+      "pt-BR": "Oi, Ana! Vim pelo seu site.",
+      "en": "Hi Ana! I found you through your website."
+    }
+  },
+  "announcement": {
+    "enabled": true,
+    "text": {
+      "pt-BR": "Agenda aberta para novos projetos a partir de janeiro.",
+      "en": "Booking new projects from January."
+    },
+    "link": {
+      "label": {
+        "pt-BR": "Vamos conversar",
+        "en": "Let's talk"
+      },
+      "href": "/#contato"
+    }
+  }
 }

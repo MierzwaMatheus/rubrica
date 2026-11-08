@@ -241,6 +241,8 @@ export const DEFAULT_UI_TEXTS: Record<string, Localized<string>> = {
   "location.map": { pt: "Ver no mapa", en: "View on map", es: "Ver en el mapa" },
   "contact.email": { pt: "E-mail", en: "Email", es: "Correo" },
   "contact.whatsapp": { pt: "WhatsApp", en: "WhatsApp", es: "WhatsApp" },
+  "whatsapp.float": { pt: "Conversar comigo no WhatsApp", en: "Chat with me on WhatsApp", es: "Habla conmigo por WhatsApp" },
+  "announcement.label": { pt: "Aviso", en: "Announcement", es: "Aviso" },
   "hero.available": { pt: "Disponível para novos projetos", en: "Available for new projects", es: "Disponible para nuevos proyectos" },
   "common.empty": { pt: "Nada por aqui ainda.", en: "Nothing here yet.", es: "Aún no hay nada aquí." },
   "common.external": { pt: "(abre em nova aba)", en: "(opens in a new tab)", es: "(se abre en una pestaña nueva)" },
@@ -308,6 +310,7 @@ export const DEFAULT_UI_TEXTS: Record<string, Localized<string>> = {
  */
 export const EMPRESA_UI_TEXTS: Record<string, Localized<string>> = {
   "sidebar.talk": { pt: "Fale conosco", en: "Talk to us", es: "Hablemos" },
+  "whatsapp.float": { pt: "Fale conosco no WhatsApp", en: "Chat with us on WhatsApp", es: "Habla con nosotros por WhatsApp" },
   "contactForm.message": { pt: "Conte um pouco mais", en: "Tell us a bit more", es: "Cuéntanos un poco más" },
   "contactForm.you": { pt: "Como falar com você?", en: "How can we reach you?", es: "¿Cómo podemos contactarte?" },
   "contactForm.successBody": {

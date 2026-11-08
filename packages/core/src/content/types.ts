@@ -268,6 +268,42 @@ export interface Appearance {
   texture?: Texture;
 }
 
+/**
+ * WhatsApp do site inteiro: o botão flutuante (opcional) e o endereço `whatsapp:` dos
+ * campos de link, que vira `https://wa.me/<número>?text=<mensagem no idioma>`.
+ */
+export interface WhatsAppSettings {
+  /** Formato internacional, só dígitos (DDI, DDD e número): `5511999999999`. O backend normaliza. */
+  number: string;
+  /** Mensagem que já vem escrita na conversa, por idioma. Sem tradução no idioma, abre sem mensagem. */
+  message?: Localized<string>;
+  /** Mostra o botão flutuante em todas as páginas do site (menos as do app: proposta, checkout). */
+  floating: boolean;
+  /** Texto visível do botão flutuante, por idioma. Sem ele, só o ícone (com nome acessível padrão). */
+  label?: Localized<string>;
+}
+
+export type AnnouncementTone = "info" | "destaque";
+
+export const ANNOUNCEMENT_TONES: readonly AnnouncementTone[] = ["info", "destaque"];
+
+/**
+ * Faixa de aviso no topo de todas as páginas (menos as do app). O período é avaliado no
+ * BUILD: o aviso entra ou sai do ar na primeira publicação depois da data.
+ */
+export interface Announcement {
+  enabled: boolean;
+  /** Sem texto no idioma, a faixa não aparece nele (decisão 28). */
+  text: Localized<string>;
+  /** Link depois do texto. Sem rótulo no idioma, a faixa aparece sem ele. */
+  link?: RawLink;
+  /** `info` (padrão): discreta, nas cores de superfície. `destaque`: na cor de destaque. */
+  tone?: AnnouncementTone;
+  /** Início e fim: `AAAA-MM-DD` (o dia inteiro, em UTC) ou data e hora ISO com fuso (`2026-12-01T09:00-03:00`). */
+  startsAt?: string;
+  endsAt?: string;
+}
+
 export interface SiteSettings {
   kind: SiteKind;
   name: Localized<string>;
@@ -309,6 +345,10 @@ export interface SiteSettings {
    * `PUBLIC_UMAMI_SCRIPT_URL` e `PUBLIC_UMAMI_WEBSITE_ID` do build.
    */
   analytics?: { scriptUrl?: string; websiteId?: string };
+  /** WhatsApp do site: botão flutuante e links `whatsapp:`. */
+  whatsapp?: WhatsAppSettings;
+  /** Faixa de aviso no topo das páginas. */
+  announcement?: Announcement;
 }
 
 /** Ícones do site no `<head>` e no `manifest.webmanifest`. */

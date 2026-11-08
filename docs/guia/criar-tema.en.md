@@ -239,6 +239,10 @@ Every shell needs:
 
 A shell can go far beyond a header with a menu: the `desktop` theme becomes a desktop with windows, `chat` a conversation, `garden` a map of notes that uses `collections`. Read their `shell.tsx` in the repository before designing a special shell.
 
+### Announcement bar and WhatsApp button
+
+The **announcement bar** and the **floating WhatsApp button** ([Content](./conteudo.en.md#whatsapp-and-announcement-bar)) belong to the core: the bar comes before the shell, the button after it, using only `--rb-*` tokens. If the shell has something fixed at the top or bottom, the theme makes room with CSS, no JavaScript: `<html>` gets `data-announcement` when there is a bar and `data-whatsapp-float` when there is a button, and the `--rb-float-bottom` and `--rb-float-right` variables move the button (`--rb-whatsapp-bg` and `--rb-whatsapp-fg` set its colors). `padrao` turns its fixed bar and sidebar into `sticky` when there is a bar; `bento` lifts the button above the dock; `chat` puts it in the quick replies bar.
+
 ## Blocks
 
 `blocks` has one component per block type, only for those the theme wants to draw. The others **inherit** the core's default component and get their look from CSS (each section has the `rb-<type>` class and the `data-block` and `data-variant` attributes). A block the core adds later also shows up in the theme, with the default component.

@@ -6,7 +6,7 @@
 import { Component, useEffect, useLayoutEffect, useState, type ReactNode } from "react";
 import { theme, projectComponents, projectBlocks } from "virtual:rubrica/client";
 import { CORE_BLOCKS } from "../../blocks/catalog";
-import { blockComponent, ColorToggleButton, LocaleLinks, templates } from "../../components";
+import { blockComponent, ColorToggleButton, LocaleLinks, SiteAnnouncement, siteWideAttributes, templates, WhatsAppFloat } from "../../components";
 import { CORE_PLUGINS } from "../../plugins/registry";
 import { appearanceHead } from "../../theme/appearance";
 import type { BlockComponent } from "../../theme/contract";
@@ -110,6 +110,13 @@ export default function PreviewApp() {
     else delete root.dataset.scheme;
     if (head.texture) root.dataset.texture = head.texture;
     else delete root.dataset.texture;
+    // Como o Document.astro: avisa a casca da faixa de aviso e do botão do WhatsApp.
+    const attrs = result?.ok ? siteWideAttributes(result.ctx) : {};
+    for (const name of ["data-announcement", "data-whatsapp-float"]) {
+      const value = attrs[name];
+      if (value === undefined) root.removeAttribute(name);
+      else root.setAttribute(name, value);
+    }
     const plan = planFonts(appearance, theme.fonts);
     const nameOf = (variable: string) => plan.fonts.find((f) => f.cssVariable === variable)?.name;
     const fontCss = Object.entries(plan.assign)
@@ -162,33 +169,37 @@ export default function PreviewApp() {
   const { ctx, page, collections } = result;
   const { Shell } = templates(theme);
   return (
-    <Shell
-      ctx={ctx}
-      pageType="page"
-      collections={collections}
-      localeSwitcher={<LocaleLinks ctx={ctx} />}
-      colorToggle={ctx.site.colorToggle ? <ColorToggleButton label={ctx.t("theme.toggle")} /> : undefined}
-    >
-      {page.needsHiddenH1 && <h1 className="rb-sr-only">{page.title}</h1>}
-      {page.blocks.length === 0 && <div style={notice}>Página sem blocos visíveis.</div>}
-      {page.blocks.map((b) => {
-        const Block = componentFor(b.type);
-        return (
-          <BlockBoundary key={b.id} type={b.type}>
-            <Block
-              id={b.id}
-              variant={b.variant}
-              fields={b.fields}
-              items={b.items}
-              headingLevel={b.headingLevel}
-              index={b.index}
-              total={b.total}
-              ctx={ctx}
-              island={b.interactive ? <div style={notice}>Parte interativa (formulário, envio): funciona no site publicado.</div> : undefined}
-            />
-          </BlockBoundary>
-        );
-      })}
-    </Shell>
+    <>
+      <SiteAnnouncement ctx={ctx} />
+      <Shell
+        ctx={ctx}
+        pageType="page"
+        collections={collections}
+        localeSwitcher={<LocaleLinks ctx={ctx} />}
+        colorToggle={ctx.site.colorToggle ? <ColorToggleButton label={ctx.t("theme.toggle")} /> : undefined}
+      >
+        {page.needsHiddenH1 && <h1 className="rb-sr-only">{page.title}</h1>}
+        {page.blocks.length === 0 && <div style={notice}>Página sem blocos visíveis.</div>}
+        {page.blocks.map((b) => {
+          const Block = componentFor(b.type);
+          return (
+            <BlockBoundary key={b.id} type={b.type}>
+              <Block
+                id={b.id}
+                variant={b.variant}
+                fields={b.fields}
+                items={b.items}
+                headingLevel={b.headingLevel}
+                index={b.index}
+                total={b.total}
+                ctx={ctx}
+                island={b.interactive ? <div style={notice}>Parte interativa (formulário, envio): funciona no site publicado.</div> : undefined}
+              />
+            </BlockBoundary>
+          );
+        })}
+      </Shell>
+      <WhatsAppFloat ctx={ctx} />
+    </>
   );
 }

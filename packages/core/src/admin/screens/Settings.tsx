@@ -1,6 +1,7 @@
 /**
- * Configurações do site: identidade, ícones e cor da barra do navegador, blog (RSS e capa
- * padrão), analytics, navegação, redes, pessoa ou empresa e, só para a
+ * Configurações do site: identidade, ícones e cor da barra do navegador, faixa de aviso e
+ * WhatsApp (com prévia), blog (RSS e capa padrão), analytics, navegação, redes, pessoa ou
+ * empresa e, só para a
  * agência (root), a parte técnica (tipo do site, URL, idiomas e principal, caminhos).
  * Os formulários saem do mesmo gerador de campos dos blocos. Salvar manda só as
  * chaves que mudaram (o backend recusa chave técnica vinda de quem não é root).
@@ -8,10 +9,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { ArrowDown, ArrowUp, Plus, Save, Star, Trash2, Undo2 } from "lucide-react";
 import { field, type FieldMap } from "../../blocks/fields";
-import type { Organization, SiteSettings } from "../../content/types";
+import type { Announcement, Organization, PageRecord, SiteSettings, WhatsAppSettings } from "../../content/types";
 import { defineLocales, localePrefix } from "../../i18n";
 import { api } from "../data/api";
-import { useMutation } from "../data/backend";
+import { useMutation, useQuery } from "../data/backend";
+import { PreviewPane } from "../editor/PreviewPane";
+import { announcementActive, announcementTime } from "../../render/sitewide";
 import { EditorLocaleProvider, FieldsForm } from "../editor/fields";
 import { errorMessage, missingTranslations, moveItem, prune, sameDraft, type Values } from "../editor/model";
 import { defaultPathsFor } from "../../render/collections";
@@ -105,6 +108,65 @@ const BLOG: FieldMap = {
   rssDescription: field.text({ label: "Descrição do feed RSS", multiline: true, maxLength: 300, help: "Vazio: a descrição do site." }),
   defaultPostCover: field.image({ label: "Capa padrão dos posts", help: "Usada nos posts sem capa, na lista e no compartilhamento (1200×630)." }),
 };
+
+const ANNOUNCEMENT: FieldMap = {
+  enabled: field.boolean({ label: "Mostrar a faixa de aviso", default: false }),
+  text: field.text({ label: "Texto do aviso", maxLength: 200, help: "Curto e direto. Sem texto num idioma, a faixa não aparece nele." }),
+  link: field.link({ label: "Link (opcional)", help: "Aparece depois do texto. Aceita /pagina, https://… ou whatsapp:." }),
+  tone: field.select({
+    label: "Estilo",
+    options: [
+      { value: "info", label: "Discreto (cores de cartão)" },
+      { value: "destaque", label: "Destaque (cor principal do tema)" },
+    ],
+    default: "info",
+  }),
+  startsAt: field.text({ label: "Começa em", localized: false, maxLength: 30, help: "Opcional. AAAA-MM-DD, ou com hora e fuso: 2026-12-01T09:00-03:00." }),
+  endsAt: field.text({ label: "Termina em", localized: false, maxLength: 30, help: "Opcional. A data vale até o fim do dia (em UTC)." }),
+};
+
+const WHATSAPP: FieldMap = {
+  number: field.text({ label: "Número do WhatsApp", localized: false, maxLength: 30, help: "Com DDI e DDD: +55 11 91234-5678. Fica salvo só com os dígitos." }),
+  message: field.text({ label: "Mensagem inicial", multiline: true, maxLength: 500, help: "Já vem escrita na conversa. Sem tradução num idioma, a conversa abre em branco." }),
+  floating: field.boolean({ label: "Botão flutuante em todas as páginas", default: false }),
+  label: field.text({ label: "Texto do botão flutuante", maxLength: 40, help: "Opcional. Vazio: só o ícone (no celular, sempre só o ícone)." }),
+};
+
+/** Valores do formulário → `Announcement`, ou `undefined` quando está tudo vazio. */
+function valuesToAnnouncement(values: Values): Announcement | undefined {
+  const v = prune(values);
+  const text = (v.text as Announcement["text"] | undefined) ?? {};
+  const link = v.link as Announcement["link"] | undefined;
+  const hasContent = Object.values(text).some((t) => t?.trim()) || !!link?.href || !!v.startsAt || !!v.endsAt || v.enabled === true;
+  if (!hasContent) return undefined;
+  const out: Announcement = { enabled: v.enabled === true, text };
+  if (link?.href) out.link = link;
+  if (v.tone === "destaque") out.tone = "destaque";
+  if (typeof v.startsAt === "string" && v.startsAt.trim()) out.startsAt = v.startsAt.trim();
+  if (typeof v.endsAt === "string" && v.endsAt.trim()) out.endsAt = v.endsAt.trim();
+  return out;
+}
+
+/** Valores do formulário → `WhatsAppSettings`, ou `undefined` sem número nem mais nada. */
+function valuesToWhatsApp(values: Values): WhatsAppSettings | undefined {
+  const v = prune(values);
+  const number = typeof v.number === "string" ? v.number : "";
+  const message = v.message as WhatsAppSettings["message"];
+  const label = v.label as WhatsAppSettings["label"];
+  const filled = (l?: Record<string, string | undefined>) => !!l && Object.values(l).some((t) => t?.trim());
+  if (!number.trim() && !filled(message) && !filled(label) && v.floating !== true) return undefined;
+  return { number, floating: v.floating === true, ...(filled(message) && { message }), ...(filled(label) && { label }) };
+}
+
+/** Situação do aviso agora (a do próximo build): no ar, agendado, encerrado ou desligado. */
+function announcementStatus(a: Announcement | undefined): string {
+  if (!a?.enabled) return "Desligado: o site não mostra a faixa.";
+  const now = Date.now();
+  if (announcementActive(a, now)) return a.endsAt ? `No ar até ${a.endsAt}, a partir da próxima publicação.` : "No ar a partir da próxima publicação.";
+  const start = a.startsAt ? announcementTime(a.startsAt, "start") : undefined;
+  if (start !== undefined && now < start) return `Agendado para ${a.startsAt}: só entra no ar na primeira publicação depois dessa data.`;
+  return "Encerrado: sai do ar na próxima publicação.";
+}
 
 const ANALYTICS: FieldMap = {
   scriptUrl: field.text({ label: "Endereço do script", localized: false, help: "https://cloud.umami.is/script.js, ou o do seu Umami." }),
@@ -200,6 +262,7 @@ export default function Settings() {
   const panel = usePanel();
   const { block } = useRouter();
   const update = useMutation(api.settings.update);
+  const snapshot = useQuery(api.site.snapshot, {});
   const isRoot = panel.me.role === "root";
   const [draft, setDraft] = useState<SiteSettings | null>(() => (panel.settings ? structuredClone(panel.settings) : null));
   const [locale, setLocale] = useState(panel.locales.default);
@@ -242,8 +305,10 @@ export default function Settings() {
     setBusy(true);
     setError(undefined);
     try {
-      const patch = Object.fromEntries(changedKeys.map((k) => [k, prune(draft[k])])) as Partial<SiteSettings>;
-      await update({ patch });
+      // Campo que saiu do rascunho (ex.: o WhatsApp apagado) vai em `unset`: `undefined` não viaja.
+      const unset = changedKeys.filter((k) => draft[k] === undefined);
+      const patch = Object.fromEntries(changedKeys.filter((k) => draft[k] !== undefined).map((k) => [k, prune(draft[k])])) as Partial<SiteSettings>;
+      await update(unset.length ? { patch, unset } : { patch });
       toast.success("Configurações salvas. O site no ar muda na próxima publicação.");
     } catch (e) {
       setError(errorMessage(e));
@@ -255,6 +320,9 @@ export default function Settings() {
   const locales = draft.locales.locales;
   const editorLocale = { locale: locales.includes(locale) ? locale : draft.locales.default, setLocale, locales, defaultLocale: draft.locales.default, translation: panel.enabled.has("translation") };
   const identity = { name: draft.name, description: draft.description, ogImage: draft.ogImage, twitterHandle: draft.twitterHandle } as Values;
+  const announcement = (draft.announcement ?? {}) as unknown as Values;
+  const whatsapp = (draft.whatsapp ?? {}) as unknown as Values;
+  const home: PageRecord | undefined = snapshot?.pages.find((p) => p.path === "/") ?? snapshot?.pages[0];
 
   return (
     <EditorLocaleProvider value={editorLocale}>
@@ -300,6 +368,56 @@ export default function Settings() {
             <FieldsForm fields={THEME_COLOR} values={(draft.themeColor ?? {}) as Values} onChange={(v) => set("themeColor", compactObject<NonNullable<SiteSettings["themeColor"]>>(v))} />
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Faixa de aviso</CardTitle>
+            <CardDescription>
+              Uma linha no topo de todas as páginas do site (menos proposta e checkout): agenda aberta, promoção, mudança de horário. O período vale na hora de publicar: o aviso entra ou
+              sai do ar na primeira publicação depois da data.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <FieldsForm
+              fields={ANNOUNCEMENT}
+              values={announcement}
+              missing={draft.announcement?.enabled ? missingTranslations({ text: ANNOUNCEMENT.text! }, { text: draft.announcement.text } as Values, locales) : []}
+              onChange={(v) => set("announcement", valuesToAnnouncement(v))}
+            />
+            <p className="text-sm text-muted-foreground" role="status">
+              {announcementStatus(draft.announcement)}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>WhatsApp</CardTitle>
+            <CardDescription>
+              Um número para o site inteiro. Liga o botão flutuante (no canto de baixo, em todas as páginas) e vale em qualquer botão ou link: use o endereço <code>whatsapp:</code> para abrir
+              a conversa com a mensagem inicial, ou <code>whatsapp:Quero o plano Pro</code> para uma mensagem própria.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <FieldsForm fields={WHATSAPP} values={whatsapp} onChange={(v) => set("whatsapp", valuesToWhatsApp(v))} />
+          </CardContent>
+        </Card>
+
+        {(draft.announcement || draft.whatsapp?.floating) && (
+          <Card className="min-w-0">
+            <CardHeader>
+              <CardTitle>Prévia</CardTitle>
+              <CardDescription>A página inicial com a faixa de aviso e o botão do WhatsApp como estão acima, antes de salvar.</CardDescription>
+            </CardHeader>
+            <CardContent className="min-w-0">
+              {home ? (
+                <PreviewPane className="h-[560px] min-w-0 overflow-hidden rounded-md border" snapshot={snapshot} page={home} locale={editorLocale.locale} locales={locales} onLocale={setLocale} settings={draft} />
+              ) : (
+                <p className="text-sm text-muted-foreground">Publique a página inicial para ver a prévia aqui.</p>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {panel.enabled.has("blog") && (
           <Card>

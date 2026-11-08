@@ -53,6 +53,10 @@ code, pre { font-family: var(--rb-font-mono); }
 .bento-footer a:hover { color: var(--rb-fg); }
 .bento-footer__social { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 0 1rem; }
 
+/* Botão flutuante do WhatsApp (núcleo): acima do dock, para não cobrir a navegação nem a troca de tema. */
+:root { --rb-float-bottom: 5.5rem; }
+@media (min-width: 640px) { :root { --rb-float-bottom: 6.5rem; } }
+
 /* dock flutuante */
 .bento-dock {
   position: fixed; left: 50%; bottom: 1rem; z-index: 50; transform: translateX(-50%);

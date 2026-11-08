@@ -1,5 +1,10 @@
 ---
-/** Documento HTML de toda página pública: <head> do núcleo (SEO) e estilos do tema. */
+/**
+ * Documento HTML de toda página pública: <head> do núcleo (SEO), estilos do tema e o que
+ * vale no site inteiro em volta da casca: a faixa de aviso (antes) e o botão flutuante
+ * do WhatsApp (depois). As páginas do app (proposta, checkout) ficam sem os dois: são
+ * fluxos de uma pessoa só, e o botão fixo cobriria os botões do formulário no celular.
+ */
 import "virtual:rubrica/styles";
 import { Font } from "astro:assets";
 import { activeTheme, activeFontPlan, headOptions, loadSite } from "../runtime";
@@ -8,6 +13,7 @@ import { fontPreloads } from "../../theme/fonts";
 import { buildHead, renderHeadTags, type HeadRoute } from "../../seo/head";
 import type { RenderContext } from "../../theme/contract";
 import type { SiteSettings } from "../../content/types";
+import { SiteAnnouncement, WhatsAppFloat, siteWideAttributes } from "../../components/sitewide";
 
 interface Props {
   route: HeadRoute;
@@ -20,10 +26,12 @@ const mode = settings.appearance.colorMode;
 const look = appearanceHead(settings, activeTheme, activeFontPlan);
 // Pré-carrega a fonte do texto e a de destaque do tema (títulos acima da dobra).
 const preloads = fontPreloads(activeFontPlan);
+const siteWide = route.type !== "app";
+const siteWideAttrs = siteWide ? siteWideAttributes(ctx) : {};
 ---
 
 <!doctype html>
-<html lang={ctx.locale} data-color-mode={mode} data-theme-id={settings.theme} data-scheme={look.scheme} data-texture={look.texture}>
+<html lang={ctx.locale} data-color-mode={mode} data-theme-id={settings.theme} data-scheme={look.scheme} data-texture={look.texture} {...siteWideAttrs}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -33,6 +41,8 @@ const preloads = fontPreloads(activeFontPlan);
     {settings.appearance.colorToggle && <script is:inline src="/_rubrica/color-mode.js" />}
   </head>
   <body>
+    {siteWide && <SiteAnnouncement ctx={ctx} />}
     <slot />
+    {siteWide && <WhatsAppFloat ctx={ctx} />}
   </body>
 </html>

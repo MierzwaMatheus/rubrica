@@ -239,6 +239,10 @@ O que toda casca precisa ter:
 
 A casca pode ir bem longe do cabeçalho com menu: o tema `desktop` vira uma área de trabalho com janelas, o `chat` uma conversa, o `garden` um mapa de notas que usa `collections`. Vale ler o `shell.tsx` deles no repositório antes de desenhar uma casca especial.
 
+### Faixa de aviso e botão do WhatsApp
+
+A **faixa de aviso** e o **botão flutuante do WhatsApp** ([Conteúdo](./conteudo.md#whatsapp-e-faixa-de-aviso)) são do núcleo: a faixa vem antes da casca, o botão depois, só com tokens `--rb-*`. Se a casca tem algo fixo no topo ou no rodapé, o tema abre espaço com CSS, sem JavaScript: o `<html>` ganha `data-announcement` quando há faixa e `data-whatsapp-float` quando há botão, e as variáveis `--rb-float-bottom` e `--rb-float-right` mudam a posição do botão (`--rb-whatsapp-bg` e `--rb-whatsapp-fg`, as cores). O `padrao` troca a barra e a lateral fixas por `sticky` com a faixa; o `bento` sobe o botão acima do dock; o `chat` o põe na barra de respostas.
+
 ## Blocos
 
 `blocks` tem um componente por tipo de bloco, só para os que o tema quer desenhar. Os outros **herdam** o componente padrão do núcleo e ganham o visual pelo CSS (cada seção tem a classe `rb-<tipo>` e os atributos `data-block` e `data-variant`). Um bloco que o núcleo acrescentar depois também aparece no tema, com o componente padrão.

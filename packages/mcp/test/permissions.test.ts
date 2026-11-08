@@ -186,6 +186,21 @@ describe("site_update e login", () => {
     expect(tech.isError).toBe(true);
   });
 
+  it("WhatsApp e faixa de aviso: prévia (dryRun), gravação com o número normalizado e mescla por idioma", async () => {
+    const { runtime } = await runtimeFor(t, "admin");
+    const announcement = { enabled: true, text: { "pt-BR": "Agenda aberta" }, tone: "destaque", startsAt: "2026-12-01" };
+    const preview = await call(runtime, "site_update", { patch: { whatsapp: { number: "+55 (11) 91234-5678", floating: true }, announcement } });
+    expect(preview.body.dryRun).toBe(true);
+    expect((await call(runtime, "site_get")).body.settings.whatsapp).toBeUndefined();
+    await call(runtime, "site_update", { patch: { whatsapp: { number: "+55 (11) 91234-5678", floating: true, message: { "pt-BR": "Oi" } }, announcement }, dryRun: false });
+    await call(runtime, "site_update", { patch: { whatsapp: { message: { en: "Hi" } }, announcement: { text: { en: "Booking open" } } }, dryRun: false });
+    const settings = (await call(runtime, "site_get")).body.settings;
+    expect(settings.whatsapp).toEqual({ number: "5511912345678", floating: true, message: { "pt-BR": "Oi", en: "Hi" } });
+    expect(settings.announcement).toEqual({ ...announcement, text: { "pt-BR": "Agenda aberta", en: "Booking open" } });
+    const bad = await call(runtime, "site_update", { patch: { whatsapp: { number: "123", floating: true } }, dryRun: false });
+    expect(bad.isError).toBe(true);
+  });
+
   it("root muda idiomas; valor inválido volta com erro por campo", async () => {
     const { runtime } = await runtimeFor(t, "root");
     const bad = await call(runtime, "site_update", { patch: { appearance: { colorMode: "neon" } } });

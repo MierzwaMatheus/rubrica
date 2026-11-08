@@ -10,8 +10,9 @@ import type { SiteSnapshot } from "../data/source";
 import { enabledPlugins, type PluginDefinition } from "../plugins/contract";
 import { resolveVariant, type Alternate, type RenderContext, type ResolvedSite, type ShellCollections, type ThemeDefinition } from "../theme/contract";
 import { queryCollection, resolvePaths, resolvePost, resolveProject, resolveSeo, type CollectionPaths, type PostItem, type ProjectItem, type ResolvedSeo } from "./collections";
-import { resolveFields, resolveHref, resolveImage, type ResolveOptions } from "./resolve";
+import { resolveFields, resolveHref, resolveImage, resolveLink, type ResolveOptions } from "./resolve";
 import { defaultUiText } from "../i18n/ui-texts";
+import { announcementActive, siteWhatsAppNumber, whatsAppMessage, whatsAppUrl } from "./sitewide";
 
 export interface ResolvedBlock {
   id: string;
@@ -55,6 +56,8 @@ export interface BuildInput {
   theme: ThemeDefinition;
   blocks: readonly BlockDefinition[];
   plugins: PluginDefinition[];
+  /** Instante do build (epoch ms), para o período da faixa de aviso. Padrão: agora. */
+  now?: number;
 }
 
 export interface BuiltSite {
@@ -106,7 +109,18 @@ export function buildSite(input: BuildInput): BuiltSite {
   const plugins = enabledPlugins(input.plugins, settings.kind, settings.plugins);
   const paths: CollectionPaths = resolvePaths(settings.kind, settings.paths);
   const blockDefs = new Map(input.blocks.map((b) => [b.type, b]));
-  const opts = (locale: Locale): ResolveOptions => ({ locale, locales: cfg, ...(settings.defaultPostCover?.url && { defaultPostCover: settings.defaultPostCover }) });
+  const whatsappNumber = siteWhatsAppNumber(settings);
+  const opts = (locale: Locale): ResolveOptions => {
+    const message = whatsAppMessage(settings, locale);
+    return {
+      locale,
+      locales: cfg,
+      ...(settings.defaultPostCover?.url && { defaultPostCover: settings.defaultPostCover }),
+      ...(whatsappNumber && { whatsapp: { number: whatsappNumber, ...(message && { message }) } }),
+    };
+  };
+  // O período do aviso vale no instante do build: muda só na próxima publicação.
+  const announcementOn = announcementActive(settings.announcement, input.now ?? Date.now());
 
   const kindAllows = (def: BlockDefinition | undefined): def is BlockDefinition =>
     !!def && (def.category === "comum" || def.category === settings.kind);
@@ -283,6 +297,7 @@ export function buildSite(input: BuildInput): BuiltSite {
         if (!label) return undefined;
         if (n.href.startsWith("/") && hiddenPaths.has(norm(n.href.split(/[?#]/)[0]!))) return undefined;
         const { href } = resolveHref(n.href, o);
+        if (!href) return undefined;
         const current = href === url || (href !== localizedPath("/", locale, cfg) && url.startsWith(`${href}/`));
         return { label, href, current };
       })
@@ -309,6 +324,19 @@ export function buildSite(input: BuildInput): BuiltSite {
         const dark = resolveImage(settings.logo.dark, o);
         if (dark) resolved.dark = { ...dark, alt: dark.alt || site.name };
         site.logo = resolved;
+      }
+    }
+    if (whatsappNumber && settings.whatsapp) {
+      const message = whatsAppMessage(settings, locale);
+      const label = pick(settings.whatsapp.label, locale);
+      site.whatsapp = { number: whatsappNumber, href: whatsAppUrl(whatsappNumber, message), floating: settings.whatsapp.floating, ...(label && { label }) };
+    }
+    if (announcementOn && settings.announcement) {
+      // Sem texto no idioma, a faixa não existe nele (decisão 28): nada de cair no principal.
+      const text = pick(settings.announcement.text, locale);
+      if (text) {
+        const link = resolveLink(settings.announcement.link, o);
+        site.announcement = { text, tone: settings.announcement.tone ?? "info", ...(link && { link }) };
       }
     }
     if (settings.person) {

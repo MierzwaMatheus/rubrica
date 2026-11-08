@@ -328,7 +328,7 @@ export const api = {
   settings: {
     get: q<Empty, SiteSettings | null>("settings", "get"),
     plugins: q<Empty, PluginRow[]>("settings", "plugins"),
-    update: m<{ patch: SettingsPatch }, null>("settings", "update"),
+    update: m<{ patch: SettingsPatch; unset?: string[] }, null>("settings", "update"),
     setPlugin: m<{ id: string; enabled: boolean }, null>("settings", "setPlugin"),
   },
   texts: {

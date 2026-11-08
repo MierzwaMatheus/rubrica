@@ -156,6 +156,24 @@ describe("configurações do site", () => {
     expect(settings.social).toEqual([{ network: "linkedin", url: "https://linkedin.com/in/brunalima" }, { network: "github", url: "https://github.com/brunalima" }]);
   });
 
+  it("WhatsApp do contactInfo (com Mostrar ligado) vira o WhatsApp do site, sem botão flutuante", () => {
+    const withPhone = (phone: string, showPhone = true) => {
+      const tables = v1Export().tables;
+      tables.contactInfo = [{ ...tables.contactInfo![0]!, phone, showPhone }];
+      const r = convertV1({ tables, v1: V1_RUBRICA_JSON, theme: "cyberpunk", recipe: CORE_RECIPES.pessoal, now: NOW });
+      return { whatsapp: r.tables.siteSettings![0]!.whatsapp, warnings: r.report.warnings };
+    };
+    expect(settings.whatsapp).toBeUndefined(); // o fixture esconde o telefone
+    expect(withPhone("+55 11 90000-0000").whatsapp).toEqual({ number: "5511900000000", floating: false });
+    const national = withPhone("(11) 90000-0000");
+    expect(national.whatsapp).toEqual({ number: "5511900000000", floating: false });
+    expect(national.warnings.join(" ")).toContain("sem DDI");
+    const bad = withPhone("ramal 12");
+    expect(bad.whatsapp).toBeUndefined();
+    expect(bad.warnings.join(" ")).toContain("ficou de fora");
+    expect(withPhone("+55 11 90000-0000", false).whatsapp).toBeUndefined();
+  });
+
   it("plugins com os nomes da v2: i18n → translation, playground sai", () => {
     expect(settings.plugins).toMatchObject({ translation: false, payments: false, blog: true, portfolio: true, "testimonials-intake": true });
     expect(settings.plugins.playground).toBeUndefined();

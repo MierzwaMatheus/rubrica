@@ -4,12 +4,15 @@
  */
 import { localizedPath, pick, type Locale, type LocaleConfig, type Localized } from "../i18n";
 import type { FieldDef, FieldMap, RawImage, RawLink, ResolvedImage, ResolvedLink } from "../blocks/fields";
+import { resolveWhatsAppHref, WHATSAPP_HREF } from "./sitewide";
 
 export interface ResolveOptions {
   locale: Locale;
   locales: LocaleConfig;
   /** Capa dos posts sem capa própria (`SiteSettings.defaultPostCover`). */
   defaultPostCover?: RawImage;
+  /** WhatsApp do site, para os links `whatsapp:` (número só com dígitos e a mensagem no idioma). */
+  whatsapp?: { number: string; message?: string };
 }
 
 const EXTERNAL = /^(https?:|mailto:|tel:|\/\/)/i;
@@ -22,8 +25,16 @@ export function resolveImage(raw: RawImage | undefined, opts: ResolveOptions): R
   return img;
 }
 
-/** Link interno ganha o prefixo do idioma; âncora (`#x`) e externo ficam como estão. */
+/**
+ * Link interno ganha o prefixo do idioma; âncora (`#x`) e externo ficam como estão.
+ * `whatsapp:` vira o `wa.me` do site; sem WhatsApp configurado, `href` vem vazio (quem
+ * monta o link o descarta).
+ */
 export function resolveHref(href: string, opts: ResolveOptions): { href: string; external: boolean } {
+  if (WHATSAPP_HREF.test(href)) {
+    const url = resolveWhatsAppHref(href, opts.whatsapp?.number, opts.whatsapp?.message);
+    return url ? { href: url, external: true } : { href: "", external: false };
+  }
   if (EXTERNAL.test(href)) return { href, external: /^(https?:|\/\/)/i.test(href) };
   if (href.startsWith("#")) return { href, external: false };
   const [path = "/", hash] = href.split("#");
@@ -35,7 +46,8 @@ export function resolveLink(raw: RawLink | undefined, opts: ResolveOptions): Res
   if (!raw?.href) return undefined;
   const label = pick(raw.label, opts.locale);
   if (!label) return undefined;
-  return { label, ...resolveHref(raw.href, opts) };
+  const resolved = resolveHref(raw.href, opts);
+  return resolved.href ? { label, ...resolved } : undefined;
 }
 
 export function resolveText(raw: Localized<string> | string | undefined, opts: ResolveOptions): string | undefined {

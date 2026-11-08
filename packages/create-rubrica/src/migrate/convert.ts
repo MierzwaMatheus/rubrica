@@ -14,7 +14,7 @@
  * - Ids dos documentos de tabelas 1:1 (usuários, posts, projetos…) são mantidos, para as
  *   referências (autor, papel, imagem) continuarem valendo depois do import.
  */
-import { validateBlock, type Recipe, type RecipeBlock } from "@rubrica/core";
+import { isWhatsAppNumber, normalizeWhatsAppNumber, validateBlock, type Recipe, type RecipeBlock } from "@rubrica/core";
 import { blockIds, isLocalizedValue, localizeRecipeValue, navigationFromPages } from "@rubrica/core/seed";
 import { CORE_PLUGINS, V1_PLUGIN_RENAMES } from "@rubrica/core/plugins";
 import { CORE_BLOCKS } from "@rubrica/core/blocks";
@@ -471,6 +471,27 @@ function hexOf(value: unknown): string | undefined {
   return typeof value === "string" && /^#[0-9a-f]{6}$/i.test(value.trim()) ? value.trim().toLowerCase() : undefined;
 }
 
+/**
+ * O "WhatsApp" do contactInfo da v1 (campo `phone`, que a sidebar abria no wa.me) vira o
+ * WhatsApp do site, sem o botão flutuante (a v1 não tinha). Só com "Mostrar" ligado.
+ * Número sem DDI com cara de brasileiro (10 ou 11 dígitos) ganha o 55.
+ */
+function convertWhatsApp(ctx: Ctx): Doc | undefined {
+  const contact = ctx.contact;
+  const raw = str(contact?.phone);
+  if (!raw || !contact?.showPhone) return undefined;
+  let number = normalizeWhatsAppNumber(raw);
+  if (!raw.trim().startsWith("+") && /^[1-9]\d{9,10}$/.test(number)) {
+    number = `55${number}`;
+    ctx.warnings.push(`WhatsApp "${raw}" sem DDI: foi gravado como +${number}. Confira em Configurações → WhatsApp.`);
+  }
+  if (!isWhatsAppNumber(number)) {
+    ctx.warnings.push(`WhatsApp "${raw}" da v1 não está no formato internacional e ficou de fora: preencha em Configurações → WhatsApp.`);
+    return undefined;
+  }
+  return { number, floating: false };
+}
+
 function convertSettings(ctx: Ctx, input: ConvertInput, plugins: Record<string, boolean>): Doc {
   const c = (k: string) => str(ctx.config.get(k));
   const id = input.v1.identity ?? {};
@@ -531,6 +552,7 @@ function convertSettings(ctx: Ctx, input: ConvertInput, plugins: Record<string, 
     plugins,
     ogImage: ogStorage || c("og_image_url") ? compact({ url: c("og_image_url") ?? "", storageId: ogStorage }) : undefined,
     twitterHandle: c("twitter_handle") ?? id.twitterHandle,
+    whatsapp: convertWhatsApp(ctx),
   });
 }
 

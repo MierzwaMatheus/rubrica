@@ -7,6 +7,11 @@ import { LinkButton } from "../primitives";
 /** Link do campo de texto livre (`href` de logos): interno ganha o prefixo do idioma. */
 export function resolveFreeHref(href: string | undefined, ctx: RenderContext): { href: string; external: boolean } | undefined {
   if (!href) return undefined;
+  // `whatsapp:` vira o wa.me do site (some sem WhatsApp configurado).
+  if (/^whatsapp:/i.test(href)) {
+    const url = ctx.href(href);
+    return url ? { href: url, external: true } : undefined;
+  }
   if (/^(https?:|\/\/)/i.test(href)) return { href, external: true };
   if (/^(mailto:|tel:|#)/i.test(href)) return { href, external: false };
   return { href: ctx.href(href), external: false };

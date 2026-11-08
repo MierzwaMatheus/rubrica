@@ -99,6 +99,12 @@ export interface ResolvedLink {
   label: string;
   href: string;
   external: boolean;
+  /**
+   * Id da janela (`popover`) que o link abre no lugar de navegar: links para o contato
+   * (`#contato`, `/#contato` ou `contato:`) quando o site tem a janela de contato. Quem
+   * desenha o link usa um `<button popoverTarget={dialog}>` (o `LinkButton` já faz).
+   */
+  dialog?: string;
 }
 
 type IsLocalized<F> = F extends { localized: false } ? false : true;

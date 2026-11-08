@@ -133,6 +133,7 @@ a { color: var(--rb-accent); }
   padding: 0.6rem 1.1rem; border-radius: var(--rb-radius); text-decoration: none; font-weight: 600;
   border: 1px solid transparent;
 }
+button.rb-button { font: inherit; font-weight: 600; cursor: pointer; }
 .rb-button--primary { background: var(--rb-accent); color: var(--rb-accent-fg); }
 .rb-button--secondary { border-color: var(--rb-border); color: var(--rb-fg); }
 .rb-button--ghost { color: var(--rb-fg); }
@@ -223,4 +224,28 @@ img.rb-case__cover:not([height]), img.rb-post__cover:not([height]) { width: 100%
 }
 @media print {
   .rb-whatsapp { display: none; }
+}
+
+/*
+ * Janela de contato (ContactDialog.astro): `popover` do HTML, aberto pelos botões do tema.
+ * Esc e clique fora fecham; o fundo escurece com ::backdrop. Só tokens.
+ */
+.rb-dialog {
+  width: min(38rem, calc(100% - 2rem)); max-height: calc(100dvh - 2rem); margin: auto; padding: 0; overflow: auto;
+  color: var(--rb-fg); background: var(--rb-bg); border: 1px solid var(--rb-border); border-radius: var(--rb-radius);
+  box-shadow: 0 24px 64px color-mix(in srgb, var(--rb-bg) 60%, transparent);
+}
+.rb-dialog::backdrop { background: color-mix(in srgb, var(--rb-bg) 75%, transparent); backdrop-filter: blur(4px); }
+.rb-dialog__head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 1rem 0 1.5rem; }
+.rb-dialog__title { margin: 0; font-size: 1.25rem; color: var(--rb-fg-strong, var(--rb-fg)); }
+.rb-dialog__close {
+  display: inline-flex; align-items: center; justify-content: center; flex: none; width: 44px; height: 44px; padding: 0;
+  font: inherit; font-size: 1.5rem; line-height: 1; color: var(--rb-muted); background: none; border: 0; border-radius: var(--rb-radius); cursor: pointer;
+}
+.rb-dialog__close:hover { color: var(--rb-fg); background: color-mix(in srgb, var(--rb-fg) 8%, transparent); }
+.rb-dialog__close:focus-visible { outline: 2px solid var(--rb-accent); outline-offset: 2px; }
+.rb-dialog__body { padding: 1rem 1.5rem 1.5rem; }
+@media (prefers-reduced-motion: no-preference) {
+  .rb-dialog:popover-open { animation: rb-dialog-in 0.18s ease-out; }
+  @keyframes rb-dialog-in { from { opacity: 0; transform: translateY(0.5rem); } }
 }

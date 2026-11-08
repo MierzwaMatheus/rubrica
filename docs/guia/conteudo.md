@@ -66,6 +66,8 @@ Dois recursos valem para o **site inteiro**, nos dois tipos de site, e ficam em 
 
 **Em qualquer botão ou link**, use o endereço `whatsapp:` no lugar de uma URL: ele vira o link do WhatsApp do site com a mensagem inicial do idioma. Para uma mensagem própria, escreva depois dos dois-pontos: `whatsapp:Quero o plano Pro`. Vale nos botões dos blocos, nos planos, no menu e no link da faixa de aviso. Sem número configurado, o link `whatsapp:` não aparece (o botão some, em vez de levar a lugar nenhum). Se o WhatsApp não foi configurado aqui, o `whatsapp:` usa o WhatsApp dos dados da empresa.
 
+**Botões para o contato.** Nos temas que abrem o contato numa janela (o `padrao` e o `cyberpunk`), um botão ou link com o endereço `contato:` (ou `#contato`) abre a janela com o formulário de contato, em qualquer página. Assim o bloco de chamada (`cta`) e o hero podem levar ao contato sem uma seção de contato na página. Nos outros temas, `contato:` leva ao bloco de contato da home.
+
 No site de empresa, o número também entra nos dados estruturados da organização (`contactPoint`), para o Google.
 
 ### Faixa de aviso

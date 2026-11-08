@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { fileURLToPath } from "node:url";
 import { fixtureSource } from "../src/data/source";
-import { buildSite } from "../src/render/site";
+import { buildSite, contactBlock, CONTACT_DIALOG_ID } from "../src/render/site";
 import { CORE_BLOCKS } from "../src/blocks/catalog";
 import { CORE_PLUGINS } from "../src/plugins/registry";
 import { defineTheme } from "../src/theme/contract";
@@ -97,6 +97,22 @@ describe("montagem do site", () => {
     const s = await site();
     expect(s.context("en", "/en").t("blog.readingTime", { minutes: 3 })).toBe("3 min read");
     expect(s.context("pt-BR", "/").t("nav.menu")).toBe("Menu");
+  });
+
+  it("janela de contato: com o tema pedindo e o plugin ligado, mesmo sem bloco de contato", async () => {
+    const snapshot = await fixtureSource(fixtures).load();
+    const withDialog = defineTheme({ ...theme, contactDialog: true });
+    const on = buildSite({ snapshot, theme: withDialog, blocks: CORE_BLOCKS, plugins: CORE_PLUGINS });
+    expect(on.context("pt-BR", "/blog", []).site.contactDialog).toBe(CONTACT_DIALOG_ID);
+    expect(contactBlock(on.routes, "pt-BR").id).not.toBe(CONTACT_DIALOG_ID); // usa o bloco da home
+    expect((await site()).context("pt-BR", "/", []).site.contactDialog).toBeUndefined();
+    const off = buildSite({ snapshot: { ...snapshot, site: { ...snapshot.site, plugins: { ...snapshot.site.plugins, "contact-wizard": false } } }, theme: withDialog, blocks: CORE_BLOCKS, plugins: CORE_PLUGINS });
+    expect(off.context("pt-BR", "/", []).site.contactDialog).toBeUndefined();
+    // Sem seção de contato, a janela continua, com o assistente padrão.
+    const noBlock = { ...snapshot, pages: snapshot.pages.map((p) => ({ ...p, blocks: p.blocks.filter((b) => b.type !== "contato") })) };
+    const bare = buildSite({ snapshot: noBlock, theme: withDialog, blocks: CORE_BLOCKS, plugins: CORE_PLUGINS });
+    expect(bare.context("pt-BR", "/", []).site.contactDialog).toBe(CONTACT_DIALOG_ID);
+    expect(contactBlock(bare.routes, "pt-BR")).toMatchObject({ id: CONTACT_DIALOG_ID, type: "contato", fields: { mode: "wizard" } });
   });
 
   it("telefone e WhatsApp do dono chegam à casca (ctx.site.person)", async () => {

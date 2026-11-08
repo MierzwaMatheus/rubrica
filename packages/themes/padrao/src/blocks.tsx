@@ -2,7 +2,7 @@
  * Blocos que, na v1 padrão, têm visual diferente do padrão do núcleo. Os outros
  * blocos herdam os componentes do núcleo e ganham o visual só pelo CSS do tema.
  */
-import type { BlockProps } from "@rubrica/core";
+import type { BlockProps, ResolvedLink } from "@rubrica/core";
 import { Heading, Img, LinkButton, Section, SectionHeader } from "@rubrica/core/components";
 import { Icon, type IconName } from "./icons";
 
@@ -10,6 +10,24 @@ import { Icon, type IconName } from "./icons";
  * Hero: chip de terminal (`$ <sobretítulo> → <nome>`), título, cargo, apoio com fio
  * lateral e botões com ícone. O nome e o cargo vêm do dono do site (`ctx.site.person`).
  */
+/** Botão do hero: abre a janela de contato quando o link aponta para o contato; senão, é um link. */
+function CtaLink({ link, className, icon }: { link: ResolvedLink; className: string; icon: IconName }) {
+  if (link.dialog) {
+    return (
+      <button type="button" className={className} popoverTarget={link.dialog}>
+        <Icon name={icon} />
+        {link.label}
+      </button>
+    );
+  }
+  return (
+    <a className={className} href={link.href} {...(link.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
+      <Icon name={icon} />
+      {link.label}
+    </a>
+  );
+}
+
 export function HeroBlock({ id, variant, fields, headingLevel, ctx }: BlockProps<any>) {
   const person = ctx.site.person;
   const showChip = Boolean(fields.eyebrow || person);
@@ -49,16 +67,10 @@ export function HeroBlock({ id, variant, fields, headingLevel, ctx }: BlockProps
         {(fields.primaryCta || fields.secondaryCta) && (
           <div className="rb-actions">
             {fields.primaryCta && (
-              <a className="rb-button rb-button--primary" href={fields.primaryCta.href} {...(fields.primaryCta.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
-                <Icon name="folder" />
-                {fields.primaryCta.label}
-              </a>
+              <CtaLink link={fields.primaryCta} className="rb-button rb-button--primary" icon="folder" />
             )}
             {fields.secondaryCta && (
-              <a className="rb-button rb-button--outline" href={fields.secondaryCta.href} {...(fields.secondaryCta.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
-                <Icon name="message" />
-                {fields.secondaryCta.label}
-              </a>
+              <CtaLink link={fields.secondaryCta} className="rb-button rb-button--outline" icon="message" />
             )}
           </div>
         )}

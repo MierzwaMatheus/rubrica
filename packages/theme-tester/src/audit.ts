@@ -145,9 +145,24 @@ async function collectFacts(page: Page): Promise<{ head: HeadFacts; scripts: Scr
   });
 }
 
-/** Rola até cada ilha (client:visible) e espera todas perderem o atributo `ssr`. */
+/**
+ * Rola até cada ilha (client:visible) e espera todas perderem o atributo `ssr`. Ilha dentro
+ * de uma janela fechada (`popover`, como a janela de contato) só carrega quando a janela abre:
+ * a bateria abre a janela, como quem clica no botão, e a deixa aberta para o axe auditar o
+ * formulário dela também.
+ */
 async function hydrate(page: Page, islands: number): Promise<CheckResult> {
   if (islands === 0) return { id: "hydration", ok: true, message: "sem ilhas" };
+  await page.evaluate(() => {
+    for (const island of document.querySelectorAll("astro-island")) {
+      const pop = island.closest<HTMLElement>("[popover]");
+      if (pop && !pop.matches(":popover-open")) pop.showPopover();
+    }
+  });
+  return hydrateVisible(page, islands);
+}
+
+async function hydrateVisible(page: Page, islands: number): Promise<CheckResult> {
   // <astro-island> tem display: contents (sem caixa): rola até o conteúdo dela (ou o pai),
   // uma ilha por vez, dando tempo ao IntersectionObserver do client:visible.
   const count = await page.locator("astro-island").count();

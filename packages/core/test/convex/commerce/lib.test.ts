@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from "vitest";
 import { asaasConfig, asaasRequest, AsaasError, effectiveDueDate, isIsoDate, onlyDigits, todayInSaoPaulo } from "../../../src/convex/commerce/lib/asaasClient";
 import { installmentOptions, installmentPlan, maxInstallmentsFor } from "../../../src/convex/commerce/lib/installments";
 import { handleAsaasWebhook } from "../../../src/convex/commerce/lib/asaasWebhook";
-import { allowedOrigins } from "../../../src/convex/commerce/commerce";
+import { allowedOrigins, isLocalDevOrigin } from "../../../src/convex/commerce/commerce";
 import { escapeTgHtml, hashPassword, randomId, randomToken, sha256Hex, timingSafeEqual, verifyPassword } from "../../../src/convex/commerce/lib/security";
 
 function jsonResponse(body: unknown, status = 200) {
@@ -202,6 +202,13 @@ describe("origens do CORS", () => {
     const all = allowedOrigins("https://exemplo.dev", { SITE_URL: "https://site.vercel.app", RUBRICA_ALLOWED_ORIGINS: "https://a.dev/x, lixo" });
     expect(all).toEqual(expect.arrayContaining(["https://site.vercel.app", "https://a.dev"]));
     expect(all.some((o) => o.includes("localhost"))).toBe(false);
-    expect(allowedOrigins(undefined, { RUBRICA_ALLOW_LOCALHOST: "true" })).toContain("http://localhost:4321");
+  });
+
+  it("servidor local em qualquer porta, só quando liberado", () => {
+    const on = { RUBRICA_ALLOW_LOCALHOST: "true" };
+    for (const o of ["http://localhost:4321", "http://localhost:4402", "http://127.0.0.1:5173", "http://[::1]:3000"]) expect(isLocalDevOrigin(o, on)).toBe(true);
+    expect(isLocalDevOrigin("http://localhost:4402", {})).toBe(false);
+    expect(isLocalDevOrigin("http://localhost.evil.dev", on)).toBe(false);
+    expect(isLocalDevOrigin("https://exemplo.dev", on)).toBe(false);
   });
 });

@@ -15,6 +15,7 @@ import type { HttpRouter } from "convex/server";
 import { httpAction, ref, type ActionCtx } from "../server";
 import { handleAsaasWebhook } from "./lib/asaasWebhook";
 import { errorPayload } from "./shared";
+import { isLocalDevOrigin } from "./commerce";
 
 type Ctx = ActionCtx;
 
@@ -58,7 +59,7 @@ type PublicHandler = (ctx: Ctx, body: unknown, meta: { ip: string; userAgent: st
 function publicRoute(handler: PublicHandler) {
   return httpAction(async (ctx, req) => {
     const origin = req.headers.get("origin");
-    const allowed = origin ? (await ctx.runQuery(refs.siteOrigins, {})).includes(origin) : false;
+    const allowed = origin ? isLocalDevOrigin(origin) || (await ctx.runQuery(refs.siteOrigins, {})).includes(origin) : false;
     const cors = origin && allowed ? corsHeaders(origin) : {};
     if (req.method === "OPTIONS") {
       return allowed ? new Response(null, { status: 204, headers: cors }) : new Response("Forbidden", { status: 403 });

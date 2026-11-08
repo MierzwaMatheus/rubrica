@@ -14,18 +14,24 @@ import { vRole } from "../validators";
 import { eraseCommercePersonalData, exportCommercePersonalData } from "./personalData";
 import { guard } from "./shared";
 
-/** Origens do servidor local (Astro e Vite), só com RUBRICA_ALLOW_LOCALHOST=true (deployment de desenvolvimento). */
-export const DEV_ORIGINS = ["http://localhost:4321", "http://127.0.0.1:4321", "http://localhost:5173", "http://localhost:3000"];
+const LOCALHOST = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/;
 
-/** Origens aceitas: URL do site (com e sem www), SITE_URL, RUBRICA_ALLOWED_ORIGINS e, se ligado, o servidor local. */
+/**
+ * Servidor local em qualquer porta (o `astro dev` pode subir em outra), só com
+ * RUBRICA_ALLOW_LOCALHOST=true (deployment de desenvolvimento). Igual aos formulários.
+ */
+export function isLocalDevOrigin(origin: string, env: Record<string, string | undefined> = process.env): boolean {
+  return env.RUBRICA_ALLOW_LOCALHOST === "true" && LOCALHOST.test(origin);
+}
+
+/** Origens aceitas: URL do site (com e sem www), SITE_URL e RUBRICA_ALLOWED_ORIGINS. O servidor local é `isLocalDevOrigin`. */
 export function allowedOrigins(siteUrl: string | undefined, env: Record<string, string | undefined> = process.env): string[] {
   const extra = (env.RUBRICA_ALLOWED_ORIGINS ?? "")
     .split(",")
     .map((o) => o.trim())
     .filter(Boolean)
     .flatMap((o) => originsOf(o).slice(0, 1));
-  const local = env.RUBRICA_ALLOW_LOCALHOST === "true" ? DEV_ORIGINS : [];
-  return [...new Set([...originsOf(siteUrl), ...originsOf(env.SITE_URL), ...extra, ...local])];
+  return [...new Set([...originsOf(siteUrl), ...originsOf(env.SITE_URL), ...extra])];
 }
 
 /** A origem e a variante com/sem `www`. */

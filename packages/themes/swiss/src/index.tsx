@@ -62,6 +62,7 @@ export default defineTheme({
   description: "Estilo tipográfico internacional: grade rígida de 12 colunas, tipografia pesada e uma cor de destaque em blocos chapados.",
   contract: "^1",
   scheme: "paper-noir",
+  colorMode: "light",
   fonts,
   tokens: {
     "rb-accent": { label: "Cor de destaque", kind: "color", default: "#F05454", light: "#BA1010" },

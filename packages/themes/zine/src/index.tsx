@@ -81,6 +81,7 @@ export default defineTheme({
   description: "Colagem de fanzine: polaroides, fita adesiva, post-its, carimbos e letra à mão.",
   contract: "^1",
   scheme: "riso",
+  colorMode: "light",
   fonts,
   tokens: {
     "rb-accent": { label: "Cor de destaque", kind: "color", default: "#FF5CBA", light: "#B4156B" },

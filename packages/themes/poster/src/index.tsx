@@ -104,6 +104,7 @@ export default defineTheme({
   description: "Tipografia gigante do começo ao fim, faixas rolando e linhas de cartaz — impacto.",
   contract: "^1",
   scheme: "tropicalia",
+  colorMode: "light",
   fonts,
   tokens: {
     "rb-accent": { label: "Cor de destaque", kind: "color", default: "#34C08A", light: "#0B6E4F" },

@@ -263,3 +263,8 @@ h2.rb-section__title::after { content: " */"; content: " */" / ""; color: var(--
 .rb-prose hr { border: 0; border-top: 1px solid var(--rb-hairline); margin-block: 2rem; }
 .rb-related { margin-top: 3rem; }
 .rb-notfound { padding-block: 4rem; }
+
+/* Logo do site (quando configurada): no topo da sidebar e na barra do celular. */
+.rb-side__logo { display: flex; justify-content: center; padding: 1rem 1rem 0; }
+.rb-side__logo .rb-logo { height: 2.25rem; }
+.rb-bar__logo { height: 1.75rem; }

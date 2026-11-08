@@ -6,7 +6,7 @@
  * `visibility: hidden`, então os links dela não recebem foco.
  */
 import type { ShellProps } from "@rubrica/core";
-import { Img } from "@rubrica/core/components";
+import { Img, Logo } from "@rubrica/core/components";
 import { Icon, type IconName } from "./icons";
 
 export interface SidebarOptions {
@@ -58,8 +58,14 @@ export function createSidebarShell({ avatar = "md" }: SidebarOptions = {}) {
 
         <header className="rb-bar">
           <a className="rb-bar__brand" href={ctx.href("/")}>
-            <Avatar className="rb-avatar rb-avatar--sm" />
-            <span className="rb-bar__name">{name}</span>
+            {site.logo ? (
+              <Logo logo={site.logo} className="rb-bar__logo" priority />
+            ) : (
+              <>
+                <Avatar className="rb-avatar rb-avatar--sm" />
+                <span className="rb-bar__name">{name}</span>
+              </>
+            )}
           </a>
           <label htmlFor="rb-menu" className="rb-bar__menu" aria-hidden="true">
             <Icon name="menu" size={20} />
@@ -68,6 +74,11 @@ export function createSidebarShell({ avatar = "md" }: SidebarOptions = {}) {
         <label htmlFor="rb-menu" className="rb-scrim" aria-hidden="true" />
 
         <aside className="rb-side">
+          {site.logo && (
+            <a href={ctx.href("/")} className="rb-side__logo">
+              <Logo logo={site.logo} />
+            </a>
+          )}
           <div className="rb-profile">
             <a href={ctx.href("/")} className="rb-profile__link" tabIndex={-1} aria-hidden="true">
               <Avatar className="rb-avatar rb-avatar--lg" />

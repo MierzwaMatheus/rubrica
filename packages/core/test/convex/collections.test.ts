@@ -131,6 +131,24 @@ describe("coleções simples", () => {
     expect((await c.query(api.rubrica.projects.get, { id }))?.sections).toEqual([{ title: { "pt-BR": "Contexto" }, body: { "pt-BR": "<p>a</p>" } }]);
   });
 
+  it("projeto guarda a métrica opcional (valor e rótulo por idioma) e a apaga com unset", async () => {
+    const c = await as(t, "admin");
+    const id = await c.mutation(api.rubrica.projects.create, {
+      title: { "pt-BR": "Case" },
+      metric: { value: "~50", label: { "pt-BR": "skills em produção", en: "skills in production" } },
+    });
+    expect((await c.query(api.rubrica.projects.get, { id }))?.metric).toEqual({ value: "~50", label: { "pt-BR": "skills em produção", en: "skills in production" } });
+    await c.mutation(api.rubrica.projects.update, { id, patch: {}, unset: ["metric"] });
+    expect((await c.query(api.rubrica.projects.get, { id }))?.metric).toBeUndefined();
+    await expect(c.mutation(api.rubrica.projects.create, { title: { "pt-BR": "X" }, metric: { value: 3 } as never })).rejects.toThrow();
+  });
+
+  it("aparência aceita o id do esquema de cor", async () => {
+    const root = await as(t, "root");
+    await root.mutation(api.rubrica.settings.update, { patch: { appearance: { colorMode: "dark", colorToggle: true, scheme: "paper-noir", fontSans: "Inter" } } });
+    expect((await root.query(api.rubrica.settings.get, {}))?.appearance).toMatchObject({ scheme: "paper-noir", fontSans: "Inter" });
+  });
+
   it("lista sem a lixeira, a não ser que peça", async () => {
     const c = await as(t, "admin");
     const id = await c.mutation(api.rubrica.faq.create, { question: { "pt-BR": "?" }, answer: { "pt-BR": "!" } });

@@ -111,6 +111,8 @@ export interface RawProject extends Base {
   year?: number;
   role?: Localized<string>;
   links?: RawLink[];
+  /** Número de destaque mostrado no card do case. */
+  metric?: { value: string; label: Localized<string> };
   seo?: SeoFields;
   updatedAt?: number;
 }

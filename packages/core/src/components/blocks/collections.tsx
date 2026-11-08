@@ -36,6 +36,11 @@ export function CasesBlock({ id, variant, fields, items, headingLevel, ctx }: Bl
                     {p.title}
                   </a>
                 </Heading>
+                {p.metric && (
+                  <p className="rb-card__metric">
+                    <strong>{p.metric.value}</strong> {p.metric.label}
+                  </p>
+                )}
                 {p.summary && <p className="rb-card__text">{p.summary}</p>}
                 {p.tags.length > 0 && (
                   <ul className="rb-tags">

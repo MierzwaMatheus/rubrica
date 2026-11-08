@@ -121,7 +121,7 @@ export default function PreviewApp() {
     let link = document.getElementById("rb-preview-fonts") as HTMLLinkElement | null;
     const families = plan.fonts.filter((f) => f.name && (f.name === appearance.fontSans || f.name === appearance.fontMono));
     const href = families.length
-      ? `https://fonts.googleapis.com/css2?${families.map((f) => `family=${encodeURIComponent(f.name).replace(/%20/g, "+")}:wght@${f.weights.join(";")}`).join("&")}&display=swap`
+      ? `https://fonts.googleapis.com/css2?${families.map((f) => `family=${encodeURIComponent(f.name).replace(/%20/g, "+")}:${f.styles?.includes("italic") ? `ital,wght@${[0, 1].flatMap((i) => f.weights.map((w) => `${i},${w}`)).join(";")}` : `wght@${f.weights.join(";")}`}`).join("&")}&display=swap`
       : "";
     if (href && (!link || link.href !== href)) {
       link?.remove();

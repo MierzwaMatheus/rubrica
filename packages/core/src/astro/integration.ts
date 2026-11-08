@@ -159,7 +159,7 @@ export default function rubrica(options: RubricaOptions): AstroIntegration {
             name: f.name,
             cssVariable: f.cssVariable,
             weights: f.weights,
-            styles: ["normal"],
+            styles: f.styles ?? ["normal"],
             subsets: ["latin", "latin-ext"],
             fallbacks: f.fallbacks,
           })),

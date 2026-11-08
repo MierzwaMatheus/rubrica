@@ -10,8 +10,8 @@ export * from "./plugins/contract";
 export type { DataSource, SiteSnapshot } from "./data/source";
 export { SCHEMES, SCHEME_TOKENS, DEFAULT_SCHEME_ID, getScheme, schemeCss, contrastRatio } from "./theme/schemes";
 export type { ColorScheme, SchemeMode, SchemeRole } from "./theme/schemes";
-export { planFonts, fontWeights, KNOWN_FONTS } from "./theme/fonts";
-export type { FontPlan, PlannedFont } from "./theme/fonts";
+export { planFonts, fontWeights, hasItalic, KNOWN_FONTS } from "./theme/fonts";
+export type { FontPlan, FontStyle, PlannedFont } from "./theme/fonts";
 /** Itens de coleção já resolvidos no idioma (o que os blocos e templates recebem). */
 export type {
   CaseSectionItem,

@@ -45,6 +45,19 @@ describe("planFonts", () => {
     expect(plan.assign).toEqual({ "--rb-font-sans": "--rbf-sans", "--rb-font-mono": "--rbf-sans" });
   });
 
+  it("o tema pede itálico por papel: vale para a família do papel, sem repetir, e não para família sem itálico", () => {
+    const plan = planFonts(undefined, { sans: "IBM Plex Serif", display: "Bodoni Moda", mono: "JetBrains Mono", italic: ["sans", "display"] });
+    expect(plan.fonts.map((f) => [f.name, f.styles])).toEqual([
+      ["IBM Plex Serif", ["normal", "italic"]],
+      ["JetBrains Mono", ["normal"]],
+      ["Bodoni Moda", ["normal", "italic"]],
+    ]);
+    // O site trocou a fonte do texto: o itálico continua pedido para o papel.
+    expect(planFonts({ fontSans: "Inter" }, { sans: "IBM Plex Serif", italic: ["sans"] }).fonts[0]).toMatchObject({ name: "Inter", styles: ["normal", "italic"] });
+    expect(planFonts({ fontSans: "Manrope" }, { italic: ["sans"] }).fonts[0]?.styles).toEqual(["normal"]);
+    expect(planFonts(undefined, { sans: "Inter" }).fonts[0]?.styles).toEqual(["normal"]);
+  });
+
   it("família desconhecida usa 400 e 700; nome com caracteres perigosos é ignorado", () => {
     expect(planFonts({ fontSans: "Minha Fonte" }, undefined).fonts[0]?.weights).toEqual([400, 700]);
     expect(planFonts({ fontSans: 'x"}body{' }, undefined).fonts).toEqual([]);

@@ -151,6 +151,12 @@ export interface ThemeFonts {
   sans?: string;
   mono?: string;
   display?: string;
+  /**
+   * Papéis (`sans`, `mono`, `display`) que também baixam o itálico de verdade, no lugar do
+   * oblíquo sintetizado pelo navegador. Vale para a família que ocupar o papel, mesmo que
+   * o site troque a fonte. Ex.: `"italic": ["sans", "display"]`.
+   */
+  italic?: string[];
 }
 
 export interface ThemeDefinition {

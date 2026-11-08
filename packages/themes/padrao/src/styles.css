@@ -57,6 +57,20 @@ code, pre { font-family: var(--rb-font-mono); }
   .rb-main { padding-left: var(--rb-side-width); padding-top: 0; }
   .rb-main__inner { padding-inline: 3rem; }
 }
+/*
+ * Faixa de aviso do núcleo (<html data-announcement>): ela vem antes da casca, então a barra
+ * fixa do celular vira sticky e, no desktop, a lateral entra no fluxo (sticky), para nenhuma
+ * das duas ficar por cima da faixa. Rolando, a faixa sai e as duas grudam no topo.
+ */
+/* O .rb-app do app.css do núcleo (páginas do app) também pega aqui: sem o respiro no topo, a barra e a lateral encostam na faixa. */
+[data-announcement] .rb-app { padding-top: 0; }
+[data-announcement] .rb-bar { position: sticky; top: 0; }
+[data-announcement] .rb-main { padding-top: 0; }
+@media (min-width: 1024px) {
+  [data-announcement] .rb-app { display: flex; align-items: flex-start; }
+  [data-announcement] .rb-side { position: sticky; top: 0; height: 100vh; flex: none; }
+  [data-announcement] .rb-main { flex: 1; min-width: 0; padding-left: 0; }
+}
 .rb-main__inner .rb-container { max-width: none; padding-inline: 0; }
 .rb-main__inner .rb-section { padding-block: 0; }
 .rb-main__inner .rb-section + .rb-section { margin-top: 4rem; }

@@ -3,22 +3,13 @@
 Lista viva do que falta para a v2 estável, vinda das revisões. Cada item sai daqui quando entra na `v2`.
 
 ## Paridade com a v1 (obrigatório antes da v2.0.0; achado no piloto do mmlo)
-- **RSS** do blog (`/rss.xml`, por idioma), como a v1 gerava.
-- **Analytics (Umami)**: a v1 injetava o script quando configurado; na v2, plugin com o script externo e CSP.
-- **Ícones e metadados do `<head>`**: favicon (SVG/ICO), `apple-touch-icon`, `manifest.webmanifest`, `theme-color` a partir das configurações.
-- **Capa padrão de post** (quando o post não tem capa): imagem da marca nas configurações.
-- **Textos personalizados no código da v1**: o `migrar` deveria usar os arquivos de tradução do projeto v1 como segundo padrão (antes do texto do template).
+- **Analytics de projeto migrado**: o `migrar` não liga o plugin `analytics` nem põe a origem na CSP quando a v1 tinha `VITE_UMAMI_*` na Vercel (o CLI não lê as variáveis da Vercel). O relatório aponta para `config --analytics`.
 
 ## Contrato (ajustes aditivos, antes de portar os outros 12 temas)
 - **Terminal (ilha)**: o "Press ~" da v1 não existe no núcleo; decidir se vira plugin do tipo pessoal.
 - **Menu móvel**: a gaveta por checkbox não fecha ao seguir âncora da mesma página.
-
-- **Fontes em itálico**: a integração pede só `styles: ["normal"]`; `fonts.json` do tema deve poder pedir itálico (o magazine sintetiza hoje).
-- **Bateria e transições de cor**: o axe mede cor intermediária quando há `transition` de cor; a bateria deveria desligar transições antes de medir (hoje os temas tiram as transições).
-
-- **Modo de cor padrão no tema**: o tema declara esquema mas não o modo (claro/escuro) recomendado.
-- **Utilitários do núcleo exportados**: `formatDays`, `safeId` e o CSS do filtro de etiquetas foram copiados pelos temas; exportar do núcleo.
 - **Lista de temas portados no CLI**: `PORTED_THEMES` é fixa; derivar dos pacotes de tema existentes.
+- **Temas usarem os utilitários do núcleo**: `formatDays`, `safeId`, `resolveFreeHref`, `digits`, `shorten` e `tagFilterCss` já saem de `@rubrica/core/components`; os temas portados ainda têm as cópias (trocar quando os ports em paralelo terminarem).
 
 ## Temas
 - Portar os 12 layouts restantes (fase 3), depois do contrato estável no fim da fase 2.
@@ -28,6 +19,15 @@ Lista viva do que falta para a v2 estável, vinda das revisões. Cada item sai d
 - Alternância de tema em mais de um lugar: `ColorToggleButton` é estático; o tema pode pôr quantos quiser com `ctx.t("theme.toggle")`.
 - Variações dos blocos padrão: `CORE_VARIANTS` lista o que os componentes do núcleo desenham.
 - Métrica no card de case: `metric` opcional no projeto, mostrada no bloco `cases` padrão.
+- RSS do blog: `/rss.xml` no idioma principal e `/<prefixo>/rss.xml` nos idiomas com post traduzido (`seo/rss.ts`), com `<link rel="alternate" type="application/rss+xml">` no `<head>`; título e descrição em `SiteSettings.rss`.
+- Analytics (Umami): plugin `analytics` (desligado por padrão); script `defer` marcado com `data-rb-analytics` só quando há endereço https e id (`SiteSettings.analytics` ou `PUBLIC_UMAMI_*`); `config --analytics` libera a origem em `script-src` e `connect-src`; a bateria aceita só esse script em página sem ilha.
+- Ícones e metadados do `<head>`: `SiteSettings.icons` (SVG, PNG/ICO, apple-touch-icon, 192, 512, maskable), `manifest.webmanifest` gerado e `theme-color` por modo (`SiteSettings.themeColor`, senão o fundo do esquema).
+- Capa padrão de post: `SiteSettings.defaultPostCover`; o post sem capa recebe a padrão já resolvida (`post.cover`, com `post.defaultCover: true`), inclusive no `og:image`.
+- `migrar` com os arquivos de tradução da v1 (`src/i18n/translations/*.ts`) como segundo padrão dos textos (banco > arquivo > template); a cópia fica em `.rubrica/migracao/textos-v1.json` para o `migrar dados`.
+- Fontes em itálico: `fonts.json` aceita `"italic": ["sans", "display"]` (por papel); o magazine e o monograph pedem.
+- Bateria e transições de cor: o axe roda com transições e animações desligadas.
+- Modo de cor recomendado: `colorMode` opcional no `defineTheme`; o CLI usa no `create` e no `config --tema`. Bento, chat, desktop, index, magazine e monograph declaram `light`.
+- Utilitários exportados em `@rubrica/core/components` e os tipos de item de coleção (`PostItem`, `ProjectItem`…) na raiz do `@rubrica/core`.
 
 ## Painel (coleções e negócio)
 - **Imagens no corpo dos textos**: o TipTap do painel não tem a extensão de imagem; capa, galeria e imagens das seções do case passam pela biblioteca, mas o corpo de posts e páginas não aceita imagem inline.

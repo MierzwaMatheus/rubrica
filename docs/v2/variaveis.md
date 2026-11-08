@@ -60,3 +60,14 @@ Propostas, modelos de contrato, pagamentos (Asaas) e currículos com IA (`packag
 | `TELEGRAM_CHAT_ID` | Não | Conversa que recebe os avisos (aceita também `TELEGRAM_ADMIN_CHAT_ID`, o nome da v1). Sem token e conversa, os avisos não saem (nada falha) |
 
 As rotas HTTP do comercial ficam em `<CONVEX_SITE_URL>` (o endereço `.convex.site` do deployment): `/api/proposal/session`, `/api/proposal/accept`, `/api/checkout/start` e `/webhooks/asaas`.
+
+## Build do site (hospedagem)
+
+Estas não ficam no Convex: vão nas variáveis de ambiente do **build** (Vercel → Settings → Environment Variables), porque o site é gerado no build.
+
+| Variável | Para quê |
+|---|---|
+| `PUBLIC_UMAMI_SCRIPT_URL` | Plugin `analytics`: endereço do script do Umami (`https://cloud.umami.is/script.js`). Só https. As Configurações do painel vencem esta. Aceita também `VITE_UMAMI_SCRIPT_URL` e `VITE_ANALYTICS_ENDPOINT` (o script em `<endpoint>/umami`), os nomes da v1 |
+| `PUBLIC_UMAMI_WEBSITE_ID` | Plugin `analytics`: id do site no Umami. Aceita também `VITE_UMAMI_WEBSITE_ID` e `VITE_ANALYTICS_WEBSITE_ID` |
+
+Sem o plugin ligado, ou sem script e id, nenhuma página leva o script. A origem do script precisa estar em `script-src` e `connect-src` da CSP: `npx create-rubrica config --analytics <script> --analytics-id <id>` grava as duas coisas (e atualiza o `vercel.json` e o `public/_headers`).

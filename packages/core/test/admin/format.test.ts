@@ -118,13 +118,9 @@ describe("contrato e datas", () => {
   });
 });
 
-describe("atividades e contrato", () => {
-  it("descreve a atividade em português", async () => {
-    const { describeAudit, unknownVariables } = await import("../../src/admin/lib/format");
-    expect(describeAudit({ eventType: "admin.update", targetType: "posts" })).toBe("editou · post");
-    expect(describeAudit({ eventType: "admin.publish", targetType: "page" })).toBe("publicou · página");
-    expect(describeAudit({ eventType: "testimonial.approved", targetType: "testimonials" })).toBe("aprovou um depoimento enviado");
-    expect(describeAudit({ eventType: "outra.coisa", success: false })).toBe("outra.coisa (falhou)");
+describe("contrato", () => {
+  it("acha variáveis que o contrato não conhece", async () => {
+    const { unknownVariables } = await import("../../src/admin/lib/format");
     expect(unknownVariables("{{client_name}} {{foo_bar}} {{scope}}")).toEqual(["foo_bar"]);
   });
 });

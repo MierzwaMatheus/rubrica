@@ -32,34 +32,52 @@
   ],
   "scripts": {
     "check": "tsc --noEmit -p tsconfig.json",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:e2e": "playwright test -c e2e/playwright.config.ts"
   },
   "peerDependencies": {
     "@astrojs/react": "^7.1.4",
-    "astro": "^7.4.0",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "convex": "^1.49.0",
+    "@auth/core": "^0.41.3",
     "@convex-dev/auth": "^0.0.96",
-    "@auth/core": "^0.41.3"
+    "astro": "^7.4.0",
+    "convex": "^1.49.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
   },
   "devDependencies": {
     "@astrojs/react": "^7.1.4",
+    "@auth/core": "^0.41.3",
+    "@convex-dev/auth": "^0.0.96",
     "@edge-runtime/vm": "^5.0.0",
+    "@playwright/test": "^1.64.0",
+    "@testing-library/react": "^16.3.3",
     "@types/node": "^22.0.0",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "astro": "^7.4.7",
+    "convex": "^1.49.0",
     "convex-test": "^0.0.67",
+    "happy-dom": "^21.0.4",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
     "typescript": "^5.9.0",
-    "vitest": "^3.2.4",
-    "convex": "^1.49.0",
-    "@convex-dev/auth": "^0.0.96",
-    "@auth/core": "^0.41.3"
+    "vitest": "^3.2.4"
   },
   "dependencies": {
+    "@radix-ui/react-dialog": "^1.3.1",
+    "@radix-ui/react-slot": "^1.5.0",
+    "@radix-ui/react-switch": "^1.4.1",
+    "@radix-ui/react-tabs": "^1.2.1",
+    "@tailwindcss/vite": "^4.3.5",
+    "@tiptap/pm": "^3.33.0",
+    "@tiptap/react": "^3.33.0",
+    "@tiptap/starter-kit": "^3.33.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.70.0",
+    "sonner": "^2.0.8",
+    "tailwind-merge": "^3.7.0",
+    "tailwindcss": "^4.3.5",
     "xss": "^1.0.17"
   }
 }

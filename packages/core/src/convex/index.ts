@@ -41,6 +41,7 @@ import { mediaFunctions } from "./media";
 import { pagesFunctions } from "./pages";
 import { privacyFunctions } from "./privacy";
 import { publishFunctions } from "./publish";
+import { panelFunctions } from "./panel";
 import { resolveRuntime, type RubricaConfig } from "./runtime";
 import { ref } from "./server";
 import { settingsFunctions, textsFunctions } from "./settings";
@@ -93,6 +94,7 @@ export function createRubrica(config: RubricaConfig = {}) {
     checkouts: once(() => checkoutsFunctions(rt)),
     asaas: once(() => asaasFunctions(rt)),
     aiResumes: once(() => aiResumesFunctions(rt)),
+    panel: once(() => panelFunctions(rt)),
   };
 
   return {
@@ -201,6 +203,10 @@ export function createRubrica(config: RubricaConfig = {}) {
     get aiResumes() {
       return modules.aiResumes();
     },
+    /** Só do painel: validar página sem gravar, uso e substituição de imagens. */
+    get panel() {
+      return modules.panel();
+    },
   };
 }
 
@@ -235,6 +241,7 @@ export const RUBRICA_MODULES = [
   "checkouts",
   "asaas",
   "aiResumes",
+  "panel",
 ] as const satisfies readonly (keyof Rubrica)[];
 
 export type { RubricaConfig } from "./runtime";

@@ -17,11 +17,13 @@ import { isAbsolute, resolve } from "node:path";
 import { fixtureSource, type DataSource } from "../data/source";
 import type { ThemeFonts } from "../theme/contract";
 import { planFonts, type FontPlan } from "../theme/fonts";
+import tailwindcss from "@tailwindcss/vite";
+import { findConvexUrl } from "../data/convex";
 
 export type SourceOption =
   /** Pasta com site.json, pages.json, texts.json e collections/*.json. */
   | { fixtures: string }
-  /** Convex de produção (lê CONVEX_URL/VITE_CONVEX_URL se `url` faltar). */
+  /** Convex de produção (lê CONVEX_URL, PUBLIC_CONVEX_URL ou VITE_CONVEX_URL se `url` faltar). */
   | { convex: { url?: string } };
 
 export interface RubricaOptions {
@@ -35,12 +37,25 @@ export interface RubricaOptions {
   blockComponents?: Record<string, string>;
   /** Ilhas extras do projeto: nome → especificador (export default). */
   islands?: Record<string, string>;
+  /**
+   * Painel em `/admin` (padrão: ligado). Com `source: { convex }`, fala com o Convex
+   * (endereço de `source.convex.url`, `CONVEX_URL`, `PUBLIC_CONVEX_URL` ou
+   * `VITE_CONVEX_URL`); com `source: { fixtures }`, roda em memória sobre os dados de
+   * exemplo (demonstração, nada é gravado).
+   */
+  admin?: boolean;
 }
 
 const VIRTUAL = {
   config: "virtual:rubrica/config",
   styles: "virtual:rubrica/styles",
   islands: "virtual:rubrica/islands",
+  /** Tema e blocos do projeto, sem a fonte de dados (painel e prévia, no navegador). */
+  client: "virtual:rubrica/client",
+  /** Como o painel acessa o backend. */
+  admin: "virtual:rubrica/admin",
+  /** Dados de exemplo do painel em modo demonstração (carregado sob demanda). */
+  adminDemo: "virtual:rubrica/admin-demo",
 } as const;
 
 const here = (p: string) => fileURLToPath(new URL(p, import.meta.url));
@@ -113,6 +128,20 @@ export default function rubrica(options: RubricaOptions): AstroIntegration {
             "export { theme };",
           ].join("\n"),
           [VIRTUAL.styles]: [`import "@rubrica/core/styles/base.css";`, `import ${JSON.stringify(`${spec(options.theme)}/styles.css`)};`].join("\n"),
+          [VIRTUAL.client]: [
+            `import theme from ${JSON.stringify(spec(options.theme))};`,
+            ...blockImports,
+            "export const projectComponents = {};",
+            ...componentImports,
+            `export const projectBlocks = [${(options.blocks ?? []).map((_, i) => `...projectBlocks${i}`).join(", ")}];`,
+            "export { theme };",
+          ].join("\n"),
+          [VIRTUAL.admin]:
+            "fixtures" in source
+              ? `export const adminBackend = { kind: "demo" };`
+              : `export const adminBackend = ${JSON.stringify(
+                  findConvexUrl(source.convex.url, process.env) ? { kind: "convex", url: findConvexUrl(source.convex.url, process.env) } : { kind: "missing" },
+                )};`,
           [VIRTUAL.islands]: [
             `import { CORE_ISLANDS } from "@rubrica/core/islands";`,
             "export const islands = { ...CORE_ISLANDS };",
@@ -136,12 +165,18 @@ export default function rubrica(options: RubricaOptions): AstroIntegration {
           })),
           vite: {
             plugins: [
+              // Só processa CSS com `@import "tailwindcss"`: o do painel. O tema não usa.
+              ...(options.admin === false ? [] : tailwindcss()),
               {
                 name: "rubrica:virtual",
                 resolveId(id) {
-                  return id in modules ? `\0${id}` : undefined;
+                  return id in modules || id === VIRTUAL.adminDemo ? `\0${id}` : undefined;
                 },
-                load(id) {
+                async load(id) {
+                  if (id === `\0${VIRTUAL.adminDemo}`) {
+                    const snapshot = "fixtures" in source ? await fixtureSource(abs(source.fixtures)).load() : null;
+                    return `export default ${JSON.stringify(snapshot)};`;
+                  }
                   if (id.startsWith("\0") && id.slice(1) in modules) return modules[id.slice(1)];
                   return undefined;
                 },
@@ -152,6 +187,12 @@ export default function rubrica(options: RubricaOptions): AstroIntegration {
         });
 
         injectRoute({ pattern: "/[...path]", entrypoint: here("./pages/page.astro"), prerender: true });
+        if (options.admin !== false) {
+          // Painel: rota do app, fora do sitemap, noindex, sem o CSS do tema.
+          injectRoute({ pattern: "/admin/[...rest]", entrypoint: here("./pages/admin.astro"), prerender: true });
+          // Prévia ao vivo: componentes e CSS do tema, num iframe do painel.
+          injectRoute({ pattern: "/admin/preview", entrypoint: here("./pages/admin-preview.astro"), prerender: true });
+        }
         injectRoute({ pattern: "/404", entrypoint: here("./pages/404.astro"), prerender: true });
         injectRoute({ pattern: "/sitemap.xml", entrypoint: here("./pages/sitemap.xml.ts"), prerender: true });
         injectRoute({ pattern: "/robots.txt", entrypoint: here("./pages/robots.txt.ts"), prerender: true });

@@ -21,7 +21,8 @@ packages/core/            @rubrica/core
   src/seo/                <head>, JSON-LD, sitemap, robots
   src/components/         casca, templates e blocos padrão (React)
   src/islands/            ilhas (o que leva JavaScript)
-  src/astro/              integração do Astro e páginas injetadas
+  src/astro/              integração do Astro e páginas injetadas (inclui /admin e /admin/preview)
+  src/admin/              painel (SPA React + Tailwind): telas, editor de páginas, prévia
   src/data/               fontes de dados do build (fixtures, Convex)
   test/                   testes do núcleo (vitest)
 packages/themes/<id>/     um pacote por tema (@rubrica/theme-<id>)
@@ -41,6 +42,8 @@ apps/docs/                site de documentação (userubrica.vercel.app)
 | Build da demo (empresa) | `SITE=empresa pnpm --filter @rubrica/demo build` |
 | Build com outro tema | `THEME=@rubrica/theme-cyberpunk pnpm --filter @rubrica/demo build` |
 | Bateria de tema | `pnpm testar-tema padrao` (opções: `--site pessoal`, `--sem-lighthouse`, `--so-lighthouse`, `--json out.json`; `--help` lista todas) |
+| Painel (ponta a ponta, Playwright) | `pnpm --filter @rubrica/core test:e2e` (builda a demo e abre `/admin` com o backend de demonstração) |
+| Painel no navegador | `pnpm demo` e abra `/admin` (com fixtures, o painel roda em memória; entra com o acesso já preenchido) |
 | Tudo | `pnpm -r check && pnpm -r test` |
 
 ## Regras do contrato

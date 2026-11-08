@@ -144,3 +144,5 @@ __pycache__/
 
 # Astro
 .astro/
+apps/demo/dist-e2e/
+packages/core/test-results/

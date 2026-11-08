@@ -1,0 +1,22 @@
+---
+/**
+ * Prévia ao vivo do editor de páginas (decisão 17): carregada num iframe do painel,
+ * com o CSS e os componentes do tema em uso. Não lê conteúdo no build: o painel manda
+ * o rascunho por postMessage. noindex e fora do sitemap.
+ */
+import "virtual:rubrica/styles";
+import PreviewApp from "../../admin/preview/PreviewApp";
+---
+
+<!doctype html>
+<html lang="pt-BR" data-color-mode="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Prévia</title>
+  </head>
+  <body>
+    <PreviewApp client:only="react" />
+  </body>
+</html>

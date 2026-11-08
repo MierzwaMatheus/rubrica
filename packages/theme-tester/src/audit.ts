@@ -186,10 +186,15 @@ export function findOverflow(width: number): string[] {
     for (let p = el.parentElement; p && p !== document.body && p !== doc; p = p.parentElement) if (clips(p)) return true;
     return false;
   };
-  const wide = [...document.body.querySelectorAll("*")].filter((el) => el.getBoundingClientRect().right > width + 1);
+  const all = [...document.body.querySelectorAll("*")];
+  const wide = all.filter((el) => el.getBoundingClientRect().right > width + 1);
   const outside = wide.filter((el) => !insideClip(el));
+  // Nenhuma caixa passa da borda: é texto que estoura a própria caixa (palavra longa num
+  // título grande). Culpado = o elemento mais interno cujo conteúdo passa da página.
+  const spills = (el: Element) => !clips(el) && el.scrollWidth > el.clientWidth + 1 && el.getBoundingClientRect().left + el.scrollWidth > width + 1;
+  const text = wide.length ? [] : all.filter((el) => spills(el) && !insideClip(el) && ![...el.children].some(spills));
   // Sem culpado fora de contêiner (ex.: elemento absoluto que escapa do corte): lista todos.
-  return (outside.length ? outside : wide)
+  return (outside.length ? outside : wide.length ? wide : text)
     .slice(0, 5)
     .map((el) => `${el.tagName.toLowerCase()}${el.className && typeof el.className === "string" ? "." + el.className.trim().split(/\s+/).join(".") : ""}`)
     .concat([`scrollWidth ${doc.scrollWidth}px > ${width}px`]);

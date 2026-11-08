@@ -31,7 +31,7 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--rb-font-display); font-weight: 500; 
 }
 .rb-mast__tools { display: flex; align-items: center; gap: 0.75rem; }
 .rb-mast__tagline { text-align: center; }
-.rb-mast .rb-locales { gap: 0; }
+.rb-mast .rb-locales { gap: 0.5rem; }
 .rb-mast .rb-locales a { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; color: var(--rb-muted); text-decoration: none; letter-spacing: 0.14em; }
 .rb-mast .rb-locales a:hover { color: var(--rb-fg); }
 .rb-mast .rb-locales a[aria-current="true"] { color: var(--rb-fg); box-shadow: inset 0 -2px 0 var(--rb-accent); }
@@ -53,7 +53,6 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--rb-font-display); font-weight: 500; 
 }
 .rb-mast__nav a:hover, .rb-mast__drawer a:hover { color: var(--rb-fg); }
 .rb-mast__nav a[aria-current="page"], .rb-mast__drawer a[aria-current="page"] { color: var(--rb-fg); border-bottom-color: var(--rb-accent); }
-@media (min-width: 768px) { .rb-mast__nav { display: flex; } .rb-mast__mobile { display: none; } }
 
 .rb-mast__mobile { display: flex; flex-direction: column; align-items: center; padding-bottom: 0.75rem; }
 .rb-mast__burger { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 44px; padding: 0 1.1rem; border: 1px solid var(--mag-rule); cursor: pointer; font-family: var(--rb-font-mono); font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--rb-fg); }
@@ -62,6 +61,8 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--rb-font-display); font-weight: 500; 
 .rb-menu__input:checked ~ .rb-mast .rb-mast__drawer { display: block; }
 .rb-mast__drawer a { display: flex; width: 100%; border-bottom: 1px solid var(--mag-hair); font-size: 0.78rem; }
 .rb-mast__drawer a[aria-current="page"] { border-bottom-color: var(--rb-accent); }
+
+@media (min-width: 768px) { .rb-mast__nav { display: flex; } .rb-mast__mobile { display: none; } }
 
 @media (max-width: 639px) {
   .rb-mast__tagline, .rb-mast__date { display: none; }
@@ -379,3 +380,6 @@ article.rb-post.rb-container, article.rb-case.rb-container { max-width: 47rem; m
 .rb-related a:hover { color: var(--rb-accent); }
 .rb-notfound { padding-block: 4rem; text-align: center; }
 .rb-notfound h1 { font-size: clamp(2.5rem, 8vw, 5rem); }
+
+/* faixa do celular: sem a edição, para o seletor de idioma e o tema caberem numa linha */
+@media (max-width: 479px) { .rb-mast__edition { display: none; } .rb-mast__strip { justify-content: center; } }

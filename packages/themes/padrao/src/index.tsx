@@ -5,11 +5,11 @@
  */
 import { CORE_RECIPES, defineTheme, type Recipe } from "@rubrica/core";
 import fonts from "./fonts.json";
-import { DepoimentosBlock, HeroBlock, ServicosBlock } from "./blocks";
+import { CurriculoBlock, DepoimentosBlock, HeroBlock, ServicosBlock } from "./blocks";
 import { createSidebarShell } from "./shell";
 
 export { createSidebarShell } from "./shell";
-export { HeroBlock, ServicosBlock, DepoimentosBlock } from "./blocks";
+export { HeroBlock, ServicosBlock, DepoimentosBlock, CurriculoBlock } from "./blocks";
 export { Icon } from "./icons";
 
 const tr = (ptBR: string, en: string, es: string) => ({ "pt-BR": ptBR, en, es });
@@ -67,6 +67,61 @@ const home: Recipe[number] = {
   ],
 };
 
+/**
+ * Currículo como o da v1: cabeçalho da página, o resumo profissional, os números, o PDF e
+ * as duas colunas do currículo (o bloco `curriculo` sem título: o cabeçalho já é o h1).
+ */
+const curriculo: Recipe[number] = {
+  path: "/curriculo",
+  title: tr("Currículo", "Résumé", "Currículum"),
+  blocks: [
+    {
+      type: "hero",
+      variant: "pagina",
+      fields: {
+        title: tr("Currículo", "Résumé", "Currículum"),
+        subtitle: tr("Onde trabalhei, o que estudei e com o que trabalho.", "Where I've worked, what I studied and what I work with.", "Dónde trabajé, qué estudié y con qué trabajo."),
+      },
+    },
+    {
+      type: "texto",
+      fields: {
+        body: tr(
+          "<p>Um parágrafo sobre você: o que faz, onde, e um ou dois resultados com <strong>números</strong>.</p>",
+          "<p>One paragraph about you: what you do, where, and one or two results with <strong>numbers</strong>.</p>",
+          "<p>Un párrafo sobre ti: qué haces, dónde, y uno o dos resultados con <strong>números</strong>.</p>",
+        ),
+      },
+    },
+    {
+      type: "numeros",
+      fields: {
+        items: [
+          { value: "8+", label: tr("anos de experiência", "years of experience", "años de experiencia") },
+          { value: "40", label: tr("projetos entregues", "projects delivered", "proyectos entregados") },
+          { value: "15", label: tr("clientes atendidos", "clients served", "clientes atendidos") },
+        ],
+      },
+    },
+    { type: "curriculo", fields: { showDownload: true } },
+  ],
+};
+
+/**
+ * Páginas de lista (portfólio, blog, depoimentos) com o cabeçalho da v1: o título e o apoio do
+ * bloco da lista sobem para um hero "pagina" (h1 visível), e a lista fica sem título.
+ */
+const LIST_PAGES = new Set(["/portfolio", "/blog", "/depoimentos"]);
+function withPageHeader(page: Recipe[number]): Recipe[number] {
+  const [list, ...rest] = page.blocks;
+  if (!LIST_PAGES.has(page.path) || !list?.fields?.title) return page;
+  const { title, intro, ...fields } = list.fields;
+  return {
+    ...page,
+    blocks: [{ type: "hero", variant: "pagina", fields: { title, ...(intro ? { subtitle: intro } : {}) } }, { ...list, fields }, ...rest],
+  };
+}
+
 export default defineTheme({
   id: "padrao",
   label: "Padrão",
@@ -81,12 +136,16 @@ export default defineTheme({
   Shell: createSidebarShell(),
   // O "Fale comigo" abre o contato numa janela, como o assistente da v1.
   contactDialog: true,
-  blocks: { hero: HeroBlock, servicos: ServicosBlock, depoimentos: DepoimentosBlock },
+  blocks: { hero: HeroBlock, servicos: ServicosBlock, depoimentos: DepoimentosBlock, curriculo: CurriculoBlock },
   variants: {
+    hero: [
+      { value: "inicio", label: "Início" },
+      { value: "pagina", label: "Cabeçalho de página" },
+    ],
     cases: [
       { value: "grade", label: "Grade" },
       { value: "lista", label: "Lista" },
     ],
   },
-  recipes: { pessoal: [home, ...core.filter((p) => p.path !== "/")] },
+  recipes: { pessoal: [home, ...core.filter((p) => p.path !== "/").map((p) => (p.path === "/curriculo" ? curriculo : withPageHeader(p)))] },
 });

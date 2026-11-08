@@ -2,8 +2,19 @@
  * Blocos que, na v1 padrão, têm visual diferente do padrão do núcleo. Os outros
  * blocos herdam os componentes do núcleo e ganham o visual só pelo CSS do tema.
  */
-import type { BlockProps, ResolvedLink } from "@rubrica/core";
-import { Heading, Img, LinkButton, Section, SectionHeader } from "@rubrica/core/components";
+import type { BlockProps, ResolvedLink, ResumeItem } from "@rubrica/core";
+import {
+  groupResumeSkills,
+  Heading,
+  Img,
+  LinkButton,
+  ResumeDescription,
+  ResumeHeading,
+  ResumePeriod,
+  Section,
+  SectionHeader,
+} from "@rubrica/core/components";
+import type { ReactNode } from "react";
 import { Icon, type IconName } from "./icons";
 
 /**
@@ -29,6 +40,19 @@ function CtaLink({ link, className, icon }: { link: ResolvedLink; className: str
 }
 
 export function HeroBlock({ id, variant, fields, headingLevel, ctx }: BlockProps<any>) {
+  // Cabeçalho de página (currículo, portfólio...): só o título e o apoio, como as páginas da v1.
+  if (variant === "pagina") {
+    return (
+      <Section id={id} type="hero" variant={variant}>
+        <div className="rb-hero__body">
+          <Heading level={headingLevel} className="rb-hero__title">
+            {fields.title}
+          </Heading>
+          {fields.subtitle && <p className="rb-hero__lead">{fields.subtitle}</p>}
+        </div>
+      </Section>
+    );
+  }
   const person = ctx.site.person;
   const showChip = Boolean(fields.eyebrow || person);
   return (
@@ -139,6 +163,176 @@ export function DepoimentosBlock({ id, variant, fields, items, headingLevel, isl
         </ul>
       )}
       {fields.allowSubmission && island ? <div className="rb-island">{island}</div> : null}
+    </Section>
+  );
+}
+
+type Level = 2 | 3 | 4 | 5;
+
+/** Título de seção do currículo com ícone (o ícone é decorativo). */
+function ResumeGroup({ id, kind, icon, level, ctx, side, children }: { id: string; kind: string; icon: IconName; level: Level; ctx: BlockProps["ctx"]; side?: boolean; children: ReactNode }) {
+  return (
+    <section className={`rb-resume__group rb-resume__group--${kind}`} aria-labelledby={`${id}-${kind}`} data-side={side ? "" : undefined}>
+      <ResumeHeading level={level} id={`${id}-${kind}`} className="rb-resume__heading">
+        <Icon name={icon} size={24} />
+        {ctx.t(`resume.${kind}`)}
+      </ResumeHeading>
+      {children}
+    </section>
+  );
+}
+
+/** Cartão de experiência ou formação: cargo, organização, período e a descrição rica. */
+function ResumeCard({ item, level, ctx }: { item: ResumeItem; level: Level; ctx: BlockProps["ctx"] }) {
+  return (
+    <li className="rb-card rb-resume__item">
+      <ResumeHeading level={level} className="rb-card__title">
+        {item.title}
+      </ResumeHeading>
+      {(item.organization || item.location) && <p className="rb-card__meta rb-resume__org">{[item.organization, item.location].filter(Boolean).join(" · ")}</p>}
+      <ResumePeriod item={item} ctx={ctx} className="rb-card__meta rb-resume__period" />
+      <ResumeDescription text={item.description} />
+    </li>
+  );
+}
+
+/** Item simples (curso, voluntariado, idioma): uma caixa com o título e, se houver, o detalhe. */
+function ResumeLine({ item, level, accent }: { item: ResumeItem; level: Level; accent?: boolean }) {
+  return (
+    <li className="rb-resume__line">
+      {accent ? (
+        <ResumeHeading level={level} className="rb-resume__lineTitle">
+          {item.title}
+        </ResumeHeading>
+      ) : (
+        <p className="rb-resume__lineTitle">{item.title}</p>
+      )}
+      {item.organization && <p className="rb-resume__lineMeta">{item.organization}</p>}
+      {item.description && (accent ? <p className="rb-resume__lineMeta">{item.description}</p> : <ResumeDescription text={item.description} />)}
+    </li>
+  );
+}
+
+/**
+ * Currículo como a página da v1: download no topo e duas colunas. À esquerda, a
+ * experiência (as duas mais recentes abertas; as anteriores num <details>, sem JavaScript),
+ * a formação, os cursos e o voluntariado; à direita, as competências por grupo, as
+ * comportamentais e os idiomas.
+ */
+export function CurriculoBlock({ id, variant, fields, items, headingLevel, ctx, island }: BlockProps<any, ResumeItem>) {
+  const by = (kind: ResumeItem["kind"]) => items.filter((i) => i.kind === kind);
+  const level = (fields.title ? headingLevel + 1 : headingLevel) as Level;
+  const itemLevel = (level + 1) as Level;
+  const experience = by("experience");
+  const recent = experience.slice(0, 2);
+  const older = experience.slice(2);
+  const education = by("education");
+  const certifications = by("certification");
+  const volunteer = by("volunteer");
+  const skills = by("skill");
+  const softSkills = by("soft-skill");
+  const languages = by("language");
+  const hasSide = skills.length + softSkills.length + languages.length > 0;
+  return (
+    <Section id={id} anchor={fields.anchor} type="curriculo" variant={variant}>
+      <SectionHeader title={fields.title} intro={fields.intro} level={headingLevel} />
+      {fields.showDownload && island ? <div className="rb-island rb-resume__download">{island}</div> : null}
+      <div className="rb-resume__cols" data-side={hasSide ? "" : undefined}>
+        <div className="rb-resume__main">
+          {experience.length > 0 && (
+            <ResumeGroup id={id} kind="experience" icon="briefcase" level={level} ctx={ctx}>
+              <ul className="rb-resume__list">
+                {recent.map((i) => (
+                  <ResumeCard key={i.id} item={i} level={itemLevel} ctx={ctx} />
+                ))}
+              </ul>
+              {older.length > 0 && (
+                <details className="rb-resume__older">
+                  <summary>
+                    <Icon name="chevronDown" />
+                    <span className="rb-resume__show">{ctx.t("resume.showOlder", { count: String(older.length) })}</span>
+                    <span className="rb-resume__hide">{ctx.t("resume.hideOlder")}</span>
+                  </summary>
+                  <ul className="rb-resume__list">
+                    {older.map((i) => (
+                      <ResumeCard key={i.id} item={i} level={itemLevel} ctx={ctx} />
+                    ))}
+                  </ul>
+                </details>
+              )}
+            </ResumeGroup>
+          )}
+          {education.length > 0 && (
+            <ResumeGroup id={id} kind="education" icon="graduation" level={level} ctx={ctx}>
+              <ul className="rb-resume__list">
+                {education.map((i) => (
+                  <ResumeCard key={i.id} item={i} level={itemLevel} ctx={ctx} />
+                ))}
+              </ul>
+            </ResumeGroup>
+          )}
+          {certifications.length > 0 && (
+            <ResumeGroup id={id} kind="certification" icon="award" level={level} ctx={ctx}>
+              <ul className="rb-resume__lines">
+                {certifications.map((i) => (
+                  <ResumeLine key={i.id} item={i} level={itemLevel} />
+                ))}
+              </ul>
+            </ResumeGroup>
+          )}
+          {volunteer.length > 0 && (
+            <ResumeGroup id={id} kind="volunteer" icon="heart" level={level} ctx={ctx}>
+              <ul className="rb-resume__lines">
+                {volunteer.map((i) => (
+                  <ResumeLine key={i.id} item={i} level={itemLevel} />
+                ))}
+              </ul>
+            </ResumeGroup>
+          )}
+        </div>
+        {hasSide && (
+          <div className="rb-resume__side">
+            {skills.length > 0 && (
+              <ResumeGroup id={id} kind="skill" icon="code" level={level} ctx={ctx}>
+                <div className="rb-resume__skillGroups">
+                  {groupResumeSkills(skills).map((g) => (
+                    <div key={g.name ?? ""} className="rb-resume__skillGroup">
+                      {g.name && (
+                        <ResumeHeading level={itemLevel} className="rb-resume__groupName">
+                          {g.name}
+                        </ResumeHeading>
+                      )}
+                      <ul className="rb-resume__chips">
+                        {g.items.map((i) => (
+                          <li key={i.id}>{i.title}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </ResumeGroup>
+            )}
+            {softSkills.length > 0 && (
+              <ResumeGroup id={id} kind="soft-skill" icon="heart" level={level} ctx={ctx}>
+                <ul className="rb-resume__chips rb-resume__chips--outline">
+                  {softSkills.map((i) => (
+                    <li key={i.id}>{i.title}</li>
+                  ))}
+                </ul>
+              </ResumeGroup>
+            )}
+            {languages.length > 0 && (
+              <ResumeGroup id={id} kind="language" icon="languages" level={level} ctx={ctx}>
+                <ul className="rb-resume__lines">
+                  {languages.map((i) => (
+                    <ResumeLine key={i.id} item={i} level={itemLevel} accent />
+                  ))}
+                </ul>
+              </ResumeGroup>
+            )}
+          </div>
+        )}
+      </div>
     </Section>
   );
 }

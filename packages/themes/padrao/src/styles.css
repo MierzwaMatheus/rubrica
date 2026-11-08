@@ -275,9 +275,83 @@ h2.rb-section__title::after { content: " */"; content: " */" / ""; color: var(--
 .rb-cta .rb-actions { margin-top: 1.5rem; }
 
 /* ---------- currículo, FAQ, contato ---------- */
-.rb-resume__heading { color: var(--rb-accent); font-size: 1.5rem; }
-.rb-resume__item .rb-card__meta { color: var(--rb-accent-2); font-weight: 500; }
-.rb-resume__item .rb-card__title { color: var(--rb-fg-strong); font-size: 1.25rem; }
+/* Currículo como o da v1 (blocks.tsx): coluna estreita, duas colunas no desktop. */
+.rb-main__inner:has(> .rb-curriculo) { max-width: 62rem; }
+.rb-resume__download { margin: 0 0 3rem; }
+.rb-resume__download .rb-button {
+  display: inline-flex; align-items: center; gap: 0.5rem; min-height: 44px; padding: 0.75rem 1.5rem; border-radius: 0.5rem;
+  background: var(--rb-accent); border-color: var(--rb-accent); color: var(--rb-accent-fg); font-weight: 600;
+}
+.rb-resume__download .rb-button::before {
+  content: ""; width: 1rem; height: 1rem; background: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 15V3'/%3E%3Cpath d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'/%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.rb-resume__download .rb-button:hover { background: color-mix(in srgb, var(--rb-accent) 90%, var(--rb-bg)); }
+.rb-resume__cols { display: grid; gap: 3rem 2rem; }
+@media (min-width: 768px) { .rb-resume__cols[data-side] { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); } }
+.rb-resume__main, .rb-resume__side { display: grid; gap: 3rem; align-content: start; }
+.rb-curriculo .rb-resume__group { margin: 0; }
+.rb-resume__heading { display: flex; align-items: center; gap: 0.5rem; margin: 0 0 1.5rem; color: var(--rb-accent); font-size: 1.5rem; line-height: 1.25; }
+h2.rb-resume__heading { font-family: var(--rb-font-sans); }
+.rb-resume__heading svg { flex: none; }
+.rb-resume__list { gap: 1.5rem; }
+.rb-curriculo .rb-resume__item { padding: 1.5rem; background: var(--rb-surface); border: 1px solid var(--rb-hairline); }
+.rb-curriculo .rb-resume__item:hover { border-color: color-mix(in srgb, var(--rb-accent) 50%, transparent); }
+.rb-resume__item .rb-card__title { margin: 0 0 0.375rem; color: var(--rb-fg-strong); font-size: 1.25rem; line-height: 1.4; }
+.rb-resume__item .rb-card__meta { margin: 0 0 0.375rem; color: var(--rb-accent-2); font-weight: 500; }
+.rb-resume__item .rb-resume__period { margin: 0; font-size: 0.875rem; font-weight: 400; color: var(--rb-muted); }
+.rb-resume__item .rb-resume__desc, .rb-resume__item .rb-resume__bullets, .rb-resume__item > .rb-card__text { margin-top: 1.5rem; }
+/* Descrição rica como a da v1: blocos colados (sem margem), listas com 0.5rem entre itens. */
+.rb-resume__desc { max-width: none; font-size: 1rem; line-height: 1.625; color: color-mix(in srgb, var(--rb-fg) 90%, transparent); }
+.rb-curriculo .rb-resume__desc > *, .rb-curriculo .rb-resume__desc li > * { margin-block: 0; }
+.rb-curriculo .rb-resume__desc ul, .rb-curriculo .rb-resume__desc ol { margin: 0; padding-left: 1.5rem; display: grid; gap: 0.5rem; }
+.rb-curriculo .rb-resume__desc ul { list-style: disc; }
+.rb-curriculo .rb-resume__desc li { margin: 0; padding-left: 0.5rem; line-height: 1.625; }
+.rb-curriculo .rb-resume__desc :is(h2, h3, h4) { margin: 0; font-size: 1rem; line-height: 1.625; }
+
+/* Experiências anteriores: <details> que abre sem JavaScript, com o texto trocando pelo estado. */
+.rb-resume__older { margin-top: 1.5rem; }
+.rb-resume__older > summary {
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 44px; padding: 0.75rem; cursor: pointer; list-style: none;
+  border: 1px solid var(--rb-hairline); border-radius: 0.5rem; font-family: var(--rb-font-mono); font-size: 0.875rem; color: var(--rb-muted);
+}
+.rb-resume__older > summary::-webkit-details-marker { display: none; }
+.rb-resume__older > summary:hover { color: var(--rb-fg-strong); border-color: color-mix(in srgb, var(--rb-accent) 40%, transparent); }
+.rb-resume__older > summary svg { transition: transform 0.2s; }
+.rb-resume__older[open] > summary svg { transform: rotate(180deg); }
+.rb-resume__older[open] .rb-resume__show, .rb-resume__older:not([open]) .rb-resume__hide { display: none; }
+.rb-resume__older > .rb-resume__list { margin-top: 1.5rem; }
+
+/* Itens simples (cursos, voluntariado, idiomas). */
+.rb-resume__lines { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; }
+.rb-resume__line { padding: 1rem; border-radius: 0.5rem; background: var(--rb-surface); border: 1px solid var(--rb-hairline); transition: border-color 0.3s; }
+.rb-resume__main .rb-resume__line:hover { border-color: color-mix(in srgb, var(--rb-accent-2) 50%, transparent); }
+.rb-resume__lineTitle { margin: 0; font-size: 1rem; font-weight: 400; line-height: 1.5; color: color-mix(in srgb, var(--rb-fg) 90%, transparent); }
+.rb-resume__lineMeta { margin: 0.25rem 0 0; font-size: 0.875rem; color: var(--rb-muted); }
+.rb-resume__line .rb-resume__desc, .rb-resume__line .rb-card__text, .rb-resume__line .rb-resume__bullets { margin-top: 0.5rem; font-size: 0.875rem; }
+.rb-resume__group--language .rb-resume__lineTitle { font-weight: 500; color: var(--rb-fg-strong); }
+.rb-resume__group--language .rb-resume__lineMeta { color: var(--rb-accent-2); }
+
+/* Competências: grupos com rótulo em caixa alta e chips; as comportamentais com borda de destaque. */
+.rb-curriculo .rb-resume__skillGroups { gap: 1.25rem; }
+.rb-curriculo .rb-resume__groupName { margin: 0 0 0.5rem; font-family: var(--rb-font-mono); font-size: 0.75rem; font-weight: 400; letter-spacing: 0.05em; color: var(--rb-muted); }
+.rb-resume__chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.rb-resume__chips li { padding: 0.25rem 0.75rem; border-radius: 0.375rem; font-size: 0.875rem; line-height: 1.43; color: var(--rb-fg); background: var(--rb-faint); border: 1px solid var(--rb-hairline); }
+.rb-resume__chips--outline li { padding: 0.25rem 0.75rem; font-size: 0.75rem; font-weight: 600; color: color-mix(in srgb, var(--rb-fg) 90%, transparent); background: none; border-color: color-mix(in srgb, var(--rb-accent) 50%, transparent); }
+.rb-resume__chips--outline li:hover { background: color-mix(in srgb, var(--rb-accent) 10%, transparent); }
+
+/* Cabeçalho de página (hero "pagina") e o texto logo depois dele, com fio lateral (o resumo da v1). */
+.rb-hero[data-variant="pagina"] .rb-hero__title { margin: 0; font-size: 1.875rem; line-height: 1.2; }
+.rb-hero__lead { margin: 0.5rem 0 0; font-size: 1rem; line-height: 1.5; color: var(--rb-muted); }
+.rb-main__inner .rb-hero[data-variant="pagina"] + .rb-section { margin-top: 2rem; }
+/* Com um resumo logo depois (o currículo), o cabeçalho é maior, como na v1. */
+.rb-hero[data-variant="pagina"]:has(+ .rb-texto) .rb-hero__title { font-size: clamp(2.25rem, 5vw, 3rem); line-height: 1.1; }
+.rb-hero[data-variant="pagina"]:has(+ .rb-texto) .rb-hero__lead { margin-top: 1rem; font-size: 1.25rem; }
+.rb-main__inner .rb-hero[data-variant="pagina"] + .rb-texto { margin-top: 3rem; }
+.rb-hero[data-variant="pagina"] + .rb-texto .rb-prose { max-width: none; padding: 0 0 0 1.5rem; border: 0; border-left: 2px solid color-mix(in srgb, var(--rb-accent) 50%, transparent); border-radius: 0; background: none; }
+.rb-hero[data-variant="pagina"] + .rb-texto .rb-prose p { font-size: 1.125rem; line-height: 1.7; color: var(--rb-fg); }
+.rb-hero[data-variant="pagina"] + .rb-texto + .rb-numeros, .rb-hero[data-variant="pagina"] + .rb-texto + .rb-numeros + .rb-curriculo { margin-top: 1.5rem; }
+.rb-hero[data-variant="pagina"] ~ .rb-numeros .rb-numeros__value { font-size: 1.5rem; }
 .rb-faq__item { border-color: var(--rb-hairline); border-radius: 0.75rem; }
 .rb-faq__question::after { color: var(--rb-accent); }
 .rb-form { border-radius: 0.75rem; border-color: var(--rb-hairline); }
@@ -306,3 +380,9 @@ h2.rb-section__title::after { content: " */"; content: " */" / ""; color: var(--
 .rb-side__logo { display: flex; justify-content: center; padding: 1rem 1rem 0; }
 .rb-side__logo .rb-logo { height: 2.25rem; }
 .rb-bar__logo { height: 1.75rem; }
+
+/* Listas das páginas de portfólio e blog (depois do cabeçalho de página): duas colunas, como na v1. */
+@media (min-width: 768px) {
+  .rb-hero[data-variant="pagina"] ~ .rb-cases:not([data-variant="lista"]) .rb-cases__list,
+  .rb-hero[data-variant="pagina"] ~ .rb-posts-recentes .rb-posts__list { grid-template-columns: repeat(2, 1fr); }
+}

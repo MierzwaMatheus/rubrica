@@ -41,6 +41,8 @@ export interface PostItem {
   updatedAt?: string;
   readingMinutes: number;
   author?: string;
+  /** Marcado como destaque no painel (o tema pode dar mais peso ao post). */
+  featured: boolean;
   seo: ResolvedSeo;
 }
 
@@ -216,6 +218,7 @@ export function resolvePost(raw: RawPost, opts: ResolveOptions, paths: Collectio
     tags: raw.tags ?? [],
     publishedAt: iso(raw.publishedAt)!,
     readingMinutes: readingMinutes(content),
+    featured: raw.featured ?? false,
     seo: resolveSeo(raw.seo, opts),
   };
   const excerpt = pick(raw.excerpt, opts.locale);

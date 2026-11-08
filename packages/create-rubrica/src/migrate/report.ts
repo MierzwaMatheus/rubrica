@@ -38,7 +38,8 @@ export function renderReport(input: ReportInput): string {
     }
     out.push("");
     out.push("### Textos", "");
-    out.push(`- Textos de seção (títulos, chamadas, botões) vão para os campos dos blocos, com o que estava no banco (${plural(d.texts.sectionKeys, "chave encontrada", "chaves encontradas")} no siteTexts) ou o padrão da v1.`);
+    out.push(`- Textos de seção (títulos, chamadas, botões) vão para os campos dos blocos, com o que estava no banco (${plural(d.texts.sectionKeys, "chave encontrada", "chaves encontradas")} no siteTexts), senão o dos arquivos de tradução do projeto, senão o padrão da v1.`);
+    if (d.texts.projectKeys !== undefined) out.push(`- Arquivos de tradução do projeto (src/i18n/translations): ${plural(d.texts.projectKeys, "texto mudado em relação ao template", "textos mudados em relação ao template")}, usados como padrão.`);
     out.push(`- Textos de interface personalizados → "Textos": ${d.texts.ui.length ? d.texts.ui.map((u) => `\`${u.v1}\` → \`${u.v2}\``).join(", ") : "nenhum"}.`);
     if (d.texts.unmapped.length) {
       out.push(`- **Sem destino na v2** (refaça no painel, num campo de bloco ou em Textos, se ainda fizer sentido):`);

@@ -37,6 +37,25 @@ describe("auditSite", () => {
     expect(find(pages, "/")?.ok).toBe(true);
   });
 
+  it("página sem ilha aceita o script de analytics do núcleo e só ele", async () => {
+    const tag = (attrs: string) => `<script ${attrs} src="/stats/script.js"></script>`;
+    const dir = await makeSite(
+      [
+        { path: "/", body: goodBody(), head: tag('defer data-website-id="abc" data-rb-analytics') },
+        { path: "/sem-defer", body: goodBody("Sem defer"), head: tag('data-website-id="abc" data-rb-analytics') },
+        { path: "/sem-marca", body: goodBody("Sem marca"), head: tag('defer data-website-id="abc"') },
+      ],
+      { "stats/script.js": "window.__umami = true;" },
+    );
+    dirs.push(dir);
+    const pages = await auditSite({ dist: dir });
+    const js = (path: string) => find(pages, path)?.checks.find((c) => c.id === "js");
+    expect(js("/")?.ok).toBe(true);
+    expect(js("/")?.message).toMatch(/analytics/);
+    expect(js("/sem-defer")?.ok).toBe(false);
+    expect(js("/sem-marca")?.ok).toBe(false);
+  });
+
   it("confere o contraste também no modo claro quando há botão de alternar", async () => {
     const style = `<style>[data-color-mode="light"] p{color:#bbb;background:#fff}</style>`;
     const body = `<main><h1>Modos</h1><button data-rb-color-toggle>Tema</button><p>Texto claro demais no modo claro.</p></main>`;
@@ -45,6 +64,22 @@ describe("auditSite", () => {
     const axe = find(await auditSite({ dist: dir }), "/")?.checks.find((c) => c.id === "axe");
     expect(axe?.ok).toBe(false);
     expect(axe?.details?.join("\n")).toMatch(/\(claro\).*color-contrast/);
+  });
+
+  it("mede o contraste depois da troca de modo sem pegar a cor no meio de uma transição", async () => {
+    // Escuro: texto claro no fundo escuro. Claro: texto escuro no fundo branco. Os dois
+    // passam; com a transição de 5 s na cor, logo depois da troca o texto ainda estaria
+    // claro sobre o fundo já branco.
+    const style = `<style>
+      body{background:#111;color:#eee} p{color:#eee;transition:color 5s linear,background-color 5s linear}
+      [data-color-mode="light"] body{background:#fff;color:#222} [data-color-mode="light"] p{color:#222}
+    </style>`;
+    const body = `<main><h1>Transição</h1><button data-rb-color-toggle>Tema</button><p>Texto com transição de cor.</p></main>`;
+    const dir = await makeSite([{ path: "/", body, head: style }]);
+    dirs.push(dir);
+    const axe = find(await auditSite({ dist: dir }), "/")?.checks.find((c) => c.id === "axe");
+    expect(axe?.details ?? []).toEqual([]);
+    expect(axe?.ok).toBe(true);
   });
 
   it("reprova <head> incompleto, lang errado e hreflang sem volta", async () => {

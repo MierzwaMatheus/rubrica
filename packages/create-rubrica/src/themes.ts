@@ -5,9 +5,9 @@
  * `ported`: já existe o pacote `@rubrica/theme-<id>`. Enquanto um tema não é portado,
  * o site usa o `padrao` e o CLI avisa (a escolha fica guardada em `temaDesejado`).
  *
- * Os esquemas de cor são os do núcleo (`SCHEMES`, `appearance.scheme`). O esquema e as
- * fontes recomendados de um tema portado são os que o pacote do tema declara (`scheme`
- * e `fonts.json`; um teste confere); os dos outros vêm do layout da v1.
+ * Os esquemas de cor são os do núcleo (`SCHEMES`, `appearance.scheme`). O esquema, o modo
+ * de cor e as fontes recomendados de um tema portado são os que o pacote do tema declara
+ * (`scheme`, `colorMode` e `fonts.json`; um teste confere); os dos outros vêm do layout da v1.
  */
 import { SCHEMES } from "@rubrica/core";
 import { LAYOUTS } from "./v1/layouts.js";
@@ -32,16 +32,19 @@ export interface ThemeSpec {
 /** Temas com pacote publicado. */
 export const PORTED_THEMES = ["padrao", "cyberpunk", "bento", "chat", "desktop", "index", "magazine", "monograph"] as const;
 
-/** O que cada pacote de tema declara: `scheme` no `defineTheme` e `fonts.json` (`test/alignment.test.ts`). */
-export const THEME_PACKAGE_DEFAULTS: Record<(typeof PORTED_THEMES)[number], { scheme: string; fontSans: string; fontMono?: string }> = {
-  padrao: { scheme: "neon", fontSans: "Chakra Petch", fontMono: "Chakra Petch" },
-  cyberpunk: { scheme: "neon", fontSans: "Chakra Petch", fontMono: "Chakra Petch" },
-  bento: { scheme: "editorial-cream", fontSans: "Manrope", fontMono: "JetBrains Mono" },
-  chat: { scheme: "alto-contraste", fontSans: "Instrument Sans", fontMono: "IBM Plex Mono" },
-  desktop: { scheme: "sorbet", fontSans: "Instrument Sans", fontMono: "IBM Plex Mono" },
-  index: { scheme: "sumi", fontSans: "Instrument Sans", fontMono: "IBM Plex Mono" },
-  magazine: { scheme: "editorial-cream", fontSans: "IBM Plex Serif", fontMono: "JetBrains Mono" },
-  monograph: { scheme: "azulejo", fontSans: "Source Serif 4", fontMono: "IBM Plex Mono" },
+/**
+ * O que cada pacote de tema declara: `scheme` e `colorMode` no `defineTheme` (sem
+ * `colorMode`, escuro) e `fonts.json` (`test/alignment.test.ts`).
+ */
+export const THEME_PACKAGE_DEFAULTS: Record<(typeof PORTED_THEMES)[number], { scheme: string; mode: ColorMode; fontSans: string; fontMono?: string }> = {
+  padrao: { scheme: "neon", mode: "dark", fontSans: "Chakra Petch", fontMono: "Chakra Petch" },
+  cyberpunk: { scheme: "neon", mode: "dark", fontSans: "Chakra Petch", fontMono: "Chakra Petch" },
+  bento: { scheme: "editorial-cream", mode: "light", fontSans: "Manrope", fontMono: "JetBrains Mono" },
+  chat: { scheme: "alto-contraste", mode: "light", fontSans: "Instrument Sans", fontMono: "IBM Plex Mono" },
+  desktop: { scheme: "sorbet", mode: "light", fontSans: "Instrument Sans", fontMono: "IBM Plex Mono" },
+  index: { scheme: "sumi", mode: "light", fontSans: "Instrument Sans", fontMono: "IBM Plex Mono" },
+  magazine: { scheme: "editorial-cream", mode: "light", fontSans: "IBM Plex Serif", fontMono: "JetBrains Mono" },
+  monograph: { scheme: "azulejo", mode: "light", fontSans: "Source Serif 4", fontMono: "IBM Plex Mono" },
 };
 
 const isPorted = (id: string): id is (typeof PORTED_THEMES)[number] => (PORTED_THEMES as readonly string[]).includes(id);
@@ -56,7 +59,7 @@ export const THEMES: ThemeSpec[] = [
     hint: "barra lateral com foto, limpo e neutro: serve para qualquer área",
     v1Layout: null,
     ported: true,
-    recommended: { mode: "dark", ...THEME_PACKAGE_DEFAULTS.padrao },
+    recommended: { ...THEME_PACKAGE_DEFAULTS.padrao },
   },
   ...LAYOUTS.map((l) => ({
     id: l.id,
@@ -65,7 +68,7 @@ export const THEMES: ThemeSpec[] = [
     v1Layout: l.id,
     ported: isPorted(l.id),
     recommended: isPorted(l.id)
-      ? { mode: l.recommended.mode, ...THEME_PACKAGE_DEFAULTS[l.id] }
+      ? { ...THEME_PACKAGE_DEFAULTS[l.id] }
       : {
           scheme: l.recommended.scheme,
           mode: l.recommended.mode,

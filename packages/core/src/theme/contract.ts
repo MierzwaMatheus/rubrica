@@ -151,6 +151,12 @@ export interface ThemeFonts {
   sans?: string;
   mono?: string;
   display?: string;
+  /**
+   * Papéis (`sans`, `mono`, `display`) que também baixam o itálico de verdade, no lugar do
+   * oblíquo sintetizado pelo navegador. Vale para a família que ocupar o papel, mesmo que
+   * o site troque a fonte. Ex.: `"italic": ["sans", "display"]`.
+   */
+  italic?: string[];
 }
 
 export interface ThemeDefinition {
@@ -177,6 +183,12 @@ export interface ThemeDefinition {
    * (`appearance.scheme`). Opcional: sem ele valem só os tokens da folha do tema.
    */
   scheme?: string;
+  /**
+   * Modo de cor recomendado (o que o layout foi desenhado para mostrar primeiro). O CLI
+   * usa como padrão ao criar o site e ao trocar de tema; quem decide no site continua
+   * sendo `appearance.colorMode`. Sem ele, o recomendado é o escuro.
+   */
+  colorMode?: "dark" | "light" | "system";
   /**
    * Fontes que o tema usa por padrão (Google Fonts), baixadas no build. O build lê as
    * mesmas famílias do `fonts.json` que o pacote do tema exporta em "./fonts.json" (o

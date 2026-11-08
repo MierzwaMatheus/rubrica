@@ -276,6 +276,37 @@ export interface SiteSettings {
    */
   logo?: RawImage & { dark?: RawImage };
   twitterHandle?: string;
+  /** Favicon, ícone da tela inicial e ícones do manifest. Todos opcionais. */
+  icons?: SiteIcons;
+  /**
+   * Cor da barra do navegador (`theme-color`) e do manifest, por modo de cor (`#0a0a0a`).
+   * Sem ela, vale o fundo do esquema de cor do site naquele modo.
+   */
+  themeColor?: { light?: string; dark?: string };
+  /** Feed RSS do blog (`/rss.xml`). Sem título ou descrição, valem os do site. */
+  rss?: { title?: Localized<string>; description?: Localized<string> };
+  /** Capa (e imagem de compartilhamento) dos posts que não têm capa própria. */
+  defaultPostCover?: RawImage;
+  /**
+   * Analytics (plugin `analytics`, Umami). Sem os dois campos, valem as variáveis
+   * `PUBLIC_UMAMI_SCRIPT_URL` e `PUBLIC_UMAMI_WEBSITE_ID` do build.
+   */
+  analytics?: { scriptUrl?: string; websiteId?: string };
+}
+
+/** Ícones do site no `<head>` e no `manifest.webmanifest`. */
+export interface SiteIcons {
+  /** Favicon vetorial (SVG). */
+  svg?: RawImage;
+  /** Favicon em PNG ou ICO, para navegadores sem SVG (32×32 ou 48×48). */
+  favicon?: RawImage;
+  /** Ícone da tela inicial do iPhone e do iPad (`apple-touch-icon`, PNG 180×180). */
+  apple?: RawImage;
+  /** Ícones do manifest (PNG 192×192 e 512×512). */
+  icon192?: RawImage;
+  icon512?: RawImage;
+  /** Ícone "maskable" do Android (PNG 512×512, com margem de segurança). */
+  maskable?: RawImage;
 }
 
 /** Textos de interface (menu, "ler mais", formulários, 404): chave → texto por idioma. */

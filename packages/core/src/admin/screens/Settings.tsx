@@ -1,5 +1,6 @@
 /**
- * Configurações do site: identidade, navegação, redes, pessoa ou empresa e, só para a
+ * Configurações do site: identidade, ícones e cor da barra do navegador, blog (RSS e capa
+ * padrão), analytics, navegação, redes, pessoa ou empresa e, só para a
  * agência (root), a parte técnica (tipo do site, URL, idiomas e principal, caminhos).
  * Os formulários saem do mesmo gerador de campos dos blocos. Salvar manda só as
  * chaves que mudaram (o backend recusa chave técnica vinda de quem não é root).
@@ -83,6 +84,37 @@ const ORGANIZATION: FieldMap = {
     ],
   }),
 };
+
+const ICONS: FieldMap = {
+  svg: field.image({ label: "Favicon (SVG)", help: "Ícone da aba do navegador, em SVG (fica nítido em qualquer tamanho)." }),
+  favicon: field.image({ label: "Favicon (PNG ou ICO)", help: "Para navegadores sem SVG: 32×32 ou 48×48." }),
+  apple: field.image({ label: "Ícone da tela inicial (Apple)", help: "PNG 180×180, sem transparência." }),
+  icon192: field.image({ label: "Ícone do app (192×192)", help: "PNG. Entra no manifest, para instalar o site no celular." }),
+  icon512: field.image({ label: "Ícone do app (512×512)", help: "PNG. Entra no manifest." }),
+  maskable: field.image({ label: "Ícone adaptável do Android (512×512)", help: "PNG com margem de segurança (o Android recorta em círculo ou quadrado)." }),
+};
+
+const THEME_COLOR: FieldMap = {
+  light: field.text({ label: "Cor da barra do navegador (modo claro)", localized: false, maxLength: 9, help: "Hexadecimal, ex.: #ffffff. Vazio: o fundo do esquema de cor." }),
+  dark: field.text({ label: "Cor da barra do navegador (modo escuro)", localized: false, maxLength: 9, help: "Hexadecimal, ex.: #0a0a0a. Vazio: o fundo do esquema de cor." }),
+};
+
+const BLOG: FieldMap = {
+  rssTitle: field.text({ label: "Título do feed RSS", maxLength: 120, help: "Vazio: o nome do site." }),
+  rssDescription: field.text({ label: "Descrição do feed RSS", multiline: true, maxLength: 300, help: "Vazio: a descrição do site." }),
+  defaultPostCover: field.image({ label: "Capa padrão dos posts", help: "Usada nos posts sem capa, na lista e no compartilhamento (1200×630)." }),
+};
+
+const ANALYTICS: FieldMap = {
+  scriptUrl: field.text({ label: "Endereço do script", localized: false, help: "https://cloud.umami.is/script.js, ou o do seu Umami." }),
+  websiteId: field.text({ label: "Id do site no Umami", localized: false, maxLength: 64 }),
+};
+
+/** Objeto sem campos vazios, ou `undefined` (o campo some das configurações). */
+function compactObject<T>(values: Values): T | undefined {
+  const out = Object.fromEntries(Object.entries(prune(values)).filter(([, v]) => v !== undefined && v !== "" && !(typeof v === "object" && v && !Array.isArray(v) && !Object.keys(v).length)));
+  return Object.keys(out).length ? (out as T) : undefined;
+}
 
 const ADDRESS_KEYS = ["street", "locality", "region", "postalCode", "country"] as const;
 
@@ -256,6 +288,52 @@ export default function Settings() {
             />
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Ícones e barra do navegador</CardTitle>
+            <CardDescription>Favicon, ícone da tela inicial e o manifest para instalar o site no celular. Tudo opcional.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <FieldsForm fields={ICONS} values={(draft.icons ?? {}) as Values} onChange={(v) => set("icons", compactObject<NonNullable<SiteSettings["icons"]>>(v))} />
+            <FieldsForm fields={THEME_COLOR} values={(draft.themeColor ?? {}) as Values} onChange={(v) => set("themeColor", compactObject<NonNullable<SiteSettings["themeColor"]>>(v))} />
+          </CardContent>
+        </Card>
+
+        {panel.enabled.has("blog") && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Blog</CardTitle>
+              <CardDescription>O feed RSS (/rss.xml, e um por idioma com post traduzido) e a capa dos posts que não têm uma.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <FieldsForm
+                fields={BLOG}
+                values={{ rssTitle: draft.rss?.title, rssDescription: draft.rss?.description, defaultPostCover: draft.defaultPostCover } as Values}
+                missing={missingTranslations(BLOG, { rssTitle: draft.rss?.title, rssDescription: draft.rss?.description } as Values, locales)}
+                onChange={(v) => {
+                  set("rss", compactObject<NonNullable<SiteSettings["rss"]>>({ title: v.rssTitle, description: v.rssDescription }));
+                  set("defaultPostCover", v.defaultPostCover as SiteSettings["defaultPostCover"]);
+                }}
+              />
+            </CardContent>
+          </Card>
+        )}
+
+        {panel.enabled.has("analytics") && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Analytics (Umami)</CardTitle>
+              <CardDescription>
+                O script entra em todas as páginas, sem cookies. Vazio: valem as variáveis PUBLIC_UMAMI_SCRIPT_URL e PUBLIC_UMAMI_WEBSITE_ID do build. A origem do script precisa
+                estar liberada na CSP do site: quem cuida do código roda <code>npx create-rubrica config --analytics &lt;endereço&gt;</code>.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <FieldsForm fields={ANALYTICS} values={(draft.analytics ?? {}) as Values} onChange={(v) => set("analytics", compactObject<NonNullable<SiteSettings["analytics"]>>(v))} />
+            </CardContent>
+          </Card>
+        )}
 
         <Card>
           <CardHeader>

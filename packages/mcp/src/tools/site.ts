@@ -12,7 +12,7 @@ import { commit, ToolInputError, type ToolDef } from "./types";
 
 /** Campos que só a agência (root) muda — espelha `TECHNICAL_SETTINGS` do backend. */
 const TECHNICAL = ["kind", "url", "locales", "theme"];
-const OBJECT_KEYS = ["appearance", "person", "organization", "paths"];
+const OBJECT_KEYS = ["appearance", "person", "organization", "paths", "icons", "themeColor", "rss", "analytics"];
 
 const DESCRIPTIONS: Record<string, string> = {
   kind: "Tipo do site: pessoal ou empresa. SÓ root.",
@@ -32,6 +32,11 @@ const DESCRIPTIONS: Record<string, string> = {
   organization: "Dados da empresa (razão social, CNPJ, endereço, horário…): geram o JSON-LD e o rodapé.",
   ogImage: "Imagem de compartilhamento (1200x630).",
   twitterHandle: "Usuário no X/Twitter.",
+  icons: "Ícones do site: svg (favicon SVG), favicon (PNG/ICO 32×32), apple (180×180), icon192 e icon512 (manifest), maskable (512×512, Android). Mesclados com os atuais.",
+  themeColor: "Cor da barra do navegador por modo (light, dark), em hexadecimal. Sem ela, o fundo do esquema de cor.",
+  rss: "Título e descrição do feed RSS do blog, por idioma. Sem eles, o nome e a descrição do site.",
+  defaultPostCover: "Capa padrão dos posts sem capa (e imagem de compartilhamento deles), 1200x630.",
+  analytics: "Analytics (plugin analytics, Umami): scriptUrl (https) e websiteId. A origem precisa estar na CSP (npx create-rubrica config --analytics).",
 };
 
 function stripRequired(schema: JsonSchema): JsonSchema {

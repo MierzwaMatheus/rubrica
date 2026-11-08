@@ -27,7 +27,7 @@ Rode os comandos na raiz do projeto. Alguns são interativos e fazem perguntas q
 | `npx create-rubrica@latest update --dry-run` | Mostra o que uma atualização faria (pacotes, `convex/` gerado, migrações de dados, ejetados cujo original mudou), sem gravar | Você |
 | `npx create-rubrica@latest update --yes` | Aplica a atualização | Você, depois do "ok" da pessoa |
 | `npx create-rubrica setup` | Conecta o Convex, grava as variáveis, cria o root, monta o conteúdo inicial e liga integrações (Telegram, e-mail, OpenRouter, Asaas, deploy hook) | A pessoa: pede senha e chaves |
-| `npx create-rubrica config` | Troca identidade, tipo, tema, esquema de cores, idiomas ou plugins | A pessoa |
+| `npx create-rubrica config` | Troca identidade, tipo, tema, esquema de cores, idiomas, plugins ou o analytics (`--analytics <script> --analytics-id <id>`, que também libera a origem na CSP) | A pessoa |
 | `npx create-rubrica publicar` | Põe o site no ar na Vercel, ou publica de novo | A pessoa, a pedido dela: publica em produção |
 | `npx create-rubrica senha` | Troca a senha do painel e libera o login bloqueado | Sempre a pessoa. A senha nunca passa pela conversa |
 | `npx create-rubrica ejetar <bloco>` | Copia o componente do bloco (do tema ou do núcleo) para `src/overrides/` e passa a usar a cópia | Você, com o "ok" da pessoa |

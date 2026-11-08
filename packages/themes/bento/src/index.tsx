@@ -82,6 +82,7 @@ export default defineTheme({
   description: "Mosaico de cartões em grade de 12 colunas e dock flutuante: moderno, orientado a produto.",
   contract: "^1",
   scheme: "editorial-cream",
+  colorMode: "light",
   fonts,
   tokens: {
     "rb-accent": { label: "Cor primária", kind: "color", default: "#C084FC", light: "#8A1AF4" },

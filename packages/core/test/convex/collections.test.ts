@@ -183,4 +183,27 @@ describe("textos de interface e configurações", () => {
     expect(plugins.find((p) => p.id === "resume")?.enabled).toBe(true);
     expect(plugins.some((p) => p.id === "pricing")).toBe(false);
   });
+
+  it("grava ícones, cor da barra, RSS, capa padrão e analytics, e recusa valor inválido", async () => {
+    const t = setup();
+    await seedSettings(t);
+    const admin = await as(t, "admin");
+    const image = { url: "/icone.png", width: 192, height: 192 };
+    await admin.mutation(api.rubrica.settings.update, {
+      patch: {
+        icons: { svg: { url: "/favicon.svg" }, icon192: image },
+        themeColor: { light: "#FAFAFA", dark: "#0a0a0a" },
+        rss: { title: { "pt-BR": "Blog" } },
+        defaultPostCover: { url: "/capa.png" },
+        analytics: { scriptUrl: "https://cloud.umami.is/script.js", websiteId: "0e7c-abc" },
+      },
+    });
+    const saved = await admin.query(api.rubrica.settings.get, {});
+    expect(saved).toMatchObject({ icons: { icon192: image }, themeColor: { dark: "#0a0a0a" }, rss: { title: { "pt-BR": "Blog" } }, defaultPostCover: { url: "/capa.png" }, analytics: { websiteId: "0e7c-abc" } });
+    await expect(admin.mutation(api.rubrica.settings.update, { patch: { themeColor: { dark: "red;}" } } })).rejects.toThrow(/Cor da barra/);
+    await expect(admin.mutation(api.rubrica.settings.update, { patch: { analytics: { scriptUrl: "http://x.com/s.js" } } })).rejects.toThrow(/analytics inválido/);
+    await expect(admin.mutation(api.rubrica.settings.update, { patch: { analytics: { websiteId: "<x>" } } })).rejects.toThrow(/Id do site/);
+    const plugins = await admin.query(api.rubrica.settings.plugins, {});
+    expect(plugins.find((p) => p.id === "analytics")?.enabled).toBe(false);
+  });
 });

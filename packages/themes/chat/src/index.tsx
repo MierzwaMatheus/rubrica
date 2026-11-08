@@ -25,6 +25,7 @@ export default defineTheme({
   description: "O site como uma conversa: cada seção responde a uma pergunta pronta, e as respostas rápidas embaixo são a navegação.",
   contract: "^1",
   scheme: "alto-contraste",
+  colorMode: "light",
   fonts,
   tokens: {
     "rb-accent": { label: "Cor dos balões de quem visita", kind: "color", default: "#FFE14D", light: "#0030B8" },

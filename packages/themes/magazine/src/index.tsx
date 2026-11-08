@@ -77,6 +77,7 @@ export default defineTheme({
   description: "Revista: masthead com o nome em letras espaçadas, grade editorial e tipografia de destaque em Bodoni Moda.",
   contract: "^1",
   scheme: "editorial-cream",
+  colorMode: "light",
   fonts,
   tokens: {
     "rb-accent": { label: "Cor de destaque", kind: "color", default: "#C084FC", light: "#8A1AF4" },

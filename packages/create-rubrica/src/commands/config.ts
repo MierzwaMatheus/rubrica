@@ -1,13 +1,14 @@
 /**
- * `config`: troca identidade, tipo, tema, esquema de cores, idiomas ou plugins.
+ * `config`: troca identidade, tipo, tema, esquema de cores, idiomas, plugins ou o analytics.
  *
  * Grava no `rubrica.json`, ajusta o código quando precisa (tema: dependência e
  * `astro.config.ts`; URL: `site` do Astro) e manda a mudança para o Convex do computador
  * (`rubrica/seed:patchSettings`). A produção só com confirmação (`--producao`).
  */
-import { readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { SiteKind, SiteSettings } from "@rubrica/core";
+import { analyticsScriptUrl, isAnalyticsId } from "@rubrica/core/seo";
 import { list, parseArgs } from "../utils/args.js";
 import { convexRun, deploymentLabel, isMissingFunction, type ConvexContext } from "../utils/convex.js";
 import { readEnvLocal } from "../utils/env.js";
@@ -17,7 +18,8 @@ import { normalizeEmail, normalizeUrl, validateEmail, validateUrl } from "../uti
 import { normalizeLocales } from "../locales.js";
 import { pluginOptions, pluginsRecord, unknownPlugins } from "../plugins.js";
 import { MARK, replaceSection, themeSection } from "../project/files.js";
-import { findProjectDir, readState, settingsFromState, writeState, type RubricaState } from "../state.js";
+import { patchHostingCsp } from "../project/hosting.js";
+import { analyticsOrigin, findProjectDir, readState, settingsFromState, writeState, type RubricaState } from "../state.js";
 import { COLOR_MODES, getTheme, initialFonts, resolveTheme, SCHEME_IDS, SCHEME_OPTIONS, THEMES, themePackage, type ColorMode } from "../themes.js";
 import { ask, canAsk, choose, chooseMany, confirm, log, outro } from "../ui.js";
 import { track } from "../telemetry.js";
@@ -36,6 +38,10 @@ export interface ConfigChange {
   idiomaPrincipal?: string;
   /** `+id` liga, `-id` desliga, `id` liga. */
   plugins?: string[];
+  /** Endereço do script do Umami (liga o plugin `analytics`), ou `desligar`. */
+  analytics?: string;
+  /** Id do site no Umami. */
+  analyticsId?: string;
 }
 
 export interface ConfigResult {
@@ -44,6 +50,8 @@ export interface ConfigResult {
   patch: Partial<SiteSettings>;
   /** Pacote do tema trocado: [antigo, novo]. */
   themeSwap?: [string, string];
+  /** Origem do analytics na CSP mudou: a anterior sai, a nova entra. */
+  cspOrigin?: { from?: string; to?: string };
   warnings: string[];
 }
 
@@ -90,6 +98,7 @@ export function applyConfigChange(current: RubricaState, change: ConfigChange): 
     const to = getTheme(toId)?.recommended;
     if (fromId !== toId && from && to) {
       if (!change.esquema && state.aparencia.esquema === from.scheme) state.aparencia.esquema = to.scheme;
+      if (!change.modo && state.aparencia.modo === from.mode) state.aparencia.modo = to.mode;
       const followed = initialFonts(fromId);
       if (state.aparencia.fonteSans === followed.fonteSans && state.aparencia.fonteMono === followed.fonteMono) {
         delete state.aparencia.fonteSans;
@@ -129,6 +138,26 @@ export function applyConfigChange(current: RubricaState, change: ConfigChange): 
     state.plugins = plugins;
   }
 
+  let cspOrigin: ConfigResult["cspOrigin"];
+  if (change.analytics !== undefined || change.analyticsId !== undefined) {
+    const from = analyticsOrigin(current);
+    if (change.analytics !== undefined && /^(desligar|off|nenhum)$/i.test(change.analytics.trim())) {
+      delete state.analytics;
+      state.plugins = { ...state.plugins, analytics: false };
+      if (from) cspOrigin = { from };
+    } else {
+      const script = change.analytics !== undefined ? analyticsScriptUrl(change.analytics) : state.analytics?.script;
+      if (!script) throw new Error(change.analytics !== undefined ? `Endereço do script inválido: "${change.analytics}". Use https://… (ex.: https://cloud.umami.is/script.js).` : "Informe o script com --analytics <https://…/script.js>.");
+      const id = change.analyticsId?.trim() || state.analytics?.id;
+      if (id && !isAnalyticsId(id)) throw new Error(`Id do site inválido: "${id}". Só letras, números e hífen.`);
+      state.analytics = { script, ...(id && { id }) };
+      state.plugins = { ...state.plugins, analytics: true };
+      if (!id) warnings.push("Sem o id do site (--analytics-id), o script não entra nas páginas: informe aqui ou nas Configurações do painel.");
+      const to = analyticsOrigin(state);
+      if (to !== from) cspOrigin = { ...(from && { from }), ...(to && { to }) };
+    }
+  }
+
   const before = settingsFromState(current);
   const after = settingsFromState(state);
   const patch: Partial<SiteSettings> = {};
@@ -136,7 +165,7 @@ export function applyConfigChange(current: RubricaState, change: ConfigChange): 
     if (key === "navigation" || key === "social") continue;
     if (JSON.stringify(before[key]) !== JSON.stringify(after[key])) (patch as Record<string, unknown>)[key] = after[key];
   }
-  return { state, patch, ...(themeSwap && { themeSwap }), warnings };
+  return { state, patch, ...(themeSwap && { themeSwap }), ...(cspOrigin && { cspOrigin }), warnings };
 }
 
 /** Troca o tema no package.json e no astro.config.ts. */
@@ -163,7 +192,7 @@ export function updateSiteUrl(projectDir: string, url: string): void {
   writeFileSync(configPath, next);
 }
 
-const CONFIG_FLAGS = ["nome", "url", "descricao", "autor", "email", "tipo", "tema", "esquema", "modo", "idiomas", "idioma-principal", "plugins"] as const;
+const CONFIG_FLAGS = ["nome", "url", "descricao", "autor", "email", "tipo", "tema", "esquema", "modo", "idiomas", "idioma-principal", "plugins", "analytics", "analytics-id"] as const;
 const MODES: Record<string, ColorMode> = { escuro: "dark", dark: "dark", claro: "light", light: "light", automatico: "system", system: "system" };
 
 async function askChange(state: RubricaState): Promise<ConfigChange> {
@@ -224,14 +253,24 @@ export async function runConfig(argv: string[], deps: { cwd: string; runner?: Ru
     ...(v.idiomas !== undefined && { idiomas: list(v.idiomas) }),
     ...(v["idioma-principal"] !== undefined && { idiomaPrincipal: v["idioma-principal"] }),
     ...(v.plugins !== undefined && { plugins: list(v.plugins) }),
+    ...(v.analytics !== undefined && { analytics: v.analytics }),
+    ...(v["analytics-id"] !== undefined && { analyticsId: v["analytics-id"] }),
   };
   const change = Object.keys(fromFlags).length ? fromFlags : canAsk(args.flags.has("yes")) ? await askChange(current) : null;
-  if (!change) throw new Error("Diga o que mudar (ex.: --tema cyberpunk, --esquema neon, --idiomas pt-BR,en) ou rode no terminal para as perguntas.");
+  if (!change) throw new Error("Diga o que mudar (ex.: --tema cyberpunk, --esquema neon, --idiomas pt-BR,en, --analytics https://cloud.umami.is/script.js --analytics-id <id>) ou rode no terminal para as perguntas.");
 
   const result = applyConfigChange(current, change);
   for (const w of result.warnings) log.warn(w);
   writeState(projectDir, result.state);
   if (change.url) updateSiteUrl(projectDir, result.state.identidade.url);
+  if (result.cspOrigin) {
+    const read = (f: string) => (existsSync(join(projectDir, f)) ? readFileSync(join(projectDir, f), "utf-8") : undefined);
+    const changed = patchHostingCsp({ "vercel.json": read("vercel.json"), "public/_headers": read("public/_headers") }, result.cspOrigin.from, result.cspOrigin.to);
+    for (const [file, content] of Object.entries(changed)) writeFileSync(join(projectDir, file), content);
+    const files = Object.keys(changed);
+    if (files.length) log.success(`CSP ${result.cspOrigin.to ? `liberando ${result.cspOrigin.to}` : "sem a origem do analytics"} em ${files.join(" e ")}. Vale no site no ar depois do próximo publicar.`);
+    else log.warn("Não achei a CSP no vercel.json nem no public/_headers: libere a origem do analytics em script-src e connect-src à mão.");
+  }
   if (result.themeSwap) {
     swapThemeInFiles(projectDir, result.state, result.themeSwap);
     log.success(`Tema trocado: ${result.themeSwap[0]} → ${result.themeSwap[1]}.`);

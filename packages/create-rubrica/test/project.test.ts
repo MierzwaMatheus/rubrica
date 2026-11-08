@@ -4,7 +4,7 @@ import { createRubrica, RUBRICA_MODULES } from "@rubrica/core/convex";
 import { CORE_MODULES } from "../src/core-manifest";
 import { convexFiles, convexOwnedFiles, isGeneratedConvexFile, reexportSource } from "../src/project/convex";
 import { astroConfig, ejectedSection, MARK, projectFiles, replaceSection, defaultDependencySpecs } from "../src/project/files";
-import { CONTENT_SECURITY_POLICY, defaultHosting, headersFile, hostingFiles, redirectsFile, vercelJson } from "../src/project/hosting";
+import { CONTENT_SECURITY_POLICY, contentSecurityPolicy, defaultHosting, headersFile, hostingFiles, patchHostingCsp, redirectsFile, swapCspOrigin, vercelJson } from "../src/project/hosting";
 import { repo, sampleState } from "./helpers";
 
 const demo = (p: string) => readFileSync(repo("apps/demo", p), "utf-8");
@@ -87,6 +87,46 @@ describe("hospedagem neutra (decisão 21)", () => {
     expect(CONTENT_SECURITY_POLICY).toContain("https://*.convex.site");
     expect(CONTENT_SECURITY_POLICY).toContain("frame-ancestors 'none'");
     expect(Object.keys(hostingFiles())).toEqual(["vercel.json", "public/_redirects", "public/_headers"]);
+  });
+});
+
+describe("CSP do analytics", () => {
+  const umami = "https://cloud.umami.is";
+  it("libera a origem em script-src e connect-src, e só neles", () => {
+    const csp = contentSecurityPolicy(umami);
+    expect(csp).toContain(`script-src 'self' 'unsafe-inline' ${umami}`);
+    expect(csp).toContain(`connect-src 'self' ${umami} https://*.convex.cloud`);
+    expect(csp.split(umami).length - 1).toBe(2);
+    expect(CONTENT_SECURITY_POLICY).not.toContain("umami");
+  });
+
+  it("troca a origem numa CSP existente sem mexer no resto e sem repetir", () => {
+    const custom = `${CONTENT_SECURITY_POLICY}; script-src-elem 'self'`;
+    const added = swapCspOrigin(custom, undefined, umami);
+    expect(added).toBe(`${contentSecurityPolicy(umami)}; script-src-elem 'self'`);
+    expect(swapCspOrigin(added, undefined, umami)).toBe(added);
+    const swapped = swapCspOrigin(added, umami, "https://stats.ana.dev");
+    expect(swapped).not.toContain(umami);
+    expect(swapped).toContain("script-src 'self' 'unsafe-inline' https://stats.ana.dev");
+    expect(swapCspOrigin(added, umami, undefined)).toBe(custom);
+  });
+
+  it("aplica nos arquivos do projeto e preserva o que a pessoa mudou", () => {
+    const files = hostingFiles();
+    const vercel = JSON.parse(files["vercel.json"]!);
+    vercel.redirects.push({ source: "/x", destination: "/y", permanent: false });
+    const changed = patchHostingCsp({ "vercel.json": JSON.stringify(vercel), "public/_headers": files["public/_headers"] }, undefined, umami);
+    expect(Object.keys(changed).sort()).toEqual(["public/_headers", "vercel.json"]);
+    const next = JSON.parse(changed["vercel.json"]!);
+    expect(next.redirects).toContainEqual({ source: "/x", destination: "/y", permanent: false });
+    expect(JSON.stringify(next)).toContain(`connect-src 'self' ${umami}`);
+    expect(changed["public/_headers"]).toContain(`Content-Security-Policy: ${contentSecurityPolicy(umami)}`);
+    expect(patchHostingCsp({ "vercel.json": undefined }, undefined, umami)).toEqual({});
+  });
+
+  it("o create já gera a CSP com o analytics do rubrica.json", () => {
+    const files = projectFiles({ name: "x", state: sampleState({ analytics: { script: `${umami}/script.js`, id: "abc" } }), deps: defaultDependencySpecs() });
+    expect(files["public/_headers"]).toContain(contentSecurityPolicy(umami));
   });
 });
 

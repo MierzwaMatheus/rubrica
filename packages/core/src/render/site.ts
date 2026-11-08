@@ -96,7 +96,7 @@ export function buildSite(input: BuildInput): BuiltSite {
   const plugins = enabledPlugins(input.plugins, settings.kind, settings.plugins);
   const paths: CollectionPaths = { ...DEFAULT_PATHS, ...settings.paths };
   const blockDefs = new Map(input.blocks.map((b) => [b.type, b]));
-  const opts = (locale: Locale): ResolveOptions => ({ locale, locales: cfg });
+  const opts = (locale: Locale): ResolveOptions => ({ locale, locales: cfg, ...(settings.defaultPostCover?.url && { defaultPostCover: settings.defaultPostCover }) });
 
   const blockAllowed = (def: BlockDefinition | undefined): def is BlockDefinition =>
     !!def && (def.category === "comum" || def.category === settings.kind) && (!def.plugin || plugins.has(def.plugin));

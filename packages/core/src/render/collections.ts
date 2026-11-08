@@ -32,7 +32,10 @@ export interface PostItem {
   title: string;
   excerpt?: string;
   content: string;
+  /** Capa do post; sem capa própria, a capa padrão das configurações (`defaultCover`). */
   cover?: ResolvedImage;
+  /** A capa é a padrão do site, não a do post (o tema pode desenhá-la de outro jeito). */
+  defaultCover?: true;
   tags: string[];
   publishedAt: string;
   updatedAt?: string;
@@ -214,9 +217,11 @@ export function resolvePost(raw: RawPost, opts: ResolveOptions, paths: Collectio
     seo: resolveSeo(raw.seo, opts),
   };
   const excerpt = pick(raw.excerpt, opts.locale);
-  const cover = resolveImage(raw.cover, opts);
+  const own = resolveImage(raw.cover, opts);
+  const cover = own ?? resolveImage(opts.defaultPostCover, opts);
   if (excerpt) item.excerpt = excerpt;
   if (cover) item.cover = cover;
+  if (cover && !own) item.defaultCover = true;
   if (raw.updatedAt) item.updatedAt = iso(raw.updatedAt)!;
   if (raw.author) item.author = raw.author;
   return item;

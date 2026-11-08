@@ -8,6 +8,7 @@ import { requireRole } from "./auth";
 import { logUserAction } from "./audit";
 import { cleanByValidator, cleanFields } from "./lib/clean";
 import { isLocaleCode } from "./lib/text";
+import { analyticsScriptUrl, isAnalyticsId, isCssColor } from "../seo/analytics";
 import { getSettingsDoc } from "./plugins";
 import type { RubricaRuntime } from "./runtime";
 import { internalMutation, mutation, query, type Doc, type MutationCtx } from "./server";
@@ -31,6 +32,12 @@ function validateSettings(settings: SiteSettingsValue): void {
   for (const [key, path] of Object.entries(settings.paths ?? {})) {
     if (path && !/^\/[a-z0-9-]+$/.test(path)) throw new Error(`Caminho inválido para ${key}: "${path}"`);
   }
+  for (const [mode, color] of Object.entries(settings.themeColor ?? {})) {
+    if (color && !isCssColor(color)) throw new Error(`Cor da barra do navegador (${mode === "light" ? "claro" : "escuro"}) inválida: use #rrggbb`);
+  }
+  const { scriptUrl, websiteId } = settings.analytics ?? {};
+  if (scriptUrl && !analyticsScriptUrl(scriptUrl)) throw new Error("Endereço do script de analytics inválido: use https://…");
+  if (websiteId && !isAnalyticsId(websiteId)) throw new Error("Id do site no analytics inválido: só letras, números e hífen");
 }
 
 export async function upsertSettings(ctx: MutationCtx, value: SiteSettingsValue, userId?: Doc<"users">["_id"]) {

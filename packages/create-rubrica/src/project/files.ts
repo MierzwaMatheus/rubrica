@@ -8,7 +8,7 @@
 import corePkg from "@rubrica/core/package.json";
 import mcpPkg from "../../../mcp/package.json";
 import agentsMd from "../../../../AGENTS.md";
-import type { RubricaState } from "../state.js";
+import { analyticsOrigin, type RubricaState } from "../state.js";
 import { themePackage } from "../themes.js";
 import { convexFiles, convexOwnedFiles } from "./convex.js";
 import { defaultHosting, hostingFiles, type HostingConfig } from "./hosting.js";
@@ -237,7 +237,7 @@ export function projectFiles(options: ProjectFilesOptions): Record<string, strin
     "src/blocks/index.ts": BLOCKS_INDEX,
     ...convexOwnedFiles(),
     ...convexFiles(options.modules),
-    ...hostingFiles(options.hosting ?? defaultHosting()),
+    ...hostingFiles(options.hosting ?? defaultHosting({ analyticsOrigin: analyticsOrigin(state) })),
     "rubrica.json": `${JSON.stringify(state, null, 2)}\n`,
   };
 }

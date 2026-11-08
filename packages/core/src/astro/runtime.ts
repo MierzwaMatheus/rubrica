@@ -16,6 +16,9 @@ import { blockComponent as themeBlockComponent } from "../components";
 import { ISLAND_META, islandNameFor } from "../islands";
 import { uiKeysWithPrefix } from "../i18n/ui-texts";
 import type { RenderContext } from "../theme/contract";
+import { rssFeeds } from "../seo/rss";
+import { resolveAnalytics } from "../seo/analytics";
+import type { SiteHeadOptions } from "../seo/site-head";
 
 let built: Promise<BuiltSite> | undefined;
 
@@ -67,5 +70,19 @@ export function islandProps(block: { id: string; type: string; fields: Record<st
       social,
     },
     ...(meta?.items ? { items: block.items } : {}),
+  };
+}
+
+/**
+ * O que o `<head>` de todas as páginas precisa além da rota: o tema (cor da barra), os
+ * feeds RSS e o analytics (plugin ligado e configurado nas configurações ou no `PUBLIC_*`).
+ */
+export function headOptions(site: BuiltSite): SiteHeadOptions {
+  const base = site.settings.url.replace(/\/+$/, "");
+  const analytics = site.plugins.has("analytics") ? resolveAnalytics(site.settings, process.env) : undefined;
+  return {
+    theme: activeTheme,
+    feeds: rssFeeds(site).map((f) => ({ locale: f.locale, href: `${base}${f.path}`, title: f.title })),
+    ...(analytics && { analytics }),
   };
 }

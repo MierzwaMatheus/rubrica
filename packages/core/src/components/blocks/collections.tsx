@@ -4,7 +4,7 @@ import type { ResolvedFields } from "../../blocks/fields";
 import type { cases as casesDef, depoimentos as depoimentosDef, faq as faqDef, postsRecentes as postsDef, precos as precosDef } from "../../blocks/catalog";
 import type { FaqItem, PlanItem, PostItem, ProjectItem, TestimonialItem } from "../../render/collections";
 import { Heading, Html, Img, LinkButton, Section, SectionHeader } from "../primitives";
-import { safeId } from "./util";
+import { safeId, tagFilterCss } from "./util";
 
 type CasesFields = ResolvedFields<typeof casesDef.fields>;
 type PostsFields = ResolvedFields<typeof postsDef.fields>;
@@ -91,24 +91,6 @@ function PostCard({ post, ctx, tagIndexes }: { post: PostItem; ctx: BlockProps["
       </div>
     </li>
   );
-}
-
-/**
- * Filtro por etiqueta SEM JavaScript: botões de opção (`radio`) antes da lista e uma
- * folha de estilo gerada para o bloco esconde os posts que não têm a etiqueta marcada.
- * Sem CSS, a lista aparece inteira. Os ids vêm do índice, nunca do texto da etiqueta.
- */
-function tagFilterCss(scope: string, count: number): string {
-  const rules: string[] = [];
-  for (let i = 0; i < count; i++) {
-    const radio = `#${scope}-t${i}`;
-    rules.push(`${radio}:checked ~ .rb-posts__list > .rb-post:not([data-tags~="t${i}"]){display:none}`);
-    rules.push(`${radio}:checked ~ .rb-filter label[for="${scope}-t${i}"]{background:var(--rb-accent);color:var(--rb-accent-fg);border-color:var(--rb-accent)}`);
-    rules.push(`${radio}:focus-visible ~ .rb-filter label[for="${scope}-t${i}"]{outline:2px solid var(--rb-accent);outline-offset:2px}`);
-  }
-  rules.push(`#${scope}-all:checked ~ .rb-filter label[for="${scope}-all"]{background:var(--rb-accent);color:var(--rb-accent-fg);border-color:var(--rb-accent)}`);
-  rules.push(`#${scope}-all:focus-visible ~ .rb-filter label[for="${scope}-all"]{outline:2px solid var(--rb-accent);outline-offset:2px}`);
-  return rules.join("\n");
 }
 
 export function PostsRecentesBlock({ id, variant, fields, items, headingLevel, ctx }: BlockProps<PostsFields, PostItem>) {

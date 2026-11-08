@@ -38,6 +38,16 @@ const WEIGHTS: Record<string, number[]> = {
   "IBM Plex Mono": [300, 400, 500, 600, 700],
 };
 
+/** Famílias do Google Fonts sem itálico: pedir o estilo falharia o download. */
+const NO_ITALIC = new Set(["Manrope", "Space Grotesk", "Bricolage Grotesque"]);
+
+/** A família tem itálico no Google Fonts? (Desconhecida: supõe que sim.) */
+export function hasItalic(family: string): boolean {
+  return !NO_ITALIC.has(family);
+}
+
+export type FontStyle = "normal" | "italic";
+
 /** Famílias com pesos conhecidos (as que o painel e o CLI oferecem). */
 export const KNOWN_FONTS = Object.keys(WEIGHTS);
 
@@ -54,6 +64,8 @@ export interface PlannedFont {
   name: string;
   cssVariable: string;
   weights: number[];
+  /** Estilos a baixar: sempre `normal`; `italic` quando o tema pede para o papel. */
+  styles: FontStyle[];
   /** Genérica de reserva (a Fonts API gera fallbacks com métricas parecidas). */
   fallbacks: string[];
 }
@@ -67,6 +79,7 @@ export interface FontPlan {
 
 /** Decide as famílias do site: o que o site escolheu vence o que o tema traz. */
 export function planFonts(appearance: Pick<Appearance, "fontSans" | "fontMono"> | undefined, themeFonts: ThemeFonts | undefined): FontPlan {
+  const italicSlots = new Set(Array.isArray(themeFonts?.italic) ? themeFonts.italic : []);
   const wanted: Partial<Record<FontSlot, string>> = {
     sans: [appearance?.fontSans, themeFonts?.sans].find(isSafeFamily)?.trim(),
     mono: [appearance?.fontMono, themeFonts?.mono].find(isSafeFamily)?.trim(),
@@ -84,11 +97,13 @@ export function planFonts(appearance: Pick<Appearance, "fontSans" | "fontMono"> 
         name,
         cssVariable: FONT_FACE_VARS[slot],
         weights: fontWeights(name),
+        styles: ["normal"],
         fallbacks: slot === "mono" ? ["ui-monospace", "monospace"] : ["system-ui", "sans-serif"],
       };
       byName.set(name, font);
       fonts.push(font);
     }
+    if (italicSlots.has(slot) && hasItalic(name) && !font.styles.includes("italic")) font.styles.push("italic");
     assign[FONT_TOKENS[slot]] = font.cssVariable;
   }
   return { fonts, assign };

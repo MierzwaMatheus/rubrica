@@ -55,3 +55,45 @@ export function digits(value: string): string {
 export function safeId(value: string): string {
   return value.replace(/[^a-zA-Z0-9_-]/g, "_");
 }
+
+/** Corta um texto longo no limite, sem partir palavra, com reticências. */
+export function shorten(text: string, max: number): string {
+  if (text.length <= max) return text;
+  const cut = text.slice(0, max);
+  const space = cut.lastIndexOf(" ");
+  return `${cut.slice(0, space > 0 ? space : max).trimEnd()}…`;
+}
+
+export interface TagFilterCssOptions {
+  /** Itens filtrados, a partir do irmão dos botões de opção. Padrão: `.rb-posts__list > .rb-post`. */
+  items?: string;
+  /** Grupo dos rótulos, irmão dos botões de opção. Padrão: `.rb-filter`. */
+  filter?: string;
+  /** Declarações CSS do rótulo marcado. */
+  checked?: string;
+  /** Declarações CSS do rótulo com foco do teclado. */
+  focus?: string;
+}
+
+/**
+ * Filtro por etiqueta SEM JavaScript: botões de opção (`radio`, ids `<scope>-all` e
+ * `<scope>-t<i>`) antes da lista e uma folha de estilo gerada para o bloco esconde os
+ * itens cujo `data-tags` não tem `t<i>`. Sem CSS, a lista aparece inteira. Os ids vêm do
+ * índice, nunca do texto da etiqueta. Os seletores e o destaque se ajustam ao tema.
+ */
+export function tagFilterCss(scope: string, count: number, options: TagFilterCssOptions = {}): string {
+  const items = options.items ?? ".rb-posts__list > .rb-post";
+  const filter = options.filter ?? ".rb-filter";
+  const on = options.checked ?? "background:var(--rb-accent);color:var(--rb-accent-fg);border-color:var(--rb-accent)";
+  const ring = options.focus ?? "outline:2px solid var(--rb-accent);outline-offset:2px";
+  const rules: string[] = [];
+  for (let i = 0; i < count; i++) {
+    const radio = `#${scope}-t${i}`;
+    rules.push(`${radio}:checked ~ ${items}:not([data-tags~="t${i}"]){display:none}`);
+    rules.push(`${radio}:checked ~ ${filter} label[for="${scope}-t${i}"]{${on}}`);
+    rules.push(`${radio}:focus-visible ~ ${filter} label[for="${scope}-t${i}"]{${ring}}`);
+  }
+  rules.push(`#${scope}-all:checked ~ ${filter} label[for="${scope}-all"]{${on}}`);
+  rules.push(`#${scope}-all:focus-visible ~ ${filter} label[for="${scope}-all"]{${ring}}`);
+  return rules.join("\n");
+}

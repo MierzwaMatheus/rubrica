@@ -2,7 +2,7 @@
 /** Documento HTML de toda página pública: <head> do núcleo (SEO) e estilos do tema. */
 import "virtual:rubrica/styles";
 import { Font } from "astro:assets";
-import { activeTheme, activeFontPlan } from "../runtime";
+import { activeTheme, activeFontPlan, headOptions, loadSite } from "../runtime";
 import { appearanceHead } from "../../theme/appearance";
 import { buildHead, renderHeadTags } from "../../seo/head";
 import type { RenderContext } from "../../theme/contract";
@@ -15,7 +15,7 @@ interface Props {
   settings: SiteSettings;
 }
 const { route, ctx, settings } = Astro.props;
-const head = renderHeadTags(buildHead(route, settings, ctx));
+const head = renderHeadTags(buildHead(route, settings, ctx, headOptions(await loadSite())));
 const mode = settings.appearance.colorMode;
 const look = appearanceHead(settings, activeTheme, activeFontPlan);
 // Só a fonte do texto é pré-carregada (peso 400): o resto carrega quando for usado.

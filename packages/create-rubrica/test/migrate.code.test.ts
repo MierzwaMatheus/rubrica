@@ -37,6 +37,12 @@ describe("personalizações", () => {
     expect(classify("convex/posts.ts", "modificado").area).toBe("backend do núcleo");
     expect(classify("convex/schema.ts", "modificado").suggestion).toMatch(/rubricaTables/);
     expect(classify("vercel.json", "modificado").area).toBe("hospedagem");
+    for (const icon of ["public/favicon.ico", "public/favicon-32x32.png", "public/apple-touch-icon.png", "public/icon-512.png", "public/maskable-512.png", "public/site.webmanifest"]) {
+      expect(classify(icon, "novo").area, icon).toBe("ícones");
+    }
+    expect(classify("public/cv.pdf", "novo").area).toBe("arquivo público");
+    expect(classify("index.html", "modificado").suggestion).toMatch(/--analytics/);
+    expect(classify("src/i18n/translations/pt-BR.ts", "modificado").suggestion).toMatch(/arquivos de tradução/);
     expect(lineDelta("a\nb\nc", "a\nc\nd\ne")).toEqual({ added: 2, removed: 1 });
   });
 });

@@ -8,6 +8,8 @@ import type { FieldDef, FieldMap, RawImage, RawLink, ResolvedImage, ResolvedLink
 export interface ResolveOptions {
   locale: Locale;
   locales: LocaleConfig;
+  /** Capa dos posts sem capa própria (`SiteSettings.defaultPostCover`). */
+  defaultPostCover?: RawImage;
 }
 
 const EXTERNAL = /^(https?:|mailto:|tel:|\/\/)/i;

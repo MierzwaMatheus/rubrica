@@ -17,6 +17,7 @@ export default defineTheme({
   description: "O site como livro: cabeçalho corrido, folha de rosto, sumário, capitulares e notas na margem.",
   contract: "^1",
   scheme: "azulejo",
+  colorMode: "light",
   fonts,
   texts: TEXTS,
   tokens: {

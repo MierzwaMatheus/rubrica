@@ -95,6 +95,7 @@ export default defineTheme({
   description: "Cada seção é uma janela sobre a área de trabalho, com barra de menu e ícones: nostalgia e brincadeira.",
   contract: "^1",
   scheme: "sorbet",
+  colorMode: "light",
   fonts,
   tokens: {
     "dk-shadow-offset": { label: "Sombra das janelas", kind: "length", default: "5px" },

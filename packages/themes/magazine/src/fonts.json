@@ -1,1 +1,1 @@
-{ "display": "Bodoni Moda", "sans": "IBM Plex Serif", "mono": "JetBrains Mono" }
+{ "display": "Bodoni Moda", "sans": "IBM Plex Serif", "mono": "JetBrains Mono", "italic": ["sans", "display"] }

@@ -1,1 +1,1 @@
-{ "sans": "Source Serif 4", "mono": "IBM Plex Mono", "display": "Fraunces" }
+{ "sans": "Source Serif 4", "mono": "IBM Plex Mono", "display": "Fraunces", "italic": ["sans", "display"] }

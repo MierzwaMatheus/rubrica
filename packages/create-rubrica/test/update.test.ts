@@ -96,6 +96,9 @@ describe("plano do update (puro)", () => {
   });
 });
 
+/** Versão atual do pacote no monorepo (o projeto de teste instala os pacotes por link). */
+const workspaceVersion = (dir: string): string => JSON.parse(readFileSync(repo(dir, "package.json"), "utf-8")).version;
+
 describe("update --dry-run (projeto instalado)", () => {
   it("mostra o plano com o núcleo instalado e não grava nada", async () => {
     const dir = installedProject();
@@ -112,8 +115,8 @@ describe("update --dry-run (projeto instalado)", () => {
     const { plan, core } = await computeUpdatePlan(dir, { cwd: dir, runner: shell.runner });
     expect(core?.modules.posts).toEqual(CORE_MODULES.posts);
     expect(plan.packages).toEqual([
-      { pkg: "@rubrica/core", from: "2.0.0-alpha.0", to: "2.1.0" },
-      { pkg: "@rubrica/theme-padrao", from: "2.0.0-alpha.0", to: "2.1.0" },
+      { pkg: "@rubrica/core", from: workspaceVersion("packages/core"), to: "2.1.0" },
+      { pkg: "@rubrica/theme-padrao", from: workspaceVersion("packages/themes/padrao"), to: "2.1.0" },
     ]);
     expect(plan.convex.write).toEqual(["convex/rubrica/posts.ts"]);
     expect(plan.ejectedChanged.map((e) => e.tipo)).toEqual(["hero"]);

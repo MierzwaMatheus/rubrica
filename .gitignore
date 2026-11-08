@@ -141,3 +141,6 @@ __pycache__/
 
 # Perfil editorial e planos das skills de conteúdo (dados pessoais). Tire esta linha para versionar.
 .rubrica/
+
+# Astro
+.astro/

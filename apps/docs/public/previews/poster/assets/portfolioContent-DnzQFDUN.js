@@ -1,0 +1,1 @@
+function i(n){return!!(n.slug&&n.case_study)}function u(n){const e=new Set;for(const t of n){const r=t.category?.trim();r&&e.add(r)}return Array.from(e)}function f(n,e){return e?n.filter(t=>t.category?.trim()===e):n}function o(n,e){const t=n.filter(i),r=t.findIndex(s=>s.slug===e);return r===-1?t[0]??null:t.length<2?null:t[(r+1)%t.length]}export{f,i as h,u as l,o as n};

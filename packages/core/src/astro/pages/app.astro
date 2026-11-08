@@ -1,0 +1,40 @@
+---
+/**
+ * Páginas das rotas do app (`kind: "app"` no registro de plugins): uma por rota e idioma,
+ * em `/_rubrica/app/[<prefixo>/]<ilha>`, com a casca do tema e a ilha da rota. O caminho
+ * público (`/proposta/<slug>`) chega aqui por reescrita da hospedagem (ou do middleware
+ * do `astro dev`), e a ilha lê os parâmetros do endereço. Noindex e fora do sitemap.
+ */
+import type { GetStaticPaths } from "astro";
+import Document from "./Document.astro";
+import Island from "../../islands/Island";
+import { loadSite, activeTheme, siteAppShells, appIslandProps } from "../runtime";
+import { templates, ColorToggleButton } from "../../components";
+import { APP_SHELL_BASE, type AppShell } from "../../plugins/app-routes";
+import { ISLAND_META } from "../../islands";
+
+export const getStaticPaths = (async () => {
+  const site = await loadSite();
+  return siteAppShells(site).map((shell) => ({ params: { app: shell.shell.slice(APP_SHELL_BASE.length + 1) }, props: { shell } }));
+}) satisfies GetStaticPaths;
+
+const { shell } = Astro.props as { shell: AppShell };
+const site = await loadSite();
+const shells = siteAppShells(site);
+// Sem alternativas de idioma: o seletor levaria para a página interna, sem o parâmetro.
+const ctx = site.context(shell.locale, shell.pattern, []);
+const { Shell } = templates(activeTheme);
+const titleKey = ISLAND_META[shell.island]?.title;
+const title = titleKey ? ctx.t(titleKey) : site.settings.name[shell.locale] ?? "";
+---
+
+<Document route={{ type: "app", url: shell.shell, locale: shell.locale, title }} ctx={ctx} settings={site.settings}>
+  <Shell ctx={ctx} pageType="notFound" collections={site.collections(shell.locale)}>
+    {ctx.site.colorToggle && <ColorToggleButton slot="colorToggle" label={ctx.t("theme.toggle")} />}
+    <div class="rb-app rb-container">
+      <Island client:only="react" name={shell.island} props={appIslandProps(shell, shells, site, ctx)}>
+        <p slot="fallback" class="rb-app__loading">{ctx.t("app.loading")}</p>
+      </Island>
+    </div>
+  </Shell>
+</Document>

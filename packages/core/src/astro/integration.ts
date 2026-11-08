@@ -25,6 +25,9 @@ import { CORE_PLUGINS } from "../plugins/registry";
 import type { SiteSnapshot } from "../data/source";
 import { DEDUPE, optimizeDepsInclude } from "./dev-deps";
 import { CONTENT_CHANGED_EVENT, contentChangeTracker, subscribeConvex, subscribeFixtures, type Unsubscribe } from "./dev-content";
+import { APP_SHELL_BASE, appRoutes, appShells, type AppShell } from "../plugins/app-routes";
+import { localePrefix } from "../i18n";
+import { appRewriteMiddleware } from "./app-dev";
 
 export type SourceOption =
   /**
@@ -111,6 +114,8 @@ const blogEnabled = (s: SiteSnapshot) => enabledPlugins(CORE_PLUGINS, s.site.kin
 
 export default function rubrica(options: RubricaOptions): AstroIntegration {
   let dev: DevContent | undefined;
+  // Rotas do app dos plugins ligados (proposta, checkout): páginas no build e reescrita no dev.
+  let appPages: AppShell[] = [];
   return {
     name: "@rubrica/core",
     hooks: {
@@ -243,6 +248,10 @@ export default function rubrica(options: RubricaOptions): AstroIntegration {
         injectRoute({ pattern: "/robots.txt", entrypoint: here("./pages/robots.txt.ts"), prerender: true });
         injectRoute({ pattern: "/_rubrica/color-mode.js", entrypoint: here("./pages/color-mode.js.ts"), prerender: true });
         injectRoute({ pattern: "/manifest.webmanifest", entrypoint: here("./pages/manifest.webmanifest.ts"), prerender: true });
+        // Rotas do app (`kind: "app"` dos plugins ligados): uma página estática por rota e idioma.
+        const locales = snapshot.site.locales;
+        appPages = appShells(appRoutes(CORE_PLUGINS, enabledPlugins(CORE_PLUGINS, snapshot.site.kind, snapshot.site.plugins)), locales.locales, (l) => localePrefix(l, locales));
+        if (appPages.length) injectRoute({ pattern: `${APP_SHELL_BASE}/[...app]`, entrypoint: here("./pages/app.astro"), prerender: true });
         // RSS do blog: o do idioma principal e os dos outros idiomas com post traduzido.
         if (blogEnabled(snapshot)) {
           injectRoute({ pattern: "/rss.xml", entrypoint: here("./pages/rss.xml.ts"), prerender: true });
@@ -251,6 +260,7 @@ export default function rubrica(options: RubricaOptions): AstroIntegration {
       },
       // Dev: o site reflete o que se salva no painel, sem reiniciar (ver dev-content.ts).
       "astro:server:setup"({ server, logger }) {
+        if (appPages.length) server.middlewares.use(appRewriteMiddleware(appPages));
         if (!dev) return;
         const { source, abs, convexUrl, snapshot, themeFonts } = dev;
         const fontsKey = (s: SiteSnapshot) => JSON.stringify(planFonts(s.site.appearance, themeFonts));

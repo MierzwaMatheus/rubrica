@@ -82,6 +82,21 @@ describe("hospedagem neutra (decisão 21)", () => {
     expect(headers).toContain("/_astro/*\n  Cache-Control: public, max-age=31536000, immutable");
   });
 
+  it("rotas do app (proposta, checkout) reescritas para a página estática delas, com status 200", () => {
+    const json = JSON.parse(vercelJson(config));
+    expect(json.rewrites).toContainEqual({ source: "/proposta/:slug", destination: "/_rubrica/app/proposta" });
+    expect(json.rewrites).toContainEqual({ source: "/:locale/proposta/:slug/aceitar", destination: "/_rubrica/app/:locale/proposta-aceite" });
+    expect(json.rewrites).toContainEqual({ source: "/checkout/:uniqueLink", destination: "/_rubrica/app/checkout" });
+    expect(json.rewrites).toContainEqual({ source: "/payment-success/:uniqueLink", destination: "/_rubrica/app/pagamento-concluido" });
+    const redirects = redirectsFile(config);
+    expect(redirects).toContain("/proposta/:slug /_rubrica/app/proposta 200");
+    expect(redirects).toContain("/:locale/checkout/:uniqueLink /_rubrica/app/:locale/checkout 200");
+    // Redirecionamentos de verdade vêm antes (o Netlify usa a primeira regra que casa).
+    expect(redirects.indexOf("/antigo /novo 301")).toBeLessThan(redirects.indexOf(" 200"));
+    // Sem reescritas, o vercel.json não ganha a chave.
+    expect(JSON.parse(vercelJson({ ...config, rewrites: [] })).rewrites).toBeUndefined();
+  });
+
   it("a CSP deixa as ilhas do Astro e os formulários funcionarem", () => {
     expect(CONTENT_SECURITY_POLICY).toContain("script-src 'self' 'unsafe-inline'");
     expect(CONTENT_SECURITY_POLICY).toContain("https://*.convex.site");

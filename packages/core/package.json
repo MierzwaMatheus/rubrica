@@ -21,6 +21,7 @@
     "./render": "./src/render/index.ts",
     "./components": "./src/components/index.ts",
     "./plugins": "./src/plugins/registry.ts",
+    "./plugins/app-routes": "./src/plugins/app-routes.ts",
     "./seo": "./src/seo/index.ts",
     "./package.json": "./package.json",
     "./islands": "./src/islands/index.ts",

@@ -36,7 +36,7 @@ export const ADMIN_BROWSER_DEPS = [
 ] as const;
 
 /** O que o código das ilhas importa (`src/islands`), além do React. */
-export const ISLAND_BROWSER_DEPS = [] as const satisfies readonly string[];
+export const ISLAND_BROWSER_DEPS = ["convex/browser", "convex/server"] as const satisfies readonly string[];
 
 /** Uma cópia só (a do projeto) no navegador. */
 export const DEDUPE = ["react", "react-dom"];

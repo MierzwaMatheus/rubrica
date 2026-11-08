@@ -71,8 +71,18 @@ function identityJsonLd(settings: SiteSettings, ctx: RenderContext): Record<stri
   };
 }
 
+/** Página de uma rota do app (proposta, checkout): fora do sitemap e com noindex. */
+export interface AppHeadRoute {
+  type: "app";
+  url: string;
+  locale: string;
+  title: string;
+}
+
+export type HeadRoute = SiteRoute | { type: "notFound"; url: string; locale: string } | AppHeadRoute;
+
 export function buildHead(
-  route: SiteRoute | { type: "notFound"; url: string; locale: string },
+  route: HeadRoute,
   settings: SiteSettings,
   ctx: RenderContext,
   options: SiteHeadOptions = {},
@@ -90,6 +100,9 @@ export function buildHead(
 
   if (route.type === "notFound") {
     title = `${ctx.t("notFound.title")} | ${site.name}`;
+    noindex = true;
+  } else if (route.type === "app") {
+    title = `${route.title} | ${site.name}`;
     noindex = true;
   } else if (route.type === "page") {
     const { page } = route;
@@ -145,9 +158,9 @@ export function buildHead(
 
   tags.push({ tag: "title", content: title });
   if (description) meta({ name: "description", content: description });
-  if (noindex) meta({ name: "robots", content: "noindex" });
+  if (noindex) meta({ name: "robots", content: route.type === "app" ? "noindex, nofollow" : "noindex" });
 
-  if (route.type !== "notFound" && !noindex) {
+  if ("alternates" in route && !noindex) {
     tags.push({ tag: "link", attrs: { rel: "canonical", href: absolute(site.url, route.url) } });
     if (route.alternates.length > 1) {
       for (const alt of route.alternates) {
@@ -158,14 +171,14 @@ export function buildHead(
     }
   }
 
-  const url = absolute(site.url, route.type === "notFound" ? localizedPath("/", ctx.locale, ctx.locales) : route.url);
+  const url = absolute(site.url, "alternates" in route ? route.url : localizedPath("/", ctx.locale, ctx.locales));
   meta({ property: "og:type", content: ogType });
   meta({ property: "og:title", content: title });
   if (description) meta({ property: "og:description", content: description });
   meta({ property: "og:url", content: url });
   meta({ property: "og:site_name", content: site.name });
   meta({ property: "og:locale", content: ogLocale(ctx.locale) });
-  if (route.type !== "notFound") {
+  if ("alternates" in route) {
     for (const alt of route.alternates) if (!alt.current) meta({ property: "og:locale:alternate", content: ogLocale(alt.locale) });
   }
   if (image) {

@@ -5,13 +5,12 @@ import { Font } from "astro:assets";
 import { activeTheme, activeFontPlan, headOptions, loadSite } from "../runtime";
 import { appearanceHead } from "../../theme/appearance";
 import { fontPreloads } from "../../theme/fonts";
-import { buildHead, renderHeadTags } from "../../seo/head";
+import { buildHead, renderHeadTags, type HeadRoute } from "../../seo/head";
 import type { RenderContext } from "../../theme/contract";
 import type { SiteSettings } from "../../content/types";
-import type { SiteRoute } from "../../render/site";
 
 interface Props {
-  route: SiteRoute | { type: "notFound"; url: string; locale: string };
+  route: HeadRoute;
   ctx: RenderContext;
   settings: SiteSettings;
 }

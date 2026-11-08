@@ -6,12 +6,25 @@
 import type { BlockDefinition } from "../blocks/define";
 import type { CollectionName, SiteKind } from "../content/types";
 
-export interface PluginRoute {
-  /** Caminho sem idioma (`/curriculo`). */
-  path: string;
-  /** `public`: página do site (pré-renderizada). `app`: rota do app (proposta, checkout). */
-  kind: "public" | "app";
-}
+export type PluginRoute =
+  | {
+      /** Caminho sem idioma (`/curriculo`). */
+      path: string;
+      /** Página do site (pré-renderizada). */
+      kind: "public";
+    }
+  | {
+      /** Caminho sem idioma, com parâmetros (`/proposta/:slug`). */
+      path: string;
+      /**
+       * Rota do app (proposta, checkout): o site é estático, então o núcleo gera uma
+       * página por rota e idioma (casca do tema + ilha) e reescreve os caminhos com
+       * parâmetro para ela (ver `plugins/app-routes.ts`).
+       */
+      kind: "app";
+      /** Ilha que monta a página (nome em `CORE_ISLANDS` ou nas ilhas do projeto). */
+      island: string;
+    };
 
 export interface AdminScreen {
   /** Caminho dentro do painel (`/admin/propostas`). */

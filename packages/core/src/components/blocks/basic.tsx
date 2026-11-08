@@ -11,10 +11,16 @@ type HeroFields = ResolvedFields<typeof heroDef.fields>;
 type TextoFields = ResolvedFields<typeof textoDef.fields>;
 type CtaFields = ResolvedFields<typeof ctaDef.fields>;
 
-export function HeroBlock({ id, variant, fields, headingLevel }: BlockProps<HeroFields>) {
+export function HeroBlock({ id, variant, fields, headingLevel, ctx }: BlockProps<HeroFields>) {
   return (
     <Section id={id} type="hero" variant={variant}>
       <div className="rb-hero__body">
+        {fields.showAvailability && (
+          <p className="rb-hero__availability">
+            <span className="rb-hero__dot" aria-hidden="true" />
+            {ctx.t("hero.available")}
+          </p>
+        )}
         {fields.eyebrow && <p className="rb-hero__eyebrow">{fields.eyebrow}</p>}
         {fields.title && (
           <Heading level={headingLevel} className="rb-hero__title">
@@ -25,7 +31,7 @@ export function HeroBlock({ id, variant, fields, headingLevel }: BlockProps<Hero
         {!!fields.tags?.length && (
           <ul className="rb-hero__tags">
             {fields.tags.map((t, i) => (
-              <li key={i}>{t.label}</li>
+              <li key={`${i}-${t.label}`}>{t.label}</li>
             ))}
           </ul>
         )}

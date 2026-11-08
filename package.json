@@ -10,6 +10,7 @@
     "check": "pnpm -r --if-present check",
     "test": "pnpm -r --if-present test",
     "build": "pnpm -r --if-present build",
+    "testar-tema": "node packages/theme-tester/bin/rubrica-testar-tema.js",
     "demo": "pnpm --filter @rubrica/demo dev",
     "changeset": "changeset"
   },

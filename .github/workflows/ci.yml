@@ -1,83 +1,104 @@
 name: CI
 
+# Rubrica v2 (monorepo pnpm). A v1 vive na branch `v1`, com o próprio CI.
 on:
   pull_request:
+    branches: [v2]
   push:
-    branches: [main]
+    branches: [v2]
 
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
-  template:
-    name: Template (tipos e testes)
+  check-test:
+    name: Tipos e testes
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - uses: ./.github/actions/setup
         with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-      - run: pnpm install --frozen-lockfile
-      - name: Typecheck
-        run: pnpm exec tsc --noEmit
-      - name: Testes
-        # tests/site importa o site (Astro), cujas dependências só o job do site instala.
-        run: pnpm exec vitest run --exclude "tests/site/**"
-      - name: Testes das skills (Python)
-        run: |
-          python3 -m unittest discover -s .agents/skills/rubrica/tests
-          python3 -m unittest discover -s .agents/skills/rubrica-voz/tests
+          playwright: "true" # os testes do theme-tester abrem o Chromium
+      - run: pnpm -r check
+      - run: pnpm -r test
 
-  cli:
-    name: CLI (tipos, testes e build)
+  demo:
+    name: Build da demo (${{ matrix.site }})
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: cli
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        site: [pessoal, empresa]
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-          cache-dependency-path: cli/pnpm-lock.yaml
-      - run: pnpm install --frozen-lockfile
-      - name: Typecheck
-        run: pnpm exec tsc --noEmit
-      - name: Testes
-        run: pnpm exec vitest run
+      - uses: ./.github/actions/setup
       - name: Build
-        run: pnpm run build
+        run: |
+          if [ ! -f "apps/demo/fixtures/${{ matrix.site }}/site.json" ]; then
+            echo "::warning::sem fixtures de ${{ matrix.site }}; build pulado"
+            exit 0
+          fi
+          SITE=${{ matrix.site }} pnpm --filter @rubrica/demo build
 
-  site:
-    name: Site (previews e build)
+  themes:
+    name: Lista de temas
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.list.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - id: list
+        run: |
+          themes=$(for f in packages/themes/*/package.json; do node -p "require('./$f').name"; done | jq -R . | jq -sc .)
+          echo "matrix=$themes" >> "$GITHUB_OUTPUT"
+
+  battery:
+    name: Bateria (${{ matrix.theme }})
+    needs: themes
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        theme: ${{ fromJSON(needs.themes.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
         with:
-          version: 10
-      - uses: actions/setup-node@v4
+          playwright: "true"
+      - name: axe, SEO, JavaScript por página e hidratação
+        run: pnpm testar-tema ${{ matrix.theme }} --sem-lighthouse --json "$RUNNER_TEMP/bateria.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          node-version: 22
-          cache: pnpm
-          cache-dependency-path: |
-            pnpm-lock.yaml
-            site/pnpm-lock.yaml
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm install --frozen-lockfile
-        working-directory: site
-      - name: Testes do site
-        run: pnpm exec vitest run tests/site
-      - name: Previews e build
-        run: pnpm build:full
-        working-directory: site
+          name: bateria-${{ strategy.job-index }}
+          path: ${{ runner.temp }}/bateria.json
+          if-no-files-found: ignore
+
+  lighthouse:
+    name: Lighthouse (${{ matrix.theme }})
+    needs: themes
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        theme: ${{ fromJSON(needs.themes.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+        with:
+          playwright: "true"
+      - run: pnpm testar-tema ${{ matrix.theme }} --so-lighthouse --json "$RUNNER_TEMP/lighthouse.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-${{ strategy.job-index }}
+          path: ${{ runner.temp }}/lighthouse.json
+          if-no-files-found: ignore

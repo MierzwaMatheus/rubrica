@@ -16,7 +16,7 @@ export { HeroBlock, TextoBlock, CtaBlock, GenericBlock } from "./blocks/basic";
 export { CasesBlock, DepoimentosBlock, FaqBlock, PostsRecentesBlock, PrecosBlock } from "./blocks/collections";
 export { ContatoBlock, LocalizacaoBlock } from "./blocks/contact";
 export { EquipeBlock, GaleriaBlock, ListaItensBlock, LogosClientesBlock, NumerosBlock, ServicosBlock } from "./blocks/lists";
-export { CurriculoBlock } from "./blocks/resume";
+export { CurriculoBlock, groupResumeSkills, ResumeDescription, ResumeHeading, ResumePeriod } from "./blocks/resume";
 export { IncorporacaoBlock, VideoBlock, VideoFrame, videoName, videoPoster, videoRatio } from "./blocks/media";
 export type { VideoFrameProps } from "./blocks/media";
 export { LinhaDoTempoBlock } from "./blocks/timeline";

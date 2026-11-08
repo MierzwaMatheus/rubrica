@@ -240,6 +240,8 @@ export const DEFAULT_UI_TEXTS: Record<string, Localized<string>> = {
   "resume.language": { pt: "Idiomas", en: "Languages", es: "Idiomas" },
   "resume.volunteer": { pt: "Voluntariado", en: "Volunteer work", es: "Voluntariado" },
   "resume.soft-skill": { pt: "Competências comportamentais", en: "Soft skills", es: "Habilidades blandas" },
+  "resume.showOlder": { pt: "Ver experiências anteriores ({count})", en: "Show earlier experience ({count})", es: "Ver experiencias anteriores ({count})" },
+  "resume.hideOlder": { pt: "Ocultar experiências anteriores", en: "Hide earlier experience", es: "Ocultar experiencias anteriores" },
   "resume.present": { pt: "atual", en: "present", es: "actual" },
   "pricing.highlighted": { pt: "Mais escolhido", en: "Most popular", es: "Más elegido" },
   "location.hours": { pt: "Horário", en: "Opening hours", es: "Horario" },

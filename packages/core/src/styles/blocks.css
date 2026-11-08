@@ -120,6 +120,9 @@
 .rb-resume__group { margin-top: 2rem; }
 .rb-resume__heading { font-size: 1.3rem; margin: 0 0 1rem; }
 .rb-resume__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; }
+.rb-resume__skillGroups { display: grid; gap: 1.25rem; }
+.rb-resume__groupName { margin: 0; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--rb-muted); }
+.rb-resume__skillGroup .rb-tags { margin-top: 0.5rem; }
 .rb-resume__bullets { margin: 0.5rem 0 0; padding-left: 1.2rem; color: var(--rb-muted); }
 
 /* Contato e localização */

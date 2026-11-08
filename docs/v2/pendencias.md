@@ -10,6 +10,10 @@ Lista viva do que falta para a v2 estável, vinda das revisões. Cada item sai d
 - **Fontes em itálico**: a integração pede só `styles: ["normal"]`; `fonts.json` do tema deve poder pedir itálico (o magazine sintetiza hoje).
 - **Bateria e transições de cor**: o axe mede cor intermediária quando há `transition` de cor; a bateria deveria desligar transições antes de medir (hoje os temas tiram as transições).
 
+- **Modo de cor padrão no tema**: o tema declara esquema mas não o modo (claro/escuro) recomendado.
+- **Utilitários do núcleo exportados**: `formatDays`, `safeId` e o CSS do filtro de etiquetas foram copiados pelos temas; exportar do núcleo.
+- **Lista de temas portados no CLI**: `PORTED_THEMES` é fixa; derivar dos pacotes de tema existentes.
+
 ## Temas
 - Portar os 12 layouts restantes (fase 3), depois do contrato estável no fim da fase 2.
 

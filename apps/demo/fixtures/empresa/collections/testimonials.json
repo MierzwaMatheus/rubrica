@@ -1,0 +1,53 @@
+[
+  {
+    "id": "t1",
+    "order": 1,
+    "featured": true,
+    "author": "Helena Prado",
+    "company": "Rede Saúde Exemplo",
+    "role": {
+      "pt-BR": "Diretora de e-commerce",
+      "en": "E-commerce director",
+      "es": "Directora de comercio electrónico"
+    },
+    "avatar": {
+      "url": "/img/avatar-1.svg",
+      "width": 200,
+      "height": 200,
+      "alt": "Helena"
+    },
+    "quote": {
+      "pt-BR": "O Meridiano entendeu nosso negócio em uma semana.",
+      "en": "Meridiano understood our business in a week.",
+      "es": "Meridiano entendió nuestro negocio en una semana."
+    }
+  },
+  {
+    "id": "t2",
+    "order": 2,
+    "featured": true,
+    "author": "Tiago Barros",
+    "company": "Escola Exemplo",
+    "role": {
+      "pt-BR": "Sócio",
+      "en": "Partner",
+      "es": "Socio"
+    },
+    "quote": {
+      "pt-BR": "Atendimento rápido e entregas no prazo.",
+      "en": "Fast service and on-time delivery.",
+      "es": "Atención rápida y entregas a tiempo."
+    }
+  },
+  {
+    "id": "t3",
+    "order": 3,
+    "featured": true,
+    "author": "Luiza Faria",
+    "company": "Indústria Exemplo",
+    "quote": {
+      "pt-BR": "Recomendo sem hesitar.",
+      "en": "I recommend them without hesitation."
+    }
+  }
+]

@@ -1,0 +1,68 @@
+[
+  {
+    "id": "b1",
+    "slug": "site-que-vende",
+    "publishedAt": 1760000000000,
+    "tags": [
+      "site",
+      "vendas"
+    ],
+    "cover": {
+      "url": "/img/cover-1.svg",
+      "width": 800,
+      "height": 500,
+      "alt": "Notebook com um site aberto"
+    },
+    "title": {
+      "pt-BR": "Cinco sinais de um site que vende",
+      "en": "Five signs of a website that sells",
+      "es": "Cinco señales de un sitio que vende"
+    },
+    "excerpt": {
+      "pt-BR": "O que olhar antes de investir.",
+      "en": "What to check before investing.",
+      "es": "Qué mirar antes de invertir."
+    },
+    "content": {
+      "pt-BR": "<p>Um bom site responde três perguntas em dez segundos.</p>",
+      "en": "<p>A good website answers three questions in ten seconds.</p>",
+      "es": "<p>Un buen sitio responde tres preguntas en diez segundos.</p>"
+    }
+  },
+  {
+    "id": "b2",
+    "slug": "seo-local",
+    "publishedAt": 1761000000000,
+    "tags": [
+      "seo"
+    ],
+    "title": {
+      "pt-BR": "SEO local para negócios de bairro",
+      "en": "Local SEO for neighborhood businesses",
+      "es": "SEO local para negocios de barrio"
+    },
+    "excerpt": {
+      "pt-BR": "Apareça para quem está perto.",
+      "en": "Show up for people nearby."
+    },
+    "content": {
+      "pt-BR": "<p>Comece pelo perfil da empresa no mapa.</p>",
+      "en": "<p>Start with your business profile on the map.</p>"
+    }
+  },
+  {
+    "id": "b3",
+    "slug": "acessibilidade-basica",
+    "publishedAt": 1762000000000,
+    "tags": [
+      "site",
+      "acessibilidade"
+    ],
+    "title": {
+      "pt-BR": "Acessibilidade básica em cinco passos"
+    },
+    "content": {
+      "pt-BR": "<p>Só em português.</p>"
+    }
+  }
+]

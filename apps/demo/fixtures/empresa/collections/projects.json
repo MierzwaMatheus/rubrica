@@ -1,0 +1,96 @@
+[
+  {
+    "id": "p1",
+    "slug": "rede-farmacias",
+    "order": 1,
+    "featured": true,
+    "year": 2024,
+    "client": "Rede Saúde Exemplo",
+    "tags": [
+      "loja",
+      "saúde"
+    ],
+    "cover": {
+      "url": "/img/cover-1.svg",
+      "width": 800,
+      "height": 500,
+      "alt": "Loja virtual de farmácia"
+    },
+    "title": {
+      "pt-BR": "Loja virtual para rede de farmácias",
+      "en": "Online store for a pharmacy chain",
+      "es": "Tienda en línea para una cadena de farmacias"
+    },
+    "summary": {
+      "pt-BR": "Vendas online cresceram 3 vezes em 6 meses.",
+      "en": "Online sales tripled in 6 months.",
+      "es": "Las ventas en línea se triplicaron en 6 meses."
+    },
+    "sections": [
+      {
+        "title": {
+          "pt-BR": "Desafio",
+          "en": "Challenge",
+          "es": "Desafío"
+        },
+        "body": {
+          "pt-BR": "<p>Integrar 40 lojas ao estoque online.</p>",
+          "en": "<p>Connect 40 stores to online inventory.</p>",
+          "es": "<p>Integrar 40 tiendas al inventario en línea.</p>"
+        }
+      }
+    ]
+  },
+  {
+    "id": "p2",
+    "slug": "escola-idiomas",
+    "order": 2,
+    "featured": true,
+    "year": 2023,
+    "client": "Escola Exemplo",
+    "tags": [
+      "site"
+    ],
+    "cover": {
+      "url": "/img/cover-2.svg",
+      "width": 800,
+      "height": 500,
+      "alt": "Site de escola"
+    },
+    "title": {
+      "pt-BR": "Site de uma escola de idiomas",
+      "en": "Language school website",
+      "es": "Sitio de una escuela de idiomas"
+    },
+    "summary": {
+      "pt-BR": "Matrículas pelo site passaram de 5% para 30%.",
+      "en": "Website enrollments went from 5% to 30%.",
+      "es": "Las matrículas por el sitio pasaron del 5% al 30%."
+    }
+  },
+  {
+    "id": "p3",
+    "slug": "industria-painel",
+    "order": 3,
+    "year": 2022,
+    "client": "Indústria Exemplo",
+    "tags": [
+      "dados"
+    ],
+    "cover": {
+      "url": "/img/cover-3.svg",
+      "width": 800,
+      "height": 500,
+      "alt": "Painel industrial"
+    },
+    "title": {
+      "pt-BR": "Painel de produção",
+      "en": "Production dashboard",
+      "es": "Panel de producción"
+    },
+    "summary": {
+      "pt-BR": "Indicadores da fábrica em tempo real.",
+      "en": "Factory indicators in real time."
+    }
+  }
+]

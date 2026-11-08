@@ -1,0 +1,57 @@
+[
+  {
+    "id": "d1",
+    "order": 1,
+    "title": {
+      "pt-BR": "Café e planejamento",
+      "en": "Coffee and planning"
+    },
+    "description": {
+      "pt-BR": "O dia começa listando o que importa.",
+      "en": "The day starts by listing what matters."
+    },
+    "image": {
+      "url": "/img/routine-1.svg",
+      "width": 800,
+      "height": 600,
+      "alt": "Mesa com caderno e café"
+    },
+    "tags": [
+      "manhã"
+    ]
+  },
+  {
+    "id": "d2",
+    "order": 2,
+    "title": {
+      "pt-BR": "Oficina com o time",
+      "en": "Team workshop"
+    },
+    "description": {
+      "pt-BR": "Pós-its, canetas e muita conversa."
+    },
+    "image": {
+      "url": "/img/routine-2.svg",
+      "width": 800,
+      "height": 600,
+      "alt": "Parede de pós-its"
+    }
+  },
+  {
+    "id": "d3",
+    "order": 3,
+    "title": {
+      "pt-BR": "Caminhada",
+      "en": "Walk"
+    },
+    "image": {
+      "url": "/img/routine-3.svg",
+      "width": 800,
+      "height": 600,
+      "alt": "Parque ao fim do dia"
+    },
+    "tags": [
+      "fim de tarde"
+    ]
+  }
+]

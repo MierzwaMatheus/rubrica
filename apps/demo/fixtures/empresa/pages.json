@@ -1,0 +1,596 @@
+[
+  {
+    "id": "home",
+    "path": "/",
+    "system": true,
+    "published": true,
+    "updatedAt": 1762560000000,
+    "title": {
+      "pt-BR": "Início",
+      "en": "Home",
+      "es": "Inicio"
+    },
+    "blocks": [
+      {
+        "id": "home-0",
+        "type": "hero",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "Sites e sistemas que fazem sua empresa crescer",
+            "en": "Websites and systems that make your company grow",
+            "es": "Sitios y sistemas que hacen crecer tu empresa"
+          },
+          "subtitle": {
+            "pt-BR": "Design, desenvolvimento e suporte para pequenas e médias empresas.",
+            "en": "Design, development and support for small and mid-sized companies.",
+            "es": "Diseño, desarrollo y soporte para pequeñas y medianas empresas."
+          },
+          "primaryCta": {
+            "label": {
+              "pt-BR": "Fale com a gente",
+              "en": "Talk to us",
+              "es": "Habla con nosotros"
+            },
+            "href": "/contato"
+          },
+          "secondaryCta": {
+            "label": {
+              "pt-BR": "Ver serviços",
+              "en": "See services",
+              "es": "Ver servicios"
+            },
+            "href": "/servicos"
+          },
+          "image": {
+            "url": "/img/hero.svg",
+            "width": 800,
+            "height": 600,
+            "alt": {
+              "pt-BR": "Equipe em reunião",
+              "en": "Team in a meeting",
+              "es": "Equipo en reunión"
+            }
+          },
+          "eyebrow": {
+            "pt-BR": "Estúdio de design e tecnologia",
+            "en": "Design and technology studio",
+            "es": "Estudio de diseño y tecnología"
+          }
+        }
+      },
+      {
+        "id": "home-logos",
+        "type": "logos-clientes",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "Quem confia em nós",
+            "en": "Trusted by",
+            "es": "Confían en nosotros"
+          },
+          "logos": [
+            {
+              "name": "Cliente 1",
+              "image": {
+                "url": "/img/logo-1.svg",
+                "width": 160,
+                "height": 48,
+                "alt": "Cliente 1"
+              },
+              "href": "https://exemplo.dev/1"
+            },
+            {
+              "name": "Cliente 2",
+              "image": {
+                "url": "/img/logo-2.svg",
+                "width": 160,
+                "height": 48,
+                "alt": "Cliente 2"
+              }
+            },
+            {
+              "name": "Cliente 3",
+              "image": {
+                "url": "/img/logo-3.svg",
+                "width": 160,
+                "height": 48,
+                "alt": "Cliente 3"
+              },
+              "href": "/cases"
+            },
+            {
+              "name": "Cliente 4",
+              "image": {
+                "url": "/img/logo-4.svg",
+                "width": 160,
+                "height": 48,
+                "alt": ""
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "home-1",
+        "type": "servicos",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "Serviços",
+            "en": "Services",
+            "es": "Servicios"
+          },
+          "cta": {
+            "label": {
+              "pt-BR": "Todos os serviços",
+              "en": "All services",
+              "es": "Todos los servicios"
+            },
+            "href": "/servicos"
+          }
+        }
+      },
+      {
+        "id": "home-2",
+        "type": "numeros",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "Nossa história em números",
+            "en": "Our story in numbers",
+            "es": "Nuestra historia en números"
+          },
+          "items": [
+            {
+              "value": "12",
+              "label": {
+                "pt-BR": "anos de mercado",
+                "en": "years in business",
+                "es": "años en el mercado"
+              }
+            },
+            {
+              "value": "300+",
+              "label": {
+                "pt-BR": "clientes atendidos",
+                "en": "clients served",
+                "es": "clientes atendidos"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "home-3",
+        "type": "cases",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "Cases",
+            "en": "Case studies",
+            "es": "Casos"
+          },
+          "cta": {
+            "label": {
+              "pt-BR": "Ver todos",
+              "en": "See all",
+              "es": "Ver todos"
+            },
+            "href": "/cases"
+          }
+        }
+      },
+      {
+        "id": "home-4",
+        "type": "depoimentos",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "O que os clientes dizem",
+            "en": "What clients say",
+            "es": "Lo que dicen los clientes"
+          }
+        }
+      },
+      {
+        "id": "home-5",
+        "type": "cta",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "Vamos começar?",
+            "en": "Ready to start?",
+            "es": "¿Empezamos?"
+          },
+          "body": {
+            "pt-BR": "Conte o que você precisa e respondemos em até um dia útil.",
+            "en": "Tell us what you need and we'll reply within one business day.",
+            "es": "Cuéntanos qué necesitas y respondemos en un día hábil."
+          },
+          "primary": {
+            "label": {
+              "pt-BR": "Pedir contato",
+              "en": "Get in touch",
+              "es": "Pedir contacto"
+            },
+            "href": "/contato"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "quem-somos",
+    "path": "/quem-somos",
+    "system": true,
+    "published": true,
+    "updatedAt": 1762560000000,
+    "title": {
+      "pt-BR": "Quem somos",
+      "en": "About us",
+      "es": "Quiénes somos"
+    },
+    "blocks": [
+      {
+        "id": "quem-somos-0",
+        "type": "texto",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "Quem somos",
+            "en": "About us",
+            "es": "Quiénes somos"
+          },
+          "body": {
+            "pt-BR": "<p>O Meridiano nasceu em 2013, quando três amigos decidiram que sites de empresas pequenas podiam ser tão bons quanto os das grandes.</p><p>Hoje somos um time de 12 pessoas.</p>",
+            "en": "<p>Meridiano was born in 2013, when three friends decided small-business websites could be as good as the big ones.</p><p>Today we are a team of 12.</p>",
+            "es": "<p>Meridiano nació en 2013, cuando tres amigos decidieron que los sitios de las pequeñas empresas podían ser tan buenos como los de las grandes.</p><p>Hoy somos un equipo de 12 personas.</p>"
+          },
+          "image": {
+            "url": "/img/routine-2.svg",
+            "width": 800,
+            "height": 600,
+            "alt": {
+              "pt-BR": "Nosso estúdio",
+              "en": "Our studio",
+              "es": "Nuestro estudio"
+            }
+          },
+          "imagePosition": "end"
+        }
+      },
+      {
+        "id": "quem-somos-1",
+        "type": "numeros",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "Em números",
+            "en": "By the numbers",
+            "es": "En números"
+          },
+          "items": [
+            {
+              "value": "12",
+              "label": {
+                "pt-BR": "anos de mercado",
+                "en": "years in business",
+                "es": "años en el mercado"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "quem-somos-2",
+        "type": "lista-itens",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "Nossos valores",
+            "en": "Our values",
+            "es": "Nuestros valores"
+          },
+          "items": [
+            {
+              "title": {
+                "pt-BR": "Transparência",
+                "en": "Transparency",
+                "es": "Transparencia"
+              },
+              "body": {
+                "pt-BR": "Combinamos tudo às claras.",
+                "en": "We agree everything in the open.",
+                "es": "Acordamos todo con claridad."
+              }
+            },
+            {
+              "title": {
+                "pt-BR": "Cuidado",
+                "en": "Care",
+                "es": "Cuidado"
+              },
+              "body": {
+                "pt-BR": "Tratamos cada cliente como único.",
+                "en": "We treat every client as unique.",
+                "es": "Tratamos a cada cliente como único."
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "quem-somos-3",
+        "type": "equipe",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "Equipe",
+            "en": "Team",
+            "es": "Equipo"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "servicos",
+    "path": "/servicos",
+    "system": true,
+    "published": true,
+    "updatedAt": 1762560000000,
+    "title": {
+      "pt-BR": "Serviços",
+      "en": "Services",
+      "es": "Servicios"
+    },
+    "blocks": [
+      {
+        "id": "servicos-0",
+        "type": "servicos",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "Serviços",
+            "en": "Services",
+            "es": "Servicios"
+          },
+          "intro": {
+            "pt-BR": "O que fazemos por você.",
+            "en": "What we do for you.",
+            "es": "Lo que hacemos por ti."
+          }
+        }
+      },
+      {
+        "id": "servicos-1",
+        "type": "faq",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "Perguntas frequentes",
+            "en": "Frequently asked questions",
+            "es": "Preguntas frecuentes"
+          }
+        }
+      },
+      {
+        "id": "servicos-2",
+        "type": "cta",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "Precisa de algo diferente?",
+            "en": "Need something different?",
+            "es": "¿Necesitas algo distinto?"
+          },
+          "body": {
+            "pt-BR": "Montamos uma proposta sob medida.",
+            "en": "We'll put together a custom proposal.",
+            "es": "Preparamos una propuesta a medida."
+          },
+          "primary": {
+            "label": {
+              "pt-BR": "Pedir proposta",
+              "en": "Request a proposal",
+              "es": "Pedir propuesta"
+            },
+            "href": "/contato"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "precos",
+    "path": "/precos",
+    "system": true,
+    "published": true,
+    "updatedAt": 1762560000000,
+    "title": {
+      "pt-BR": "Preços",
+      "en": "Pricing",
+      "es": "Precios"
+    },
+    "blocks": [
+      {
+        "id": "precos-0",
+        "type": "precos",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "Planos e preços",
+            "en": "Plans and pricing",
+            "es": "Planes y precios"
+          },
+          "intro": {
+            "pt-BR": "Escolha o plano que cabe no seu momento.",
+            "en": "Pick the plan that fits where you are.",
+            "es": "Elige el plan que se ajusta a tu momento."
+          },
+          "note": {
+            "pt-BR": "Valores sem impostos.",
+            "en": "Prices exclude taxes.",
+            "es": "Valores sin impuestos."
+          }
+        }
+      },
+      {
+        "id": "precos-1",
+        "type": "faq",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "Dúvidas sobre os planos",
+            "en": "Questions about the plans",
+            "es": "Dudas sobre los planes"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "cases",
+    "path": "/cases",
+    "system": true,
+    "published": true,
+    "updatedAt": 1762560000000,
+    "title": {
+      "pt-BR": "Cases",
+      "en": "Case studies",
+      "es": "Casos"
+    },
+    "blocks": [
+      {
+        "id": "cases-0",
+        "type": "cases",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "Cases",
+            "en": "Case studies",
+            "es": "Casos"
+          },
+          "intro": {
+            "pt-BR": "Resultados que ajudamos a construir.",
+            "en": "Results we helped build.",
+            "es": "Resultados que ayudamos a construir."
+          }
+        },
+        "source": {
+          "collection": "projects",
+          "sort": "order"
+        }
+      }
+    ]
+  },
+  {
+    "id": "blog",
+    "path": "/blog",
+    "system": true,
+    "published": true,
+    "updatedAt": 1762560000000,
+    "title": {
+      "pt-BR": "Blog",
+      "en": "Blog"
+    },
+    "blocks": [
+      {
+        "id": "blog-0",
+        "type": "posts-recentes",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "Blog",
+            "en": "Blog",
+            "es": "Blog"
+          },
+          "showTagFilter": true
+        },
+        "source": {
+          "collection": "posts",
+          "sort": "recent"
+        }
+      }
+    ]
+  },
+  {
+    "id": "contato",
+    "path": "/contato",
+    "system": true,
+    "published": true,
+    "updatedAt": 1762560000000,
+    "title": {
+      "pt-BR": "Contato",
+      "en": "Contact",
+      "es": "Contacto"
+    },
+    "blocks": [
+      {
+        "id": "contato-0",
+        "type": "contato",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "Fale com a gente",
+            "en": "Talk to us",
+            "es": "Habla con nosotros"
+          },
+          "intro": {
+            "pt-BR": "Respondemos em até um dia útil.",
+            "en": "We reply within one business day.",
+            "es": "Respondemos en un día hábil."
+          },
+          "mode": "wizard",
+          "showChannels": true
+        }
+      },
+      {
+        "id": "contato-1",
+        "type": "localizacao",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "Onde estamos",
+            "en": "Where we are",
+            "es": "Dónde estamos"
+          },
+          "showMap": true,
+          "showHours": true
+        }
+      }
+    ]
+  },
+  {
+    "id": "privacidade",
+    "path": "/privacidade",
+    "system": true,
+    "published": true,
+    "updatedAt": 1762560000000,
+    "title": {
+      "pt-BR": "Política de privacidade",
+      "en": "Privacy policy",
+      "es": "Política de privacidad"
+    },
+    "blocks": [
+      {
+        "id": "privacidade-0",
+        "type": "texto",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "Política de privacidade",
+            "en": "Privacy policy",
+            "es": "Política de privacidad"
+          },
+          "body": {
+            "pt-BR": "<p>Esta página explica quais dados pessoais este site coleta, por quê e por quanto tempo, conforme a Lei Geral de Proteção de Dados (LGPD).</p><h3>Dados que você nos envia</h3><p>Nome, e-mail e a mensagem que você escreve nos formulários de contato e de depoimento. Usamos esses dados só para responder a você e, no caso do depoimento, para exibi-lo no site depois da sua autorização.</p><h3>Seus direitos</h3><p>Você pode pedir acesso, correção ou exclusão dos seus dados a qualquer momento pelo e-mail de contato deste site.</p>",
+            "en": "<p>This page explains which personal data this site collects, why, and for how long, in line with Brazil's General Data Protection Law (LGPD).</p><h3>Data you send us</h3><p>Name, email and the message you write in the contact and testimonial forms. We use it only to reply to you and, for testimonials, to display them on the site once you authorize it.</p><h3>Your rights</h3><p>You can ask for access, correction or deletion of your data at any time through this site's contact email.</p>",
+            "es": "<p>Esta página explica qué datos personales recoge este sitio, por qué y por cuánto tiempo, conforme a la Ley General de Protección de Datos de Brasil (LGPD).</p><h3>Datos que nos envías</h3><p>Nombre, correo y el mensaje que escribes en los formularios de contacto y de testimonio. Los usamos solo para responderte y, en el caso del testimonio, para mostrarlo en el sitio con tu autorización.</p><h3>Tus derechos</h3><p>Puedes pedir acceso, corrección o eliminación de tus datos en cualquier momento mediante el correo de contacto de este sitio.</p>"
+          }
+        }
+      }
+    ]
+  }
+]

@@ -1,18 +1,93 @@
 {
   "kind": "pessoal",
-  "name": { "pt-BR": "Ana Souza", "en": "Ana Souza" },
-  "description": { "pt-BR": "Designer de produto em São Paulo. Cases, artigos e serviços.", "en": "Product designer in São Paulo. Case studies, articles and services." },
+  "name": {
+    "pt-BR": "Ana Souza",
+    "en": "Ana Souza"
+  },
+  "description": {
+    "pt-BR": "Designer de produto em São Paulo. Cases, artigos e serviços.",
+    "en": "Product designer in São Paulo. Case studies, articles and services."
+  },
   "url": "https://demo.userubrica.dev",
-  "locales": { "locales": ["pt-BR", "en"], "default": "pt-BR" },
+  "locales": {
+    "locales": [
+      "pt-BR",
+      "en"
+    ],
+    "default": "pt-BR"
+  },
   "theme": "padrao",
-  "appearance": { "colorMode": "dark", "colorToggle": true },
+  "appearance": {
+    "colorMode": "dark",
+    "colorToggle": true
+  },
   "navigation": [
-    { "label": { "pt-BR": "Início", "en": "Home" }, "href": "/" },
-    { "label": { "pt-BR": "Sobre", "en": "About" }, "href": "/sobre" },
-    { "label": { "pt-BR": "Projetos", "en": "Projects" }, "href": "/portfolio" },
-    { "label": { "pt-BR": "Blog", "en": "Blog" }, "href": "/blog" }
+    {
+      "label": {
+        "pt-BR": "Início",
+        "en": "Home"
+      },
+      "href": "/"
+    },
+    {
+      "label": {
+        "pt-BR": "Sobre",
+        "en": "About"
+      },
+      "href": "/sobre"
+    },
+    {
+      "label": {
+        "pt-BR": "Currículo",
+        "en": "Résumé"
+      },
+      "href": "/curriculo"
+    },
+    {
+      "label": {
+        "pt-BR": "Projetos",
+        "en": "Projects"
+      },
+      "href": "/portfolio"
+    },
+    {
+      "label": {
+        "pt-BR": "Blog",
+        "en": "Blog"
+      },
+      "href": "/blog"
+    },
+    {
+      "label": {
+        "pt-BR": "Depoimentos",
+        "en": "Testimonials"
+      },
+      "href": "/depoimentos"
+    }
   ],
-  "social": [{ "network": "LinkedIn", "url": "https://www.linkedin.com/in/exemplo" }],
-  "person": { "name": "Ana Souza", "jobTitle": { "pt-BR": "Designer de produto", "en": "Product designer" } },
+  "social": [
+    {
+      "network": "LinkedIn",
+      "url": "https://www.linkedin.com/in/exemplo"
+    },
+    {
+      "network": "GitHub",
+      "url": "https://github.com/exemplo"
+    }
+  ],
+  "person": {
+    "name": "Ana Souza",
+    "jobTitle": {
+      "pt-BR": "Designer de produto",
+      "en": "Product designer"
+    },
+    "email": "ana@exemplo.dev",
+    "photo": {
+      "url": "/img/avatar-1.svg",
+      "width": 200,
+      "height": 200,
+      "alt": "Retrato de Ana"
+    }
+  },
   "plugins": {}
 }

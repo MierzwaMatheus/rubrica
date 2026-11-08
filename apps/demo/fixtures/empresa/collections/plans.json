@@ -1,0 +1,130 @@
+[
+  {
+    "id": "pl1",
+    "order": 1,
+    "name": {
+      "pt-BR": "Essencial",
+      "en": "Essential",
+      "es": "Esencial"
+    },
+    "description": {
+      "pt-BR": "Para quem está começando.",
+      "en": "For those just starting out.",
+      "es": "Para quien está empezando."
+    },
+    "priceCents": 49000,
+    "currency": "BRL",
+    "period": "month",
+    "features": [
+      {
+        "pt-BR": "Site de até 5 páginas",
+        "en": "Site of up to 5 pages",
+        "es": "Sitio de hasta 5 páginas"
+      },
+      {
+        "pt-BR": "Hospedagem inclusa",
+        "en": "Hosting included",
+        "es": "Hosting incluido"
+      },
+      {
+        "pt-BR": "Suporte por e-mail",
+        "en": "Email support",
+        "es": "Soporte por correo"
+      }
+    ],
+    "cta": {
+      "label": {
+        "pt-BR": "Começar",
+        "en": "Get started",
+        "es": "Empezar"
+      },
+      "href": "/contato"
+    }
+  },
+  {
+    "id": "pl2",
+    "order": 2,
+    "name": {
+      "pt-BR": "Profissional",
+      "en": "Professional",
+      "es": "Profesional"
+    },
+    "description": {
+      "pt-BR": "Para empresas em crescimento.",
+      "en": "For growing companies.",
+      "es": "Para empresas en crecimiento."
+    },
+    "priceCents": 129000,
+    "currency": "BRL",
+    "period": "month",
+    "highlighted": true,
+    "features": [
+      {
+        "pt-BR": "Tudo do Essencial",
+        "en": "Everything in Essential",
+        "es": "Todo lo de Esencial"
+      },
+      {
+        "pt-BR": "Blog e SEO",
+        "en": "Blog and SEO"
+      },
+      {
+        "pt-BR": "Suporte prioritário",
+        "en": "Priority support",
+        "es": "Soporte prioritario"
+      },
+      {
+        "pt-BR": "Relatório mensal",
+        "en": "Monthly report",
+        "es": "Informe mensual"
+      }
+    ],
+    "cta": {
+      "label": {
+        "pt-BR": "Falar com vendas",
+        "en": "Talk to sales",
+        "es": "Hablar con ventas"
+      },
+      "href": "/contato"
+    }
+  },
+  {
+    "id": "pl3",
+    "order": 3,
+    "name": {
+      "pt-BR": "Sob medida",
+      "en": "Custom",
+      "es": "A medida"
+    },
+    "priceLabel": {
+      "pt-BR": "Sob consulta",
+      "en": "Contact us",
+      "es": "A consultar"
+    },
+    "description": {
+      "pt-BR": "Projetos grandes e integrações.",
+      "en": "Large projects and integrations.",
+      "es": "Proyectos grandes e integraciones."
+    },
+    "features": [
+      {
+        "pt-BR": "Escopo definido junto com você",
+        "en": "Scope defined together",
+        "es": "Alcance definido contigo"
+      },
+      {
+        "pt-BR": "Integrações com seus sistemas",
+        "en": "Integrations with your systems",
+        "es": "Integraciones con tus sistemas"
+      }
+    ],
+    "cta": {
+      "label": {
+        "pt-BR": "Pedir proposta",
+        "en": "Request a proposal",
+        "es": "Pedir propuesta"
+      },
+      "href": "/contato"
+    }
+  }
+]

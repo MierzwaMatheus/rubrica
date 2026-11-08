@@ -1,9 +1,60 @@
 [
-  { "id": "post1", "slug": "pesquisa-com-usuarios", "publishedAt": 1760000000000, "tags": ["pesquisa"],
-    "title": { "pt-BR": "Pesquisa com usuários em uma semana", "en": "User research in one week" },
-    "excerpt": { "pt-BR": "Um roteiro enxuto.", "en": "A lean playbook." },
-    "content": { "pt-BR": "<p>Conteúdo do post em português.</p>", "en": "<p>Post content in English.</p>" } },
-  { "id": "post2", "slug": "so-portugues", "publishedAt": 1761000000000, "tags": ["pesquisa"],
-    "title": { "pt-BR": "Um post só em português" },
-    "content": { "pt-BR": "<p>Sem tradução.</p>" } }
+  {
+    "id": "post1",
+    "slug": "pesquisa-com-usuarios",
+    "publishedAt": 1760000000000,
+    "tags": [
+      "pesquisa",
+      "processo"
+    ],
+    "title": {
+      "pt-BR": "Pesquisa com usuários em uma semana",
+      "en": "User research in one week"
+    },
+    "excerpt": {
+      "pt-BR": "Um roteiro enxuto.",
+      "en": "A lean playbook."
+    },
+    "content": {
+      "pt-BR": "<p>Conteúdo do post em português.</p><h2>Roteiro</h2><p>Segunda: recrutar. Quarta: entrevistar.</p>",
+      "en": "<p>Post content in English.</p><h2>Playbook</h2><p>Monday: recruit. Wednesday: interview.</p>"
+    },
+    "cover": {
+      "url": "/img/cover-3.svg",
+      "width": 800,
+      "height": 500,
+      "alt": "Post-its numa parede"
+    }
+  },
+  {
+    "id": "post2",
+    "slug": "so-portugues",
+    "publishedAt": 1761000000000,
+    "tags": [
+      "pesquisa"
+    ],
+    "title": {
+      "pt-BR": "Um post só em português"
+    },
+    "content": {
+      "pt-BR": "<p>Sem tradução.</p>"
+    }
+  },
+  {
+    "id": "post3",
+    "slug": "carreira-em-design",
+    "publishedAt": 1762000000000,
+    "tags": [
+      "carreira"
+    ],
+    "title": {
+      "pt-BR": "Como organizei minha carreira em design"
+    },
+    "excerpt": {
+      "pt-BR": "Quatro decisões que mudaram meu rumo."
+    },
+    "content": {
+      "pt-BR": "<p>Só em português.</p>"
+    }
+  }
 ]

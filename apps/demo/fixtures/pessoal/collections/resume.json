@@ -1,0 +1,111 @@
+[
+  {
+    "id": "r1",
+    "order": 1,
+    "kind": "experience",
+    "title": {
+      "pt-BR": "Designer sênior",
+      "en": "Senior designer"
+    },
+    "organization": "Banco Exemplo",
+    "location": {
+      "pt-BR": "São Paulo",
+      "en": "São Paulo"
+    },
+    "start": "2021-03",
+    "description": {
+      "pt-BR": "- Liderei o redesenho do onboarding\n- Estruturei a pesquisa contínua",
+      "en": "- Led the onboarding redesign\n- Set up continuous research"
+    }
+  },
+  {
+    "id": "r2",
+    "order": 2,
+    "kind": "experience",
+    "title": {
+      "pt-BR": "Designer pleno",
+      "en": "Mid-level designer"
+    },
+    "organization": "Estúdio Exemplo",
+    "start": "2018-02",
+    "end": "2021-02",
+    "description": {
+      "pt-BR": "Interfaces para web e mobile.",
+      "en": "Web and mobile interfaces."
+    }
+  },
+  {
+    "id": "r3",
+    "order": 3,
+    "kind": "education",
+    "title": {
+      "pt-BR": "Bacharelado em Design",
+      "en": "BA in Design"
+    },
+    "organization": "Universidade Exemplo",
+    "start": "2013-02",
+    "end": "2017-12"
+  },
+  {
+    "id": "r4",
+    "order": 4,
+    "kind": "skill",
+    "title": {
+      "pt-BR": "Figma"
+    }
+  },
+  {
+    "id": "r5",
+    "order": 5,
+    "kind": "skill",
+    "title": {
+      "pt-BR": "Pesquisa qualitativa",
+      "en": "Qualitative research"
+    }
+  },
+  {
+    "id": "r6",
+    "order": 6,
+    "kind": "skill",
+    "title": {
+      "pt-BR": "Prototipação",
+      "en": "Prototyping"
+    }
+  },
+  {
+    "id": "r7",
+    "order": 7,
+    "kind": "certification",
+    "title": {
+      "pt-BR": "Certificação em UX",
+      "en": "UX certification"
+    },
+    "organization": "Instituto Exemplo"
+  },
+  {
+    "id": "r8",
+    "order": 8,
+    "kind": "language",
+    "title": {
+      "pt-BR": "Português",
+      "en": "Portuguese"
+    },
+    "description": {
+      "pt-BR": "Nativo",
+      "en": "Native"
+    }
+  },
+  {
+    "id": "r9",
+    "order": 9,
+    "kind": "language",
+    "title": {
+      "pt-BR": "Inglês",
+      "en": "English"
+    },
+    "description": {
+      "pt-BR": "Avançado",
+      "en": "Advanced"
+    }
+  }
+]

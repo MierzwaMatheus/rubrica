@@ -39,6 +39,7 @@ apps/docs/                site de documentação (userubrica.vercel.app)
 | Build da demo (pessoal) | `pnpm --filter @rubrica/demo build` |
 | Build da demo (empresa) | `SITE=empresa pnpm --filter @rubrica/demo build` |
 | Build com outro tema | `THEME=@rubrica/theme-cyberpunk pnpm --filter @rubrica/demo build` |
+| Bateria de tema | `pnpm testar-tema padrao` (opções: `--site pessoal`, `--sem-lighthouse`, `--so-lighthouse`, `--json out.json`; `--help` lista todas) |
 | Tudo | `pnpm -r check && pnpm -r test` |
 
 ## Regras do contrato

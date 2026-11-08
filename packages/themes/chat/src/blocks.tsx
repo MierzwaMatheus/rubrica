@@ -1,7 +1,8 @@
 /**
  * Blocos do tema Conversa. No layout `chat` da v1 toda seção é uma troca de mensagens
  * (a pergunta de quem visita e as respostas em balões), então o tema desenha os 17
- * blocos do catálogo; nenhum fica com o visual de grade/cartão do núcleo.
+ * blocos do catálogo; nenhum fica com o visual de grade/cartão do núcleo. Os blocos que
+ * chegaram depois entram na conversa com o componente do núcleo num balão (`embedded.tsx`).
  *
  * O que na v1 dependia de estado vira estático:
  * - filtro de posts por etiqueta: botões de opção + CSS, e a escolha aparece como uma
@@ -12,6 +13,7 @@
  */
 import type { BlockProps, CollectionItems, ResolvedLink } from "@rubrica/core";
 import { Heading, Html, Img, digits, formatDays, safeId } from "@rubrica/core/components";
+import { CHAT_CORE_BLOCKS } from "./embedded";
 import { Ask, askFor, Avatar, Bubble, BubbleLink, ChatSection, FileDown, kindText, LinkCard, MapPin, Pill, splitBlocks } from "./chat";
 
 type Project = CollectionItems["projects"];
@@ -822,4 +824,5 @@ export const CHAT_BLOCKS = {
   equipe: EquipeBlock,
   localizacao: LocalizacaoBlock,
   "logos-clientes": LogosClientesBlock,
+  ...CHAT_CORE_BLOCKS,
 };

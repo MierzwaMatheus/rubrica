@@ -5,6 +5,7 @@
  */
 import type { SiteKind } from "../../content/types";
 import { isRole, ROLE_LABELS } from "../../convex/lib/roles";
+import { CONTENT_LABELS } from "./labels";
 
 /** Só o que a frase usa de um registro de `auditLog`. */
 export interface AuditEntry {
@@ -140,18 +141,18 @@ export const AUDIT_ACTIONS: Record<string, ActionDef> = {
 
 /** Tipos de alvo. `kinds` esconde o tipo no filtro quando não se aplica ao tipo do site. */
 export const AUDIT_TARGETS: Record<string, { label: string; kinds?: SiteKind[] }> = {
-  page: { label: "página" },
-  posts: { label: "post" },
-  projects: { label: "projeto" },
-  services: { label: "serviço" },
-  testimonials: { label: "depoimento" },
+  page: { label: CONTENT_LABELS.page },
+  posts: { label: CONTENT_LABELS.posts },
+  projects: { label: CONTENT_LABELS.projects },
+  services: { label: CONTENT_LABELS.services },
+  testimonials: { label: CONTENT_LABELS.testimonials },
   testimonialSubmission: { label: "depoimento enviado" },
-  faq: { label: "pergunta" },
-  resume: { label: "item do currículo", kinds: ["pessoal"] },
-  routine: { label: "dia a dia", kinds: ["pessoal"] },
+  faq: { label: CONTENT_LABELS.faq },
+  resume: { label: CONTENT_LABELS.resume, kinds: ["pessoal"] },
+  routine: { label: CONTENT_LABELS.routine, kinds: ["pessoal"] },
   ai_resume: { label: "currículo com IA", kinds: ["pessoal"] },
-  plans: { label: "plano", kinds: ["empresa"] },
-  team: { label: "pessoa da equipe", kinds: ["empresa"] },
+  plans: { label: CONTENT_LABELS.plans, kinds: ["empresa"] },
+  team: { label: CONTENT_LABELS.team, kinds: ["empresa"] },
   proposal: { label: "proposta" },
   checkout: { label: "link de pagamento" },
   contract_template: { label: "modelo de contrato" },
@@ -162,7 +163,7 @@ export const AUDIT_TARGETS: Record<string, { label: string; kinds?: SiteKind[] }
   contactDestinations: { label: "destinos dos avisos" },
   user: { label: "usuário" },
   plugin: { label: "plugin" },
-  siteSettings: { label: "configurações do site" },
+  siteSettings: { label: CONTENT_LABELS.siteSettings },
   uiText: { label: "texto da interface" },
   webhook: { label: "webhook" },
   titular: { label: "titular (LGPD)" },

@@ -8,6 +8,7 @@ import { ArrowLeft, Eye, EyeOff, Save, Trash2, Undo2 } from "lucide-react";
 import { validateFields, type FieldError } from "../../blocks/fields";
 import type { SeoFields } from "../../content/types";
 import { isValidSlug } from "../../convex/lib/slug";
+import { resolvePaths } from "../../render/collections";
 import { localizedPath, type Localized } from "../../i18n";
 import { api, type CollectionDoc } from "../data/api";
 import { useMutation, useQuery } from "../data/backend";
@@ -193,7 +194,8 @@ function Editor({ config, doc }: { config: CollectionConfig; doc?: CollectionDoc
     [locale, panel.locales, panel.enabled],
   );
 
-  const detailBase = config.name === "posts" ? (panel.settings?.paths?.posts ?? "/blog") : (panel.settings?.paths?.projects ?? "/portfolio");
+  const detailPaths = resolvePaths(panel.settings?.kind, panel.settings?.paths);
+  const detailBase = config.name === "posts" ? detailPaths.posts : detailPaths.projects;
   const siteUrl = panel.settings?.url ?? "";
   const siteName = panel.settings ? textIn(panel.settings.name, panel.locales.default, panel.locales.default) : "";
   const slugValue = typeof draft.slug === "string" ? draft.slug : "";

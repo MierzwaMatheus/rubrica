@@ -14,6 +14,7 @@ import { api } from "../data/api";
 import { useMutation } from "../data/backend";
 import { EditorLocaleProvider, FieldsForm } from "../editor/fields";
 import { errorMessage, missingTranslations, moveItem, prune, sameDraft, type Values } from "../editor/model";
+import { defaultPathsFor } from "../../render/collections";
 import { PageHeader } from "../Layout";
 import { useRouter } from "../lib/router";
 import { toast } from "../lib/toast";
@@ -400,8 +401,8 @@ export default function Settings() {
                 <div className="space-y-1.5">
                   <Label htmlFor="cfg-posts">Base dos posts e dos projetos</Label>
                   <div className="flex gap-2">
-                    <Input id="cfg-posts" aria-label="Base dos posts" value={draft.paths?.posts ?? ""} placeholder="/blog" onChange={(e) => set("paths", { ...draft.paths, posts: e.target.value || undefined })} />
-                    <Input aria-label="Base dos projetos" value={draft.paths?.projects ?? ""} placeholder="/portfolio" onChange={(e) => set("paths", { ...draft.paths, projects: e.target.value || undefined })} />
+                    <Input id="cfg-posts" aria-label="Base dos posts" value={draft.paths?.posts ?? ""} placeholder={defaultPathsFor(draft.kind).posts} onChange={(e) => set("paths", { ...draft.paths, posts: e.target.value || undefined })} />
+                    <Input aria-label="Base dos projetos" value={draft.paths?.projects ?? ""} placeholder={defaultPathsFor(draft.kind).projects} onChange={(e) => set("paths", { ...draft.paths, projects: e.target.value || undefined })} />
                   </div>
                 </div>
               </div>

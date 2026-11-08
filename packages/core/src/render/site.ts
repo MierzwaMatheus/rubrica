@@ -5,11 +5,11 @@
  */
 import { localizedPath, pick, pickWithFallback, translatedLocales, type Locale } from "../i18n";
 import type { BlockDefinition } from "../blocks/define";
-import type { CollectionName, PageRecord, SiteSettings } from "../content/types";
+import type { CollectionName, CollectionQuery, PageRecord, SiteSettings } from "../content/types";
 import type { SiteSnapshot } from "../data/source";
 import { enabledPlugins, type PluginDefinition } from "../plugins/contract";
 import { resolveVariant, type Alternate, type RenderContext, type ResolvedSite, type ShellCollections, type ThemeDefinition } from "../theme/contract";
-import { DEFAULT_PATHS, queryCollection, resolvePost, resolveProject, resolveSeo, type CollectionPaths, type PostItem, type ProjectItem, type ResolvedSeo } from "./collections";
+import { queryCollection, resolvePaths, resolvePost, resolveProject, resolveSeo, type CollectionPaths, type PostItem, type ProjectItem, type ResolvedSeo } from "./collections";
 import { resolveFields, resolveHref, resolveImage, type ResolveOptions } from "./resolve";
 import { defaultUiText } from "../i18n/ui-texts";
 
@@ -104,43 +104,89 @@ export function buildSite(input: BuildInput): BuiltSite {
   const settings = snapshot.site;
   const cfg = settings.locales;
   const plugins = enabledPlugins(input.plugins, settings.kind, settings.plugins);
-  const paths: CollectionPaths = { ...DEFAULT_PATHS, ...settings.paths };
+  const paths: CollectionPaths = resolvePaths(settings.kind, settings.paths);
   const blockDefs = new Map(input.blocks.map((b) => [b.type, b]));
   const opts = (locale: Locale): ResolveOptions => ({ locale, locales: cfg, ...(settings.defaultPostCover?.url && { defaultPostCover: settings.defaultPostCover }) });
 
-  const blockAllowed = (def: BlockDefinition | undefined): def is BlockDefinition =>
-    !!def && (def.category === "comum" || def.category === settings.kind) && (!def.plugin || plugins.has(def.plugin));
+  const kindAllows = (def: BlockDefinition | undefined): def is BlockDefinition =>
+    !!def && (def.category === "comum" || def.category === settings.kind);
 
   const collectionOn = (c: CollectionName) => {
     const owner = input.plugins.find((p) => p.collections?.includes(c));
     return !owner || plugins.has(owner.id);
   };
 
+  /** Bloco cujo plugin (ou o dono da coleção que ele lista) está desligado. */
+  const blockOff = (def: BlockDefinition, query: CollectionQuery | undefined) =>
+    (!!def.plugin && !plugins.has(def.plugin)) || (!!query && !collectionOn(query.collection));
+
+  const blockAllowed = (def: BlockDefinition | undefined, query?: CollectionQuery): def is BlockDefinition =>
+    kindAllows(def) && !blockOff(def, query);
+
+  const norm = (path: string) => (path.length > 1 ? path.replace(/\/+$/, "") : path) || "/";
+
+  /** Caminhos de página que só existem com o plugin dono ligado: plugins desligados do tipo. */
+  const offPaths = new Set<string>();
+  for (const p of input.plugins) {
+    if (plugins.has(p.id)) continue;
+    for (const path of p.pages ?? []) offPaths.add(norm(path));
+    if (p.collections?.includes("posts")) offPaths.add(norm(paths.posts));
+    if (p.collections?.includes("projects")) offPaths.add(norm(paths.projects));
+  }
+
+  /**
+   * A página perde a razão de existir quando é a listagem de um plugin desligado ou quando
+   * todos os seus blocos visíveis eram de plugins desligados. Com sobra (um bloco de outro
+   * plugin ou conteúdo comum), a página fica e só o bloco some.
+   */
+  function pageOff(page: PageRecord): boolean {
+    if (page.path === "/") return false;
+    if (offPaths.has(norm(page.path))) return true;
+    const visible = page.blocks.filter((b) => b.visible && kindAllows(blockDefs.get(b.type)));
+    if (!visible.length) return false;
+    return visible.every((b) => {
+      const def = blockDefs.get(b.type)!;
+      return blockOff(def, b.source ?? def.source?.default);
+    });
+  }
+
   function resolvePage(page: PageRecord, locale: Locale): ResolvedPage | undefined {
     const title = pick(page.title, locale);
     if (!title) return undefined;
     const o = opts(locale);
-    const visible = page.blocks.filter((b) => b.visible && blockAllowed(blockDefs.get(b.type)));
-    const firstIsHero = visible[0]?.type === "hero";
-    const blocks = visible.map((b, index): ResolvedBlock => {
-      const def = blockDefs.get(b.type)!;
-      const query = b.source ?? def.source?.default;
-      const items = query && collectionOn(query.collection) ? queryCollection(query, snapshot.collections[query.collection] as never[], o, paths) : [];
-      const fields = resolveFields(def.fields, b.fields, o);
-      return {
-        id: b.id,
-        type: b.type,
-        variant: resolveVariant(theme, b.type, b.variant),
-        fields,
-        items,
-        headingLevel: index === 0 && firstIsHero ? 1 : 2,
-        index,
-        total: visible.length,
-        interactive: !!def.interactive && (def.islandWhen?.(fields, plugins) ?? true),
-      };
-    });
+    const prepared = page.blocks
+      .filter((b) => b.visible)
+      .flatMap((b) => {
+        const def = blockDefs.get(b.type);
+        const query = b.source ?? def?.source?.default;
+        if (!blockAllowed(def, query)) return [];
+        const items = query ? queryCollection(query, snapshot.collections[query.collection] as never[], o, paths) : [];
+        const fields = resolveFields(def.fields, b.fields, o);
+        const interactive = !!def.interactive && (def.islandWhen?.(fields, plugins) ?? true);
+        return [{ b, def, query, items, fields, interactive }];
+      });
+    // Bloco de coleção sem itens não vira título solto: some (um convite interativo, como o de
+    // depoimento, é conteúdo). Se sobrasse página vazia, os blocos ficam e o tema mostra o vazio padrão.
+    const withContent = prepared.filter((x) => !x.query || x.items.length > 0 || x.interactive);
+    const visible = withContent.length ? withContent : prepared;
+    const firstIsHero = visible[0]?.b.type === "hero";
+    const blocks = visible.map(({ b, def, items, fields, interactive }, index): ResolvedBlock => ({
+      id: b.id,
+      type: b.type,
+      variant: resolveVariant(theme, b.type, b.variant),
+      fields,
+      items,
+      headingLevel: index === 0 && firstIsHero ? 1 : 2,
+      index,
+      total: visible.length,
+      interactive,
+    }));
     return { id: page.id, path: page.path, title, seo: resolveSeo(page.seo, o), blocks, needsHiddenH1: !firstIsHero };
   }
+
+  /** Caminhos que não viram página por causa de plugin desligado (o menu não aponta para eles). */
+  const hiddenPaths = new Set(offPaths);
+  for (const page of snapshot.pages) if (pageOff(page)) hiddenPaths.add(norm(page.path));
 
   const alternatesFor = (available: Locale[], urlFor: (l: Locale) => string, current: Locale): Alternate[] =>
     available.map((l) => ({ locale: l, href: urlFor(l), label: languageLabel(l), current: l === current }));
@@ -148,7 +194,7 @@ export function buildSite(input: BuildInput): BuiltSite {
   const routes: SiteRoute[] = [];
 
   for (const page of snapshot.pages) {
-    if (!page.published) continue;
+    if (!page.published || pageOff(page)) continue;
     const available = translatedLocales(page.title, cfg);
     for (const locale of available) {
       const resolved = resolvePage(page, locale);
@@ -235,6 +281,7 @@ export function buildSite(input: BuildInput): BuiltSite {
       .map((n) => {
         const label = pick(n.label, locale);
         if (!label) return undefined;
+        if (n.href.startsWith("/") && hiddenPaths.has(norm(n.href.split(/[?#]/)[0]!))) return undefined;
         const { href } = resolveHref(n.href, o);
         const current = href === url || (href !== localizedPath("/", locale, cfg) && url.startsWith(`${href}/`));
         return { label, href, current };

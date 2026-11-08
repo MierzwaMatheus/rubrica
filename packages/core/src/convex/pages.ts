@@ -7,6 +7,7 @@
 import { v } from "convex/values";
 import type { BlockInstance } from "../content/types";
 import { localePrefix } from "../i18n";
+import { resolvePaths } from "../render/collections";
 import { requireRole } from "./auth";
 import { logUserAction } from "./audit";
 import { assertValidPagePath, preparePageBlocks, type BlockCatalog } from "./lib/blocks";
@@ -25,7 +26,7 @@ async function catalogFor(ctx: MutationCtx, rt: RubricaRuntime): Promise<{ catal
     enabledPlugins: await enabledPluginsFor(ctx, rt, settings),
   };
   // As páginas de detalhe (`/blog/<slug>`, `/portfolio/<slug>`) e os prefixos de idioma são do núcleo.
-  const detailBases = [settings?.paths?.posts ?? "/blog", settings?.paths?.projects ?? "/portfolio"];
+  const detailBases = Object.values(resolvePaths(settings?.kind, settings?.paths));
   const reserved: string[] = [];
   if (settings) {
     for (const locale of settings.locales.locales) {

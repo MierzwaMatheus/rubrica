@@ -9,6 +9,7 @@ import type {
   CollectionQuery,
   PricePeriod,
   RawCollections,
+  SiteKind,
   RawPlan,
   RawPost,
   RawProject,
@@ -159,7 +160,21 @@ export interface CollectionPaths {
   projects: string;
 }
 
+/** Caminhos do tipo pessoal (as URLs da v1). */
 export const DEFAULT_PATHS: CollectionPaths = { posts: "/blog", projects: "/portfolio" };
+
+/**
+ * Base padrão das páginas de detalhe por tipo de site: o detalhe segue o caminho da listagem
+ * que a receita do tipo cria (`/portfolio` no pessoal, `/cases` na empresa). `settings.paths` vence.
+ */
+export function defaultPathsFor(kind: SiteKind | undefined): CollectionPaths {
+  return kind === "empresa" ? { posts: "/blog", projects: "/cases" } : DEFAULT_PATHS;
+}
+
+/** Bases efetivas: o que o site configurou, senão o padrão do tipo. */
+export function resolvePaths(kind: SiteKind | undefined, configured?: { posts?: string; projects?: string }): CollectionPaths {
+  return { ...defaultPathsFor(kind), ...(configured?.posts && { posts: configured.posts }), ...(configured?.projects && { projects: configured.projects }) };
+}
 
 function iso(ms: number | undefined): string | undefined {
   return ms === undefined ? undefined : new Date(ms).toISOString();
@@ -393,11 +408,10 @@ export function queryCollection<C extends CollectionName>(
     const byId = new Map(items.map((i) => [i.id, i]));
     list = query.ids.map((id) => byId.get(id)).filter((i): i is RawCollections[C] => i !== undefined);
   } else {
-    list = items.filter((i) => {
-      if (query.featured && !i.featured) return false;
-      if (query.tags?.length && !query.tags.some((t) => i.tags?.includes(t))) return false;
-      return true;
-    });
+    const byTags = items.filter((i) => !query.tags?.length || query.tags.some((t) => i.tags?.includes(t)));
+    list = query.featured ? byTags.filter((i) => i.featured) : byTags;
+    // "Só os destaques" sem nenhum destaque cadastrado: cai para a lista toda (ordem e limite do bloco).
+    if (query.featured && !list.length) list = byTags;
     const recent = (i: RawCollections[C]): number => {
       const r = i as { publishedAt?: number; updatedAt?: number };
       return r.publishedAt ?? r.updatedAt ?? 0;

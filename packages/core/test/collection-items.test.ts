@@ -1,6 +1,6 @@
 /** Campos dos itens de coleção que os temas recebem (contrato aditivo da v2.0). */
 import { describe, expect, it } from "vitest";
-import { resolveItem, resolvePost, resolveProject } from "../src/render/collections";
+import { queryCollection, resolveItem, resolvePost, resolveProject } from "../src/render/collections";
 import type { RawPost, RawProject, RawResumeItem } from "../src/content/types";
 import type { ResolveOptions } from "../src/render/resolve";
 
@@ -24,5 +24,13 @@ describe("itens de coleção", () => {
     const raw: RawResumeItem = { id: "r", kind: "skill", title: { "pt-BR": "Figma", en: "Figma" }, group: { "pt-BR": "Ferramentas", en: "Tools" } };
     expect(resolveItem("resume", raw, opts("en"))?.group).toBe("Tools");
     expect(resolveItem("resume", { ...raw, group: undefined }, opts("pt-BR"))).not.toHaveProperty("group");
+  });
+
+  it("consulta com destaques: só eles; sem nenhum, a lista na ordem do bloco, até o limite", () => {
+    const mk = (id: string, order: number, featured?: boolean): RawProject => ({ id, slug: id, title: { "pt-BR": id }, order, featured });
+    const items = [mk("c", 3), mk("a", 1), mk("b", 2), mk("d", 4)];
+    const q = { collection: "projects", featured: true, limit: 3, sort: "order" } as const;
+    expect(queryCollection(q, items, opts("pt-BR")).map((i) => i.id)).toEqual(["a", "b", "c"]);
+    expect(queryCollection(q, [...items, mk("z", 9, true)], opts("pt-BR")).map((i) => i.id)).toEqual(["z"]);
   });
 });

@@ -5,11 +5,10 @@
  * herdam os componentes do núcleo e ganham o visual de cartão pelo CSS.
  */
 import type { BlockProps, ResolvedImage } from "@rubrica/core";
-import { Heading, Img, LinkButton, Logo, Section, SectionHeader } from "@rubrica/core/components";
+import { Heading, Img, LinkButton, Logo, Section, SectionHeader, digits } from "@rubrica/core/components";
 import { Icon, type IconName } from "./icons";
 
 const pad = (n: number) => String(n).padStart(2, "0");
-const digits = (s: string) => s.replace(/\D/g, "");
 const initialsOf = (name: string) =>
   name
     .trim()

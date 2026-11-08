@@ -42,6 +42,7 @@ import { ref } from "./server";
 import { settingsFunctions, textsFunctions } from "./settings";
 import { siteFunctions } from "./site";
 import { usersFunctions } from "./users";
+import { aiResumesFunctions } from "./commerce/aiResumes";
 import { asaasFunctions } from "./commerce/asaas";
 import { checkoutsFunctions } from "./commerce/checkouts";
 import { commerceFunctions } from "./commerce/commerce";
@@ -74,12 +75,13 @@ export function createRubrica(config: RubricaConfig = {}) {
     routine: once(() => routineFunctions(rt)),
     plans: once(() => plansFunctions(rt)),
     team: once(() => teamFunctions(rt)),
-    // Comercial (commerce/): propostas, contratos e pagamentos.
+    // Comercial (commerce/): propostas, contratos, pagamentos, currículos com IA.
     commerce: once(() => commerceFunctions(rt)),
     proposals: once(() => proposalsFunctions(rt)),
     contractTemplates: once(() => contractTemplatesFunctions(rt)),
     checkouts: once(() => checkoutsFunctions(rt)),
     asaas: once(() => asaasFunctions(rt)),
+    aiResumes: once(() => aiResumesFunctions(rt)),
   };
 
   return {
@@ -168,6 +170,9 @@ export function createRubrica(config: RubricaConfig = {}) {
     get asaas() {
       return modules.asaas();
     },
+    get aiResumes() {
+      return modules.aiResumes();
+    },
   };
 }
 
@@ -196,6 +201,7 @@ export const RUBRICA_MODULES = [
   "contractTemplates",
   "checkouts",
   "asaas",
+  "aiResumes",
 ] as const satisfies readonly (keyof Rubrica)[];
 
 export type { RubricaConfig } from "./runtime";

@@ -23,6 +23,7 @@ import { devFsAllow, projectEnv } from "./env";
 import { enabledPlugins } from "../plugins/contract";
 import { CORE_PLUGINS } from "../plugins/registry";
 import type { SiteSnapshot } from "../data/source";
+import { DEDUPE, optimizeDepsInclude } from "./dev-deps";
 import { CONTENT_CHANGED_EVENT, contentChangeTracker, subscribeConvex, subscribeFixtures, type Unsubscribe } from "./dev-content";
 
 export type SourceOption =
@@ -220,6 +221,9 @@ export default function rubrica(options: RubricaOptions): AstroIntegration {
               },
             ],
             ssr: { noExternal: ["@rubrica/core", /^@rubrica\/theme-/] },
+            // Dev: dependências do painel e das ilhas otimizadas na partida (ver dev-deps.ts).
+            optimizeDeps: { include: optimizeDepsInclude({ admin: options.admin !== false }) },
+            resolve: { dedupe: DEDUPE },
           },
         });
 

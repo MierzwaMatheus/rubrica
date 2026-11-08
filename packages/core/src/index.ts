@@ -8,6 +8,17 @@ export * from "./theme/contract";
 export { CORE_RECIPES, recipeFor } from "./theme/recipes";
 export * from "./plugins/contract";
 export type { DataSource, SiteSnapshot } from "./data/source";
+/** WhatsApp e faixa de aviso do site inteiro: número, `wa.me`, links `whatsapp:` e o período do aviso. */
+export {
+  WHATSAPP_HREF,
+  announcementActive,
+  announcementTime,
+  isWhatsAppNumber,
+  normalizeWhatsAppNumber,
+  resolveWhatsAppHref,
+  siteWhatsAppNumber,
+  whatsAppUrl,
+} from "./render/sitewide";
 export { SCHEMES, SCHEME_TOKENS, DEFAULT_SCHEME_ID, getScheme, schemeCss, contrastRatio } from "./theme/schemes";
 export type { ColorScheme, SchemeMode, SchemeRole } from "./theme/schemes";
 export { planFonts, fontWeights, hasItalic, KNOWN_FONTS } from "./theme/fonts";

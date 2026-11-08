@@ -268,7 +268,12 @@ function Editor({ config, doc }: { config: CollectionConfig; doc?: CollectionDoc
               )}
               <TabsContent value="content" className="space-y-4">
                 <Section title="Conteúdo">
-                  <FieldsForm fields={config.fields} values={fieldVals} errors={fieldErrors} missing={missing} onChange={(values) => setDraft((d) => ({ ...omit(d, Object.keys(config.fields)), ...values }))} />
+                  <FieldsForm fields={config.fields} values={fieldVals} errors={fieldErrors} missing={missing} onChange={(values) => {
+                      // O erro de um campo some quando a pessoa mexe nele; a próxima tentativa de salvar confere de novo.
+                      const touched = Object.keys(config.fields).filter((k) => !sameDraft(fieldVals[k], values[k]));
+                      if (touched.length) setErrors((e) => ({ ...e, fields: e.fields.filter((err) => !touched.some((k) => err.path === k || err.path.startsWith(`${k}.`))) }));
+                      setDraft((d) => ({ ...omit(d, Object.keys(config.fields)), ...values }));
+                    }} />
                 </Section>
                 {config.name === "plans" && <PlanExtras doc={doc} form={draft} set={set} dirty={dirty} />}
                 {(config.tags || config.featured) && (

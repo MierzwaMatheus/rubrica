@@ -450,7 +450,11 @@ function Editor({ doc }: { doc?: ProposalDoc }) {
         <EditingLocaleBar missingIn={missingIn} />
         <fieldset disabled={accepted} className="space-y-4">
           <Section title="Proposta">
-            <FieldsForm fields={PROPOSAL_FIELDS} values={draft} missing={missing} errors={errors.fields} onChange={(v) => setDraft(prune(v))} />
+            <FieldsForm fields={PROPOSAL_FIELDS} values={draft} missing={missing} errors={errors.fields} onChange={(v) => {
+                const touched = Object.keys(PROPOSAL_FIELDS).filter((k) => !sameDraft(draft[k], v[k]));
+                if (touched.length) setErrors((e) => ({ fields: e.fields.filter((err) => !touched.some((k) => err.path === k || err.path.startsWith(`${k}.`))), discount: e.discount && touched.some((k) => ["investmentValue", "originalValue", "scope"].includes(k)) ? undefined : e.discount }));
+                setDraft(prune(v));
+              }} />
             {discountAt("scope")}
             {discountAt("originalValue")}
             {discountAt("investmentValue")}

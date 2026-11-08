@@ -92,7 +92,7 @@ body { font-family: var(--rb-font-sans); -webkit-font-smoothing: antialiased; }
 .ix-inline--big { font-size: 15px; }
 .ix-hero-tags { margin-top: 16px; }
 .ix-hero-img { margin: 28px 0 0; }
-.ix-hero-img img { display: block; width: 100%; max-width: 760px; height: auto; background: var(--rb-subtle); }
+.ix-hero-img img { display: block; width: 100%; max-width: 760px; max-height: 360px; object-fit: cover; background: var(--rb-subtle); }
 .ix-intro, .ix-count { margin: 0 0 14px; color: var(--rb-muted); font-size: 12.5px; }
 .ix-intro { font-size: 15px; max-width: 600px; }
 .ix-note { margin: 16px 0 0; color: var(--rb-muted); font-size: 12.5px; }
@@ -345,7 +345,9 @@ body { font-family: var(--rb-font-sans); -webkit-font-smoothing: antialiased; }
 /* ---------- celular: o rótulo sobe para cima do conteúdo e o menu abre por CSS ---------- */
 @media (max-width: 759px) {
   :root { --ix-gutter: 16px; }
-  .ix-h-in { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "name tools" "role role" "nav nav"; padding-top: 4px; padding-bottom: 8px; }
+  .ix-h-in { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "name name" "role role" "tools tools" "nav nav"; padding-top: 4px; padding-bottom: 8px; }
+  .ix-h-tools { flex-wrap: wrap; }
+  .ix-h-menu { margin-left: auto; }
   .ix-h-role { font-size: 12.5px; }
   .ix-h-menu { display: inline-flex; padding-inline: 6px; }
   .ix-h-nav { display: none; }

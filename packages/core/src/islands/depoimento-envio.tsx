@@ -6,7 +6,7 @@
  */
 import { useEffect, useId, useState, type FormEvent } from "react";
 import { apiBase, submitJson, type DepoimentoRequest } from "./api";
-import { Consent, EMAIL_RE, Field, makeT, useFocusOnChange, type FormIslandProps } from "./kit";
+import { Consent, EMAIL_RE, Field, makeT, useFocusOnChange, type FormIslandProps, Honeypot, honeypotValue } from "./kit";
 
 type Errors = Partial<Record<"name" | "email" | "quote" | "consent", string>>;
 
@@ -43,6 +43,7 @@ export default function DepoimentoEnvio({ blockId, page, locale, texts, privacyH
       email: email.trim(),
       quote: quote.trim(),
       consent: true,
+      ...(honeypotValue(ev.currentTarget as HTMLFormElement) ? { website: honeypotValue(ev.currentTarget as HTMLFormElement) } : {}),
       locale,
       blockId,
       page,
@@ -72,6 +73,7 @@ export default function DepoimentoEnvio({ blockId, page, locale, texts, privacyH
 
   return (
     <form id={`${uid}-form`} className="rb-form" onSubmit={onSubmit} noValidate aria-labelledby={`${uid}-title`}>
+      <Honeypot />
       {!enabled && <p className="rb-form__notice">{t("form.disabled")}</p>}
       <fieldset>
         <legend id={`${uid}-title`} tabIndex={-1} ref={title}>

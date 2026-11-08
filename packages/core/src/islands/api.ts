@@ -30,6 +30,8 @@ export interface ContatoRequest {
   /** Respostas do assistente (ex.: `{ topic: "project" }`). Valores curtos e planos. */
   details?: Record<string, string>;
   consent: true;
+  /** Honeypot: sempre vazio para pessoas (ver kit.tsx). */
+  website?: string;
   /** Idioma da página (BCP 47), para responder no mesmo idioma. */
   locale: string;
   /** Id do bloco `contato` na página. */
@@ -46,6 +48,8 @@ export interface DepoimentoRequest {
   /** O texto do depoimento. */
   quote: string;
   consent: true;
+  /** Honeypot: sempre vazio para pessoas (ver kit.tsx). */
+  website?: string;
   locale: string;
   blockId: string;
   page: string;

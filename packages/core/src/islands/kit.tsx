@@ -80,3 +80,24 @@ export function useFocusOnChange(dep: unknown, skipFirst = true) {
   }, [dep, skipFirst]);
   return ref;
 }
+
+/**
+ * Campo-armadilha anti-spam (honeypot): fora da tela, fora do foco e do leitor de tela.
+ * Pessoas não preenchem; robôs costumam preencher. O backend finge sucesso e não grava.
+ */
+export function Honeypot() {
+  return (
+    <div aria-hidden="true" style={{ position: "absolute", left: "-10000px", width: 1, height: 1, overflow: "hidden" }}>
+      <label>
+        Website
+        <input type="text" name="website" tabIndex={-1} autoComplete="off" defaultValue="" />
+      </label>
+    </div>
+  );
+}
+
+/** Valor do honeypot no envio (vazio para pessoas). */
+export function honeypotValue(form: HTMLFormElement): string {
+  const el = form.elements.namedItem("website");
+  return el instanceof HTMLInputElement ? el.value : "";
+}

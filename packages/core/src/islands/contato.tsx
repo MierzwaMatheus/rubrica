@@ -6,7 +6,7 @@
  */
 import { useEffect, useId, useState, type FormEvent } from "react";
 import { apiBase, submitJson, type ContatoRequest } from "./api";
-import { Consent, EMAIL_RE, Field, makeT, useFocusOnChange, type FormIslandProps } from "./kit";
+import { Consent, EMAIL_RE, Field, makeT, useFocusOnChange, type FormIslandProps, Honeypot, honeypotValue } from "./kit";
 
 const TOPICS = ["project", "job", "talk", "other"] as const;
 type Errors = Partial<Record<"topic" | "message" | "name" | "email" | "consent", string>>;
@@ -64,6 +64,7 @@ export default function Contato({ blockId, page, locale, fields, texts, privacyH
       email: email.trim(),
       message: message.trim(),
       consent: true,
+      ...(honeypotValue(ev.currentTarget as HTMLFormElement) ? { website: honeypotValue(ev.currentTarget as HTMLFormElement) } : {}),
       locale,
       blockId,
       page,
@@ -90,6 +91,7 @@ export default function Contato({ blockId, page, locale, fields, texts, privacyH
 
   return (
     <form className="rb-form" onSubmit={onSubmit} noValidate aria-labelledby={`${uid}-title`}>
+      <Honeypot />
       {!enabled && <p className="rb-form__notice">{t("form.disabled")}</p>}
       <fieldset>
         <legend id={`${uid}-title`} tabIndex={-1} ref={legend}>

@@ -1,7 +1,7 @@
 /** Campos dos itens de coleção que os temas recebem (contrato aditivo da v2.0). */
 import { describe, expect, it } from "vitest";
-import { resolvePost, resolveProject } from "../src/render/collections";
-import type { RawPost, RawProject } from "../src/content/types";
+import { resolveItem, resolvePost, resolveProject } from "../src/render/collections";
+import type { RawPost, RawProject, RawResumeItem } from "../src/content/types";
 import type { ResolveOptions } from "../src/render/resolve";
 
 const opts = (locale: string): ResolveOptions => ({ locale, locales: { locales: ["pt-BR", "en"], default: "pt-BR" } });
@@ -18,5 +18,11 @@ describe("itens de coleção", () => {
     const raw: RawPost = { id: "a", slug: "a", title: { "pt-BR": "A" }, content: { "pt-BR": "<p>a</p>" }, publishedAt: 0 };
     expect(resolvePost(raw, opts("pt-BR"))?.featured).toBe(false);
     expect(resolvePost({ ...raw, featured: true }, opts("pt-BR"))?.featured).toBe(true);
+  });
+
+  it("currículo: grupo no idioma", () => {
+    const raw: RawResumeItem = { id: "r", kind: "skill", title: { "pt-BR": "Figma", en: "Figma" }, group: { "pt-BR": "Ferramentas", en: "Tools" } };
+    expect(resolveItem("resume", raw, opts("en"))?.group).toBe("Tools");
+    expect(resolveItem("resume", { ...raw, group: undefined }, opts("pt-BR"))).not.toHaveProperty("group");
   });
 });

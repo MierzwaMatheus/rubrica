@@ -153,6 +153,11 @@ export interface RawResumeItem extends Base {
   start?: string;
   end?: string;
   description?: Localized<string>;
+  /**
+   * Grupo do item no currículo, por idioma: agrupa as competências ("IA", "Front-end",
+   * "Ferramentas"), como o `group` das skills da v1. Vale para qualquer tipo.
+   */
+  group?: Localized<string>;
 }
 
 export interface RawRoutineItem extends Base {

@@ -107,6 +107,8 @@ export interface ResumeItem {
   start?: string;
   end?: string;
   description?: string;
+  /** Grupo no idioma (ex.: as competências de "Front-end"), para o tema agrupar. */
+  group?: string;
 }
 
 export interface RoutineItem {
@@ -326,6 +328,7 @@ const RESOLVERS: { [C in CollectionName]: Resolver<C> } = {
       start: raw.start,
       end: raw.end,
       description: pick(raw.description, opts.locale),
+      group: pick(raw.group, opts.locale),
     });
   },
   routine: (raw, opts) => {

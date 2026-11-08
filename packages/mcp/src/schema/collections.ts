@@ -141,6 +141,7 @@ export const COLLECTION_SPECS: Record<CollectionName, CollectionSpec> = {
       start: "Início, no formato AAAA-MM.",
       end: "Fim, AAAA-MM. Vazio = atual.",
       description: "Detalhes.",
+      group: "Grupo do item (agrupa as competências: Front-end, IA, Ferramentas).",
     },
   },
   routine: {

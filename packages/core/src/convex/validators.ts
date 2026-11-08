@@ -239,6 +239,8 @@ export const resumeItemFields = {
   start: v.optional(v.string()),
   end: v.optional(v.string()),
   description: v.optional(vLocalized),
+  /** Grupo do item (agrupa as competências), por idioma. */
+  group: v.optional(vLocalized),
 };
 
 export const routineFields = {

@@ -4,7 +4,7 @@
 
 Every block that ships with the Rubrica core, with its fields. A block is a page section: you pick blocks in the panel's page editor, and each theme draws each one its own way.
 
-This page is generated from the core's code. Field names (like `title`) are the ones the MCP and data files use; the label is what the panel shows, in Portuguese.
+This page is generated from the core's code. Field names (like `title`) are the ones the MCP and data files use; the label is what the panel shows, in Portuguese. "When to use", "When not to use" and "Pairs well with" are each block's guidance, the same the MCP gives agents.
 
 **Variants** are named designs a theme offers for the block (for example, `cases` as a grid or a list). The panel shows only the ones of the theme in use, and the first in each list is the default. When you switch themes, a variant the new theme lacks falls back to its default.
 
@@ -40,6 +40,9 @@ Need a section that isn't here? See [Create a block](./criar-bloco.md).
 
 Opening section: main title, supporting text, buttons and image. Carries the h1 when it is the page's first block.
 
+- **When to use:** The page's opening: the first block, with the main promise (it carries the h1), short supporting text and one or two buttons. One per page.
+- **When not to use:** Away from the top or repeated on the page. For a call to action in the middle or at the end, use cta; to explain in paragraphs, texto.
+- **Pairs well with:** [`numeros`](#numeros--números), [`logos-clientes`](#logos-clientes--logos-de-clientes), [`cases`](#cases--cases), [`servicos`](#servicos--serviços)
 - **Site type:** personal and company
 - **Plugin:** none: always available
 - **Variants:** themes: `blueprint` (`apresentacao`, `folha`); `monograph` (`folha-de-rosto`, `capitulo`)
@@ -60,6 +63,9 @@ Opening section: main title, supporting text, buttons and image. Carries the h1 
 
 Title and free text, with an optional image beside it.
 
+- **When to use:** Explaining in paragraphs: a story, an about section, an approach, a policy. Takes an image beside it.
+- **When not to use:** For parallel items (values, steps, differentiators), use lista-itens; for dated milestones, linha-do-tempo; for numbers, numeros. Never put an h1 in the body.
+- **Pairs well with:** [`numeros`](#numeros--números), [`lista-itens`](#lista-itens--lista-de-itens), [`galeria`](#galeria--galeria), [`cta`](#cta--chamada)
 - **Site type:** personal and company
 - **Plugin:** none: always available
 - **Variants:** themes: `brutalist` (`simples`, `numerado`); `chat` (`mensagens`, `pergunta`); `magazine` (`coluna`, `ensaio`); `poster` (`declaracao`, `corrido`); `zine` (`carta`, `postit`)
@@ -76,6 +82,9 @@ Title and free text, with an optional image beside it.
 
 Highlighted numbers (years of experience, clients, projects).
 
+- **When to use:** Three or four concrete numbers that give quick proof (years, clients, projects), right after the hero or a text.
+- **When not to use:** Without real numbers the person has confirmed (don't make them up). Too many numbers dilute the highlight: up to four is ideal.
+- **Pairs well with:** [`hero`](#hero--hero), [`texto`](#texto--texto), [`depoimentos`](#depoimentos--depoimentos)
 - **Site type:** personal and company
 - **Plugin:** none: always available
 - **Variants:** none: a single design in each theme
@@ -94,6 +103,9 @@ Highlighted numbers (years of experience, clients, projects).
 
 Items with a title and text: working principles, values, differentiators, steps.
 
+- **When to use:** Parallel items with a title and short text: principles, values, differentiators, the steps of a process (numbered).
+- **When not to use:** For dated milestones, use linha-do-tempo; for services with their own page, servicos; for questions and answers, faq.
+- **Pairs well with:** [`texto`](#texto--texto), [`numeros`](#numeros--números), [`cta`](#cta--chamada)
 - **Site type:** personal and company
 - **Plugin:** none: always available
 - **Variants:** none: a single design in each theme
@@ -113,6 +125,9 @@ Items with a title and text: working principles, values, differentiators, steps.
 
 Projects or cases from the collection, linking to each one's page. Shows the featured ones; with none featured, the first in the list. With no projects, the block disappears.
 
+- **When to use:** Showing work done (projects collection): the featured ones on the home page, the whole list on the portfolio or cases page.
+- **When not to use:** With no projects the block disappears: create the projects first. To only show brands served, logos-clientes.
+- **Pairs well with:** [`depoimentos`](#depoimentos--depoimentos), [`logos-clientes`](#logos-clientes--logos-de-clientes), [`cta`](#cta--chamada)
 - **Site type:** personal and company
 - **Plugin:** `portfolio`: the block disappears when the plugin is off
 - **Lists items from:** `projects` (default when created: featured only, 3 items, in panel order)
@@ -129,6 +144,9 @@ Projects or cases from the collection, linking to each one's page. Shows the fea
 
 Services from the collection.
 
+- **When to use:** Listing what is offered (services collection): a summary on the home page, the full list on the services page.
+- **When not to use:** For prices, use precos or comparativo-planos; for a step-by-step way of working, lista-itens or linha-do-tempo.
+- **Pairs well with:** [`faq`](#faq--perguntas-frequentes), [`depoimentos`](#depoimentos--depoimentos), [`cta`](#cta--chamada)
 - **Site type:** personal and company
 - **Plugin:** none: always available
 - **Lists items from:** `services` (default when created: in panel order)
@@ -145,6 +163,9 @@ Services from the collection.
 
 Approved testimonials from the collection, with an optional invitation to send a new one. Shows the featured ones; with none featured, the first in the list. With no testimonials, the block disappears.
 
+- **When to use:** Social proof with the collection's approved testimonials, close to a decision (before the cta or the contact).
+- **When not to use:** Never write testimonials: only the ones the person received. With none approved, the block disappears.
+- **Pairs well with:** [`cases`](#cases--cases), [`logos-clientes`](#logos-clientes--logos-de-clientes), [`cta`](#cta--chamada)
 - **Site type:** personal and company
 - **Plugin:** `testimonials`: the block disappears when the plugin is off
 - **Lists items from:** `testimonials` (default when created: featured only, 6 items, in panel order)
@@ -162,6 +183,9 @@ Approved testimonials from the collection, with an optional invitation to send a
 
 Questions and answers from the collection. Outputs FAQPage JSON-LD.
 
+- **When to use:** Answering recurring questions and objections (FAQ collection) on services, pricing or contact pages. Outputs FAQ structured data.
+- **When not to use:** For continuous explanatory content, use texto. Avoid the same full FAQ on several pages.
+- **Pairs well with:** [`servicos`](#servicos--serviços), [`precos`](#precos--preços), [`cta`](#cta--chamada)
 - **Site type:** personal and company
 - **Plugin:** none: always available
 - **Lists items from:** `faq` (default when created: in panel order)
@@ -177,6 +201,9 @@ Questions and answers from the collection. Outputs FAQPage JSON-LD.
 
 Blog posts. With an empty quantity, lists them all (the blog page).
 
+- **When to use:** Blog posts: a few on the home page, all of them (empty quantity) on the blog page.
+- **When not to use:** Without the blog plugin or published posts, it does not show. For a fixed notice, use texto or the site's announcement bar.
+- **Pairs well with:** [`texto`](#texto--texto), [`cta`](#cta--chamada)
 - **Site type:** personal and company
 - **Plugin:** `blog`: the block disappears when the plugin is off
 - **Lists items from:** `posts` (default when created: 3 items, newest first)
@@ -194,6 +221,9 @@ Blog posts. With an empty quantity, lists them all (the blog page).
 
 Closing call with one or two paths (e.g. "I have a project" and "I have a role").
 
+- **When to use:** Closing a page or section with a clear action (one or two buttons): talk, request a proposal, see plans. A whatsapp: link opens the chat.
+- **When not to use:** At the top (that's the hero's place) or several in a row. Right before a contato block, it is usually redundant.
+- **Pairs well with:** [`depoimentos`](#depoimentos--depoimentos), [`servicos`](#servicos--serviços), [`contato`](#contato--contato)
 - **Site type:** personal and company
 - **Plugin:** none: always available
 - **Variants:** none: a single design in each theme
@@ -210,6 +240,9 @@ Closing call with one or two paths (e.g. "I have a project" and "I have a role")
 
 Contact form or wizard, with the channels (e-mail, WhatsApp, social).
 
+- **When to use:** Receiving contact requests (form or wizard) and showing the channels: at the end of the home page or on the contact page.
+- **When not to use:** More than one per page. For just a button that leads to contact, use cta.
+- **Pairs well with:** [`localizacao`](#localizacao--localização), [`faq`](#faq--perguntas-frequentes), [`cta`](#cta--chamada)
 - **Site type:** personal and company
 - **Plugin:** none: always available
 - **JavaScript:** may mount an island (the interactive part, with JavaScript in the browser); the rest is static HTML
@@ -227,6 +260,9 @@ Contact form or wizard, with the channels (e-mail, WhatsApp, social).
 
 Images with a title and description: day to day, behind the scenes, the company's space.
 
+- **When to use:** Photos with a title and description (routine collection): day to day, behind the scenes, the company's space.
+- **When not to use:** For logos, use logos-clientes; for the team's people, equipe; for a single image, texto with an image.
+- **Pairs well with:** [`texto`](#texto--texto), [`equipe`](#equipe--equipe)
 - **Site type:** personal and company
 - **Plugin:** `about`, owner of the `routine` collection: the block disappears when the plugin is off
 - **Lists items from:** `routine` (default when created: in panel order)
@@ -242,6 +278,9 @@ Images with a title and description: day to day, behind the scenes, the company'
 
 Experience, education and skills from the collection, with a PDF download.
 
+- **When to use:** The full résumé (experience, education, skills) with a PDF, on personal sites; it usually stands alone on the résumé page.
+- **When not to use:** On the home page: there, prefer texto and numeros with a button to the résumé.
+- **Pairs well with:** [`texto`](#texto--texto), [`cta`](#cta--chamada)
 - **Site type:** personal only
 - **Plugin:** `resume`: the block disappears when the plugin is off
 - **Lists items from:** `resume` (default when created: in panel order)
@@ -259,6 +298,9 @@ Experience, education and skills from the collection, with a PDF download.
 
 Plans from the collection side by side, each with its highlight and button.
 
+- **When to use:** Plans side by side as cards (plans collection), on the pricing page.
+- **When not to use:** To compare feature by feature, use comparativo-planos (it can follow the cards). Don't make up prices.
+- **Pairs well with:** [`comparativo-planos`](#comparativo-planos--comparativo-de-planos), [`faq`](#faq--perguntas-frequentes), [`cta`](#cta--chamada)
 - **Site type:** company only
 - **Plugin:** `pricing`, owner of the `plans` collection: the block disappears when the plugin is off
 - **Lists items from:** `plans` (default when created: in panel order)
@@ -275,6 +317,9 @@ Plans from the collection side by side, each with its highlight and button.
 
 People from the collection, with photo, role and social links.
 
+- **When to use:** Introducing the company's people (team collection), usually on the About us page.
+- **When not to use:** For a single person, use texto with an image; for clients, logos-clientes or depoimentos.
+- **Pairs well with:** [`texto`](#texto--texto), [`linha-do-tempo`](#linha-do-tempo--linha-do-tempo), [`numeros`](#numeros--números)
 - **Site type:** company only
 - **Plugin:** `team`, owner of the `team` collection: the block disappears when the plugin is off
 - **Lists items from:** `team` (default when created: in panel order)
@@ -290,6 +335,9 @@ People from the collection, with photo, role and social links.
 
 Address, opening hours and map from the company details.
 
+- **When to use:** The company's address, opening hours and map (from the company details), on the contact page.
+- **When not to use:** Without an address or in-person service. For another service's map or calendar, use incorporacao.
+- **Pairs well with:** [`contato`](#contato--contato), [`faq`](#faq--perguntas-frequentes)
 - **Site type:** company only
 - **Plugin:** none: always available
 - **Variants:** none: a single design in each theme
@@ -306,6 +354,9 @@ Address, opening hours and map from the company details.
 
 A strip of client or partner logos.
 
+- **When to use:** A strip of client or partner logos as quick social proof, right after the hero or near the cases.
+- **When not to use:** Without permission to use the brands. For results told in full, use cases or depoimentos.
+- **Pairs well with:** [`hero`](#hero--hero), [`cases`](#cases--cases), [`depoimentos`](#depoimentos--depoimentos)
 - **Site type:** company only
 - **Plugin:** none: always available
 - **Variants:** none: a single design in each theme
@@ -323,6 +374,9 @@ A strip of client or partner logos.
 
 A YouTube or Vimeo video. Loads light: a thumbnail and a play button, and the player only after the click.
 
+- **When to use:** A YouTube or Vimeo video (introduction, demo, talk) that loads light: a thumbnail, and the player only on click.
+- **When not to use:** For another service's calendar, map or form, use incorporacao. The main information shouldn't live only in the video: repeat the essentials in text.
+- **Pairs well with:** [`texto`](#texto--texto), [`cta`](#cta--chamada)
 - **Site type:** personal and company
 - **Plugin:** none: always available
 - **JavaScript:** may mount an island (the interactive part, with JavaScript in the browser); the rest is static HTML
@@ -342,6 +396,9 @@ A YouTube or Vimeo video. Loads light: a thumbnail and a play button, and the pl
 
 A calendar, form, map or player from another service, by address, only from the allowed providers (Calendly, Cal.com, Google Calendar, Google Forms, Typeform, Tally, Google Maps, OpenStreetMap, Spotify, SoundCloud, Figma).
 
+- **When to use:** A calendar, form, map or player from an allowed provider (e.g. Calendly, Google Maps), by its embed address.
+- **When not to use:** For YouTube or Vimeo videos, use video (lighter); to receive contacts on the site, contato. Providers outside the list are refused.
+- **Pairs well with:** [`texto`](#texto--texto), [`contato`](#contato--contato), [`cta`](#cta--chamada)
 - **Site type:** personal and company
 - **Plugin:** none: always available
 - **Variants:** none: a single design in each theme
@@ -360,6 +417,9 @@ A calendar, form, map or player from another service, by address, only from the 
 
 Milestones in order: the company's history, a career path, the stages of a project.
 
+- **When to use:** Milestones in order, with dates: the company's history, a career path, the stages of a project or of a process with deadlines.
+- **When not to use:** For items with no order or date (values, differentiators), use lista-itens; for the whole résumé, curriculo.
+- **Pairs well with:** [`texto`](#texto--texto), [`equipe`](#equipe--equipe), [`numeros`](#numeros--números)
 - **Site type:** personal and company
 - **Plugin:** none: always available
 - **Variants:** core default component: `vertical`, `horizontal`
@@ -379,6 +439,9 @@ Milestones in order: the company's history, a career path, the stages of a proje
 
 A table that compares the collection's plans item by item (rows = features, columns = plans), with each plan's button.
 
+- **When to use:** A table that compares the plans feature by feature, on the pricing page, when the difference between them is in the details.
+- **When not to use:** With one or two simple plans, precos is enough. Don't make up features or values.
+- **Pairs well with:** [`precos`](#precos--preços), [`faq`](#faq--perguntas-frequentes), [`cta`](#cta--chamada)
 - **Site type:** company only
 - **Plugin:** `pricing`: the block disappears when the plugin is off
 - **Lists items from:** `plans` (default when created: in panel order)

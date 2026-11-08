@@ -69,4 +69,89 @@ export const EN: Record<string, string> = {
     "One value per plan, in column order (the same as the block's plan list). A plan with no value shows a dash.",
   "Para o valor \"Texto\" (ex.: até 5, ilimitado).":
     "For the \"Text\" value (e.g. up to 5, unlimited).",
+  // Orientação de uso dos blocos (guidance, contrato 1.2)
+  "Abertura da página: o primeiro bloco, com a promessa principal (leva o h1), um apoio curto e um ou dois botões. Um por página.":
+    "The page's opening: the first block, with the main promise (it carries the h1), short supporting text and one or two buttons. One per page.",
+  "Fora do topo ou repetido na página. Para um chamado no meio ou no fim, use cta; para explicar com parágrafos, texto.":
+    "Away from the top or repeated on the page. For a call to action in the middle or at the end, use cta; to explain in paragraphs, texto.",
+  "Explicar com parágrafos: história, sobre, abordagem, uma política. Aceita uma imagem ao lado.":
+    "Explaining in paragraphs: a story, an about section, an approach, a policy. Takes an image beside it.",
+  "Para itens paralelos (valores, etapas, diferenciais), use lista-itens; para marcos com data, linha-do-tempo; para números, numeros. Nunca ponha h1 no corpo.":
+    "For parallel items (values, steps, differentiators), use lista-itens; for dated milestones, linha-do-tempo; for numbers, numeros. Never put an h1 in the body.",
+  "Três ou quatro números concretos que dão prova rápida (anos, clientes, projetos), logo depois do hero ou de um texto.":
+    "Three or four concrete numbers that give quick proof (years, clients, projects), right after the hero or a text.",
+  "Sem números reais que a pessoa confirmou (não invente). Muitos números diluem o destaque: até quatro é o ideal.":
+    "Without real numbers the person has confirmed (don't make them up). Too many numbers dilute the highlight: up to four is ideal.",
+  "Itens paralelos com título e texto curto: princípios, valores, diferenciais, etapas de um processo (numerados).":
+    "Parallel items with a title and short text: principles, values, differentiators, the steps of a process (numbered).",
+  "Para marcos com data, use linha-do-tempo; para serviços com página própria, servicos; para perguntas e respostas, faq.":
+    "For dated milestones, use linha-do-tempo; for services with their own page, servicos; for questions and answers, faq.",
+  "Mostrar trabalhos feitos (coleção de projetos): os destaques na home, a lista inteira na página de portfólio ou de cases.":
+    "Showing work done (projects collection): the featured ones on the home page, the whole list on the portfolio or cases page.",
+  "Sem projetos cadastrados o bloco some: crie os projetos antes. Para só mostrar marcas atendidas, logos-clientes.":
+    "With no projects the block disappears: create the projects first. To only show brands served, logos-clientes.",
+  "Listar o que é oferecido (coleção de serviços): um resumo na home, a lista completa na página de serviços.":
+    "Listing what is offered (services collection): a summary on the home page, the full list on the services page.",
+  "Para preços, use precos ou comparativo-planos; para o jeito de trabalhar em etapas, lista-itens ou linha-do-tempo.":
+    "For prices, use precos or comparativo-planos; for a step-by-step way of working, lista-itens or linha-do-tempo.",
+  "Prova social com os depoimentos aprovados da coleção, perto de uma decisão (antes do cta ou do contato).":
+    "Social proof with the collection's approved testimonials, close to a decision (before the cta or the contact).",
+  "Nunca escreva depoimentos: só os que a pessoa recebeu. Sem nenhum aprovado, o bloco some.":
+    "Never write testimonials: only the ones the person received. With none approved, the block disappears.",
+  "Responder dúvidas e objeções recorrentes (coleção de FAQ) em páginas de serviços, preços ou contato. Gera dados estruturados de FAQ.":
+    "Answering recurring questions and objections (FAQ collection) on services, pricing or contact pages. Outputs FAQ structured data.",
+  "Para conteúdo explicativo contínuo, use texto. Evite o mesmo FAQ inteiro em várias páginas.":
+    "For continuous explanatory content, use texto. Avoid the same full FAQ on several pages.",
+  "Posts do blog: alguns na home, todos (quantidade vazia) na página do blog.":
+    "Blog posts: a few on the home page, all of them (empty quantity) on the blog page.",
+  "Sem o plugin blog ou sem posts publicados, não aparece. Para um aviso fixo, use texto ou a faixa de aviso do site.":
+    "Without the blog plugin or published posts, it does not show. For a fixed notice, use texto or the site's announcement bar.",
+  "Fechar uma página ou seção com uma ação clara (um ou dois botões): conversar, pedir proposta, ver planos. Um link whatsapp: abre a conversa.":
+    "Closing a page or section with a clear action (one or two buttons): talk, request a proposal, see plans. A whatsapp: link opens the chat.",
+  "No topo (lá vai o hero) ou vários seguidos. Logo antes de um bloco contato, costuma sobrar.":
+    "At the top (that's the hero's place) or several in a row. Right before a contato block, it is usually redundant.",
+  "Receber pedidos de contato (formulário ou assistente) e mostrar os canais: no fim da home ou na página de contato.":
+    "Receiving contact requests (form or wizard) and showing the channels: at the end of the home page or on the contact page.",
+  "Mais de um por página. Para só um botão que leva ao contato, use cta.":
+    "More than one per page. For just a button that leads to contact, use cta.",
+  "Fotos com título e descrição (coleção de rotina): dia a dia, bastidores, o espaço da empresa.":
+    "Photos with a title and description (routine collection): day to day, behind the scenes, the company's space.",
+  "Para logos, use logos-clientes; para as pessoas da equipe, equipe; para uma imagem só, texto com imagem.":
+    "For logos, use logos-clientes; for the team's people, equipe; for a single image, texto with an image.",
+  "O currículo completo (experiência, formação, competências) com PDF, em sites pessoais; costuma ficar sozinho na página de currículo.":
+    "The full résumé (experience, education, skills) with a PDF, on personal sites; it usually stands alone on the résumé page.",
+  "Na home: lá, prefira texto e numeros com um botão para o currículo.":
+    "On the home page: there, prefer texto and numeros with a button to the résumé.",
+  "Planos lado a lado em cartões (coleção de planos), na página de preços.":
+    "Plans side by side as cards (plans collection), on the pricing page.",
+  "Para comparar recurso por recurso, use comparativo-planos (pode vir depois dos cartões). Não invente preços.":
+    "To compare feature by feature, use comparativo-planos (it can follow the cards). Don't make up prices.",
+  "Apresentar as pessoas da empresa (coleção de equipe), em geral na página Quem somos.":
+    "Introducing the company's people (team collection), usually on the About us page.",
+  "Para uma pessoa só, use texto com imagem; para clientes, logos-clientes ou depoimentos.":
+    "For a single person, use texto with an image; for clients, logos-clientes or depoimentos.",
+  "Endereço, horário e mapa da empresa (dos dados da empresa), na página de contato.":
+    "The company's address, opening hours and map (from the company details), on the contact page.",
+  "Sem endereço ou atendimento presencial. Para o mapa ou a agenda de outro serviço, use incorporacao.":
+    "Without an address or in-person service. For another service's map or calendar, use incorporacao.",
+  "Faixa de logos de clientes ou parceiros como prova social rápida, logo depois do hero ou perto dos cases.":
+    "A strip of client or partner logos as quick social proof, right after the hero or near the cases.",
+  "Sem autorização para usar as marcas. Para resultados contados, use cases ou depoimentos.":
+    "Without permission to use the brands. For results told in full, use cases or depoimentos.",
+  "Um vídeo do YouTube ou do Vimeo (apresentação, demonstração, palestra), que carrega leve: miniatura e player só no clique.":
+    "A YouTube or Vimeo video (introduction, demo, talk) that loads light: a thumbnail, and the player only on click.",
+  "Para agenda, mapa ou formulário de outro serviço, use incorporacao. A informação principal não deve estar só no vídeo: repita o essencial em texto.":
+    "For another service's calendar, map or form, use incorporacao. The main information shouldn't live only in the video: repeat the essentials in text.",
+  "Agenda, formulário, mapa ou player de um provedor permitido (ex.: Calendly, Google Maps), pelo endereço de incorporação.":
+    "A calendar, form, map or player from an allowed provider (e.g. Calendly, Google Maps), by its embed address.",
+  "Para vídeo do YouTube ou do Vimeo, use video (mais leve); para receber contatos no site, contato. Provedor fora da lista é recusado.":
+    "For YouTube or Vimeo videos, use video (lighter); to receive contacts on the site, contato. Providers outside the list are refused.",
+  "Marcos em ordem, com data: a história da empresa, uma trajetória, as etapas de um projeto ou de um processo com prazos.":
+    "Milestones in order, with dates: the company's history, a career path, the stages of a project or of a process with deadlines.",
+  "Para itens sem ordem nem data (valores, diferenciais), use lista-itens; para o currículo inteiro, curriculo.":
+    "For items with no order or date (values, differentiators), use lista-itens; for the whole résumé, curriculo.",
+  "Tabela que compara os planos recurso a recurso, na página de preços, quando a diferença entre eles está nos detalhes.":
+    "A table that compares the plans feature by feature, on the pricing page, when the difference between them is in the details.",
+  "Com um ou dois planos simples, precos basta. Não invente recursos nem valores.":
+    "With one or two simple plans, precos is enough. Don't make up features or values.",
 };

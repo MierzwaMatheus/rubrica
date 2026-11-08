@@ -33,7 +33,7 @@ const WORDS = {
     title: "# Catálogo de blocos",
     intro: [
       "Todos os blocos que o núcleo do Rubrica traz, com os campos de cada um. Um bloco é uma seção de página: você escolhe os blocos no editor de páginas do painel, e cada tema desenha o seu jeito de mostrar cada um.",
-      "Esta página é gerada do código do núcleo. Os nomes dos campos (como `title`) são os que o MCP e os arquivos de dados usam; o rótulo é o que aparece no painel.",
+      "Esta página é gerada do código do núcleo. Os nomes dos campos (como `title`) são os que o MCP e os arquivos de dados usam; o rótulo é o que aparece no painel. \"Quando usar\", \"Quando não usar\" e \"Combina com\" são a orientação de cada bloco, a mesma que o MCP entrega aos agentes.",
       "**Variações** são desenhos com nome que um tema oferece para o bloco (por exemplo, `cases` em grade ou em lista). O painel mostra só as do tema em uso, e a primeira de cada lista é a padrão. Ao trocar de tema, uma variação que o tema novo não tem cai na padrão dele.",
       "Precisa de uma seção que não está aqui? Veja [Criar um bloco](./criar-bloco.md).",
     ],
@@ -49,6 +49,9 @@ const WORDS = {
     sourceDefault: "padrão ao criar",
     island: "JavaScript",
     islandYes: "pode montar uma ilha (a parte interativa, com JavaScript no navegador); o resto é HTML estático",
+    use: "Quando usar",
+    avoid: "Quando não usar",
+    pairs: "Combina com",
     variants: "Variações",
     variantsNone: "nenhuma: um desenho só em cada tema",
     variantsCore: "componente padrão do núcleo",
@@ -87,7 +90,7 @@ const WORDS = {
     title: "# Block catalog",
     intro: [
       "Every block that ships with the Rubrica core, with its fields. A block is a page section: you pick blocks in the panel's page editor, and each theme draws each one its own way.",
-      "This page is generated from the core's code. Field names (like `title`) are the ones the MCP and data files use; the label is what the panel shows, in Portuguese.",
+      "This page is generated from the core's code. Field names (like `title`) are the ones the MCP and data files use; the label is what the panel shows, in Portuguese. \"When to use\", \"When not to use\" and \"Pairs well with\" are each block's guidance, the same the MCP gives agents.",
       "**Variants** are named designs a theme offers for the block (for example, `cases` as a grid or a list). The panel shows only the ones of the theme in use, and the first in each list is the default. When you switch themes, a variant the new theme lacks falls back to its default.",
       "Need a section that isn't here? See [Create a block](./criar-bloco.md).",
     ],
@@ -103,6 +106,9 @@ const WORDS = {
     sourceDefault: "default when created",
     island: "JavaScript",
     islandYes: "may mount an island (the interactive part, with JavaScript in the browser); the rest is static HTML",
+    use: "When to use",
+    avoid: "When not to use",
+    pairs: "Pairs well with",
     variants: "Variants",
     variantsNone: "none: a single design in each theme",
     variantsCore: "core default component",
@@ -255,6 +261,12 @@ export function renderCatalog(input: CatalogInput, lang: Lang): string {
 
   for (const def of input.blocks) {
     out.push(`## ${code(def.type)} — ${def.label}`, "", tr(def.description, lang), "");
+    if (def.guidance) {
+      out.push(`- **${w.use}:** ${tr(def.guidance.use, lang)}`);
+      if (def.guidance.avoid) out.push(`- **${w.avoid}:** ${tr(def.guidance.avoid, lang)}`);
+      const pairs = (def.guidance.pairsWith ?? []).map((t) => input.blocks.find((b) => b.type === t)).filter((b): b is BlockDefinition => !!b);
+      if (pairs.length) out.push(`- **${w.pairs}:** ${pairs.map((b) => `[${code(b.type)}](#${blockAnchor(b)})`).join(", ")}`);
+    }
     out.push(`- **${w.kindLabel}:** ${w.kind[def.category] ?? def.category}`);
     out.push(`- **${w.plugin}:** ${pluginText(def, input, w)}`);
     if (def.source) {

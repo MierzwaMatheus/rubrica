@@ -4,6 +4,7 @@ import "virtual:rubrica/styles";
 import { Font } from "astro:assets";
 import { activeTheme, activeFontPlan, headOptions, loadSite } from "../runtime";
 import { appearanceHead } from "../../theme/appearance";
+import { fontPreloads } from "../../theme/fonts";
 import { buildHead, renderHeadTags } from "../../seo/head";
 import type { RenderContext } from "../../theme/contract";
 import type { SiteSettings } from "../../content/types";
@@ -18,8 +19,8 @@ const { route, ctx, settings } = Astro.props;
 const head = renderHeadTags(buildHead(route, settings, ctx, headOptions(await loadSite())));
 const mode = settings.appearance.colorMode;
 const look = appearanceHead(settings, activeTheme, activeFontPlan);
-// Só a fonte do texto é pré-carregada (peso 400): o resto carrega quando for usado.
-const preloadVar = activeFontPlan.assign["--rb-font-sans"];
+// Pré-carrega a fonte do texto e a de destaque do tema (títulos acima da dobra).
+const preloads = fontPreloads(activeFontPlan);
 ---
 
 <!doctype html>
@@ -28,7 +29,7 @@ const preloadVar = activeFontPlan.assign["--rb-font-sans"];
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <Fragment set:html={head} />
-    {look.fonts.fonts.map((f) => <Font cssVariable={f.cssVariable as any} preload={f.cssVariable === preloadVar ? [{ weight: "400", style: "normal", subset: "latin" }] : false} />)}
+    {look.fonts.fonts.map((f) => <Font cssVariable={f.cssVariable as any} preload={preloads.has(f.cssVariable) ? [{ weight: preloads.get(f.cssVariable)!, style: "normal", subset: "latin" }] : false} />)}
     {look.css && <style set:html={look.css} />}
     {settings.appearance.colorToggle && <script is:inline src="/_rubrica/color-mode.js" />}
   </head>

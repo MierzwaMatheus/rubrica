@@ -36,11 +36,14 @@ const WEIGHTS: Record<string, number[]> = {
   "Fira Code": [300, 400, 500, 600, 700],
   "Space Mono": [400, 700],
   "IBM Plex Mono": [300, 400, 500, 600, 700],
+  Caveat: [400, 500, 600, 700],
 };
 
 /** Famílias conhecidas com serifa ou monoespaçadas (o resto é tratado como sem serifa). */
 const SERIF = new Set(["Playfair Display", "Bodoni Moda", "IBM Plex Serif", "Fraunces", "Source Serif 4"]);
 const MONO = new Set(["JetBrains Mono", "Fira Code", "Space Mono", "IBM Plex Mono"]);
+/** Letra à mão: a reserva precisa ser cursiva, senão a troca muda a altura dos títulos. */
+const HANDWRITING = new Set(["Caveat"]);
 
 /**
  * Fontes de reserva da família, terminando na genérica do desenho dela (não do papel): a
@@ -51,6 +54,7 @@ const MONO = new Set(["JetBrains Mono", "Fira Code", "Space Mono", "IBM Plex Mon
 export function fontFallbacks(family: string): string[] {
   if (MONO.has(family) || /\b(mono|code)\b/i.test(family)) return ["ui-monospace", "monospace"];
   if (SERIF.has(family) || (/serif/i.test(family) && !/sans/i.test(family))) return ["ui-serif", "serif"];
+  if (HANDWRITING.has(family)) return ["cursive"];
   return ["system-ui", "sans-serif"];
 }
 
@@ -66,6 +70,24 @@ export type FontStyle = "normal" | "italic";
 
 /** Famílias com pesos conhecidos (as que o painel e o CLI oferecem). */
 export const KNOWN_FONTS = Object.keys(WEIGHTS);
+
+/**
+ * Fontes a pré-carregar: a do texto (400) e, se o tema tem fonte de destaque própria, a de
+ * destaque no peso mais forte até 700 (é a dos títulos acima da dobra: sem ela, a troca
+ * desloca o layout).
+ */
+export function fontPreloads(plan: FontPlan): Map<string, string> {
+  const out = new Map<string, string>();
+  const sans = plan.assign["--rb-font-sans"];
+  if (sans) out.set(sans, "400");
+  const display = plan.assign["--rb-font-display"];
+  if (display && display !== sans) {
+    const font = plan.fonts.find((f) => f.cssVariable === display);
+    const weight = font ? [...font.weights].filter((w) => w <= 700).pop() ?? font.weights[0] : 700;
+    out.set(display, String(weight));
+  }
+  return out;
+}
 
 export function fontWeights(family: string): number[] {
   return WEIGHTS[family] ?? [400, 700];

@@ -429,7 +429,8 @@ function convertResume(ctx: Ctx, docs: Doc[]): Doc[] {
       case "education":
         return compact({ ...base, kind: "education", title: loc(c.degree, { enUS: en.degree }), organization: str(c.institution), description: loc(c.description, { enUS: en.description }), ...period(c.period) });
       case "skill":
-        return compact({ ...base, kind: "skill", title: loc(c.name, { enUS: en.name }), description: loc(c.level, { enUS: en.level }), tags: str(c.group) ? [c.group] : undefined });
+        // O grupo da v1 vai para o campo próprio e continua na etiqueta.
+        return compact({ ...base, kind: "skill", title: loc(c.name, { enUS: en.name }), description: loc(c.level, { enUS: en.level }), group: str(c.group) ? loc(c.group, { enUS: en.group }) : undefined, tags: str(c.group) ? [c.group] : undefined });
       case "soft_skill":
         return compact({ ...base, kind: "skill", title: loc(c.text, tr), tags: ["soft-skill"] });
       case "course":

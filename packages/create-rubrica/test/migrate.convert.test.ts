@@ -110,7 +110,7 @@ describe("tabelas 1:1", () => {
     expect(items[0]!.end).toBeUndefined();
     expect(items[1]!.start).toBeUndefined();
     expect(items[2]).toMatchObject({ organization: "Universidade Z", start: "2014", end: "2018" });
-    expect(items[3]).toMatchObject({ title: { "pt-BR": "Figma" }, description: { "pt-BR": "Avançado" }, tags: ["Ferramentas"] });
+    expect(items[3]).toMatchObject({ title: { "pt-BR": "Figma" }, description: { "pt-BR": "Avançado" }, group: { "pt-BR": "Ferramentas" }, tags: ["Ferramentas"] });
     expect(items[4]).toMatchObject({ title: { "pt-BR": "Comunicação", en: "Communication" }, tags: ["soft-skill"] });
     expect(items[6]).toMatchObject({ title: { "pt-BR": "Inglês", en: "English" }, description: { "pt-BR": "Fluente" } });
     expect(items[7]).toMatchObject({ title: { "pt-BR": "Mentoria em ONG" }, tags: ["voluntariado"] });

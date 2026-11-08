@@ -6,7 +6,7 @@ What changed in each version of Rubrica (core, themes and the `create-rubrica` C
 
 v2: Rubrica stops being a template copied into your project and becomes a **core in a package**, with **themes** and two site lines (personal and company). Updating becomes bumping a package version.
 
-**Coming from 1.x:** it is not an update, it is a migration. Run `npx create-rubrica@latest migrar` in a project on 1.13.1, with a clean git state: it creates the `rubrica-v2` branch, swaps the code, converts the data and lists what you customized. **Nothing is written to Convex**: the import goes into a new development database, and production only with your "ok". Guide: [Migrating from v1](./docs/guia/migrar.md). v1 keeps receiving bug and security fixes for 6 months (`v1` branch); its documentation is in [`docs/v1`](./docs/v1/README.md).
+**Coming from 1.x:** it is not an update, it is a migration. Run `npx create-rubrica@latest migrar` in a project on 1.13.1, with a clean git state: it creates the `rubrica-v2` branch, swaps the code, converts the data and lists what you customized. **Nothing is written to Convex**: the import goes into a new development database, and production only with your "ok". Guide: [Migrating from v1](./docs/guia/migrar.md). v1 keeps receiving bug and security fixes for 6 months on the [`v1` branch](https://github.com/MierzwaMatheus/rubrica/tree/v1), which also holds [its documentation](https://github.com/MierzwaMatheus/rubrica/tree/v1/docs).
 
 ### Security
 Three v1 flaws are fixed in v2. v1 does not get a fix for them: if you have a v1 site with proposals, the fix is to migrate to v2.
@@ -325,7 +325,7 @@ A CLI designed for non-technical people: fewer questions, nothing asked twice, s
 - Running `setup` again no longer asks for the password when the panel already has an admin.
 - **`npx create-rubrica senha`**: changes the panel password from the terminal, on the published site or the one on your computer, and unlocks a login blocked by wrong attempts.
 - `config` → Identity (Identidade) opens the questions with the saved values, instead of asking for everything again.
-- [CLI maintenance](./docs/v1/cli-manutencao.md) guide (in Portuguese): what to change in the CLI when a new layout, color scheme, font or plugin comes in, and the recipe rules.
+- [CLI maintenance](https://github.com/MierzwaMatheus/rubrica/blob/v1/docs/cli/manutencao.md) guide (in Portuguese): what to change in the CLI when a new layout, color scheme, font or plugin comes in, and the recipe rules.
 
 ## 1.1.0 — 2026-10-24
 
@@ -336,7 +336,7 @@ A CLI designed for non-technical people: fewer questions, nothing asked twice, s
 - Colors changed earlier in the admin keep applying to both modes until the appearance is saved again.
 
 ### 8 new layouts
-- **Desktop Retrô**, **Índice**, **Monografia**, **Zine**, **Blueprint**, **Jardim Digital**, **Conversa** and **Pôster Cinético**, each with the 5 pages (Home, Resume, Portfolio, About, Blog), working on mobile and in both modes. See the [templates guide](./docs/v1/templates/README.md) (in Portuguese).
+- **Desktop Retrô**, **Índice**, **Monografia**, **Zine**, **Blueprint**, **Jardim Digital**, **Conversa** and **Pôster Cinético**, each with the 5 pages (Home, Resume, Portfolio, About, Blog), working on mobile and in both modes. See the [templates guide](https://github.com/MierzwaMatheus/rubrica/blob/v1/docs/templates/README.md) (in Portuguese).
 
 ### Color schemes, light/dark mode and texture
 - **15 color schemes**, each with light and dark modes and 11 color roles: the 4 original presets (now also in the other mode), Neon (the original look) and 10 new ones (Riso, Cianotipia, Tropicália, Azulejo, Sumi, Fósforo, Crepúsculo, Concreto, Sorbet, Alto Contraste). The 5 original layouts still use only the usual 4 colors; the new ones use the full scheme.
@@ -352,7 +352,7 @@ A CLI designed for non-technical people: fewer questions, nothing asked twice, s
 First stable version. From here on, within 1.x, updating doesn't break your customizations or your data: new database fields are always optional, and changes that need a migration only come in a new major version, with a guide.
 
 **Coming from 0.x:**
-- Update with `npx create-rubrica@latest update`. Projects created with the CLI up to v0.3.18 pass their starting version with `--from` (see [Atualizando o seu Rubrica](./docs/v1/atualizacao.md), in Portuguese); fork projects use `git merge v1.0.0`.
+- Update with `npx create-rubrica@latest update`. Projects created with the CLI up to v0.3.18 pass their starting version with `--from` (see [Atualizando o seu Rubrica](https://github.com/MierzwaMatheus/rubrica/blob/v1/docs/atualizacao.md), in Portuguese); fork projects use `git merge v1.0.0`.
 - Payments are now real: set `ASAAS_API_KEY` and register the Asaas webhook (README → "Configurando os pagamentos"). The Stripe integration was removed.
 - The Umami script now uses `VITE_UMAMI_SCRIPT_URL` and `VITE_UMAMI_WEBSITE_ID` (the old variables are still accepted).
 

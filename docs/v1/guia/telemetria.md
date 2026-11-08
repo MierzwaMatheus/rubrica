@@ -44,4 +44,4 @@ Na primeira vez em cada projeto, o CLI avisa que a telemetria existe e como desl
 
 ## Como funciona
 
-O envio dura no máximo 2 segundos. Sem internet, ou com o coletor fora do ar, o comando segue normal e nada aparece na tela. O código que monta e manda os eventos é aberto: [`cli/src/telemetry.ts`](https://github.com/MierzwaMatheus/rubrica/blob/main/cli/src/telemetry.ts).
+O envio dura no máximo 2 segundos. Sem internet, ou com o coletor fora do ar, o comando segue normal e nada aparece na tela. O código que monta e manda os eventos é aberto: [`cli/src/telemetry.ts`](https://github.com/MierzwaMatheus/rubrica/blob/v1/cli/src/telemetry.ts).

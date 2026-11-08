@@ -66,7 +66,7 @@ No Claude Code, você pode digitar `! npx rubrica mcp login` no próprio prompt.
 
 Há também prompts prontos (`montar-pagina`, `traduzir-conteudo`, `revisar-antes-de-publicar`) e recursos de leitura, como o guia de escrita e o catálogo de blocos.
 
-A referência completa de ferramentas, papéis e variáveis está em [`docs/v2/mcp.md`](https://github.com/MierzwaMatheus/rubrica/blob/v2/docs/v2/mcp.md).
+A referência completa de ferramentas, papéis e variáveis está em [`docs/v2/mcp.md`](https://github.com/MierzwaMatheus/rubrica/blob/main/docs/v2/mcp.md).
 
 ## Exemplo: trocar o botão da abertura nos dois idiomas
 

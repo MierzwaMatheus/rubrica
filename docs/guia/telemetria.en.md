@@ -44,4 +44,4 @@ The first time in each project, the CLI notes that telemetry exists and how to t
 
 ## How it works
 
-Sending takes at most 2 seconds. With no internet, or with the collector down, the command carries on as normal and nothing shows on screen. The code that builds and sends the events is open: [`packages/create-rubrica/src/telemetry.ts`](https://github.com/MierzwaMatheus/rubrica/blob/v2/packages/create-rubrica/src/telemetry.ts).
+Sending takes at most 2 seconds. With no internet, or with the collector down, the command carries on as normal and nothing shows on screen. The code that builds and sends the events is open: [`packages/create-rubrica/src/telemetry.ts`](https://github.com/MierzwaMatheus/rubrica/blob/main/packages/create-rubrica/src/telemetry.ts).

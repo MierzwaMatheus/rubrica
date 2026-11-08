@@ -6,7 +6,7 @@ O que mudou em cada versão do Rubrica (núcleo, temas e CLI `create-rubrica`). 
 
 A v2: o Rubrica deixa de ser um template copiado para o projeto e vira um **núcleo em pacote**, com **temas** e duas linhas de site (pessoal e empresa). Atualizar passa a ser subir a versão de um pacote.
 
-**Vindo da 1.x:** não é uma atualização, é uma migração. Rode `npx create-rubrica@latest migrar` num projeto na 1.13.1, com o git limpo: ele cria a branch `rubrica-v2`, troca o código, converte os dados e lista o que você personalizou. **Nada é gravado no Convex**: o import vai para um banco de desenvolvimento novo, e a produção só com o seu "ok". Guia: [Migrar da v1](./docs/guia/migrar.md). A v1 recebe correções de bug e de segurança por 6 meses (branch `v1`); a documentação dela está em [`docs/v1`](./docs/v1/README.md).
+**Vindo da 1.x:** não é uma atualização, é uma migração. Rode `npx create-rubrica@latest migrar` num projeto na 1.13.1, com o git limpo: ele cria a branch `rubrica-v2`, troca o código, converte os dados e lista o que você personalizou. **Nada é gravado no Convex**: o import vai para um banco de desenvolvimento novo, e a produção só com o seu "ok". Guia: [Migrar da v1](./docs/guia/migrar.md). A v1 recebe correções de bug e de segurança por 6 meses na [branch `v1`](https://github.com/MierzwaMatheus/rubrica/tree/v1), onde também fica a [documentação dela](https://github.com/MierzwaMatheus/rubrica/tree/v1/docs).
 
 ### Segurança
 Três falhas da v1 estão corrigidas na v2. A v1 não recebe correção para elas: se você tem um site v1 com propostas, a solução é migrar para a v2.
@@ -325,7 +325,7 @@ CLI pensado para quem não é da área técnica: menos perguntas, nada repetido,
 - Rodar o `setup` de novo não pede mais a senha quando o painel já tem admin.
 - **`npx create-rubrica senha`**: troca a senha do painel pelo terminal, no site publicado ou no do computador, e libera o login bloqueado por tentativas erradas.
 - `config` → Identidade abre as perguntas com os valores salvos, em vez de pedir tudo de novo.
-- Guia de [manutenção do CLI](./docs/v1/cli-manutencao.md): o que mudar no CLI quando entra layout, esquema, fonte ou plugin novo, e as regras da receita.
+- Guia de [manutenção do CLI](https://github.com/MierzwaMatheus/rubrica/blob/v1/docs/cli/manutencao.md): o que mudar no CLI quando entra layout, esquema, fonte ou plugin novo, e as regras da receita.
 
 ## 1.1.0 — 2026-10-24
 
@@ -336,7 +336,7 @@ CLI pensado para quem não é da área técnica: menos perguntas, nada repetido,
 - Cores trocadas antes pelo admin continuam valendo nos dois modos até a aparência ser salva de novo.
 
 ### 8 layouts novos
-- **Desktop Retrô**, **Índice**, **Monografia**, **Zine**, **Blueprint**, **Jardim Digital**, **Conversa** e **Pôster Cinético**, cada um com as 5 páginas (Início, Currículo, Portfólio, Sobre, Blog), funcionando no celular e nos dois modos. Veja o [guia dos templates](./docs/v1/templates/README.md).
+- **Desktop Retrô**, **Índice**, **Monografia**, **Zine**, **Blueprint**, **Jardim Digital**, **Conversa** e **Pôster Cinético**, cada um com as 5 páginas (Início, Currículo, Portfólio, Sobre, Blog), funcionando no celular e nos dois modos. Veja o [guia dos templates](https://github.com/MierzwaMatheus/rubrica/blob/v1/docs/templates/README.md).
 
 ### Esquemas de cores, modo claro/escuro e textura
 - **15 esquemas de cores**, cada um com modo claro e escuro e 11 papéis de cor: os 4 presets originais (agora também no outro modo), o Neon (o visual original) e 10 novos (Riso, Cianotipia, Tropicália, Azulejo, Sumi, Fósforo, Crepúsculo, Concreto, Sorbet, Alto Contraste). Os 5 layouts originais seguem usando só as 4 cores de sempre; os novos usam o esquema completo.
@@ -352,7 +352,7 @@ CLI pensado para quem não é da área técnica: menos perguntas, nada repetido,
 Primeira versão estável. A partir daqui, dentro da 1.x, atualizar não quebra o que você personalizou nem os seus dados: campos novos no banco são sempre opcionais, e mudanças que exijam migração só entram numa versão major nova, com guia.
 
 **Vindo da 0.x:**
-- Atualize com `npx create-rubrica@latest update`. Projetos criados com o CLI até a v0.3.18 informam a versão de origem com `--from` (veja [Atualizando o seu Rubrica](./docs/v1/atualizacao.md)); projetos de fork usam `git merge v1.0.0`.
+- Atualize com `npx create-rubrica@latest update`. Projetos criados com o CLI até a v0.3.18 informam a versão de origem com `--from` (veja [Atualizando o seu Rubrica](https://github.com/MierzwaMatheus/rubrica/blob/v1/docs/atualizacao.md)); projetos de fork usam `git merge v1.0.0`.
 - Pagamentos agora são reais: configure `ASAAS_API_KEY` e cadastre o webhook do Asaas (README → "Configurando os pagamentos"). A integração com o Stripe foi removida.
 - O script do Umami passa a usar `VITE_UMAMI_SCRIPT_URL` e `VITE_UMAMI_WEBSITE_ID` (as variáveis antigas continuam aceitas).
 

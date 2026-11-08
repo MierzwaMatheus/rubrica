@@ -128,7 +128,7 @@ Um tema é um pacote que exporta, por padrão, `defineTheme({...})`, e a folha d
 
 O contrato tem versão própria: o pacote declara `"rubrica": { "contract": "^1" }`. Bloco novo no núcleo é uma versão menor (o tema herda o padrão); mudar ou remover campo é uma versão maior, sempre com migração de dados.
 
-O modo mais curto de começar é copiar `packages/themes/padrao` do [repositório](https://github.com/MierzwaMatheus/rubrica) e trocar o que quiser. O guia do monorepo, com as regras completas, está em [`docs/v2/contribuindo.md`](https://github.com/MierzwaMatheus/rubrica/blob/v2/docs/v2/contribuindo.md).
+O modo mais curto de começar é copiar `packages/themes/padrao` do [repositório](https://github.com/MierzwaMatheus/rubrica) e trocar o que quiser. O guia do monorepo, com as regras completas, está em [`docs/v2/contribuindo.md`](https://github.com/MierzwaMatheus/rubrica/blob/main/docs/v2/contribuindo.md).
 
 ### A bateria de testes
 

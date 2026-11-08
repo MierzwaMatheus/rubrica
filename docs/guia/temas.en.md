@@ -128,7 +128,7 @@ A theme is a package that exports `defineTheme({...})` by default, and the style
 
 The contract has its own version: the package declares `"rubrica": { "contract": "^1" }`. A new block in the core is a minor version (the theme inherits the default); changing or removing a field is a major version, always with a data migration.
 
-The shortest way to start is to copy `packages/themes/padrao` from the [repository](https://github.com/MierzwaMatheus/rubrica) and change what you want. The monorepo guide, with the complete rules, is in [`docs/v2/contribuindo.md`](https://github.com/MierzwaMatheus/rubrica/blob/v2/docs/v2/contribuindo.md) (in Portuguese).
+The shortest way to start is to copy `packages/themes/padrao` from the [repository](https://github.com/MierzwaMatheus/rubrica) and change what you want. The monorepo guide, with the complete rules, is in [`docs/v2/contribuindo.md`](https://github.com/MierzwaMatheus/rubrica/blob/main/docs/v2/contribuindo.md) (in Portuguese).
 
 ### The test battery
 

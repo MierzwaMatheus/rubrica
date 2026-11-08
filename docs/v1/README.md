@@ -15,4 +15,4 @@
 | `cli-manutencao.md` | Manutenção do CLI da v1 |
 | `mudancas-backend-conversao.md` | Notas de conversão do backend da v1 |
 
-Os links entre estes arquivos podem apontar para caminhos que não existem mais. A v1 completa está na branch `v1` do repositório.
+Os links entre estes arquivos podem apontar para caminhos que não existem mais. A v1 completa, com estes documentos nos caminhos certos, está na [branch `v1`](https://github.com/MierzwaMatheus/rubrica/tree/v1) do repositório.

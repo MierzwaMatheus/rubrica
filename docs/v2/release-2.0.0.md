@@ -61,7 +61,7 @@ A v1 não recebe correção para essas falhas: quem tem propostas com senha na v
 - Textos de seção viraram campos dos blocos; a textura de fundo da v1 não existe mais.
 - Precisa de Node 22.23 ou mais novo.
 
-Detalhes no [CHANGELOG](https://github.com/MierzwaMatheus/rubrica/blob/v2/CHANGELOG.md).
+Detalhes no [CHANGELOG](https://github.com/MierzwaMatheus/rubrica/blob/main/CHANGELOG.md).
 
 ## Pacotes publicados
 
@@ -69,7 +69,7 @@ Detalhes no [CHANGELOG](https://github.com/MierzwaMatheus/rubrica/blob/v2/CHANGE
 
 ## Pendências conhecidas
 
-Imagens no corpo dos textos do painel, prévia ao vivo de posts e cases, tradução de um item inteiro de uma vez e abrir o PDF do currículo com IA. A lista viva está em [`docs/v2/pendencias.md`](https://github.com/MierzwaMatheus/rubrica/blob/v2/docs/v2/pendencias.md).
+Imagens no corpo dos textos do painel, prévia ao vivo de posts e cases, tradução de um item inteiro de uma vez e abrir o PDF do currículo com IA. A lista viva está em [`docs/v2/pendencias.md`](https://github.com/MierzwaMatheus/rubrica/blob/main/docs/v2/pendencias.md).
 
 ---
 
@@ -83,4 +83,4 @@ Rubrica stops being a template copied into your project and becomes a **core in 
 - **New:** pages made of blocks with a live preview, a company line (pricing, team, company data), 14 themes and 15 color schemes passing one test battery, several languages, agency and client roles, contacts and privacy tooling, a local MCP server for agents, and host-neutral output (Vercel official; Netlify and Cloudflare Pages files generated).
 - **Breaking:** no more template copy in the project, no SPA, no `playground` plugin, no Python skill script, Node 22.23+.
 
-Full details: [CHANGELOG.en.md](https://github.com/MierzwaMatheus/rubrica/blob/v2/CHANGELOG.en.md).
+Full details: [CHANGELOG.en.md](https://github.com/MierzwaMatheus/rubrica/blob/main/CHANGELOG.en.md).

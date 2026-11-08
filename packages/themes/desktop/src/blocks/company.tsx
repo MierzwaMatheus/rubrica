@@ -5,7 +5,7 @@
  */
 import type { BlockProps, CollectionItems, RenderContext, ResolvedFields } from "@rubrica/core";
 import type { contato as contatoDef, equipe as equipeDef, localizacao as localizacaoDef, logosClientes as logosDef, precos as precosDef } from "@rubrica/core/blocks";
-import { Img } from "@rubrica/core/components";
+import { Img, digits, formatDays } from "@rubrica/core/components";
 import { ButtonRow, DeskButton, Square, Window, iconColor, items } from "../window";
 
 type PlanItem = CollectionItems["plans"];
@@ -17,7 +17,6 @@ type EquipeFields = ResolvedFields<typeof equipeDef.fields>;
 type LocalizacaoFields = ResolvedFields<typeof localizacaoDef.fields>;
 type LogosFields = ResolvedFields<typeof logosDef.fields>;
 
-const digits = (v: string) => v.replace(/\D+/g, "");
 
 function External({ ctx }: { ctx: RenderContext }) {
   return <span className="rb-sr-only"> {ctx.t("common.external")}</span>;
@@ -142,26 +141,6 @@ export function EquipeBlock({ id, variant, fields, items: list, headingLevel, ct
       )}
     </Window>
   );
-}
-
-const WEEKDAYS: Record<string, number> = { Mo: 1, Tu: 2, We: 3, Th: 4, Fr: 5, Sa: 6, Su: 0 };
-
-/** "Mo-Fr" (schema.org) → "seg. – sex." no idioma. Formato desconhecido volta como veio. */
-function formatDays(days: string, locale: string): string {
-  const name = (code: string) => {
-    const n = WEEKDAYS[code];
-    // 2024-01-07 foi um domingo.
-    return n === undefined ? undefined : new Intl.DateTimeFormat(locale, { weekday: "short", timeZone: "UTC" }).format(new Date(Date.UTC(2024, 0, 7 + n)));
-  };
-  const parts = days.split(",").map((part) => {
-    const [a, b] = part.trim().split("-");
-    const first = a && name(a);
-    if (!first) return undefined;
-    if (!b) return first;
-    const last = name(b);
-    return last ? `${first} – ${last}` : undefined;
-  });
-  return parts.every(Boolean) ? parts.join(", ") : days;
 }
 
 /** Localização: o endereço como arquivo de texto e o horário na lista do Finder. */

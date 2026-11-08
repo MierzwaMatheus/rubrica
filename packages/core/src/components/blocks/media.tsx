@@ -3,7 +3,6 @@
  * (`blocks/media.ts`). O vídeo carrega leve (miniatura e play; o player só no clique, pela
  * ilha `video`); sem JavaScript, a miniatura é um link para o vídeo no site do provedor.
  */
-import type { Ref } from "react";
 import type { ResolvedFields, ResolvedImage } from "../../blocks/fields";
 import type { incorporacao as incorporacaoDef, video as videoDef } from "../../blocks/catalog";
 import {
@@ -50,7 +49,8 @@ export interface VideoFrameProps {
   mode: "link" | "button" | "player";
   t: T;
   onPlay?: () => void;
-  frameRef?: Ref<HTMLIFrameElement>;
+  /** Recebe o iframe do player (a ilha põe o foco nele). Função, não `Ref`: o tipo não depende da cópia do @types/react do projeto. */
+  frameRef?: (el: HTMLIFrameElement | null) => void;
 }
 
 /** Moldura do vídeo, pura: o bloco usa no HTML estático e a ilha usa depois de hidratar. */

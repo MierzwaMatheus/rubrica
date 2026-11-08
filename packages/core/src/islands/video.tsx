@@ -34,7 +34,9 @@ export default function Video({ fields, texts }: VideoIslandProps) {
       mode={playing ? "player" : ready ? "button" : "link"}
       t={t}
       onPlay={() => setPlaying(true)}
-      frameRef={frame}
+      frameRef={(el) => {
+        frame.current = el;
+      }}
     />
   );
 }

@@ -46,3 +46,14 @@ Lista viva do que falta para a v2 estável, vinda das revisões. Cada item sai d
 - **Prévia ao vivo de posts e cases**: o editor de coleções mostra a prévia do Google, não a página de detalhe renderizada (a prévia do painel só renderiza páginas de blocos).
 - **Tradução em lote**: o botão "traduzir" é por campo; traduzir um item inteiro de uma vez (`translation.translateDocument`) ainda não tem tela.
 - **Currículos com IA**: a tela lista e gera, mas não abre nem baixa o PDF do currículo gerado.
+
+## Achados do primeiro teste com Convex real (roxus, 2026-11-08)
+Os 17 problemas do QA e os do setup foram corrigidos na v2. Ficaram para 2.0.x:
+- **`update` não regenera `vercel.json` e `public/_headers`**: correções de cabeçalho ou de reescrita (como a da prévia do painel e as rotas de proposta/checkout) só chegam a projetos novos. Precisa de um caminho com conflito (`.rubrica-new`), como a v1 fazia com arquivos do template.
+- **Reescritas e `_headers` sem teste em hospedagem real**: Vercel, Netlify e Cloudflare foram conferidos só pelo arquivo gerado e pelo `astro dev`.
+- **Dependências de navegador dos temas** (ex.: `figlet` do brutalist) não entram no `optimizeDeps` do dev: a primeira vez pode reotimizar.
+- **`robots.txt`** bloqueia `/proposta/`, mas não `/<idioma>/proposta/` (as páginas têm `noindex`).
+- **Evento `admin.delete` do Asaas** (`commerce/asaas.ts`) usa o mesmo nome da lixeira e aparece como "mandou para a lixeira" em Atividades, embora apague de verdade no Asaas.
+- **Links soltos para página de plugin desligado** (botão "Ver todos", link no texto) continuam no HTML.
+- **Sites empresa já publicados sem `paths`** passam o detalhe do case de `/portfolio/<slug>` para `/cases/<slug>` sem redirecionamento (não há nenhum ainda; vale para quem testou a v2 antes do lançamento).
+- **Assinatura desenhada no aceite** ficou opcional (acessibilidade); na v1 era obrigatória.

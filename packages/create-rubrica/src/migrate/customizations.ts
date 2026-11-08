@@ -20,9 +20,9 @@ export interface Customization {
 
 /** Fora da comparação: gerados no build, segredos, dependências, artefatos de ferramentas. */
 const IGNORE = [
-  /^\.git(\/|$)/, /(^|\/)node_modules(\/|$)/, /^dist(-server)?(\/|$)/, /^\.env/, /^\.vercel(\/|$)/, /^\.rubrica(\/|$)/,
+  /^\.git(\/|$)/, /(^|\/)node_modules(\/|$)/, /^dist(-server)?(\/|$)/, /(^|\/)\.env/, /^\.vercel(\/|$)/, /^\.rubrica(\/|$)/,
   /^public\/(data|media|fonts)(\/|$)/, /^public\/(sitemap\.xml|robots\.txt|rss\.xml|feed\.xml)$/, /^coverage(\/|$)/, /^\.stryker-tmp(\/|$)/, /^reports(\/|$)/,
-  /^\.playwright-mcp(\/|$)/, /\.log$/, /^pnpm-lock\.yaml$/, /^package-lock\.json$/, /^\.DS_Store$/, /(^|\/)\.DS_Store$/, /^\.convex(\/|$)/,
+  /^\.playwright-mcp(\/|$)/, /\.log$/, /^pnpm-lock\.yaml$/, /^package-lock\.json$/, /^\.DS_Store$/, /(^|\/)\.DS_Store$/, /^\.convex(\/|$)/, /^rubrica\.json$/, /(^|\/)(__pycache__|\.pytest_cache)(\/|$)/,
   /^convex\/_generated(\/|$)/, /^src\/i18n\/key-manifest\.json$/, /^\.tdd(\/|$)/, /^\.claude\/settings\.local\.json$/,
 ];
 
@@ -115,9 +115,13 @@ export function classify(path: string, kind: ChangeKind): { area: string; sugges
 }
 
 /** Diferenças entre o projeto e a v1 de referência, com a sugestão de cada uma. */
-export function listCustomizations(projectDir: string, pristineDir: string): Customization[] {
-  const mine = new Set(listFiles(projectDir));
-  const base = new Set(listFiles(pristineDir));
+export function listCustomizations(projectDir: string, pristineDir: string, projectFiles?: string[]): Customization[] {
+  const listed = (projectFiles ?? listFiles(projectDir)).filter((f) => !ignored(f) && existsSync(join(projectDir, f)));
+  // Atalho (symlink) para uma pasta, como .claude/skills/x → .agents/skills/x: conta como igual ao da v1.
+  const linkedDirs = listed.filter((f) => statSync(join(projectDir, f)).isDirectory());
+  const underLink = (f: string) => linkedDirs.some((d) => f === d || f.startsWith(`${d}/`));
+  const mine = new Set(listed.filter((f) => !underLink(f)));
+  const base = new Set(listFiles(pristineDir).filter((f) => !underLink(f)));
   const out: Customization[] = [];
   for (const path of [...new Set([...mine, ...base])].sort()) {
     const inMine = mine.has(path);

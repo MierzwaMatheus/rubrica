@@ -71,10 +71,10 @@ async function defaultPristine(dir: string, v1: V1RubricaJson, packageName: stri
     ? async (target: string) => {
         mkdirSync(target, { recursive: true });
         if (existsSync(join(templateDir, ".git"))) {
-          // git archive da tag: o mesmo conteúdo da release, sem os arquivos locais da pasta.
-          const archive = join(mkdtempSync(join(tmpdir(), "rubrica-v1-")), "v1.tar");
-          defaultRun("git", ["-C", templateDir, "archive", "--format=tar", "-o", archive, tag]);
-          defaultRun("tar", ["-xf", archive, "-C", target]);
+          // Clone da tag: a árvore inteira (o tarball da release deixa de fora docs/, tests/… por
+          // export-ignore, e um fork tem esses arquivos). A pasta de origem não muda.
+          defaultRun("git", ["clone", "-q", "--depth", "1", "--branch", tag, `file://${resolve(templateDir)}`, target]);
+          rmSync(join(target, ".git"), { recursive: true, force: true });
         } else {
           cpSync(templateDir, target, { recursive: true, filter: (src) => !/[\\/](node_modules|\.git)([\\/]|$)/.test(src) });
         }
@@ -151,11 +151,21 @@ async function customizationsFor(projectDir: string, v1: V1RubricaJson, packageN
   const dir = mkdtempSync(join(tmpdir(), "rubrica-v1-pristine-"));
   try {
     await (deps.pristine ?? defaultPristine)(dir, v1, packageName, templateDir);
-    return { list: listCustomizations(projectDir, dir) };
+    return { list: listCustomizations(projectDir, dir, gitFiles(projectDir, deps.runner ?? defaultRun)) };
   } catch (err) {
     return { error: `${(err as Error).message}${templateDir ? "" : " (sem internet? passe --template-v1 <pasta com o repositório do Rubrica>)"}` };
   } finally {
     rmSync(dir, { recursive: true, force: true });
+  }
+}
+
+/** Arquivos do projeto pelo git (versionados + novos não ignorados): deixa de fora caches e gerados. */
+function gitFiles(projectDir: string, runner: Runner): string[] | undefined {
+  if (!existsSync(join(projectDir, ".git"))) return undefined;
+  try {
+    return runner("git", ["ls-files", "-co", "--exclude-standard"], { cwd: projectDir }).split("\n").map((l) => l.trim()).filter(Boolean);
+  } catch {
+    return undefined;
   }
 }
 

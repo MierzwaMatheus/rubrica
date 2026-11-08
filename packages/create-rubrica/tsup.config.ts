@@ -14,5 +14,7 @@ export default defineConfig({
   noExternal: [/^@rubrica\/core/],
   // O AGENTS.md do monorepo vai junto para os projetos criados.
   loader: { ".md": "text" },
+  // Um arquivo só: o package.json publica só o dist/index.js.
+  splitting: false,
   clean: true,
 });

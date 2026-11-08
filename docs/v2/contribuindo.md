@@ -26,6 +26,7 @@ packages/core/            @rubrica/core
   test/                   testes do núcleo (vitest)
 packages/themes/<id>/     um pacote por tema (@rubrica/theme-<id>)
 packages/create-rubrica/  CLI
+packages/mcp/             @rubrica/mcp, servidor MCP local (ver docs/v2/mcp.md)
 apps/demo/                site de demonstração (fixtures em apps/demo/fixtures/<pessoal|empresa>)
 apps/docs/                site de documentação (userubrica.vercel.app)
 ```

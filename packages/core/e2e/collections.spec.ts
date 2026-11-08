@@ -39,6 +39,13 @@ test("blog: criar um post, ver o SEO e publicar, com o botão Publicar site", as
   await page.keyboard.press("Enter");
   await expect(page.getByRole("list", { name: "Etiquetas do item" })).toContainText("produtividade");
   await expect(page.getByText("Título: obrigatório")).toHaveCount(0);
+
+  // O idioma sem texto ganha o ponto, e o botão traduzir (plugin ligado) preenche a partir do principal.
+  await expect(page.getByRole("group", { name: "Idioma em edição" }).getByLabel("falta traduzir")).toBeVisible();
+  await page.getByRole("group", { name: "Idioma em edição" }).getByRole("button", { name: /inglês/ }).click();
+  await page.getByRole("button", { name: "Traduzir de pt-BR" }).first().click();
+  await expect(page.getByRole("textbox", { name: /^Título/ })).toHaveValue(/^\[en\] Como escolho as ferramentas/);
+  await page.getByRole("group", { name: "Idioma em edição" }).getByRole("button", { name: /português/ }).click();
   await shot(page, "blog-editor");
 
   // Endereço sugerido do título e prévia do Google com contador.
@@ -61,9 +68,10 @@ test("blog: criar um post, ver o SEO e publicar, com o botão Publicar site", as
 
   await page.getByRole("button", { name: "Publicar", exact: true }).click();
   await expect(page.getByText("publicado", { exact: true }).first()).toBeVisible();
-  const post = await demoState<{ slug: string; published: boolean; publishedAt: number; tags: string[] }>(page, `(s) => s.collections.posts.find((p) => p.slug.startsWith("como-escolho"))`);
+  const post = await demoState<{ slug: string; published: boolean; publishedAt: number; tags: string[]; title: Record<string, string> }>(page, `(s) => s.collections.posts.find((p) => p.slug.startsWith("como-escolho"))`);
   expect(post).toMatchObject({ slug: "como-escolho-as-ferramentas-do-meu-dia-a-dia", published: true, tags: ["produtividade"] });
   expect(typeof post.publishedAt).toBe("number");
+  expect(post.title["en"]).toMatch(/^\[en\] Como escolho as ferramentas/);
 
   // Publicar o site: mudanças pendentes -> publicando -> publicado.
   const bar = page.locator("[data-publish-status]:visible");

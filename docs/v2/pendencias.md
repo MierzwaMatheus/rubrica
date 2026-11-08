@@ -18,7 +18,7 @@ Lista viva do que falta para a v2 estável, vinda das revisões. Cada item sai d
 
 ## Bateria
 - **Vitrine só no idioma principal**: as páginas `/vitrine` não existem nos outros idiomas (o seletor de idioma e as traduções dos blocos ficam com as páginas da demo).
-- **Lighthouse com textura**: a camada de textura (SVG com `feTurbulence`, fixa) não passou pela bateria completa do Lighthouse em todos os temas que a usam.
+- **Lighthouse com textura**: a camada de textura (SVG com `feTurbulence`, fixa) foi medida no poster (grão) e no blueprint (papel), site pessoal, com performance 97 a 100; falta a rodada completa nos sete temas que a usam.
 
 ## Resolvido
 - Vitrine na bateria (decisão 31): `withShowcase` (`@rubrica/core/data/showcase`) acrescenta às fixtures, sem mudar os arquivos, uma página por bloco (`/vitrine/<tipo>`) com cada variação declarada pelo tema em instâncias cheia, curta, por opção de seleção e vazia (blocos com coleção), e as páginas da receita do tema (`/vitrine/receita/...`). A bateria liga com `RUBRICA_SHOWCASE=1` (`--sem-vitrine` desliga); as páginas passam por todas as checagens, menos o Lighthouse.

@@ -179,6 +179,7 @@ export default function PreviewApp() {
               items={b.items}
               headingLevel={b.headingLevel}
               index={b.index}
+              total={b.total}
               ctx={ctx}
               island={b.interactive ? <div style={notice}>Parte interativa (formulário, envio): funciona no site publicado.</div> : undefined}
             />

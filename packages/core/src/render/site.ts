@@ -21,6 +21,8 @@ export interface ResolvedBlock {
   items: unknown[];
   headingLevel: 1 | 2;
   index: number;
+  /** Quantos blocos visíveis a página tem. */
+  total: number;
   interactive: boolean;
 }
 
@@ -125,6 +127,7 @@ export function buildSite(input: BuildInput): BuiltSite {
         items,
         headingLevel: index === 0 && firstIsHero ? 1 : 2,
         index,
+        total: visible.length,
         interactive: !!def.interactive && (def.islandWhen?.(fields, plugins) ?? true),
       };
     });

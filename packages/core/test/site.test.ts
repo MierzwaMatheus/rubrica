@@ -34,6 +34,8 @@ describe("montagem do site", () => {
     expect(home.page.blocks[0]?.headingLevel).toBe(1);
     expect(home.page.blocks.slice(1).every((b) => b.headingLevel === 2)).toBe(true);
     expect(sobre.page.needsHiddenH1).toBe(true);
+    // Cada bloco sabe quantos blocos visíveis a página tem.
+    expect(home.page.blocks.every((b) => b.total === home.page.blocks.length)).toBe(true);
   });
 
   it("blocos ocultos somem e listas em inglês não mostram itens só em português", async () => {

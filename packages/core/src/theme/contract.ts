@@ -82,6 +82,8 @@ export interface BlockProps<Fields = Record<string, unknown>, Item = unknown> {
   headingLevel: 1 | 2;
   /** Posição na página, a partir de 0. */
   index: number;
+  /** Quantos blocos visíveis a página tem (para "03/06"). */
+  total: number;
   ctx: RenderContext;
   /** Ilha do bloco interativo (ex.: o assistente de contato), já montada pelo núcleo. */
   island?: ReactNode;

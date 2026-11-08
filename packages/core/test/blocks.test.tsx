@@ -28,7 +28,7 @@ const MARK = 'data-island="1"';
 function render(type: string, props: Partial<BlockProps> & Pick<BlockProps, "ctx">): string {
   const Block = DEFAULT_BLOCKS[type]!;
   return renderToStaticMarkup(
-    createElement(Block, { id: "x", variant: "default", fields: {}, items: [], headingLevel: 2, index: 1, ...props } as BlockProps),
+    createElement(Block, { id: "x", variant: "default", fields: {}, items: [], headingLevel: 2, index: 1, total: 3, ...props } as BlockProps),
   );
 }
 

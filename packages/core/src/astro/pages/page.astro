@@ -38,11 +38,11 @@ const pageType = route.type;
           {route.page.blocks.map((b) => {
             const Block = componentFor(b.type);
             return b.interactive && hasIsland(b.type) ? (
-              <Block id={b.id} variant={b.variant} fields={b.fields} items={b.items} headingLevel={b.headingLevel} index={b.index} ctx={ctx}>
+              <Block id={b.id} variant={b.variant} fields={b.fields} items={b.items} headingLevel={b.headingLevel} index={b.index} total={b.total} ctx={ctx}>
                 <Island slot="island" client:visible name={islandNameFor(b.type)} props={islandProps(b, ctx)} />
               </Block>
             ) : (
-              <Block id={b.id} variant={b.variant} fields={b.fields} items={b.items} headingLevel={b.headingLevel} index={b.index} ctx={ctx} />
+              <Block id={b.id} variant={b.variant} fields={b.fields} items={b.items} headingLevel={b.headingLevel} index={b.index} total={b.total} ctx={ctx} />
             );
           })}
         </>

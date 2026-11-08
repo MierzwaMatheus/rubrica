@@ -17,6 +17,20 @@ export interface HeadFacts {
 export interface ScriptFact {
   src: string | null;
   type: string | null;
+  /** Atributos do script de analytics que o núcleo injeta (plugin `analytics`). */
+  analytics?: { defer: boolean; websiteId: string | null };
+}
+
+/** Marca do script de analytics do núcleo (`@rubrica/core/seo`, `ANALYTICS_ATTR`). */
+export const ANALYTICS_ATTR = "data-rb-analytics";
+
+/**
+ * O único script de terceiro aceito em página sem ilha: o do analytics que o núcleo põe
+ * quando o plugin está ligado e configurado. Precisa da marca, de `src`, de `defer` e do
+ * id do site (o formato que o núcleo gera); qualquer outro continua reprovando.
+ */
+export function isAnalyticsScript(s: ScriptFact): boolean {
+  return !!s.analytics && s.src !== null && s.analytics.defer && !!s.analytics.websiteId;
 }
 
 const pass = (id: CheckResult["id"], message: string): CheckResult => ({ id, ok: true, message });
@@ -79,6 +93,14 @@ export function checkHreflang(path: string, facts: HeadFacts, all: Map<string, H
 
 export const COLOR_MODE_SCRIPT = "/_rubrica/color-mode.js";
 
+const sameHost = (a: string, b: string) => {
+  try {
+    return new URL(a, "http://x").host === new URL(b, "http://x").host;
+  } catch {
+    return false;
+  }
+};
+
 const pathOf = (src: string) => {
   try {
     return new URL(src, "http://x").pathname;
@@ -100,18 +122,26 @@ export function checkJs(args: {
   const total = args.requested.reduce((n, f) => n + f.gzipBytes, 0);
   const kb = (total / 1024).toFixed(1);
   const problems: string[] = [];
+  const analytics = args.scripts.filter(isAnalyticsScript).map((s) => s.src!);
+  const isAnalyticsUrl = (url: string) => analytics.some((src) => url === src || (pathOf(url) === pathOf(src) && sameHost(url, src)));
   if (args.islands === 0) {
     for (const s of args.scripts) {
       if (s.src === null && /ld\+json/i.test(s.type ?? "")) continue;
       if (s.src !== null && pathOf(s.src) === COLOR_MODE_SCRIPT) continue;
+      if (isAnalyticsScript(s)) continue;
+      if (s.analytics) {
+        problems.push(`script de analytics sem ${s.analytics.defer ? "data-website-id" : "defer"}: ${s.src ?? "inline"}`);
+        continue;
+      }
       problems.push(s.src ? `<script src="${s.src}">` : `<script> inline${s.type ? ` (type="${s.type}")` : ""}`);
     }
     for (const f of args.requested) {
-      if (pathOf(f.url) !== COLOR_MODE_SCRIPT) problems.push(`requisição de JavaScript: ${f.url}`);
+      if (pathOf(f.url) !== COLOR_MODE_SCRIPT && !isAnalyticsUrl(f.url)) problems.push(`requisição de JavaScript: ${f.url}`);
     }
+    const extra = analytics.length ? " e o script de analytics configurado" : "";
     return problems.length
-      ? fail("js", "página sem ilha carrega JavaScript além de color-mode.js e JSON-LD", [...new Set(problems)])
-      : pass("js", `sem ilha, só color-mode.js (${kb} KB gzip)`);
+      ? fail("js", "página sem ilha carrega JavaScript além de color-mode.js, JSON-LD e o analytics configurado", [...new Set(problems)])
+      : pass("js", `sem ilha, só color-mode.js${extra} (${kb} KB gzip)`);
   }
   if (total > args.limitKb * 1024) {
     const biggest = [...args.requested].sort((a, b) => b.gzipBytes - a.gzipBytes).slice(0, 5);

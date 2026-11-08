@@ -41,6 +41,21 @@ describe("verificações puras", () => {
     expect(checkJs({ ...base, scripts: [], requested: [{ url: "/_astro/a.js", gzipBytes: 10 }] }).ok).toBe(false);
   });
 
+  it("js: sem ilha, aceita só o script de analytics marcado, com defer e id do site", () => {
+    const base = { islands: 0, limitKb: 120 };
+    const umami = "https://cloud.umami.is/script.js";
+    const ok = { src: umami, type: null, analytics: { defer: true, websiteId: "abc" } };
+    const r = checkJs({ ...base, scripts: [{ src: "/_rubrica/color-mode.js", type: null }, ok], requested: [{ url: umami, gzipBytes: 900 }] });
+    expect(r.ok).toBe(true);
+    expect(r.message).toMatch(/analytics/);
+    // Sem defer, sem id ou sem a marca: reprova.
+    expect(checkJs({ ...base, scripts: [{ ...ok, analytics: { defer: false, websiteId: "abc" } }], requested: [] }).details?.join()).toMatch(/sem defer/);
+    expect(checkJs({ ...base, scripts: [{ ...ok, analytics: { defer: true, websiteId: null } }], requested: [] }).ok).toBe(false);
+    expect(checkJs({ ...base, scripts: [{ src: umami, type: null }], requested: [{ url: umami, gzipBytes: 900 }] }).ok).toBe(false);
+    // A marca não libera outro arquivo de JavaScript.
+    expect(checkJs({ ...base, scripts: [ok], requested: [{ url: "https://cloud.umami.is/outro.js", gzipBytes: 1 }] }).ok).toBe(false);
+  });
+
   it("js: com ilha vale o limite em gzip", () => {
     const args = { islands: 1, scripts: [], limitKb: 1 };
     expect(checkJs({ ...args, requested: [{ url: "/a.js", gzipBytes: 1000 }] }).ok).toBe(true);

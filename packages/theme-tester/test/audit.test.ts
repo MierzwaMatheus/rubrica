@@ -37,6 +37,25 @@ describe("auditSite", () => {
     expect(find(pages, "/")?.ok).toBe(true);
   });
 
+  it("página sem ilha aceita o script de analytics do núcleo e só ele", async () => {
+    const tag = (attrs: string) => `<script ${attrs} src="/stats/script.js"></script>`;
+    const dir = await makeSite(
+      [
+        { path: "/", body: goodBody(), head: tag('defer data-website-id="abc" data-rb-analytics') },
+        { path: "/sem-defer", body: goodBody("Sem defer"), head: tag('data-website-id="abc" data-rb-analytics') },
+        { path: "/sem-marca", body: goodBody("Sem marca"), head: tag('defer data-website-id="abc"') },
+      ],
+      { "stats/script.js": "window.__umami = true;" },
+    );
+    dirs.push(dir);
+    const pages = await auditSite({ dist: dir });
+    const js = (path: string) => find(pages, path)?.checks.find((c) => c.id === "js");
+    expect(js("/")?.ok).toBe(true);
+    expect(js("/")?.message).toMatch(/analytics/);
+    expect(js("/sem-defer")?.ok).toBe(false);
+    expect(js("/sem-marca")?.ok).toBe(false);
+  });
+
   it("confere o contraste também no modo claro quando há botão de alternar", async () => {
     const style = `<style>[data-color-mode="light"] p{color:#bbb;background:#fff}</style>`;
     const body = `<main><h1>Modos</h1><button data-rb-color-toggle>Tema</button><p>Texto claro demais no modo claro.</p></main>`;

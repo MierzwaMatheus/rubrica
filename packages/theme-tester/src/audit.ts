@@ -135,7 +135,11 @@ async function collectFacts(page: Page): Promise<{ head: HeadFacts; scripts: Scr
           path: toPath(l.getAttribute("href") ?? ""),
         })),
       },
-      scripts: [...document.querySelectorAll("script")].map((s) => ({ src: s.getAttribute("src"), type: s.getAttribute("type") })),
+      scripts: [...document.querySelectorAll("script")].map((s) => ({
+        src: s.getAttribute("src"),
+        type: s.getAttribute("type"),
+        ...(s.hasAttribute("data-rb-analytics") && { analytics: { defer: s.defer, websiteId: s.getAttribute("data-website-id") } }),
+      })),
       islands: document.querySelectorAll("astro-island").length,
     };
   });

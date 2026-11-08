@@ -63,13 +63,39 @@ The company line also has **company data** (legal name, tax id, address, hours, 
 ## Other panel screens
 
 - **Appearance:** color scheme, mode, fonts and theme tokens. See [Themes](./temas.md).
-- **Settings:** identity, address, navigation, social links, SEO, icons.
+- **Settings:** identity, address, navigation, social links, SEO, icons, [WhatsApp and announcement bar](#whatsapp-and-announcement-bar).
 - **Texts:** interface texts (menu, "read more", forms, 404), per language. Section titles and buttons are not here: they are block fields.
 - **Media:** image library.
 - **Contacts, Proposals, Contracts, Payments:** the sales side, when the plugins are on.
 - **Plugins:** turn features on and off. See below.
 - **Privacy (LGPD/GDPR):** privacy policy built from the company data and the plugins that are on, and export or deletion of a person's data.
 - **Users and activity:** `root` only.
+
+## WhatsApp and announcement bar
+
+Two features apply to the **whole site**, in both site types, and live in **Settings** (with a preview of the home page before you save). All 14 themes show both without any change.
+
+### WhatsApp
+
+- **Number:** international format, with country and area code (`+55 11 91234-5678`). The panel accepts spaces, parentheses and dashes and stores only the digits.
+- **Opening message** (per language): already typed when the chat opens. With no translation in a language, the chat opens empty in it.
+- **Floating button:** a button in the bottom corner of every page (except proposal and checkout) that opens the chat in a new tab. No JavaScript, it respects reduced motion and doesn't cover the theme's color toggle or menu.
+- **Button text** (per language, optional): shown next to the icon on wide screens. Empty, only the icon shows, with the accessible name "Chat with me on WhatsApp" ("Chat with us on WhatsApp" on company sites), which you can change in **Texts** (`whatsapp.float`).
+
+**In any button or link**, use the address `whatsapp:` instead of a URL: it becomes the site's WhatsApp link with the opening message in the page's language. For a custom message, write it after the colon: `whatsapp:I want the Pro plan`. It works in block buttons, plans, the menu and the announcement link. With no number set, a `whatsapp:` link doesn't render (the button disappears instead of going nowhere). If WhatsApp isn't set here, `whatsapp:` uses the WhatsApp from the company data.
+
+On company sites, the number also goes into the organization's structured data (`contactPoint`) for Google.
+
+### Announcement bar
+
+One line at the top of every page (except proposal and checkout, which are a one-person flow): open bookings, a promotion, new opening hours.
+
+- **Text** (per language, up to 200 characters). With no text in a language, the bar **doesn't show** in it: it doesn't fall back to the default language.
+- Optional **link** after the text (`/contact`, `https://…` or `whatsapp:`). With no label in a language, the bar shows without the link.
+- **Style:** subtle (card colors) or highlight (the theme's primary color). Both pass AA contrast in every scheme and in both modes.
+- **Starts / Ends** (optional): `YYYY-MM-DD`, which covers the whole day in UTC, or a date and time with offset, `2026-12-01T09:00-03:00`.
+
+The period is checked **when the site is published**, because the site is static: the bar only goes live or away on the first build after the date. If it must change at an exact time, publish the site then.
 
 ## Plugins
 

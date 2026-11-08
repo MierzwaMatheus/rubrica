@@ -126,6 +126,8 @@ Um tema é um pacote que exporta, por padrão, `defineTheme({...})`, e a folha d
 - **receitas**: a lista padrão de blocos de cada página, usada ao criar um site e ao migrar;
 - opcionalmente, templates de post, de case e de 404.
 
+A **faixa de aviso** e o **botão flutuante do WhatsApp** ([Conteúdo](./conteudo.md#whatsapp-e-faixa-de-aviso)) são do núcleo: a faixa vem antes da casca, o botão depois, só com tokens `--rb-*`. Se a casca tem algo fixo no topo ou no rodapé, o tema abre espaço com CSS, sem JavaScript: o `<html>` ganha `data-announcement` quando há faixa e `data-whatsapp-float` quando há botão, e as variáveis `--rb-float-bottom` e `--rb-float-right` mudam a posição do botão (`--rb-whatsapp-bg` e `--rb-whatsapp-fg`, as cores). O `padrao` troca a barra e a lateral fixas por `sticky` com a faixa; o `bento` sobe o botão acima do dock; o `chat` o põe na barra de respostas.
+
 O contrato tem versão própria: o pacote declara `"rubrica": { "contract": "^1" }`. Bloco novo no núcleo é uma versão menor (o tema herda o padrão); mudar ou remover campo é uma versão maior, sempre com migração de dados.
 
 O modo mais curto de começar é copiar `packages/themes/padrao` do [repositório](https://github.com/MierzwaMatheus/rubrica) e trocar o que quiser. O guia do monorepo, com as regras completas, está em [`docs/v2/contribuindo.md`](https://github.com/MierzwaMatheus/rubrica/blob/main/docs/v2/contribuindo.md).

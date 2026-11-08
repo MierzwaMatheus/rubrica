@@ -126,6 +126,8 @@ A theme is a package that exports `defineTheme({...})` by default, and the style
 - **recipes**: the default list of blocks of each page, used when creating a site and when migrating;
 - optionally, post, case and 404 templates.
 
+The **announcement bar** and the **floating WhatsApp button** ([Content](./conteudo.en.md#whatsapp-and-announcement-bar)) belong to the core: the bar comes before the shell, the button after it, using only `--rb-*` tokens. If the shell has something fixed at the top or bottom, the theme makes room with CSS, no JavaScript: `<html>` gets `data-announcement` when there is a bar and `data-whatsapp-float` when there is a button, and the `--rb-float-bottom` and `--rb-float-right` variables move the button (`--rb-whatsapp-bg` and `--rb-whatsapp-fg` set its colors). `padrao` turns its fixed bar and sidebar into `sticky` when there is a bar; `bento` lifts the button above the dock; `chat` puts it in the quick replies bar.
+
 The contract has its own version: the package declares `"rubrica": { "contract": "^1" }`. A new block in the core is a minor version (the theme inherits the default); changing or removing a field is a major version, always with a data migration.
 
 The shortest way to start is to copy `packages/themes/padrao` from the [repository](https://github.com/MierzwaMatheus/rubrica) and change what you want. The monorepo guide, with the complete rules, is in [`docs/v2/contribuindo.md`](https://github.com/MierzwaMatheus/rubrica/blob/main/docs/v2/contribuindo.md) (in Portuguese).

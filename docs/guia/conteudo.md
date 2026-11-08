@@ -63,13 +63,39 @@ Na linha de empresa também há os **dados da empresa** (razão social, CNPJ, en
 ## Outras telas do painel
 
 - **Aparência:** esquema de cores, modo, fontes e tokens do tema. Veja [Temas](./temas.md).
-- **Configurações:** identidade, endereço, navegação, redes sociais, SEO, ícones.
+- **Configurações:** identidade, endereço, navegação, redes sociais, SEO, ícones, [WhatsApp e faixa de aviso](#whatsapp-e-faixa-de-aviso).
 - **Textos:** os textos de interface (menu, "ler mais", formulários, 404), por idioma. Os títulos e botões de cada seção não estão aqui: são campos do bloco.
 - **Mídia:** biblioteca de imagens.
 - **Contatos, Propostas, Contratos, Pagamentos:** o lado comercial, quando os plugins estão ligados.
 - **Plugins:** liga e desliga recursos. Veja abaixo.
 - **Privacidade (LGPD):** política de privacidade gerada a partir dos dados da empresa e dos plugins ligados, e a exportação ou exclusão dos dados de um titular.
 - **Usuários e atividade:** só para o `root`.
+
+## WhatsApp e faixa de aviso
+
+Dois recursos valem para o **site inteiro**, nos dois tipos de site, e ficam em **Configurações** (com prévia da página inicial, antes de salvar). Os 14 temas mostram os dois sem nenhum ajuste.
+
+### WhatsApp
+
+- **Número:** em formato internacional, com DDI e DDD (`+55 11 91234-5678`). O painel aceita espaços, parênteses e traços e guarda só os dígitos.
+- **Mensagem inicial** (por idioma): já vem escrita quando a conversa abre. Sem tradução num idioma, a conversa abre em branco nele.
+- **Botão flutuante:** liga um botão no canto de baixo de todas as páginas (menos proposta e checkout), que abre a conversa em outra aba. Não usa JavaScript, respeita quem pede menos movimento e não cobre a troca de tema nem o menu do tema.
+- **Texto do botão** (por idioma, opcional): aparece ao lado do ícone em telas largas. Vazio, fica só o ícone, com o nome acessível "Conversar comigo no WhatsApp" (ou "Fale conosco no WhatsApp" no site de empresa), que você muda em **Textos** (`whatsapp.float`).
+
+**Em qualquer botão ou link**, use o endereço `whatsapp:` no lugar de uma URL: ele vira o link do WhatsApp do site com a mensagem inicial do idioma. Para uma mensagem própria, escreva depois dos dois-pontos: `whatsapp:Quero o plano Pro`. Vale nos botões dos blocos, nos planos, no menu e no link da faixa de aviso. Sem número configurado, o link `whatsapp:` não aparece (o botão some, em vez de levar a lugar nenhum). Se o WhatsApp não foi configurado aqui, o `whatsapp:` usa o WhatsApp dos dados da empresa.
+
+No site de empresa, o número também entra nos dados estruturados da organização (`contactPoint`), para o Google.
+
+### Faixa de aviso
+
+Uma linha no topo de todas as páginas (menos proposta e checkout, que são o fluxo de uma pessoa só): agenda aberta, promoção, mudança de horário.
+
+- **Texto** (por idioma, até 200 caracteres). Sem texto num idioma, a faixa **não aparece** nele: não cai no idioma principal.
+- **Link** opcional, depois do texto (`/contato`, `https://…` ou `whatsapp:`). Sem rótulo num idioma, a faixa aparece sem o link.
+- **Estilo:** discreto (cores de cartão) ou destaque (cor principal do tema). Os dois passam o contraste AA em todos os esquemas e nos dois modos.
+- **Começa em / Termina em** (opcionais): `AAAA-MM-DD`, que vale o dia inteiro em UTC (21h do dia anterior em Brasília), ou data e hora com fuso, `2026-12-01T09:00-03:00`.
+
+O período é avaliado **na publicação**, porque o site é estático: o aviso só entra ou sai do ar no primeiro build depois da data. Para um aviso que precisa sair na hora certa, publique o site nesse momento.
 
 ## Plugins
 

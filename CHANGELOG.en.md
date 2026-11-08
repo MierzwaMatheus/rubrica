@@ -2,6 +2,22 @@
 
 What changed in each version of Rubrica (core, themes and the `create-rubrica` CLI). Details for each one are in the [release notes](https://github.com/MierzwaMatheus/rubrica/releases). To update a v2 project, see [Updating Rubrica](./docs/guia/atualizar.md); to leave v1, [Migrating from v1](./docs/guia/migrar.md).
 
+## 2.0.1 — 2026-11-08
+
+Fixes found while migrating a real portfolio (mmlo.com.br) from v1 to v2.
+
+- **`migrar`:**
+  - understands the résumé periods "Jan-2025 - atual", "2022 - Nov-2024" and "2015-2017";
+  - installs dependencies from scratch, because old v1 packages broke the build;
+  - no longer deletes the files you created at the project root, such as `PRD.md` and `.windsurf/`;
+  - keeps the v1 SEO titles (with " | site name", and the home title in both languages);
+  - moves the profile photo to the new database;
+  - follows the v1 menu order;
+  - keeps the "whoami" badge and the sidebar phone;
+  - accepts `--help`.
+- **Export:** the guide and the command now ask for `--prod --include-file-storage`, to bring the real content and the images.
+- **Cyberpunk theme:** the case page is back to the v1 design (cover with the title, tags, buttons and sections in cards); the mobile header gets the contact button; and the sidebar footer matches v1.
+
 ## 2.0.0 — 2026-11-08
 
 v2: Rubrica stops being a template copied into your project and becomes a **core in a package**, with **themes** and two site lines (personal and company). Updating becomes bumping a package version.

@@ -1,6 +1,6 @@
 {
   "name": "@rubrica/theme-padrao",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Tema padrão do Rubrica (layout padrão da v1).",
   "type": "module",
   "license": "GPL-3.0-only",

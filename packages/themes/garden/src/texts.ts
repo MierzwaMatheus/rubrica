@@ -25,6 +25,7 @@ export const GARDEN_TEXTS: Record<string, Tr> = {
   "garden.page": tr("página", "page", "página"),
   "garden.hello": tr("Oi! Eu sou {name}.", "Hi! I'm {name}.", "¡Hola! Soy {name}."),
   "garden.org.hello": tr("Olá! Aqui é {name}.", "Hi! We're {name}.", "¡Hola! Somos {name}."),
+  "garden.plant": tr("Plante uma conversa", "Plant a conversation", "Planta una conversación"),
   "garden.linkedTo": tr("Ligada a", "Linked to", "Enlazada con"),
   "garden.readCase": tr("ler case", "read case", "leer caso"),
   "garden.bed": tr("canteiro", "bed", "bancal"),

@@ -268,6 +268,11 @@ export interface SiteSettings {
   paths?: { posts?: string; projects?: string };
   /** Imagem padrão de compartilhamento. */
   ogImage?: RawImage;
+  /**
+   * Logo do site (lockup com o nome). O tema decide onde mostrar; sem logo, mostra o nome.
+   * `dark` é a versão para fundo escuro, quando difere.
+   */
+  logo?: RawImage & { dark?: RawImage };
   twitterHandle?: string;
 }
 

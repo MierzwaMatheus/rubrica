@@ -43,6 +43,8 @@ export interface ResolvedSite {
   plugins: Record<string, boolean>;
   colorMode: "dark" | "light" | "system";
   colorToggle: boolean;
+  /** Logo resolvida (o `alt` já vem com o nome do site se faltar). `dark` para fundo escuro. */
+  logo?: ResolvedImage & { dark?: ResolvedImage };
 }
 
 export interface Alternate {
@@ -187,6 +189,18 @@ export function defineTheme(theme: ThemeDefinition): ThemeDefinition {
   if (!/^[a-z][a-z0-9-]*$/.test(theme.id)) throw new Error(`[rubrica] id de tema inválido: "${theme.id}"`);
   return theme;
 }
+
+/**
+ * Variações que os componentes PADRÃO do núcleo sabem desenhar, por bloco. Um tema que
+ * herda o componente padrão só deve declarar estas (pode reordenar para mudar a padrão);
+ * variações novas exigem o componente próprio do tema.
+ */
+export const CORE_VARIANTS: Partial<Record<string, VariantOption[]>> = {
+  cases: [
+    { value: "grade", label: "Grade" },
+    { value: "lista", label: "Lista" },
+  ],
+};
 
 /** Variação válida para o bloco no tema; desconhecida ou ausente cai na primeira. */
 export function resolveVariant(theme: ThemeDefinition, type: string, variant: string | undefined): string {

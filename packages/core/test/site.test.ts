@@ -69,4 +69,12 @@ describe("montagem do site", () => {
     const built = await buildSite({ snapshot, theme, blocks: CORE_BLOCKS, plugins: CORE_PLUGINS });
     expect(built.context("pt-BR", "/", []).site.person).toMatchObject({ phone: "+55 11 90000-0000", whatsapp: "+5511900000000" });
   });
+
+  it("logo do site chega ao contexto com o nome como alt quando falta", async () => {
+    const snapshot = await fixtureSource(fixtures).load();
+    snapshot.site.logo = { url: "/logo.svg", dark: { url: "/logo-dark.svg", alt: { en: "Ana" } } };
+    const s = buildSite({ snapshot, theme, blocks: CORE_BLOCKS, plugins: CORE_PLUGINS });
+    const logo = s.context("en", "/en").site.logo;
+    expect(logo).toMatchObject({ src: "/logo.svg", alt: "Ana Souza", dark: { src: "/logo-dark.svg", alt: "Ana" } });
+  });
 });

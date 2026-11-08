@@ -27,6 +27,9 @@ export const vImage = v.object({
   height: v.optional(v.number()),
 });
 
+/** Logo do site: imagem com versão opcional para fundo escuro. */
+export const vLogo = v.object({ ...vImage.fields, dark: v.optional(vImage) });
+
 export const vLink = v.object({ label: vLocalized, href: v.string() });
 
 export const vSeo = v.object({
@@ -131,6 +134,7 @@ export const siteSettingsFields = {
   plugins: v.record(v.string(), v.boolean()),
   paths: v.optional(v.object({ posts: v.optional(v.string()), projects: v.optional(v.string()) })),
   ogImage: v.optional(vImage),
+  logo: v.optional(vLogo),
   twitterHandle: v.optional(v.string()),
 };
 export const vSiteSettings = v.object(siteSettingsFields);

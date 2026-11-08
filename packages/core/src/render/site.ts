@@ -232,6 +232,15 @@ export function buildSite(input: BuildInput): BuiltSite {
     const description = pickWithFallback(settings.description, locale, cfg);
     if (description) site.description = description;
     if (settings.organization) site.organization = settings.organization;
+    if (settings.logo) {
+      const logo = resolveImage(settings.logo, o);
+      if (logo) {
+        const resolved: NonNullable<ResolvedSite["logo"]> = { ...logo, alt: logo.alt || site.name };
+        const dark = resolveImage(settings.logo.dark, o);
+        if (dark) resolved.dark = { ...dark, alt: dark.alt || site.name };
+        site.logo = resolved;
+      }
+    }
     if (settings.person) {
       const person: NonNullable<ResolvedSite["person"]> = { name: settings.person.name };
       const jobTitle = pickWithFallback(settings.person.jobTitle, locale, cfg);

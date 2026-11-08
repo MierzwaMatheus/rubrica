@@ -7,6 +7,9 @@ Lista viva do que falta para a v2 estável, vinda das revisões. Cada item sai d
 - **Terminal (ilha)**: o "Press ~" da v1 não existe no núcleo; decidir se vira plugin do tipo pessoal.
 - **Menu móvel**: a gaveta por checkbox não fecha ao seguir âncora da mesma página.
 
+- **Fontes em itálico**: a integração pede só `styles: ["normal"]`; `fonts.json` do tema deve poder pedir itálico (o magazine sintetiza hoje).
+- **Bateria e transições de cor**: o axe mede cor intermediária quando há `transition` de cor; a bateria deveria desligar transições antes de medir (hoje os temas tiram as transições).
+
 ## Temas
 - Portar os 12 layouts restantes (fase 3), depois do contrato estável no fim da fase 2.
 

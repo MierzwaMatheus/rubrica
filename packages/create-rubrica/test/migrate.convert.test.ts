@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { CORE_RECIPES, validateBlock, type Recipe } from "@rubrica/core";
 import { CORE_BLOCKS } from "@rubrica/core/blocks";
-import { convertV1, loc, parsePeriod, slugify, toHtml, V1_TEXTS } from "../src/migrate/convert";
+import { convertV1, loc, parsePeriod, sameInBoth, slugify, toHtml, v1FullTitle, V1_TEXTS } from "../src/migrate/convert";
 import { IDS, PRINCIPIOS, V1_RUBRICA_JSON, v1Export } from "./fixtures/v1-export";
 
 const NOW = 1_800_000_000_000;
@@ -15,6 +15,13 @@ describe("ajudantes", () => {
     expect(loc("Olá", { ptBR: "Olá", enUS: "Hi" })).toEqual({ "pt-BR": "Olá", en: "Hi" });
     expect(loc(undefined, { ptBR: "Só pt" })).toEqual({ "pt-BR": "Só pt" });
     expect(loc("", { enUS: "  " })).toEqual({});
+  });
+
+  it("títulos de SEO como a v1 mostrava", () => {
+    expect(v1FullTitle({ "pt-BR": "Sobre Mim", en: "About Me" }, "Matheus Mierzwa")).toEqual({ "pt-BR": "Sobre Mim | Matheus Mierzwa", en: "About Me | Matheus Mierzwa" });
+    expect(v1FullTitle({ "pt-BR": "Matheus Mierzwa | Lead" }, "Matheus Mierzwa")).toEqual({ "pt-BR": "Matheus Mierzwa | Lead" });
+    expect(v1FullTitle({ "pt-BR": "Blog" }, undefined)).toEqual({ "pt-BR": "Blog" });
+    expect(sameInBoth({ "pt-BR": "Matheus Mierzwa | Lead" })).toEqual({ "pt-BR": "Matheus Mierzwa | Lead", en: "Matheus Mierzwa | Lead" });
   });
 
   it("períodos do currículo", () => {
@@ -209,7 +216,7 @@ describe("páginas pela receita, preenchidas com a v1", () => {
   it("home: hero com o texto personalizado, números, cases, sobre e chamada", () => {
     const home = byPath(r, "/");
     expect(home.title).toEqual({ "pt-BR": "Início", en: V1_TEXTS["navigation.home"]!.en });
-    expect(home.seo).toEqual({ title: { "pt-BR": "Bruna Lima · Designer de produto" } });
+    expect(home.seo).toEqual({ title: { "pt-BR": "Bruna Lima · Designer de produto", en: "Bruna Lima · Designer de produto" } });
     const hero = block(home, "hero").fields;
     expect(hero.title).toEqual({ "pt-BR": "Desenho produtos que as pessoas entendem.", en: "I design products people understand." });
     expect(hero.eyebrow).toEqual({ "pt-BR": "Designer de produto", en: "Product designer" });

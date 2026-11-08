@@ -174,6 +174,24 @@ export function loc(base?: unknown, translations?: unknown): Loc {
   return out;
 }
 
+/**
+ * Título de SEO como a v1 mostrava (componente SEO da v1): "<título> | <nome do site>",
+ * a menos que já contenha o nome. Na v2, um `seo.title` preenchido sai como está, então o
+ * sufixo vem para o dado.
+ */
+export function v1FullTitle(title: Loc, siteTitle: string | undefined): Loc {
+  if (!siteTitle) return title;
+  const out: Loc = {};
+  for (const [l, t] of Object.entries(title)) if (t) out[l] = t.includes(siteTitle) ? t : `${t} | ${siteTitle}`;
+  return out;
+}
+
+/** Texto que a v1 guardava sem tradução (siteConfig) e mostrava igual nos dois idiomas. */
+export function sameInBoth(value: Loc): Loc {
+  const v = value[PT] ?? value[EN];
+  return v ? { [PT]: v, [EN]: value[EN] ?? v } : value;
+}
+
 /** Valor que pode ser texto ou `{ ptBR, enUS }` (homeContent). */
 function locAny(value: unknown): Loc {
   if (typeof value === "string") return loc(value);
@@ -275,6 +293,11 @@ class Ctx {
     this.contact = (tables.contactInfo ?? [])[0];
   }
 
+  /** O `site_title` da v1, que o componente SEO punha no fim dos títulos. */
+  get siteTitle(): string | undefined {
+    return str(this.config.get("site_title"));
+  }
+
   /** Imagem da biblioteca da v1 (id do imageMetadata), ou só a URL. */
   image(imageId?: string, url?: string): Doc | undefined {
     const m = imageId ? this.media.get(imageId) : undefined;
@@ -334,7 +357,7 @@ function convertPosts(ctx: Ctx, docs: Doc[]): Doc[] {
       content: loc(d.content, d.contentTranslations),
       cover: ctx.image(d.imageId, d.imageUrl),
       seo: compact({
-        title: loc(d.seoTitle, d.seoTitleTranslations),
+        title: v1FullTitle(loc(d.seoTitle, d.seoTitleTranslations), ctx.siteTitle),
         description: loc(d.seoDescription, d.seoDescriptionTranslations),
         image: ctx.image(d.ogImageId, d.ogImageUrl),
       }),
@@ -634,11 +657,12 @@ export const SECTION_FILLERS: Record<string, Record<string, Filler | Filler[]>> 
 
 /** Título e SEO de cada página fixa. */
 const PAGE_META: Record<string, (ctx: Ctx) => { title: Loc; seo?: Doc }> = {
-  "/": (ctx) => ({ title: ctx.t("navigation.home"), seo: compact({ title: loc(ctx.config.get("seo_home_title")), description: loc(ctx.config.get("seo_home_description")) }) }),
-  "/sobre": (ctx) => ({ title: ctx.t("navigation.about"), seo: compact({ title: ctx.t("seo.aboutTitle"), description: ctx.t("seo.aboutDescription") }) }),
-  "/curriculo": (ctx) => ({ title: ctx.t("navigation.resume"), seo: compact({ title: ctx.t("seo.resumeTitle"), description: ctx.t("seo.resumeDescription") }) }),
-  "/portfolio": (ctx) => ({ title: ctx.t("navigation.portfolio"), seo: compact({ title: ctx.t("seo.portfolioTitle"), description: ctx.t("seo.portfolioDescription") }) }),
-  "/blog": (ctx) => ({ title: ctx.t("navigation.blog"), seo: compact({ title: ctx.t("seo.blogTitle"), description: ctx.t("seo.blogDescription") }) }),
+  // O título e a descrição da home ficavam no siteConfig, sem tradução: valiam nos dois idiomas.
+  "/": (ctx) => ({ title: ctx.t("navigation.home"), seo: compact({ title: sameInBoth(loc(ctx.config.get("seo_home_title"))), description: sameInBoth(loc(ctx.config.get("seo_home_description"))) }) }),
+  "/sobre": (ctx) => ({ title: ctx.t("navigation.about"), seo: compact({ title: v1FullTitle(ctx.t("seo.aboutTitle"), ctx.siteTitle), description: ctx.t("seo.aboutDescription") }) }),
+  "/curriculo": (ctx) => ({ title: ctx.t("navigation.resume"), seo: compact({ title: v1FullTitle(ctx.t("seo.resumeTitle"), ctx.siteTitle), description: ctx.t("seo.resumeDescription") }) }),
+  "/portfolio": (ctx) => ({ title: ctx.t("navigation.portfolio"), seo: compact({ title: v1FullTitle(ctx.t("seo.portfolioTitle"), ctx.siteTitle), description: ctx.t("seo.portfolioDescription") }) }),
+  "/blog": (ctx) => ({ title: ctx.t("navigation.blog"), seo: compact({ title: v1FullTitle(ctx.t("seo.blogTitle"), ctx.siteTitle), description: ctx.t("seo.blogDescription") }) }),
   "/depoimentos": (ctx) => ({ title: ctx.t("testimonials.title"), seo: compact({ description: ctx.t("seo.testimonialsDescription") }) }),
 };
 

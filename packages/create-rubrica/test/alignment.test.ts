@@ -50,12 +50,13 @@ describe("temas ↔ pacotes do workspace", () => {
 
   it("esquema e fontes recomendados de um tema portado são os que o pacote declara", async () => {
     for (const id of PORTED_THEMES) {
-      const theme = (await import(repo("packages/themes", id, "src/index.tsx"))).default as { scheme?: string; fonts?: { sans?: string; mono?: string } };
+      const theme = (await import(repo("packages/themes", id, "src/index.tsx"))).default as { scheme?: string; colorMode?: string; fonts?: { sans?: string; mono?: string } };
       const fonts = JSON.parse(readFileSync(repo("packages/themes", id, "src/fonts.json"), "utf-8")) as { sans: string; mono?: string };
-      expect(THEME_PACKAGE_DEFAULTS[id], id).toEqual({ scheme: theme.scheme, fontSans: fonts.sans, ...(fonts.mono && { fontMono: fonts.mono }) });
+      expect(THEME_PACKAGE_DEFAULTS[id], id).toEqual({ scheme: theme.scheme, mode: theme.colorMode ?? "dark", fontSans: fonts.sans, ...(fonts.mono && { fontMono: fonts.mono }) });
       expect(getTheme(id)!.recommended).toMatchObject(THEME_PACKAGE_DEFAULTS[id]);
     }
     expect(getTheme("cyberpunk")!.recommended.scheme).toBe("neon");
+    expect(getTheme("magazine")!.recommended.mode).toBe("light");
   });
 
   it("os esquemas oferecidos são os do núcleo, e todo tema recomenda um que existe", () => {

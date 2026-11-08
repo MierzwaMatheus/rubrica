@@ -90,6 +90,7 @@ export function applyConfigChange(current: RubricaState, change: ConfigChange): 
     const to = getTheme(toId)?.recommended;
     if (fromId !== toId && from && to) {
       if (!change.esquema && state.aparencia.esquema === from.scheme) state.aparencia.esquema = to.scheme;
+      if (!change.modo && state.aparencia.modo === from.mode) state.aparencia.modo = to.mode;
       const followed = initialFonts(fromId);
       if (state.aparencia.fonteSans === followed.fonteSans && state.aparencia.fonteMono === followed.fonteMono) {
         delete state.aparencia.fonteSans;

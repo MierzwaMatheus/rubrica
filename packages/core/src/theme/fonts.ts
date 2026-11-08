@@ -74,17 +74,25 @@ export const KNOWN_FONTS = Object.keys(WEIGHTS);
 /**
  * Fontes a pré-carregar: a do texto (400) e, se o tema tem fonte de destaque própria, a de
  * destaque no peso mais forte até 700 (é a dos títulos acima da dobra: sem ela, a troca
- * desloca o layout).
+ * desloca o layout). Devolve os pesos aceitos por variável CSS, para o filtro do `<Font>`.
+ *
+ * Fonte variável do Google é um arquivo só para todos os pesos, e o Astro registra o
+ * pré-carregamento dele no primeiro peso pedido: por isso o primeiro peso da família entra
+ * junto. Numa fonte estática, isso pode pré-carregar um arquivo a mais.
  */
-export function fontPreloads(plan: FontPlan): Map<string, string> {
-  const out = new Map<string, string>();
+export function fontPreloads(plan: FontPlan): Map<string, string[]> {
+  const out = new Map<string, string[]>();
+  const weightsOf = (cssVariable: string, wanted: number) => {
+    const first = plan.fonts.find((f) => f.cssVariable === cssVariable)?.weights[0];
+    return [...new Set([wanted, ...(first !== undefined ? [first] : [])])].map(String);
+  };
   const sans = plan.assign["--rb-font-sans"];
-  if (sans) out.set(sans, "400");
+  if (sans) out.set(sans, weightsOf(sans, 400));
   const display = plan.assign["--rb-font-display"];
   if (display && display !== sans) {
     const font = plan.fonts.find((f) => f.cssVariable === display);
-    const weight = font ? [...font.weights].filter((w) => w <= 700).pop() ?? font.weights[0] : 700;
-    out.set(display, String(weight));
+    const weight = font ? [...font.weights].filter((w) => w <= 700).pop() ?? font.weights[0]! : 700;
+    out.set(display, weightsOf(display, weight));
   }
   return out;
 }

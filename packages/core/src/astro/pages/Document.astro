@@ -28,7 +28,7 @@ const preloads = fontPreloads(activeFontPlan);
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <Fragment set:html={head} />
-    {look.fonts.fonts.map((f) => <Font cssVariable={f.cssVariable as any} preload={preloads.has(f.cssVariable) ? [{ weight: preloads.get(f.cssVariable)!, style: "normal", subset: "latin" }] : false} />)}
+    {look.fonts.fonts.map((f) => <Font cssVariable={f.cssVariable as any} preload={preloads.has(f.cssVariable) ? preloads.get(f.cssVariable)!.map((weight) => ({ weight, style: "normal" as const, subset: "latin" })) : false} />)}
     {look.css && <style set:html={look.css} />}
     {settings.appearance.colorToggle && <script is:inline src="/_rubrica/color-mode.js" />}
   </head>

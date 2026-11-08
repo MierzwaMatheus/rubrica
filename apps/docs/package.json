@@ -6,12 +6,13 @@
   "scripts": {
     "previews": "tsx scripts/build-previews.ts",
     "dev": "astro dev",
-    "build": "astro build",
-    "build:full": "pnpm previews && astro build",
+    "build": "astro build && pnpm links",
+    "build:full": "pnpm previews && astro build && pnpm links",
     "preview": "astro preview",
     "docs:blocos": "tsx --tsconfig scripts/tsconfig.json scripts/blocos.ts",
     "test": "tsx --tsconfig scripts/tsconfig.json --test scripts/*.test.ts",
-    "check": "tsx --tsconfig scripts/tsconfig.json scripts/exemplos.ts"
+    "check": "tsx --tsconfig scripts/tsconfig.json scripts/exemplos.ts",
+    "links": "tsx --tsconfig scripts/tsconfig.json scripts/links-dist.ts"
   },
   "dependencies": {
     "astro": "7.4.1",

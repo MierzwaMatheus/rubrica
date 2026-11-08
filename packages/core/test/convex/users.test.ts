@@ -2,6 +2,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { assertStrongPassword, temporaryPassword } from "../../src/convex/users";
 import { api, as, internal, seedSettings, setup, type T } from "./_setup";
+import type { Id } from "../../src/convex/server";
 
 describe("senhas", () => {
   it("exige 12 caracteres com maiúscula, minúscula e número", () => {
@@ -91,5 +92,95 @@ describe("usuários e papéis", () => {
       });
     });
     await expect(root.action(api.rubrica.users.create, { name: "Z", email: "z@exemplo.dev", role: "admin" })).rejects.toThrow(/Muitas tentativas/);
+  });
+});
+
+describe("reiniciar senha, suspender e senha temporária", () => {
+  let t: T;
+  beforeEach(async () => {
+    t = setup();
+    await seedSettings(t);
+  });
+
+  const sessionsOf = (userId: string) => t.run(async (ctx) => (await ctx.db.query("authSessions").collect()).filter((s) => s.userId === userId).length);
+  const openSession = (userId: Id<"users">) =>
+    t.run(async (ctx) => {
+      const sessionId = await ctx.db.insert("authSessions", { userId, expirationTime: Date.now() + 3_600_000 });
+      await ctx.db.insert("authRefreshTokens", { sessionId, expirationTime: Date.now() + 3_600_000 });
+    });
+
+  it("quem está com senha temporária só troca a senha", async () => {
+    const root = await as(t, "root");
+    const { userId } = await root.action(api.rubrica.users.create, { name: "Bia", email: "bia@exemplo.dev", role: "admin" });
+    const bia = t.withIdentity({ subject: `${userId}|s` });
+    await expect(bia.query(api.rubrica.users.list, {})).rejects.toThrow(/senha temporária/);
+    await expect(bia.query(api.rubrica.contacts.list, {})).rejects.toThrow(/senha temporária/);
+    expect(await bia.query(api.rubrica.users.me, {})).toMatchObject({ role: "admin", mustChangePassword: true });
+    await bia.action(api.rubrica.users.changePassword, { newPassword: "NovaSenhaBoa123" });
+    await expect(bia.query(api.rubrica.contacts.list, {})).resolves.toBeDefined();
+    await expect(bia.query(api.rubrica.users.list, {})).rejects.toThrow(/Sem permissão/);
+  });
+
+  it("root reinicia a senha de outra pessoa: temporária, troca obrigatória, sessões derrubadas, login destravado", async () => {
+    const root = await as(t, "root");
+    const { userId } = await root.action(api.rubrica.users.create, { name: "Caio", email: "caio@exemplo.dev", role: "comercial" });
+    const caio = t.withIdentity({ subject: `${userId}|s` });
+    await caio.action(api.rubrica.users.changePassword, { newPassword: "SenhaDoCaio123" });
+    await openSession(userId);
+    const accountId = await t.run(async (ctx) => (await ctx.db.query("authAccounts").collect()).find((a) => a.userId === userId)!._id);
+    await t.run((ctx) => ctx.db.insert("authRateLimits", { identifier: accountId, lastAttemptTime: Date.now(), attemptsLeft: 0 }));
+
+    const { tempPassword, email } = await root.action(api.rubrica.users.resetPassword, { userId });
+    expect(email).toBe("caio@exemplo.dev");
+    expect(() => assertStrongPassword(tempPassword)).not.toThrow();
+    expect(await caio.query(api.rubrica.users.me, {})).toMatchObject({ mustChangePassword: true });
+    expect(await sessionsOf(userId)).toBe(0);
+    expect(await t.run(async (ctx) => (await ctx.db.query("authRateLimits").collect()).length)).toBe(0);
+    const audit = await root.query(api.rubrica.audit.recent, { eventType: "auth.password_reset" });
+    expect(audit).toHaveLength(1);
+  });
+
+  it("só root reinicia senha, e não a própria", async () => {
+    const root = await as(t, "root");
+    const admin = await as(t, "admin");
+    await expect(admin.action(api.rubrica.users.resetPassword, { userId: root.userId })).rejects.toThrow(/Sem permissão/);
+    await expect(root.action(api.rubrica.users.resetPassword, { userId: root.userId })).rejects.toThrow(/Minha conta/);
+  });
+
+  it("suspender corta o acesso na hora e reativar devolve o mesmo papel", async () => {
+    const root = await as(t, "root");
+    const editor = await as(t, "content-editor");
+    await openSession(editor.userId);
+    expect(await editor.query(api.rubrica.contacts.unreadCount, {}).catch((e: Error) => e.message)).toMatch(/Sem permissão/);
+    await expect(editor.query(api.rubrica.pages.list, {})).resolves.toBeDefined();
+
+    await root.mutation(api.rubrica.users.suspend, { userId: editor.userId });
+    await expect(editor.query(api.rubrica.pages.list, {})).rejects.toThrow(/Sem permissão/);
+    expect(await editor.query(api.rubrica.users.me, {})).toMatchObject({ role: null, suspended: true });
+    expect(await sessionsOf(editor.userId)).toBe(0);
+    expect((await root.query(api.rubrica.users.list, {})).find((u) => u.userId === editor.userId)).toMatchObject({ role: "content-editor", suspended: true });
+
+    await root.mutation(api.rubrica.users.reactivate, { userId: editor.userId });
+    expect(await editor.query(api.rubrica.users.me, {})).toMatchObject({ role: "content-editor", suspended: false });
+    await expect(editor.query(api.rubrica.pages.list, {})).resolves.toBeDefined();
+  });
+
+  it("não suspende a si mesmo nem o último root; suspenso não conta como root", async () => {
+    const root = await as(t, "root");
+    const other = await as(t, "root");
+    await expect(root.mutation(api.rubrica.users.suspend, { userId: root.userId })).rejects.toThrow(/a si mesmo/);
+    await root.mutation(api.rubrica.users.suspend, { userId: other.userId });
+    // Com o outro suspenso, este é o último root que vale.
+    const third = await as(t, "admin");
+    await expect(third.mutation(api.rubrica.users.suspend, { userId: root.userId })).rejects.toThrow(/Sem permissão/);
+    await expect(other.mutation(api.rubrica.users.suspend, { userId: root.userId })).rejects.toThrow(/Sem permissão/);
+    await expect(root.mutation(api.rubrica.users.setRole, { userId: third.userId, role: "admin" })).resolves.toBeNull();
+  });
+
+  it("só root suspende", async () => {
+    const admin = await as(t, "admin");
+    const editor = await as(t, "blog-editor");
+    await expect(admin.mutation(api.rubrica.users.suspend, { userId: editor.userId })).rejects.toThrow(/Sem permissão/);
+    await expect(admin.mutation(api.rubrica.users.reactivate, { userId: editor.userId })).rejects.toThrow(/Sem permissão/);
   });
 });

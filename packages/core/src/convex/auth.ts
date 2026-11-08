@@ -46,12 +46,21 @@ export async function requireAuth(ctx: ReaderCtx): Promise<{ userId: Id<"users">
   return { userId, user };
 }
 
-export async function getUserRole(ctx: ReaderCtx, userId: Id<"users">): Promise<Role | null> {
-  const doc = await ctx.db
+/** Documento do papel (com suspensão e troca de senha pendente). */
+export async function getRoleDoc(ctx: ReaderCtx, userId: Id<"users">): Promise<Doc<"userRoles"> | null> {
+  return ctx.db
     .query("userRoles")
     .withIndex("by_userId", (q) => q.eq("userId", userId))
     .unique();
-  return doc?.role ?? null;
+}
+
+/** Papel que vale agora: suspenso conta como sem papel. */
+export function activeRole(doc: Doc<"userRoles"> | null): Role | null {
+  return doc && doc.suspendedAt === undefined ? doc.role : null;
+}
+
+export async function getUserRole(ctx: ReaderCtx, userId: Id<"users">): Promise<Role | null> {
+  return activeRole(await getRoleDoc(ctx, userId));
 }
 
 export interface Actor {
@@ -60,15 +69,21 @@ export interface Actor {
   role: Role;
 }
 
+export const MUST_CHANGE_PASSWORD = "Troque a senha temporária antes de continuar";
+
 /**
  * Exige login e um dos papéis. Aceita a lista de papéis ou o nome de uma permissão
- * de `PERMISSIONS` (`requireRole(ctx, "blog")`).
+ * de `PERMISSIONS` (`requireRole(ctx, "blog")`). Usuário suspenso não tem papel; quem
+ * está com senha temporária só troca a senha (a única função liberada é a da troca).
  */
 export async function requireRole(ctx: ReaderCtx, allowed: readonly Role[] | Permission): Promise<Actor> {
   const roles: readonly Role[] = typeof allowed === "string" ? PERMISSIONS[allowed] : allowed;
   const { userId, user } = await requireAuth(ctx);
-  const role = await getUserRole(ctx, userId);
-  if (!role || !roles.includes(role)) throw new Error("Sem permissão para esta ação");
+  const doc = await getRoleDoc(ctx, userId);
+  const role = activeRole(doc);
+  if (!role) throw new Error("Sem permissão para esta ação");
+  if (doc?.mustChangePassword) throw new Error(MUST_CHANGE_PASSWORD);
+  if (!roles.includes(role)) throw new Error("Sem permissão para esta ação");
   return { userId, user, role };
 }
 

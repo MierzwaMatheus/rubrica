@@ -8,7 +8,9 @@
  * - As páginas fixas (home, sobre, currículo, portfólio, blog, depoimentos) são montadas
  *   pela receita do tema equivalente ao layout (decisão 24) e preenchidas com o
  *   `homeContent`, o `contactInfo` e os textos de seção do `siteTexts` (decisão 25). O
- *   resto do `siteTexts` que foi personalizado vira texto de interface.
+ *   resto do `siteTexts` que foi personalizado vira texto de interface. Os arquivos de
+ *   tradução do projeto (`src/i18n/translations/*.ts`) são o segundo padrão dos textos,
+ *   entre o `siteTexts` e o texto do template.
  * - Ids dos documentos de tabelas 1:1 (usuários, posts, projetos…) são mantidos, para as
  *   referências (autor, papel, imagem) continuarem valendo depois do import.
  */
@@ -113,6 +115,11 @@ export interface ConvertInput {
   recipe: Recipe;
   /** Agora (para datas de criação das páginas). Padrão: Date.now(). */
   now?: number;
+  /**
+   * Textos dos arquivos de tradução do projeto v1 (`src/i18n/translations/*.ts`), chave
+   * achatada → texto. Segundo padrão: depois do `siteTexts`, antes do texto do template.
+   */
+  projectTexts?: Record<string, { pt?: string; en?: string }>;
 }
 
 export interface PageReport {
@@ -125,7 +132,13 @@ export interface PageReport {
 export interface MigrationReport {
   tables: { v2: string; from: string; count: number }[];
   pages: PageReport[];
-  texts: { sectionKeys: number; ui: { v1: string; v2: string }[]; unmapped: { key: string; pt: string }[] };
+  texts: {
+    sectionKeys: number;
+    /** Chaves dos arquivos de tradução do projeto que diferem do template da v1. */
+    projectKeys?: number;
+    ui: { v1: string; v2: string }[];
+    unmapped: { key: string; pt: string }[];
+  };
   plugins: { v1: string; v2: string | null; enabled: boolean }[];
   /** Documentos sem destino na v2, guardados como estavam (pendentes-v1.zip). */
   pending: { table: string; count: number; reason: string }[];
@@ -243,7 +256,10 @@ class Ctx {
   config = new Map<string, unknown>();
   contact: Doc | undefined;
 
-  constructor(readonly tables: Record<string, Doc[]>) {
+  constructor(
+    readonly tables: Record<string, Doc[]>,
+    readonly projectTexts: Record<string, { pt?: string; en?: string }> = {},
+  ) {
     for (const f of tables.imageFolders ?? []) this.folders.set(f._id, f.path);
     for (const m of tables.imageMetadata ?? []) this.media.set(m._id, m);
     for (const t of tables.siteTexts ?? []) this.siteTexts.set(t.key, t);
@@ -265,22 +281,39 @@ class Ctx {
     });
   }
 
-  /** Texto de seção ou de interface: o do site (siteTexts), senão o padrão da v1. Sem os espaços de enfeite. */
+  /**
+   * Texto de seção ou de interface: o do site (siteTexts), senão o dos arquivos de
+   * tradução do projeto, senão o padrão da v1. Sem os espaços de enfeite.
+   */
   t(key: string): Loc {
     const row = this.siteTexts.get(key);
+    const file = this.projectTexts[key];
     const def = V1_TEXTS[key];
-    const pt = str(row?.ptBR) ?? def?.pt;
-    const en = str(row?.enUS) ?? def?.en;
+    const pt = str(row?.ptBR) ?? str(file?.pt) ?? def?.pt;
+    const en = str(row?.enUS) ?? str(file?.en) ?? def?.en;
     return mapLoc(compact({ [PT]: pt, [EN]: en }) as Loc, (s) => s.trim());
   }
 
-  /** O texto foi personalizado no painel (diferente do padrão da v1)? */
+  /** O arquivo de tradução do projeto mudou o texto do template? (Só chaves que o template tem.) */
+  fileCustomized(key: string): boolean {
+    const file = this.projectTexts[key];
+    const def = V1_TEXTS[key];
+    if (!file || !def) return false;
+    return (str(file.pt) !== undefined && file.pt !== def.pt) || (str(file.en) !== undefined && file.en !== def.en);
+  }
+
+  /** O texto foi personalizado no painel ou no arquivo de tradução (diferente do padrão da v1)? */
   customized(key: string): boolean {
     const row = this.siteTexts.get(key);
-    if (!row) return false;
+    if (!row) return this.fileCustomized(key);
     const def = V1_TEXTS[key];
     if (!def) return true;
-    return (row.ptBR ?? "") !== def.pt || (str(row.enUS) !== undefined && row.enUS !== def.en);
+    return (row.ptBR ?? "") !== def.pt || (str(row.enUS) !== undefined && row.enUS !== def.en) || this.fileCustomized(key);
+  }
+
+  /** Chaves com texto do site: as do banco e as que o projeto mudou nos arquivos. */
+  textKeys(): string[] {
+    return [...new Set([...this.siteTexts.keys(), ...Object.keys(this.projectTexts).filter((k) => this.fileCustomized(k))])];
   }
 }
 
@@ -713,7 +746,7 @@ function buildUiTexts(ctx: Ctx, report: MigrationReport, now: number): Doc[] {
     out.push({ key: "hero.available", value: fromHome, updatedAt: now });
     report.texts.ui.push({ v1: "homeContent.availability_status", v2: "hero.available" });
   }
-  for (const key of ctx.siteTexts.keys()) {
+  for (const key of ctx.textKeys()) {
     if (!ctx.customized(key)) continue;
     if (SECTION_KEYS.has(key)) continue;
     const v2 = UI_TEXT_MAP[key];
@@ -722,7 +755,7 @@ function buildUiTexts(ctx: Ctx, report: MigrationReport, now: number): Doc[] {
       out.push({ key: v2, value: ctx.t(key), updatedAt: now });
       report.texts.ui.push({ v1: key, v2 });
     } else if (!key.startsWith("admin.")) {
-      report.texts.unmapped.push({ key, pt: String(ctx.siteTexts.get(key)?.ptBR ?? "").slice(0, 120) });
+      report.texts.unmapped.push({ key, pt: String(ctx.siteTexts.get(key)?.ptBR ?? ctx.projectTexts[key]?.pt ?? "").slice(0, 120) });
     }
   }
   return out;
@@ -730,7 +763,7 @@ function buildUiTexts(ctx: Ctx, report: MigrationReport, now: number): Doc[] {
 
 export function convertV1(input: ConvertInput): ConvertResult {
   const t = input.tables;
-  const ctx = new Ctx(t);
+  const ctx = new Ctx(t, input.projectTexts);
   const report: MigrationReport = { tables: [], pages: [], texts: { sectionKeys: 0, ui: [], unmapped: [] }, plugins: [], pending: [], dropped: [], unknownTables: [], warnings: ctx.warnings };
   const now = input.now ?? Date.now();
   const out: Record<string, Doc[]> = {};
@@ -777,6 +810,7 @@ export function convertV1(input: ConvertInput): ConvertResult {
   put("pages", "", pages);
   put("uiTexts", "", buildUiTexts(ctx, report, now));
   report.texts.sectionKeys = [...ctx.siteTexts.keys()].filter((k) => SECTION_KEYS.has(k)).length;
+  if (input.projectTexts) report.texts.projectKeys = Object.keys(input.projectTexts).filter((k) => ctx.fileCustomized(k)).length;
 
   const business = convertBusiness(t, now);
   for (const row of business.report.tables) put(row.v2, row.from, business.tables[row.v2]!);

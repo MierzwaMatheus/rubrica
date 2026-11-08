@@ -26,6 +26,7 @@ import { convexFiles } from "../project/convex.js";
 import { CORE_VERSION, GITIGNORE, defaultDependencySpecs, projectFiles, type DependencySpecs } from "../project/files.js";
 import { loadInstalledCore, loadThemeRecipe } from "../project/introspect.js";
 import { convertV1, type ConvertResult, type V1RubricaJson } from "../migrate/convert.js";
+import { readV1ProjectTexts, SAVED_TEXTS_FILE, type ReadTexts } from "../migrate/v1-translations.js";
 import { listCustomizations, type Customization } from "../migrate/customizations.js";
 import { importZip, pendingZip, readSnapshot } from "../migrate/snapshot.js";
 import { toFixtures } from "../migrate/fixtures.js";
@@ -118,9 +119,10 @@ interface DataOutputs {
 }
 
 /** Converte o export e grava import, pendentes, fixtures (na pasta `outDir`). */
-export function convertExport(exportPath: string, v1: V1RubricaJson, theme: string, recipe: Recipe, outDir: string, storageUrl?: (id: string) => string): DataOutputs {
+export function convertExport(exportPath: string, v1: V1RubricaJson, theme: string, recipe: Recipe, outDir: string, storageUrl?: (id: string) => string, texts?: ReadTexts): DataOutputs {
   const snapshot = readSnapshot(exportPath);
-  const result = convertV1({ tables: snapshot.tables, v1, theme, recipe });
+  const result = convertV1({ tables: snapshot.tables, v1, theme, recipe, ...(texts?.texts && { projectTexts: texts.texts }) });
+  result.report.warnings.push(...(texts?.warnings ?? []));
   mkdirSync(outDir, { recursive: true });
   const files: Record<string, string> = {};
   writeFileSync(join(outDir, "import-v2.zip"), importZip(result, snapshot));
@@ -188,7 +190,9 @@ async function runReport(projectDir: string, values: Record<string, string>, dep
   let data;
   if (values.export) {
     const snapshot = readSnapshot(resolve(deps.cwd, values.export));
-    data = convertV1({ tables: snapshot.tables, v1, theme: theme.tema, recipe: CORE_RECIPES.pessoal }).report;
+    const texts = readV1ProjectTexts(projectDir, resolve(projectDir, WORK_DIR));
+    data = convertV1({ tables: snapshot.tables, v1, theme: theme.tema, recipe: CORE_RECIPES.pessoal, ...(texts.texts && { projectTexts: texts.texts }) }).report;
+    data.warnings.push(...texts.warnings);
   }
   const report = renderReport({
     projectName: name,
@@ -233,7 +237,9 @@ async function runData(projectDir: string, values: Record<string, string>, deps:
     // tema ainda não instalado (projeto ainda na v1): a receita do núcleo
   }
   const outDir = resolve(deps.cwd, values.saida ?? WORK_DIR);
-  return convertExport(resolve(deps.cwd, values.export), v1, tema, recipe, outDir, values["convex-url"] ? (id) => `${values["convex-url"]!.replace(/\/+$/, "")}/api/storage/${id}` : undefined);
+  // Arquivos de tradução da v1: os do projeto (ainda na v1) ou a cópia que o migrar guardou.
+  const texts = readV1ProjectTexts(projectDir, join(projectDir, WORK_DIR));
+  return convertExport(resolve(deps.cwd, values.export), v1, tema, recipe, outDir, values["convex-url"] ? (id) => `${values["convex-url"]!.replace(/\/+$/, "")}/api/storage/${id}` : undefined, texts);
 }
 
 async function runFull(projectDir: string, values: Record<string, string>, flags: Set<string>, deps: MigrateDeps): Promise<void> {
@@ -279,6 +285,14 @@ async function runFull(projectDir: string, values: Record<string, string>, flags
   const custom = await customizationsFor(projectDir, v1, name, deps, values["template-v1"] && resolve(deps.cwd, values["template-v1"]));
   s.stop(custom.list ? `${custom.list.length} arquivo(s) diferem da v1 de referência.` : "Não deu para comparar com a v1.");
 
+  // Textos dos arquivos de tradução da v1 (src/i18n): lidos antes de o código sair, e
+  // guardados para o `migrar dados` depois.
+  const texts = readV1ProjectTexts(projectDir);
+  if (texts.texts) {
+    mkdirSync(join(projectDir, WORK_DIR), { recursive: true });
+    writeFileSync(join(projectDir, WORK_DIR, SAVED_TEXTS_FILE), `${JSON.stringify(texts.texts, null, 2)}\n`);
+  }
+
   // 3. Código.
   const previous = JSON.parse(readFileSync(join(projectDir, "package.json"), "utf-8")) as Record<string, unknown>;
   const oldGitignore = existsSync(join(projectDir, ".gitignore")) ? readFileSync(join(projectDir, ".gitignore"), "utf-8") : "";
@@ -322,7 +336,7 @@ async function runFull(projectDir: string, values: Record<string, string>, flags
     } catch {
       // sem receita do tema: a do núcleo
     }
-    data = convertExport(resolve(deps.cwd, values.export), v1, state.tema, recipe, outDir);
+    data = convertExport(resolve(deps.cwd, values.export), v1, state.tema, recipe, outDir, undefined, texts);
     const plugins = (data.result.tables.siteSettings?.[0]?.plugins ?? {}) as Record<string, boolean>;
     const current = JSON.parse(readFileSync(join(projectDir, STATE_FILE), "utf-8")) as RubricaState;
     writeFileSync(join(projectDir, STATE_FILE), `${JSON.stringify({ ...current, plugins: { ...current.plugins, ...plugins } }, null, 2)}\n`);

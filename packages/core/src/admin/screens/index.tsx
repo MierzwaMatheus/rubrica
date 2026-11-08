@@ -22,6 +22,13 @@ const SCREENS: Record<string, LazyExoticComponent<ComponentType>> = {
   "/admin/planos": lazy(() => import("./collections").then((m) => ({ default: m.Plans }))),
   "/admin/equipe": lazy(() => import("./collections").then((m) => ({ default: m.Team }))),
   "/admin/depoimentos": lazy(() => import("./Testimonials")),
+  "/admin/contatos": lazy(() => import("./Contacts")),
+  "/admin/propostas": lazy(() => import("./Proposals")),
+  "/admin/contratos": lazy(() => import("./Contracts")),
+  "/admin/pagamentos": lazy(() => import("./Payments")),
+  "/admin/curriculos-ia": lazy(() => import("./AiResumes")),
+  "/admin/privacidade": lazy(() => import("./Privacy")),
+  "/admin/logs": lazy(() => import("./Activity")),
   "/admin/aparencia": lazy(() => import("./Appearance")),
   "/admin/configuracoes": lazy(() => import("./Settings")),
   "/admin/textos": lazy(() => import("./Texts")),
@@ -45,7 +52,7 @@ function Notice({ title, children, icon }: { title: string; children: React.Reac
   );
 }
 
-/** Tela de plugin cuja interface ainda não existe nesta versão do painel. */
+/** Tela de um plugin de terceiros: o painel não conhece a interface dela. */
 function PendingScreen({ screen }: { screen: AdminScreenDef }) {
   return (
     <>
@@ -53,7 +60,7 @@ function PendingScreen({ screen }: { screen: AdminScreenDef }) {
       <div className="p-6">
         <Alert className="max-w-2xl">
           <Puzzle />
-          <p>A tela de “{screen.label}” chega na próxima etapa do painel da v2. Enquanto isso, o conteúdo pode ser editado pelo agente (MCP) ou pelo CLI.</p>
+          <p>O plugin traz a tela “{screen.label}”, mas este painel não sabe abri-la. O conteúdo dele pode ser editado pelo agente (MCP) ou pelo CLI.</p>
         </Alert>
       </div>
     </>

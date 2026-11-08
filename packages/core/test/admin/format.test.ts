@@ -117,3 +117,14 @@ describe("contrato e datas", () => {
     expect(timeAgo(now - 3 * 86_400_000, now)).toBe("há 3 dias");
   });
 });
+
+describe("atividades e contrato", () => {
+  it("descreve a atividade em português", async () => {
+    const { describeAudit, unknownVariables } = await import("../../src/admin/lib/format");
+    expect(describeAudit({ eventType: "admin.update", targetType: "posts" })).toBe("editou · post");
+    expect(describeAudit({ eventType: "admin.publish", targetType: "page" })).toBe("publicou · página");
+    expect(describeAudit({ eventType: "testimonial.approved", targetType: "testimonials" })).toBe("aprovou um depoimento enviado");
+    expect(describeAudit({ eventType: "outra.coisa", success: false })).toBe("outra.coisa (falhou)");
+    expect(unknownVariables("{{client_name}} {{foo_bar}} {{scope}}")).toEqual(["foo_bar"]);
+  });
+});

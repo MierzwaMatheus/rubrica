@@ -206,3 +206,86 @@ export function diffVersions(before: Record<string, unknown>, after: Record<stri
 export function templateVariables(content: string): string[] {
   return [...new Set([...content.matchAll(/\{\{\s*([a-z_][a-z0-9_]*)\s*\}\}/gi)].map((m) => m[1]!))];
 }
+
+// ── Atividades ──────────────────────────────────────────────────────────────
+
+const AUDIT_ACTIONS: Record<string, string> = {
+  "admin.create": "criou",
+  "admin.update": "editou",
+  "admin.publish": "publicou",
+  "admin.unpublish": "despublicou",
+  "admin.delete": "mandou para a lixeira",
+  "admin.restore": "restaurou",
+  "admin.permanent_delete": "apagou de vez",
+  "admin.reorder": "reordenou",
+  "settings.updated": "mudou as configurações",
+  "texts.updated": "mudou um texto",
+  "plugin.toggled": "ligou ou desligou um plugin",
+  "media.updated": "mudou uma imagem",
+  "media.deleted": "apagou uma imagem",
+  "testimonial.approved": "aprovou um depoimento enviado",
+  "testimonial.rejected": "recusou um depoimento enviado",
+  "contact.status_changed": "mudou o estado de um contato",
+  "contact.deleted": "apagou um contato",
+  "contact.destinations_updated": "mudou os destinos dos avisos",
+  "contact.delivery_retried": "tentou de novo um aviso",
+  "contact.delivery_failed": "um aviso de contato falhou",
+  "lgpd.erasure_executed": "excluiu dados de um titular (LGPD)",
+  "publish.triggered": "publicou o site",
+  "publish.failed": "tentou publicar o site e falhou",
+};
+
+export const AUDIT_TARGETS: Record<string, string> = {
+  page: "página",
+  posts: "post",
+  projects: "projeto",
+  services: "serviço",
+  testimonials: "depoimento",
+  faq: "pergunta",
+  resume: "item do currículo",
+  routine: "dia a dia",
+  plans: "plano",
+  team: "pessoa",
+  proposal: "proposta",
+  checkout: "cobrança",
+  contract_template: "modelo de contrato",
+  ai_resume: "currículo com IA",
+  site: "site",
+  contactRequest: "contato",
+};
+
+/** Frase curta da atividade: "editou · post". */
+export function describeAudit(entry: { eventType: string; targetType?: string; success?: boolean }): string {
+  const action = AUDIT_ACTIONS[entry.eventType] ?? entry.eventType;
+  const target = entry.targetType ? AUDIT_TARGETS[entry.targetType] : undefined;
+  const text = target && !/ (um|uma) /.test(` ${action} `) && !action.includes(target) ? `${action} · ${target}` : action;
+  return entry.success === false ? `${text} (falhou)` : text;
+}
+
+/** Variáveis `{{nome}}` que o texto do contrato entende. */
+export const CONTRACT_VARIABLES: { name: string; label: string }[] = [
+  { name: "client_name", label: "Nome do cliente" },
+  { name: "client_document_line", label: "Documento do cliente (linha)" },
+  { name: "client_email_line", label: "E-mail do cliente (linha)" },
+  { name: "contractor_name", label: "Nome de quem presta o serviço" },
+  { name: "contractor_document", label: "Documento de quem presta" },
+  { name: "contractor_document_type", label: "Tipo do documento (CPF/CNPJ)" },
+  { name: "contractor_address", label: "Endereço de quem presta" },
+  { name: "objective", label: "Objetivo" },
+  { name: "scope", label: "Escopo" },
+  { name: "timeline", label: "Cronograma" },
+  { name: "delivery_date_line", label: "Entrega (linha)" },
+  { name: "investment_value", label: "Valor do investimento" },
+  { name: "discount", label: "Desconto" },
+  { name: "payment_methods", label: "Formas de pagamento" },
+  { name: "conditions", label: "Condições" },
+  { name: "rescission_policy", label: "Rescisão" },
+  { name: "jurisdiction", label: "Foro" },
+  { name: "accepted_at", label: "Data do aceite" },
+];
+
+/** Variáveis do texto que o contrato não conhece (ficariam sem preencher). */
+export function unknownVariables(content: string): string[] {
+  const known = new Set(CONTRACT_VARIABLES.map((v) => v.name));
+  return templateVariables(content).filter((v) => !known.has(v));
+}

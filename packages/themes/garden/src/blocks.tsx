@@ -11,7 +11,7 @@
  * - formulário de depoimento e PDF do currículo: ilhas do núcleo.
  */
 import type { BlockProps, CollectionItems, ResolvedLink } from "@rubrica/core";
-import { Heading, Img, LinkButton } from "@rubrica/core/components";
+import { Heading, Img, LinkButton, safeId } from "@rubrica/core/components";
 import { barePath, cls, Crumb, currentLabel, experienceStage, ownerName, postStage, projectStage, RECENT_DAYS, SectionHead, StageDot, StageLabel, type Stage } from "./garden";
 
 type Project = CollectionItems["projects"];
@@ -22,7 +22,6 @@ type Routine = CollectionItems["routine"];
 type Resume = CollectionItems["resume"];
 
 /** Identificador seguro para `id` e seletores CSS. */
-const safeId = (value: string) => value.replace(/[^a-zA-Z0-9_-]/g, "_");
 
 function Frame({ id, anchor, type, variant, className, children }: { id: string; anchor?: string; type: string; variant: string; className?: string; children: React.ReactNode }) {
   return (

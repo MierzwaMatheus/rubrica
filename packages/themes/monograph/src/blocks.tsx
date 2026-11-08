@@ -152,6 +152,7 @@ export function CasesBlock({ id, variant, fields, items, headingLevel, ctx }: Bl
               <div className="mn-fig__cap">
                 <p className="mn-sc mn-fig__n">
                   {ctx.t("monograph.plate")} {toRoman(i + 1)}
+                  {p.category && ` · ${p.category}`}
                 </p>
                 <Heading level={3} className="mn-fig__title">
                   <a href={p.url} className="mn-entry-link">
@@ -176,7 +177,7 @@ export function CasesBlock({ id, variant, fields, items, headingLevel, ctx }: Bl
                 </a>
               </Heading>
               {p.summary && <p className="mn-entry-sum">{p.summary}</p>}
-              {p.tags.length > 0 && <p className="mn-entry-meta">{p.tags.slice(0, 3).join(" · ")}</p>}
+              {(p.category || p.tags.length > 0) && <p className="mn-entry-meta">{[p.category, ...p.tags.slice(0, 3)].filter(Boolean).join(" · ")}</p>}
             </li>
           ))}
         </ol>

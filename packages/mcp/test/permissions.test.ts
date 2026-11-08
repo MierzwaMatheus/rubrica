@@ -135,11 +135,13 @@ describe("plugins e tipo do site", () => {
 });
 
 describe("módulos opcionais do backend", () => {
-  it("contatos e publicação não aparecem enquanto o backend não tem as funções", async () => {
+  it("com o backend atual, contatos e publicação aparecem para root e somem para quem não pode", async () => {
     const t = setup();
     await seedSettings(t);
-    const tools = await names(t, "root");
-    for (const n of ["contacts_list", "contacts_get", "contacts_set_status", "site_publish"]) expect(tools, n).not.toContain(n);
+    const root = await names(t, "root");
+    for (const n of ["contacts_list", "contacts_get", "contacts_set_status", "site_publish"]) expect(root, n).toContain(n);
+    const editor = await names(t, "content-editor");
+    for (const n of ["contacts_list", "site_publish"]) expect(editor, n).not.toContain(n);
   });
 
   it("probeModule: função inexistente = ausente; argumento recusado = presente", async () => {

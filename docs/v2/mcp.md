@@ -138,7 +138,7 @@ As colunas "papel" dizem quem enxerga a ferramenta (permissões de `PERMISSIONS`
 | `site_update` | root, admin | Muda parte das configurações (objetos e textos por idioma são mesclados). Idiomas, URL, tema e tipo do site só aparecem para root |
 | `plugins_list` | todos | Plugins do tipo do site e se estão ligados |
 | `plugin_set` | root, admin | Liga ou desliga um plugin |
-| `site_publish` | root, admin | Dispara o deploy hook (rebuild). **Só existe se o backend tiver `rubrica/deploy:trigger`** |
+| `site_publish` | root, admin | Dispara o deploy hook (rebuild). **Usa `rubrica/publish:trigger`** |
 
 **Páginas e blocos** — `pages`: root, admin, content-editor
 

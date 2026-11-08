@@ -241,26 +241,27 @@ export const siteTools: ToolDef[] = [
   {
     name: "contacts_set_status",
     title: "Mudar status de um contato",
-    description: "Muda o status de um contato e/ou a nota interna (a nota nova substitui a anterior: leia antes e junte).",
+    description: "Marca um contato como novo (não lido), lido ou arquivado.",
     access: { permission: "contacts", plugin: "contact-wizard", module: "contacts" },
     write: true,
     input: () => ({
       type: "object",
-      properties: { id: prop.string("Id do contato."), status: prop.string("Novo status."), note: prop.string("Nota interna.") },
-      required: ["id"],
+      properties: {
+        id: prop.string("Id do contato."),
+        status: { type: "string", enum: ["new", "read", "archived"], description: "new = não lido, read = lido, archived = arquivado." },
+      },
+      required: ["id", "status"],
       additionalProperties: false,
     }),
-    async handler(args: { id: string; status?: string; note?: string }, ctx) {
-      if (!args.status && args.note === undefined) throw new ToolInputError("Informe status e/ou note.");
+    async handler(args: { id: string; status: "new" | "read" | "archived" }, ctx) {
       const current = await ctx.client.query<Record<string, unknown> | null>("rubrica/contacts:get", { id: args.id });
       if (!current) throw new RubricaError(`Contato não encontrado: ${args.id}`, "validation");
-      const before = { status: current.status, note: current.note };
-      const after = { status: args.status ?? current.status, note: args.note ?? current.note };
+      const fn = { new: "markUnread", read: current.status === "archived" ? "unarchive" : "markRead", archived: "archive" }[args.status];
       return commit(ctx, {
-        summary: "Atualizar o contato.",
-        changes: diffValues(before, after),
+        summary: "Atualizar o status do contato.",
+        changes: diffValues({ status: current.status }, { status: args.status }),
         apply: async () => {
-          await ctx.client.mutation("rubrica/contacts:setStatus", { id: args.id, ...(args.status ? { status: args.status } : {}), ...(args.note !== undefined ? { note: args.note } : {}) });
+          await ctx.client.mutation(`rubrica/contacts:${fn}`, { id: args.id });
         },
       });
     },
@@ -270,16 +271,16 @@ export const siteTools: ToolDef[] = [
     title: "Publicar o site (rebuild)",
     description:
       "Dispara o deploy hook: o site é gerado de novo com o conteúdo publicado (leva alguns minutos). Só com pedido explícito da pessoa, no máximo uma vez por minuto. Rascunhos e blocos ocultos não vão ao ar.",
-    access: { permission: "settings", module: "deploy" },
+    access: { permission: "publish", module: "deploy" },
     write: true,
     destructive: true,
     input: () => ({ type: "object", properties: {}, additionalProperties: false }),
     async handler(_args, ctx) {
-      if (!can(ctx.state.me?.role, "settings")) throw new RubricaError("Sem permissão para esta ação", "forbidden");
+      if (!can(ctx.state.me?.role, "publish")) throw new RubricaError("Sem permissão para esta ação", "forbidden");
       return commit(ctx, {
         summary: "Disparar o rebuild do site publicado.",
         warnings: ctx.state.settings?.url ? [`Atualiza ${ctx.state.settings.url} em alguns minutos.`] : [],
-        apply: async () => ctx.client.action("rubrica/deploy:trigger", {}),
+        apply: async () => ctx.client.action("rubrica/publish:trigger", {}),
       });
     },
   },

@@ -36,7 +36,7 @@ export interface OptionalModule {
 
 export const OPTIONAL_MODULES: OptionalModule[] = [
   { id: "contacts", probe: { type: "query", path: "rubrica/contacts:list" } },
-  { id: "deploy", probe: { type: "action", path: "rubrica/deploy:trigger" } },
+  { id: "deploy", probe: { type: "query", path: "rubrica/publish:status" } },
 ];
 
 export interface SiteState {

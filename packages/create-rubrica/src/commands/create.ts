@@ -36,7 +36,7 @@ Opções:
   --esquema <id>              esquema de cores (${SCHEME_IDS.join(", ")})
   --modo escuro|claro|automatico
   --plugins <lista|pacote>    plugins separados por vírgula, ou recommended|freelancer|simple
-  --gerenciador pnpm|npm      gerenciador de pacotes (padrão: o que rodou o create)
+  --gerenciador pnpm|npm      gerenciador de pacotes (padrão: o que rodou o create; pnpm com --local)
   --local <monorepo>          usa os pacotes de um clone do monorepo (link:), para testar versões novas
   --sem-instalar              não roda o pnpm/npm install
   --sem-git                   não roda o git init
@@ -160,7 +160,8 @@ export async function resolveCreateOptions(argv: string[], cwd: string, env: Rec
     deps: v.local ? localDependencySpecs(resolve(cwd, v.local), theme.tema) : defaultDependencySpecs(),
     install: !args.flags.has("sem-instalar"),
     git: !args.flags.has("sem-git"),
-    packageManager: v.gerenciador === "pnpm" || v.gerenciador === "npm" ? v.gerenciador : packageManagerFromUserAgent(env.npm_config_user_agent),
+    // --local liga os pacotes por `link:`, que o npm não entende: nesse caso o padrão é o pnpm.
+    packageManager: v.gerenciador === "pnpm" || v.gerenciador === "npm" ? v.gerenciador : v.local ? "pnpm" : packageManagerFromUserAgent(env.npm_config_user_agent),
   };
 }
 

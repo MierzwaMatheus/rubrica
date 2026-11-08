@@ -30,3 +30,15 @@ describe("git do projeto criado", () => {
     expect(calls.at(-1)).toContain("user.name=create-rubrica");
   });
 });
+
+describe("gerenciador com --local", () => {
+  it("usa pnpm por padrão, porque o npm não instala link:", async () => {
+    const parent = tmp("rubrica-pm-");
+    const { repo } = await import("./helpers");
+    const options = await resolveCreateOptions(["site", "--yes", "--tema", "padrao", "--local", repo()], parent, { npm_config_user_agent: "npm/10 node/v24" });
+    expect(options.packageManager).toBe("pnpm");
+    const plain = await resolveCreateOptions(["site2", "--yes", "--tema", "padrao"], parent, { npm_config_user_agent: "npm/10 node/v24" });
+    expect(plain.packageManager).toBe("npm");
+    rmSync(parent, { recursive: true, force: true });
+  });
+});

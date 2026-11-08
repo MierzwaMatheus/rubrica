@@ -19,13 +19,13 @@ import { formatDate, textIn } from "../lib/format";
 import { Link, useRouter } from "../lib/router";
 import { toast } from "../lib/toast";
 import { cn } from "../lib/utils";
-import { localeName, usePanel } from "../panel";
+import { usePanel } from "../panel";
 import { Button } from "../ui/button";
 import { Alert, Badge, Spinner } from "../ui/form";
 import { Switch, Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { itemImage, type CollectionConfig } from "./config";
 import { allTags, planCreate, planUpdate, suggestSlug } from "./model";
-import { Section, SeoPanel, SlugPanel, TagsInput } from "./parts";
+import { EditingLocaleBar, Section, SeoPanel, SlugPanel, TagsInput } from "./parts";
 import { PlanExtras } from "./PlanExtras";
 
 const SHELL_KEYS = ["tags", "featured", "seo", "priceCents", "currency"];
@@ -254,24 +254,7 @@ function Editor({ config, doc }: { config: CollectionConfig; doc?: CollectionDoc
         />
         <div className="min-h-0 flex-1 overflow-y-auto">
           <div className="mx-auto max-w-3xl space-y-4 p-6">
-            {panel.locales.locales.length > 1 && (
-              <div role="group" aria-label="Idioma em edição" className="flex flex-wrap items-center gap-2 rounded-lg border bg-card px-3 py-2 text-sm">
-                <span className="text-muted-foreground">Editando em</span>
-                {panel.locales.locales.map((l) => (
-                  <button
-                    key={l}
-                    type="button"
-                    aria-pressed={l === locale}
-                    onClick={() => setLocale(l)}
-                    className={cn("inline-flex h-7 cursor-pointer items-center gap-1.5 rounded-md px-2 font-medium hover:bg-accent", l === locale && "bg-primary/10 text-primary")}
-                  >
-                    {localeName(l)}
-                    {missingIn.includes(l) && <span className="size-1.5 rounded-full bg-warning" aria-label="falta traduzir" />}
-                  </button>
-                ))}
-                {missingIn.length > 0 && <span className="ml-auto text-xs text-muted-foreground">O ponto marca o idioma com texto faltando.</span>}
-              </div>
-            )}
+            <EditingLocaleBar missingIn={missingIn} />
             <Tabs value={tab} onValueChange={setTab}>
               {hasSeoTab && (
                 <TabsList className="mb-4 w-full">

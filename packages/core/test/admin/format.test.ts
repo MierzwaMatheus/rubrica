@@ -3,12 +3,10 @@ import {
   centsToInput,
   countState,
   diffVersions,
-  discountPercent,
   formatBRL,
   formatCents,
   formatPlanPrice,
   googlePreview,
-  installments,
   parseMoney,
   planPayability,
   templateVariables,
@@ -57,15 +55,6 @@ describe("preço", () => {
     expect(planPayability({ priceCents: 100 })).toMatchObject({ ok: false, reason: expect.stringContaining("mínimo") });
     expect(planPayability({ priceCents: 9900, period: "month" })).toMatchObject({ ok: false });
     expect(planPayability({ priceCents: 9900, currency: "USD" })).toMatchObject({ ok: false });
-  });
-
-  it("calcula desconto e parcelas", () => {
-    expect(discountPercent(1000, 800)).toBe(20);
-    expect(discountPercent(undefined, 800)).toBe(0);
-    expect(discountPercent(700, 800)).toBe(0);
-    expect(installments(100, 3)).toEqual({ count: 3, each: 33.34, last: 33.32 });
-    expect(installments(90, 3)).toEqual({ count: 3, each: 30, last: 30 });
-    expect(installments(50, 0).count).toBe(1);
   });
 });
 

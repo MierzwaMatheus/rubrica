@@ -1,9 +1,12 @@
 /** Casca do painel: menu lateral (por papel e plugins), conta e conteúdo da tela. */
 import { useState, type ReactNode } from "react";
 import { ExternalLink, LogOut, Menu, Moon, Sun, X } from "lucide-react";
-import { ROLE_LABELS } from "../convex/lib/roles";
+import { can, ROLE_LABELS } from "../convex/lib/roles";
 import { pickWithFallback } from "../i18n";
-import { useAuth, useBackend } from "./data/backend";
+import { api } from "./data/api";
+import { useAuth, useBackend, useQuery } from "./data/backend";
+import { QuietBoundary } from "./lib/boundary";
+import { PublishBar } from "./PublishBar";
 import { MenuIcon } from "./lib/icons";
 import { Link, useRouter } from "./lib/router";
 import { cn } from "./lib/utils";
@@ -31,6 +34,17 @@ function ThemeToggle() {
     >
       {mode === "dark" ? <Sun /> : <Moon />}
     </Button>
+  );
+}
+
+/** Quantos pedidos de contato novos (selo no menu). */
+function UnreadBadge() {
+  const count = useQuery(api.contacts.unreadCount, {});
+  if (!count) return null;
+  return (
+    <span className="ml-auto inline-flex min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-semibold text-primary-foreground" aria-label={`${count} ${count === 1 ? "novo" : "novos"}`}>
+      {count > 99 ? "99+" : count}
+    </span>
   );
 }
 
@@ -63,6 +77,7 @@ export function Layout({ children }: { children: ReactNode }) {
                 >
                   <MenuIcon name={item.icon} className="size-4" />
                   {item.label}
+                  {item.path === "/admin/contatos" && can(panel.me.role, "contacts") && <QuietBoundary><UnreadBadge /></QuietBoundary>}
                 </Link>
               </li>
             ))}
@@ -109,6 +124,11 @@ export function Layout({ children }: { children: ReactNode }) {
             <Menu />
           </Button>
           <span className="truncate font-semibold">{siteName || "Painel"}</span>
+          <div className="ml-auto">
+            <QuietBoundary>
+              <PublishBar compact />
+            </QuietBoundary>
+          </div>
         </header>
         {mode === "demo" && (
           <div className="border-b bg-warning/10 px-4 py-1.5 text-xs text-warning">
@@ -118,6 +138,11 @@ export function Layout({ children }: { children: ReactNode }) {
             </a>
           </div>
         )}
+        <div className="hidden h-12 items-center justify-end gap-3 border-b bg-card px-6 lg:flex">
+          <QuietBoundary>
+            <PublishBar />
+          </QuietBoundary>
+        </div>
         <main className="min-h-0 min-w-0 flex-1 overflow-y-auto">{children}</main>
       </div>
     </div>

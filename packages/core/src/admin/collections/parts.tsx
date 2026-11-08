@@ -5,6 +5,7 @@ import type { SeoFields } from "../../content/types";
 import { isValidSlug, SLUG_MAX_LENGTH } from "../../convex/lib/slug";
 import type { Localized } from "../../i18n";
 import { LocaleTabs, LocalizedTextInput, ImageControl, useEditorLocale } from "../editor/fields";
+import { localeName } from "../lib/locale";
 import { setLocalized } from "../editor/model";
 import { centsToInput, countState, formatCents, googlePreview, parseMoney, plainText, SEO_DESCRIPTION_MAX, SEO_DESCRIPTION_RANGE, SEO_TITLE_MAX, SEO_TITLE_RANGE, textIn, toCents, type CountState } from "../lib/format";
 import { cn } from "../lib/utils";
@@ -294,6 +295,32 @@ export function PriceField({ cents, currency, onChange }: { cents: number | unde
         {!focused && cents !== undefined && <Badge variant="secondary">{formatCents(cents, currency || "BRL")}</Badge>}
       </div>
       {invalid ? <p className="text-xs text-destructive" role="alert">Digite um valor, como 1.500,00.</p> : <p className="text-xs text-muted-foreground">Vazio mostra o texto livre no lugar do preço.</p>}
+    </div>
+  );
+}
+
+// ── Idioma em edição ────────────────────────────────────────────────────────
+
+/** Troca o idioma de edição de todos os campos; o ponto marca o idioma com texto faltando. */
+export function EditingLocaleBar({ missingIn }: { missingIn: readonly string[] }) {
+  const { locale, setLocale, locales } = useEditorLocale();
+  if (locales.length < 2) return null;
+  return (
+    <div role="group" aria-label="Idioma em edição" className="flex flex-wrap items-center gap-2 rounded-lg border bg-card px-3 py-2 text-sm">
+      <span className="text-muted-foreground">Editando em</span>
+      {locales.map((l) => (
+        <button
+          key={l}
+          type="button"
+          aria-pressed={l === locale}
+          onClick={() => setLocale(l)}
+          className={cn("inline-flex h-7 cursor-pointer items-center gap-1.5 rounded-md px-2 font-medium hover:bg-accent", l === locale && "bg-primary/10 text-primary")}
+        >
+          {localeName(l)}
+          {missingIn.includes(l) && <span className="size-1.5 rounded-full bg-warning" aria-label="falta traduzir" />}
+        </button>
+      ))}
+      {missingIn.length > 0 && <span className="ml-auto text-xs text-muted-foreground">O ponto marca o idioma com texto faltando.</span>}
     </div>
   );
 }

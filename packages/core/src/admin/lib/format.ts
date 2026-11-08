@@ -72,20 +72,6 @@ export function planPayability(plan: { priceCents?: number; currency?: string; p
   return { ok: true };
 }
 
-/** Desconto em % de `original` para `final` (arredondado), ou 0 se não houver. */
-export function discountPercent(original: number | undefined, final: number): number {
-  if (!original || original <= final) return 0;
-  return Math.round(((original - final) / original) * 100);
-}
-
-/** Parcelas iguais: valor da parcela (arredondado para cima no centavo, a última ajusta). */
-export function installments(total: number, count: number): { count: number; each: number; last: number } {
-  const n = Math.max(1, Math.floor(count));
-  const each = Math.ceil((total * 100) / n) / 100;
-  const last = Math.round((total - each * (n - 1)) * 100) / 100;
-  return { count: n, each, last };
-}
-
 // ── SEO ─────────────────────────────────────────────────────────────────────
 
 export const SEO_TITLE_MAX = 60;

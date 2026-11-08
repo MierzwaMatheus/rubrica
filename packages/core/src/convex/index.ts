@@ -42,6 +42,8 @@ import { ref } from "./server";
 import { settingsFunctions, textsFunctions } from "./settings";
 import { siteFunctions } from "./site";
 import { usersFunctions } from "./users";
+import { asaasFunctions } from "./commerce/asaas";
+import { checkoutsFunctions } from "./commerce/checkouts";
 import { commerceFunctions } from "./commerce/commerce";
 import { contractTemplatesFunctions } from "./commerce/contractTemplates";
 import { addCommerceRoutes } from "./commerce/http";
@@ -72,10 +74,12 @@ export function createRubrica(config: RubricaConfig = {}) {
     routine: once(() => routineFunctions(rt)),
     plans: once(() => plansFunctions(rt)),
     team: once(() => teamFunctions(rt)),
-    // Comercial (commerce/): propostas e contratos.
+    // Comercial (commerce/): propostas, contratos e pagamentos.
     commerce: once(() => commerceFunctions(rt)),
     proposals: once(() => proposalsFunctions(rt)),
     contractTemplates: once(() => contractTemplatesFunctions(rt)),
+    checkouts: once(() => checkoutsFunctions(rt)),
+    asaas: once(() => asaasFunctions(rt)),
   };
 
   return {
@@ -96,7 +100,9 @@ export function createRubrica(config: RubricaConfig = {}) {
     get crons() {
       const crons = cronJobs();
       crons.daily("rubrica: limpar registros e limites vencidos", { hourUTC: 6, minuteUTC: 0 }, ref("mutation", "audit", "cleanup"), {});
+      crons.hourly("rubrica: vencer checkouts", { minuteUTC: 30 }, ref("mutation", "checkouts", "expireOldCheckouts"), {});
       crons.daily("rubrica: limpar sessoes de proposta", { hourUTC: 3, minuteUTC: 0 }, ref("mutation", "proposals", "cleanupExpiredSessions"), {});
+      crons.daily("rubrica: limpar eventos de pagamento", { hourUTC: 3, minuteUTC: 15 }, ref("mutation", "checkouts", "cleanupPaymentEvents"), {});
       return crons;
     },
     get users() {
@@ -156,6 +162,12 @@ export function createRubrica(config: RubricaConfig = {}) {
     get contractTemplates() {
       return modules.contractTemplates();
     },
+    get checkouts() {
+      return modules.checkouts();
+    },
+    get asaas() {
+      return modules.asaas();
+    },
   };
 }
 
@@ -182,6 +194,8 @@ export const RUBRICA_MODULES = [
   "commerce",
   "proposals",
   "contractTemplates",
+  "checkouts",
+  "asaas",
 ] as const satisfies readonly (keyof Rubrica)[];
 
 export type { RubricaConfig } from "./runtime";

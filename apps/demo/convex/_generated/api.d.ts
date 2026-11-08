@@ -12,7 +12,9 @@
   import type * as auth from "../auth.js";
 import type * as crons from "../crons.js";
 import type * as http from "../http.js";
+import type * as rubrica_asaas from "../rubrica/asaas.js";
 import type * as rubrica_audit from "../rubrica/audit.js";
+import type * as rubrica_checkouts from "../rubrica/checkouts.js";
 import type * as rubrica_commerce from "../rubrica/commerce.js";
 import type * as rubrica_contractTemplates from "../rubrica/contractTemplates.js";
 import type * as rubrica_faq from "../rubrica/faq.js";
@@ -44,7 +46,9 @@ import type * as rubrica_users from "../rubrica/users.js";
     "auth": typeof auth,
 "crons": typeof crons,
 "http": typeof http,
+"rubrica/asaas": typeof rubrica_asaas,
 "rubrica/audit": typeof rubrica_audit,
+"rubrica/checkouts": typeof rubrica_checkouts,
 "rubrica/commerce": typeof rubrica_commerce,
 "rubrica/contractTemplates": typeof rubrica_contractTemplates,
 "rubrica/faq": typeof rubrica_faq,

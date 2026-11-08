@@ -1,16 +1,14 @@
 # create-rubrica
 
-CLI para criar, configurar, publicar e atualizar projetos [Rubrica](https://github.com/MierzwaMatheus/rubrica), o template de portfólio profissional com React + Convex.
+CLI do [Rubrica](https://github.com/MierzwaMatheus/rubrica) v2: cria, configura, publica, atualiza e migra sites feitos com `@rubrica/core` (Astro + Convex). No projeto, o mesmo CLI responde por `rubrica`.
 
-Precisa de Node 20+ e do `git` instalado.
+Precisa de Node 22.23+ e do `git`.
 
 ```bash
-npx create-rubrica@latest meu-portfolio
+npx create-rubrica@latest meu-site --tipo pessoal --tema padrao
 # ou
-pnpm create rubrica meu-portfolio
+pnpm create rubrica meu-site
 ```
-
-Para chegar com a aparência já escolhida, monte o seu no [combinador do site](https://userubrica.vercel.app/#combinador) e copie o comando pronto (`--receita <código>`).
 
 ## Comandos
 
@@ -18,27 +16,35 @@ Tirando o `create`, rode dentro da pasta do projeto.
 
 | Comando | Para quê |
 |---|---|
-| `npx create-rubrica@latest <pasta>` | Cria o projeto (aceita `--receita` do site e opções como `--layout` e `--esquema`) |
-| `npx create-rubrica setup` | Conecta o Convex, cria o admin e os dados iniciais; liga as integrações |
-| `npx create-rubrica config` | Troca identidade, aparência, layout ou plugins depois de criado |
-| `npx create-rubrica publicar` | Põe o site no ar na Vercel, e publica de novo nas próximas vezes |
-| `npx create-rubrica senha` | Troca a senha do painel e libera o login bloqueado |
-| `npx create-rubrica@latest update` | Traz a versão nova do Rubrica sem desfazer as suas personalizações |
-| `npx create-rubrica telemetria [ligar\|desligar]` | Mostra, liga ou desliga a telemetria anônima do projeto |
+| `create <pasta> [--tipo pessoal\|empresa] [--tema <id>]` | Gera o projeto: `@rubrica/core` + tema, `astro.config.ts`, `convex/` de reexportações, hospedagem neutra (`vercel.json`, `_redirects`, `_headers`), `AGENTS.md` e `.mcp.json`. `--help` lista as opções |
+| `setup` | Liga o Convex, grava as variáveis, cria o root e o conteúdo inicial (receita do tema) e as integrações |
+| `config` | Troca identidade, tipo, tema, esquema de cores, idiomas ou plugins |
+| `publicar` | Põe o site no ar na Vercel, ou publica de novo |
+| `senha` | Troca a senha do painel e libera o login bloqueado |
+| `update [--dry-run] [--yes]` | Sobe o núcleo e o tema, regenera o `convex/`, roda as migrações de dados no desenvolvimento e avisa dos ejetados cujo original mudou |
+| `ejetar <bloco>` | Copia o componente do bloco para `src/overrides/` e passa a usar a cópia |
+| `verificar` | Confere o `convex/` gerado, o tema e os ejetados (o `pnpm test` dos projetos) |
+| `testar-tema [tema]` | Bateria de testes de tema (`@rubrica/theme-tester`) |
+| `mcp` | Servidor MCP local (`@rubrica/mcp`), que o agente inicia pelo `.mcp.json` |
+| `migrar [--relatorio]` | Leva um projeto da v1 para a v2 (`migrar dados`, `migrar conferir`) |
+| `telemetria [ligar\|desligar]` | Mostra, liga ou desliga a telemetria anônima do projeto |
 
-## Documentação
+## Migrar da v1
 
-- [Começando](https://userubrica.vercel.app/docs/guia/comecando): do zero ao site rodando no computador.
-- [Comandos do CLI](https://userubrica.vercel.app/docs/guia/cli): todas as perguntas, opções e arquivos gerados.
-- [Publicar o site](https://userubrica.vercel.app/docs/guia/publicar): Vercel, o botão Publicar do painel e domínio próprio.
-- [Atualizando o seu Rubrica](https://userubrica.vercel.app/docs/atualizacao).
-- [Telemetria do CLI](https://userubrica.vercel.app/docs/guia/telemetria): o que o CLI manda, sem dados pessoais, e como desligar.
+```bash
+npx create-rubrica@latest migrar --relatorio          # só mostra: tema, personalizações, dados
+npx convex export --path .rubrica/migracao/export-v1.zip
+npx create-rubrica@latest migrar --export .rubrica/migracao/export-v1.zip
+```
 
-Também em inglês: [userubrica.vercel.app/en/docs](https://userubrica.vercel.app/en/docs).
+O `migrar` cria a branch `rubrica-v2`, troca o código, converte o export num arquivo de import da v2 (mais os dados em fixtures, para buildar sem banco) e grava o relatório em `.rubrica/migracao/relatorio.md`. Ele não grava no Convex: o import vai para um deployment de desenvolvimento novo, rodado por você; a produção só com o seu "ok".
 
 ## Manutenção
 
-Layout, esquema de cores, fonte ou plugin novo no template precisa entrar também nas listas do CLI. O passo a passo está em [Manutenção do CLI](https://github.com/MierzwaMatheus/rubrica/blob/main/docs/cli/manutencao.md).
+- Tema novo portado: acrescente o id em `PORTED_THEMES` (`src/themes.ts`).
+- Módulo novo no núcleo: rode os testes; `test/project.test.ts` acusa o manifesto (`src/core-manifest.ts`) fora do `RUBRICA_MODULES`.
+- Variável de ambiente nova de integração: `INTEGRATIONS` em `src/commands/setup.ts`.
+- `pnpm --filter create-rubrica test` roda também os testes de ponta a ponta (instalam e buildam projetos de verdade); `RUBRICA_SKIP_E2E=1` os pula.
 
 ## Licença
 

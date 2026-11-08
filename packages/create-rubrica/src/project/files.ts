@@ -182,8 +182,9 @@ dist
 
 export const ENV_EXAMPLE = `# Endereço do Convex usado no build (o npx convex dev grava o do computador no .env.local).
 CONVEX_URL=
-# Endereço HTTP do Convex (termina em .convex.site), para os formulários do site.
-PUBLIC_RUBRICA_API=
+# Só se a API dos formulários ficar em outro endereço. Por padrão ela sai do endereço do
+# Convex (CONVEX_SITE_URL, ou o CONVEX_URL com .convex.site no lugar de .convex.cloud).
+# PUBLIC_RUBRICA_API=
 `;
 
 export const MCP_JSON = `${JSON.stringify({ mcpServers: { rubrica: { command: "npx", args: ["rubrica", "mcp"] } } }, null, 2)}\n`;

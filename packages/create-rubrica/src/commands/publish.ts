@@ -208,7 +208,6 @@ export async function runPublish(deps: PublishDeps): Promise<void> {
   const vercelEnv: [string, string, boolean][] = [
     ["CONVEX_DEPLOY_KEY", deployKey, true],
     ["CONVEX_URL", urls.convexUrl, false],
-    ["PUBLIC_RUBRICA_API", urls.siteUrl, false],
     ["SITE_URL", prodState.identidade.url, false],
   ];
   for (const [key, value, sensitive] of vercelEnv) {

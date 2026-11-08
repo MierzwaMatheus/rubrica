@@ -165,7 +165,7 @@ describe("publicar", () => {
     expect(shell.fnCalls("rubrica/users:setupRoot")[0]?.prod).toBe(true);
     expect(shell.fnCalls("rubrica/seed:apply")[0]?.prod).toBe(true);
     const envAdds = shell.calls.filter((c) => c.includes("env") && c.includes("add")).map((c) => c[c.indexOf("add") + 1]);
-    expect(envAdds).toEqual(["CONVEX_DEPLOY_KEY", "CONVEX_URL", "PUBLIC_RUBRICA_API", "SITE_URL"]);
+    expect(envAdds).toEqual(["CONVEX_DEPLOY_KEY", "CONVEX_URL", "SITE_URL"]);
     expect(JSON.parse(readFileSync(join(dir, "rubrica.json"), "utf-8")).producao).toEqual({ convexUrl: "https://feliz-gato-123.convex.cloud", siteUrl: "https://site-da-ana.vercel.app" });
     expect(shell.calls.some((c) => c.includes("deploy") && c.includes("--prod") && c.some((a) => a.startsWith("vercel")))).toBe(true);
   });

@@ -287,13 +287,13 @@ Os componentes padrão e as peças (`Section`, `SectionHeader`, `Heading`, `Img`
 
 `variants` dá nomes a desenhos diferentes de um bloco (decisão 23): o painel mostra só as do tema em uso, e a **primeira é a padrão**. Ao trocar de tema, uma variação que o tema novo não tem cai na padrão dele. O componente lê a escolhida em `variant`.
 
-Os componentes padrão do núcleo só sabem desenhar as variações de `CORE_VARIANTS` (hoje, `grade` e `lista` em `cases`). Um tema que herda o componente padrão de um bloco só pode declarar essas, em qualquer ordem. Variação nova pede componente próprio, como a `faixa` acima. O [catálogo de blocos](./blocos.md) mostra as variações que cada tema declara.
+Os componentes padrão do núcleo só sabem desenhar as variações de `CORE_VARIANTS` (hoje, `grade` e `lista` em `cases`, `vertical` e `horizontal` em `linha-do-tempo`). Um tema que herda o componente padrão de um bloco só pode declarar essas, em qualquer ordem. Variação nova pede componente próprio, como a `faixa` acima. O [catálogo de blocos](./blocos.md) mostra as variações que cada tema declara, e o MCP as entrega ao agente (e recusa uma variação que o tema não tem).
 
 ## Receitas
 
 A **receita** é a lista de páginas e blocos com que um site novo começa (decisão 24), por tipo de site. O `setup` usa a receita do tema ao criar o conteúdo inicial, e o `migrar` usa a mesma para trazer um site da v1. Sem receita, vale a do núcleo (`CORE_RECIPES`).
 
-Cada página tem `path`, `title` (um texto por idioma) e `blocks`, e cada bloco, `type` e, se quiser, `variant`, `fields` (no mesmo formato que fica guardado, com um texto por idioma) e `source`. O jeito mais seguro é partir da receita do núcleo e trocar só o que o tema muda, como no exemplo da definição. A vitrine da bateria (`/vitrine/receita/...`) mostra as receitas montadas.
+Cada página tem `path`, `title` (um texto por idioma) e `blocks`, e cada bloco, `type` e, se quiser, `variant`, `fields` (no mesmo formato que fica guardado, com um texto por idioma) e `source`. O jeito mais seguro é partir da receita do núcleo e trocar só o que o tema muda, como no exemplo da definição. A vitrine da bateria (`/vitrine/receita/...`) mostra as receitas montadas. O MCP também entrega a receita aos agentes (`page_recipes`), como ponto de partida para montar uma página do mesmo tipo: mantenha a ordem dos blocos de cada página coerente com o desenho do tema.
 
 ## Templates
 

@@ -68,7 +68,7 @@ describe("servidor stdio", () => {
     await client.connect(transport(root, config));
     try {
       const { tools } = await client.listTools();
-      expect(tools.map((t) => t.name).sort()).toEqual(["blocks_catalog", "login", "logout", "whoami"]);
+      expect(tools.map((t) => t.name).sort()).toEqual(["blocks_catalog", "login", "logout", "page_recipes", "whoami"]);
       const who = await client.callTool({ name: "whoami", arguments: {} });
       const body = JSON.parse((who.content as any)[0].text);
       expect(body).toMatchObject({ loggedIn: false, project: { name: "smoke" } });

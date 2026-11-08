@@ -96,9 +96,9 @@ describe("servidor MCP", () => {
     expect(bad.isError).toBe(true);
   });
 
-  it("sem login só aparecem login, logout, whoami e o catálogo", async () => {
+  it("sem login só aparecem login, logout, whoami, o catálogo e as receitas", async () => {
     const { client } = await connect(false);
-    expect((await client.listTools()).tools.map((t) => t.name).sort()).toEqual(["blocks_catalog", "login", "logout", "whoami"]);
+    expect((await client.listTools()).tools.map((t) => t.name).sort()).toEqual(["blocks_catalog", "login", "logout", "page_recipes", "whoami"]);
     const res = await client.callTool({ name: "pages_list", arguments: {} });
     expect(res.isError).toBe(true);
     expect(JSON.parse((res.content as any)[0].text).error).toContain("rubrica mcp login");
@@ -130,9 +130,15 @@ describe("servidor MCP", () => {
     const guide = await client.readResource({ uri: "rubrica://guia/escrita" });
     expect((guide.contents[0] as any).text).toMatch(/sem tradução num idioma não aparece|não aparece no idioma/i);
     expect((guide.contents[0] as any).text).toContain("h1 é do hero");
+    expect((guide.contents[0] as any).text).toContain('"whatsapp:Quero um orçamento"');
+    expect((guide.contents[0] as any).text).toContain("**announcement**");
     const catalog = await client.readResource({ uri: "rubrica://blocos/catalogo" });
     expect((catalog.contents[0] as any).text).toContain("## hero");
     expect((catalog.contents[0] as any).text).not.toContain("## precos");
+    expect((catalog.contents[0] as any).text).toContain("Quando usar:");
+    expect(uris).toContain("rubrica://receitas");
+    const recipes = (await client.readResource({ uri: "rubrica://receitas" })).contents[0] as any;
+    expect(recipes.text).toContain("`/sobre`");
     const hero = JSON.parse(((await client.readResource({ uri: "rubrica://blocos/hero" })).contents[0] as any).text);
     expect(hero.fields.required).toEqual(["title"]);
     const state = JSON.parse(((await client.readResource({ uri: "rubrica://site/estado" })).contents[0] as any).text);
@@ -147,5 +153,9 @@ describe("servidor MCP", () => {
     const p = await client.getPrompt({ name: "montar-pagina", arguments: { caminho: "/servicos", objetivo: "vender design" } });
     expect((p.messages[0]!.content as any).text).toContain("/servicos");
     expect((p.messages[0]!.content as any).text).toContain("dryRun");
+    expect((p.messages[0]!.content as any).text).toContain("page_recipes");
+    expect((p.messages[0]!.content as any).text).toContain("quando usar");
+    expect(client.getInstructions()).toContain("page_recipes");
+    expect(client.getInstructions()).toContain('"whatsapp:"');
   });
 });

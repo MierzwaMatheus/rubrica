@@ -22,8 +22,8 @@ import type { ResolvedImage, ResolvedLink } from "../blocks/fields";
 import type { NavItem, Organization, SiteKind, SocialLink } from "../content/types";
 import type { CollectionItems, PostItem, ProjectItem } from "../render/collections";
 
-/** Versão do contrato de blocos que este núcleo implementa (decisão 30). 1.1: vídeo, incorporação, linha do tempo e comparativo de planos. */
-export const CONTRACT_VERSION = "1.1.0";
+/** Versão do contrato de blocos que este núcleo implementa (decisão 30). 1.1: vídeo, incorporação, linha do tempo e comparativo de planos. 1.2: orientação de uso dos blocos (`guidance`). */
+export const CONTRACT_VERSION = "1.2.0";
 
 export interface ResolvedNavItem {
   label: string;

@@ -6,6 +6,7 @@ import { AuthManager, ConvexClient, RubricaError, type RubricaClient } from "./c
 import { ConfigError, type ProjectConfig } from "./config";
 import { validateAgainst } from "./schema/validate";
 import { loadState, EMPTY_STATE, type SiteState } from "./state";
+import { loadProjectTheme, type ThemeInfo } from "./theme";
 import { allTools, isVisible, toolSchema } from "./tools";
 import { ToolInputError, type RuntimeApi, type ToolDef } from "./tools/types";
 
@@ -40,6 +41,7 @@ export class Runtime implements RuntimeApi {
   private state: SiteState = EMPTY_STATE;
   private loading: Promise<SiteState> | null = null;
   private readonly tools = allTools();
+  private theme: Promise<ThemeInfo> | null = null;
   onToolsChanged: () => void = () => {};
 
   constructor(
@@ -47,10 +49,18 @@ export class Runtime implements RuntimeApi {
     private readonly auth: AuthManager,
     private readonly client: RubricaClient,
     readonly options: RuntimeOptions,
+    /** Lê o tema instalado (variações e receitas). Padrão: o do projeto, pelo esbuild dele. */
+    private readonly themeLoader: () => Promise<ThemeInfo> = () => loadProjectTheme(project.root),
   ) {}
 
-  static create(project: ProjectConfig, options: RuntimeOptions, deps: { auth: AuthManager; client?: RubricaClient }): Runtime {
-    return new Runtime(project, deps.auth, deps.client ?? new ConvexClient(deps.auth), options);
+  static create(project: ProjectConfig, options: RuntimeOptions, deps: { auth: AuthManager; client?: RubricaClient; loadTheme?: () => Promise<ThemeInfo> }): Runtime {
+    return new Runtime(project, deps.auth, deps.client ?? new ConvexClient(deps.auth), options, deps.loadTheme);
+  }
+
+  /** O tema é lido uma vez por processo (trocar de tema pede reinstalar e reiniciar o agente). */
+  private loadTheme(): Promise<ThemeInfo> {
+    this.theme ??= this.themeLoader();
+    return this.theme;
   }
 
   hasSession(): boolean {
@@ -68,8 +78,9 @@ export class Runtime implements RuntimeApi {
 
   /** Relê papel, configurações e plugins; avisa o agente quando a lista de ferramentas muda. */
   async refresh(): Promise<SiteState> {
-    this.loading ??= loadState(this.client, this.hasSession())
-      .then((next) => {
+    this.loading ??= Promise.all([loadState(this.client, this.hasSession()), this.loadTheme()])
+      .then(([loaded, theme]) => {
+        const next: SiteState = { ...loaded, theme };
         const changed = this.visibleTools(this.state).map((t) => t.name).join() !== this.visibleTools(next).map((t) => t.name).join();
         this.state = next;
         if (changed) this.onToolsChanged();

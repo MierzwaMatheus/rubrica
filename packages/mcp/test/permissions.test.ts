@@ -19,9 +19,9 @@ describe("ferramentas por papel", () => {
     await seedSettings(t);
   });
 
-  it("sem papel, só as ferramentas de login e o catálogo", async () => {
+  it("sem papel, só as ferramentas de login, o catálogo e as receitas", async () => {
     const tools = await names(t, null);
-    expect([...tools].sort()).toEqual(["blocks_catalog", "login", "logout", "whoami"]);
+    expect([...tools].sort()).toEqual(["blocks_catalog", "login", "logout", "page_recipes", "whoami"]);
   });
 
   it("content-editor mexe em páginas e conteúdo, não em configurações", async () => {

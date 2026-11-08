@@ -5,7 +5,10 @@
  * campos `richText` é sanitizado.
  */
 import { v } from "convex/values";
+import { CORE_BLOCKS } from "../blocks/catalog";
+import { serializeBlock, type SerializedBlock } from "../blocks/define";
 import type { BlockInstance } from "../content/types";
+import { CONTRACT_VERSION } from "../theme/contract";
 import { localePrefix } from "../i18n";
 import { resolvePaths } from "../render/collections";
 import { requireRole } from "./auth";
@@ -59,6 +62,23 @@ function cleanTitle(title: Record<string, string>): Record<string, string> {
 
 const label = (page: Doc<"pages">) => anyText(page.title) || page.path;
 
+export interface BlockCatalogData {
+  /** Versão do contrato de blocos do núcleo instalado no backend. */
+  contract: string;
+  /**
+   * Todos os blocos (núcleo + projeto), só com dados; quem lê filtra pelo tipo do site e
+   * pelos plugins. `origin`: do núcleo ou próprio do projeto (`createRubrica({ blocks })`).
+   */
+  blocks: (SerializedBlock & { origin: "nucleo" | "projeto" })[];
+}
+
+const CORE_TYPES = new Set<string>(CORE_BLOCKS.map((b) => b.type));
+
+/** Catálogo efetivo do backend (núcleo + blocos do projeto), serializável. */
+export function blockCatalogOf(rt: RubricaRuntime): BlockCatalogData {
+  return { contract: CONTRACT_VERSION, blocks: rt.blocks.map((b) => ({ ...serializeBlock(b), origin: CORE_TYPES.has(b.type) ? "nucleo" : "projeto" })) };
+}
+
 export function pagesFunctions(rt: RubricaRuntime) {
   async function saveBlocks(ctx: MutationCtx, page: Doc<"pages">, blocks: BlockInstance[], userId: Id<"users">, event: string) {
     const { catalog } = await catalogFor(ctx, rt);
@@ -68,6 +88,18 @@ export function pagesFunctions(rt: RubricaRuntime) {
   }
 
   return {
+    /**
+     * Catálogo de blocos que este backend aceita (núcleo + os do projeto), para quem não
+     * tem o código do projeto (o MCP). A validação final continua nas mutations.
+     */
+    blockCatalog: query({
+      args: {},
+      handler: async (ctx): Promise<BlockCatalogData> => {
+        await requireRole(ctx, "panel");
+        return blockCatalogOf(rt);
+      },
+    }),
+
     list: query({
       args: { includeDeleted: v.optional(v.boolean()) },
       handler: async (ctx, args) => {

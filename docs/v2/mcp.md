@@ -12,7 +12,9 @@ agente (Claude Code, Codex)  ──stdio──▶  rubrica mcp  ──HTTPS─�
                                           └─ token em ~/.config/rubrica/   papel do usuário logado)
 ```
 
-- As ferramentas saem dos mesmos schemas que valem no backend e no painel: os campos dos blocos (`CORE_BLOCKS`) e os validadores do Convex das coleções. O JSON Schema é gerado em código, com descrições em pt-BR, e já traz os idiomas do site.
+- As ferramentas saem dos mesmos schemas que valem no backend e no painel: os campos dos blocos e os validadores do Convex das coleções. O JSON Schema é gerado em código, com descrições em pt-BR, e já traz os idiomas do site.
+- **O catálogo de blocos é o do backend do projeto** (`rubrica/pages:blockCatalog`): os do núcleo e os próprios (`createRubrica({ blocks })`, de `src/blocks/`), só com dados (`serializeBlock`: tipo, rótulo, descrição, orientação, categoria, plugin, fonte, campos). Regras em função (`validate`) não viajam: as dos blocos do núcleo o MCP tem; as dos blocos do projeto são conferidas pelo backend já na prévia (`rubrica/panel:validatePage`, sem gravar). Num backend anterior a essa função, ou sem login, vale o `CORE_BLOCKS` que vem com o MCP (e um bloco genérico no schema, para blocos próprios que o MCP não conhece).
+- **O tema instalado** dá as variações por bloco e as receitas. O pacote do tema é TypeScript com React, então o MCP faz como o CLI: empacota um trecho que importa o tema com o esbuild que vem com o `convex` do projeto (React fica de fora, nada é renderizado) e lê só `variants`, `recipes` e quais blocos o tema desenha. O tema é o `theme` do `astro.config.ts` (ou o `tema` do `rubrica.json`), lido uma vez por processo. Sem projeto, sem esbuild ou com erro, valem `CORE_VARIANTS` e `CORE_RECIPES`, a variação desconhecida vira aviso em vez de erro, e `whoami` diz o motivo. (Ler pelo backend não daria: o Convex não importa o tema.)
 - Valem as permissões do **papel** do usuário logado. O MCP só **mostra** o que o papel pode, e o backend recusa o resto de qualquer forma.
 - Toda gravação começa em **prévia** (ver [Prévia antes de gravar](#prévia-antes-de-gravar)).
 
@@ -128,7 +130,8 @@ As colunas "papel" dizem quem enxerga a ferramenta (permissões de `PERMISSIONS`
 | `whoami` | Projeto, Convex (dev/produção), conta, papel, site (tipo, idiomas, tema), plugins ligados e ferramentas disponíveis |
 | `login` | Confere a sessão e devolve a instrução do login no terminal |
 | `logout` | Encerra a sessão e apaga o token |
-| `blocks_catalog` | Tipos de bloco do site (ou o JSON Schema de um tipo) |
+| `blocks_catalog` | Tipos de bloco do site (núcleo e projeto, `origin`), com a orientação (`guidance`: quando usar, quando não usar, combina com), as variações do tema e os campos; com `type`, o JSON Schema de um tipo |
+| `page_recipes` | Receita do tema para o tipo do site: as páginas padrão e a ordem dos blocos de cada uma (com variação, fonte e se o bloco está disponível). Com `page` (caminho ou título), os campos de exemplo de uma página, nos idiomas do site |
 
 **Site** — `panel`: todo papel; `settings`: root e admin
 
@@ -207,14 +210,17 @@ Quando um módulo do backend (contatos, publicação) ainda não existe, o MCP d
 
 ## Recursos e prompts
 
-- Recursos: `rubrica://guia/escrita` (regras de escrita), `rubrica://blocos/catalogo` (catálogo em texto, filtrado pelo site), `rubrica://blocos/<tipo>` (JSON Schema de um bloco), `rubrica://site/estado` (papel, idiomas, plugins, ferramentas).
+- Recursos: `rubrica://guia/escrita` (regras de escrita, inclusive links `whatsapp:` e a faixa de aviso), `rubrica://blocos/catalogo` (catálogo em texto, filtrado pelo site, com a orientação e as variações), `rubrica://blocos/<tipo>` (orientação, variações e JSON Schema de um bloco, inclusive os do projeto), `rubrica://receitas` (receitas do tema), `rubrica://site/estado` (papel, idiomas, tema, plugins, ferramentas).
 - Prompts: `montar-pagina`, `traduzir-conteudo`, `revisar-antes-de-publicar`.
-- As instruções do servidor repetem o essencial: ver o ambiente antes, prévia antes de gravar, um texto por idioma, h1 do hero, rascunho primeiro.
+- As instruções do servidor repetem o essencial: ver o ambiente antes, prévia antes de gravar, escolher blocos pela orientação e partir da receita, variações só as do tema, um texto por idioma, h1 do hero, `whatsapp:` nos links, rascunho primeiro.
+- `montar-pagina` chama `page_recipes` e `blocks_catalog`, parte da receita quando o caminho ou o tipo da página está nela e propõe a lista de blocos (com variação e função de cada um) antes de escrever.
 
 ## Regras de escrita (resumo)
 
 - Todo texto traduzível é um mapa por idioma. **Conteúdo sem tradução num idioma não aparece nesse idioma** (decisão 28); a prévia avisa.
 - O **h1 é do hero** (o primeiro bloco). Nada de `<h1>` no corpo.
+- Variação (`variant`) só a que o tema declara para o bloco; uma que não existe é recusada com a lista das válidas.
+- Links: `whatsapp:` abre a conversa com o WhatsApp do site (`site_update` → `whatsapp`); `whatsapp:<texto>`, com a mensagem própria. Aviso temporário vai na faixa (`announcement`), que entra e sai do ar no build.
 - Imagens: `media_upload`, usar o `image` devolvido, `alt` por idioma.
 - Rascunho primeiro; publicar e fazer o rebuild só a pedido.
 

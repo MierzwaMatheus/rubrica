@@ -12,6 +12,7 @@ import type { SiteSettings } from "@rubrica/core";
 import { RubricaError, classifyError, cleanErrorMessage, type Args, type AuthManager, type RubricaClient } from "../src/client";
 import type { ProjectConfig } from "../src/config";
 import { Runtime, type RuntimeOptions } from "../src/runtime";
+import { CORE_THEME, type ThemeInfo } from "../src/theme";
 
 export const modules = (import.meta as unknown as { glob: (p: string) => Record<string, () => Promise<unknown>> }).glob("../../../apps/demo/convex/**/*.*s");
 
@@ -58,10 +59,13 @@ export class TestClient implements RubricaClient {
   constructor(
     private readonly user: Identity,
     private readonly t: T,
+    private readonly intercept?: RuntimeExtras["intercept"],
   ) {}
 
   private async run(type: "query" | "mutation" | "action", path: string, args: Args = {}) {
     this.calls.push({ type, path, args });
+    const replaced = this.intercept?.(type, path, args);
+    if (replaced !== undefined) return replaced;
     const ref = makeFunctionReference<typeof type>(path) as never;
     try {
       return await (this.user as never as Record<string, (r: never, a: Args) => Promise<unknown>>)[type]!(ref, args);
@@ -90,11 +94,19 @@ export class TestClient implements RubricaClient {
 
 export const PROJECT: ProjectConfig = { root: "/tmp/projeto", name: "projeto", convexUrl: "https://teste-1.convex.cloud", source: ".env.local", environment: "desenvolvimento" };
 
-export async function runtimeFor(t: T, role: Role | null, options: Partial<RuntimeOptions> = {}) {
+export interface RuntimeExtras {
+  /** Tema instalado (padrão: o do núcleo, como num projeto sem tema legível). */
+  theme?: ThemeInfo;
+  /** Troca respostas do backend (ex.: um catálogo com blocos do projeto). */
+  intercept?: (type: "query" | "mutation" | "action", path: string, args: Args) => Promise<unknown> | undefined;
+}
+
+export async function runtimeFor(t: T, role: Role | null, options: Partial<RuntimeOptions> = {}, extras: RuntimeExtras = {}) {
   const user = await userAs(t, role);
-  const client = new TestClient(user, t);
+  const client = new TestClient(user, t, extras.intercept);
   const auth = { session: () => ({ convexUrl: PROJECT.convexUrl, email: "x@y.dev", token: "t", refreshToken: "r", savedAt: 0 }) } as unknown as AuthManager;
-  const runtime = new Runtime(PROJECT, auth, client, { defaultDryRun: true, allowPasswordArg: false, stateTtlMs: 60_000, ...options });
+  const theme = extras.theme ?? CORE_THEME;
+  const runtime = new Runtime(PROJECT, auth, client, { defaultDryRun: true, allowPasswordArg: false, stateTtlMs: 60_000, ...options }, async () => theme);
   return { runtime, client, user };
 }
 

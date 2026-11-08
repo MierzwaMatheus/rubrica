@@ -56,7 +56,8 @@ No Claude Code, você pode digitar `! npx rubrica mcp login` no próprio prompt.
 
 | Área | Exemplos |
 |---|---|
-| Conta e ambiente | Ver o projeto, o banco (desenvolvimento ou produção), o papel, os plugins e o catálogo de blocos |
+| Conta e ambiente | Ver o projeto, o banco (desenvolvimento ou produção), o papel, os plugins, o tema e o catálogo de blocos |
+| Montar páginas | O catálogo real do site (blocos do núcleo e os seus, de `src/blocks/`), com quando usar cada bloco, com o que ele combina e as variações do seu tema; as receitas do tema (a lista de blocos de cada página padrão, como "Quem somos" ou "Serviços") |
 | Site | Ler e mudar configurações (nome, aparência, navegação, redes), ligar e desligar plugins, **publicar** (dispara o build) |
 | Páginas e blocos | Listar, criar (sempre rascunho), mudar título, caminho e SEO; adicionar, editar campos, mover, ocultar e remover blocos |
 | Coleções | Listar, ler, criar (rascunho), editar, publicar e remover posts, projetos, serviços, depoimentos, FAQ, currículo, equipe e planos |
@@ -65,7 +66,9 @@ No Claude Code, você pode digitar `! npx rubrica mcp login` no próprio prompt.
 | Mídia | Listar a biblioteca e subir imagens de um caminho local |
 | Contatos | Ver pedidos e mudar o status (com o plugin de contato ligado) |
 
-Há também prompts prontos (`montar-pagina`, `traduzir-conteudo`, `revisar-antes-de-publicar`) e recursos de leitura, como o guia de escrita e o catálogo de blocos.
+Há também prompts prontos (`montar-pagina`, `traduzir-conteudo`, `revisar-antes-de-publicar`) e recursos de leitura, como o guia de escrita, o catálogo de blocos e as receitas. O `montar-pagina` parte da receita do tema quando a página é de um tipo conhecido e propõe a lista de blocos antes de escrever.
+
+O MCP lê o tema instalado no projeto (o do `astro.config.ts`) para saber as variações de cada bloco: uma variação que o tema não tem é recusada, com a lista das que existem.
 
 A referência completa de ferramentas, papéis e variáveis está em [`docs/v2/mcp.md`](https://github.com/MierzwaMatheus/rubrica/blob/main/docs/v2/mcp.md).
 

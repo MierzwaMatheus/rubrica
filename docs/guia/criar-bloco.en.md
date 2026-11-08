@@ -36,6 +36,11 @@ export const selos = defineBlock({
   type: "selos",
   label: "Selos e certificações",
   description: "Selos, prêmios e certificações, com imagem, ano e link.",
+  guidance: {
+    use: "Mostrar selos, prêmios e certificações que dão confiança, perto dos cases ou do contato.",
+    avoid: "Para logos de clientes, use logos-clientes; para um prêmio só, texto com imagem.",
+    pairsWith: ["logos-clientes", "depoimentos", "cta"],
+  },
   category: "comum",
   fields: {
     anchor: field.text({ label: "Âncora", localized: false, maxLength: 40, help: "Para links na página (#selos). Opcional." }),
@@ -128,6 +133,7 @@ Run `pnpm dev` (and `pnpm dev:convex`, so the backend knows the new block). In t
 | `type` | Stable identifier, in lowercase letters, digits and hyphens (`selos`, `opening-hours`). It is saved in every page that uses the block: changing it later breaks those pages. It can't repeat a core type; pick a name that is clearly yours, because the core may gain new blocks |
 | `label` | The block's name in the panel |
 | `description` | One sentence on what it is for, shown in the panel |
+| `guidance` | Optional. Usage guidance: `use` (when to use it), `avoid` (when not to, and what to use instead) and `pairsWith` (block types that go well with it). The MCP hands it to agents in the catalog (`blocks_catalog`), so they pick the right block when building a page. It doesn't change what the block accepts. Write it in the same language as the rest of the definition |
 | `category` | `comum` (personal and company sites), `pessoal` or `empresa`: the panel only offers the block in the right site type |
 | `fields` | The fields (below) |
 | `plugin` | Optional. Id of a core plugin (`blog`, `portfolio`...): with it off, the block disappears from the panel and the site |
@@ -299,7 +305,7 @@ Register `cupom` in `blocks` and `components` in `src/blocks/index.ts`, like `se
 
 - **Panel.** In the page editor, with the form generated from the fields (`help` under each one, `itemLabel` on each list item) and the live preview in the theme in use. Only in the site type of its `category`, and only with its `plugin` on.
 - **Site.** In any theme: the project's component wins over the theme. With no component registered, the core uses a generic one.
-- **MCP.** The agent saves the block like any other, with `type` and `fields`, and the backend validates it against your definition. The MCP catalog (`blocks_catalog`) lists only the core blocks, so tell the agent the block exists and which fields it has, or ask it to read `src/blocks/`.
+- **MCP.** The MCP catalog (`blocks_catalog`) comes from the project's backend, so the agent sees the block like the core ones: label, description, the `guidance`, the fields with their limits and the variants the theme declares for it. The agent saves with `type` and `fields`; the MCP checks the fields first and the backend validates again (rules written as functions, like a `validate`, are checked by the backend already in the preview). Push the backend (`pnpm dev:convex`) for the MCP to see a new block. With a backend older than the catalog, the MCP shows only the core blocks.
 
 ## Checking
 

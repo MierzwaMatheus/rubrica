@@ -73,15 +73,15 @@ docs/rfc/v2.md              decisões da v2
 
 A forma do bloco é a mesma de um bloco de projeto ([Criar um bloco](../guia/criar-bloco.md) tem a referência completa dos campos e das props); muda onde cada parte mora.
 
-1. **Definição** em `packages/core/src/blocks/catalog/index.ts`, com `defineBlock`, reaproveitando as constantes do topo (`anchor`, `heading`, `intro`). Acrescente em `CORE_BLOCKS`, na posição em que ele deve aparecer no painel. Bloco que depende de plugin leva `plugin`; bloco que lista coleção leva `source` (e some com o plugin dono da coleção desligado).
+1. **Definição** em `packages/core/src/blocks/catalog/index.ts`, com `defineBlock`, reaproveitando as constantes do topo (`anchor`, `heading`, `intro`), e a `guidance` (quando usar, quando não usar, `pairsWith`): o `block-contract.test.ts` exige nos blocos do núcleo. Acrescente em `CORE_BLOCKS`, na posição em que ele deve aparecer no painel. Bloco que depende de plugin leva `plugin`; bloco que lista coleção leva `source` (e some com o plugin dono da coleção desligado).
 2. **Componente padrão** em `packages/core/src/components/blocks/` (no arquivo do grupo dele: `basic`, `lists`, `collections`, `contact`...), tipado com `ResolvedFields<typeof def.fields>`, e registrado em `DEFAULT_BLOCKS` (`components/index.ts`). Ele precisa funcionar com campos e itens vazios.
 3. **CSS** em `packages/core/src/styles/blocks.css`, só com tokens `--rb-*`, na classe `.rb-<tipo>`. Os 14 temas herdam esse componente: confira cada um na vitrine.
 4. **Ilha**, se o bloco é `interactive`: o componente em `src/islands/`, registrado em `CORE_ISLANDS` (e em `ISLAND_FOR_BLOCK` se o nome difere do tipo), com os prefixos de texto em `ISLAND_META`. Use `islandWhen` para não montar a ilha quando ela não serve.
 5. **Textos de interface** novos em `src/i18n/ui-texts.ts` (`pt`, `en`, `es`).
 6. **Fixtures**: use o bloco em `apps/demo/fixtures/<pessoal|empresa>/pages.json` (o `fixtures.test.ts` valida contra o catálogo).
-7. **Testes**: o `blocks.test.tsx` confere o número de blocos e que cada um tem componente padrão; acrescente casos do que o bloco faz de próprio. O MCP lê o catálogo direto (`CORE_BLOCKS`), sem registro à parte.
+7. **Testes**: o `blocks.test.tsx` confere o número de blocos e que cada um tem componente padrão; acrescente casos do que o bloco faz de próprio. O MCP recebe o catálogo do backend (`rubrica/pages:blockCatalog`, que serializa `rt.blocks`), sem registro à parte.
 8. **Variações**: se o componente padrão desenha mais de uma, declare em `CORE_VARIANTS` (`theme/contract.ts`).
-9. **Documentação**: `pnpm docs:blocos` regera o catálogo; acrescente o inglês da descrição e das ajudas em `apps/docs/scripts/blocos/en.ts`. O teste do `rubrica-site` falha enquanto o catálogo estiver desatualizado.
+9. **Documentação**: `pnpm docs:blocos` regera o catálogo; acrescente o inglês da descrição, das ajudas e da orientação em `apps/docs/scripts/blocos/en.ts`. O teste do `rubrica-site` falha enquanto o catálogo estiver desatualizado.
 10. **Bateria**: `pnpm testar-tema --todos --sem-lighthouse` passa o bloco por todos os temas.
 11. **Changeset**: bloco novo é versão menor do `@rubrica/core` (`pnpm changeset`).
 

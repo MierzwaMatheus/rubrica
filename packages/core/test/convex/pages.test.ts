@@ -1,6 +1,10 @@
 // @vitest-environment edge-runtime
 import { beforeEach, describe, expect, it } from "vitest";
 import { api, as, seedSettings, setup, type T } from "./_setup";
+import { createRubrica } from "../../src/convex";
+import { blockCatalogOf } from "../../src/convex/pages";
+import { defineBlock } from "../../src/blocks/define";
+import { field } from "../../src/blocks/fields";
 
 const hero = (id = "h1") => ({ id, type: "hero", visible: true, fields: { title: { "pt-BR": "Olá", en: "Hi" } } });
 const texto = (id = "t1", body = "<p>Texto</p>") => ({ id, type: "texto", visible: true, fields: { body: { "pt-BR": body } } });
@@ -104,5 +108,27 @@ describe("páginas e blocos", () => {
     await editor.mutation(api.rubrica.pages.publish, { id });
     const events = (await root.query(api.rubrica.audit.recent, {})).map((e) => `${e.eventType}:${e.targetType}:${e.actorEmail === null ? "?" : "ok"}`);
     expect(events).toEqual(expect.arrayContaining(["admin.create:page:ok", "admin.publish:page:ok"]));
+  });
+});
+
+describe("catálogo de blocos do backend", () => {
+  it("devolve os blocos do núcleo só com dados, para qualquer papel do painel", async () => {
+    const t = setup();
+    await seedSettings(t);
+    const blog = await as(t, "blog-editor");
+    const data = await blog.query(api.rubrica.pages.blockCatalog, {});
+    expect(data.contract).toMatch(/^1\.\d+\.\d+$/);
+    expect(data.blocks.map((b) => b.type)).toContain("hero");
+    const comparativo = data.blocks.find((b) => b.type === "comparativo-planos");
+    expect(comparativo?.customValidation).toBe(true);
+    expect(comparativo?.guidance?.use).toBeTruthy();
+    await expect((await as(t, null)).query(api.rubrica.pages.blockCatalog, {})).rejects.toThrow();
+  });
+
+  it("inclui os blocos próprios do projeto", () => {
+    const selos = defineBlock({ type: "selos", label: "Selos", description: "Selos e prêmios.", category: "comum", fields: { title: field.text({ label: "Título", maxLength: 80 }) } });
+    const data = blockCatalogOf(createRubrica({ blocks: [selos] }).runtime);
+    expect(data.blocks.at(-1)).toEqual({ type: "selos", label: "Selos", description: "Selos e prêmios.", category: "comum", fields: { title: { kind: "text", label: "Título", maxLength: 80 } }, origin: "projeto" });
+    expect(data.blocks[0]).toMatchObject({ type: "hero", origin: "nucleo" });
   });
 });

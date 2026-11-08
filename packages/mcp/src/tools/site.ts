@@ -1,13 +1,14 @@
-/** Configurações do site, plugins, catálogo de blocos, contatos e publicação. */
-import { CORE_BLOCKS } from "@rubrica/core/blocks";
+/** Configurações do site, plugins, catálogo de blocos e receitas, contatos e publicação. */
+import type { SiteKind } from "@rubrica/core";
 import { can } from "@rubrica/core/convex/roles";
 import { RubricaError } from "../client";
 import { contentWarnings, diffValues, mergeFields } from "../diff";
-import { blockFieldsSchema, validatorToSchema, type JsonSchema } from "../schema/json-schema";
+import { blockDetail, blockSummary, catalogBlocks, recipesFor, themeSummary } from "../guide";
+import { validatorToSchema, type JsonSchema } from "../schema/json-schema";
 import { siteSettingsJson } from "../schema/settings";
 import { validateAgainst } from "../schema/validate";
 import { siteLocales } from "../state";
-import { blocksFor, prop } from "./shared";
+import { findBlock, prop } from "./shared";
 import { commit, ToolInputError, type ToolDef } from "./types";
 
 /** Campos que só a agência (root) muda — espelha `TECHNICAL_SETTINGS` do backend. */
@@ -192,33 +193,47 @@ export const siteTools: ToolDef[] = [
     name: "blocks_catalog",
     title: "Catálogo de blocos",
     description:
-      "Os tipos de bloco que o site aceita (com o tipo e os plugins ligados): o que cada um faz e os campos, com limites e obrigatórios. Passe `type` para ver o JSON Schema completo de um tipo.",
+      "Os tipos de bloco que o site aceita (os do núcleo e os próprios do projeto, filtrados pelo tipo do site e pelos plugins ligados): o que cada um faz, quando usar e quando não usar, com quais blocos combina, as variações do tema instalado e os campos. Passe `type` para ver o JSON Schema completo de um tipo.",
     access: { login: false },
     input: () => ({
       type: "object",
-      properties: { type: prop.string('Tipo do bloco, ex.: "hero". Devolve o JSON Schema dos campos.') },
+      properties: { type: prop.string('Tipo do bloco, ex.: "hero". Devolve a orientação, as variações e o JSON Schema dos campos.') },
       additionalProperties: false,
     }),
     async handler(args: { type?: string }, ctx) {
-      const defs = ctx.state.settings ? blocksFor(ctx.state) : [...CORE_BLOCKS];
-      const locales = siteLocales(ctx.state);
+      const defs = catalogBlocks(ctx.state);
       if (args.type) {
-        const def = CORE_BLOCKS.find((b) => b.type === args.type);
-        if (!def) throw new ToolInputError(`Tipo de bloco desconhecido: ${args.type}. Tipos: ${CORE_BLOCKS.map((b) => b.type).join(", ")}`);
-        return { type: def.type, label: def.label, description: def.description, category: def.category, plugin: def.plugin ?? null, source: def.source ?? null, fields: blockFieldsSchema(def, { locales }) };
+        const def = findBlock(ctx.state, args.type);
+        if (!def) throw new ToolInputError(`Tipo de bloco desconhecido: ${args.type}. Tipos: ${ctx.state.catalog.blocks.map((b) => b.type).join(", ")}`);
+        return blockDetail(def, ctx.state);
       }
       return {
         filteredBySite: !!ctx.state.settings,
-        blocks: defs.map((d) => ({
-          type: d.type,
-          label: d.label,
-          description: d.description,
-          category: d.category,
-          ...(d.plugin ? { plugin: d.plugin } : {}),
-          ...(d.source ? { source: d.source.collections } : {}),
-          fields: Object.entries(d.fields).map(([k, f]) => `${k} (${f.kind}${f.required ? ", obrigatório" : ""}): ${f.label}`),
-        })),
+        catalog: ctx.state.catalog.source,
+        ...(ctx.state.catalog.source === "nucleo" ? { catalogNote: "Catálogo do núcleo: o backend não informou o dele (versão antiga ou sem login). Blocos próprios do projeto não aparecem; o backend ainda os aceita." } : {}),
+        theme: themeSummary(ctx.state),
+        blocks: defs.map((d) => blockSummary(d, ctx.state)),
       };
+    },
+  },
+  {
+    name: "page_recipes",
+    title: "Receitas de página",
+    description:
+      "A receita do tema instalado para o tipo do site: a lista de blocos (em ordem, com variação e fonte) de cada página padrão — Início, Sobre/Quem somos, Serviços, Preços, Contato... Use para propor uma página nova a partir do padrão. Passe `page` (caminho ou título, ex.: \"/quem-somos\" ou \"Quem somos\") para ver os campos de exemplo de uma página.",
+    access: { login: false },
+    input: ({ state }) => ({
+      type: "object",
+      properties: {
+        page: prop.string('Caminho ou título de uma página da receita ("/sobre", "Quem somos"). Sem ele, todas, sem os campos.'),
+        kind: { type: "string", enum: ["pessoal", "empresa"], description: `Tipo do site.${state.settings ? ` Padrão: ${state.settings.kind} (o deste site).` : " Obrigatório sem login."}` },
+      },
+      additionalProperties: false,
+    }),
+    async handler(args: { page?: string; kind?: SiteKind }, ctx) {
+      const kind = args.kind ?? ctx.state.settings?.kind;
+      if (!kind) throw new ToolInputError('Diga o tipo do site em kind ("pessoal" ou "empresa"), ou faça login para usar o deste site.');
+      return recipesFor(ctx.state, kind, args.page);
     },
   },
 

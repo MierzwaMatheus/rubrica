@@ -11,7 +11,7 @@
  */
 import type { CSSProperties } from "react";
 import type { BlockProps, CollectionItems } from "@rubrica/core";
-import { Heading, Html, Img, Section, SectionHeader } from "@rubrica/core/components";
+import { Heading, Html, Img, Section, SectionHeader, safeId, tagFilterCss as coreTagFilterCss } from "@rubrica/core/components";
 import { Btn, Dim, Hatch, Num, Sheet, TitleBlock, count, drawnBy, isoDate, ownerName, pad2, stampDate, stripTags, wordCount } from "./parts";
 
 type Project = CollectionItems["projects"];
@@ -440,26 +440,16 @@ export function CtaBlock({ id, variant, fields, headingLevel, index, ctx }: Bloc
 // ---- posts ---------------------------------------------------------------------------
 
 /**
- * Filtro por etiqueta SEM JavaScript (como o do núcleo): botões de opção antes da lista e
- * uma folha de estilo por bloco que esconde o que não tem a etiqueta marcada. Os ids vêm do
- * índice, nunca do texto da etiqueta. (Cópia do filtro do núcleo, que não o exporta.)
+ * Filtro por etiqueta SEM JavaScript (o do núcleo): botões de opção antes da lista e uma
+ * folha de estilo por bloco que esconde o que não tem a etiqueta marcada.
  */
-function tagFilterCss(scope: string, count: number): string {
-  const rules: string[] = [];
-  const on = "background:var(--rb-fg);color:var(--rb-bg)";
-  const ring = "outline:2px dashed var(--rb-fg);outline-offset:3px";
-  for (let i = 0; i < count; i++) {
-    const radio = `#${scope}-t${i}`;
-    rules.push(`${radio}:checked ~ .bp-posts .bp-post:not([data-tags~="t${i}"]){display:none}`);
-    rules.push(`${radio}:checked ~ .bp-layers label[for="${scope}-t${i}"]{${on}}`);
-    rules.push(`${radio}:focus-visible ~ .bp-layers label[for="${scope}-t${i}"]{${ring}}`);
-  }
-  rules.push(`#${scope}-all:checked ~ .bp-layers label[for="${scope}-all"]{${on}}`);
-  rules.push(`#${scope}-all:focus-visible ~ .bp-layers label[for="${scope}-all"]{${ring}}`);
-  return rules.join("\n");
-}
-
-const safeId = (value: string) => value.replace(/[^a-zA-Z0-9_-]/g, "_");
+const tagFilterCss = (scope: string, count: number) =>
+  coreTagFilterCss(scope, count, {
+    items: ".bp-posts .bp-post",
+    filter: ".bp-layers",
+    checked: "background:var(--rb-fg);color:var(--rb-bg)",
+    focus: "outline:2px dashed var(--rb-fg);outline-offset:3px",
+  });
 
 /**
  * Registro de revisões: o primeiro post vira prancha em destaque e os outros entram numa

@@ -34,7 +34,7 @@ body {
 }
 .dk { min-height: 100vh; display: flex; flex-direction: column; color: var(--rb-fg); }
 .dk :focus-visible { outline: 3px solid var(--rb-accent); outline-offset: 2px; }
-.dk a { color: inherit; }
+:where(.dk) a { color: inherit; }
 .dk h1, .dk h2, .dk h3, .dk h4 { letter-spacing: -0.01em; color: var(--rb-fg-strong); }
 .dk-mono { font-family: var(--rb-font-mono); }
 .dk-muted { color: var(--rb-muted); }
@@ -277,7 +277,7 @@ ul.dk-li__desc { padding-left: 18px; list-style: disc; }
 .dk-mail__list { border-right: 2px solid var(--dk-line); background: var(--rb-bg); }
 .dk-mail__item { display: flex; flex-direction: column; gap: 2px; min-height: 44px; padding: 10px 12px; border-bottom: 1px solid var(--rb-border); font-size: 14px; cursor: pointer; }
 .dk-mail__item:hover { background: var(--rb-subtle); }
-.dk-mail__item small { color: inherit; opacity: 0.85; font-size: 12.5px; line-height: 1.35; }
+.dk-mail__item small { color: inherit; font-size: 12.5px; line-height: 1.35; }
 .dk-mail__view { display: flex; flex-direction: column; min-width: 0; }
 .dk-msg { display: flex; flex-direction: column; gap: 12px; min-width: 0; margin: 0; padding: 16px 20px; }
 .dk-msg__from { display: flex; align-items: center; gap: 10px; margin: 0; font-family: var(--rb-font-mono); font-size: 13px; }
@@ -312,9 +312,9 @@ ul.dk-li__desc { padding-left: 18px; list-style: disc; }
 .dk-note__link--on { background: var(--rb-accent); color: var(--rb-accent-fg); }
 .dk-note__link--on:hover { background: color-mix(in srgb, var(--rb-accent) 86%, var(--rb-fg)); }
 .dk-note__title { font-weight: 700; font-size: 14.5px; line-height: 1.3; }
-.dk-note__meta { margin: 0; font-family: var(--rb-font-mono); font-size: 12px; opacity: 0.85; }
-.dk-view .dk-note__meta { opacity: 1; color: var(--rb-muted); }
-.dk-note__excerpt { font-size: 13px; opacity: 0.9; }
+.dk-note__meta { margin: 0; font-family: var(--rb-font-mono); font-size: 12px; color: var(--rb-muted); }
+.dk-note__link--on .dk-note__meta, .dk-note__link--on .dk-note__excerpt { color: inherit; }
+.dk-note__excerpt { font-size: 13px; color: var(--rb-muted); }
 .dk-view { display: flex; flex-direction: column; gap: 14px; min-width: 0; padding: 22px 26px; }
 .dk-view__title { margin: 0; font-size: clamp(22px, 2.4vw, 30px); font-weight: 700; line-height: 1.15; }
 .dk-cover { aspect-ratio: 16 / 7; overflow: hidden; border: 2px solid var(--dk-line); background: color-mix(in srgb, var(--rb-accent-2) 30%, var(--rb-surface)); }

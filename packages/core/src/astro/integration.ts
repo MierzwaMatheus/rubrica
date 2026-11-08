@@ -15,7 +15,7 @@ import { isAbsolute, resolve } from "node:path";
 export type SourceOption =
   /** Pasta com site.json, pages.json, texts.json e collections/*.json. */
   | { fixtures: string }
-  /** Convex de produção (lê CONVEX_URL/VITE_CONVEX_URL se `url` faltar). */
+  /** Convex de produção (lê CONVEX_URL, PUBLIC_CONVEX_URL ou VITE_CONVEX_URL se `url` faltar). */
   | { convex: { url?: string } };
 
 export interface RubricaOptions {

@@ -12,9 +12,16 @@ export const SNAPSHOT_FUNCTION = "rubrica/site:snapshot";
 
 const snapshotRef = makeFunctionReference<"query", Record<string, never>, SiteSnapshot>(SNAPSHOT_FUNCTION);
 
-/** Endereço do Convex: o informado, senão `CONVEX_URL`, senão `VITE_CONVEX_URL`. */
+/**
+ * Endereço do Convex: o informado, senão `CONVEX_URL`, `PUBLIC_CONVEX_URL` ou
+ * `VITE_CONVEX_URL`. O build e o painel (`/admin`) usam a mesma resolução.
+ */
+export function findConvexUrl(url: string | null | undefined, env: Record<string, string | undefined> = process.env): string | undefined {
+  return url?.trim() || env.CONVEX_URL?.trim() || env.PUBLIC_CONVEX_URL?.trim() || env.VITE_CONVEX_URL?.trim() || undefined;
+}
+
 export function resolveConvexUrl(url: string | null | undefined, env: Record<string, string | undefined> = process.env): string {
-  const resolved = url?.trim() || env.CONVEX_URL?.trim() || env.VITE_CONVEX_URL?.trim();
+  const resolved = findConvexUrl(url, env);
   if (!resolved) {
     throw new Error(
       "[rubrica] endereço do Convex ausente: defina CONVEX_URL (ou VITE_CONVEX_URL) no ambiente do build, ou passe source: { convex: { url } } na integração.",

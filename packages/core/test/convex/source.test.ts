@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getFunctionName } from "convex/server";
-import { convexSource, resolveConvexUrl, SNAPSHOT_FUNCTION } from "../../src/data/convex";
+import { convexSource, findConvexUrl, resolveConvexUrl, SNAPSHOT_FUNCTION } from "../../src/data/convex";
 import { emptyCollections, type SiteSnapshot } from "../../src/data/source";
 import { BASE_SETTINGS } from "./_setup";
 
@@ -9,6 +9,8 @@ describe("convexSource", () => {
     expect(resolveConvexUrl("https://a.convex.cloud", { CONVEX_URL: "https://b.convex.cloud" })).toBe("https://a.convex.cloud");
     expect(resolveConvexUrl(null, { CONVEX_URL: "https://b.convex.cloud", VITE_CONVEX_URL: "https://c.convex.cloud" })).toBe("https://b.convex.cloud");
     expect(resolveConvexUrl(null, { VITE_CONVEX_URL: "https://c.convex.cloud" })).toBe("https://c.convex.cloud");
+    expect(resolveConvexUrl(null, { PUBLIC_CONVEX_URL: "https://d.convex.cloud", VITE_CONVEX_URL: "https://c.convex.cloud" })).toBe("https://d.convex.cloud");
+    expect(findConvexUrl(null, { CONVEX_URL: " " })).toBeUndefined();
     expect(() => resolveConvexUrl(null, {})).toThrow(/CONVEX_URL/);
   });
 

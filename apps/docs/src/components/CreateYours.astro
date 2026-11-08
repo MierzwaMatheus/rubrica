@@ -7,8 +7,11 @@ interface Props {
 }
 const d = useDict(Astro.props.lang);
 const t = d.create;
+/** O idioma da página vem marcado: quem lê em inglês provavelmente quer o site em inglês. */
+const pageLocale = Astro.props.lang === "en" ? "en" : "pt-BR";
 const formText = {
   ...t.form,
+  pageLocale,
   siteNamePh: t.siteNamePh,
   presets: PLUGIN_PRESETS.map((p) => ({ id: p.id, plugins: p.plugins, kinds: p.kinds })),
 };
@@ -45,7 +48,7 @@ const LOCALES = [
       <fieldset class="grp">
         <legend>{t.locales}</legend>
         <div class="presets">
-          {LOCALES.map((l) => <button type="button" class="preset" data-locale={l.code} aria-pressed={l.code === "pt-BR" ? "true" : "false"}><span class="nm">{l.label}</span><span class="ht">{l.code}</span></button>)}
+          {LOCALES.map((l) => <button type="button" class="preset" data-locale={l.code} aria-pressed={l.code === pageLocale ? "true" : "false"}><span class="nm">{l.label}</span><span class="ht">{l.code}</span></button>)}
         </div>
         <p class="help">{t.localesHelp}</p>
       </fieldset>

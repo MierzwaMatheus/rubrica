@@ -21,6 +21,8 @@ interface FormText {
   willAsk: string;
   allSet: string;
   siteNamePh: string;
+  /** Idioma marcado de início: o da página. */
+  pageLocale: string;
 }
 
 interface Preset {
@@ -59,7 +61,7 @@ export function initRecipeForm(): void {
   let visual: CombinatorChoice | null = null;
   let kind: SiteKind = "pessoal";
   let preset = "recommended";
-  const locales = new Set<string>(["pt-BR"]);
+  const locales = new Set<string>([tx.pageLocale || "pt-BR"]);
 
   const input = (f: Field) => form.querySelector<HTMLInputElement>(`[name="${f}"]`)!;
   const value = (f: Field) => input(f).value.trim();

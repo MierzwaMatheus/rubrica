@@ -13,7 +13,9 @@ import { CORE_BLOCKS } from "@rubrica/core/blocks";
 import { blockResource, catalogMarkdown, INSTRUCTIONS, PROMPTS, writingGuide } from "./guide";
 import type { Runtime } from "./runtime";
 
-export const SERVER_INFO = { name: "rubrica", title: "Rubrica", version: "2.0.0-alpha.0" };
+import pkg from "../package.json" with { type: "json" };
+
+export const SERVER_INFO = { name: "rubrica", title: "Rubrica", version: pkg.version };
 
 export function createServer(runtime: Runtime): Server {
   const server = new Server(SERVER_INFO, {

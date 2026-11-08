@@ -21,7 +21,10 @@
     "./package.json": "./package.json",
     "./islands": "./src/islands/index.ts",
     "./styles/base.css": "./src/styles/base.css",
-    "./data/convex": "./src/data/convex.ts"
+    "./data/convex": "./src/data/convex.ts",
+    "./convex": "./src/convex/index.ts",
+    "./convex/schema": "./src/convex/schema.ts",
+    "./convex/roles": "./src/convex/lib/roles.ts"
   },
   "files": [
     "src"
@@ -31,20 +34,31 @@
     "test": "vitest run"
   },
   "peerDependencies": {
+    "@astrojs/react": "^7.1.4",
     "astro": "^7.4.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "@astrojs/react": "^7.1.4"
+    "convex": "^1.49.0",
+    "@convex-dev/auth": "^0.0.96",
+    "@auth/core": "^0.41.3"
   },
   "devDependencies": {
+    "@astrojs/react": "^7.1.4",
+    "@edge-runtime/vm": "^5.0.0",
     "@types/node": "^22.0.0",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "astro": "^7.4.7",
+    "convex-test": "^0.0.67",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
     "typescript": "^5.9.0",
     "vitest": "^3.2.4",
-    "@astrojs/react": "^7.1.4"
+    "convex": "^1.49.0",
+    "@convex-dev/auth": "^0.0.96",
+    "@auth/core": "^0.41.3"
+  },
+  "dependencies": {
+    "xss": "^1.0.17"
   }
 }

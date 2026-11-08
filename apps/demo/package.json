@@ -5,14 +5,23 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "convex:codegen": "node scripts/convex-codegen.mjs",
+    "convex:check": "tsc -p convex/tsconfig.json && node scripts/convex-bundle-check.mjs"
   },
   "dependencies": {
+    "@astrojs/react": "^7.1.4",
+    "@auth/core": "^0.41.3",
+    "@convex-dev/auth": "^0.0.96",
     "@rubrica/core": "workspace:^",
     "@rubrica/theme-padrao": "workspace:^",
     "astro": "^7.4.7",
+    "convex": "^1.49.0",
     "react": "^19.2.1",
-    "react-dom": "^19.2.1",
-    "@astrojs/react": "^7.1.4"
+    "react-dom": "^19.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "typescript": "^5.9.3"
   }
 }

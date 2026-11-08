@@ -7,6 +7,7 @@ import { collectionTools, genericCollectionTools } from "./collections";
 import { mediaTools } from "./media";
 import { pagesTools } from "./pages";
 import { siteTools } from "./site";
+import { proposalTools } from "./proposals";
 import { textTools } from "./texts";
 import { DRY_RUN_PROP, type SchemaContext, type ToolDef } from "./types";
 
@@ -18,6 +19,7 @@ export function allTools(): ToolDef[] {
     ...pagesTools,
     ...COLLECTION_NAMES.flatMap((name) => collectionTools(COLLECTION_SPECS[name])),
     ...genericCollectionTools,
+    ...proposalTools,
     ...textTools,
     ...mediaTools,
   ];

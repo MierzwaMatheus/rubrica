@@ -1,0 +1,787 @@
+/**
+ * Conversão dos dados da v1 para a v2 (RFC v2: "Migração da v1", passo 2). Função pura:
+ * recebe as tabelas de um export do Convex da v1 e devolve as tabelas da v2, mais um
+ * relatório do que foi convertido, do que ficou pendente e do que não tem destino.
+ *
+ * - Traduções `ptBR`/`enUS` viram mapa por idioma: `pt-BR` (principal, sem prefixo) e
+ *   `en` (prefixo `/en`, as mesmas URLs da v1).
+ * - As páginas fixas (home, sobre, currículo, portfólio, blog, depoimentos) são montadas
+ *   pela receita do tema equivalente ao layout (decisão 24) e preenchidas com o
+ *   `homeContent`, o `contactInfo` e os textos de seção do `siteTexts` (decisão 25). O
+ *   resto do `siteTexts` que foi personalizado vira texto de interface.
+ * - Ids dos documentos de tabelas 1:1 (usuários, posts, projetos…) são mantidos, para as
+ *   referências (autor, papel, imagem) continuarem valendo depois do import.
+ */
+import { validateBlock, type Recipe, type RecipeBlock } from "@rubrica/core";
+import { blockIds, isLocalizedValue, localizeRecipeValue, navigationFromPages } from "@rubrica/core/seed";
+import { CORE_PLUGINS, V1_PLUGIN_RENAMES } from "@rubrica/core/plugins";
+import { CORE_BLOCKS } from "@rubrica/core/blocks";
+import { SCHEMES } from "../v1/themes/schemes.js";
+import V1_TEXTS_JSON from "./v1-texts.json";
+
+type Doc = Record<string, any>;
+type Loc = Record<string, string>;
+
+/** Textos padrão da última v1 (pt-BR e en-US), chave achatada → texto. */
+export const V1_TEXTS = V1_TEXTS_JSON as Record<string, { pt: string; en?: string }>;
+
+export const PT = "pt-BR";
+export const EN = "en";
+export const LOCALES = { locales: [PT, EN], default: PT };
+
+/** Plugins da v1 e o padrão de cada um no registro da v1.13 (sem chave no homeContent, vale o padrão). */
+export const V1_PLUGIN_DEFAULTS: Record<string, boolean> = {
+  "contact-wizard": true,
+  proposals: true,
+  payments: true,
+  blog: true,
+  portfolio: true,
+  resume: true,
+  about: true,
+  "ai-resumes": false,
+  "audit-log": true,
+  "media-manager": true,
+  i18n: true,
+  playground: false,
+  testimonials: true,
+  "testimonials-intake": true,
+  "contract-templates": true,
+};
+
+/** v1 → v2 nas tabelas 1:1 (os ids continuam). */
+export const TABLE_MAP: Record<string, string> = {
+  users: "users",
+  authAccounts: "authAccounts",
+  userRoles: "userRoles",
+  posts: "posts",
+  projects: "projects",
+  services: "services",
+  testimonials: "testimonials",
+  aboutFaq: "faq",
+  aboutDailyRoutine: "routine",
+  resumeItems: "resumeItems",
+  imageMetadata: "media",
+  auditLog: "auditLog",
+};
+
+/** Tabelas da v1 que ainda não têm destino no núcleo desta versão: vão como estão para um arquivo à parte. */
+export const PENDING_TABLES = [
+  "proposals",
+  "proposalVersions",
+  "proposalSessions",
+  "proposalAcceptances",
+  "checkouts",
+  "contractTemplates",
+  "contactRequests",
+  "testimonialSubmissions",
+  "aiGeneratedResumes",
+];
+
+/** Tabelas que não vão para a v2, e por quê. */
+export const DROPPED_TABLES: Record<string, string> = {
+  authSessions: "sessões de login: todo mundo entra de novo",
+  authRefreshTokens: "sessões de login: todo mundo entra de novo",
+  authVerificationCodes: "códigos temporários de login",
+  authVerifiers: "códigos temporários de login",
+  authRateLimits: "limites de tentativa de login (zerados)",
+  rateLimitAttempts: "limites de envio (zerados)",
+  playgroundAuditLog: "o playground saiu da v2 (decisão 32)",
+  deployStatus: "o estado da publicação é refeito pelo núcleo",
+  imageFolders: "as pastas viraram o caminho de cada imagem (media.folder)",
+  homeContent: "convertido em blocos das páginas e plugins",
+  siteConfig: "convertido nas configurações do site",
+  siteTexts: "convertido em campos dos blocos e textos de interface",
+  contactInfo: "convertido nas configurações do site (pessoa, redes)",
+};
+
+/** Tabelas da v2 construídas pela conversão (sem id de origem). */
+export const BUILT_TABLES = ["pages", "siteSettings", "uiTexts"];
+
+export interface V1RubricaJson {
+  version?: string;
+  layout?: string;
+  theme?: string;
+  fontSans?: string;
+  fontMono?: string;
+  colorMode?: "dark" | "light" | "system";
+  colorModeToggle?: boolean;
+  plugins?: Record<string, boolean>;
+  identity?: Partial<Record<"siteName" | "siteUrl" | "siteDescription" | "authorName" | "authorEmail" | "twitterHandle" | "lang", string>>;
+}
+
+export interface ConvertInput {
+  tables: Record<string, Doc[]>;
+  /** `rubrica.json` da v1 (layout, esquema, fontes, identidade). */
+  v1: V1RubricaJson;
+  /** Tema da v2 (id) que o site vai usar. */
+  theme: string;
+  /** Receita do tema para o tipo pessoal (decisão 24). */
+  recipe: Recipe;
+  /** Agora (para datas de criação das páginas). Padrão: Date.now(). */
+  now?: number;
+}
+
+export interface PageReport {
+  path: string;
+  blocks: string[];
+  /** Blocos da receita que saíram (sem conteúdo na v1, ou plugin desligado). */
+  dropped: { type: string; reason: string }[];
+}
+
+export interface MigrationReport {
+  tables: { v2: string; from: string; count: number }[];
+  pages: PageReport[];
+  texts: { sectionKeys: number; ui: { v1: string; v2: string }[]; unmapped: { key: string; pt: string }[] };
+  plugins: { v1: string; v2: string | null; enabled: boolean }[];
+  pending: { table: string; count: number }[];
+  dropped: { table: string; count: number; reason: string }[];
+  unknownTables: { table: string; count: number }[];
+  warnings: string[];
+}
+
+export interface ConvertResult {
+  /** Tabelas da v2, prontas para o import. */
+  tables: Record<string, Doc[]>;
+  /** Tabela da v1 de onde veio cada tabela 1:1 da v2 (para manter o número da tabela). */
+  sources: Record<string, string>;
+  /** Tabelas da v1 sem destino ainda, como estavam. */
+  pending: Record<string, Doc[]>;
+  report: MigrationReport;
+}
+
+// ── Ajudantes ───────────────────────────────────────────────────────────────
+
+const str = (v: unknown): string | undefined => (typeof v === "string" && v.trim() ? v : undefined);
+
+/** `{ ptBR, enUS }` (+ valor base em pt) → `{ "pt-BR", en }`, sem idiomas vazios. */
+export function loc(base?: unknown, translations?: unknown): Loc {
+  const tr = (translations && typeof translations === "object" ? translations : {}) as Record<string, unknown>;
+  const out: Loc = {};
+  const pt = str(base) ?? str(tr.ptBR);
+  const en = str(tr.enUS);
+  if (pt) out[PT] = pt;
+  if (en) out[EN] = en;
+  return out;
+}
+
+/** Valor que pode ser texto ou `{ ptBR, enUS }` (homeContent). */
+function locAny(value: unknown): Loc {
+  if (typeof value === "string") return loc(value);
+  if (value && typeof value === "object") return loc((value as Doc).ptBR, value);
+  return {};
+}
+
+const hasText = (l: Loc) => Object.keys(l).length > 0;
+
+function mapLoc(l: Loc, fn: (s: string) => string): Loc {
+  return Object.fromEntries(Object.entries(l).map(([k, v]) => [k, fn(v)]));
+}
+
+/** Texto puro → HTML em parágrafos (o que já é HTML fica como está). */
+export function toHtml(text: string): string {
+  if (/<(p|h[1-6]|ul|ol|div|blockquote)[\s>]/i.test(text)) return text;
+  const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return text
+    .split(/\n\s*\n/)
+    .map((p) => p.trim())
+    .filter(Boolean)
+    .map((p) => `<p>${esc(p).replace(/\n/g, "<br>")}</p>`)
+    .join("");
+}
+
+const compact = <T extends Doc>(doc: T): T => Object.fromEntries(Object.entries(doc).filter(([, v]) => v !== undefined && !(typeof v === "object" && v !== null && !Array.isArray(v) && Object.keys(v).length === 0))) as T;
+
+const meta = (d: Doc) => ({ _id: d._id, _creationTime: d._creationTime });
+
+const lifecycle = (d: Doc, published = true) => ({
+  published,
+  createdAt: typeof d.createdAt === "number" ? d.createdAt : (d._creationTime ?? 0),
+  updatedAt: d.updatedAt,
+  deletedAt: d.deletedAt,
+  deletedBy: d.deletedBy,
+});
+
+export function slugify(text: string): string {
+  return text
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80) || "item";
+}
+
+const MONTHS: Record<string, string> = {
+  jan: "01", fev: "02", feb: "02", mar: "03", abr: "04", apr: "04", mai: "05", may: "05", jun: "06",
+  jul: "07", ago: "08", aug: "08", set: "09", sep: "09", out: "10", oct: "10", nov: "11", dez: "12", dec: "12",
+};
+const PRESENT = /atual|presente|present|hoje|now|current|o momento|em andamento/i;
+
+/** "jan/2020 – atual", "03/2019 - 12/2021", "2018 - 2020" → { start, end } no formato da v2. */
+export function parsePeriod(period: string): { start?: string; end?: string; ok: boolean } {
+  const parts = period.split(/\s+(?:-|–|—|a|até|to)\s+|\s*[–—]\s*|\s+-\s+/i).map((p) => p.trim()).filter(Boolean);
+  const one = (p: string): string | undefined => {
+    const numeric = /^(\d{1,2})[/.-](\d{4})$/.exec(p);
+    if (numeric) return `${numeric[2]}-${numeric[1]!.padStart(2, "0")}`;
+    const named = /^([a-zç]{3})[a-zç]*\.?[\s/de]*(\d{4})$/i.exec(p.normalize("NFD").replace(/[̀-ͯ]/g, ""));
+    if (named && MONTHS[named[1]!.toLowerCase()]) return `${named[2]}-${MONTHS[named[1]!.toLowerCase()]}`;
+    const year = /^(\d{4})$/.exec(p);
+    return year ? year[1] : undefined;
+  };
+  if (parts.length === 0) return { ok: false };
+  const start = one(parts[0]!);
+  if (!start) return { ok: false };
+  if (parts.length === 1) return { start, ok: true };
+  if (PRESENT.test(parts[1]!)) return { start, ok: true };
+  const end = one(parts[1]!);
+  return end ? { start, end, ok: true } : { ok: false };
+}
+
+// ── Conversão ───────────────────────────────────────────────────────────────
+
+class Ctx {
+  warnings: string[] = [];
+  media = new Map<string, Doc>();
+  folders = new Map<string, string>();
+  siteTexts = new Map<string, Doc>();
+  home = new Map<string, unknown>();
+  config = new Map<string, unknown>();
+  contact: Doc | undefined;
+
+  constructor(readonly tables: Record<string, Doc[]>) {
+    for (const f of tables.imageFolders ?? []) this.folders.set(f._id, f.path);
+    for (const m of tables.imageMetadata ?? []) this.media.set(m._id, m);
+    for (const t of tables.siteTexts ?? []) this.siteTexts.set(t.key, t);
+    for (const h of tables.homeContent ?? []) this.home.set(h.key, h.value);
+    for (const c of tables.siteConfig ?? []) this.config.set(c.key, c.value);
+    this.contact = (tables.contactInfo ?? [])[0];
+  }
+
+  /** Imagem da biblioteca da v1 (id do imageMetadata), ou só a URL. */
+  image(imageId?: string, url?: string): Doc | undefined {
+    const m = imageId ? this.media.get(imageId) : undefined;
+    if (!m && !str(url)) return undefined;
+    return compact({
+      url: str(url) ?? "",
+      storageId: m?.storageId,
+      alt: m?.altText ? loc(m.altText) : undefined,
+      width: m?.width,
+      height: m?.height,
+    });
+  }
+
+  /** Texto de seção ou de interface: o do site (siteTexts), senão o padrão da v1. Sem os espaços de enfeite. */
+  t(key: string): Loc {
+    const row = this.siteTexts.get(key);
+    const def = V1_TEXTS[key];
+    const pt = str(row?.ptBR) ?? def?.pt;
+    const en = str(row?.enUS) ?? def?.en;
+    return mapLoc(compact({ [PT]: pt, [EN]: en }) as Loc, (s) => s.trim());
+  }
+
+  /** O texto foi personalizado no painel (diferente do padrão da v1)? */
+  customized(key: string): boolean {
+    const row = this.siteTexts.get(key);
+    if (!row) return false;
+    const def = V1_TEXTS[key];
+    if (!def) return true;
+    return (row.ptBR ?? "") !== def.pt || (str(row.enUS) !== undefined && row.enUS !== def.en);
+  }
+}
+
+function convertPosts(ctx: Ctx, docs: Doc[]): Doc[] {
+  return docs.map((d) =>
+    compact({
+      ...meta(d),
+      slug: d.slug,
+      title: loc(d.title, d.titleTranslations),
+      excerpt: loc(d.subtitle, d.subtitleTranslations),
+      content: loc(d.content, d.contentTranslations),
+      cover: ctx.image(d.imageId, d.imageUrl),
+      seo: compact({
+        title: loc(d.seoTitle, d.seoTitleTranslations),
+        description: loc(d.seoDescription, d.seoDescriptionTranslations),
+        image: ctx.image(d.ogImageId, d.ogImageUrl),
+      }),
+      tags: d.tags?.length ? d.tags : undefined,
+      featured: d.featured === true ? true : undefined,
+      publishedAt: d.publishedAt,
+      authorId: d.authorId,
+      ...lifecycle(d, d.status === "published"),
+    }),
+  );
+}
+
+const CASE_SECTIONS: { field: string; key: string }[] = [
+  { field: "context", key: "portfolio.before" },
+  { field: "problem", key: "portfolio.problem" },
+  { field: "solution", key: "portfolio.solution" },
+  { field: "decisions", key: "portfolio.decisions" },
+  { field: "results", key: "portfolio.results" },
+  { field: "learnings", key: "portfolio.learnings" },
+];
+
+function convertProjects(ctx: Ctx, docs: Doc[]): Doc[] {
+  const slugs = new Set<string>();
+  return docs.map((d) => {
+    let slug = str(d.slug) ?? slugify(d.title ?? "projeto");
+    if (!str(d.slug)) ctx.warnings.push(`Projeto "${d.title}" não tinha slug na v1: ganhou /portfolio/${slug}.`);
+    for (let n = 2; slugs.has(slug); n++) slug = `${str(d.slug) ?? slugify(d.title)}-${n}`;
+    slugs.add(slug);
+
+    const cs = d.caseStudy as Doc | undefined;
+    const csEn = (d.caseStudyTranslations as Doc | undefined)?.enUS as Doc | undefined;
+    const sections: Doc[] = [];
+    if (cs) {
+      for (const s of CASE_SECTIONS) {
+        const body = mapLoc(loc(cs[s.field], { enUS: csEn?.[s.field] }), toHtml);
+        if (hasText(body)) sections.push({ title: ctx.t(s.key), body });
+      }
+      if (cs.metrics?.length) {
+        const list = (metrics: Doc[]) => `<ul>${metrics.map((m) => `<li><strong>${m.value}</strong> ${m.label}</li>`).join("")}</ul>`;
+        const body: Loc = { [PT]: list(cs.metrics) };
+        if (csEn?.metrics?.length) body[EN] = list(csEn.metrics);
+        sections.push({ title: ctx.t("portfolio.metrics"), body });
+      }
+      if (cs.testimonial?.text) {
+        const t = cs.testimonial as Doc;
+        const quote = (text: string, role?: string) => `<blockquote><p>${text}</p><footer>${t.author}${role ? `, ${role}` : ""}</footer></blockquote>`;
+        const original = t.lang === "en-US" ? EN : PT;
+        const other = original === PT ? EN : PT;
+        const translated = (original === PT ? csEn : (d.caseStudyTranslations as Doc | undefined)?.ptBR)?.testimonial as Doc | undefined;
+        const body: Loc = { [original]: quote(t.text, t.role) };
+        if (translated?.text) body[other] = quote(translated.text, translated.role ?? t.role);
+        sections.push({ title: ctx.t("portfolio.testimonial"), body });
+      }
+    }
+    const images = (d.imageIds as string[] | undefined ?? []).map((id) => ctx.image(id)).filter(Boolean) as Doc[];
+    const external = (d.externalImageUrls as string[] | undefined ?? []).map((url) => ({ url }));
+    const [cover, ...gallery] = [...images, ...external];
+    const links: Doc[] = [];
+    if (str(d.demoLink)) links.push({ label: ctx.t("portfolio.liveDemo"), href: d.demoLink });
+    if (str(d.githubLink)) links.push({ label: ctx.t("portfolio.code"), href: d.githubLink });
+    const tags = [...new Set([...(str(d.category) ? [d.category as string] : []), ...(d.tags ?? [])])];
+    return compact({
+      ...meta(d),
+      slug,
+      title: loc(d.title, d.titleTranslations),
+      summary: loc(d.description, d.descriptionTranslations),
+      content: mapLoc(loc(d.longDescription, d.longDescriptionTranslations), toHtml),
+      sections: sections.length ? sections : undefined,
+      cover,
+      gallery: gallery.length ? gallery : undefined,
+      role: cs ? loc(cs.role, { enUS: csEn?.role }) : undefined,
+      links: links.length ? links : undefined,
+      tags: tags.length ? tags : undefined,
+      // Na v1, a home mostrava os projetos com case e slug (selectFeaturedCases).
+      featured: cs && str(d.slug) ? true : undefined,
+      order: d.orderIndex,
+      ...lifecycle(d),
+    });
+  });
+}
+
+function convertResume(ctx: Ctx, docs: Doc[]): Doc[] {
+  return docs.map((d) => {
+    const c = (d.content ?? {}) as Doc;
+    const tr = (d.contentTranslations ?? {}) as Doc;
+    const en = (tr.enUS ?? {}) as Doc;
+    const base = { ...meta(d), order: d.orderIndex, ...lifecycle(d) };
+    const period = (p?: string) => {
+      if (!str(p)) return {};
+      const parsed = parsePeriod(p!);
+      if (!parsed.ok) ctx.warnings.push(`Currículo: não entendi o período "${p}" de "${c.role ?? c.degree ?? c.text}"; preencha início e fim no painel.`);
+      return compact({ start: parsed.start, end: parsed.end });
+    };
+    switch (d.type) {
+      case "experience":
+        return compact({ ...base, kind: "experience", title: loc(c.role, { enUS: en.role }), organization: str(c.company), description: mapLoc(loc(c.description, { enUS: en.description }), (s) => s), ...period(c.period) });
+      case "education":
+        return compact({ ...base, kind: "education", title: loc(c.degree, { enUS: en.degree }), organization: str(c.institution), description: loc(c.description, { enUS: en.description }), ...period(c.period) });
+      case "skill":
+        return compact({ ...base, kind: "skill", title: loc(c.name, { enUS: en.name }), description: loc(c.level, { enUS: en.level }), tags: str(c.group) ? [c.group] : undefined });
+      case "soft_skill":
+        return compact({ ...base, kind: "skill", title: loc(c.text, tr), tags: ["soft-skill"] });
+      case "course":
+        return compact({ ...base, kind: "certification", title: loc(c.text, tr) });
+      case "language":
+        return compact({ ...base, kind: "language", title: loc(c.name, tr.enUS ? { enUS: typeof tr.enUS === "string" ? tr.enUS : tr.enUS.name } : undefined), description: str(c.level) ? loc(c.level) : undefined });
+      case "volunteer":
+        if (str(c.text)) return compact({ ...base, kind: "experience", title: loc(c.text, tr), tags: ["voluntariado"] });
+        return compact({ ...base, kind: "experience", title: loc(c.role, { enUS: en.role }), organization: str(c.company), description: loc(c.description, { enUS: en.description }), tags: ["voluntariado"], ...period(c.period) });
+      default:
+        ctx.warnings.push(`Currículo: item do tipo desconhecido "${d.type}" ficou de fora.`);
+        return null;
+    }
+  }).filter(Boolean) as Doc[];
+}
+
+/** Estado efetivo dos plugins da v1 e o equivalente na v2. */
+function convertPlugins(ctx: Ctx): { record: Record<string, boolean>; report: MigrationReport["plugins"] } {
+  const v2Ids = new Set(CORE_PLUGINS.filter((p) => p.kinds.includes("pessoal")).map((p) => p.id));
+  const record: Record<string, boolean> = {};
+  const report: MigrationReport["plugins"] = [];
+  const ids = new Set([...Object.keys(V1_PLUGIN_DEFAULTS), ...[...ctx.home.keys()].filter((k) => /^plugin:.+:enabled$/.test(k)).map((k) => k.slice(7, -8))]);
+  for (const id of ids) {
+    const key = `plugin:${id}:enabled`;
+    let enabled = ctx.home.has(key) ? ctx.home.get(key) !== false : (V1_PLUGIN_DEFAULTS[id] ?? false);
+    if (id === "contact-wizard" && ctx.home.get("contact_wizard_enabled") === false) enabled = false;
+    const v2 = id in V1_PLUGIN_RENAMES ? V1_PLUGIN_RENAMES[id]! : id;
+    const target = v2 && v2Ids.has(v2) ? v2 : null;
+    if (target) record[target] = enabled;
+    report.push({ v1: id, v2: target, enabled });
+  }
+  return { record, report };
+}
+
+function hexOf(value: unknown): string | undefined {
+  return typeof value === "string" && /^#[0-9a-f]{6}$/i.test(value.trim()) ? value.trim().toLowerCase() : undefined;
+}
+
+function convertSettings(ctx: Ctx, input: ConvertInput, plugins: Record<string, boolean>): Doc {
+  const c = (k: string) => str(ctx.config.get(k));
+  const id = input.v1.identity ?? {};
+  const contact = ctx.contact;
+  const scheme = SCHEMES.find((s) => s.id === input.v1.theme);
+  // Cores mudadas no painel ("Aparência") que diferem do esquema: viram tokens.
+  const tokens: Record<string, string> = {};
+  const pairs: [string, string, "bg" | "text" | "primary"][] = [
+    ["theme_background", "rb-bg", "bg"],
+    ["theme_foreground", "rb-fg", "text"],
+    ["theme_primary", "rb-accent", "primary"],
+  ];
+  for (const [key, token, role] of pairs) {
+    const hex = hexOf(ctx.config.get(key));
+    if (!hex) continue;
+    const fromScheme = scheme && [scheme.light[role], scheme.dark[role]].map((v) => v.toLowerCase()).includes(hex);
+    if (!fromScheme) tokens[token] = hex;
+  }
+  if (ctx.config.get("theme_colors_per_mode") === true) ctx.warnings.push("As cores separadas por modo (claro/escuro) do painel da v1 não foram convertidas: ajuste em Aparência.");
+  const social = [
+    ["linkedin", contact?.linkedinUrl],
+    ["github", contact?.githubUrl],
+    ["behance", contact?.behanceUrl],
+  ]
+    .filter(([, url]) => str(url))
+    .map(([network, url]) => ({ network, url }));
+  const url = (c("site_url") ?? id.siteUrl ?? "").replace(/\/+$/, "");
+  const ogStorage = str(ctx.config.get("og_image_storage_id"));
+  return compact({
+    kind: "pessoal",
+    name: loc(c("site_name") ?? c("site_title") ?? id.siteName),
+    description: loc(c("site_description") ?? id.siteDescription),
+    url: url && !/^https?:\/\//.test(url) ? `https://${url}` : url,
+    locales: LOCALES,
+    theme: input.theme,
+    appearance: compact({
+      colorMode: input.v1.colorMode ?? "dark",
+      colorToggle: input.v1.colorModeToggle ?? false,
+      scheme: input.v1.theme,
+      tokens: Object.keys(tokens).length ? tokens : undefined,
+      fontSans: c("theme_font_sans") ?? input.v1.fontSans,
+      fontMono: c("theme_font_mono") ?? input.v1.fontMono,
+    }),
+    navigation: [],
+    social,
+    person: contact || id.authorName
+      ? compact({
+          name: str(contact?.name) ?? id.authorName ?? "",
+          jobTitle: contact ? loc(contact.role, contact.roleTranslations) : undefined,
+          email: contact?.showEmail ? str(contact.email) : undefined,
+          photo: contact?.avatarStorageId || str(contact?.avatarUrl) ? compact({ url: str(contact?.avatarUrl) ?? "", storageId: contact?.avatarStorageId }) : undefined,
+        })
+      : undefined,
+    plugins,
+    ogImage: ogStorage || c("og_image_url") ? compact({ url: c("og_image_url") ?? "", storageId: ogStorage }) : undefined,
+    twitterHandle: c("twitter_handle") ?? id.twitterHandle,
+  });
+}
+
+/** Campos de cada bloco das páginas fixas, a partir da v1. `null`: o bloco sai (sem conteúdo). */
+type Filler = (ctx: Ctx, plugins: Record<string, boolean>) => Doc | null;
+
+const link = (label: Loc, href: string) => (hasText(label) ? { label, href } : undefined);
+
+const ABOUT_TEXT = (ctx: Ctx) => mapLoc(locAny(ctx.home.get("about_text")), toHtml);
+
+/** Por página e tipo de bloco (com a ocorrência quando o tipo repete na página). */
+export const SECTION_FILLERS: Record<string, Record<string, Filler | Filler[]>> = {
+  "/": {
+    hero: (ctx, plugins) => {
+      const tags = (ctx.home.get("hero_tags") as Doc[] | undefined)?.filter((t) => str(t.label)).map((t) => ({ label: loc(t.label) }));
+      const availability = ctx.home.get("availability_status") as Doc | undefined;
+      const title = ctx.t("home.hero.headline");
+      return compact({
+        eyebrow: ctx.contact ? loc(ctx.contact.role, ctx.contact.roleTranslations) : undefined,
+        title: hasText(title) ? title : loc(ctx.home.get("hero_title")),
+        subtitle: ctx.t("home.hero.description"),
+        primaryCta: plugins.portfolio !== false ? link(ctx.t("home.hero.ctaCases"), "#cases") : undefined,
+        secondaryCta: plugins["contact-wizard"] !== false ? link(ctx.t("home.hero.ctaContact"), "#contato") : undefined,
+        tags: tags?.length ? tags.slice(0, 8) : undefined,
+        showAvailability: availability?.available === true,
+      });
+    },
+    numeros: (ctx) => {
+      const metrics = (ctx.home.get("home_metrics") as Doc[] | undefined) ?? [];
+      if (!metrics.length) return null;
+      return { items: metrics.slice(0, 8).map((m) => ({ value: String(m.value), label: loc(m.label, m.labelTranslations) })) };
+    },
+    cases: (ctx) => compact({ anchor: "cases", title: ctx.t("home.cases.title"), cta: link(ctx.t("home.cases.viewAll"), "/portfolio") }),
+    texto: (ctx) => {
+      const body = ABOUT_TEXT(ctx);
+      return hasText(body) ? { title: ctx.t("home.about.title"), body } : null;
+    },
+    servicos: (ctx) => ({ title: ctx.t("home.skills.title") }),
+    depoimentos: (ctx, plugins) => compact({ title: ctx.t("home.testimonials.title"), allowSubmission: plugins["testimonials-intake"] !== false }),
+    cta: (ctx, plugins) =>
+      compact({
+        title: ctx.t("home.cta.title"),
+        body: ctx.t("home.cta.subtitle"),
+        primary: link(ctx.t("home.cta.project"), "#contato"),
+        secondary: plugins["contact-wizard"] !== false ? link(ctx.t("home.cta.job"), "#contato") : undefined,
+      }),
+    contato: (ctx, plugins) => ({ anchor: "contato", title: ctx.t("sidebar.contact"), mode: plugins["contact-wizard"] === false ? "channels" : "wizard", showChannels: true }),
+    "posts-recentes": (ctx) => compact({ title: ctx.t("blog.title"), cta: link(ctx.t("blog.title"), "/blog") }),
+  },
+  "/sobre": {
+    texto: [
+      (ctx) => {
+        const body = ABOUT_TEXT(ctx);
+        return hasText(body) ? { title: ctx.t("about.professional.title"), body } : null;
+      },
+      (ctx) => {
+        const body = mapLoc(ctx.t("about.aboutMe.text"), toHtml);
+        return hasText(body) ? { title: ctx.t("about.aboutMe.title"), body } : null;
+      },
+    ],
+    "lista-itens": (ctx) => {
+      const items = ((ctx.home.get("work_principles") as Doc[] | undefined) ?? []).filter((p) => str(p.title));
+      if (!items.length) return null;
+      return { title: ctx.t("about.principles.title"), numbered: true, items: items.slice(0, 12).map((p) => compact({ title: loc(p.title, p.titleTranslations), body: loc(p.description, p.descriptionTranslations) })) };
+    },
+    galeria: (ctx) => ({ title: ctx.t("about.dailyRoutine.title") }),
+    faq: (ctx) => ({ title: ctx.t("about.faq.title") }),
+  },
+  "/curriculo": { curriculo: (ctx) => ({ title: ctx.t("resume.title"), intro: ctx.t("resume.subtitle"), showDownload: true }) },
+  "/portfolio": { cases: (ctx) => ({ title: ctx.t("portfolio.title"), intro: ctx.t("portfolio.subtitle") }) },
+  "/blog": { "posts-recentes": (ctx) => ({ title: ctx.t("blog.title"), intro: ctx.t("blog.subtitle"), showTagFilter: true }) },
+  "/depoimentos": { depoimentos: (ctx, plugins) => compact({ title: ctx.t("testimonials.title"), intro: ctx.t("testimonials.subtitle"), allowSubmission: plugins["testimonials-intake"] !== false }) },
+};
+
+/** Título e SEO de cada página fixa. */
+const PAGE_META: Record<string, (ctx: Ctx) => { title: Loc; seo?: Doc }> = {
+  "/": (ctx) => ({ title: ctx.t("navigation.home"), seo: compact({ title: loc(ctx.config.get("seo_home_title")), description: loc(ctx.config.get("seo_home_description")) }) }),
+  "/sobre": (ctx) => ({ title: ctx.t("navigation.about"), seo: compact({ title: ctx.t("seo.aboutTitle"), description: ctx.t("seo.aboutDescription") }) }),
+  "/curriculo": (ctx) => ({ title: ctx.t("navigation.resume"), seo: compact({ title: ctx.t("seo.resumeTitle"), description: ctx.t("seo.resumeDescription") }) }),
+  "/portfolio": (ctx) => ({ title: ctx.t("navigation.portfolio"), seo: compact({ title: ctx.t("seo.portfolioTitle"), description: ctx.t("seo.portfolioDescription") }) }),
+  "/blog": (ctx) => ({ title: ctx.t("navigation.blog"), seo: compact({ title: ctx.t("seo.blogTitle"), description: ctx.t("seo.blogDescription") }) }),
+  "/depoimentos": (ctx) => ({ title: ctx.t("testimonials.title"), seo: compact({ description: ctx.t("seo.testimonialsDescription") }) }),
+};
+
+/** Chaves de seção usadas pelos blocos (vão para os campos, não para "Textos"). */
+export const SECTION_KEYS = new Set([
+  "home.hero.headline", "home.hero.description", "home.hero.ctaCases", "home.hero.ctaContact", "home.cases.title", "home.cases.viewAll",
+  "home.about.title", "home.skills.title", "home.testimonials.title", "home.cta.title", "home.cta.subtitle", "home.cta.project", "home.cta.job",
+  "sidebar.contact", "blog.title", "blog.subtitle", "about.professional.title", "about.aboutMe.title", "about.aboutMe.text", "about.principles.title",
+  "about.dailyRoutine.title", "about.faq.title", "resume.title", "resume.subtitle", "portfolio.title", "portfolio.subtitle", "testimonials.title",
+  "testimonials.subtitle", "navigation.home", "navigation.about", "navigation.resume", "navigation.portfolio", "navigation.blog",
+  "seo.aboutTitle", "seo.aboutDescription", "seo.resumeTitle", "seo.resumeDescription", "seo.portfolioTitle", "seo.portfolioDescription",
+  "seo.blogTitle", "seo.blogDescription", "seo.testimonialsDescription", "portfolio.before", "portfolio.problem", "portfolio.solution",
+  "portfolio.decisions", "portfolio.results", "portfolio.learnings", "portfolio.metrics", "portfolio.testimonial", "portfolio.liveDemo", "portfolio.code",
+]);
+
+/** Textos de interface da v1 → chave da v2 (só os personalizados vão; os outros usam o padrão da v2). */
+export const UI_TEXT_MAP: Record<string, string> = {
+  "blog.readMore": "common.readMore",
+  "common.back": "common.back",
+  "testimonials.leaveTestimonial": "testimonials.send",
+  "testimonials.empty": "common.empty",
+  "resume.experience": "resume.experience",
+  "resume.education": "resume.education",
+  "resume.skills": "resume.skill",
+  "resume.courses": "resume.certification",
+  "resume.languages": "resume.language",
+  "resume.downloadCV": "resume.download",
+  "home.cases.read": "case.view",
+  "blog.filterByTags": "blog.filter",
+  "sidebar.language": "nav.language",
+  "sidebar.menu": "nav.menu",
+  "contactWizard.contact.name": "form.name",
+  "contactWizard.contact.email": "form.email",
+  "contactWizard.contact.phone": "form.phone",
+  "contactWizard.successTitle": "contactForm.success",
+  "contactWizard.successBody": "contactForm.successBody",
+  "contactWizard.rateLimited": "form.rateLimited",
+  "contactWizard.back": "form.back",
+  "notFound.cta": "notFound.home",
+  "portfolio.myRole": "case.role",
+  "home.availability.label": "hero.available",
+};
+
+function buildPages(ctx: Ctx, input: ConvertInput, plugins: Record<string, boolean>, report: MigrationReport): Doc[] {
+  const allowed = (type: string) => {
+    const def = CORE_BLOCKS.find((b) => b.type === type);
+    if (!def) return "bloco desconhecido no núcleo";
+    if (def.category === "empresa") return "bloco da linha empresa";
+    if (def.plugin && plugins[def.plugin] === false) return `plugin ${def.plugin} desligado na v1`;
+    return null;
+  };
+  const now = input.now ?? Date.now();
+  const pages: Doc[] = [];
+  for (const page of input.recipe) {
+    const fillers = SECTION_FILLERS[page.path];
+    const seen = new Map<string, number>();
+    const kept: RecipeBlock[] = [];
+    const dropped: PageReport["dropped"] = [];
+    for (const block of page.blocks) {
+      const n = seen.get(block.type) ?? 0;
+      seen.set(block.type, n + 1);
+      const reason = allowed(block.type);
+      if (reason) {
+        dropped.push({ type: block.type, reason });
+        continue;
+      }
+      const filler = fillers?.[block.type];
+      const fill = Array.isArray(filler) ? filler[n] : n === 0 ? filler : undefined;
+      if (!fillers) {
+        // Página que a v1 não tinha (ex.: privacidade): fica com o texto da receita.
+        kept.push({ ...block, fields: localizeRecipeValue(block.fields ?? {}, LOCALES.locales) as Doc });
+        continue;
+      }
+      if (!fill) {
+        dropped.push({ type: block.type, reason: "a v1 não tinha esta seção nesta página" });
+        continue;
+      }
+      const fields = fill(ctx, plugins);
+      if (!fields) {
+        dropped.push({ type: block.type, reason: "sem conteúdo na v1" });
+        continue;
+      }
+      // Campos estruturais da receita (variação, booleanos) ficam; textos de exemplo, não.
+      const structural = Object.fromEntries(Object.entries(block.fields ?? {}).filter(([, v]) => typeof v === "boolean" || (typeof v === "string" && !isLocalizedValue(v))));
+      kept.push({ ...block, fields: { ...structural, ...fields } });
+    }
+    // Confere cada bloco com o contrato (campos obrigatórios, tamanhos): o import não passa pelas mutations.
+    for (let i = kept.length - 1; i >= 0; i--) {
+      const block = kept[i]!;
+      const def = CORE_BLOCKS.find((b) => b.type === block.type)!;
+      const errors = validateBlock(def, { id: "x", fields: block.fields ?? {}, ...(block.source && { source: block.source }) });
+      if (errors.length) {
+        dropped.push({ type: block.type, reason: `campos inválidos: ${errors.map((e) => `${e.path} ${e.message}`).join("; ")}` });
+        kept.splice(i, 1);
+      }
+    }
+    if (!kept.length) {
+      report.pages.push({ path: page.path, blocks: [], dropped });
+      continue;
+    }
+    const metaFor = PAGE_META[page.path];
+    const m = metaFor ? metaFor(ctx) : { title: localizeRecipeValue(page.title, LOCALES.locales) as Loc };
+    const title = hasText(m.title) ? m.title : (localizeRecipeValue(page.title, LOCALES.locales) as Loc);
+    const ids = blockIds(kept);
+    pages.push(
+      compact({
+        path: page.path,
+        title,
+        seo: m.seo && Object.keys(m.seo).length ? m.seo : undefined,
+        blocks: kept.map((b, i) => compact({ id: ids[i], type: b.type, variant: b.variant, visible: true, fields: b.fields ?? {}, source: b.source })),
+        published: true,
+        system: true,
+        createdAt: now,
+        updatedAt: now,
+      }),
+    );
+    report.pages.push({ path: page.path, blocks: kept.map((b) => b.type), dropped });
+  }
+  return pages;
+}
+
+function buildUiTexts(ctx: Ctx, report: MigrationReport, now: number): Doc[] {
+  const out: Doc[] = [];
+  const availability = ctx.home.get("availability_status") as Doc | undefined;
+  const fromHome = availability?.label ? locAny(availability.label) : {};
+  if (hasText(fromHome)) {
+    out.push({ key: "hero.available", value: fromHome, updatedAt: now });
+    report.texts.ui.push({ v1: "homeContent.availability_status", v2: "hero.available" });
+  }
+  for (const key of ctx.siteTexts.keys()) {
+    if (!ctx.customized(key)) continue;
+    if (SECTION_KEYS.has(key)) continue;
+    const v2 = UI_TEXT_MAP[key];
+    if (v2) {
+      if (out.some((t) => t.key === v2)) continue;
+      out.push({ key: v2, value: ctx.t(key), updatedAt: now });
+      report.texts.ui.push({ v1: key, v2 });
+    } else if (!key.startsWith("admin.")) {
+      report.texts.unmapped.push({ key, pt: String(ctx.siteTexts.get(key)?.ptBR ?? "").slice(0, 120) });
+    }
+  }
+  return out;
+}
+
+export function convertV1(input: ConvertInput): ConvertResult {
+  const t = input.tables;
+  const ctx = new Ctx(t);
+  const report: MigrationReport = { tables: [], pages: [], texts: { sectionKeys: 0, ui: [], unmapped: [] }, plugins: [], pending: [], dropped: [], unknownTables: [], warnings: ctx.warnings };
+  const now = input.now ?? Date.now();
+  const out: Record<string, Doc[]> = {};
+  const sources: Record<string, string> = {};
+  const put = (v2: string, from: string, docs: Doc[]) => {
+    out[v2] = docs;
+    if (from) sources[v2] = from;
+    report.tables.push({ v2, from: from || "(montada)", count: docs.length });
+  };
+
+  put("users", "users", (t.users ?? []).map((d) => ({ ...d })));
+  put("authAccounts", "authAccounts", (t.authAccounts ?? []).map((d) => ({ ...d })));
+  put("userRoles", "userRoles", (t.userRoles ?? []).map((d) => ({ ...d })));
+  put("posts", "posts", convertPosts(ctx, t.posts ?? []));
+  put("projects", "projects", convertProjects(ctx, t.projects ?? []));
+  put("services", "services", (t.services ?? []).map((d) => compact({ ...meta(d), title: loc(d.title, d.titleTranslations), description: loc(d.description, d.descriptionTranslations), order: d.orderIndex, ...lifecycle(d) })));
+  put(
+    "testimonials",
+    "testimonials",
+    (t.testimonials ?? []).map((d) =>
+      compact({ ...meta(d), quote: loc(d.text, d.textTranslations), author: d.name, role: loc(d.role, d.roleTranslations), avatar: ctx.image(d.imageId, d.imageUrl), featured: d.showOnHome === true ? true : undefined, tags: str(d.category) ? [d.category] : undefined, order: d.orderIndex, ...lifecycle(d) }),
+    ),
+  );
+  put("faq", "aboutFaq", (t.aboutFaq ?? []).map((d) => compact({ ...meta(d), question: loc(d.question, d.questionTranslations), answer: mapLoc(loc(d.answer, d.answerTranslations), (s) => s), order: d.displayOrder, ...lifecycle(d) })));
+  const routine = t.aboutDailyRoutine ?? [];
+  if (routine.some((d) => d.spanSize && d.spanSize !== "1x1")) ctx.warnings.push("Dia a dia: o tamanho de cada foto na grade (1x2, 2x1) não existe na v2; a galeria do tema decide.");
+  put("routine", "aboutDailyRoutine", routine.map((d) => compact({ ...meta(d), title: loc(d.description, d.descriptionTranslations), image: ctx.image(d.imageId, d.imageUrl), order: d.displayOrder, ...lifecycle(d) })));
+  put("resumeItems", "resumeItems", convertResume(ctx, t.resumeItems ?? []));
+  put(
+    "media",
+    "imageMetadata",
+    (t.imageMetadata ?? []).map((d) =>
+      compact({ ...meta(d), storageId: d.storageId, name: d.displayName, folder: (d.folderId && ctx.folders.get(d.folderId)) || "/", alt: d.altText ? loc(d.altText) : undefined, width: d.width, height: d.height, size: d.fileSize, contentType: d.mimeType, createdAt: d.createdAt ?? d._creationTime, createdBy: d.createdBy, updatedAt: d.updatedAt }),
+    ),
+  );
+  put("auditLog", "auditLog", (t.auditLog ?? []).map((d) => ({ ...d })));
+
+  const plugins = convertPlugins(ctx);
+  report.plugins = plugins.report;
+  const settings = convertSettings(ctx, input, plugins.record);
+  const pages = buildPages(ctx, input, plugins.record, report);
+  settings.navigation = navigationFromPages(pages as never) as Doc[];
+  put("siteSettings", "", [compact({ ...settings, updatedAt: now })]);
+  put("pages", "", pages);
+  put("uiTexts", "", buildUiTexts(ctx, report, now));
+  report.texts.sectionKeys = [...ctx.siteTexts.keys()].filter((k) => SECTION_KEYS.has(k)).length;
+
+  const pending: Record<string, Doc[]> = {};
+  for (const table of PENDING_TABLES) {
+    if (t[table]?.length) {
+      pending[table] = t[table]!;
+      report.pending.push({ table, count: t[table]!.length });
+    }
+  }
+  const known = new Set([...Object.keys(TABLE_MAP), ...PENDING_TABLES, ...Object.keys(DROPPED_TABLES)]);
+  for (const [table, docs] of Object.entries(t)) {
+    if (table.startsWith("_")) continue;
+    if (table in DROPPED_TABLES) report.dropped.push({ table, count: docs.length, reason: DROPPED_TABLES[table]! });
+    else if (!known.has(table)) report.unknownTables.push({ table, count: docs.length });
+  }
+  for (const u of report.unknownTables) ctx.warnings.push(`Tabela própria do projeto na v1 (${u.table}, ${u.count} documentos): não convertida. Leve-a para o convex/ do projeto v2 (schema e funções) e importe à parte.`);
+  return { tables: out, sources, pending, report };
+}

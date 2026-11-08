@@ -1,0 +1,1212 @@
+{
+ "seo.aboutTitle": {
+  "pt": "Sobre Mim",
+  "en": "About Me"
+ },
+ "seo.aboutDescription": {
+  "pt": "Conheça minha trajetória, dia-a-dia e respostas para perguntas frequentes sobre meu trabalho como desenvolvedor.",
+  "en": "Get to know my journey, day-to-day and answers to frequently asked questions about my work as a developer."
+ },
+ "seo.portfolioTitle": {
+  "pt": "Portfólio de Projetos",
+  "en": "Project Portfolio"
+ },
+ "seo.portfolioDescription": {
+  "pt": "Confira meus projetos de desenvolvimento front-end e full-stack. Cases com React, TypeScript e tecnologias modernas.",
+  "en": "Check out my front-end and full-stack development projects. Case studies with React, TypeScript and modern technologies."
+ },
+ "seo.resumeTitle": {
+  "pt": "Currículo",
+  "en": "Resume"
+ },
+ "seo.resumeDescription": {
+  "pt": "Minha trajetória profissional, formação acadêmica, habilidades técnicas e certificações em desenvolvimento de software.",
+  "en": "My professional background, education, technical skills and certifications in software development."
+ },
+ "seo.blogTitle": {
+  "pt": "Blog",
+  "en": "Blog"
+ },
+ "seo.blogDescription": {
+  "pt": "Artigos sobre desenvolvimento web, React, TypeScript e tecnologia. Compartilhando conhecimento e experiências.",
+  "en": "Articles about web development, React, TypeScript and technology. Sharing knowledge and experience."
+ },
+ "seo.testimonialsDescription": {
+  "pt": "Veja o que clientes e colegas dizem sobre o meu trabalho.",
+  "en": "See what clients and colleagues say about my work."
+ },
+ "common.loading": {
+  "pt": "Carregando...",
+  "en": "Loading..."
+ },
+ "common.error": {
+  "pt": "Erro ao carregar",
+  "en": "Error loading"
+ },
+ "common.close": {
+  "pt": "Fechar",
+  "en": "Close"
+ },
+ "common.back": {
+  "pt": "Voltar",
+  "en": "Back"
+ },
+ "common.next": {
+  "pt": "Próximo",
+  "en": "Next"
+ },
+ "common.previous": {
+  "pt": "Anterior",
+  "en": "Previous"
+ },
+ "common.save": {
+  "pt": "Salvar",
+  "en": "Save"
+ },
+ "common.cancel": {
+  "pt": "Cancelar",
+  "en": "Cancel"
+ },
+ "common.delete": {
+  "pt": "Excluir",
+  "en": "Delete"
+ },
+ "common.edit": {
+  "pt": "Editar",
+  "en": "Edit"
+ },
+ "common.add": {
+  "pt": "Adicionar",
+  "en": "Add"
+ },
+ "common.confirm": {
+  "pt": "Confirmar",
+  "en": "Confirm"
+ },
+ "common.yes": {
+  "pt": "Sim",
+  "en": "Yes"
+ },
+ "common.no": {
+  "pt": "Não",
+  "en": "No"
+ },
+ "navigation.home": {
+  "pt": "Início",
+  "en": "Home"
+ },
+ "navigation.about": {
+  "pt": "Sobre Mim",
+  "en": "About Me"
+ },
+ "navigation.portfolio": {
+  "pt": "Portfólio",
+  "en": "Portfolio"
+ },
+ "navigation.resume": {
+  "pt": "Currículo",
+  "en": "Resume"
+ },
+ "navigation.blog": {
+  "pt": "Blog",
+  "en": "Blog"
+ },
+ "navigation.contact": {
+  "pt": "Contato",
+  "en": "Contact"
+ },
+ "home.greeting": {
+  "pt": "whoami",
+  "en": "whoami"
+ },
+ "home.title": {
+  "pt": "Oi! Eu sou o",
+  "en": "Hi! I'm"
+ },
+ "home.subtitle": {
+  "pt": "> Portfólio profissional",
+  "en": "> Professional portfolio"
+ },
+ "home.about.title": {
+  "pt": " Sobre mim ",
+  "en": " About me "
+ },
+ "home.about.loading": {
+  "pt": "Carregando sobre mim...",
+  "en": "Loading about me..."
+ },
+ "home.testimonials.title": {
+  "pt": "O que falam sobre mim",
+  "en": "What they say about me"
+ },
+ "home.hero.description": {
+  "pt": "Projetos, trajetória e ideias reunidos em um só lugar.",
+  "en": "Projects, career and ideas in one place."
+ },
+ "home.hero.headline": {
+  "pt": "Construo produtos digitais do começo ao fim.",
+  "en": "I build digital products end to end."
+ },
+ "home.hero.ctaCases": {
+  "pt": "Ver cases",
+  "en": "See case studies"
+ },
+ "home.hero.ctaContact": {
+  "pt": "Fale comigo",
+  "en": "Get in touch"
+ },
+ "home.hero.technologies.0.name": {
+  "pt": "Figma",
+  "en": "Figma"
+ },
+ "home.hero.technologies.0.color": {
+  "pt": "bg-pink-500",
+  "en": "bg-pink-500"
+ },
+ "home.hero.technologies.1.name": {
+  "pt": "React",
+  "en": "React"
+ },
+ "home.hero.technologies.1.color": {
+  "pt": "bg-sky-400",
+  "en": "bg-sky-400"
+ },
+ "home.hero.technologies.2.name": {
+  "pt": "TypeScript",
+  "en": "TypeScript"
+ },
+ "home.hero.technologies.2.color": {
+  "pt": "bg-blue-600",
+  "en": "bg-blue-600"
+ },
+ "home.hero.technologies.3.name": {
+  "pt": "Design Systems",
+  "en": "Design Systems"
+ },
+ "home.hero.technologies.3.color": {
+  "pt": "bg-violet-500",
+  "en": "bg-violet-500"
+ },
+ "home.hero.technologies.4.name": {
+  "pt": "Acessibilidade",
+  "en": "Accessibility"
+ },
+ "home.hero.technologies.4.color": {
+  "pt": "bg-emerald-500",
+  "en": "bg-emerald-500"
+ },
+ "home.cases.title": {
+  "pt": " Cases em destaque ",
+  "en": " Featured case studies "
+ },
+ "home.cases.viewAll": {
+  "pt": "ver todos os projetos",
+  "en": "see all projects"
+ },
+ "home.cases.read": {
+  "pt": "$ cat case.md",
+  "en": "$ cat case.md"
+ },
+ "home.cta.title": {
+  "pt": "Tem um projeto em mente?",
+  "en": "Have a project in mind?"
+ },
+ "home.cta.subtitle": {
+  "pt": "Conte o contexto e eu respondo com os próximos passos.",
+  "en": "Share the context and I'll reply with the next steps."
+ },
+ "home.cta.project": {
+  "pt": "Tenho um projeto",
+  "en": "I have a project"
+ },
+ "home.cta.job": {
+  "pt": "Tenho uma vaga",
+  "en": "I have a role"
+ },
+ "home.skills.title": {
+  "pt": "O que eu faço",
+  "en": "What I do"
+ },
+ "home.availability.label": {
+  "pt": "disponível para novos projetos",
+  "en": "available for new projects"
+ },
+ "home.catRole": {
+  "pt": "cat role.txt",
+  "en": "cat role.txt"
+ },
+ "home.loading": {
+  "pt": "Carregando informações do perfil...\n\nSincronizando dados do banco de dados, processando traduções e preparando experiência personalizada. Por favor, aguarde enquanto o sistema carrega todas as informações.",
+  "en": "Loading profile information...\n\nSyncing database data, processing translations and preparing personalized experience. Please wait while the system loads all information."
+ },
+ "home.loadingTestimonial": {
+  "pt": "\"Carregando depoimento...\"",
+  "en": "\"Loading testimonial...\""
+ },
+ "testimonials.title": {
+  "pt": "Depoimentos",
+  "en": "Testimonials"
+ },
+ "testimonials.subtitle": {
+  "pt": "Experiências de clientes e colaboradores que trabalharam comigo.",
+  "en": "Experiences from clients and collaborators I've worked with."
+ },
+ "testimonials.empty": {
+  "pt": "Nenhum depoimento publicado ainda.",
+  "en": "No testimonials published yet."
+ },
+ "testimonials.leaveTestimonial": {
+  "pt": "Deixar meu depoimento",
+  "en": "Leave my testimonial"
+ },
+ "testimonials.viewAll": {
+  "pt": "Ver todos os depoimentos →",
+  "en": "View all testimonials →"
+ },
+ "portfolio.title": {
+  "pt": "Portfólio",
+  "en": "Portfolio"
+ },
+ "portfolio.subtitle": {
+  "pt": "Uma seleção dos meus trabalhos recentes",
+  "en": "A selection of my recent works"
+ },
+ "portfolio.all": {
+  "pt": "Todos",
+  "en": "All"
+ },
+ "portfolio.details": {
+  "pt": "$ view --details",
+  "en": "$ view --details"
+ },
+ "portfolio.noImage": {
+  "pt": "Sem imagem",
+  "en": "No image"
+ },
+ "portfolio.noImages": {
+  "pt": "Sem imagens disponíveis",
+  "en": "No images available"
+ },
+ "portfolio.projectLinks": {
+  "pt": "Links do Projeto",
+  "en": "Project Links"
+ },
+ "portfolio.code": {
+  "pt": "Código",
+  "en": "Code"
+ },
+ "portfolio.liveDemo": {
+  "pt": "Demo ao Vivo",
+  "en": "Live Demo"
+ },
+ "portfolio.image": {
+  "pt": "Imagem",
+  "en": "Image"
+ },
+ "portfolio.of": {
+  "pt": "de",
+  "en": "of"
+ },
+ "portfolio.expandImage": {
+  "pt": "Expandir imagem",
+  "en": "Expand image"
+ },
+ "portfolio.previousImage": {
+  "pt": "Imagem anterior",
+  "en": "Previous image"
+ },
+ "portfolio.nextImage": {
+  "pt": "Próxima imagem",
+  "en": "Next image"
+ },
+ "portfolio.viewCaseStudy": {
+  "pt": "$ view --case-study",
+  "en": "$ view --case-study"
+ },
+ "portfolio.caseStudy": {
+  "pt": "Estudo de Caso",
+  "en": "Case Study"
+ },
+ "portfolio.backToPortfolio": {
+  "pt": "Voltar ao Portfólio",
+  "en": "Back to Portfolio"
+ },
+ "portfolio.problem": {
+  "pt": "O Problema",
+  "en": "The Problem"
+ },
+ "portfolio.solution": {
+  "pt": "A Solução",
+  "en": "The Solution"
+ },
+ "portfolio.results": {
+  "pt": "Os Resultados",
+  "en": "The Results"
+ },
+ "portfolio.metrics": {
+  "pt": "Resultados em Números",
+  "en": "Results by the Numbers"
+ },
+ "portfolio.screenshots": {
+  "pt": "Screenshots",
+  "en": "Screenshots"
+ },
+ "portfolio.testimonial": {
+  "pt": "Depoimento",
+  "en": "Testimonial"
+ },
+ "portfolio.testimonialTranslatedFromPt": {
+  "pt": "Tradução automática do original em português.",
+  "en": "Machine translation of the original in Portuguese."
+ },
+ "portfolio.testimonialTranslatedFromEn": {
+  "pt": "Tradução automática do original em inglês.",
+  "en": "Machine translation of the original in English."
+ },
+ "portfolio.showOriginal": {
+  "pt": "Ver original",
+  "en": "Show original"
+ },
+ "portfolio.showTranslation": {
+  "pt": "Ver tradução",
+  "en": "Show translation"
+ },
+ "portfolio.viewCase": {
+  "pt": "$ cat case.md",
+  "en": "$ cat case.md"
+ },
+ "portfolio.myRole": {
+  "pt": "Meu papel",
+  "en": "My role"
+ },
+ "portfolio.before": {
+  "pt": "Antes",
+  "en": "Before"
+ },
+ "portfolio.decisions": {
+  "pt": "Decisões e trade-offs",
+  "en": "Decisions and trade-offs"
+ },
+ "portfolio.learnings": {
+  "pt": "Aprendizados",
+  "en": "Learnings"
+ },
+ "portfolio.ctaTitle": {
+  "pt": "Precisa de algo parecido?",
+  "en": "Need something similar?"
+ },
+ "portfolio.ctaSubtitle": {
+  "pt": "Conte o contexto do seu projeto e eu respondo com os próximos passos.",
+  "en": "Share your project context and I'll reply with the next steps."
+ },
+ "portfolio.ctaProject": {
+  "pt": "Falar sobre um projeto",
+  "en": "Talk about a project"
+ },
+ "portfolio.nextCase": {
+  "pt": "Próximo case",
+  "en": "Next case study"
+ },
+ "portfolio.projectNotFound": {
+  "pt": "Projeto não encontrado",
+  "en": "Project not found"
+ },
+ "portfolio.projectNotFoundDescription": {
+  "pt": "O projeto que você procura não existe ou foi removido.",
+  "en": "The project you're looking for doesn't exist or has been removed."
+ },
+ "sidebar.contact": {
+  "pt": "Contato",
+  "en": "Contact"
+ },
+ "sidebar.downloadCV": {
+  "pt": "Baixar CV",
+  "en": "Download CV"
+ },
+ "sidebar.menu": {
+  "pt": "Menu de Navegação",
+  "en": "Navigation Menu"
+ },
+ "sidebar.language": {
+  "pt": "Idioma",
+  "en": "Language"
+ },
+ "sidebar.languagePT": {
+  "pt": "Português",
+  "en": "Português"
+ },
+ "sidebar.languageEN": {
+  "pt": "English",
+  "en": "English"
+ },
+ "sidebar.terminalHint": {
+  "pt": "Pressione ~ para o terminal",
+  "en": "Press ~ for terminal"
+ },
+ "resume.title": {
+  "pt": "Currículo",
+  "en": "Resume"
+ },
+ "resume.subtitle": {
+  "pt": "Minha trajetória profissional, formação e habilidades.",
+  "en": "My professional trajectory, education and skills."
+ },
+ "resume.experience": {
+  "pt": "Experiência Profissional",
+  "en": "Professional Experience"
+ },
+ "resume.education": {
+  "pt": "Formação Acadêmica",
+  "en": "Academic Education"
+ },
+ "resume.courses": {
+  "pt": "Cursos e Certificações",
+  "en": "Courses and Certifications"
+ },
+ "resume.volunteer": {
+  "pt": "Voluntariado",
+  "en": "Volunteer Work"
+ },
+ "resume.skills": {
+  "pt": "Habilidades",
+  "en": "Skills"
+ },
+ "resume.softSkills": {
+  "pt": "Soft Skills",
+  "en": "Soft Skills"
+ },
+ "resume.languages": {
+  "pt": "Idiomas",
+  "en": "Languages"
+ },
+ "resume.summary": {
+  "pt": "Resumo",
+  "en": "Summary"
+ },
+ "resume.downloadCV": {
+  "pt": "Baixar CV (PDF)",
+  "en": "Download CV (PDF)"
+ },
+ "resume.showOlder": {
+  "pt": "ver experiências anteriores",
+  "en": "show earlier experience"
+ },
+ "resume.hideOlder": {
+  "pt": "ocultar experiências anteriores",
+  "en": "hide earlier experience"
+ },
+ "resume.stack": {
+  "pt": "Stack",
+  "en": "Stack"
+ },
+ "blog.title": {
+  "pt": "Blog",
+  "en": "Blog"
+ },
+ "blog.subtitle": {
+  "pt": "Compartilhando conhecimento sobre desenvolvimento e design",
+  "en": "Sharing knowledge about development and design"
+ },
+ "blog.authorCta": {
+  "pt": "Fale comigo",
+  "en": "Get in touch"
+ },
+ "blog.authorLine": {
+  "pt": "Escrevo sobre o que construo e lidero na prática.",
+  "en": "I write about what I build and lead in practice."
+ },
+ "blog.relatedCase": {
+  "pt": "Case relacionado",
+  "en": "Related case study"
+ },
+ "blog.readCase": {
+  "pt": "$ cat case.md",
+  "en": "$ cat case.md"
+ },
+ "blog.featured": {
+  "pt": "Em Destaque",
+  "en": "Featured"
+ },
+ "blog.readNow": {
+  "pt": "Ler agora",
+  "en": "Read now"
+ },
+ "blog.readTime": {
+  "pt": "min de leitura",
+  "en": "min read"
+ },
+ "blog.searchPlaceholder": {
+  "pt": "Buscar artigos...",
+  "en": "Search articles..."
+ },
+ "blog.filterByTags": {
+  "pt": "Filtrar por tags",
+  "en": "Filter by tags"
+ },
+ "blog.clear": {
+  "pt": "Limpar",
+  "en": "Clear"
+ },
+ "blog.noTags": {
+  "pt": "Nenhuma tag disponível",
+  "en": "No tags available"
+ },
+ "blog.noPosts": {
+  "pt": "Nenhum artigo publicado ainda.",
+  "en": "No articles published yet."
+ },
+ "blog.comeBackSoon": {
+  "pt": "Volte em breve para conferir novos conteúdos!",
+  "en": "Come back soon to check out new content!"
+ },
+ "blog.readMore": {
+  "pt": "Ler mais",
+  "en": "Read more"
+ },
+ "blog.backToBlog": {
+  "pt": "Voltar para o Blog",
+  "en": "Back to Blog"
+ },
+ "blog.postNotFound": {
+  "pt": "Post não encontrado",
+  "en": "Post not found"
+ },
+ "blog.postNotFoundDescription": {
+  "pt": "O artigo que você procura não existe ou foi removido.",
+  "en": "The article you are looking for does not exist or has been removed."
+ },
+ "blog.loading": {
+  "pt": "Carregando...",
+  "en": "Loading..."
+ },
+ "blog.loadMore": {
+  "pt": "Carregar mais",
+  "en": "Load more"
+ },
+ "about.seoDescription": {
+  "pt": "Conheça a trajetória, rotina e perguntas frequentes sobre este portfolio profissional.",
+  "en": "Get to know the journey, daily routine and frequently asked questions about this professional portfolio."
+ },
+ "about.title": {
+  "pt": "Sobre Mim",
+  "en": "About Me"
+ },
+ "about.subtitle": {
+  "pt": "Conheça um pouco mais sobre quem eu sou",
+  "en": "Get to know a little more about who I am"
+ },
+ "about.professional.title": {
+  "pt": "Resumo profissional",
+  "en": "Professional summary"
+ },
+ "about.principles.title": {
+  "pt": "Como eu trabalho",
+  "en": "How I work"
+ },
+ "about.aboutMe.title": {
+  "pt": "Fora do trabalho",
+  "en": "Outside work"
+ },
+ "about.aboutMe.text": {
+  "pt": "Conte aqui um pouco sobre você fora do trabalho: o que te motiva e o que você gosta de fazer quando não está trabalhando.\n\nEste texto pode ser editado no painel admin, em Textos.",
+  "en": "Tell a bit about yourself outside work: what drives you and what you enjoy doing when you're not working.\n\nThis text can be edited in the admin panel, under Texts."
+ },
+ "about.tapToKnowMore": {
+  "pt": "Toque para Saber Mais",
+  "en": "Tap to Learn More"
+ },
+ "about.dailyRoutine.title": {
+  "pt": "Meu dia-a-dia",
+  "en": "My day-to-day"
+ },
+ "about.dailyRoutine.empty": {
+  "pt": "Nenhum item adicionado ainda",
+  "en": "No items added yet"
+ },
+ "about.faq.title": {
+  "pt": "FAQ Pessoal",
+  "en": "Personal FAQ"
+ },
+ "about.faq.empty": {
+  "pt": "Nenhuma pergunta adicionada ainda",
+  "en": "No questions added yet"
+ },
+ "contactWizard.trigger": {
+  "pt": "Fale comigo",
+  "en": "Contact me"
+ },
+ "contactWizard.title": {
+  "pt": "Como posso te ajudar?",
+  "en": "How can I help you?"
+ },
+ "contactWizard.subtitle": {
+  "pt": "Escolha o que melhor descreve o seu interesse",
+  "en": "Choose what best describes your interest"
+ },
+ "contactWizard.step": {
+  "pt": "Passo",
+  "en": "Step"
+ },
+ "contactWizard.of": {
+  "pt": "de",
+  "en": "of"
+ },
+ "contactWizard.back": {
+  "pt": "Voltar",
+  "en": "Back"
+ },
+ "contactWizard.next": {
+  "pt": "Próximo",
+  "en": "Next"
+ },
+ "contactWizard.submit": {
+  "pt": "Enviar",
+  "en": "Send"
+ },
+ "contactWizard.submitting": {
+  "pt": "Enviando...",
+  "en": "Sending..."
+ },
+ "contactWizard.successTitle": {
+  "pt": "Mensagem enviada!",
+  "en": "Message sent!"
+ },
+ "contactWizard.successBody": {
+  "pt": "Obrigado pelo contato. Vou retornar em breve.",
+  "en": "Thank you for reaching out. I'll get back to you soon."
+ },
+ "contactWizard.errorMessage": {
+  "pt": "Erro ao enviar. Tente novamente.",
+  "en": "Error sending. Please try again."
+ },
+ "contactWizard.rateLimited": {
+  "pt": "Muitas tentativas. Aguarde um momento.",
+  "en": "Too many attempts. Please wait a moment."
+ },
+ "contactWizard.summaryTitle": {
+  "pt": "Resumo",
+  "en": "Summary"
+ },
+ "contactWizard.flows.project.label": {
+  "pt": "Tenho um projeto",
+  "en": "I have a project"
+ },
+ "contactWizard.flows.project.description": {
+  "pt": "Quero desenvolver algo novo",
+  "en": "I want to build something new"
+ },
+ "contactWizard.flows.job.label": {
+  "pt": "Oportunidade de emprego",
+  "en": "Job opportunity"
+ },
+ "contactWizard.flows.job.description": {
+  "pt": "Tenho uma vaga para você",
+  "en": "I have a position for you"
+ },
+ "contactWizard.flows.networking.label": {
+  "pt": "Networking / Colaboração",
+  "en": "Networking / Collaboration"
+ },
+ "contactWizard.flows.networking.description": {
+  "pt": "Quero trocar ideias",
+  "en": "I want to exchange ideas"
+ },
+ "contactWizard.flows.feedback.label": {
+  "pt": "Feedback / Dúvida",
+  "en": "Feedback / Question"
+ },
+ "contactWizard.flows.feedback.description": {
+  "pt": "Tenho uma pergunta ou sugestão",
+  "en": "I have a question or suggestion"
+ },
+ "contactWizard.project.step1.title": {
+  "pt": "Qual o tipo de projeto?",
+  "en": "What type of project?"
+ },
+ "contactWizard.project.step1.options.webapp": {
+  "pt": "Web App / SaaS",
+  "en": "Web App / SaaS"
+ },
+ "contactWizard.project.step1.options.mobile": {
+  "pt": "Mobile",
+  "en": "Mobile"
+ },
+ "contactWizard.project.step1.options.landing": {
+  "pt": "Landing Page",
+  "en": "Landing Page"
+ },
+ "contactWizard.project.step1.options.system": {
+  "pt": "Sistema Interno",
+  "en": "Internal System"
+ },
+ "contactWizard.project.step1.options.consulting": {
+  "pt": "Consultoria Técnica",
+  "en": "Technical Consulting"
+ },
+ "contactWizard.project.step1.options.other": {
+  "pt": "Outro",
+  "en": "Other"
+ },
+ "contactWizard.project.step2.title": {
+  "pt": "Qual o prazo estimado?",
+  "en": "What's the estimated timeline?"
+ },
+ "contactWizard.project.step2.options.urgent": {
+  "pt": "Urgente (< 1 mês)",
+  "en": "Urgent (< 1 month)"
+ },
+ "contactWizard.project.step2.options.short": {
+  "pt": "Curto (1–3 meses)",
+  "en": "Short (1–3 months)"
+ },
+ "contactWizard.project.step2.options.medium": {
+  "pt": "Médio (3–6 meses)",
+  "en": "Medium (3–6 months)"
+ },
+ "contactWizard.project.step2.options.flexible": {
+  "pt": "Sem pressa",
+  "en": "No rush"
+ },
+ "contactWizard.project.step3.title": {
+  "pt": "Qual o orçamento estimado?",
+  "en": "What's the estimated budget?"
+ },
+ "contactWizard.project.step3.options.small": {
+  "pt": "Até R$ 5.000",
+  "en": "Up to R$ 5,000"
+ },
+ "contactWizard.project.step3.options.medium": {
+  "pt": "R$ 5.000 – R$ 15.000",
+  "en": "R$ 5,000 – R$ 15,000"
+ },
+ "contactWizard.project.step3.options.large": {
+  "pt": "R$ 15.000 – R$ 30.000",
+  "en": "R$ 15,000 – R$ 30,000"
+ },
+ "contactWizard.project.step3.options.enterprise": {
+  "pt": "Acima de R$ 30.000",
+  "en": "Above R$ 30,000"
+ },
+ "contactWizard.project.step3.options.unknown": {
+  "pt": "Ainda não sei",
+  "en": "Not sure yet"
+ },
+ "contactWizard.project.step4.title": {
+  "pt": "Descreva o projeto",
+  "en": "Describe the project"
+ },
+ "contactWizard.project.step4.placeholder": {
+  "pt": "Conte um pouco sobre o que você tem em mente...",
+  "en": "Tell me a bit about what you have in mind..."
+ },
+ "contactWizard.job.step1.title": {
+  "pt": "Qual o tipo de oportunidade?",
+  "en": "What type of opportunity?"
+ },
+ "contactWizard.job.step1.options.clt": {
+  "pt": "CLT",
+  "en": "Full-time (CLT)"
+ },
+ "contactWizard.job.step1.options.pj": {
+  "pt": "PJ / Contrato",
+  "en": "Contractor (PJ)"
+ },
+ "contactWizard.job.step1.options.freelance": {
+  "pt": "Freelance",
+  "en": "Freelance"
+ },
+ "contactWizard.job.step2.title": {
+  "pt": "Qual a modalidade?",
+  "en": "What's the work modality?"
+ },
+ "contactWizard.job.step2.options.remote": {
+  "pt": "Remoto",
+  "en": "Remote"
+ },
+ "contactWizard.job.step2.options.hybrid": {
+  "pt": "Híbrido",
+  "en": "Hybrid"
+ },
+ "contactWizard.job.step2.options.onsite": {
+  "pt": "Presencial",
+  "en": "On-site"
+ },
+ "contactWizard.job.step3.title": {
+  "pt": "Qual a área principal?",
+  "en": "What's the main area?"
+ },
+ "contactWizard.job.step3.options.frontend": {
+  "pt": "Frontend",
+  "en": "Frontend"
+ },
+ "contactWizard.job.step3.options.fullstack": {
+  "pt": "Full Stack",
+  "en": "Full Stack"
+ },
+ "contactWizard.job.step3.options.techlead": {
+  "pt": "Tech Lead / Arquitetura",
+  "en": "Tech Lead / Architecture"
+ },
+ "contactWizard.job.step4.title": {
+  "pt": "Empresa e cargo ofertado",
+  "en": "Company and position"
+ },
+ "contactWizard.job.step4.companyPlaceholder": {
+  "pt": "Nome da empresa",
+  "en": "Company name"
+ },
+ "contactWizard.job.step4.rolePlaceholder": {
+  "pt": "Título do cargo",
+  "en": "Job title"
+ },
+ "contactWizard.networking.step1.title": {
+  "pt": "Como você me encontrou?",
+  "en": "How did you find me?"
+ },
+ "contactWizard.networking.step1.options.blog": {
+  "pt": "Blog / Artigos",
+  "en": "Blog / Articles"
+ },
+ "contactWizard.networking.step1.options.linkedin": {
+  "pt": "LinkedIn",
+  "en": "LinkedIn"
+ },
+ "contactWizard.networking.step1.options.referral": {
+  "pt": "Indicação",
+  "en": "Referral"
+ },
+ "contactWizard.networking.step1.options.portfolio": {
+  "pt": "Portfólio",
+  "en": "Portfolio"
+ },
+ "contactWizard.networking.step2.title": {
+  "pt": "Sobre o que você quer conversar?",
+  "en": "What would you like to talk about?"
+ },
+ "contactWizard.networking.step2.placeholder": {
+  "pt": "Qual é o assunto de interesse?",
+  "en": "What's the topic of interest?"
+ },
+ "contactWizard.feedback.step1.title": {
+  "pt": "Sobre o que é o feedback?",
+  "en": "What is your feedback about?"
+ },
+ "contactWizard.feedback.step1.options.post": {
+  "pt": "Um post do blog",
+  "en": "A blog post"
+ },
+ "contactWizard.feedback.step1.options.project": {
+  "pt": "Um projeto específico",
+  "en": "A specific project"
+ },
+ "contactWizard.feedback.step1.options.general": {
+  "pt": "Portfolio em geral",
+  "en": "Portfolio in general"
+ },
+ "contactWizard.feedback.step2.title": {
+  "pt": "Sua mensagem",
+  "en": "Your message"
+ },
+ "contactWizard.feedback.step2.placeholder": {
+  "pt": "Escreva aqui...",
+  "en": "Write here..."
+ },
+ "contactWizard.contact.title": {
+  "pt": "Seus dados de contato",
+  "en": "Your contact details"
+ },
+ "contactWizard.contact.name": {
+  "pt": "Nome *",
+  "en": "Name *"
+ },
+ "contactWizard.contact.email": {
+  "pt": "E-mail *",
+  "en": "Email *"
+ },
+ "contactWizard.contact.phone": {
+  "pt": "Telefone (opcional)",
+  "en": "Phone (optional)"
+ },
+ "contactWizard.contact.linkedin": {
+  "pt": "LinkedIn (opcional)",
+  "en": "LinkedIn (optional)"
+ },
+ "contactWizard.contact.company": {
+  "pt": "Empresa (opcional)",
+  "en": "Company (optional)"
+ },
+ "contactWizard.contact.namePlaceholder": {
+  "pt": "Seu nome",
+  "en": "Your name"
+ },
+ "contactWizard.contact.emailPlaceholder": {
+  "pt": "seu@email.com",
+  "en": "your@email.com"
+ },
+ "contactWizard.contact.phonePlaceholder": {
+  "pt": "+55 (11) 99999-9999",
+  "en": "+1 (555) 000-0000"
+ },
+ "contactWizard.contact.linkedinPlaceholder": {
+  "pt": "linkedin.com/in/seu-perfil",
+  "en": "linkedin.com/in/your-profile"
+ },
+ "contactWizard.contact.companyPlaceholder": {
+  "pt": "Nome da empresa",
+  "en": "Company name"
+ },
+ "contactWizard.summary.title": {
+  "pt": "Revise e envie",
+  "en": "Review and send"
+ },
+ "contactWizard.summary.type": {
+  "pt": "Tipo",
+  "en": "Type"
+ },
+ "contactWizard.summary.origin": {
+  "pt": "Origem",
+  "en": "Origin"
+ },
+ "contactWizard.summary.contact": {
+  "pt": "Contato",
+  "en": "Contact"
+ },
+ "admin.home.title": {
+  "pt": "Edição da Página Inicial",
+  "en": "Home Page Editing"
+ },
+ "admin.home.about": {
+  "pt": "Sobre Mim",
+  "en": "About Me"
+ },
+ "admin.home.aboutDescription": {
+  "pt": "Edite o texto de apresentação principal",
+  "en": "Edit the main presentation text"
+ },
+ "admin.home.services": {
+  "pt": "O que eu faço",
+  "en": "What I do"
+ },
+ "admin.home.testimonials": {
+  "pt": "Depoimentos",
+  "en": "Testimonials"
+ },
+ "admin.home.addService": {
+  "pt": "Adicionar Item",
+  "en": "Add Item"
+ },
+ "admin.home.addTestimonial": {
+  "pt": "Adicionar Depoimento",
+  "en": "Add Testimonial"
+ },
+ "admin.home.editService": {
+  "pt": "Editar Serviço",
+  "en": "Edit Service"
+ },
+ "admin.home.editTestimonial": {
+  "pt": "Editar Depoimento",
+  "en": "Edit Testimonial"
+ },
+ "admin.home.serviceTitle": {
+  "pt": "Título",
+  "en": "Title"
+ },
+ "admin.home.serviceDescription": {
+  "pt": "Descrição",
+  "en": "Description"
+ },
+ "admin.home.testimonialName": {
+  "pt": "Nome",
+  "en": "Name"
+ },
+ "admin.home.testimonialRole": {
+  "pt": "Cargo/Empresa",
+  "en": "Position/Company"
+ },
+ "admin.home.testimonialPhoto": {
+  "pt": "Foto",
+  "en": "Photo"
+ },
+ "admin.home.testimonialText": {
+  "pt": "Depoimento",
+  "en": "Testimonial"
+ },
+ "admin.home.changeImage": {
+  "pt": "Alterar Imagem",
+  "en": "Change Image"
+ },
+ "admin.home.selectImage": {
+  "pt": "Selecionar Imagem",
+  "en": "Select Image"
+ },
+ "admin.home.deleteConfirm": {
+  "pt": "Tem certeza que deseja excluir este item?",
+  "en": "Are you sure you want to delete this item?"
+ },
+ "admin.home.saveSuccess": {
+  "pt": "Salvo com sucesso!",
+  "en": "Saved successfully!"
+ },
+ "admin.home.saveError": {
+  "pt": "Erro ao salvar. Verifique o console.",
+  "en": "Error saving. Check console."
+ },
+ "admin.home.deleteError": {
+  "pt": "Erro ao excluir.",
+  "en": "Error deleting."
+ },
+ "admin.about.title": {
+  "pt": "Edição da Página Sobre Mim",
+  "en": "About Page Editing"
+ },
+ "admin.about.dailyRoutine": {
+  "pt": "Meu dia-a-dia",
+  "en": "My day-to-day"
+ },
+ "admin.about.faq": {
+  "pt": "FAQ Pessoal",
+  "en": "Personal FAQ"
+ },
+ "admin.about.addDailyRoutine": {
+  "pt": "Adicionar Item ao Dia-a-Dia",
+  "en": "Add Day-to-Day Item"
+ },
+ "admin.about.addFaq": {
+  "pt": "Adicionar Pergunta ao FAQ",
+  "en": "Add FAQ Question"
+ },
+ "admin.about.editDailyRoutine": {
+  "pt": "Editar Item do Dia-a-Dia",
+  "en": "Edit Day-to-Day Item"
+ },
+ "admin.about.editFaq": {
+  "pt": "Editar Pergunta do FAQ",
+  "en": "Edit FAQ Question"
+ },
+ "admin.about.imageUrl": {
+  "pt": "URL da Imagem",
+  "en": "Image URL"
+ },
+ "admin.about.tags": {
+  "pt": "Tags",
+  "en": "Tags"
+ },
+ "admin.about.description": {
+  "pt": "Descrição",
+  "en": "Description"
+ },
+ "admin.about.question": {
+  "pt": "Pergunta",
+  "en": "Question"
+ },
+ "admin.about.answer": {
+  "pt": "Resposta",
+  "en": "Answer"
+ },
+ "admin.about.spanSize": {
+  "pt": "Tamanho do Card",
+  "en": "Card Size"
+ },
+ "admin.about.span1": {
+  "pt": "1x1",
+  "en": "1x1"
+ },
+ "admin.about.span2": {
+  "pt": "2x1",
+  "en": "2x1"
+ },
+ "admin.about.displayOrder": {
+  "pt": "Ordem de Exibição",
+  "en": "Display Order"
+ },
+ "admin.about.deleteConfirm": {
+  "pt": "Tem certeza que deseja excluir este item?",
+  "en": "Are you sure you want to delete this item?"
+ },
+ "admin.about.saveSuccess": {
+  "pt": "Salvo com sucesso!",
+  "en": "Saved successfully!"
+ },
+ "admin.about.saveError": {
+  "pt": "Erro ao salvar. Verifique o console.",
+  "en": "Error saving. Check console."
+ },
+ "admin.about.deleteError": {
+  "pt": "Erro ao excluir.",
+  "en": "Error deleting."
+ },
+ "auth.adminArea": {
+  "pt": "Área Administrativa",
+  "en": "Administrative Area"
+ },
+ "auth.enterCredentials": {
+  "pt": "Entre com suas credenciais para acessar o painel",
+  "en": "Sign in with your credentials to access the dashboard"
+ },
+ "auth.emailPlaceholder": {
+  "pt": "admin@exemplo.com",
+  "en": "admin@example.com"
+ },
+ "auth.password": {
+  "pt": "Senha",
+  "en": "Password"
+ },
+ "auth.signingIn": {
+  "pt": "Entrando...",
+  "en": "Signing in..."
+ },
+ "auth.signIn": {
+  "pt": "Entrar",
+  "en": "Sign in"
+ },
+ "auth.invalidCredentials": {
+  "pt": "Credenciais inválidas. Verifique seu email e senha.",
+  "en": "Invalid credentials. Check your email and password."
+ },
+ "notFound.label": {
+  "pt": "erro do sistema",
+  "en": "system error"
+ },
+ "notFound.errorCode": {
+  "pt": "ERR_ROTA_NAO_ENCONTRADA",
+  "en": "ERR_ROUTE_NOT_FOUND"
+ },
+ "notFound.lines.0": {
+  "pt": "> processo encerrado com código 404",
+  "en": "> process exited with code 404"
+ },
+ "notFound.lines.1": {
+  "pt": "> rota não encontrada no manifesto",
+  "en": "> route not found in manifest"
+ },
+ "notFound.lines.2": {
+  "pt": "> verificando handlers de fallback...",
+  "en": "> scanning fallback handlers..."
+ },
+ "notFound.lines.3": {
+  "pt": "> nenhum encontrado. abortando.",
+  "en": "> none matched. abort."
+ },
+ "notFound.cta": {
+  "pt": "voltar ao início",
+  "en": "back to home"
+ },
+ "proposals.clause6": {
+  "pt": "1. **Transferência de Titularidade:** Após a quitação integral do valor total previsto neste contrato, a CONTRATADA transfere ao CONTRATANTE a propriedade total sobre o código-fonte desenvolvido e a titularidade das contas de infraestrutura criadas especificamente para este projeto.\n\n2. **Direitos de Portfólio:** A CONTRATADA reserva para si o direito de imagem da aplicação para fins de divulgação de seu trabalho e portfólio profissional. Isso inclui a exibição de capturas de tela, vídeos de funcionamento e o compartilhamento de trechos de código não críticos (que não exponham vulnerabilidades ou segredos de negócio do cliente) para fins de demonstração técnica."
+ },
+ "proposals.clause7": {
+  "pt": "1. **Aceite Tácito:** Após a entrega da solução, o CONTRATANTE terá um prazo de **5 (cinco) dias corridos** para manifestar sua intenção de iniciar o período de homologação. Caso não haja manifestação neste prazo, a entrega será considerada finalizada e aceita para todos os fins de direito.\n\n2. **Período de Homologação:** Caso o CONTRATANTE se manifeste dentro dos 5 dias iniciais, terá um prazo adicional de **30 (trinta) dias corridos** para realizar testes e solicitar ajustes.\n\n3. **Limitação de Correções:** Neste período de 30 dias, o CONTRATANTE terá direito a submeter até **2 (duas) listas consolidadas de correções de bugs**. Falhas decorrentes de correções anteriores não serão contabilizadas nesta limitação.\n\n4. **Manutenção Posterior:** Findo o prazo de 30 dias ou exauridas as listas de correção, qualquer nova alteração, funcionalidade ou suporte será objeto de novo orçamento a parte."
+ },
+ "proposals.clause8": {
+  "pt": "1. **Serviços de Terceiros:** A CONTRATADA não se responsabiliza por instabilidades, interrupções de serviço, perda de dados ou alterações de preços praticadas pelos provedores de infraestrutura (servidores, bancos de dados, APIs).\n\n2. **Garantia de Não-Bloqueio (Lock-in):** A CONTRATADA garante que a arquitetura do sistema não utilizará tecnologias que impeçam a migração futura para outros provedores, assegurando a portabilidade do sistema.\n\n3. **Mudança de Stack:** Caso o CONTRATANTE deseje alterar a infraestrutura ou tecnologias escolhidas após o início do projeto, um novo orçamento será apresentado considerando o progresso já realizado e a complexidade da migração."
+ },
+ "proposals.clause9": {
+  "pt": "1. **Controlador de Dados:** O CONTRATANTE figura como único Controlador dos dados (nos termos da Lei 13.709/18 - LGPD), sendo o responsável exclusivo por coletar autorizações, garantir a integridade, privacidade e atender às solicitações de exclusão ou acesso de seus próprios clientes.\n\n2. **Uso da Ferramenta:** Por ser o proprietário final da aplicação, cabe ao CONTRATANTE garantir que o uso do software esteja em conformidade com as normas legais vigentes, isentando a CONTRATADA de qualquer mau uso ou vazamento decorrente da gestão das contas e acessos."
+ },
+ "proposals.clause11": {
+  "pt": "Esta proposta, quando aceita eletronicamente, constitui contrato válido entre as partes, nos termos do Código Civil Brasileiro."
+ },
+ "proposals.clause12": {
+  "pt": "Fica eleito o foro da comarca de Itapevi – SP para dirimir quaisquer controvérsias oriundas deste contrato, com renúncia a qualquer outro, por mais privilegiado que seja."
+ }
+}

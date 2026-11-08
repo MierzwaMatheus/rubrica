@@ -40,6 +40,7 @@ import { addBusinessRoutes } from "./httpRoutes";
 import { mediaFunctions } from "./media";
 import { pagesFunctions } from "./pages";
 import { privacyFunctions } from "./privacy";
+import { publishFunctions } from "./publish";
 import { resolveRuntime, type RubricaConfig } from "./runtime";
 import { ref } from "./server";
 import { settingsFunctions, textsFunctions } from "./settings";
@@ -75,6 +76,7 @@ export function createRubrica(config: RubricaConfig = {}) {
     contacts: once(() => contactsFunctions(rt)),
     testimonialIntake: once(() => testimonialIntakeFunctions(rt)),
     privacy: once(() => privacyFunctions(rt)),
+    publish: once(publishFunctions),
   };
 
   return {
@@ -155,6 +157,9 @@ export function createRubrica(config: RubricaConfig = {}) {
     get privacy() {
       return modules.privacy();
     },
+    get publish() {
+      return modules.publish();
+    },
   };
 }
 
@@ -181,6 +186,7 @@ export const RUBRICA_MODULES = [
   "contacts",
   "testimonialIntake",
   "privacy",
+  "publish",
 ] as const satisfies readonly (keyof Rubrica)[];
 
 export type { RubricaConfig } from "./runtime";

@@ -90,6 +90,14 @@ Cada usuário do painel tem um papel, e o painel mostra só o que o papel pode m
 
 O primeiro usuário, criado no `setup`, é o `root`. Crie os outros em **Usuários**. A regra vale no backend, não só na tela: quem não tem o papel não consegue a operação nem por outra via.
 
+Na tela **Usuários**, o `root` também:
+
+- **Reinicia a senha** de alguém, sem e-mail. O painel gera uma senha temporária e mostra uma vez só, para você passar à pessoa. Ela sai de todas as sessões abertas e cria uma senha nova no próximo acesso. A sua própria senha você troca em **Minha conta**. Se ninguém consegue entrar, use `npx create-rubrica senha` no terminal.
+- **Suspende** o acesso: a pessoa sai do painel na hora, e o papel e o histórico ficam guardados. **Reativar** devolve o mesmo papel.
+- **Exclui** a conta de vez: apaga o login e o papel. Para só tirar o acesso, prefira suspender.
+
+Quem está com senha temporária não consegue fazer nada antes de trocá-la, nem pelo painel nem pelo MCP.
+
 ## Publicar uma mudança
 
 Salvar no painel grava no Convex na hora, e o site estático **só muda no próximo build**. O botão **Publicar** do painel dispara o build na hospedagem (o deploy hook). Veja [Publicar o site](./publicar.md).

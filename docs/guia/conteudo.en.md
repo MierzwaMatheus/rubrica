@@ -90,6 +90,14 @@ Each panel user has a role, and the panel shows only what the role can change.
 
 The first user, created in `setup`, is the `root`. Create the others in **Users**. The rule holds in the backend, not just on screen: without the role, the operation is refused by any route.
 
+On the **Users** screen, the `root` can also:
+
+- **Reset someone's password**, without email. The panel generates a temporary password and shows it once, for you to pass on. The person is signed out of every open session and creates a new password at the next sign-in. You change your own password in **Minha conta** (My account). If nobody can sign in, use `npx create-rubrica senha` in the terminal.
+- **Suspend** access: the person leaves the panel at once, and the role and history are kept. **Reactivate** gives the same role back.
+- **Delete** the account for good: the login and the role are erased. To only remove access, prefer suspending.
+
+Someone with a temporary password can't do anything until they change it, neither in the panel nor through the MCP.
+
 ## Publishing a change
 
 Saving in the panel writes to Convex immediately, and the static site **only changes at the next build**. The panel's **Publish** button triggers the build on the host (the deploy hook). See [Publishing the site](./publicar.md).

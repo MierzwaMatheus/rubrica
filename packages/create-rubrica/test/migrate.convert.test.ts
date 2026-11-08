@@ -86,9 +86,11 @@ describe("tabelas 1:1", () => {
       { label: { "pt-BR": "Código", en: "Code" }, href: "https://github.com/exemplo/app" },
     ]);
     expect(app!.tags).toEqual(["Produto", "ux", "mobile"]);
+    expect(app!.category).toEqual({ "pt-BR": "Produto", en: "Product" });
     expect(marca!.slug).toBe("identidade-visual");
     expect(marca!.featured).toBeUndefined();
     expect(marca!.cover).toEqual({ url: "https://imagens.exemplo.dev/marca.png" });
+    expect(marca!.category).toEqual({ "pt-BR": "Marca" });
     expect(r.report.warnings.join(" ")).toMatch(/Identidade visual.*não tinha slug/);
   });
 

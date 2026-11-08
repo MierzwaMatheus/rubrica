@@ -399,6 +399,8 @@ function convertProjects(ctx: Ctx, docs: Doc[]): Doc[] {
       cover,
       gallery: gallery.length ? gallery : undefined,
       role: cs ? loc(cs.role, { enUS: csEn?.role }) : undefined,
+      // A categoria da v1 vai para o campo próprio e continua nas etiquetas (filtros já feitos).
+      category: str(d.category) ? loc(d.category, d.categoryTranslations) : undefined,
       links: links.length ? links : undefined,
       tags: tags.length ? tags : undefined,
       // Na v1, a home mostrava os projetos com case e slug (selectFeaturedCases).

@@ -138,6 +138,20 @@ export const siteSettingsFields = {
   ogImage: v.optional(vImage),
   logo: v.optional(vLogo),
   twitterHandle: v.optional(v.string()),
+  icons: v.optional(
+    v.object({
+      svg: v.optional(vImage),
+      favicon: v.optional(vImage),
+      apple: v.optional(vImage),
+      icon192: v.optional(vImage),
+      icon512: v.optional(vImage),
+      maskable: v.optional(vImage),
+    }),
+  ),
+  themeColor: v.optional(v.object({ light: v.optional(v.string()), dark: v.optional(v.string()) })),
+  rss: v.optional(v.object({ title: v.optional(vLocalized), description: v.optional(vLocalized) })),
+  defaultPostCover: v.optional(vImage),
+  analytics: v.optional(v.object({ scriptUrl: v.optional(v.string()), websiteId: v.optional(v.string()) })),
 };
 export const vSiteSettings = v.object(siteSettingsFields);
 

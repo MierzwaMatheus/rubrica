@@ -71,7 +71,7 @@ npx convex env set NOME valor --prod     # no banco de produção
 | Variável | Para quê |
 |---|---|
 | `CONVEX_URL` | Endereço do Convex de **produção** (termina em `.convex.cloud`). O build lê o conteúdo daqui |
-| `PUBLIC_RUBRICA_API` | Endereço do Convex de produção que recebe os formulários (termina em `.convex.site`). Sem ele, os formulários do site não enviam |
+| `PUBLIC_RUBRICA_API` | Só é preciso se a API dos formulários ficar em outro endereço. Por padrão ela sai do `CONVEX_SITE_URL` (que o `convex dev` grava no `.env.local`) ou do `CONVEX_URL` (`x.convex.cloud` vira `x.convex.site`). Em demonstração (fixtures) os formulários não enviam |
 | `SITE_URL` | Endereço do site |
 | `CONVEX_DEPLOY_KEY` | Chave que deixa o build enviar o backend para o Convex de produção. Só é preciso quando o build roda `convex deploy`, como faz o da Vercel |
 | `PUBLIC_UMAMI_SCRIPT_URL` e `PUBLIC_UMAMI_WEBSITE_ID` | Endereço do script e id do site no Umami, para o plugin Analytics. O que estiver nas Configurações do painel vale mais |

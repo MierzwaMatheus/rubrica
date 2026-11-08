@@ -71,7 +71,7 @@ npx convex env set NAME value --prod     # in the production database
 | Variable | What for |
 |---|---|
 | `CONVEX_URL` | The **production** Convex address (ends in `.convex.cloud`). The build reads the content from here |
-| `PUBLIC_RUBRICA_API` | The production Convex address that receives the forms (ends in `.convex.site`). Without it, the site's forms do not send |
+| `PUBLIC_RUBRICA_API` | Only needed if the forms API lives at another address. By default it comes from `CONVEX_SITE_URL` (which `convex dev` writes to `.env.local`) or from `CONVEX_URL` (`x.convex.cloud` becomes `x.convex.site`). In demo mode (fixtures) the forms do not send |
 | `SITE_URL` | The site address |
 | `CONVEX_DEPLOY_KEY` | Key that lets the build send the backend to the production Convex. Only needed when the build runs `convex deploy`, as the Vercel one does |
 | `PUBLIC_UMAMI_SCRIPT_URL` and `PUBLIC_UMAMI_WEBSITE_ID` | Umami script address and site id, for the Analytics plugin. What is in the panel's Configurações (Settings) wins |

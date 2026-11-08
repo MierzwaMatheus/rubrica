@@ -92,6 +92,11 @@ export function findComponentSource(projectDir: string, themePkg: string, type: 
     const deps = Object.keys((readJson(join(dir, "package.json")).dependencies as Record<string, string>) ?? {});
     queue.push(...deps.filter((d) => d.startsWith("@rubrica/theme-")));
   }
+  return findCoreSource(projectDir, type);
+}
+
+/** Componente padrão do núcleo para o bloco (ignora o tema). */
+export function findCoreSource(projectDir: string, type: string): ComponentSource | null {
   const coreDir = packageDir(projectDir, "@rubrica/core");
   if (!coreDir) return null;
   const index = join(coreDir, "src/components/index.ts");

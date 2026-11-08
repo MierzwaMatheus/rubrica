@@ -1,8 +1,9 @@
 /**
  * Contrato HTTP das ilhas com o backend (RFC v2: LGPD com consentimento registrado).
  *
- * Base: `import.meta.env.PUBLIC_RUBRICA_API` (sem barra no final). Sem ela, o envio
- * está desativado (demonstração) e nada sai do navegador.
+ * Base: `import.meta.env.PUBLIC_RUBRICA_API` (sem barra no final), que a integração do Astro
+ * resolve (PUBLIC_RUBRICA_API > CONVEX_SITE_URL > derivado do CONVEX_URL, ver `findApiUrl`).
+ * Sem ela (fixtures/demonstração), o envio está desativado e nada sai do navegador.
  *
  * Os dois endpoints recebem `Content-Type: application/json` por POST, sem cookies nem
  * credenciais, de outra origem: o backend precisa responder o preflight (CORS) para a

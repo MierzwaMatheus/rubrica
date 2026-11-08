@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mkdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { ejectBlock, ejectedStatus } from "../src/commands/eject";
 import { componentSegment, findBlockMapping, findComponentSource, hashText } from "../src/project/eject";
@@ -81,5 +81,20 @@ describe("ejetar", () => {
     state.ejetados!.hero!.componente = "NaoExiste";
     writeState(dir, state);
     expect(ejectedStatus(dir, readState(dir))[0]?.status).toBe("sumiu");
+  });
+
+  it("se o tema passa a implementar um bloco ejetado do núcleo, o original continua sendo o do núcleo", () => {
+    const dir = installedProject();
+    ejectBlock(dir, readState(dir), "cases");
+    // Tema que agora desenha o bloco "cases" com outro componente.
+    const theme = join(dir, "node_modules/@rubrica/theme-padrao");
+    rmSync(theme);
+    mkdirSync(join(theme, "src"), { recursive: true });
+    writeFileSync(join(theme, "package.json"), JSON.stringify({ name: "@rubrica/theme-padrao", version: "9.9.9" }));
+    writeFileSync(join(theme, "src/index.ts"), "export const theme = { blocks: { cases: TemaCases } };\n");
+    writeFileSync(join(theme, "src/cases.tsx"), "export function TemaCases() { return null; }\n");
+    const [status] = ejectedStatus(dir, readState(dir));
+    expect(status?.status).toBe("igual");
+    expect(status?.entry.origem).toBe("@rubrica/core");
   });
 });

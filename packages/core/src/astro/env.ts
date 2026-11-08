@@ -64,3 +64,18 @@ export function devFsAllow(root: string, corePackageDir: string): string[] | und
   const inside = rel !== "" && !rel.startsWith("..") && !isAbsolute(rel);
   return inside || rel === "" ? undefined : [ws, corePackageDir];
 }
+
+/**
+ * Endereço HTTP do Convex (`.convex.site`) que recebe os formulários das ilhas. Ordem:
+ * `PUBLIC_RUBRICA_API` (API em outro endereço), `CONVEX_SITE_URL` (o `convex dev` grava no
+ * `.env.local`) e o derivado do `CONVEX_URL` (`https://x.convex.cloud` → `https://x.convex.site`).
+ * Sem nenhum, `undefined`: o envio fica desativado.
+ */
+export function findApiUrl(env: Record<string, string | undefined>): string | undefined {
+  const clean = (v: string | undefined) => v?.trim().replace(/\/+$/, "") || undefined;
+  const explicit = clean(env.PUBLIC_RUBRICA_API) ?? clean(env.CONVEX_SITE_URL);
+  if (explicit) return explicit;
+  const cloud = clean(env.CONVEX_URL) ?? clean(env.PUBLIC_CONVEX_URL) ?? clean(env.VITE_CONVEX_URL);
+  const m = cloud && /^(https?:\/\/[^/]+)\.convex\.cloud$/.exec(cloud);
+  return m ? `${m[1]}.convex.site` : undefined;
+}

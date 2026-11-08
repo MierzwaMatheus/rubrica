@@ -282,9 +282,15 @@ export const siteTools: ToolDef[] = [
     input: () => ({ type: "object", properties: {}, additionalProperties: false }),
     async handler(_args, ctx) {
       if (!can(ctx.state.me?.role, "publish")) throw new RubricaError("Sem permissão para esta ação", "forbidden");
+      // Mesmo aviso do painel ("Publicação não configurada"): sem o deploy hook, o disparo falha.
+      const status = await ctx.client.query<{ configured?: boolean }>("rubrica/publish:status", {}).catch(() => null);
+      const warnings = ctx.state.settings?.url ? [`Atualiza ${ctx.state.settings.url} em alguns minutos.`] : [];
+      if (status && status.configured === false) {
+        warnings.unshift("Publicação não configurada: falta o deploy hook (RUBRICA_DEPLOY_HOOK_URL no Convex; `npx create-rubrica publicar` define na Vercel). Aplicar vai falhar até configurar.");
+      }
       return commit(ctx, {
         summary: "Disparar o rebuild do site publicado.",
-        warnings: ctx.state.settings?.url ? [`Atualiza ${ctx.state.settings.url} em alguns minutos.`] : [],
+        warnings,
         apply: async () => ctx.client.action("rubrica/publish:trigger", {}),
       });
     },

@@ -270,6 +270,21 @@ function PlanLinks() {
   );
 }
 
+/** Avisa na hora, em vez de só no pagamento, que falta a chave do Asaas. */
+export function AsaasNotice() {
+  const status = useQuery(api.checkouts.status, {});
+  if (!status || status.asaasConfigured) return null;
+  return (
+    <div className="px-4 pt-4">
+      <Alert variant="warning">
+        <p>
+          <strong>Asaas não configurado.</strong> Você pode criar cobranças, mas o cliente não consegue pagar até a chave estar no Convex (<code>npx convex env set ASAAS_API_KEY ...</code>; use <code>npx create-rubrica setup</code> para guiar).
+        </p>
+      </Alert>
+    </div>
+  );
+}
+
 export default function Payments() {
   const { search } = useRouter();
   const tab = search.get("aba") === "planos" ? "planos" : "cobrancas";
@@ -285,6 +300,7 @@ export default function Payments() {
         {link("cobrancas", "Cobranças", "/admin/pagamentos")}
         {link("planos", "Links de plano", "/admin/pagamentos?aba=planos")}
       </nav>
+      <AsaasNotice />
       {tab === "planos" ? <PlanLinks /> : <Checkouts />}
     </>
   );

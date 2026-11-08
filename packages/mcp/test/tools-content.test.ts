@@ -142,3 +142,15 @@ describe("mídia", () => {
     expect((await call(runtime, "media_upload", { path: join(dir, "nao-existe.png") })).body.error).toContain("Não consegui ler");
   });
 });
+
+describe("site_publish", () => {
+  it("a prévia avisa que falta o deploy hook, como o painel", async () => {
+    const t = setup();
+    await seedSettings(t);
+    const { runtime, client } = await runtimeFor(t, "root");
+    const preview = await call(runtime, "site_publish", {});
+    expect(preview.body).toMatchObject({ applied: false, dryRun: true });
+    expect(preview.body.warnings.join(" ")).toMatch(/Publicação não configurada.*deploy hook/);
+    expect(client.writes()).toEqual([]);
+  });
+});

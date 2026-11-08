@@ -17,6 +17,13 @@ export interface Redirect {
 export interface HeaderRule {
   source: string;
   headers: Record<string, string>;
+  /**
+   * A regra traz o conjunto completo de cabeçalhos para esse caminho e substitui o da regra
+   * `/*`, em vez de somar a ele. Na Vercel, a regra `/*` passa a excluir esse caminho (todas as
+   * regras que casam são aplicadas, e dois valores do mesmo cabeçalho conflitam); no `_headers`,
+   * a regra começa com `! Cabeçalho` (destacar) para soltar o valor herdado da `/*`.
+   */
+  replaces?: boolean;
 }
 
 export interface HostingConfig {
@@ -31,10 +38,13 @@ export interface HostingConfig {
  * ilhas vem de `/_astro/` (self). Os formulários (contato e depoimento) falam com o
  * Convex (`*.convex.site`), e o painel com `*.convex.cloud` (inclusive por WebSocket).
  *
+ * `frameAncestors` é `'none'` no site; no painel (`/admin*`) é `'self'`, porque a prévia ao
+ * vivo (`/admin/preview`) é um iframe da mesma origem.
+ *
  * Com o plugin `analytics`, a origem do script do Umami entra em script-src (o script) e
  * connect-src (os eventos vão para a mesma origem), como na v1.
  */
-export function contentSecurityPolicy(analyticsOrigin?: string): string {
+export function contentSecurityPolicy(analyticsOrigin?: string, frameAncestors = "'none'"): string {
   const extra = analyticsOrigin ? ` ${analyticsOrigin}` : "";
   return [
     "default-src 'self'",
@@ -44,7 +54,7 @@ export function contentSecurityPolicy(analyticsOrigin?: string): string {
     "font-src 'self' data:",
     `connect-src 'self'${extra} https://*.convex.cloud wss://*.convex.cloud https://*.convex.site`,
     "frame-src 'self' https://www.google.com https://maps.google.com",
-    "frame-ancestors 'none'",
+    `frame-ancestors ${frameAncestors}`,
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
@@ -62,18 +72,31 @@ export interface HostingOptions {
 }
 
 export function defaultHosting(options: HostingOptions = {}): HostingConfig {
+  const common = {
+    "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+    "X-Content-Type-Options": "nosniff",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+  };
   return {
     redirects: [],
     headers: [
       {
         source: "/*",
         headers: {
-          "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
-          "X-Content-Type-Options": "nosniff",
+          ...common,
           "X-Frame-Options": "DENY",
-          "Referrer-Policy": "strict-origin-when-cross-origin",
-          "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
           "Content-Security-Policy": contentSecurityPolicy(options.analyticsOrigin),
+        },
+      },
+      // O painel mostra a prévia ao vivo num iframe da mesma origem (/admin/preview).
+      {
+        source: "/admin*",
+        replaces: true,
+        headers: {
+          ...common,
+          "X-Frame-Options": "SAMEORIGIN",
+          "Content-Security-Policy": contentSecurityPolicy(options.analyticsOrigin, "'self'"),
         },
       },
       // Arquivos com hash no nome: nunca mudam.
@@ -125,6 +148,16 @@ export function patchHostingCsp(files: Record<string, string | undefined>, from:
 
 const toVercel = (pattern: string) => (pattern.endsWith("*") ? `${pattern.slice(0, -1)}(.*)` : pattern);
 
+/**
+ * Origem de uma regra de cabeçalhos na Vercel. A `/*` exclui os caminhos das regras que a
+ * substituem (`/((?!admin).*)`), para que o painel não receba os cabeçalhos do site junto com os seus.
+ */
+function vercelHeaderSource(rule: HeaderRule, all: HeaderRule[]): string {
+  if (rule.source !== "/*") return toVercel(rule.source);
+  const excluded = all.filter((r) => r.replaces).map((r) => r.source.replace(/^\//, "").replace(/\*$/, ""));
+  return excluded.length ? `/((?!${excluded.join("|")}).*)` : toVercel(rule.source);
+}
+
 /** `vercel.json`. O build envia o backend ao Convex de produção e gera o site. */
 export function vercelJson(config: HostingConfig): string {
   const json = {
@@ -135,7 +168,7 @@ export function vercelJson(config: HostingConfig): string {
     buildCommand: "npx convex deploy --cmd-url-env-var-name CONVEX_URL --cmd \"npm run build\"",
     trailingSlash: false,
     redirects: config.redirects.map((r) => ({ source: toVercel(r.from), destination: r.to, permanent: r.status === 301 })),
-    headers: config.headers.map((h) => ({ source: toVercel(h.source), headers: Object.entries(h.headers).map(([key, value]) => ({ key, value })) })),
+    headers: config.headers.map((h) => ({ source: vercelHeaderSource(h, config.headers), headers: Object.entries(h.headers).map(([key, value]) => ({ key, value })) })),
   };
   return `${JSON.stringify(json, null, 2)}\n`;
 }
@@ -150,7 +183,12 @@ export function redirectsFile(config: HostingConfig): string {
 
 /** `_headers` (Netlify, Cloudflare Pages). */
 export function headersFile(config: HostingConfig): string {
-  const blocks = config.headers.map((h) => [h.source, ...Object.entries(h.headers).map(([k, v]) => `  ${k}: ${v}`)].join("\n"));
+  const catchAll = config.headers.find((h) => h.source === "/*");
+  const blocks = config.headers.map((h) => {
+    // Regra que substitui a `/*`: solta primeiro os cabeçalhos herdados, depois define os seus.
+    const detach = h.replaces && catchAll ? Object.keys(catchAll.headers).filter((k) => k in h.headers).map((k) => `  ! ${k}`) : [];
+    return [h.source, ...detach, ...Object.entries(h.headers).map(([k, v]) => `  ${k}: ${v}`)].join("\n");
+  });
   return `${[NOTE, ...blocks].join("\n")}\n`;
 }
 

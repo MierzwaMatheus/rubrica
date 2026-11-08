@@ -187,6 +187,15 @@ describe("checkouts: página pública e pagamento", () => {
     expect((await t.run((ctx) => ctx.db.get(free.id)))!.paymentLockUntil).toBeUndefined();
   });
 
+  it("status expõe só se o Asaas está configurado, sem vazar a chave", async () => {
+    expect(await root.query(api.rubrica.checkouts.status, {})).toEqual({ asaasConfigured: true });
+    delete process.env.ASAAS_API_KEY;
+    const off = await root.query(api.rubrica.checkouts.status, {});
+    expect(off).toEqual({ asaasConfigured: false });
+    process.env.ASAAS_API_KEY = "   ";
+    expect(await root.query(api.rubrica.checkouts.status, {})).toEqual({ asaasConfigured: false });
+  });
+
   it("limita quantas cobranças um link pode gerar", async () => {
     const { id } = await createCheckout();
     await t.run((ctx) => ctx.db.patch(id, { chargeAttempts: 8 }));

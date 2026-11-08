@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { devFsAllow, parseDotenv, projectEnv, workspaceRoot } from "../src/astro/env";
+import { devFsAllow, findApiUrl, parseDotenv, projectEnv, workspaceRoot } from "../src/astro/env";
 
 const tmp = () => mkdtempSync(join(tmpdir(), "rubrica-env-"));
 
@@ -39,5 +39,24 @@ describe("pastas do servidor de desenvolvimento", () => {
     const project = tmp();
     const core = join(tmp(), "packages/core");
     expect(devFsAllow(project, core)).toEqual([project, core]);
+  });
+});
+
+describe("endereço da API dos formulários", () => {
+  it("segue PUBLIC_RUBRICA_API > CONVEX_SITE_URL > derivado do CONVEX_URL", () => {
+    const all = { PUBLIC_RUBRICA_API: "https://api.exemplo.com/", CONVEX_SITE_URL: "https://a.convex.site", CONVEX_URL: "https://b.convex.cloud" };
+    expect(findApiUrl(all)).toBe("https://api.exemplo.com");
+    expect(findApiUrl({ CONVEX_SITE_URL: "https://a.convex.site", CONVEX_URL: "https://b.convex.cloud" })).toBe("https://a.convex.site");
+    expect(findApiUrl({ CONVEX_URL: "https://quixotic-dog-374.convex.cloud/" })).toBe("https://quixotic-dog-374.convex.site");
+    expect(findApiUrl({ VITE_CONVEX_URL: "https://x.convex.cloud" })).toBe("https://x.convex.site");
+  });
+  it("sem Convex reconhecível, fica desligada", () => {
+    expect(findApiUrl({})).toBeUndefined();
+    expect(findApiUrl({ PUBLIC_RUBRICA_API: " ", CONVEX_URL: "https://dominio.proprio.com" })).toBeUndefined();
+  });
+  it("lê o .env.local que o convex dev grava", () => {
+    const root = tmp();
+    writeFileSync(join(root, ".env.local"), "CONVEX_URL=https://x-y-1.convex.cloud\nCONVEX_SITE_URL=https://x-y-1.convex.site\n");
+    expect(findApiUrl(projectEnv(root, "development", {}))).toBe("https://x-y-1.convex.site");
   });
 });

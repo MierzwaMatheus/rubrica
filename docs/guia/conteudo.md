@@ -73,7 +73,7 @@ Na linha de empresa também há os **dados da empresa** (razão social, CNPJ, en
 
 ## Plugins
 
-Cada recurso opcional é um plugin que o painel liga e desliga: assistente de contato, propostas, modelos de contrato, pagamentos, blog, projetos, currículo, dia a dia, depoimentos, envio de depoimentos, tradução com IA, currículo por vaga com IA, analytics (Umami), registro de atividades e biblioteca de mídia. No tipo empresa entram também **preços** e **equipe**. Desligado, o recurso some do site e do menu do painel. Os plugins que precisam de uma chave de serviço externo estão em [Integrações](./integracoes.md).
+Cada recurso opcional é um plugin que o painel liga e desliga: assistente de contato, propostas, modelos de contrato, pagamentos, blog, projetos, currículo, dia a dia, depoimentos, envio de depoimentos, tradução com IA, currículo por vaga com IA, analytics (Umami), registro de atividades e biblioteca de mídia. No tipo empresa entram também **preços** e **equipe**. Desligado, o recurso some do site e do menu do painel. Os plugins que precisam de uma chave de serviço externo estão em [Integrações](./integracoes.md). O que cada um faz, em qual tipo de site e como começa está em [Plugins](./plugins.md).
 
 ## Papéis
 

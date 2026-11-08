@@ -1,1 +1,337 @@
-export default function S() { return <p className="p-6">Settings</p>; }
+/**
+ * Configurações do site: identidade, navegação, redes, pessoa ou empresa e, só para a
+ * agência (root), a parte técnica (tipo do site, URL, idiomas e principal, caminhos).
+ * Os formulários saem do mesmo gerador de campos dos blocos. Salvar manda só as
+ * chaves que mudaram (o backend recusa chave técnica vinda de quem não é root).
+ */
+import { useEffect, useMemo, useState } from "react";
+import { ArrowDown, ArrowUp, Plus, Save, Star, Trash2, Undo2 } from "lucide-react";
+import { field, type FieldMap } from "../../blocks/fields";
+import type { Organization, SiteSettings } from "../../content/types";
+import { defineLocales, localePrefix } from "../../i18n";
+import { api } from "../data/api";
+import { useMutation } from "../data/backend";
+import { EditorLocaleProvider, FieldsForm } from "../editor/fields";
+import { errorMessage, missingTranslations, moveItem, prune, sameDraft, type Values } from "../editor/model";
+import { PageHeader } from "../Layout";
+import { useRouter } from "../lib/router";
+import { toast } from "../lib/toast";
+import { localeName, usePanel } from "../panel";
+import { Button } from "../ui/button";
+import { Alert, Badge, Card, CardContent, CardDescription, CardHeader, CardTitle, Input, Label, NativeSelect, Spinner } from "../ui/form";
+
+const IDENTITY: FieldMap = {
+  name: field.text({ label: "Nome do site", required: true, maxLength: 80 }),
+  description: field.text({ label: "Descrição", multiline: true, maxLength: 200, help: "Aparece nos buscadores quando a página não tem descrição própria." }),
+  ogImage: field.image({ label: "Imagem padrão de compartilhamento" }),
+  twitterHandle: field.text({ label: "Usuário no X/Twitter", localized: false, maxLength: 40, help: "Sem o @." }),
+};
+
+const NAVIGATION: FieldMap = {
+  navigation: field.list({
+    label: "Menu",
+    itemLabel: "Item",
+    of: {
+      label: field.text({ label: "Texto", required: true, maxLength: 40 }),
+      href: field.text({ label: "Endereço", localized: false, required: true, help: "/sobre, #contato ou https://…" }),
+    },
+  }),
+  social: field.list({
+    label: "Redes",
+    itemLabel: "Rede",
+    of: {
+      network: field.text({ label: "Rede", localized: false, required: true, help: "LinkedIn, GitHub, Instagram…" }),
+      url: field.text({ label: "Endereço", localized: false, required: true }),
+    },
+  }),
+};
+
+const PERSON: FieldMap = {
+  name: field.text({ label: "Nome", localized: false, required: true }),
+  jobTitle: field.text({ label: "Cargo ou área" }),
+  email: field.text({ label: "E-mail", localized: false }),
+  photo: field.image({ label: "Foto" }),
+};
+
+const ORGANIZATION: FieldMap = {
+  legalName: field.text({ label: "Razão social", localized: false }),
+  taxId: field.text({ label: "CNPJ", localized: false }),
+  email: field.text({ label: "E-mail", localized: false }),
+  phone: field.text({ label: "Telefone", localized: false }),
+  whatsapp: field.text({ label: "WhatsApp", localized: false, help: "Com DDI e DDD, só números." }),
+  street: field.text({ label: "Endereço (rua e número)", localized: false }),
+  locality: field.text({ label: "Cidade", localized: false }),
+  region: field.text({ label: "Estado", localized: false }),
+  postalCode: field.text({ label: "CEP", localized: false }),
+  country: field.text({ label: "País", localized: false }),
+  openingHours: field.list({
+    label: "Horário",
+    itemLabel: "Horário",
+    of: {
+      days: field.text({ label: "Dias", localized: false, required: true, help: "Formato schema.org: Mo-Fr, Sa" }),
+      opens: field.text({ label: "Abre", localized: false, required: true, help: "09:00" }),
+      closes: field.text({ label: "Fecha", localized: false, required: true, help: "18:00" }),
+    },
+  }),
+  mapUrl: field.text({ label: "Link do mapa", localized: false }),
+  schemaType: field.select({
+    label: "Tipo (schema.org)",
+    options: [
+      { value: "Organization", label: "Organização" },
+      { value: "LocalBusiness", label: "Negócio local" },
+      { value: "ProfessionalService", label: "Serviço profissional" },
+    ],
+  }),
+};
+
+const ADDRESS_KEYS = ["street", "locality", "region", "postalCode", "country"] as const;
+
+function orgToValues(org: Organization | undefined): Values {
+  const { address, ...rest } = org ?? {};
+  return { ...rest, ...(address ?? {}) };
+}
+
+function valuesToOrg(values: Values): Organization | undefined {
+  const out: Values = {};
+  const address: Values = {};
+  for (const [k, v] of Object.entries(values)) {
+    if ((ADDRESS_KEYS as readonly string[]).includes(k)) address[k] = v;
+    else out[k] = v;
+  }
+  if (Object.keys(address).length) out.address = address;
+  return Object.keys(out).length ? (out as Organization) : undefined;
+}
+
+function LocalesEditor({ value, onChange }: { value: SiteSettings["locales"]; onChange: (v: SiteSettings["locales"]) => void }) {
+  const [code, setCode] = useState("");
+  let error: string | undefined;
+  try {
+    defineLocales(value);
+  } catch (e) {
+    error = (e as Error).message.replace("[rubrica] ", "");
+  }
+  return (
+    <div className="space-y-2">
+      <Label>Idiomas do site</Label>
+      <ul className="space-y-1">
+        {value.locales.map((l, i) => (
+          <li key={l} className="flex items-center gap-2 rounded-md border px-2 py-1 text-sm">
+            <span className="flex-1">
+              {localeName(l)} <span className="font-mono text-xs text-muted-foreground">{l}</span>{" "}
+              <span className="font-mono text-xs text-muted-foreground">{l === value.default ? "(sem prefixo)" : `/${localePrefix(l, value)}`}</span>
+            </span>
+            {l === value.default ? (
+              <Badge>principal</Badge>
+            ) : (
+              <Button variant="ghost" size="sm" onClick={() => onChange({ ...value, default: l })}>
+                <Star /> Tornar principal
+              </Button>
+            )}
+            <Button variant="ghost" size="icon-sm" aria-label={`Subir ${l}`} disabled={i === 0} onClick={() => onChange({ ...value, locales: moveItem(value.locales, i, i - 1) })}>
+              <ArrowUp />
+            </Button>
+            <Button variant="ghost" size="icon-sm" aria-label={`Descer ${l}`} disabled={i === value.locales.length - 1} onClick={() => onChange({ ...value, locales: moveItem(value.locales, i, i + 1) })}>
+              <ArrowDown />
+            </Button>
+            <Button variant="ghost" size="icon-sm" aria-label={`Remover ${l}`} disabled={l === value.default} onClick={() => onChange({ ...value, locales: value.locales.filter((x) => x !== l) })}>
+              <Trash2 />
+            </Button>
+          </li>
+        ))}
+      </ul>
+      <form
+        className="flex gap-2"
+        onSubmit={(e) => {
+          e.preventDefault();
+          const c = code.trim();
+          if (/^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$/.test(c) && !value.locales.includes(c)) {
+            onChange({ ...value, locales: [...value.locales, c] });
+            setCode("");
+          }
+        }}
+      >
+        <Input aria-label="Código do idioma" placeholder="es, en-US, fr…" value={code} onChange={(e) => setCode(e.target.value)} className="max-w-40" />
+        <Button type="submit" variant="outline" size="sm">
+          <Plus /> Acrescentar
+        </Button>
+      </form>
+      <p className="text-xs text-muted-foreground">
+        Conteúdo sem tradução num idioma não existe nesse idioma (decisão 28). Trocar o principal muda as URLs: o principal fica sem prefixo.
+      </p>
+      {error && <p className="text-xs text-destructive">{error}</p>}
+    </div>
+  );
+}
+
+export default function Settings() {
+  const panel = usePanel();
+  const { block } = useRouter();
+  const update = useMutation(api.settings.update);
+  const isRoot = panel.me.role === "root";
+  const [draft, setDraft] = useState<SiteSettings | null>(() => (panel.settings ? structuredClone(panel.settings) : null));
+  const [locale, setLocale] = useState(panel.locales.default);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string>();
+
+  const changedKeys = useMemo(() => {
+    if (!draft || !panel.settings) return [];
+    return (Object.keys({ ...draft, ...panel.settings }) as (keyof SiteSettings)[]).filter((k) => !sameDraft(draft[k], panel.settings![k]));
+  }, [draft, panel.settings]);
+  const dirty = changedKeys.length > 0;
+
+  useEffect(() => (dirty ? block("Há configurações não salvas. Sair mesmo assim?") : undefined), [dirty, block]);
+  useEffect(() => {
+    if (!dirty && panel.settings) setDraft(structuredClone(panel.settings));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [panel.settings]);
+
+  if (!draft) {
+    return (
+      <>
+        <PageHeader title="Configurações" />
+        <Alert variant="warning" className="m-6">
+          O site ainda não foi configurado. Rode <code>npx create-rubrica setup</code> no projeto.
+        </Alert>
+      </>
+    );
+  }
+
+  const set = <K extends keyof SiteSettings>(key: K, value: SiteSettings[K] | undefined) =>
+    setDraft((d) => {
+      const next = { ...d! } as unknown as Values;
+      if (value === undefined) delete next[key];
+      else next[key] = value;
+      return next as unknown as SiteSettings;
+    });
+
+  async function save() {
+    if (!draft) return;
+    setBusy(true);
+    setError(undefined);
+    try {
+      const patch = Object.fromEntries(changedKeys.map((k) => [k, prune(draft[k])])) as Partial<SiteSettings>;
+      await update({ patch });
+      toast.success("Configurações salvas. O site no ar muda na próxima publicação.");
+    } catch (e) {
+      setError(errorMessage(e));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const locales = draft.locales.locales;
+  const editorLocale = { locale: locales.includes(locale) ? locale : draft.locales.default, setLocale, locales, defaultLocale: draft.locales.default, translation: panel.enabled.has("translation") };
+  const identity = { name: draft.name, description: draft.description, ogImage: draft.ogImage, twitterHandle: draft.twitterHandle } as Values;
+
+  return (
+    <EditorLocaleProvider value={editorLocale}>
+      <PageHeader
+        title="Configurações"
+        description="Dados do site que valem em todas as páginas."
+        actions={
+          <>
+            {dirty && (
+              <Button variant="ghost" onClick={() => setDraft(structuredClone(panel.settings!))}>
+                <Undo2 /> Descartar
+              </Button>
+            )}
+            <Button onClick={save} disabled={!dirty || busy}>
+              {busy ? <Spinner /> : <Save />} Salvar
+            </Button>
+          </>
+        }
+      />
+      <div className="grid max-w-5xl gap-4 p-6">
+        {error && <Alert variant="destructive">{error}</Alert>}
+        <Card>
+          <CardHeader>
+            <CardTitle>Identidade</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <FieldsForm
+              fields={IDENTITY}
+              values={identity}
+              missing={missingTranslations(IDENTITY, identity, locales)}
+              onChange={(v) => setDraft((d) => ({ ...d!, name: (v.name as SiteSettings["name"]) ?? {}, description: (v.description as SiteSettings["description"]) ?? {}, ogImage: v.ogImage as SiteSettings["ogImage"], twitterHandle: v.twitterHandle as string | undefined }))}
+            />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Navegação e redes</CardTitle>
+            <CardDescription>O menu do cabeçalho e os links do rodapé. Item sem texto num idioma não aparece nele.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <FieldsForm
+              fields={NAVIGATION}
+              values={{ navigation: draft.navigation, social: draft.social }}
+              missing={missingTranslations(NAVIGATION, { navigation: draft.navigation }, locales)}
+              onChange={(v) => setDraft((d) => ({ ...d!, navigation: (v.navigation as SiteSettings["navigation"]) ?? [], social: (v.social as SiteSettings["social"]) ?? [] }))}
+            />
+          </CardContent>
+        </Card>
+
+        {draft.kind === "pessoal" ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>Pessoa</CardTitle>
+              <CardDescription>Dono do site: autor dos posts e dados estruturados (JSON-LD Person).</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <FieldsForm fields={PERSON} values={(draft.person ?? {}) as Values} onChange={(v) => set("person", Object.keys(v).length ? (v as unknown as SiteSettings["person"]) : undefined)} />
+            </CardContent>
+          </Card>
+        ) : (
+          <Card>
+            <CardHeader>
+              <CardTitle>Empresa</CardTitle>
+              <CardDescription>Rodapé, contato, localização e dados estruturados (JSON-LD Organization).</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <FieldsForm fields={ORGANIZATION} values={orgToValues(draft.organization)} onChange={(v) => set("organization", valuesToOrg(v))} />
+            </CardContent>
+          </Card>
+        )}
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Configuração técnica</CardTitle>
+            <CardDescription>{isRoot ? "Só a agência (root) muda esta parte." : "Só a agência (root) muda esta parte. Fale com quem cuida do site."}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <fieldset disabled={!isRoot} className="space-y-4 disabled:opacity-70">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-1.5">
+                  <Label htmlFor="cfg-url">Endereço do site</Label>
+                  <Input id="cfg-url" value={draft.url} onChange={(e) => set("url", e.target.value)} placeholder="https://exemplo.com" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="cfg-kind">Tipo do site</Label>
+                  <NativeSelect id="cfg-kind" value={draft.kind} onChange={(e) => set("kind", e.target.value as SiteSettings["kind"])}>
+                    <option value="pessoal">Pessoal</option>
+                    <option value="empresa">Empresa</option>
+                  </NativeSelect>
+                  {draft.kind !== panel.settings?.kind && <p className="text-xs text-warning">Trocar o tipo muda os blocos e plugins disponíveis; blocos do outro tipo param de aparecer.</p>}
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="cfg-theme">Tema</Label>
+                  <Input id="cfg-theme" value={draft.theme} disabled />
+                  <p className="text-xs text-muted-foreground">O tema é um pacote do projeto: troca-se no código (npx create-rubrica config).</p>
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="cfg-posts">Base dos posts e dos projetos</Label>
+                  <div className="flex gap-2">
+                    <Input id="cfg-posts" aria-label="Base dos posts" value={draft.paths?.posts ?? ""} placeholder="/blog" onChange={(e) => set("paths", { ...draft.paths, posts: e.target.value || undefined })} />
+                    <Input aria-label="Base dos projetos" value={draft.paths?.projects ?? ""} placeholder="/portfolio" onChange={(e) => set("paths", { ...draft.paths, projects: e.target.value || undefined })} />
+                  </div>
+                </div>
+              </div>
+              <LocalesEditor value={draft.locales} onChange={(v) => set("locales", v)} />
+            </fieldset>
+          </CardContent>
+        </Card>
+      </div>
+    </EditorLocaleProvider>
+  );
+}

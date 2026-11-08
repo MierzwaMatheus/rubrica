@@ -150,11 +150,19 @@ function importSteps(outDir: string, pm: PackageManager): string[] {
   ];
 }
 
-async function customizationsFor(projectDir: string, v1: V1RubricaJson, packageName: string, deps: MigrateDeps, templateDir?: string): Promise<{ list?: Customization[]; error?: string }> {
+async function customizationsFor(
+  projectDir: string,
+  v1: V1RubricaJson,
+  packageName: string,
+  deps: MigrateDeps,
+  templateDir?: string,
+): Promise<{ list?: Customization[]; templateRoots?: Set<string>; error?: string }> {
   const dir = mkdtempSync(join(tmpdir(), "rubrica-v1-pristine-"));
   try {
     await (deps.pristine ?? defaultPristine)(dir, v1, packageName, templateDir);
-    return { list: listCustomizations(projectDir, dir, gitFiles(projectDir, deps.runner ?? defaultRun)) };
+    // O que fica na raiz do template da v1: só isso sai do projeto (o resto é da pessoa).
+    const templateRoots = new Set(readdirSync(dir));
+    return { list: listCustomizations(projectDir, dir, gitFiles(projectDir, deps.runner ?? defaultRun)), templateRoots };
   } catch (err) {
     return { error: `${(err as Error).message}${templateDir ? "" : " (sem internet? passe --template-v1 <pasta com o repositório do Rubrica>)"}` };
   } finally {
@@ -297,7 +305,18 @@ async function runFull(projectDir: string, values: Record<string, string>, flags
   // 3. Código.
   const previous = JSON.parse(readFileSync(join(projectDir, "package.json"), "utf-8")) as Record<string, unknown>;
   const oldGitignore = existsSync(join(projectDir, ".gitignore")) ? readFileSync(join(projectDir, ".gitignore"), "utf-8") : "";
-  for (const entry of readdirSync(projectDir)) if (!KEEP.has(entry)) rmSync(join(projectDir, entry), { recursive: true, force: true });
+  // Sai o que é do template da v1. Arquivos e pastas que a pessoa criou na raiz (PRD.md,
+  // .windsurf/, notas) ficam. Sem o template de referência, vale só a lista fixa.
+  const kept: string[] = [];
+  for (const entry of readdirSync(projectDir)) {
+    if (KEEP.has(entry)) continue;
+    if (custom.templateRoots && !custom.templateRoots.has(entry)) {
+      kept.push(entry);
+      continue;
+    }
+    rmSync(join(projectDir, entry), { recursive: true, force: true });
+  }
+  if (kept.length) log.info(`Ficaram na raiz (não são do template da v1): ${kept.join(", ")}`);
   rmSync(join(projectDir, "public", "data"), { recursive: true, force: true });
   const state = v2StateFrom(v1, theme);
   const depSpecs: DependencySpecs = values.local ? localDependencySpecs(resolve(deps.cwd, values.local), theme.tema) : defaultDependencySpecs();

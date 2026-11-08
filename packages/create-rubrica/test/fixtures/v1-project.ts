@@ -32,6 +32,9 @@ export function v1Project(layout = "cyberpunk") {
     "src/index.css": ":root { --bg: #111; }\n",
     "public/cv.pdf": "%PDF",
     "docs/notas.md": "# notas\n",
+    // Criados pela pessoa na raiz (não existem no template): ficam.
+    "PRD.md": "# PRD\n",
+    ".windsurf/rules/solid.md": "# SOLID\n",
     "rubrica.json": JSON.stringify({ ...V1_RUBRICA_JSON, layout }, null, 2),
     ".gitignore": "node_modules\n.env.local\nmeus-rascunhos/\n",
   });

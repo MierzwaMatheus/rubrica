@@ -1,0 +1,15 @@
+/*
+ * Cyberpunk = tema padrão + ajustes do cyberpunk da v1: sidebar com o mesmo fundo da
+ * página, títulos na cor do texto (sem o realce "forte") e brilho nos destaques.
+ */
+@import "@rubrica/theme-padrao/styles.css";
+
+:root {
+  --rb-side-bg: var(--rb-bg);
+  --rb-fg-strong: var(--rb-fg);
+}
+.rb-side { box-shadow: 1px 0 0 var(--rb-hairline); }
+.rb-profile__role { backdrop-filter: blur(4px); }
+.rb-avatar { box-shadow: 0 0 18px color-mix(in srgb, var(--rb-accent) 25%, transparent); }
+.rb-button--primary:hover { box-shadow: 0 0 14px color-mix(in srgb, var(--rb-accent) 40%, transparent); }
+.rb-card:hover { box-shadow: 0 0 20px color-mix(in srgb, var(--rb-accent) 12%, transparent); }

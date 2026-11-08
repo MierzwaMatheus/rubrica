@@ -46,6 +46,44 @@ export const DEFAULT_UI_TEXTS: Record<string, Localized<string>> = {
   "contact.social": { pt: "Redes", en: "Social", es: "Redes" },
   "resume.period": { pt: "Período", en: "Period", es: "Período" },
   "plans.included": { pt: "O que está incluso", en: "What's included", es: "Qué incluye" },
+  "resume.downloadError": { pt: "Não foi possível abrir o currículo. Permita pop-ups e tente de novo.", en: "Couldn't open the résumé. Allow pop-ups and try again.", es: "No se pudo abrir el CV. Permite las ventanas emergentes e inténtalo de nuevo." },
+  "form.name": { pt: "Nome", en: "Name", es: "Nombre" },
+  "form.email": { pt: "E-mail", en: "Email", es: "Correo" },
+  "form.phone": { pt: "Telefone", en: "Phone", es: "Teléfono" },
+  "form.message": { pt: "Mensagem", en: "Message", es: "Mensaje" },
+  "form.optional": { pt: "Opcional", en: "Optional", es: "Opcional" },
+  "form.required": { pt: "Preencha este campo.", en: "Fill in this field.", es: "Completa este campo." },
+  "form.invalidEmail": { pt: "Informe um e-mail válido.", en: "Enter a valid email.", es: "Ingresa un correo válido." },
+  "form.consent": { pt: "Li e concordo com o tratamento dos meus dados conforme a", en: "I have read and agree to the processing of my data under the", es: "He leído y acepto el tratamiento de mis datos según la" },
+  "form.consentLink": { pt: "política de privacidade", en: "privacy policy", es: "política de privacidad" },
+  "form.consentRequired": { pt: "Para enviar, é preciso concordar com a política de privacidade.", en: "To send, you need to agree to the privacy policy.", es: "Para enviar, es necesario aceptar la política de privacidad." },
+  "form.step": { pt: "Etapa {current} de {total}", en: "Step {current} of {total}", es: "Paso {current} de {total}" },
+  "form.next": { pt: "Continuar", en: "Continue", es: "Continuar" },
+  "form.back": { pt: "Voltar", en: "Back", es: "Volver" },
+  "form.cancel": { pt: "Cancelar", en: "Cancel", es: "Cancelar" },
+  "form.send": { pt: "Enviar", en: "Send", es: "Enviar" },
+  "form.sending": { pt: "Enviando…", en: "Sending…", es: "Enviando…" },
+  "form.error": { pt: "Não foi possível enviar agora. Tente de novo em instantes.", en: "Couldn't send right now. Please try again in a moment.", es: "No se pudo enviar ahora. Inténtalo de nuevo en unos instantes." },
+  "form.rateLimited": { pt: "Muitos envios seguidos. Aguarde um pouco e tente de novo.", en: "Too many submissions in a row. Wait a bit and try again.", es: "Demasiados envíos seguidos. Espera un poco e inténtalo de nuevo." },
+  "form.disabled": { pt: "O envio está desativado nesta demonstração.", en: "Sending is turned off in this demo.", es: "El envío está desactivado en esta demostración." },
+  "contactForm.title": { pt: "Envie uma mensagem", en: "Send a message", es: "Envía un mensaje" },
+  "contactForm.topic": { pt: "Sobre o que você quer falar?", en: "What would you like to talk about?", es: "¿Sobre qué quieres hablar?" },
+  "contactForm.message": { pt: "Conte um pouco mais", en: "Tell me a bit more", es: "Cuéntame un poco más" },
+  "contactForm.you": { pt: "Como falar com você?", en: "How can I reach you?", es: "¿Cómo puedo contactarte?" },
+  "contactForm.topic.project": { pt: "Tenho um projeto", en: "I have a project", es: "Tengo un proyecto" },
+  "contactForm.topic.job": { pt: "Tenho uma vaga", en: "I have a job opening", es: "Tengo una vacante" },
+  "contactForm.topic.talk": { pt: "Quero trocar uma ideia", en: "I'd like to chat", es: "Quiero conversar" },
+  "contactForm.topic.other": { pt: "Outro assunto", en: "Something else", es: "Otro asunto" },
+  "contactForm.success": { pt: "Mensagem enviada.", en: "Message sent.", es: "Mensaje enviado." },
+  "contactForm.successBody": { pt: "Obrigado pelo contato. Respondo assim que possível.", en: "Thanks for reaching out. I'll reply as soon as I can.", es: "Gracias por escribir. Responderé lo antes posible." },
+  "testimonialForm.open": { pt: "Enviar um depoimento", en: "Send a testimonial", es: "Enviar un testimonio" },
+  "testimonialForm.title": { pt: "Conte como foi trabalhar junto", en: "Tell us what it was like to work together", es: "Cuéntanos cómo fue trabajar juntos" },
+  "testimonialForm.quote": { pt: "Seu depoimento", en: "Your testimonial", es: "Tu testimonio" },
+  "testimonialForm.role": { pt: "Cargo", en: "Role", es: "Cargo" },
+  "testimonialForm.company": { pt: "Empresa", en: "Company", es: "Empresa" },
+  "testimonialForm.emailHint": { pt: "Não aparece no site.", en: "Not shown on the site.", es: "No se muestra en el sitio." },
+  "testimonialForm.success": { pt: "Depoimento enviado.", en: "Testimonial sent.", es: "Testimonio enviado." },
+  "testimonialForm.successBody": { pt: "Obrigado! Ele aparece no site depois de aprovado.", en: "Thank you! It will show on the site once approved.", es: "¡Gracias! Aparecerá en el sitio una vez aprobado." },
   "footer.rights": { pt: "Todos os direitos reservados.", en: "All rights reserved.", es: "Todos los derechos reservados." },
   "footer.privacy": { pt: "Política de privacidade", en: "Privacy policy", es: "Política de privacidad" },
   "notFound.title": { pt: "Página não encontrada", en: "Page not found", es: "Página no encontrada" },
@@ -56,6 +94,11 @@ export const DEFAULT_UI_TEXTS: Record<string, Localized<string>> = {
   },
   "notFound.home": { pt: "Ir para a página inicial", en: "Go to the home page", es: "Ir a la página de inicio" },
 };
+
+/** Chaves de interface do núcleo que começam com algum dos prefixos. */
+export function uiKeysWithPrefix(prefixes: string[]): string[] {
+  return Object.keys(DEFAULT_UI_TEXTS).filter((k) => prefixes.some((p) => k.startsWith(p)));
+}
 
 /** Texto padrão do núcleo: idioma exato, idioma base, inglês. */
 export function defaultUiText(key: string, locale: Locale): string | undefined {

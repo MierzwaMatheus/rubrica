@@ -22,7 +22,7 @@ export type { VideoFrameProps } from "./blocks/media";
 export { LinhaDoTempoBlock } from "./blocks/timeline";
 export { ComparativoPlanosBlock } from "./blocks/compare";
 /** Utilitários puros dos blocos padrão, para os temas não copiarem. */
-export { digits, formatDays, resolveFreeHref, safeId, shorten, tagFilterCss } from "./blocks/util";
+export { digits, formatDays, isHtmlText, resolveFreeHref, safeId, shorten, tagFilterCss } from "./blocks/util";
 export type { TagFilterCssOptions } from "./blocks/util";
 
 /** Componentes padrão por tipo de bloco. Tipo sem entrada usa `GenericBlock`. */

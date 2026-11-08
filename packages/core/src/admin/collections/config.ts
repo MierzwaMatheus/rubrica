@@ -133,7 +133,8 @@ const RESUME_FIELDS: FieldMap = {
   location: field.text({ label: "Local", maxLength: 80 }),
   start: field.text({ label: "Início", localized: false, maxLength: 7, help: "AAAA-MM (ex.: 2021-03)." }),
   end: field.text({ label: "Fim", localized: false, maxLength: 7, help: "AAAA-MM. Vazio = até hoje." }),
-  description: field.text({ label: "Descrição", multiline: true, maxLength: 800 }),
+  // Texto rico: experiências longas, com listas e destaques (como na v1).
+  description: field.richText({ label: "Descrição" }),
   group: field.text({ label: "Grupo", maxLength: 60, help: "Agrupa as competências no currículo (ex.: Front-end, IA, Ferramentas). Opcional." }),
 };
 

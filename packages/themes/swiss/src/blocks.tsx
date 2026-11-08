@@ -6,7 +6,7 @@
  * Textos de interface vêm de `ctx.t("swiss.*")`; sem texto fixo.
  */
 import type { BlockProps, CollectionItems } from "@rubrica/core";
-import { Heading, Html, Img, Section, SectionHeader } from "@rubrica/core/components";
+import { Heading, Html, Img, Section, SectionHeader, isHtmlText } from "@rubrica/core/components";
 import { safeId, splitName, tagFilterCss, two } from "./util";
 
 type Props<F = any, I = any> = BlockProps<F, I>;
@@ -432,6 +432,7 @@ function period(item: ResumeItem, ctx: Props["ctx"]) {
 
 function Description({ text }: { text?: string }) {
   if (!text) return null;
+  if (isHtmlText(text)) return <Html html={text} className="rb-prose rb-resume__desc" />;
   const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
   const bullets = lines.filter((l) => /^[-•]\s/.test(l));
   if (bullets.length === lines.length) {

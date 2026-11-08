@@ -93,31 +93,49 @@ function PostCard({ post, ctx, tagIndexes }: { post: PostItem; ctx: BlockProps["
   );
 }
 
+/** Quantas etiquetas o filtro do blog mostra abertas; mais que isso, ele recolhe. */
+export const TAG_FILTER_OPEN_MAX = 10;
+
 export function PostsRecentesBlock({ id, variant, fields, items, headingLevel, ctx }: BlockProps<PostsFields, PostItem>) {
   const allTags = fields.showTagFilter ? [...new Set(items.flatMap((p) => p.tags))].sort((a, b) => a.localeCompare(b, ctx.locale)) : [];
   const filter = allTags.length > 0;
   const tagIndexes = new Map(allTags.map((t, i) => [t, i] as const));
   const scope = `f-${safeId(id)}`;
+  /** Acima disso, o filtro fica recolhido: um paredão de etiquetas empurra os posts para baixo. */
+  const collapsed = allTags.length > TAG_FILTER_OPEN_MAX;
+  const filterGroup = (
+    <div className="rb-filter" role="group" aria-label={ctx.t("blog.filter")}>
+      <label htmlFor={`${scope}-all`}>{ctx.t("blog.allTags")}</label>
+      {allTags.map((t, i) => (
+        <label key={t} htmlFor={`${scope}-t${i}`}>
+          {t}
+        </label>
+      ))}
+    </div>
+  );
   return (
     <Section id={id} anchor={fields.anchor} type="posts-recentes" variant={variant}>
       <SectionHeader title={fields.title} intro={fields.intro} level={headingLevel} />
       {items.length > 0 ? (
         <div className="rb-posts">
-          {filter && <style dangerouslySetInnerHTML={{ __html: tagFilterCss(scope, allTags.length) }} />}
+          {filter && <style dangerouslySetInnerHTML={{ __html: tagFilterCss(scope, allTags.length, collapsed ? { filter: ".rb-filter-more" } : {}) }} />}
           {filter && (
             <>
               <input type="radio" name={scope} id={`${scope}-all`} className="rb-sr-only" defaultChecked />
               {allTags.map((t, i) => (
                 <input key={t} type="radio" name={scope} id={`${scope}-t${i}`} className="rb-sr-only" />
               ))}
-              <div className="rb-filter" role="group" aria-label={ctx.t("blog.filter")}>
-                <label htmlFor={`${scope}-all`}>{ctx.t("blog.allTags")}</label>
-                {allTags.map((t, i) => (
-                  <label key={t} htmlFor={`${scope}-t${i}`}>
-                    {t}
-                  </label>
-                ))}
-              </div>
+              {collapsed ? (
+                // Muitas etiquetas: recolhidas atrás de "Filtrar por etiqueta", como na v1, sem JavaScript.
+                <details className="rb-filter-more">
+                  <summary>
+                    {ctx.t("blog.filter")} ({allTags.length})
+                  </summary>
+                  {filterGroup}
+                </details>
+              ) : (
+                filterGroup
+              )}
             </>
           )}
           <ul className="rb-grid rb-posts__list">

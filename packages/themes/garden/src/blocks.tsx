@@ -11,7 +11,7 @@
  * - formulário de depoimento e PDF do currículo: ilhas do núcleo.
  */
 import type { BlockProps, CollectionItems, ResolvedLink } from "@rubrica/core";
-import { Heading, Img, LinkButton, safeId } from "@rubrica/core/components";
+import { Heading, Img, LinkButton, safeId, Html, isHtmlText } from "@rubrica/core/components";
 import { barePath, cls, Crumb, currentLabel, experienceStage, ownerName, postStage, projectStage, RECENT_DAYS, SectionHead, StageDot, StageLabel, type Stage } from "./garden";
 
 type Project = CollectionItems["projects"];
@@ -456,6 +456,7 @@ function Period({ item, ctx }: { item: Resume; ctx: BlockProps["ctx"] }) {
 /** Texto do item: linhas com "- " viram lista, o resto vira parágrafo. */
 function Description({ text }: { text?: string }) {
   if (!text) return null;
+  if (isHtmlText(text)) return <Html html={text} className="rb-prose rb-resume__desc" />;
   const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
   const bullets = lines.filter((l) => /^[-•]\s/.test(l));
   if (bullets.length === lines.length) {

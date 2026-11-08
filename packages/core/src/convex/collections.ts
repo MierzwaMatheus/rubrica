@@ -321,7 +321,12 @@ const simple = <F extends PropertyValidators>(
 export const servicesFunctions = (rt: RubricaRuntime) => simple(rt, "services", serviceFields, ["title"], (d) => d.title as Localized<string>);
 export const testimonialsFunctions = (rt: RubricaRuntime) => simple(rt, "testimonials", testimonialFields, ["quote"], (d) => d.author as string);
 export const faqFunctions = (rt: RubricaRuntime) => simple(rt, "faq", faqFields, ["question", "answer"], (d) => d.question as Localized<string>);
-export const resumeFunctions = (rt: RubricaRuntime) => simple(rt, "resume", resumeItemFields, ["title"], (d) => d.title as Localized<string>);
+/** A descrição do currículo é texto rico (HTML, como na v1): sanitizada ao gravar. */
+const sanitizeResume = (data: Data): Data =>
+  data.description ? { ...data, description: sanitizeLocalizedHtml(data.description as Localized<string>) } : data;
+
+export const resumeFunctions = (rt: RubricaRuntime) =>
+  collectionFunctions(rt, { name: "resume", fields: resumeItemFields, extra: {}, permission: "content", defaultPublished: true, requiredText: ["title"], label: (d) => d.title as Localized<string>, sanitize: sanitizeResume });
 export const routineFunctions = (rt: RubricaRuntime) => simple(rt, "routine", routineFields, ["title"], (d) => d.title as Localized<string>);
 export const plansFunctions = (rt: RubricaRuntime) => simple(rt, "plans", planFields, ["name"], (d) => d.name as Localized<string>, "plans");
 export const teamFunctions = (rt: RubricaRuntime) => simple(rt, "team", teamMemberFields, ["role"], (d) => d.name as string);

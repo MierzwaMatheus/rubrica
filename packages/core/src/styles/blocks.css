@@ -70,6 +70,14 @@
 
 /* Posts e filtro por etiqueta (sem JavaScript) */
 .rb-filter { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
+.rb-filter-more { margin-bottom: 1.5rem; }
+.rb-filter-more > summary { display: inline-flex; align-items: center; min-height: 44px; padding: 0 1rem; border: 1px solid var(--rb-border); border-radius: 999px; cursor: pointer; color: var(--rb-fg); list-style: none; }
+.rb-filter-more > summary::-webkit-details-marker { display: none; }
+.rb-filter-more > summary::after { content: "▾"; margin-left: 0.5rem; color: var(--rb-muted); }
+.rb-filter-more[open] > summary { margin-bottom: 0.75rem; }
+.rb-filter-more[open] > summary::after { content: "▴"; }
+.rb-filter-more > summary:focus-visible { outline: 2px solid var(--rb-accent); outline-offset: 2px; }
+.rb-filter-more .rb-filter { margin-bottom: 0; }
 .rb-filter label { display: inline-flex; align-items: center; min-height: 44px; padding: 0 1rem; border: 1px solid var(--rb-border); border-radius: 999px; cursor: pointer; color: var(--rb-fg); }
 
 /* Depoimentos */

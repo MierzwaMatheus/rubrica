@@ -4,7 +4,8 @@ import type { ResolvedFields } from "../../blocks/fields";
 import type { curriculo as curriculoDef } from "../../blocks/catalog";
 import type { ResumeItem } from "../../render/collections";
 import type { ResumeKind } from "../../content/types";
-import { Heading, Section, SectionHeader } from "../primitives";
+import { Heading, Html, Section, SectionHeader } from "../primitives";
+import { isHtmlText } from "./util";
 
 type CurriculoFields = ResolvedFields<typeof curriculoDef.fields>;
 
@@ -24,6 +25,8 @@ function Period({ item, ctx }: { item: ResumeItem; ctx: BlockProps["ctx"] }) {
 
 function Description({ text }: { text?: string }) {
   if (!text) return null;
+  // HTML (texto rico do painel ou vindo da v1): o backend sanitiza ao gravar.
+  if (isHtmlText(text)) return <Html html={text} className="rb-prose rb-resume__desc" />;
   const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
   const bullets = lines.filter((l) => /^[-•]\s/.test(l));
   if (bullets.length === lines.length) {

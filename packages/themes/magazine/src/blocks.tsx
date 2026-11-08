@@ -6,7 +6,7 @@
  */
 import type { ReactNode } from "react";
 import type { BlockProps, RenderContext } from "@rubrica/core";
-import { Heading, Html, Img, LinkButton, Section, SectionHeader, safeId, tagFilterCss as coreTagFilterCss } from "@rubrica/core/components";
+import { Heading, Html, Img, LinkButton, Section, SectionHeader, safeId, tagFilterCss as coreTagFilterCss, isHtmlText } from "@rubrica/core/components";
 
 const num = (i: number) => String(i + 1).padStart(2, "0");
 
@@ -391,6 +391,7 @@ function period(item: Item, ctx: RenderContext) {
 
 function Description({ text }: { text?: string }) {
   if (!text) return null;
+  if (isHtmlText(text)) return <Html html={text} className="rb-prose rb-resume__desc" />;
   const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
   const bullets = lines.filter((l) => /^[-•]\s/.test(l));
   if (bullets.length === lines.length) {

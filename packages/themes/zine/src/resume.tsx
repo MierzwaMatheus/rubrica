@@ -4,7 +4,7 @@
  * como fichas presas com fita. O botão de PDF (ilha) vem do núcleo.
  */
 import type { CollectionItems } from "@rubrica/core";
-import { Heading } from "@rubrica/core/components";
+import { Heading, Html, isHtmlText } from "@rubrica/core/components";
 import { Letter, Tape, ZHead, ZSection, tilt, tiltAt } from "./parts";
 import type { Props } from "./blocks";
 
@@ -19,6 +19,7 @@ function periodOf(item: ResumeItem, ctx: Props["ctx"]): string {
 /** Descrição: linhas com marcador viram lista; o resto, um parágrafo. */
 function Description({ text }: { text?: string }) {
   if (!text) return null;
+  if (isHtmlText(text)) return <Html html={text} className="rb-prose rb-resume__desc" />;
   const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
   const bullets = lines.filter((l) => /^[-•]\s/.test(l));
   if (bullets.length === lines.length) {

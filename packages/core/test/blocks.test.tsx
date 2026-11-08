@@ -297,3 +297,12 @@ describe("estilos", () => {
     });
   }
 });
+
+describe("descrição do currículo em HTML", () => {
+  it("mostra como HTML (texto rico, ou vindo da v1), não como texto com as tags", async () => {
+    const { isHtmlText } = await import("../src/components/blocks/util");
+    expect(isHtmlText("<p>Fundei a área de <strong>IA</strong></p>")).toBe(true);
+    expect(isHtmlText("- item\n- outro")).toBe(false);
+    expect(isHtmlText("Liderei 3 < 5 times")).toBe(false);
+  });
+});

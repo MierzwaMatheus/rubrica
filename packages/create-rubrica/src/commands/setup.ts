@@ -28,17 +28,19 @@ export interface SeedStatus {
 }
 
 /**
- * Integrações e as variáveis do Convex de cada uma (os nomes que o núcleo lê). Ficam
- * num lugar só: o setup pergunta, o publicar copia para a produção.
+ * Integrações e as variáveis do Convex de cada uma: os nomes que o núcleo lê, os mesmos
+ * de `docs/v2/variaveis.md` (um teste confere). Ficam num lugar só: o setup pergunta, o
+ * publicar copia para a produção.
  */
 export const INTEGRATIONS = [
   {
     id: "telegram",
-    label: "Aviso no Telegram a cada contato ou depoimento",
-    when: (p: Record<string, boolean>) => p["contact-wizard"] !== false || p["testimonials-intake"] === true,
+    label: "Aviso no Telegram (contatos, depoimentos, propostas aceitas e pagamentos)",
+    when: (p: Record<string, boolean>) => p["contact-wizard"] !== false || p["testimonials-intake"] === true || p.proposals === true || p.payments === true,
     vars: [
       { key: "TELEGRAM_BOT_TOKEN", prompt: "Token do bot do Telegram (quem cria é o @BotFather):", secret: true },
-      { key: "TELEGRAM_ADMIN_CHAT_ID", prompt: "Id da conversa que recebe os avisos:" },
+      // O núcleo aceita também TELEGRAM_ADMIN_CHAT_ID, o nome da v1.
+      { key: "TELEGRAM_CHAT_ID", prompt: "Id da conversa que recebe os avisos:" },
     ],
   },
   {
@@ -71,10 +73,13 @@ export const INTEGRATIONS = [
 ] as const;
 
 /** Variáveis das integrações que valem igual no computador e na produção. */
-export const COPIED_TO_PRODUCTION = ["TELEGRAM_BOT_TOKEN", "TELEGRAM_ADMIN_CHAT_ID", "RESEND_API_KEY", "RUBRICA_EMAIL_FROM", "OPENROUTER_API_KEY"];
+export const COPIED_TO_PRODUCTION = ["TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID", "RESEND_API_KEY", "RUBRICA_EMAIL_FROM", "OPENROUTER_API_KEY"];
 
-/** Caminho do webhook do Asaas no Convex (HTTP). */
-export const ASAAS_WEBHOOK_PATH = "/rubrica/webhooks/asaas";
+/** Variáveis que o setup grava sozinho em todo deployment (`ensureBaseEnv`) e as do Asaas que ele gera. */
+export const BASE_ENV = ["SITE_URL", "RUBRICA_IP_SALT", "RUBRICA_DEPLOY_CALLBACK_SECRET", "RUBRICA_ALLOW_LOCALHOST", "ASAAS_WEBHOOK_TOKEN"] as const;
+
+/** Rota do webhook do Asaas no Convex (`packages/core/src/convex/commerce/http.ts`), sob o endereço `.convex.site`. */
+export const ASAAS_WEBHOOK_PATH = "/webhooks/asaas";
 
 export interface SetupDeps {
   cwd: string;

@@ -66,8 +66,11 @@ export const MOODS: Mood[] = [
   { id: "revista", layout: "magazine", scheme: "editorial-cream", mode: "light", sans: "Bodoni Moda", mono: "JetBrains Mono" },
 ];
 
-/** Comandos dos três passos de "Começar"; os textos ficam no dicionário (i18n). */
-export const STEP_CODES = [COMMAND, "pnpm dev", "npx create-rubrica publicar"];
+/**
+ * Comandos dos três passos de "Começar"; os textos ficam no dicionário (i18n). O `npx`
+ * cria o projeto com npm, e `npm run dev` funciona também num projeto com pnpm.
+ */
+export const STEP_CODES = [COMMAND, "npm run dev", "npx create-rubrica publicar"];
 
 export function layoutLabel(id: string): string {
   return LAYOUTS.find((l) => l.id === id)?.label ?? id;

@@ -184,7 +184,10 @@ export const pt = {
         title: "Crie o projeto",
         text: 'Monte no combinador e copie o comando pronto em "Crie o seu", ou rode este e responda às perguntas. Ele instala tudo, liga o Convex e cria o painel.',
       },
-      { title: "Abra o site", text: "Na pasta do projeto. O painel fica em /admin, com o e-mail e a senha que você definiu." },
+      {
+        title: "Abra o site",
+        text: "Na pasta do projeto (com pnpm, pnpm dev também serve). O painel fica em /admin, com o e-mail e a senha que você definiu.",
+      },
       {
         title: "Publique",
         text: "Coloca o site no ar na Vercel (conta gratuita), com o banco de produção. Depois, o update sobe as versões novas do núcleo e do tema.",

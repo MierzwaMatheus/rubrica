@@ -175,7 +175,10 @@ export const en: Dict = {
         title: "Create the project",
         text: 'Build it in the builder and copy the ready command in "Create yours", or run this one and answer the questions. It installs everything, connects Convex and creates the panel.',
       },
-      { title: "Open the site", text: "In the project folder. The panel is at /admin, with the email and password you set." },
+      {
+        title: "Open the site",
+        text: "In the project folder (with pnpm, pnpm dev works too). The panel is at /admin, with the email and password you set.",
+      },
       {
         title: "Publish",
         text: "Puts the site online on Vercel (free account), with the production database. After that, update brings new core and theme versions.",

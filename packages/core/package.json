@@ -31,7 +31,8 @@
   ],
   "scripts": {
     "check": "tsc --noEmit -p tsconfig.json",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:e2e": "playwright test -c e2e/playwright.config.ts"
   },
   "peerDependencies": {
     "@astrojs/react": "^7.1.4",
@@ -47,7 +48,7 @@
     "@auth/core": "^0.41.3",
     "@convex-dev/auth": "^0.0.96",
     "@edge-runtime/vm": "^5.0.0",
-    "@playwright/test": "^1.65.0",
+    "@playwright/test": "^1.64.0",
     "@testing-library/react": "^16.3.3",
     "@types/node": "^22.0.0",
     "@types/react": "^19.2.0",

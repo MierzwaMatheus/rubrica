@@ -68,3 +68,22 @@ describe("rotas do app", () => {
     for (const shell of ["/_rubrica/app/proposta", "/_rubrica/app/en/proposta-aceite"]) expect(rewrites.filter((r) => matchPath(r.from, shell))).toHaveLength(0);
   });
 });
+
+describe("astro dev: reescrita das rotas do app", () => {
+  it("serve o caminho público pela página da rota, mantendo a query", async () => {
+    const { appRewriteMiddleware } = await import("../src/astro/app-dev");
+    const shells = appShells(appRoutes(CORE_PLUGINS), ["pt-BR", "en"], (l) => (l === "pt-BR" ? "" : "en"));
+    const run = (url: string) => {
+      const req = { url };
+      let called = false;
+      appRewriteMiddleware(shells)(req, {}, () => (called = true));
+      expect(called).toBe(true);
+      return req.url;
+    };
+    expect(run("/proposta/acme")).toBe("/_rubrica/app/proposta");
+    expect(run("/en/proposta/acme/aceitar?x=1")).toBe("/_rubrica/app/en/proposta-aceite?x=1");
+    expect(run("/payment-success/abc")).toBe("/_rubrica/app/pagamento-concluido");
+    expect(run("/blog/post")).toBe("/blog/post");
+    expect(run("/fr/checkout/abc")).toBe("/fr/checkout/abc");
+  });
+});

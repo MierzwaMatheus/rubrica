@@ -6,6 +6,7 @@
 import { theme, source, projectBlocks, projectComponents, fontPlan } from "virtual:rubrica/config";
 // @ts-expect-error módulo virtual da integração
 import { islands } from "virtual:rubrica/islands";
+import { adminBackend } from "virtual:rubrica/admin";
 import { CORE_BLOCKS } from "../blocks/catalog";
 import type { BlockDefinition } from "../blocks/define";
 import type { DataSource } from "../data/source";
@@ -19,6 +20,10 @@ import type { RenderContext } from "../theme/contract";
 import { rssFeeds } from "../seo/rss";
 import { resolveAnalytics } from "../seo/analytics";
 import type { SiteHeadOptions } from "../seo/site-head";
+import { appRoutes, appShells, type AppShell } from "../plugins/app-routes";
+import { localePrefix } from "../i18n";
+import { appBackend } from "../islands/app/client";
+import type { AppIslandProps } from "../islands/app/ui";
 
 let built: Promise<BuiltSite> | undefined;
 
@@ -84,5 +89,28 @@ export function headOptions(site: BuiltSite): SiteHeadOptions {
     theme: activeTheme,
     feeds: rssFeeds(site).map((f) => ({ locale: f.locale, href: `${base}${f.path}`, title: f.title })),
     ...(analytics && { analytics }),
+  };
+}
+
+/**
+ * Páginas das rotas do app (proposta, checkout…) a gerar: as dos plugins ligados, em cada
+ * idioma, com ilha registrada. Ver `plugins/app-routes.ts`.
+ */
+export function siteAppShells(site: BuiltSite): AppShell[] {
+  const routes = appRoutes(CORE_PLUGINS, site.plugins).filter((r) => r.island in (islands as Record<string, unknown>));
+  return appShells(routes, site.settings.locales.locales, (l) => localePrefix(l, site.settings.locales));
+}
+
+/** Props da ilha de uma página do app: textos, links entre as páginas do idioma e o backend. */
+export function appIslandProps(shell: AppShell, shells: AppShell[], site: BuiltSite, ctx: RenderContext): Omit<AppIslandProps, "api"> {
+  const meta = ISLAND_META[shell.island];
+  return {
+    locale: shell.locale,
+    defaultLocale: site.settings.locales.default,
+    pattern: shell.pattern,
+    routes: Object.fromEntries(shells.filter((s) => s.locale === shell.locale).map((s) => [s.island, s.pattern])),
+    homeHref: ctx.href("/"),
+    texts: Object.fromEntries(uiKeysWithPrefix(meta?.textPrefixes ?? []).map((k) => [k, ctx.t(k)])),
+    backend: appBackend(adminBackend, import.meta.env.PUBLIC_RUBRICA_API),
   };
 }

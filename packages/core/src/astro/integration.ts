@@ -19,7 +19,7 @@ import type { ThemeFonts } from "../theme/contract";
 import { planFonts, type FontPlan } from "../theme/fonts";
 import tailwindcss from "@tailwindcss/vite";
 import { convexSource, findConvexUrl } from "../data/convex";
-import { devFsAllow, projectEnv } from "./env";
+import { devFsAllow, findApiUrl, projectEnv } from "./env";
 import { enabledPlugins } from "../plugins/contract";
 import { CORE_PLUGINS } from "../plugins/registry";
 
@@ -108,6 +108,9 @@ export default function rubrica(options: RubricaOptions): AstroIntegration {
         const env = projectEnv(root, command === "dev" ? "development" : "production");
         const convexUrl = "convex" in source ? findConvexUrl(source.convex.url, env) : undefined;
 
+        // API dos formulários das ilhas: com fixtures (demonstração) fica desligada.
+        const apiUrl = "convex" in source ? findApiUrl({ ...env, ...(convexUrl ? { CONVEX_URL: convexUrl } : {}) }) : undefined;
+
         const sourceCode =
           "fixtures" in source
             ? `import { fixtureSource } from "@rubrica/core/data";\nconst baseSource = fixtureSource(${JSON.stringify(abs(source.fixtures))});`
@@ -184,6 +187,7 @@ export default function rubrica(options: RubricaOptions): AstroIntegration {
             fallbacks: f.fallbacks,
           })),
           vite: {
+            define: { "import.meta.env.PUBLIC_RUBRICA_API": JSON.stringify(apiUrl ?? "") },
             ...(devFsAllowed(root) && { server: { fs: { allow: devFsAllowed(root)! } } }),
             plugins: [
               // Só processa CSS com `@import "tailwindcss"`: o do painel. O tema não usa.

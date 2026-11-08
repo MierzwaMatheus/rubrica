@@ -21,6 +21,7 @@ import { assertValidPagePath, preparePageBlocks, validatePageBlocks } from "../.
 import { enabledPlugins, type PluginDefinition } from "../../plugins/contract";
 import { CORE_PLUGINS } from "../../plugins/registry";
 import type { Backend } from "./backend";
+import { businessHandlers, createBusinessState, type DemoDoc } from "./demo-business";
 
 type Data = Record<string, unknown>;
 type Doc = Data & { _id: string; _creationTime: number };
@@ -85,7 +86,8 @@ export function createDemoStore(options: DemoOptions) {
   const now = Date.now();
 
   const state = {
-    settings: snap.site as SiteSettings,
+    // A demonstração liga a tradução e os currículos com IA para mostrar todas as telas.
+    settings: { ...snap.site, plugins: { translation: true, "ai-resumes": true, ...snap.site.plugins } } as SiteSettings,
     pages: snap.pages.map((p, i): Doc => ({ ...p, _id: p.id, _creationTime: now + i, createdAt: p.updatedAt, published: p.published })),
     collections: Object.fromEntries(
       COLLECTIONS.map((name) => [name, (snap.collections[name] as unknown as Data[]).map((item, i): Doc => ({ ...item, _id: String(item.id), _creationTime: now + i, published: true, createdAt: now }))]),
@@ -98,6 +100,7 @@ export function createDemoStore(options: DemoOptions) {
       { userId: "u-editor", email: "editora@rubrica.dev", name: "Editora", role: "content-editor", password: "Editora2026!x", mustChangePassword: false, createdAt: now },
     ] as DemoUser[],
     session: null as string | null,
+    business: createBusinessState(now, (prefix) => newId(prefix)),
   };
 
   // Imagens dos fixtures entram na biblioteca, para a tela de mídia ter o que mostrar.
@@ -166,7 +169,6 @@ export function createDemoStore(options: DemoOptions) {
     return doc;
   };
   const withUrl = (doc: Doc) => ({ ...doc, url: state.blobs.get(doc.storageId as string) ?? null });
-  const collectionPermission = (name: CollectionName): Permission => (name === "posts" ? "blog" : name === "plans" ? "plans" : "content");
 
   function snapshot(): SiteSnapshot {
     const on = enabled();
@@ -263,13 +265,6 @@ export function createDemoStore(options: DemoOptions) {
       return found;
     },
   };
-  for (const name of COLLECTIONS) {
-    queries[`${name}:list`] = (args) => {
-      require(collectionPermission(name));
-      return structuredClone(state.collections[name].filter((d) => args.includeDeleted || d.deletedAt === undefined));
-    };
-  }
-
   const mutations: Record<string, (args: Data) => unknown> = {
     "users:setRole": (args) => {
       const me = require("users");
@@ -436,6 +431,45 @@ export function createDemoStore(options: DemoOptions) {
     },
   };
 
+  const host = {
+    b: state.business,
+    state: state as unknown as Parameters<typeof businessHandlers>[0]["state"],
+    require: (permission: Permission) => require(permission),
+    requireRoles: (roles: readonly Role[]) => {
+      const user = actor();
+      if (!roles.includes(user.role)) throw new Error("Sem permissão para esta ação");
+      return user;
+    },
+    enabled,
+    plugins,
+    newId,
+    prepareBlocks: (list: BlockInstance[]) => preparePageBlocks(list, catalog()),
+    changed,
+  };
+  const business = businessHandlers(host);
+  Object.assign(queries, business.queries);
+  Object.assign(mutations, business.mutations);
+  Object.assign(actions, business.actions);
+
+  /** Registro de atividades da demonstração (alimenta "Atividades" e o estado do botão publicar). */
+  function audit(full: string, args: Data) {
+    const name = full.replace(/^rubrica\//, "");
+    const [module = "", fn = ""] = name.split(":");
+    const user = state.users.find((u) => u.userId === state.session);
+    const entry = (eventType: string, targetType: string, extra: Data = {}) =>
+      state.business.audit.push({ _id: newId("a"), _creationTime: Date.now(), eventType, actorType: "user", actorId: user?.userId, actorEmail: user?.email ?? null, targetType, targetId: typeof args.id === "string" ? args.id : undefined, success: true, createdAt: Date.now(), ...extra } as DemoDoc);
+    const verbs: Record<string, string> = { remove: "delete", removePermanently: "permanent_delete" };
+    const target = module === "pages" ? "page" : module;
+    if (module === "settings") entry(fn === "setPlugin" ? "plugin.toggled" : "settings.updated", "site");
+    else if (module === "texts") entry("texts.updated", "texts");
+    else if (module === "media") entry(fn === "remove" ? "media.deleted" : "media.updated", "media");
+    else if (module === "testimonialIntake") entry(fn === "approve" ? "testimonial.approved" : "testimonial.rejected", "testimonials");
+    else if (module === "privacy") entry(fn === "erase" ? "lgpd.erasure_executed" : "admin.update", fn === "erase" ? "titular" : "page");
+    else if (module === "publish") entry("publish.triggered", "site");
+    else if (module === "contacts") entry(fn === "remove" ? "contact.deleted" : "contact.status_changed", "contactRequest");
+    else if (!["users", "translation"].includes(module)) entry(`admin.${verbs[fn] ?? fn}`, target);
+  }
+
   function call(table: Record<string, (args: Data) => unknown>, ref: unknown, args: unknown) {
     const full = getFunctionName(ref as never);
     const name = full.replace(/^rubrica\//, "");
@@ -458,11 +492,13 @@ export function createDemoStore(options: DemoOptions) {
     query: (ref: unknown, args: unknown) => call(queries, ref, args),
     mutate(ref: unknown, args: unknown) {
       const result = call(mutations, ref, args);
+      audit(getFunctionName(ref as never), (args ?? {}) as Data);
       changed();
       return result;
     },
     act(ref: unknown, args: unknown) {
       const result = call(actions, ref, args);
+      audit(getFunctionName(ref as never), (args ?? {}) as Data);
       changed();
       return result;
     },

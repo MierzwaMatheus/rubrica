@@ -1,12 +1,15 @@
 /**
- * Aparência: tema em uso, modo de cor, tokens do tema (cores, medidas) e fontes, com a
- * prévia da página inicial já com as mudanças não salvas. Esquemas de cor prontos
- * entram aqui quando o núcleo tiver `schemes`.
+ * Aparência: tema em uso, modo de cor, esquema de cor (conjuntos prontos que funcionam
+ * com qualquer tema), tokens do tema (cores, medidas) e fontes, com a prévia da página
+ * inicial já com as mudanças não salvas.
  */
 import { useEffect, useMemo, useState } from "react";
 import { RotateCcw, Save, Undo2 } from "lucide-react";
 import type { Appearance as AppearanceValue, PageRecord, SiteSettings } from "../../content/types";
 import type { TokenDef } from "../../theme/contract";
+import { isSafeFamily, KNOWN_FONTS } from "../../theme/fonts";
+import { SCHEMES, getScheme, type ColorScheme } from "../../theme/schemes";
+import { cn } from "../lib/utils";
 import { api } from "../data/api";
 import { useMutation, useQuery } from "../data/backend";
 import { PreviewPane } from "../editor/PreviewPane";
@@ -20,6 +23,56 @@ import { Alert, Card, CardContent, CardDescription, CardHeader, CardTitle, Input
 import { Switch } from "../ui/tabs";
 
 const SAFE_VALUE = /^[^;{}<>]*$/;
+
+const SWATCH_ROLES = ["bg", "surface", "primary", "accent", "accent2"] as const;
+
+function SchemeCard({ scheme, selected, onSelect }: { scheme: ColorScheme; selected: boolean; onSelect: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      aria-pressed={selected}
+      className={cn("cursor-pointer space-y-2 rounded-lg border p-3 text-left transition hover:bg-accent", selected && "border-primary ring-2 ring-primary/30")}
+    >
+      <span className="block text-sm font-semibold">{scheme.label}</span>
+      <span className="block text-xs text-muted-foreground">{scheme.hint}</span>
+      {(["light", "dark"] as const).map((mode) => (
+        <span key={mode} className="flex items-center gap-1.5" aria-label={mode === "light" ? "Amostra do modo claro" : "Amostra do modo escuro"}>
+          <span className="w-9 text-[10px] text-muted-foreground uppercase">{mode === "light" ? "claro" : "escuro"}</span>
+          <span className="flex overflow-hidden rounded border">
+            {SWATCH_ROLES.map((role) => (
+              <span key={role} className="block size-5" style={{ background: scheme[mode][role] }} />
+            ))}
+          </span>
+        </span>
+      ))}
+    </button>
+  );
+}
+
+function FontField({ id, label, value, placeholder, onChange, mono }: { id: string; label: string; value: string | undefined; placeholder: string; onChange: (v: string | undefined) => void; mono: boolean }) {
+  const options = KNOWN_FONTS.filter((f) => /mono|code/i.test(f) === mono);
+  const invalid = value !== undefined && !isSafeFamily(value);
+  return (
+    <div className="space-y-1.5">
+      <div className="flex items-center justify-between gap-2">
+        <Label htmlFor={id}>{label}</Label>
+        {value !== undefined && (
+          <Button variant="ghost" size="sm" onClick={() => onChange(undefined)}>
+            <RotateCcw /> Padrão
+          </Button>
+        )}
+      </div>
+      <Input id={id} list={`${id}-list`} value={value ?? ""} placeholder={placeholder} aria-invalid={invalid || undefined} onChange={(e) => onChange(e.target.value || undefined)} />
+      <datalist id={`${id}-list`}>
+        {options.map((f) => (
+          <option key={f} value={f} />
+        ))}
+      </datalist>
+      {invalid && <p className="text-xs text-destructive">Use só o nome da família (letras, números e espaço).</p>}
+    </div>
+  );
+}
 
 function TokenInput({ name, def, value, onChange }: { name: string; def: TokenDef; value: string | undefined; onChange: (v: string | undefined) => void }) {
   const id = `token-${name}`;
@@ -147,6 +200,30 @@ export default function Appearance() {
           </Card>
           <Card>
             <CardHeader>
+              <CardTitle>Esquema de cor</CardTitle>
+              <CardDescription>
+                Conjuntos de cores prontos, com modo claro e escuro, que funcionam com qualquer tema. Valem sobre as cores do tema e sob os ajustes abaixo.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="grid gap-2 sm:grid-cols-2" role="group" aria-label="Esquemas de cor">
+                {SCHEMES.map((scheme) => (
+                  <SchemeCard key={scheme.id} scheme={scheme} selected={draft.scheme === scheme.id} onSelect={() => setDraft({ ...draft, scheme: scheme.id })} />
+                ))}
+              </div>
+              <div className="flex flex-wrap items-center gap-2 text-sm">
+                <Button variant="outline" size="sm" disabled={draft.scheme === undefined} onClick={() => setDraft({ ...draft, scheme: undefined })}>
+                  <RotateCcw /> Usar o padrão do tema
+                </Button>
+                <span className="text-muted-foreground">
+                  {draft.scheme ? `Esquema escolhido: ${getScheme(draft.scheme)?.label ?? draft.scheme}.` : panel.theme.scheme ? `Padrão do tema: ${getScheme(panel.theme.scheme)?.label ?? panel.theme.scheme}.` : "O tema usa as próprias cores."}
+                </span>
+              </div>
+              {draft.scheme && !getScheme(draft.scheme) && <p className="text-xs text-destructive">Esquema desconhecido: o site vai ignorá-lo.</p>}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
               <CardTitle>Cores e medidas do tema</CardTitle>
               <CardDescription>Vazio usa o padrão do tema. Confira o contraste na prévia.</CardDescription>
             </CardHeader>
@@ -160,20 +237,11 @@ export default function Appearance() {
           <Card>
             <CardHeader>
               <CardTitle>Fontes</CardTitle>
-              <CardDescription>Nomes do Google Fonts. Ainda não chegam ao site: entram com o tratamento de fontes do build.</CardDescription>
+              <CardDescription>Famílias do Google Fonts. O site baixa as fontes na hora de gerar (o visitante não fala com o Google). A prévia já usa a família escolhida.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              {(["fontSans", "fontMono"] as const).map((key) => (
-                <div key={key} className="space-y-1.5">
-                  <Label htmlFor={key}>{key === "fontSans" ? "Texto" : "Monoespaçada"}</Label>
-                  <Input
-                    id={key}
-                    value={draft[key] ?? ""}
-                    placeholder={(key === "fontSans" ? panel.theme.fonts?.sans : panel.theme.fonts?.mono) ?? "padrão do tema"}
-                    onChange={(e) => setDraft({ ...draft, [key]: e.target.value || undefined })}
-                  />
-                </div>
-              ))}
+              <FontField id="fontSans" label="Texto" mono={false} value={draft.fontSans} placeholder={panel.theme.fonts?.sans ?? "padrão do tema"} onChange={(v) => setDraft({ ...draft, fontSans: v })} />
+              <FontField id="fontMono" label="Monoespaçada (código e detalhes)" mono value={draft.fontMono} placeholder={panel.theme.fonts?.mono ?? "padrão do tema"} onChange={(v) => setDraft({ ...draft, fontMono: v })} />
             </CardContent>
           </Card>
         </div>

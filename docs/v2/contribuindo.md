@@ -22,7 +22,9 @@ packages/core/            @rubrica/core
   src/components/         casca, templates e blocos padrão (React)
   src/islands/            ilhas (o que leva JavaScript)
   src/astro/              integração do Astro e páginas injetadas (inclui /admin e /admin/preview)
-  src/admin/              painel (SPA React + Tailwind): telas, editor de páginas, prévia
+  src/admin/              painel (SPA React + Tailwind): telas, editor de páginas, prévia,
+                          collections/ (lista e editor genéricos das coleções), proposals/ (formulário
+                          da proposta), data/demo*.ts (backend de demonstração em memória)
   src/data/               fontes de dados do build (fixtures, Convex)
   test/                   testes do núcleo (vitest)
 packages/themes/<id>/     um pacote por tema (@rubrica/theme-<id>)

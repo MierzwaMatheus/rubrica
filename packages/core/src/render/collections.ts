@@ -61,6 +61,8 @@ export interface ProjectItem {
   year?: number;
   role?: string;
   links: ResolvedLink[];
+  /** Número de destaque do case; só existe com o rótulo no idioma. */
+  metric?: { value: string; label: string };
   tags: string[];
   featured: boolean;
   seo: ResolvedSeo;
@@ -256,6 +258,8 @@ export function resolveProject(raw: RawProject, opts: ResolveOptions, paths: Col
   if (role) item.role = role;
   if (raw.client) item.client = raw.client;
   if (raw.year) item.year = raw.year;
+  const metricLabel = raw.metric ? pick(raw.metric.label, opts.locale) : undefined;
+  if (raw.metric?.value && metricLabel) item.metric = { value: raw.metric.value, label: metricLabel };
   return item;
 }
 

@@ -90,6 +90,221 @@ export interface PageValidation {
 /** Item de coleção como o `list` devolve (formato do banco, campos variam por coleção). */
 export type CollectionDoc = Record<string, unknown> & { _id: string; published?: boolean; deletedAt?: number };
 
+
+// ── Negócio ────────────────────────────────────────────────────────────────
+
+export type ContactStatus = "new" | "read" | "archived";
+export type DestinationId = "telegram" | "email" | "webhook";
+
+export interface DeliveryDoc {
+  _id: string;
+  destination: DestinationId;
+  status: "pending" | "sent" | "failed";
+  attempts: number;
+  lastError?: string;
+  lastAttemptAt?: number;
+  nextAttemptAt?: number;
+  sentAt?: number;
+  /** Só nas falhas listadas à parte. */
+  source?: "contact" | "testimonial";
+  sourceId?: string;
+  createdAt?: number;
+}
+
+export interface ContactDoc {
+  _id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  message: string;
+  details?: Record<string, string>;
+  locale: string;
+  page: string;
+  status: ContactStatus;
+  spam?: boolean;
+  createdAt: number;
+  readAt?: number;
+  archivedAt?: number;
+  deliveries: DeliveryDoc[];
+}
+
+export interface ContactDestinations {
+  telegram: boolean;
+  email: { enabled: boolean; to: string[] };
+  webhook: { enabled: boolean; url?: string };
+  /** O que falta no ambiente (variáveis) para cada destino. */
+  missing: Record<DestinationId, string[]>;
+}
+
+export interface TestimonialSubmission {
+  _id: string;
+  name: string;
+  email: string;
+  role?: string;
+  company?: string;
+  quote: string;
+  locale: string;
+  page: string;
+  status: "pending" | "approved";
+  createdAt: number;
+}
+
+export interface PrivacyExport {
+  email: string;
+  generatedAt: number;
+  total: number;
+  sources: { id: string; label: string; records: unknown[] }[];
+}
+
+export interface PolicyStatus {
+  path: string;
+  exists: boolean;
+  pageId: string | null;
+  published: boolean;
+  version: number;
+  updatedAt: number | null;
+}
+
+export type PublishState = "unconfigured" | "publishing" | "pending" | "published" | "failed";
+export interface PublishStatus {
+  status: PublishState;
+  configured: boolean;
+  pendingChanges: number;
+  lastTriggeredAt: number | null;
+  lastPublishedAt: number | null;
+  lastError: string | null;
+  nextAllowedAt: number;
+}
+
+export interface AuditEntry {
+  _id: string;
+  eventType: string;
+  actorType: string;
+  actorId?: string;
+  actorEmail: string | null;
+  targetType?: string;
+  targetId?: string;
+  metadata?: unknown;
+  success: boolean;
+  createdAt: number;
+}
+
+export interface TimelineItem {
+  step: Localized<string>;
+  period: Localized<string>;
+}
+
+/** Conteúdo de uma proposta (o que o painel edita e o histórico guarda). */
+export interface ProposalContent {
+  clientName: string;
+  title: Localized<string>;
+  objective: Localized<string>;
+  scope: Localized<string>[];
+  timeline: TimelineItem[];
+  deliveryDate: string;
+  /** Valor final, em reais. */
+  investmentValue: number;
+  scopePrices?: (number | null)[];
+  originalValue?: number;
+  giftIndexes?: number[];
+  paymentMethods: Localized<string>[];
+  conditions: Localized<string>[];
+  rescissionPolicy: Localized<string>;
+  templateId?: string;
+}
+
+export interface ProposalDoc extends ProposalContent {
+  _id: string;
+  slug: string;
+  hasPassword: boolean;
+  version: number;
+  isAccepted: boolean;
+  acceptedAt?: number;
+  expiresAt: number;
+  createdAt: number;
+  updatedAt?: number;
+  deletedAt?: number;
+}
+
+export interface ProposalVersion {
+  _id: string;
+  proposalId: string;
+  version: number;
+  content: ProposalContent;
+  createdAt: number;
+}
+
+export interface ProposalAcceptance {
+  _id: string;
+  clientName: string;
+  clientDocument: string;
+  clientEmail: string;
+  clientRole?: string;
+  clientDeclaration?: string;
+  proposalVersion: number;
+  locale?: string;
+  contentHash: string;
+  ipAddress: string;
+  userAgent: string;
+  acceptedAt: number;
+  signatureUrl: string | null;
+}
+
+export interface ContractTemplate {
+  _id: string;
+  name: string;
+  description?: string;
+  content: string;
+  isDefault: boolean;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export type BillingType = "PIX" | "BOLETO" | "CREDIT_CARD";
+export type CheckoutStatus = "pending" | "payment_selected" | "payment_confirmed" | "paid" | "expired" | "failed" | "refunded";
+
+export interface CheckoutDoc {
+  _id: string;
+  uniqueLink: string;
+  customerName: string;
+  customerEmail: string;
+  value: number;
+  description?: string;
+  dueDate: string;
+  billingType?: BillingType;
+  status: CheckoutStatus;
+  paymentMethod?: string;
+  planId?: string;
+  proposalId?: string;
+  paidValue?: number;
+  expiresAt: number;
+  createdAt: number;
+  completedAt?: number;
+  deletedAt?: number;
+}
+
+export interface PaymentLink {
+  _id: string;
+  uniqueLink: string;
+  planId: string;
+  billingType?: BillingType;
+  active: boolean;
+  createdAt: number;
+}
+
+export interface AiResume {
+  _id: string;
+  title: string;
+  locale: string;
+  jobDescription: string;
+  fitScore: number;
+  fitComment: string;
+  strengths: string[];
+  weaknesses: string[];
+  createdAt: number;
+  deletedAt?: number;
+}
+
 type SettingsPatch = Partial<Omit<SiteSettings, "kind">> & { kind?: SiteKind };
 
 export const api = {
@@ -147,7 +362,83 @@ export const api = {
   },
   collection: (name: CollectionName) => ({
     list: q<{ includeDeleted?: boolean }, CollectionDoc[]>(name, "list"),
+    get: q<{ id: string }, CollectionDoc | null>(name, "get"),
+    create: m<Args, string>(name, "create"),
+    update: m<{ id: string; patch: Args; unset?: string[] }, null>(name, "update"),
+    publish: m<{ id: string }, null>(name, "publish"),
+    unpublish: m<{ id: string }, null>(name, "unpublish"),
+    reorder: m<{ ids: string[] }, null>(name, "reorder"),
+    remove: m<{ id: string }, null>(name, "remove"),
+    restore: m<{ id: string }, null>(name, "restore"),
+    removePermanently: m<{ id: string }, null>(name, "removePermanently"),
   }),
+  contacts: {
+    list: q<{ status?: ContactStatus; limit?: number }, ContactDoc[]>("contacts", "list"),
+    get: q<{ id: string }, ContactDoc | null>("contacts", "get"),
+    unreadCount: q<Empty, number>("contacts", "unreadCount"),
+    markRead: m<{ id: string }, null>("contacts", "markRead"),
+    markUnread: m<{ id: string }, null>("contacts", "markUnread"),
+    archive: m<{ id: string }, null>("contacts", "archive"),
+    unarchive: m<{ id: string }, null>("contacts", "unarchive"),
+    remove: m<{ id: string }, null>("contacts", "remove"),
+    destinations: q<Empty, ContactDestinations>("contacts", "destinations"),
+    setDestinations: m<{ telegram: boolean; email: { enabled: boolean; to: string[] }; webhook: { enabled: boolean; url?: string } }, null>("contacts", "setDestinations"),
+    failedDeliveries: q<{ limit?: number }, DeliveryDoc[]>("contacts", "failedDeliveries"),
+    retryDelivery: m<{ id: string }, null>("contacts", "retryDelivery"),
+  },
+  testimonialIntake: {
+    list: q<{ status?: "pending" | "approved"; limit?: number }, TestimonialSubmission[]>("testimonialIntake", "list"),
+    approve: m<{ id: string; locale?: string; quote?: string; role?: string; published?: boolean }, string>("testimonialIntake", "approve"),
+    reject: m<{ id: string }, null>("testimonialIntake", "reject"),
+  },
+  privacy: {
+    exportData: q<{ email: string }, PrivacyExport>("privacy", "exportData"),
+    erase: m<{ email: string; confirm: string }, { total: number; bySource: Record<string, number> }>("privacy", "erase"),
+    policyStatus: q<Empty, PolicyStatus>("privacy", "policyStatus"),
+    policyDraft: q<Empty, { path: string; title: Localized<string>; blocks: BlockInstance[] }>("privacy", "policyDraft"),
+    generatePolicy: m<{ overwrite?: boolean; publish?: boolean }, { pageId: string; version: number }>("privacy", "generatePolicy"),
+  },
+  publish: {
+    status: q<Empty, PublishStatus>("publish", "status"),
+    trigger: a<{ force?: boolean }, { ok: boolean; skipped?: boolean; message?: string }>("publish", "trigger"),
+  },
+  audit: {
+    recent: q<{ limit?: number; eventType?: string; targetType?: string }, AuditEntry[]>("audit", "recent"),
+  },
+  proposals: {
+    list: q<{ filter?: "all" | "accepted" | "pending"; limit?: number; includeDeleted?: boolean }, ProposalDoc[]>("proposals", "list"),
+    get: q<{ id: string }, ProposalDoc | null>("proposals", "get"),
+    versions: q<{ id: string }, ProposalVersion[]>("proposals", "versions"),
+    getAcceptance: q<{ id: string }, ProposalAcceptance | null>("proposals", "getAcceptance"),
+    create: m<Args, string>("proposals", "create"),
+    update: m<{ id: string; patch?: Args; unset?: string[]; password?: string; expiresAt?: number }, null>("proposals", "update"),
+    resetPassword: m<{ id: string; newPassword?: string }, null>("proposals", "resetPassword"),
+    remove: m<{ id: string }, null>("proposals", "remove"),
+    restore: m<{ id: string }, null>("proposals", "restore"),
+    removePermanently: m<{ id: string }, null>("proposals", "removePermanently"),
+  },
+  contractTemplates: {
+    list: q<Empty, ContractTemplate[]>("contractTemplates", "list"),
+    create: m<{ name: string; description?: string; content: string; isDefault?: boolean }, string>("contractTemplates", "create"),
+    update: m<{ id: string; name?: string; description?: string; content?: string }, null>("contractTemplates", "update"),
+    remove: m<{ id: string }, null>("contractTemplates", "remove"),
+    setDefault: m<{ id: string }, null>("contractTemplates", "setDefault"),
+  },
+  checkouts: {
+    list: q<{ status?: CheckoutStatus; limit?: number; includeDeleted?: boolean }, CheckoutDoc[]>("checkouts", "list"),
+    create: m<Args, string>("checkouts", "create"),
+    remove: m<{ id: string }, null>("checkouts", "remove"),
+    restore: m<{ id: string }, null>("checkouts", "restore"),
+    linkPlan: m<{ planId: string; billingType?: BillingType }, { uniqueLink: string; href: string }>("checkouts", "linkPlan"),
+    unlinkPlan: m<{ planId: string }, null>("checkouts", "unlinkPlan"),
+    listLinks: q<Empty, PaymentLink[]>("checkouts", "listLinks"),
+  },
+  aiResumes: {
+    list: q<{ includeDeleted?: boolean }, AiResume[]>("aiResumes", "list"),
+    generate: a<{ title: string; locale: string; jobDescription: string }, { id: string }>("aiResumes", "generate"),
+    remove: m<{ id: string }, null>("aiResumes", "remove"),
+    restore: m<{ id: string }, null>("aiResumes", "restore"),
+  },
 };
 
 /** O backend não tem a função (módulo ainda não instalado ou de outra versão). */

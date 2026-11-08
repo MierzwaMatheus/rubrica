@@ -14,6 +14,8 @@
 .rb-card { position: relative; background: var(--rb-surface); border: 1px solid var(--rb-border); border-radius: var(--rb-radius); padding: 1.25rem; min-width: 0; }
 .rb-card__title { font-size: 1.15rem; line-height: 1.3; margin: 0 0 0.5rem; overflow-wrap: anywhere; }
 .rb-card__text { margin: 0.5rem 0 0; color: var(--rb-muted); }
+.rb-card__metric { margin: 0 0 0.5rem; color: var(--rb-muted); font-size: 0.9rem; }
+.rb-card__metric strong { color: var(--rb-accent); font-size: 1.25rem; }
 .rb-card__meta { margin: 0 0 0.5rem; color: var(--rb-muted); font-size: 0.9rem; }
 .rb-card__image { display: block; width: 100%; height: auto; border-radius: var(--rb-radius); margin-bottom: 1rem; }
 .rb-card--link { padding: 0; overflow: hidden; }

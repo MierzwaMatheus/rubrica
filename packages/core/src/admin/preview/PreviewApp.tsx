@@ -8,7 +8,9 @@ import { theme, projectComponents, projectBlocks } from "virtual:rubrica/client"
 import { CORE_BLOCKS } from "../../blocks/catalog";
 import { blockComponent, ColorToggleButton, LocaleLinks, templates } from "../../components";
 import { CORE_PLUGINS } from "../../plugins/registry";
+import { appearanceHead } from "../../theme/appearance";
 import type { BlockComponent } from "../../theme/contract";
+import { planFonts } from "../../theme/fonts";
 import type { SiteSnapshot } from "../../data/source";
 import { isPreviewMessage, type FromPreview, type ToPreview } from "./protocol";
 import { resolvePreview } from "./resolve";
@@ -100,12 +102,35 @@ export default function PreviewApp() {
       style.id = "rb-preview-tokens";
       document.head.appendChild(style);
     }
-    const tokens = Object.entries(settings.appearance.tokens ?? {})
-      .filter(([k, v]) => /^[a-z0-9-]+$/i.test(k) && !/[;{}<>]/.test(v))
-      .map(([k, v]) => `--${k}:${v}`)
+    // Igual ao Document.astro: esquema de cor e tokens do painel. As fontes do site vêm
+    // do build (Fonts API do Astro); na prévia, as famílias escolhidas entram pelo Google Fonts.
+    const { appearance } = settings;
+    const head = appearanceHead({ appearance: { ...appearance, fontSans: undefined, fontMono: undefined } }, { scheme: theme.scheme });
+    if (head.scheme) root.dataset.scheme = head.scheme;
+    else delete root.dataset.scheme;
+    const plan = planFonts(appearance, theme.fonts);
+    const nameOf = (variable: string) => plan.fonts.find((f) => f.cssVariable === variable)?.name;
+    const fontCss = Object.entries(plan.assign)
+      .flatMap(([token, variable]) => {
+        const name = variable ? nameOf(variable) : undefined;
+        const fallback = token.includes("mono") ? "ui-monospace,monospace" : "system-ui,sans-serif";
+        return name ? [`${token}:"${name}",${fallback}`] : [];
+      })
       .join(";");
-    // Igual ao Document.astro: só os tokens. (As fontes do painel ainda não chegam ao site.)
-    style.textContent = tokens ? `:root{${tokens}}` : "";
+    style.textContent = [head.css, fontCss ? `:root[data-theme-id][data-color-mode][lang]{${fontCss}}` : ""].filter(Boolean).join("\n");
+    let link = document.getElementById("rb-preview-fonts") as HTMLLinkElement | null;
+    const families = plan.fonts.filter((f) => f.name && (f.name === appearance.fontSans || f.name === appearance.fontMono));
+    const href = families.length
+      ? `https://fonts.googleapis.com/css2?${families.map((f) => `family=${encodeURIComponent(f.name).replace(/%20/g, "+")}:wght@${f.weights.join(";")}`).join("&")}&display=swap`
+      : "";
+    if (href && (!link || link.href !== href)) {
+      link?.remove();
+      link = document.createElement("link");
+      link.id = "rb-preview-fonts";
+      link.rel = "stylesheet";
+      link.href = href;
+      document.head.appendChild(link);
+    } else if (!href) link?.remove();
   });
 
   // Marca cada bloco e destaca o selecionado.

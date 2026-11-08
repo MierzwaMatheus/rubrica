@@ -21,7 +21,7 @@ export default function RichText({ id, value, onChange, lang }: { id: string; va
 
   // Valor de fora (troca de bloco, desfazer pelo painel) sem perder o cursor ao digitar.
   useEffect(() => {
-    if (editor && value !== editor.getHTML() && !editor.isFocused) editor.commands.setContent(value || "", { emitUpdate: false });
+    if (editor && !editor.isDestroyed && value !== editor.getHTML() && !editor.isFocused) editor.commands.setContent(value || "", { emitUpdate: false });
   }, [editor, value]);
 
   const state = useEditorState({

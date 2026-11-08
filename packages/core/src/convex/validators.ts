@@ -164,6 +164,9 @@ export const postFields = {
 
 export const vCaseSection = v.object({ title: vLocalized, body: vLocalized, image: v.optional(vImage) });
 
+/** Número de destaque do case ("~50", "3x"), mostrado no card. */
+export const vMetric = v.object({ value: v.string(), label: vLocalized });
+
 export const projectFields = {
   ...itemFields,
   title: vLocalized,
@@ -176,6 +179,7 @@ export const projectFields = {
   year: v.optional(v.number()),
   role: v.optional(vLocalized),
   links: v.optional(v.array(vLink)),
+  metric: v.optional(vMetric),
   seo: v.optional(vSeo),
 };
 

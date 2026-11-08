@@ -84,7 +84,7 @@ export default function Dashboard() {
           <CardHeader>
             <CardTitle>Publicação</CardTitle>
             <CardDescription>
-              O que você salva aqui fica no banco na hora. O site no ar é gerado de novo a cada publicação (rebuild), feita por quem cuida do site.
+              O que você salva aqui fica no banco na hora. O site no ar é gerado de novo a cada publicação (rebuild): use o botão “Publicar site” no topo do painel, que mostra quando há mudanças pendentes.
             </CardDescription>
           </CardHeader>
         </Card>

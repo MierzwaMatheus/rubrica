@@ -38,7 +38,7 @@ describe("backend de demonstração do painel", () => {
     expect((s.query(api.site.snapshot, {}) as { pages: { id: string }[] }).pages.map((p) => p.id)).not.toContain(id);
     s.mutate(api.pages.publish, { id });
     expect((s.query(api.site.snapshot, {}) as { pages: { id: string }[] }).pages.map((p) => p.id)).toContain(id);
-    expect(() => s.act(api.translation.translate, { text: "a", from: "pt-BR", to: "en" })).toThrow(/Could not find public function/);
+    expect(() => s.act(api.users.remove as never, {})).toThrow(/Could not find public function/);
   });
 
   it("respeita papéis: editor não mexe em configurações técnicas nem em usuários", async () => {

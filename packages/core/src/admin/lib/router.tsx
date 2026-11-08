@@ -10,7 +10,7 @@ interface Location {
 }
 
 interface RouterValue extends Location {
-  navigate(to: string, options?: { replace?: boolean }): void;
+  navigate(to: string, options?: { replace?: boolean; force?: boolean }): void;
   /** Pergunta antes de sair (mudanças não salvas). Devolve a função que desfaz. */
   block(message: string): () => void;
 }
@@ -43,8 +43,8 @@ export function RouterProvider({ children }: { children: ReactNode }) {
   }, [blocker]);
 
   const navigate = useCallback(
-    (to: string, options: { replace?: boolean } = {}) => {
-      if (blocker && !window.confirm(blocker)) return;
+    (to: string, options: { replace?: boolean; force?: boolean } = {}) => {
+      if (blocker && !options.force && !window.confirm(blocker)) return;
       setBlocker(null);
       if (options.replace) window.history.replaceState(null, "", to);
       else window.history.pushState(null, "", to);

@@ -46,6 +46,17 @@ describe("blocos padrão", () => {
     }
   });
 
+  it("cases: mostra a métrica do projeto só quando existe", async () => {
+    const ctx = (await load("pessoal")).context("pt-BR", "/");
+    const project = (metric?: { value: string; label: string }) => ({
+      id: "p1", slug: "p", url: "/portfolio/p", title: "Case", sections: [], gallery: [], links: [], tags: [], featured: false, seo: {}, ...(metric ? { metric } : {}),
+    });
+    const withMetric = render("cases", { ctx, items: [project({ value: "~50", label: "skills em produção" })] as never });
+    expect(withMetric).toContain("rb-card__metric");
+    expect(withMetric).toContain("<strong>~50</strong> skills em produção");
+    expect(render("cases", { ctx, items: [project()] as never })).not.toContain("rb-card__metric");
+  });
+
   it("título da seção no nível pedido, e itens em h3", async () => {
     const site = await load("empresa");
     const ctx = site.context("pt-BR", "/");

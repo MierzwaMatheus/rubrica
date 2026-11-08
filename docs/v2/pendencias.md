@@ -10,7 +10,6 @@ Lista viva do que falta para a v2 estável, vinda das revisões. Cada item sai d
 - **Textos personalizados no código da v1**: o `migrar` deveria usar os arquivos de tradução do projeto v1 como segundo padrão (antes do texto do template).
 
 ## Contrato (ajustes aditivos, antes de portar os outros 12 temas)
-- **Métrica no card de case**: campo opcional `metric` no projeto (`{ value, label }` por idioma), como o "~50 skills em produção" da v1.
 - **Terminal (ilha)**: o "Press ~" da v1 não existe no núcleo; decidir se vira plugin do tipo pessoal.
 - **Menu móvel**: a gaveta por checkbox não fecha ao seguir âncora da mesma página.
 
@@ -28,3 +27,10 @@ Lista viva do que falta para a v2 estável, vinda das revisões. Cada item sai d
 - Logo no Shell: `SiteSettings.logo` (com `dark`) → `ctx.site.logo` e o componente `Logo` do núcleo.
 - Alternância de tema em mais de um lugar: `ColorToggleButton` é estático; o tema pode pôr quantos quiser com `ctx.t("theme.toggle")`.
 - Variações dos blocos padrão: `CORE_VARIANTS` lista o que os componentes do núcleo desenham.
+- Métrica no card de case: `metric` opcional no projeto, mostrada no bloco `cases` padrão.
+
+## Painel (coleções e negócio)
+- **Imagens no corpo dos textos**: o TipTap do painel não tem a extensão de imagem; capa, galeria e imagens das seções do case passam pela biblioteca, mas o corpo de posts e páginas não aceita imagem inline.
+- **Prévia ao vivo de posts e cases**: o editor de coleções mostra a prévia do Google, não a página de detalhe renderizada (a prévia do painel só renderiza páginas de blocos).
+- **Tradução em lote**: o botão "traduzir" é por campo; traduzir um item inteiro de uma vez (`translation.translateDocument`) ainda não tem tela.
+- **Currículos com IA**: a tela lista e gera, mas não abre nem baixa o PDF do currículo gerado.

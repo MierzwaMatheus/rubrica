@@ -104,6 +104,8 @@ export default defineTheme({
   description: "Tipografia gigante do começo ao fim, faixas rolando e linhas de cartaz — impacto.",
   contract: "^1",
   scheme: "tropicalia",
+  // Textura que o layout da v1 recomendava (o site troca ou desliga em Aparência).
+  texture: "grain",
   colorMode: "light",
   fonts,
   tokens: {

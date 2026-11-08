@@ -22,6 +22,8 @@ import { convexSource, findConvexUrl } from "../data/convex";
 import { devFsAllow, projectEnv } from "./env";
 import { enabledPlugins } from "../plugins/contract";
 import { CORE_PLUGINS } from "../plugins/registry";
+import type { SiteSnapshot } from "../data/source";
+import { CONTENT_CHANGED_EVENT, contentChangeTracker, subscribeConvex, subscribeFixtures, type Unsubscribe } from "./dev-content";
 
 export type SourceOption =
   /**
@@ -95,7 +97,19 @@ function loadSource(source: SourceOption, abs: (p: string) => string, convexUrl:
   return convexSource(convexUrl ?? null);
 }
 
+/** O que o `astro:server:setup` precisa do `astro:config:setup` para o conteúdo ao vivo do dev. */
+interface DevContent {
+  source: SourceOption;
+  abs: (p: string) => string;
+  convexUrl: string | undefined;
+  snapshot: SiteSnapshot;
+  themeFonts: ThemeFonts | undefined;
+}
+
+const blogEnabled = (s: SiteSnapshot) => enabledPlugins(CORE_PLUGINS, s.site.kind, s.site.plugins).has("blog");
+
 export default function rubrica(options: RubricaOptions): AstroIntegration {
+  let dev: DevContent | undefined;
   return {
     name: "@rubrica/core",
     hooks: {
@@ -133,7 +147,9 @@ export default function rubrica(options: RubricaOptions): AstroIntegration {
         // Fontes: as famílias vêm do site (aparência) ou do tema. O Astro baixa do Google Fonts
         // no build e serve local; o <head> só recebe `<Font>` (ver Document.astro).
         const snapshot = await loadSource(source, abs, convexUrl).load();
-        const fontPlan: FontPlan = planFonts(snapshot.site.appearance, readThemeFonts(options.theme, root));
+        const themeFonts = readThemeFonts(options.theme, root);
+        const fontPlan: FontPlan = planFonts(snapshot.site.appearance, themeFonts);
+        if (command === "dev") dev = { source, abs, convexUrl, snapshot, themeFonts };
 
         const modules: Record<string, string> = {
           [VIRTUAL.config]: [
@@ -220,10 +236,37 @@ export default function rubrica(options: RubricaOptions): AstroIntegration {
         injectRoute({ pattern: "/_rubrica/color-mode.js", entrypoint: here("./pages/color-mode.js.ts"), prerender: true });
         injectRoute({ pattern: "/manifest.webmanifest", entrypoint: here("./pages/manifest.webmanifest.ts"), prerender: true });
         // RSS do blog: o do idioma principal e os dos outros idiomas com post traduzido.
-        if (enabledPlugins(CORE_PLUGINS, snapshot.site.kind, snapshot.site.plugins).has("blog")) {
+        if (blogEnabled(snapshot)) {
           injectRoute({ pattern: "/rss.xml", entrypoint: here("./pages/rss.xml.ts"), prerender: true });
           injectRoute({ pattern: "/[prefix]/rss.xml", entrypoint: here("./pages/rss-locale.xml.ts"), prerender: true });
         }
+      },
+      // Dev: o site reflete o que se salva no painel, sem reiniciar (ver dev-content.ts).
+      "astro:server:setup"({ server, logger }) {
+        if (!dev) return;
+        const { source, abs, convexUrl, snapshot, themeFonts } = dev;
+        const fontsKey = (s: SiteSnapshot) => JSON.stringify(planFonts(s.site.appearance, themeFonts));
+        const track = contentChangeTracker({
+          initial: snapshot,
+          onChange() {
+            for (const name of ["ssr", "prerender"]) server.environments[name]?.hot.send(CONTENT_CHANGED_EVENT, {});
+            logger.info("conteúdo atualizado: recarregue a página para ver.");
+          },
+          warn: (message) => logger.warn(message),
+          restartNotices: [
+            { key: fontsKey, message: "as fontes da aparência mudaram: reinicie o dev para carregá-las (o resto do conteúdo já está atualizado)." },
+            { key: (s) => String(blogEnabled(s)), message: "o plugin do blog foi ligado ou desligado: reinicie o dev para atualizar as rotas do RSS." },
+          ],
+        });
+        const onError = (e: Error) => logger.warn(`não foi possível acompanhar o conteúdo: ${e.message}`);
+        let stop: Unsubscribe | undefined;
+        if ("fixtures" in source) {
+          const dir = abs(source.fixtures);
+          stop = subscribeFixtures(dir, fixtureSource(dir), server.watcher, track, onError);
+        } else if (convexUrl) {
+          stop = subscribeConvex(convexUrl, track, onError);
+        }
+        server.httpServer?.once("close", () => stop?.());
       },
     },
   };

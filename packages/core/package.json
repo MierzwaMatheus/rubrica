@@ -21,7 +21,10 @@
     "./package.json": "./package.json",
     "./islands": "./src/islands/index.ts",
     "./styles/base.css": "./src/styles/base.css",
-    "./data/convex": "./src/data/convex.ts"
+    "./data/convex": "./src/data/convex.ts",
+    "./convex": "./src/convex/index.ts",
+    "./convex/schema": "./src/convex/schema.ts",
+    "./convex/roles": "./src/convex/lib/roles.ts"
   },
   "files": [
     "src"

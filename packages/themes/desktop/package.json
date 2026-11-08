@@ -4,6 +4,14 @@
   "description": "Tema desktop do Rubrica (layout Desktop Retrô da v1): cada seção é uma janela sobre a área de trabalho, com barra de menu e ícones.",
   "type": "module",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MierzwaMatheus/rubrica.git",
+    "directory": "packages/themes/desktop"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     ".": "./src/index.tsx",
     "./styles.css": "./src/styles.css",

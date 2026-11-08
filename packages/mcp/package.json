@@ -9,6 +9,9 @@
     "url": "git+https://github.com/MierzwaMatheus/rubrica.git",
     "directory": "packages/mcp"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "bin": {
     "rubrica-mcp": "./bin/rubrica-mcp.js"
   },

@@ -4,6 +4,14 @@
   "description": "Tema Terminal Brutalista do Rubrica (layout brutalist da v1): monoespaçada, bordas retas e seções como linhas de comando.",
   "type": "module",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MierzwaMatheus/rubrica.git",
+    "directory": "packages/themes/brutalist"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     ".": "./src/index.tsx",
     "./styles.css": "./src/styles.css",

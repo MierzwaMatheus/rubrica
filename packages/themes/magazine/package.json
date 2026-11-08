@@ -4,6 +4,14 @@
   "description": "Tema magazine do Rubrica: revista, com masthead, grade editorial e tipografia de destaque (Bodoni Moda).",
   "type": "module",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MierzwaMatheus/rubrica.git",
+    "directory": "packages/themes/magazine"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     ".": "./src/index.tsx",
     "./styles.css": "./src/styles.css",

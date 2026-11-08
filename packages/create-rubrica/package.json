@@ -27,6 +27,9 @@
     "url": "git+https://github.com/MierzwaMatheus/rubrica.git",
     "directory": "packages/create-rubrica"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "engines": {
     "node": ">=22.23.4"
   },

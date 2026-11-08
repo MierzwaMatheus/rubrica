@@ -4,6 +4,14 @@
   "description": "Tema Bento do Rubrica (layout bento da v1): mosaico de cartões em grade de 12 colunas e dock flutuante de navegação.",
   "type": "module",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MierzwaMatheus/rubrica.git",
+    "directory": "packages/themes/bento"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     ".": "./src/index.tsx",
     "./styles.css": "./src/styles.css",

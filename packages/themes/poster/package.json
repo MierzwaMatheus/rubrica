@@ -4,6 +4,14 @@
   "description": "Tema Pôster do Rubrica (layout \"poster\" da v1): tipografia gigante, faixa rolante e linhas de cartaz que invertem no hover.",
   "type": "module",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MierzwaMatheus/rubrica.git",
+    "directory": "packages/themes/poster"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     ".": "./src/index.tsx",
     "./styles.css": "./src/styles.css",

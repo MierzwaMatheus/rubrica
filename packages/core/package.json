@@ -9,6 +9,9 @@
     "url": "git+https://github.com/MierzwaMatheus/rubrica.git",
     "directory": "packages/core"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     ".": "./src/index.ts",
     "./blocks": "./src/blocks/catalog/index.ts",

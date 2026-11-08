@@ -4,6 +4,14 @@
   "description": "Tema monografia do Rubrica: o site como livro (cabeçalho corrido, tipografia de livro, notas na margem).",
   "type": "module",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MierzwaMatheus/rubrica.git",
+    "directory": "packages/themes/monograph"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     ".": "./src/index.tsx",
     "./styles.css": "./src/styles.css",

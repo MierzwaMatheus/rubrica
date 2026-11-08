@@ -33,6 +33,7 @@ interface DemoUser {
   role: Role;
   password: string;
   mustChangePassword: boolean;
+  suspended?: boolean;
   createdAt: number;
 }
 
@@ -143,7 +144,16 @@ export function createDemoStore(options: DemoOptions) {
   };
   const require = (permission: Permission): DemoUser => {
     const user = actor();
+    if (user.suspended) throw new Error("Sem permissão para esta ação");
+    if (user.mustChangePassword) throw new Error("Troque a senha temporária antes de continuar");
     if (!can(user.role, permission)) throw new Error("Sem permissão para esta ação");
+    return user;
+  };
+  const activeRoots = () => state.users.filter((u) => u.role === "root" && !u.suspended).length;
+  const target = (id: unknown, me: DemoUser, verb: string): DemoUser => {
+    if (id === me.userId) throw new Error(`Você não pode ${verb} a si mesmo`);
+    const user = state.users.find((u) => u.userId === id);
+    if (!user) throw new Error("Usuário não encontrado");
     return user;
   };
   const enabled = () => enabledPlugins(plugins, state.settings.kind, state.settings.plugins);
@@ -198,11 +208,11 @@ export function createDemoStore(options: DemoOptions) {
     "users:isSetupRequired": () => false,
     "users:me": () => {
       const user = state.users.find((u) => u.userId === state.session);
-      return user ? { userId: user.userId, email: user.email, name: user.name, role: user.role, mustChangePassword: user.mustChangePassword } : null;
+      return user ? { userId: user.userId, email: user.email, name: user.name, role: user.suspended ? null : user.role, suspended: !!user.suspended, mustChangePassword: user.mustChangePassword } : null;
     },
     "users:list": () => {
       require("users");
-      return state.users.map((u) => ({ userId: u.userId, email: u.email, name: u.name, createdAt: u.createdAt, role: u.role }));
+      return state.users.map((u) => ({ userId: u.userId, email: u.email, name: u.name, createdAt: u.createdAt, role: u.role, suspended: !!u.suspended, mustChangePassword: u.mustChangePassword }));
     },
     "settings:get": () => (require("panel"), structuredClone(state.settings)),
     "settings:plugins": () => {
@@ -279,6 +289,19 @@ export function createDemoStore(options: DemoOptions) {
       const me = require("users");
       if (args.userId === me.userId) throw new Error("Você não pode remover a si mesmo");
       state.users = state.users.filter((u) => u.userId !== args.userId);
+      return null;
+    },
+    "users:suspend": (args) => {
+      const user = target(args.userId, require("users"), "suspender");
+      if (user.role === "root" && !user.suspended && activeRoots() <= 1) throw new Error("O site precisa de pelo menos um root");
+      user.suspended = true;
+      return null;
+    },
+    "users:reactivate": (args) => {
+      require("users");
+      const user = state.users.find((u) => u.userId === args.userId);
+      if (!user) throw new Error("Usuário não encontrado");
+      user.suspended = false;
       return null;
     },
     "settings:update": (args) => {
@@ -417,6 +440,15 @@ export function createDemoStore(options: DemoOptions) {
       const userId = newId("u");
       state.users.push({ userId, email, name: String(args.name).trim(), role: args.role as Role, password: tempPassword, mustChangePassword: true, createdAt: Date.now() });
       return { userId, tempPassword };
+    },
+    "users:resetPassword": (args) => {
+      const me = require("users");
+      if (args.userId === me.userId) throw new Error("Para trocar a sua senha, use Minha conta");
+      const user = target(args.userId, me, "reiniciar a senha de");
+      const tempPassword = `Temp${Math.random().toString(36).slice(2, 10)}A1`;
+      user.password = tempPassword;
+      user.mustChangePassword = true;
+      return { tempPassword, email: user.email };
     },
     "users:changePassword": (args) => {
       const me = actor();

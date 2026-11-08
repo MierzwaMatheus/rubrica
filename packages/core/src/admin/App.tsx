@@ -57,7 +57,7 @@ function Gate() {
     return setupRequired ? <FirstAccessScreen /> : <LoginScreen />;
   }
   if (me === undefined) return <Loading />;
-  if (me === null || !me.role) return <NoRoleScreen />;
+  if (me === null || !me.role) return <NoRoleScreen suspended={!!me?.suspended} />;
   if (me.mustChangePassword) return <ChangePasswordScreen forced />;
   const user = { ...me, role: me.role };
   return (

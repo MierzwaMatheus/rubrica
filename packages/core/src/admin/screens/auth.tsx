@@ -174,14 +174,18 @@ export function ChangePasswordScreen({ forced }: { forced?: boolean }) {
   );
 }
 
-export function NoRoleScreen() {
+export function NoRoleScreen({ suspended = false }: { suspended?: boolean }) {
   const auth = useAuth();
   return (
     <Centered>
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle as="h1" className="text-xl">Sem acesso</CardTitle>
-          <CardDescription>Sua conta existe, mas não tem papel no painel. Peça ao root do site para dar um papel a você.</CardDescription>
+          <CardTitle as="h1" className="text-xl">{suspended ? "Acesso suspenso" : "Sem acesso"}</CardTitle>
+          <CardDescription>
+            {suspended
+              ? "Seu acesso ao painel foi suspenso. Para voltar, fale com o root do site."
+              : "Sua conta existe, mas não tem papel no painel. Peça ao root do site para dar um papel a você."}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Button variant="outline" onClick={() => auth.signOut()}>

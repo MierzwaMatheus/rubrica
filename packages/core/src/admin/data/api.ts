@@ -26,6 +26,7 @@ export interface Me {
   email: string | null;
   name: string | null;
   role: Role | null;
+  suspended: boolean;
   mustChangePassword: boolean;
 }
 
@@ -34,7 +35,11 @@ export interface UserRow {
   email: string | null;
   name: string | null;
   createdAt: number;
+  /** Papel guardado; o do suspenso volta ao reativar. */
   role: Role | null;
+  suspended: boolean;
+  /** Ainda não trocou a senha temporária. */
+  mustChangePassword: boolean;
 }
 
 export interface PageDoc {
@@ -315,6 +320,9 @@ export const api = {
     create: a<{ name: string; email: string; role: Exclude<Role, "root"> }, { userId: string; tempPassword: string }>("users", "create"),
     setRole: m<{ userId: string; role: Role }, null>("users", "setRole"),
     remove: m<{ userId: string }, null>("users", "remove"),
+    suspend: m<{ userId: string }, null>("users", "suspend"),
+    reactivate: m<{ userId: string }, null>("users", "reactivate"),
+    resetPassword: a<{ userId: string }, { tempPassword: string; email: string }>("users", "resetPassword"),
     changePassword: a<{ newPassword: string }, null>("users", "changePassword"),
   },
   settings: {

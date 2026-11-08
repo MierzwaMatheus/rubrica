@@ -122,7 +122,13 @@ export const AUDIT_ACTIONS: Record<string, ActionDef> = {
   "user.removed": { label: "removeu o usuário", target: false, detail: (m) => text(m.email) },
   "user.root_created": { label: "criou a conta da agência (setup)", target: false },
   "auth.password_changed": { label: "trocou a própria senha", target: false },
-  "auth.password_reset": { label: "redefiniu a senha de um usuário pelo terminal", target: false },
+  "auth.password_reset": {
+    label: "reiniciou a senha de um usuário",
+    target: false,
+    detail: (m) => (m.via === "painel" ? "pelo painel, com senha temporária" : "pelo terminal"),
+  },
+  "user.suspended": { label: "suspendeu o acesso de um usuário", target: false, detail: (m) => text(m.email) },
+  "user.reactivated": { label: "reativou o acesso de um usuário", target: false, detail: (m) => text(m.email) },
 
   // Propostas e pagamentos
   "proposal.accepted": { label: "aceitou", detail: (m) => (typeof m.version === "number" ? `versão ${m.version}` : undefined) },

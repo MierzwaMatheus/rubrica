@@ -228,7 +228,7 @@ export function buildSite(input: BuildInput): BuiltSite {
   function context(locale: Locale, url: string, alternates: Alternate[] = []): RenderContext {
     const o = opts(locale);
     const t = (key: string, vars?: Record<string, string | number>) => {
-      const text = pickWithFallback(snapshot.texts[key], locale, cfg) ?? themeText(theme, key, locale) ?? defaultUiText(key, locale) ?? key;
+      const text = pickWithFallback(snapshot.texts[key], locale, cfg) ?? themeText(theme, key, locale) ?? defaultUiText(key, locale, settings.kind) ?? key;
       return interpolate(text, vars);
     };
     const navigation = settings.navigation

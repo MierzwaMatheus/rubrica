@@ -42,3 +42,13 @@ describe("idiomas", () => {
     expect(() => defineLocales({ locales: ["pt-BR", "en-US", "en-GB"], default: "pt-BR" })).toThrow(/prefixo/);
   });
 });
+
+describe("textos de interface por tipo de site", () => {
+  it("usa a voz da empresa na linha empresa e mantém a pessoal no resto", async () => {
+    const { defaultUiText } = await import("../src/i18n/ui-texts");
+    expect(defaultUiText("sidebar.talk", "pt-BR")).toBe("Fale comigo");
+    expect(defaultUiText("sidebar.talk", "pt-BR", "empresa")).toBe("Fale conosco");
+    expect(defaultUiText("contactForm.successBody", "en", "empresa")).toBe("Thanks for reaching out. We'll reply as soon as we can.");
+    expect(defaultUiText("form.send", "pt-BR", "empresa")).toBe("Enviar");
+  });
+});

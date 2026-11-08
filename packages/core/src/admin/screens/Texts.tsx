@@ -6,6 +6,7 @@
 import { useMemo, useState } from "react";
 import { RotateCcw, Search } from "lucide-react";
 import { DEFAULT_UI_TEXTS, defaultUiText } from "../../i18n/ui-texts";
+import type { SiteKind } from "../../content/types";
 import type { Localized } from "../../i18n";
 import { api } from "../data/api";
 import { useMutation, useQuery } from "../data/backend";
@@ -37,7 +38,7 @@ const GROUPS: Record<string, string> = {
   notFound: "Página 404",
 };
 
-function TextRow({ k, saved, locales }: { k: string; saved: Localized<string> | undefined; locales: string[] }) {
+function TextRow({ k, saved, locales, kind }: { k: string; saved: Localized<string> | undefined; locales: string[]; kind: SiteKind }) {
   const set = useMutation(api.texts.set);
   const reset = useMutation(api.texts.reset);
   const [values, setValues] = useState<Localized<string>>(saved ?? {});
@@ -67,7 +68,7 @@ function TextRow({ k, saved, locales }: { k: string; saved: Localized<string> | 
             <Input
               lang={l}
               value={values[l] ?? ""}
-              placeholder={defaultUiText(k, l) ?? ""}
+              placeholder={defaultUiText(k, l, kind) ?? ""}
               onChange={(e) => setValues((v) => ({ ...v, [l]: e.target.value }))}
               onBlur={() => commit(values)}
             />
@@ -107,7 +108,7 @@ export default function Texts() {
   const shown = keys.filter((k) => {
     if (onlyCustom && !saved[k]) return false;
     if (!q) return true;
-    const texts = [...locales.map((l) => defaultUiText(k, l) ?? ""), ...Object.values(saved[k] ?? {})];
+    const texts = [...locales.map((l) => defaultUiText(k, l, panel.kind) ?? ""), ...Object.values(saved[k] ?? {})];
     return k.toLowerCase().includes(q) || texts.some((t) => t?.toLowerCase().includes(q));
   });
   const grouped = new Map<string, string[]>();
@@ -138,7 +139,7 @@ export default function Texts() {
             <h2 className="text-sm font-semibold text-muted-foreground">{group}</h2>
             <ul className="divide-y rounded-lg border bg-card">
               {list.map((k) => (
-                <TextRow key={`${k}:${JSON.stringify(saved[k] ?? null)}`} k={k} saved={saved[k]} locales={locales} />
+                <TextRow key={`${k}:${JSON.stringify(saved[k] ?? null)}`} k={k} saved={saved[k]} locales={locales} kind={panel.kind} />
               ))}
             </ul>
           </section>

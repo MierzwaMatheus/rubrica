@@ -97,14 +97,29 @@ export const DEFAULT_UI_TEXTS: Record<string, Localized<string>> = {
   "notFound.home": { pt: "Ir para a página inicial", en: "Go to the home page", es: "Ir a la página de inicio" },
 };
 
+/**
+ * Na linha empresa, quem fala é a empresa ("nós"): estes textos trocam a primeira pessoa
+ * do singular da linha pessoal. O resto vale para os dois tipos.
+ */
+export const EMPRESA_UI_TEXTS: Record<string, Localized<string>> = {
+  "sidebar.talk": { pt: "Fale conosco", en: "Talk to us", es: "Hablemos" },
+  "contactForm.message": { pt: "Conte um pouco mais", en: "Tell us a bit more", es: "Cuéntanos un poco más" },
+  "contactForm.you": { pt: "Como falar com você?", en: "How can we reach you?", es: "¿Cómo podemos contactarte?" },
+  "contactForm.successBody": {
+    pt: "Obrigado pelo contato. Respondemos assim que possível.",
+    en: "Thanks for reaching out. We'll reply as soon as we can.",
+    es: "Gracias por escribir. Responderemos lo antes posible.",
+  },
+};
+
 /** Chaves de interface do núcleo que começam com algum dos prefixos. */
 export function uiKeysWithPrefix(prefixes: string[]): string[] {
   return Object.keys(DEFAULT_UI_TEXTS).filter((k) => prefixes.some((p) => k.startsWith(p)));
 }
 
-/** Texto padrão do núcleo: idioma exato, idioma base, inglês. */
-export function defaultUiText(key: string, locale: Locale): string | undefined {
-  const entry = DEFAULT_UI_TEXTS[key];
+/** Texto padrão do núcleo: idioma exato, idioma base, inglês. Na linha empresa, a versão em "nós" quando existe. */
+export function defaultUiText(key: string, locale: Locale, kind?: "pessoal" | "empresa"): string | undefined {
+  const entry = (kind === "empresa" && EMPRESA_UI_TEXTS[key]) || DEFAULT_UI_TEXTS[key];
   if (!entry) return undefined;
   const base = locale.split("-")[0]!.toLowerCase();
   return entry[locale] ?? entry[base] ?? entry.en;

@@ -6,17 +6,21 @@ import type { BlockDefinition } from "../blocks/define";
 import { CORE_BLOCKS } from "../blocks/catalog";
 import type { PluginDefinition } from "../plugins/contract";
 import { CORE_PLUGINS } from "../plugins/registry";
+import { resolvePersonalDataSources, type PersonalDataSource } from "./personalData";
 
 export interface RubricaConfig {
   /** Blocos próprios do projeto (só a definição: tipo, campos, plugin). */
   blocks?: BlockDefinition[];
   /** Plugins próprios do projeto. */
   plugins?: PluginDefinition[];
+  /** Fontes de dados pessoais do projeto (LGPD), além das do núcleo. Ver `personalData.ts`. */
+  personalData?: PersonalDataSource[];
 }
 
 export interface RubricaRuntime {
   blocks: readonly BlockDefinition[];
   plugins: readonly PluginDefinition[];
+  personalData: readonly PersonalDataSource[];
 }
 
 export function resolveRuntime(config: RubricaConfig = {}): RubricaRuntime {
@@ -32,5 +36,5 @@ export function resolveRuntime(config: RubricaConfig = {}): RubricaRuntime {
   };
   dup(blocks, (b) => b.type, "tipo de bloco");
   dup(plugins, (p) => p.id, "plugin");
-  return { blocks, plugins };
+  return { blocks, plugins, personalData: resolvePersonalDataSources(config.personalData) };
 }

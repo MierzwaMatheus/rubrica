@@ -57,6 +57,10 @@ export const PERMISSIONS = {
   contracts: ["root", "admin", "comercial"],
   checkouts: ["root", "admin", "comercial"],
   contacts: ["root", "admin", "comercial"],
+  /** LGPD: exportar e apagar dados de um titular, gerar a política de privacidade. */
+  privacy: ["root", "admin"],
+  /** Botão "publicar" (deploy hook). */
+  publish: ["root", "admin"],
 } as const satisfies Record<string, readonly Role[]>;
 
 export type Permission = keyof typeof PERMISSIONS;

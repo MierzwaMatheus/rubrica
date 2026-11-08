@@ -35,12 +35,18 @@ import {
   teamFunctions,
   testimonialsFunctions,
 } from "./collections";
+import { contactsFunctions } from "./contacts";
+import { addBusinessRoutes } from "./httpRoutes";
 import { mediaFunctions } from "./media";
 import { pagesFunctions } from "./pages";
+import { privacyFunctions } from "./privacy";
+import { publishFunctions } from "./publish";
 import { resolveRuntime, type RubricaConfig } from "./runtime";
 import { ref } from "./server";
 import { settingsFunctions, textsFunctions } from "./settings";
 import { siteFunctions } from "./site";
+import { testimonialIntakeFunctions } from "./testimonialIntake";
+import { translationFunctions } from "./translation";
 import { usersFunctions } from "./users";
 
 export function createRubrica(config: RubricaConfig = {}) {
@@ -68,6 +74,11 @@ export function createRubrica(config: RubricaConfig = {}) {
     routine: once(() => routineFunctions(rt)),
     plans: once(() => plansFunctions(rt)),
     team: once(() => teamFunctions(rt)),
+    contacts: once(() => contactsFunctions(rt)),
+    testimonialIntake: once(() => testimonialIntakeFunctions(rt)),
+    privacy: once(() => privacyFunctions(rt)),
+    publish: once(publishFunctions),
+    translation: once(() => translationFunctions(rt)),
   };
 
   return {
@@ -81,12 +92,14 @@ export function createRubrica(config: RubricaConfig = {}) {
     get http() {
       const http = httpRouter();
       auth().auth.addHttpRoutes(http);
+      addBusinessRoutes(http);
       return http;
     },
     /** Para `convex/crons.ts`: `export default rubrica.crons;` */
     get crons() {
       const crons = cronJobs();
       crons.daily("rubrica: limpar registros e limites vencidos", { hourUTC: 6, minuteUTC: 0 }, ref("mutation", "audit", "cleanup"), {});
+      crons.daily("rubrica: apagar contatos fora da retencao", { hourUTC: 6, minuteUTC: 10 }, ref("mutation", "contacts", "cleanup"), {});
       return crons;
     },
     get users() {
@@ -137,6 +150,21 @@ export function createRubrica(config: RubricaConfig = {}) {
     get team() {
       return modules.team();
     },
+    get contacts() {
+      return modules.contacts();
+    },
+    get testimonialIntake() {
+      return modules.testimonialIntake();
+    },
+    get privacy() {
+      return modules.privacy();
+    },
+    get publish() {
+      return modules.publish();
+    },
+    get translation() {
+      return modules.translation();
+    },
   };
 }
 
@@ -160,6 +188,11 @@ export const RUBRICA_MODULES = [
   "routine",
   "plans",
   "team",
+  "contacts",
+  "testimonialIntake",
+  "privacy",
+  "publish",
+  "translation",
 ] as const satisfies readonly (keyof Rubrica)[];
 
 export type { RubricaConfig } from "./runtime";
@@ -168,6 +201,7 @@ export { requireAuth, requireRole, getUserRole, MAX_FAILED_SIGN_INS_PER_HOUR } f
 export { logAudit, logUserAction, checkRateLimit, recordRateLimitAttempt, hitRateLimit, resetRateLimit, RATE_LIMITS } from "./audit";
 export { ROLES, PERMISSIONS, ROLE_LABELS, can, isRole, type Role, type Permission } from "./lib/roles";
 export { buildSnapshot } from "./site";
+export { CORE_PERSONAL_DATA_SOURCES, type PersonalDataSource } from "./personalData";
 export { MODULE_DIR } from "./server";
 export type { DataModel, Doc, Id, QueryCtx, MutationCtx, ActionCtx } from "./server";
 

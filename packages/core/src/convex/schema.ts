@@ -32,6 +32,7 @@ import {
   vRole,
   vSeo,
 } from "./validators";
+import { businessTables } from "./businessTables";
 
 const collection = <F extends PropertyValidators>(fields: F) => ({ ...fields, ...lifecycleFields });
 
@@ -160,6 +161,9 @@ export const rubricaTables = {
   })
     .index("by_key", ["key"])
     .index("by_expiresAt", ["expiresAt"]),
+
+  // ── Linha de empresa: contatos, depoimentos enviados, LGPD, publicação ──
+  ...businessTables,
 };
 
 /** Tabelas de coleção, pelo nome usado no conteúdo (`CollectionName`). */

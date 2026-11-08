@@ -6,11 +6,11 @@ import { defineLocales } from "../i18n";
 import { enabledPlugins } from "../plugins/contract";
 import { requireRole } from "./auth";
 import { logUserAction } from "./audit";
-import { cleanByValidator, cleanFields } from "./lib/clean";
+import { cleanByValidator, cleanFields, optionalKeys } from "./lib/clean";
 import { isLocaleCode } from "./lib/text";
 import { analyticsScriptUrl, isAnalyticsId, isCssColor } from "../seo/analytics";
 import { getSettingsDoc } from "./plugins";
-import { announcementTime, isWhatsAppNumber, normalizeWhatsAppNumber } from "../render/sitewide";
+import { normalizeSiteWide, validateSiteWide } from "../render/sitewide";
 import type { RubricaRuntime } from "./runtime";
 import { internalMutation, mutation, query, type Doc, type MutationCtx } from "./server";
 import { siteSettingsFields, vLocalized, vSiteSettings, type SiteSettingsValue } from "./validators";
@@ -39,48 +39,12 @@ function validateSettings(settings: SiteSettingsValue): void {
   const { scriptUrl, websiteId } = settings.analytics ?? {};
   if (scriptUrl && !analyticsScriptUrl(scriptUrl)) throw new Error("Endereço do script de analytics inválido: use https://…");
   if (websiteId && !isAnalyticsId(websiteId)) throw new Error("Id do site no analytics inválido: só letras, números e hífen");
-  validateWhatsApp(settings.whatsapp);
-  validateAnnouncement(settings.announcement);
-}
-
-function tooLong(value: Record<string, string> | undefined, max: number): boolean {
-  return Object.values(value ?? {}).some((s) => s.length > max);
-}
-
-function validateWhatsApp(whatsapp: SiteSettingsValue["whatsapp"]): void {
-  if (!whatsapp) return;
-  if (!isWhatsAppNumber(whatsapp.number)) {
-    throw new Error("Número do WhatsApp inválido: use o formato internacional, com DDI e DDD (ex.: +55 11 91234-5678)");
-  }
-  if (tooLong(whatsapp.message, 500)) throw new Error("Mensagem do WhatsApp: até 500 caracteres por idioma");
-  if (tooLong(whatsapp.label, 40)) throw new Error("Texto do botão do WhatsApp: até 40 caracteres por idioma");
-}
-
-function validateAnnouncement(announcement: SiteSettingsValue["announcement"]): void {
-  if (!announcement) return;
-  const hasText = Object.values(announcement.text).some((s) => s.trim());
-  if (announcement.enabled && !hasText) throw new Error("Aviso ligado sem texto: escreva o aviso em pelo menos um idioma");
-  if (tooLong(announcement.text, 200)) throw new Error("Texto do aviso: até 200 caracteres por idioma");
-  if (announcement.link) {
-    if (!announcement.link.href.trim()) throw new Error("Link do aviso sem endereço");
-    if (tooLong(announcement.link.label, 40)) throw new Error("Rótulo do link do aviso: até 40 caracteres por idioma");
-  }
-  const start = announcement.startsAt ? announcementTime(announcement.startsAt, "start") : undefined;
-  const end = announcement.endsAt ? announcementTime(announcement.endsAt, "end") : undefined;
-  const format = "use AAAA-MM-DD ou data e hora com fuso (2026-12-01T09:00-03:00)";
-  if (announcement.startsAt && start === undefined) throw new Error(`Início do aviso inválido: ${format}`);
-  if (announcement.endsAt && end === undefined) throw new Error(`Fim do aviso inválido: ${format}`);
-  if (start !== undefined && end !== undefined && start > end) throw new Error("O aviso termina antes de começar: confira as datas");
-}
-
-/** Normaliza o que dá para normalizar sem mudar o sentido (o número do WhatsApp vira só dígitos). */
-function normalizeSettings(settings: SiteSettingsValue): SiteSettingsValue {
-  if (!settings.whatsapp) return settings;
-  return { ...settings, whatsapp: { ...settings.whatsapp, number: normalizeWhatsAppNumber(settings.whatsapp.number) } };
+  validateSiteWide(settings);
 }
 
 export async function upsertSettings(ctx: MutationCtx, value: SiteSettingsValue, userId?: Doc<"users">["_id"]) {
-  const clean = normalizeSettings(cleanFields(siteSettingsFields, value) as SiteSettingsValue);
+  // O número do WhatsApp vira só dígitos antes de conferir.
+  const clean = normalizeSiteWide(cleanFields(siteSettingsFields, value) as SiteSettingsValue);
   validateSettings(clean);
   const existing = await getSettingsDoc(ctx);
   const doc = { ...clean, updatedAt: Date.now(), updatedBy: userId };
@@ -125,19 +89,26 @@ export function settingsFunctions(rt: RubricaRuntime) {
 
     /**
      * Altera parte das configurações. `kind`, `url`, `locales` e `theme` são da
-     * agência (root); o resto, root e admin.
+     * agência (root); o resto, root e admin. `unset` apaga campos opcionais (ex.: tirar o
+     * WhatsApp do site), o que um `patch` não consegue: `undefined` não viaja.
      */
     update: mutation({
-      args: { patch: vSiteSettings.partial() },
+      args: { patch: vSiteSettings.partial(), unset: v.optional(v.array(v.string())) },
       handler: async (ctx, args) => {
         const { userId, role } = await requireRole(ctx, "settings");
-        const changed = Object.keys(args.patch);
+        const unset = [...new Set(args.unset ?? [])];
+        const optional = optionalKeys(siteSettingsFields);
+        const notOptional = unset.filter((k) => !optional.has(k));
+        if (notOptional.length) throw new Error(`Campo que não pode ser apagado: ${notOptional.join(", ")}`);
+        const changed = [...Object.keys(args.patch), ...unset.filter((k) => !(k in args.patch))];
         if (role !== "root" && changed.some((k) => (TECHNICAL_SETTINGS as readonly string[]).includes(k))) {
           throw new Error("Tipo do site, URL, idiomas e tema só a agência (root) muda");
         }
         const existing = await getSettingsDoc(ctx);
         if (!existing) throw new Error("O site ainda não foi configurado (rode o setup)");
-        await upsertSettings(ctx, { ...stripMeta(existing), ...args.patch } as SiteSettingsValue, userId);
+        const next: Record<string, unknown> = { ...stripMeta(existing), ...args.patch };
+        for (const key of unset) if (!(key in args.patch)) delete next[key];
+        await upsertSettings(ctx, next as SiteSettingsValue, userId);
         await logUserAction(ctx, userId, "settings.updated", { type: "siteSettings" }, { fields: changed });
         return null;
       },

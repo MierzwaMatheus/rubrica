@@ -84,6 +84,16 @@ describe("configurações do site inteiro (WhatsApp e aviso)", () => {
     await expect(admin.mutation(api.rubrica.settings.update, { patch: { announcement: { enabled: true, text: { "pt-BR": "Aviso" }, link: { label: { "pt-BR": "Ver" }, href: " " } } } })).rejects.toThrow(/sem endereço/);
   });
 
+  it("unset apaga o WhatsApp e o aviso; campo obrigatório não se apaga", async () => {
+    const admin = await as(t, "admin");
+    await admin.mutation(api.rubrica.settings.update, { patch: { whatsapp: { number: "5511912345678", floating: true }, announcement: { enabled: false, text: {} } } });
+    await admin.mutation(api.rubrica.settings.update, { patch: {}, unset: ["whatsapp", "announcement"] });
+    const { site } = await t.query(api.rubrica.site.snapshot, {});
+    expect(site.whatsapp).toBeUndefined();
+    expect(site.announcement).toBeUndefined();
+    await expect(admin.mutation(api.rubrica.settings.update, { patch: {}, unset: ["url"] })).rejects.toThrow(/não pode ser apagado/);
+  });
+
   it("editor de conteúdo não muda as configurações", async () => {
     const editor = await as(t, "content-editor");
     await expect(editor.mutation(api.rubrica.settings.update, { patch: { announcement: { enabled: true, text: { "pt-BR": "Aviso" } } } })).rejects.toThrow();

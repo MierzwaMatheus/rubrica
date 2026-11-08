@@ -4,7 +4,7 @@
  * Funções puras: rodam no backend (validação), no build, na prévia e nos testes.
  */
 import { pick, type Locale } from "../i18n";
-import type { Announcement, SiteSettings } from "../content/types";
+import type { Announcement, SiteSettings, WhatsAppSettings } from "../content/types";
 
 // ── WhatsApp ────────────────────────────────────────────────────────────────
 
@@ -88,4 +88,45 @@ export function announcementActive(announcement: Announcement | undefined, now: 
   if (start !== undefined && now < start) return false;
   if (end !== undefined && now > end) return false;
   return true;
+}
+
+// ── Validação (backend e backend de demonstração do painel) ────────────────
+
+type SiteWide = { whatsapp?: WhatsAppSettings; announcement?: Announcement };
+
+/** O número do WhatsApp vira só dígitos ("+55 (11) 9…" → "55119…"). O resto fica como está. */
+export function normalizeSiteWide<T extends SiteWide>(settings: T): T {
+  if (!settings.whatsapp) return settings;
+  return { ...settings, whatsapp: { ...settings.whatsapp, number: normalizeWhatsAppNumber(settings.whatsapp.number) } };
+}
+
+function tooLong(value: Partial<Record<string, string>> | undefined, max: number): boolean {
+  return Object.values(value ?? {}).some((s) => (s ?? "").length > max);
+}
+
+/** Confere o WhatsApp e a faixa de aviso (já normalizados). Lança `Error` com a mensagem para o painel. */
+export function validateSiteWide(settings: SiteWide): void {
+  const { whatsapp, announcement } = settings;
+  if (whatsapp) {
+    if (!isWhatsAppNumber(whatsapp.number)) {
+      throw new Error("Número do WhatsApp inválido: use o formato internacional, com DDI e DDD (ex.: +55 11 91234-5678)");
+    }
+    if (tooLong(whatsapp.message, 500)) throw new Error("Mensagem do WhatsApp: até 500 caracteres por idioma");
+    if (tooLong(whatsapp.label, 40)) throw new Error("Texto do botão do WhatsApp: até 40 caracteres por idioma");
+  }
+  if (announcement) {
+    const hasText = Object.values(announcement.text).some((s) => s?.trim());
+    if (announcement.enabled && !hasText) throw new Error("Aviso ligado sem texto: escreva o aviso em pelo menos um idioma");
+    if (tooLong(announcement.text, 200)) throw new Error("Texto do aviso: até 200 caracteres por idioma");
+    if (announcement.link) {
+      if (!announcement.link.href.trim()) throw new Error("Link do aviso sem endereço");
+      if (tooLong(announcement.link.label, 40)) throw new Error("Rótulo do link do aviso: até 40 caracteres por idioma");
+    }
+    const start = announcement.startsAt ? announcementTime(announcement.startsAt, "start") : undefined;
+    const end = announcement.endsAt ? announcementTime(announcement.endsAt, "end") : undefined;
+    const format = "use AAAA-MM-DD ou data e hora com fuso (2026-12-01T09:00-03:00)";
+    if (announcement.startsAt && start === undefined) throw new Error(`Início do aviso inválido: ${format}`);
+    if (announcement.endsAt && end === undefined) throw new Error(`Fim do aviso inválido: ${format}`);
+    if (start !== undefined && end !== undefined && start > end) throw new Error("O aviso termina antes de começar: confira as datas");
+  }
 }

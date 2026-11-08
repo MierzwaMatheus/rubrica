@@ -122,6 +122,24 @@ export const vOrganization = v.object({
   schemaType: v.optional(v.string()),
 });
 
+/** WhatsApp do site (`WhatsAppSettings`). O número é normalizado para só dígitos ao gravar. */
+export const vWhatsApp = v.object({
+  number: v.string(),
+  message: v.optional(vLocalized),
+  floating: v.boolean(),
+  label: v.optional(vLocalized),
+});
+
+/** Faixa de aviso (`Announcement`). As datas são conferidas ao gravar. */
+export const vAnnouncement = v.object({
+  enabled: v.boolean(),
+  text: vLocalized,
+  link: v.optional(vLink),
+  tone: v.optional(v.union(v.literal("info"), v.literal("destaque"))),
+  startsAt: v.optional(v.string()),
+  endsAt: v.optional(v.string()),
+});
+
 /** Campos do `SiteSettings` (documento único da tabela `siteSettings`). */
 export const siteSettingsFields = {
   kind: vSiteKind,
@@ -154,6 +172,8 @@ export const siteSettingsFields = {
   rss: v.optional(v.object({ title: v.optional(vLocalized), description: v.optional(vLocalized) })),
   defaultPostCover: v.optional(vImage),
   analytics: v.optional(v.object({ scriptUrl: v.optional(v.string()), websiteId: v.optional(v.string()) })),
+  whatsapp: v.optional(vWhatsApp),
+  announcement: v.optional(vAnnouncement),
 };
 export const vSiteSettings = v.object(siteSettingsFields);
 

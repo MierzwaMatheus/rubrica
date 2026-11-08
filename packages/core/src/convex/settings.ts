@@ -10,6 +10,7 @@ import { cleanByValidator, cleanFields } from "./lib/clean";
 import { isLocaleCode } from "./lib/text";
 import { analyticsScriptUrl, isAnalyticsId, isCssColor } from "../seo/analytics";
 import { getSettingsDoc } from "./plugins";
+import { announcementTime, isWhatsAppNumber, normalizeWhatsAppNumber } from "../render/sitewide";
 import type { RubricaRuntime } from "./runtime";
 import { internalMutation, mutation, query, type Doc, type MutationCtx } from "./server";
 import { siteSettingsFields, vLocalized, vSiteSettings, type SiteSettingsValue } from "./validators";
@@ -38,10 +39,48 @@ function validateSettings(settings: SiteSettingsValue): void {
   const { scriptUrl, websiteId } = settings.analytics ?? {};
   if (scriptUrl && !analyticsScriptUrl(scriptUrl)) throw new Error("Endereço do script de analytics inválido: use https://…");
   if (websiteId && !isAnalyticsId(websiteId)) throw new Error("Id do site no analytics inválido: só letras, números e hífen");
+  validateWhatsApp(settings.whatsapp);
+  validateAnnouncement(settings.announcement);
+}
+
+function tooLong(value: Record<string, string> | undefined, max: number): boolean {
+  return Object.values(value ?? {}).some((s) => s.length > max);
+}
+
+function validateWhatsApp(whatsapp: SiteSettingsValue["whatsapp"]): void {
+  if (!whatsapp) return;
+  if (!isWhatsAppNumber(whatsapp.number)) {
+    throw new Error("Número do WhatsApp inválido: use o formato internacional, com DDI e DDD (ex.: +55 11 91234-5678)");
+  }
+  if (tooLong(whatsapp.message, 500)) throw new Error("Mensagem do WhatsApp: até 500 caracteres por idioma");
+  if (tooLong(whatsapp.label, 40)) throw new Error("Texto do botão do WhatsApp: até 40 caracteres por idioma");
+}
+
+function validateAnnouncement(announcement: SiteSettingsValue["announcement"]): void {
+  if (!announcement) return;
+  const hasText = Object.values(announcement.text).some((s) => s.trim());
+  if (announcement.enabled && !hasText) throw new Error("Aviso ligado sem texto: escreva o aviso em pelo menos um idioma");
+  if (tooLong(announcement.text, 200)) throw new Error("Texto do aviso: até 200 caracteres por idioma");
+  if (announcement.link) {
+    if (!announcement.link.href.trim()) throw new Error("Link do aviso sem endereço");
+    if (tooLong(announcement.link.label, 40)) throw new Error("Rótulo do link do aviso: até 40 caracteres por idioma");
+  }
+  const start = announcement.startsAt ? announcementTime(announcement.startsAt, "start") : undefined;
+  const end = announcement.endsAt ? announcementTime(announcement.endsAt, "end") : undefined;
+  const format = "use AAAA-MM-DD ou data e hora com fuso (2026-12-01T09:00-03:00)";
+  if (announcement.startsAt && start === undefined) throw new Error(`Início do aviso inválido: ${format}`);
+  if (announcement.endsAt && end === undefined) throw new Error(`Fim do aviso inválido: ${format}`);
+  if (start !== undefined && end !== undefined && start > end) throw new Error("O aviso termina antes de começar: confira as datas");
+}
+
+/** Normaliza o que dá para normalizar sem mudar o sentido (o número do WhatsApp vira só dígitos). */
+function normalizeSettings(settings: SiteSettingsValue): SiteSettingsValue {
+  if (!settings.whatsapp) return settings;
+  return { ...settings, whatsapp: { ...settings.whatsapp, number: normalizeWhatsAppNumber(settings.whatsapp.number) } };
 }
 
 export async function upsertSettings(ctx: MutationCtx, value: SiteSettingsValue, userId?: Doc<"users">["_id"]) {
-  const clean = cleanFields(siteSettingsFields, value) as SiteSettingsValue;
+  const clean = normalizeSettings(cleanFields(siteSettingsFields, value) as SiteSettingsValue);
   validateSettings(clean);
   const existing = await getSettingsDoc(ctx);
   const doc = { ...clean, updatedAt: Date.now(), updatedBy: userId };

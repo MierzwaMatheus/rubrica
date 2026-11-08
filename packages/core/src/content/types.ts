@@ -227,6 +227,9 @@ export interface Person {
   name: string;
   jobTitle?: Localized<string>;
   email?: string;
+  /** Telefone e WhatsApp públicos (aparecem na casca, ex.: sidebar do tema padrão). */
+  phone?: string;
+  whatsapp?: string;
   photo?: RawImage;
 }
 

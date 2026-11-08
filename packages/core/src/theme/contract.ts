@@ -39,7 +39,7 @@ export interface ResolvedSite {
   navigation: ResolvedNavItem[];
   social: SocialLink[];
   organization?: Organization;
-  person?: { name: string; jobTitle?: string; email?: string; photo?: ResolvedImage };
+  person?: { name: string; jobTitle?: string; email?: string; phone?: string; whatsapp?: string; photo?: ResolvedImage };
   plugins: Record<string, boolean>;
   colorMode: "dark" | "light" | "system";
   colorToggle: boolean;

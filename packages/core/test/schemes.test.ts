@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { SCHEMES, SCHEME_TOKENS, contrastRatio, getScheme, schemeCss, type SchemeMode } from "../src/theme/schemes";
+import { SCHEMES, SCHEME_TOKENS, contrastRatio, getScheme, mixColors, schemeCss, type SchemeMode } from "../src/theme/schemes";
 
 const base = readFileSync(fileURLToPath(new URL("../src/styles/base.css", import.meta.url)), "utf-8");
 const tokens = (block: string) => Object.fromEntries([...block.matchAll(/(--rb-[a-z-0-9]+):\s*(#[0-9a-f]{6})/gi)].map((m) => [m[1]!, m[2]!]));
@@ -11,7 +11,7 @@ const baseLight = tokens(base.slice(base.indexOf('\n[data-color-mode="light"] {'
 describe("esquemas de cor", () => {
   it("traz os 15 esquemas da v1, com neon", () => {
     expect(SCHEMES).toHaveLength(15);
-    expect(getScheme("neon")?.dark.primary).toBe("#A855F7");
+    expect(getScheme("neon")?.light.primary).toBe("#7E22CE");
     expect(new Set(SCHEMES.map((s) => s.id)).size).toBe(SCHEMES.length);
   });
 
@@ -39,6 +39,12 @@ describe("esquemas de cor", () => {
             if (bgName === "subtle" && fgName !== "text" && fgName !== "textMuted") continue; // sobre o "subtle" só se garante o texto
             pairs.push([`${fgName} sobre ${bgName}`, fg, bg]);
           }
+        }
+        // Cores de destaque também sobre fundos "elevados" (cartão, chip: 10% do texto sobre o fundo)
+        // e sobre o próprio tom a 12% (botão de contorno).
+        const raised = mixColors(m.bg, m.text, 0.1);
+        for (const [fgName, fg] of [["primary", m.primary], ["accent", m.accent]] as const) {
+          pairs.push([`${fgName} sobre cartão elevado`, fg, raised], [`${fgName} sobre o próprio tom a 12%`, fg, mixColors(m.bg, fg, 0.12)]);
         }
         pairs.push(["onPrimary sobre primary", m.onPrimary, m.primary], ["onAccent sobre accent", m.onAccent, m.accent]);
         const failures = pairs.filter(([, fg, bg]) => contrastRatio(fg, bg) < 4.5).map(([label, fg, bg]) => `${label} (${fg} em ${bg}): ${contrastRatio(fg, bg).toFixed(2)}`);

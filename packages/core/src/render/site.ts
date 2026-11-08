@@ -238,6 +238,8 @@ export function buildSite(input: BuildInput): BuiltSite {
       const photo = resolveImage(settings.person.photo, o);
       if (jobTitle) person.jobTitle = jobTitle;
       if (settings.person.email) person.email = settings.person.email;
+      if (settings.person.phone) person.phone = settings.person.phone;
+      if (settings.person.whatsapp) person.whatsapp = settings.person.whatsapp;
       if (photo) person.photo = photo;
       site.person = person;
     }

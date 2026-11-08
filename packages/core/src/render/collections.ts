@@ -408,11 +408,10 @@ export function queryCollection<C extends CollectionName>(
     const byId = new Map(items.map((i) => [i.id, i]));
     list = query.ids.map((id) => byId.get(id)).filter((i): i is RawCollections[C] => i !== undefined);
   } else {
-    list = items.filter((i) => {
-      if (query.featured && !i.featured) return false;
-      if (query.tags?.length && !query.tags.some((t) => i.tags?.includes(t))) return false;
-      return true;
-    });
+    const byTags = items.filter((i) => !query.tags?.length || query.tags.some((t) => i.tags?.includes(t)));
+    list = query.featured ? byTags.filter((i) => i.featured) : byTags;
+    // "Só os destaques" sem nenhum destaque cadastrado: cai para a lista toda (ordem e limite do bloco).
+    if (query.featured && !list.length) list = byTags;
     const recent = (i: RawCollections[C]): number => {
       const r = i as { publishedAt?: number; updatedAt?: number };
       return r.publishedAt ?? r.updatedAt ?? 0;

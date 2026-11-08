@@ -106,7 +106,7 @@ export const listaItens = defineBlock({
 export const cases = defineBlock({
   type: "cases",
   label: "Cases",
-  description: "Projetos ou cases da coleção, com link para a página de cada um.",
+  description: "Projetos ou cases da coleção, com link para a página de cada um. Mostra os destaques; sem nenhum, os primeiros da lista. Sem projetos, o bloco some.",
   category: "comum",
   plugin: "portfolio",
   source: { collections: ["projects"], default: { collection: "projects", featured: true, limit: 3, sort: "order" } },
@@ -135,7 +135,7 @@ export const servicos = defineBlock({
 export const depoimentos = defineBlock({
   type: "depoimentos",
   label: "Depoimentos",
-  description: "Depoimentos aprovados da coleção, com convite opcional para enviar um novo.",
+  description: "Depoimentos aprovados da coleção, com convite opcional para enviar um novo. Mostra os destaques; sem nenhum, os primeiros da lista. Sem depoimentos, o bloco some.",
   category: "comum",
   plugin: "testimonials",
   interactive: true,

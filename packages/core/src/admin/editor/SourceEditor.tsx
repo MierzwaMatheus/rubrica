@@ -141,9 +141,14 @@ export function SourceEditor({ def, value, onChange, locale }: { def: BlockDefin
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="flex items-center justify-between gap-3 sm:col-span-2">
-            <Label htmlFor={`${id}-f`}>Só os destaques</Label>
+            <Label htmlFor={`${id}-f`}>Mostrar os destaques</Label>
             <Switch id={`${id}-f`} checked={!!query.featured} onCheckedChange={(on) => patch({ featured: on || undefined })} />
           </div>
+          {query.featured && (
+            <p className="-mt-2 text-xs text-muted-foreground sm:col-span-2">
+              Mostra só os itens marcados como destaque. Se nenhum estiver marcado, mostra os primeiros da lista, na ordem escolhida abaixo.
+            </p>
+          )}
           <div className="space-y-1">
             <Label htmlFor={`${id}-l`}>Quantidade</Label>
             <Input

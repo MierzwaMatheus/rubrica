@@ -11,7 +11,7 @@
  *   de um balão.
  */
 import type { BlockProps, CollectionItems, ResolvedLink } from "@rubrica/core";
-import { Heading, Html, Img } from "@rubrica/core/components";
+import { Heading, Html, Img, digits, formatDays, safeId } from "@rubrica/core/components";
 import { Ask, askFor, Avatar, Bubble, BubbleLink, ChatSection, FileDown, kindText, LinkCard, MapPin, Pill, splitBlocks } from "./chat";
 
 type Project = CollectionItems["projects"];
@@ -317,7 +317,6 @@ export function FaqBlock({ id, variant, fields, items, headingLevel }: BlockProp
 
 // ---- posts --------------------------------------------------------------------------------
 
-const safeId = (v: string) => v.replace(/[^a-zA-Z0-9_-]/g, "_");
 
 /**
  * Filtro por etiqueta sem JavaScript: botões de opção antes da conversa e uma folha de
@@ -427,7 +426,6 @@ export function CtaBlock({ id, variant, fields, headingLevel }: BlockProps<any>)
 
 // ---- contato ------------------------------------------------------------------------------
 
-const digits = (v: string) => v.replace(/\D+/g, "");
 
 /** Contato: o assistente (ilha) dentro do balão e os canais numa lista de "rótulo → link". */
 export function ContatoBlock({ id, variant, fields, headingLevel, ctx, island }: BlockProps<any>) {
@@ -711,25 +709,6 @@ export function EquipeBlock({ id, variant, fields, items, headingLevel, ctx }: B
 }
 
 // ---- localização --------------------------------------------------------------------------
-
-const WEEKDAYS: Record<string, number> = { Mo: 1, Tu: 2, We: 3, Th: 4, Fr: 5, Sa: 6, Su: 0 };
-
-/** "Mo-Fr" (schema.org) → "seg. – sex." no idioma. Formatos desconhecidos voltam como vieram. */
-function formatDays(days: string, locale: string): string {
-  const name = (code: string) => {
-    const n = WEEKDAYS[code];
-    return n === undefined ? undefined : new Intl.DateTimeFormat(locale, { weekday: "short", timeZone: "UTC" }).format(new Date(Date.UTC(2024, 0, 7 + n)));
-  };
-  const parts = days.split(",").map((part) => {
-    const [a, b] = part.trim().split("-");
-    const first = a && name(a);
-    if (!first) return undefined;
-    if (!b) return first;
-    const last = name(b);
-    return last ? `${first} – ${last}` : undefined;
-  });
-  return parts.every(Boolean) ? parts.join(", ") : days;
-}
 
 /** Localização: o endereço como uma "localização enviada" e o horário numa lista. */
 export function LocalizacaoBlock({ id, variant, fields, headingLevel, ctx }: BlockProps<any>) {

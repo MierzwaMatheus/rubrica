@@ -8,3 +8,7 @@ export * from "./theme/contract";
 export { CORE_RECIPES, recipeFor } from "./theme/recipes";
 export * from "./plugins/contract";
 export type { DataSource, SiteSnapshot } from "./data/source";
+export { SCHEMES, SCHEME_TOKENS, DEFAULT_SCHEME_ID, getScheme, schemeCss, contrastRatio } from "./theme/schemes";
+export type { ColorScheme, SchemeMode, SchemeRole } from "./theme/schemes";
+export { planFonts, fontWeights, KNOWN_FONTS } from "./theme/fonts";
+export type { FontPlan, PlannedFont } from "./theme/fonts";

@@ -3,7 +3,7 @@
  * (page.astro, 404, sitemap, robots) importam daqui.
  */
 // @ts-expect-error módulo virtual da integração
-import { theme, source, projectBlocks, projectComponents } from "virtual:rubrica/config";
+import { theme, source, projectBlocks, projectComponents, fontPlan } from "virtual:rubrica/config";
 // @ts-expect-error módulo virtual da integração
 import { islands } from "virtual:rubrica/islands";
 import { CORE_BLOCKS } from "../blocks/catalog";
@@ -20,6 +20,7 @@ import type { RenderContext } from "../theme/contract";
 let built: Promise<BuiltSite> | undefined;
 
 export const activeTheme = theme as ThemeDefinition;
+export const activeFontPlan = fontPlan as import("../theme/fonts").FontPlan;
 
 export function loadSite(): Promise<BuiltSite> {
   built ??= (source as DataSource).load().then((snapshot) =>

@@ -63,12 +63,31 @@ async function axeViolations(page: Page): Promise<AxeViolation[]> {
   }, AXE_TAGS)) as AxeViolation[];
 }
 
+/** Folha que desliga transições e animações durante a medição do axe. */
+export const NO_MOTION_CSS = "*,*::before,*::after{transition:none!important;animation:none!important}";
+
 /**
  * axe no modo de cor atual e, se a página tem o botão de alternar, também no outro
- * (contraste do claro e do escuro são tokens diferentes).
+ * (contraste do claro e do escuro são tokens diferentes). Transições e animações ficam
+ * desligadas durante a medição: com `transition: color`, o axe mediria a cor do meio do
+ * caminho logo depois da troca de modo.
  */
 async function runAxe(page: Page, source: string): Promise<CheckResult> {
   await page.addScriptTag({ content: source });
+  await page.evaluate((css) => {
+    const style = document.createElement("style");
+    style.id = "rb-tester-no-motion";
+    style.textContent = css;
+    document.head.appendChild(style);
+  }, NO_MOTION_CSS);
+  try {
+    return await measureAxe(page);
+  } finally {
+    await page.evaluate(() => document.getElementById("rb-tester-no-motion")?.remove());
+  }
+}
+
+async function measureAxe(page: Page): Promise<CheckResult> {
   const hasToggle = (await page.locator("[data-rb-color-toggle]").count()) > 0;
   const original = await page.evaluate(() => document.documentElement.dataset.colorMode ?? "");
   const modes = hasToggle ? ["dark", "light"] : [original || "padrão"];

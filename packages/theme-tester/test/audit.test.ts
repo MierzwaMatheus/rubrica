@@ -47,6 +47,22 @@ describe("auditSite", () => {
     expect(axe?.details?.join("\n")).toMatch(/\(claro\).*color-contrast/);
   });
 
+  it("mede o contraste depois da troca de modo sem pegar a cor no meio de uma transição", async () => {
+    // Escuro: texto claro no fundo escuro. Claro: texto escuro no fundo branco. Os dois
+    // passam; com a transição de 5 s na cor, logo depois da troca o texto ainda estaria
+    // claro sobre o fundo já branco.
+    const style = `<style>
+      body{background:#111;color:#eee} p{color:#eee;transition:color 5s linear,background-color 5s linear}
+      [data-color-mode="light"] body{background:#fff;color:#222} [data-color-mode="light"] p{color:#222}
+    </style>`;
+    const body = `<main><h1>Transição</h1><button data-rb-color-toggle>Tema</button><p>Texto com transição de cor.</p></main>`;
+    const dir = await makeSite([{ path: "/", body, head: style }]);
+    dirs.push(dir);
+    const axe = find(await auditSite({ dist: dir }), "/")?.checks.find((c) => c.id === "axe");
+    expect(axe?.details ?? []).toEqual([]);
+    expect(axe?.ok).toBe(true);
+  });
+
   it("reprova <head> incompleto, lang errado e hreflang sem volta", async () => {
     const alt: [string, string][] = [["pt-BR", "/"], ["en", "/en"]];
     const dir = await makeSite([

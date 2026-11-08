@@ -59,6 +59,15 @@ describe("montagem do site", () => {
     expect(enTags.filter((t) => t.attrs?.hreflang).map((t) => t.attrs!.hreflang)).toEqual(["pt-BR", "en", "x-default"]);
   });
 
+  it("<head> das páginas do app (proposta, checkout): título, noindex e sem canonical nem hreflang", async () => {
+    const s = await site();
+    const tags = buildHead({ type: "app", url: "/_rubrica/app/en/proposta", locale: "en", title: "Proposal" }, s.settings, s.context("en", "/en/proposta/:slug", []));
+    expect(tags.find((t) => t.tag === "title")?.content).toMatch(/^Proposal \| /);
+    expect(tags.find((t) => t.attrs?.name === "robots")?.attrs?.content).toBe("noindex, nofollow");
+    expect(tags.filter((t) => t.attrs?.rel === "canonical" || t.attrs?.hreflang)).toEqual([]);
+    expect(tags.find((t) => t.attrs?.property === "og:url")?.attrs?.content).toBe("https://demo.userubrica.dev/en");
+  });
+
   it("feed RSS e disponibilidade chegam ao contexto", async () => {
     const s = await site();
     expect(s.context("pt-BR", "/").feeds).toEqual({ rss: "/rss.xml" });

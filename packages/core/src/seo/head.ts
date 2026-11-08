@@ -9,6 +9,7 @@ import type { FaqItem } from "../render/collections";
 import { stripHtml, truncate } from "../render/text";
 import type { SiteSettings } from "../content/types";
 import { resolveImage } from "../render/resolve";
+import { siteHeadTags, type SiteHeadOptions } from "./site-head";
 
 export interface HeadTag {
   tag: "title" | "meta" | "link" | "script";
@@ -70,7 +71,12 @@ function identityJsonLd(settings: SiteSettings, ctx: RenderContext): Record<stri
   };
 }
 
-export function buildHead(route: SiteRoute | { type: "notFound"; url: string; locale: string }, settings: SiteSettings, ctx: RenderContext): HeadTag[] {
+export function buildHead(
+  route: SiteRoute | { type: "notFound"; url: string; locale: string },
+  settings: SiteSettings,
+  ctx: RenderContext,
+  options: SiteHeadOptions = {},
+): HeadTag[] {
   const site = ctx.site;
   const tags: HeadTag[] = [];
   const meta = (attrs: Record<string, string>) => tags.push({ tag: "meta", attrs });
@@ -168,6 +174,8 @@ export function buildHead(route: SiteRoute | { type: "notFound"; url: string; lo
   }
   meta({ name: "twitter:card", content: image ? "summary_large_image" : "summary" });
   if (settings.twitterHandle) meta({ name: "twitter:site", content: `@${settings.twitterHandle.replace(/^@/, "")}` });
+
+  tags.push(...siteHeadTags(settings, ctx, options));
 
   if (jsonLd.length) {
     tags.push({

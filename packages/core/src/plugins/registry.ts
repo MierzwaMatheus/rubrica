@@ -26,8 +26,8 @@ export const CORE_PLUGINS: PluginDefinition[] = [
     kinds: [...both],
     defaultEnabled: { pessoal: true, empresa: true },
     routes: [
-      { path: "/proposta/:id", kind: "app" },
-      { path: "/proposta/:slug/aceitar", kind: "app" },
+      { path: "/proposta/:slug", kind: "app", island: "proposta" },
+      { path: "/proposta/:slug/aceitar", kind: "app", island: "proposta-aceite" },
     ],
     admin: [{ path: "/admin/propostas", label: "Propostas", icon: "file-signature", roles: [...SALES, "proposal-editor"] }],
     mcpTools: ["proposals_list", "proposals_get", "proposals_create", "proposals_update"],
@@ -48,8 +48,8 @@ export const CORE_PLUGINS: PluginDefinition[] = [
     kinds: [...both],
     defaultEnabled: { pessoal: true, empresa: true },
     routes: [
-      { path: "/checkout/:uniqueLink", kind: "app" },
-      { path: "/payment-success/:uniqueLink", kind: "app" },
+      { path: "/checkout/:uniqueLink", kind: "app", island: "checkout" },
+      { path: "/payment-success/:uniqueLink", kind: "app", island: "pagamento-concluido" },
     ],
     admin: [{ path: "/admin/pagamentos", label: "Pagamentos", icon: "credit-card", roles: [...SALES] }],
   }),

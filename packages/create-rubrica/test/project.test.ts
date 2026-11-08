@@ -99,6 +99,8 @@ describe("projectFiles", () => {
     expect(pkg.dependencies["@rubrica/theme-padrao"]).toMatch(/^\^2\./);
     expect(pkg.dependencies.astro).toBeDefined();
     expect(pkg.devDependencies["create-rubrica"]).toBeDefined();
+    // O .mcp.json roda npx rubrica mcp, que delega ao @rubrica/mcp.
+    expect(pkg.devDependencies["@rubrica/mcp"]).toMatch(/^\^2\./);
     expect(Object.keys(files).some((f) => f.startsWith("src/components") || f.startsWith("src/pages"))).toBe(false);
   });
 
@@ -108,5 +110,18 @@ describe("projectFiles", () => {
     expect(JSON.parse(files[".mcp.json"]!).mcpServers.rubrica).toEqual({ command: "npx", args: ["rubrica", "mcp"] });
     expect(JSON.parse(files["rubrica.json"]!).rubrica).toBe(2);
     expect(files[".gitignore"]).toContain(".env*");
+  });
+});
+
+describe("create --local", () => {
+  it("aponta para os pacotes reais do monorepo (tema escolhido e MCP)", async () => {
+    const { localDependencySpecs } = await import("../src/commands/create");
+    expect(localDependencySpecs(repo(), "cyberpunk")).toEqual({
+      core: `link:${repo("packages/core")}`,
+      theme: `link:${repo("packages/themes/cyberpunk")}`,
+      cli: `link:${repo("packages/create-rubrica")}`,
+      mcp: `link:${repo("packages/mcp")}`,
+    });
+    expect(() => localDependencySpecs(repo(), "zine")).toThrow(/não existe/);
   });
 });

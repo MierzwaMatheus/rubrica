@@ -164,13 +164,15 @@ export async function resolveCreateOptions(argv: string[], cwd: string, env: Rec
   };
 }
 
-/** Pacotes de um clone do monorepo (`link:`), para testar uma versão antes de publicar. */
+/** Pacotes de um clone do monorepo (`link:`): núcleo, tema, CLI e MCP de verdade, para testar uma versão antes de publicar. */
 export function localDependencySpecs(monorepo: string, theme: string): DependencySpecs {
   const pkg = (p: string) => join(monorepo, p);
   const themeDir = pkg(`packages/themes/${theme}`);
   if (!existsSync(pkg("packages/core/package.json"))) throw new Error(`Não achei packages/core em ${monorepo} (--local precisa apontar para o monorepo do Rubrica).`);
   if (!existsSync(join(themeDir, "package.json"))) throw new Error(`O tema ${theme} não existe em ${monorepo}/packages/themes.`);
-  return { core: `link:${pkg("packages/core")}`, theme: `link:${themeDir}`, cli: `link:${pkg("packages/create-rubrica")}` };
+  if (!existsSync(pkg("packages/mcp/package.json"))) throw new Error(`Não achei packages/mcp em ${monorepo} (o .mcp.json do projeto usa o @rubrica/mcp).`);
+  if (!existsSync(pkg("packages/mcp/dist"))) log.warn(`O @rubrica/mcp do monorepo ainda não foi buildado: rode pnpm --filter @rubrica/mcp build em ${monorepo} antes de usar o MCP.`);
+  return { core: `link:${pkg("packages/core")}`, theme: `link:${themeDir}`, cli: `link:${pkg("packages/create-rubrica")}`, mcp: `link:${pkg("packages/mcp")}` };
 }
 
 /** Grava o projeto, instala e gera o convex/ com as funções do núcleo instalado. */

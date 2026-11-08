@@ -6,6 +6,7 @@
  * Funções puras: devolvem `caminho → conteúdo`. Quem grava é o comando.
  */
 import corePkg from "@rubrica/core/package.json";
+import mcpPkg from "../../../mcp/package.json";
 import agentsMd from "../../../../AGENTS.md";
 import type { RubricaState } from "../state.js";
 import { themePackage } from "../themes.js";
@@ -25,9 +26,14 @@ export interface DependencySpecs {
   theme: string;
   /** Especificador do próprio CLI (fica nas devDependencies, para `npx rubrica`). */
   cli?: string;
+  /** Especificador do `@rubrica/mcp` (devDependencies): o `.mcp.json` roda `npx rubrica mcp`, que usa ele. */
+  mcp?: string;
 }
 
-export const defaultDependencySpecs = (): DependencySpecs => ({ core: `^${CORE_VERSION}`, theme: `^${CORE_VERSION}`, cli: `^${CLI_PACKAGE_VERSION}` });
+/** Versão do servidor MCP com que este CLI foi feito. */
+export const MCP_VERSION: string = mcpPkg.version;
+
+export const defaultDependencySpecs = (): DependencySpecs => ({ core: `^${CORE_VERSION}`, theme: `^${CORE_VERSION}`, cli: `^${CLI_PACKAGE_VERSION}`, mcp: `^${MCP_VERSION}` });
 
 declare const __CLI_VERSION__: string | undefined;
 const CLI_PACKAGE_VERSION = typeof __CLI_VERSION__ === "string" ? __CLI_VERSION__ : CORE_VERSION;
@@ -52,6 +58,7 @@ export function packageJson(name: string, state: RubricaState, deps: DependencyS
     "@types/react": "^19.2.0",
     typescript: "^5.9.0",
     ...(deps.cli && { "create-rubrica": deps.cli }),
+    ...(deps.mcp && { "@rubrica/mcp": deps.mcp }),
   };
   const pkg = {
     name,

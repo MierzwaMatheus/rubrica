@@ -1,0 +1,2 @@
+/* Tema padrão: por enquanto só os tokens base do núcleo. */
+.rb-hero__title { font-family: var(--rb-font-display); font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1.1; margin: 0 0 1rem; }

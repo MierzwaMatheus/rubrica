@@ -1,0 +1,58 @@
+---
+/**
+ * Toda página pública: páginas com blocos, posts e cases, em cada idioma em que
+ * existem. Componentes React do tema renderizados em HTML estático; só as ilhas
+ * levam JavaScript.
+ */
+import type { GetStaticPaths } from "astro";
+import Document from "./Document.astro";
+import Island from "../../islands/Island";
+import { loadSite, activeTheme, componentFor, hasIsland } from "../runtime";
+import { templates, LocaleLinks, ColorToggleButton } from "../../components";
+import type { SiteRoute } from "../../render/site";
+
+export const getStaticPaths = (async () => {
+  const site = await loadSite();
+  return site.routes.map((route) => ({
+    params: { path: route.url === "/" ? undefined : route.url.slice(1) },
+    props: { route },
+  }));
+}) satisfies GetStaticPaths;
+
+const { route } = Astro.props as { route: SiteRoute };
+const site = await loadSite();
+const ctx = site.context(route.locale, route.url, route.alternates);
+const { Shell, Post, Case } = templates(activeTheme);
+const pageType = route.type;
+---
+
+<Document route={route} ctx={ctx} settings={site.settings}>
+  <Shell ctx={ctx} pageType={pageType}>
+    <LocaleLinks slot="localeSwitcher" ctx={ctx} />
+    {ctx.site.colorToggle && <ColorToggleButton slot="colorToggle" label={ctx.t("theme.toggle")} />}
+    {
+      route.type === "page" && (
+        <>
+          {route.page.needsHiddenH1 && <h1 class="rb-sr-only">{route.page.title}</h1>}
+          {route.page.blocks.map((b) => {
+            const Block = componentFor(b.type);
+            return b.interactive && hasIsland(b.type) ? (
+              <Block id={b.id} variant={b.variant} fields={b.fields} items={b.items} headingLevel={b.headingLevel} index={b.index} ctx={ctx}>
+                <Island
+                  slot="island"
+                  client:visible
+                  name={b.type}
+                  props={{ blockId: b.id, fields: b.fields, locale: ctx.locale, site: { name: ctx.site.name, organization: ctx.site.organization ?? null, social: ctx.site.social } }}
+                />
+              </Block>
+            ) : (
+              <Block id={b.id} variant={b.variant} fields={b.fields} items={b.items} headingLevel={b.headingLevel} index={b.index} ctx={ctx} />
+            );
+          })}
+        </>
+      )
+    }
+    {route.type === "post" && <Post post={route.post} html={route.post.content} related={route.related} ctx={ctx} />}
+    {route.type === "case" && <Case project={route.project} related={route.related} ctx={ctx} />}
+  </Shell>
+</Document>

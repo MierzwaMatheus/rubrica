@@ -184,6 +184,12 @@ export interface ThemeDefinition {
    */
   scheme?: string;
   /**
+   * Modo de cor recomendado (o que o layout foi desenhado para mostrar primeiro). O CLI
+   * usa como padrão ao criar o site e ao trocar de tema; quem decide no site continua
+   * sendo `appearance.colorMode`. Sem ele, o recomendado é o escuro.
+   */
+  colorMode?: "dark" | "light" | "system";
+  /**
    * Fontes que o tema usa por padrão (Google Fonts), baixadas no build. O build lê as
    * mesmas famílias do `fonts.json` que o pacote do tema exporta em "./fonts.json" (o
    * `index` do tema importa esse arquivo, então há uma fonte só).

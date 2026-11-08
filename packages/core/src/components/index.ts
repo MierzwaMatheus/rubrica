@@ -1,16 +1,38 @@
 import type { BlockComponent, ThemeDefinition } from "../theme/contract";
 import { CtaBlock, GenericBlock, HeroBlock, TextoBlock } from "./blocks/basic";
+import { CasesBlock, DepoimentosBlock, FaqBlock, PostsRecentesBlock, PrecosBlock } from "./blocks/collections";
+import { ContatoBlock, LocalizacaoBlock } from "./blocks/contact";
+import { EquipeBlock, GaleriaBlock, ListaItensBlock, LogosClientesBlock, NumerosBlock, ServicosBlock } from "./blocks/lists";
+import { CurriculoBlock } from "./blocks/resume";
 import { DefaultCase, DefaultNotFound, DefaultPost, DefaultShell } from "./shell";
 
 export * from "./primitives";
 export { DefaultShell, DefaultPost, DefaultCase, DefaultNotFound, LocaleLinks } from "./shell";
 export { HeroBlock, TextoBlock, CtaBlock, GenericBlock } from "./blocks/basic";
+export { CasesBlock, DepoimentosBlock, FaqBlock, PostsRecentesBlock, PrecosBlock } from "./blocks/collections";
+export { ContatoBlock, LocalizacaoBlock } from "./blocks/contact";
+export { EquipeBlock, GaleriaBlock, ListaItensBlock, LogosClientesBlock, NumerosBlock, ServicosBlock } from "./blocks/lists";
+export { CurriculoBlock } from "./blocks/resume";
 
 /** Componentes padrão por tipo de bloco. Tipo sem entrada usa `GenericBlock`. */
 export const DEFAULT_BLOCKS: Partial<Record<string, BlockComponent>> = {
   hero: HeroBlock,
   texto: TextoBlock,
   cta: CtaBlock,
+  numeros: NumerosBlock,
+  "lista-itens": ListaItensBlock,
+  cases: CasesBlock,
+  servicos: ServicosBlock,
+  depoimentos: DepoimentosBlock,
+  faq: FaqBlock,
+  "posts-recentes": PostsRecentesBlock,
+  contato: ContatoBlock,
+  galeria: GaleriaBlock,
+  curriculo: CurriculoBlock,
+  precos: PrecosBlock,
+  equipe: EquipeBlock,
+  localizacao: LocalizacaoBlock,
+  "logos-clientes": LogosClientesBlock,
 };
 
 /** Componente do bloco no tema, senão o padrão do núcleo, senão o genérico. */

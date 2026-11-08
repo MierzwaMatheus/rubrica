@@ -1,0 +1,67 @@
+[
+  {
+    "id": "m1",
+    "order": 1,
+    "name": "Paula Mendes",
+    "role": {
+      "pt-BR": "Diretora de design",
+      "en": "Design director",
+      "es": "Directora de diseño"
+    },
+    "bio": {
+      "pt-BR": "Lidera o design desde 2013.",
+      "en": "Has led design since 2013.",
+      "es": "Lidera el diseño desde 2013."
+    },
+    "photo": {
+      "url": "/img/team-1.svg",
+      "width": 400,
+      "height": 400,
+      "alt": "Paula Mendes"
+    },
+    "links": [
+      {
+        "label": {
+          "pt-BR": "LinkedIn"
+        },
+        "href": "https://www.linkedin.com/in/exemplo-paula"
+      }
+    ]
+  },
+  {
+    "id": "m2",
+    "order": 2,
+    "name": "Rafael Costa",
+    "role": {
+      "pt-BR": "Diretor de tecnologia",
+      "en": "Technology director",
+      "es": "Director de tecnología"
+    },
+    "bio": {
+      "pt-BR": "Cuida da plataforma e da segurança.",
+      "en": "Looks after the platform and security."
+    },
+    "photo": {
+      "url": "/img/team-2.svg",
+      "width": 400,
+      "height": 400,
+      "alt": "Rafael Costa"
+    }
+  },
+  {
+    "id": "m3",
+    "order": 3,
+    "name": "Bia Nunes",
+    "role": {
+      "pt-BR": "Atendimento",
+      "en": "Customer success",
+      "es": "Atención al cliente"
+    },
+    "photo": {
+      "url": "/img/team-3.svg",
+      "width": 400,
+      "height": 400,
+      "alt": ""
+    }
+  }
+]

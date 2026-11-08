@@ -1,0 +1,44 @@
+[
+  {
+    "id": "sv1",
+    "order": 1,
+    "icon": "search",
+    "title": {
+      "pt-BR": "Pesquisa com usuários",
+      "en": "User research"
+    },
+    "description": {
+      "pt-BR": "Entrevistas e testes para decidir com evidência.",
+      "en": "Interviews and tests to decide with evidence."
+    },
+    "priceLabel": {
+      "pt-BR": "A partir de R$ 3.000",
+      "en": "From R$ 3,000"
+    }
+  },
+  {
+    "id": "sv2",
+    "order": 2,
+    "icon": "layout",
+    "title": {
+      "pt-BR": "Design de interface",
+      "en": "Interface design"
+    },
+    "description": {
+      "pt-BR": "Do fluxo ao protótipo navegável.",
+      "en": "From flow to clickable prototype."
+    }
+  },
+  {
+    "id": "sv3",
+    "order": 3,
+    "icon": "layers",
+    "title": {
+      "pt-BR": "Sistemas de design",
+      "en": "Design systems"
+    },
+    "description": {
+      "pt-BR": "Componentes, tokens e documentação."
+    }
+  }
+]

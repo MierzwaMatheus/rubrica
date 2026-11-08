@@ -1,6 +1,122 @@
 [
-  { "id": "proj1", "slug": "app-banco", "order": 1, "featured": true, "year": 2024, "client": "Banco Exemplo",
-    "title": { "pt-BR": "App de banco digital", "en": "Digital banking app" },
-    "summary": { "pt-BR": "Redesenho do onboarding.", "en": "Onboarding redesign." },
-    "sections": [{ "title": { "pt-BR": "Contexto", "en": "Context" }, "body": { "pt-BR": "<p>O onboarding perdia 60% das pessoas.</p>", "en": "<p>Onboarding lost 60% of people.</p>" } }] }
+  {
+    "id": "proj1",
+    "slug": "app-banco",
+    "order": 1,
+    "featured": true,
+    "year": 2024,
+    "client": "Banco Exemplo",
+    "tags": [
+      "mobile",
+      "pesquisa"
+    ],
+    "cover": {
+      "url": "/img/cover-1.svg",
+      "width": 800,
+      "height": 500,
+      "alt": "Telas do app de banco"
+    },
+    "title": {
+      "pt-BR": "App de banco digital",
+      "en": "Digital banking app"
+    },
+    "summary": {
+      "pt-BR": "Redesenho do onboarding.",
+      "en": "Onboarding redesign."
+    },
+    "role": {
+      "pt-BR": "Designer líder",
+      "en": "Lead designer"
+    },
+    "links": [
+      {
+        "label": {
+          "pt-BR": "Ver no ar",
+          "en": "See it live"
+        },
+        "href": "https://exemplo.dev/banco"
+      }
+    ],
+    "sections": [
+      {
+        "title": {
+          "pt-BR": "Contexto",
+          "en": "Context"
+        },
+        "body": {
+          "pt-BR": "<p>O onboarding perdia 60% das pessoas.</p>",
+          "en": "<p>Onboarding lost 60% of people.</p>"
+        }
+      },
+      {
+        "title": {
+          "pt-BR": "Resultado",
+          "en": "Result"
+        },
+        "body": {
+          "pt-BR": "<p>A conclusão subiu de 40% para 78%.</p>",
+          "en": "<p>Completion rose from 40% to 78%.</p>"
+        },
+        "image": {
+          "url": "/img/cover-2.svg",
+          "width": 800,
+          "height": 500,
+          "alt": "Gráfico de conclusão"
+        }
+      }
+    ]
+  },
+  {
+    "id": "proj2",
+    "slug": "painel-saude",
+    "order": 2,
+    "featured": true,
+    "year": 2023,
+    "client": "Clínica Exemplo",
+    "tags": [
+      "web",
+      "dados"
+    ],
+    "cover": {
+      "url": "/img/cover-2.svg",
+      "width": 800,
+      "height": 500,
+      "alt": "Painel de saúde"
+    },
+    "title": {
+      "pt-BR": "Painel de saúde",
+      "en": "Health dashboard"
+    },
+    "summary": {
+      "pt-BR": "Um painel que a equipe clínica realmente usa.",
+      "en": "A dashboard the clinical team actually uses."
+    },
+    "content": {
+      "pt-BR": "<p>Do levantamento ao protótipo de alta fidelidade.</p>",
+      "en": "<p>From discovery to high-fidelity prototype.</p>"
+    }
+  },
+  {
+    "id": "proj3",
+    "slug": "design-system",
+    "order": 3,
+    "featured": false,
+    "year": 2022,
+    "tags": [
+      "sistema"
+    ],
+    "cover": {
+      "url": "/img/cover-3.svg",
+      "width": 800,
+      "height": 500,
+      "alt": "Biblioteca de componentes"
+    },
+    "title": {
+      "pt-BR": "Sistema de design",
+      "en": "Design system"
+    },
+    "summary": {
+      "pt-BR": "Componentes e princípios para quatro times."
+    }
+  }
 ]

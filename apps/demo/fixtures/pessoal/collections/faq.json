@@ -1,0 +1,37 @@
+[
+  {
+    "id": "f1",
+    "order": 1,
+    "question": {
+      "pt-BR": "Você atende projetos pequenos?",
+      "en": "Do you take on small projects?"
+    },
+    "answer": {
+      "pt-BR": "<p>Sim, a partir de duas semanas de trabalho.</p>",
+      "en": "<p>Yes, from two weeks of work.</p>"
+    }
+  },
+  {
+    "id": "f2",
+    "order": 2,
+    "question": {
+      "pt-BR": "Trabalha remoto?",
+      "en": "Do you work remotely?"
+    },
+    "answer": {
+      "pt-BR": "<p>Sim, com encontros ao vivo quando fizer sentido.</p>",
+      "en": "<p>Yes, with live sessions when it makes sense.</p>"
+    }
+  },
+  {
+    "id": "f3",
+    "order": 3,
+    "question": {
+      "pt-BR": "Qual o prazo médio?",
+      "en": "Typical timeline?"
+    },
+    "answer": {
+      "pt-BR": "<p>De 4 a 12 semanas.</p>"
+    }
+  }
+]

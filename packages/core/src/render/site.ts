@@ -109,15 +109,16 @@ export function buildSite(input: BuildInput): BuiltSite {
       const def = blockDefs.get(b.type)!;
       const query = b.source ?? def.source?.default;
       const items = query && collectionOn(query.collection) ? queryCollection(query, snapshot.collections[query.collection] as never[], o, paths) : [];
+      const fields = resolveFields(def.fields, b.fields, o);
       return {
         id: b.id,
         type: b.type,
         variant: resolveVariant(theme, b.type, b.variant),
-        fields: resolveFields(def.fields, b.fields, o),
+        fields,
         items,
         headingLevel: index === 0 && firstIsHero ? 1 : 2,
         index,
-        interactive: !!def.interactive,
+        interactive: !!def.interactive && (def.islandWhen?.(fields, plugins) ?? true),
       };
     });
     return { id: page.id, path: page.path, title, seo: resolveSeo(page.seo, o), blocks, needsHiddenH1: !firstIsHero };

@@ -1,0 +1,65 @@
+[
+  {
+    "id": "sv1",
+    "order": 1,
+    "icon": "layout",
+    "title": {
+      "pt-BR": "Sites institucionais",
+      "en": "Company websites",
+      "es": "Sitios institucionales"
+    },
+    "description": {
+      "pt-BR": "Rápidos, acessíveis e fáceis de editar.",
+      "en": "Fast, accessible and easy to edit.",
+      "es": "Rápidos, accesibles y fáciles de editar."
+    }
+  },
+  {
+    "id": "sv2",
+    "order": 2,
+    "icon": "shopping-cart",
+    "title": {
+      "pt-BR": "Lojas virtuais",
+      "en": "Online stores",
+      "es": "Tiendas en línea"
+    },
+    "description": {
+      "pt-BR": "Do catálogo ao pagamento.",
+      "en": "From catalog to checkout.",
+      "es": "Del catálogo al pago."
+    }
+  },
+  {
+    "id": "sv3",
+    "order": 3,
+    "icon": "bar-chart",
+    "title": {
+      "pt-BR": "Painéis e relatórios",
+      "en": "Dashboards and reports",
+      "es": "Paneles e informes"
+    },
+    "description": {
+      "pt-BR": "Seus dados em um só lugar.",
+      "en": "Your data in one place.",
+      "es": "Tus datos en un solo lugar."
+    },
+    "priceLabel": {
+      "pt-BR": "Sob consulta",
+      "en": "Contact us",
+      "es": "A consultar"
+    }
+  },
+  {
+    "id": "sv4",
+    "order": 4,
+    "icon": "life-buoy",
+    "title": {
+      "pt-BR": "Suporte contínuo",
+      "en": "Ongoing support"
+    },
+    "description": {
+      "pt-BR": "Atualizações e correções todo mês.",
+      "en": "Updates and fixes every month."
+    }
+  }
+]

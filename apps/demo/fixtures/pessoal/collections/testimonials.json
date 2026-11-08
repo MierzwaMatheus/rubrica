@@ -1,0 +1,47 @@
+[
+  {
+    "id": "t1",
+    "order": 1,
+    "featured": true,
+    "author": "Carlos Lima",
+    "company": "Banco Exemplo",
+    "avatar": {
+      "url": "/img/avatar-2.svg",
+      "width": 200,
+      "height": 200,
+      "alt": "Carlos"
+    },
+    "role": {
+      "pt-BR": "Gerente de produto",
+      "en": "Product manager"
+    },
+    "quote": {
+      "pt-BR": "A Ana destravou o time e entregou antes do prazo.",
+      "en": "Ana unblocked the team and delivered ahead of schedule."
+    }
+  },
+  {
+    "id": "t2",
+    "order": 2,
+    "featured": true,
+    "author": "Marina Alves",
+    "company": "Clínica Exemplo",
+    "role": {
+      "pt-BR": "Diretora clínica",
+      "en": "Clinical director"
+    },
+    "quote": {
+      "pt-BR": "Pela primeira vez, o painel é usado todos os dias.",
+      "en": "For the first time, the dashboard is used every day."
+    }
+  },
+  {
+    "id": "t3",
+    "order": 3,
+    "featured": true,
+    "author": "João Reis",
+    "quote": {
+      "pt-BR": "Excelente profissional."
+    }
+  }
+]

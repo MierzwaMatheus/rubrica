@@ -13,6 +13,9 @@ import { CORE_PLUGINS } from "../plugins/registry";
 import { buildSite, type BuiltSite } from "../render/site";
 import type { BlockComponent, ThemeDefinition } from "../theme/contract";
 import { blockComponent as themeBlockComponent } from "../components";
+import { ISLAND_META, islandNameFor } from "../islands";
+import { uiKeysWithPrefix } from "../i18n/ui-texts";
+import type { RenderContext } from "../theme/contract";
 
 let built: Promise<BuiltSite> | undefined;
 
@@ -37,5 +40,31 @@ export function componentFor(type: string): BlockComponent {
 
 /** Há componente de ilha para o bloco? Sem ele, o bloco sai estático (sem JavaScript). */
 export function hasIsland(type: string): boolean {
-  return type in (islands as Record<string, unknown>);
+  return islandNameFor(type) in (islands as Record<string, unknown>);
+}
+
+/**
+ * Props serializáveis da ilha de um bloco: o básico (bloco, campos, idioma, página, site,
+ * política de privacidade), os textos de interface que ela declara e, se pedir, os itens.
+ */
+export function islandProps(block: { id: string; type: string; fields: Record<string, unknown>; items: unknown[] }, ctx: RenderContext) {
+  const name = islandNameFor(block.type);
+  const meta = ISLAND_META[name];
+  const texts = Object.fromEntries(uiKeysWithPrefix(meta?.textPrefixes ?? []).map((k) => [k, ctx.t(k)]));
+  const { person, organization, social } = ctx.site;
+  return {
+    blockId: block.id,
+    page: ctx.path,
+    locale: ctx.locale,
+    fields: block.fields,
+    texts,
+    privacyHref: ctx.href("/privacidade"),
+    site: {
+      name: ctx.site.name,
+      person: person ?? null,
+      organization: organization ? { email: organization.email, phone: organization.phone } : null,
+      social,
+    },
+    ...(meta?.items ? { items: block.items } : {}),
+  };
 }

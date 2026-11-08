@@ -1,0 +1,123 @@
+{
+  "kind": "empresa",
+  "name": {
+    "pt-BR": "Estúdio Meridiano",
+    "en": "Meridiano Studio",
+    "es": "Estudio Meridiano"
+  },
+  "description": {
+    "pt-BR": "Estúdio de design e tecnologia para empresas que querem crescer.",
+    "en": "Design and technology studio for companies that want to grow.",
+    "es": "Estudio de diseño y tecnología para empresas que quieren crecer."
+  },
+  "url": "https://empresa.demo.userubrica.dev",
+  "locales": {
+    "locales": [
+      "pt-BR",
+      "en",
+      "es"
+    ],
+    "default": "pt-BR"
+  },
+  "theme": "padrao",
+  "appearance": {
+    "colorMode": "light",
+    "colorToggle": true
+  },
+  "navigation": [
+    {
+      "label": {
+        "pt-BR": "Início",
+        "en": "Home",
+        "es": "Inicio"
+      },
+      "href": "/"
+    },
+    {
+      "label": {
+        "pt-BR": "Quem somos",
+        "en": "About us",
+        "es": "Quiénes somos"
+      },
+      "href": "/quem-somos"
+    },
+    {
+      "label": {
+        "pt-BR": "Serviços",
+        "en": "Services",
+        "es": "Servicios"
+      },
+      "href": "/servicos"
+    },
+    {
+      "label": {
+        "pt-BR": "Preços",
+        "en": "Pricing",
+        "es": "Precios"
+      },
+      "href": "/precos"
+    },
+    {
+      "label": {
+        "pt-BR": "Cases",
+        "en": "Case studies",
+        "es": "Casos"
+      },
+      "href": "/cases"
+    },
+    {
+      "label": {
+        "pt-BR": "Blog",
+        "en": "Blog"
+      },
+      "href": "/blog"
+    },
+    {
+      "label": {
+        "pt-BR": "Contato",
+        "en": "Contact",
+        "es": "Contacto"
+      },
+      "href": "/contato"
+    }
+  ],
+  "social": [
+    {
+      "network": "LinkedIn",
+      "url": "https://www.linkedin.com/company/exemplo"
+    },
+    {
+      "network": "Instagram",
+      "url": "https://www.instagram.com/exemplo"
+    }
+  ],
+  "organization": {
+    "legalName": "Meridiano Estúdio Digital Ltda",
+    "taxId": "00.000.000/0001-00",
+    "email": "contato@meridiano.example",
+    "phone": "+55 11 4000-0000",
+    "whatsapp": "+55 11 90000-0000",
+    "address": {
+      "street": "Rua Exemplo, 123, sala 45",
+      "locality": "São Paulo",
+      "region": "SP",
+      "postalCode": "01000-000",
+      "country": "BR"
+    },
+    "openingHours": [
+      {
+        "days": "Mo-Fr",
+        "opens": "09:00",
+        "closes": "18:00"
+      },
+      {
+        "days": "Sa",
+        "opens": "09:00",
+        "closes": "13:00"
+      }
+    ],
+    "mapUrl": "https://maps.example/meridiano",
+    "schemaType": "ProfessionalService"
+  },
+  "plugins": {}
+}

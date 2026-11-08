@@ -138,6 +138,8 @@ export const depoimentos = defineBlock({
   description: "Depoimentos aprovados da coleção, com convite opcional para enviar um novo.",
   category: "comum",
   plugin: "testimonials",
+  interactive: true,
+  islandWhen: (f, plugins) => f.allowSubmission === true && plugins.has("testimonials-intake"),
   source: { collections: ["testimonials"], default: { collection: "testimonials", featured: true, limit: 6, sort: "order" } },
   fields: {
     anchor,
@@ -200,6 +202,7 @@ export const contato = defineBlock({
   description: "Formulário ou assistente de contato, com os canais (e-mail, WhatsApp, redes).",
   category: "comum",
   interactive: true,
+  islandWhen: (f, plugins) => f.mode !== "channels" && plugins.has("contact-wizard"),
   fields: {
     anchor,
     title: heading,
@@ -236,6 +239,8 @@ export const curriculo = defineBlock({
   description: "Experiência, formação e competências da coleção, com download em PDF.",
   category: "pessoal",
   plugin: "resume",
+  interactive: true,
+  islandWhen: (f) => f.showDownload !== false,
   source: { collections: ["resume"], default: { collection: "resume", sort: "order" } },
   fields: {
     anchor,

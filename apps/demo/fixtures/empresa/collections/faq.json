@@ -1,0 +1,54 @@
+[
+  {
+    "id": "f1",
+    "order": 1,
+    "question": {
+      "pt-BR": "Quanto tempo leva um site?",
+      "en": "How long does a website take?",
+      "es": "¿Cuánto tarda un sitio?"
+    },
+    "answer": {
+      "pt-BR": "<p>De 3 a 8 semanas, conforme o escopo.</p>",
+      "en": "<p>3 to 8 weeks, depending on scope.</p>",
+      "es": "<p>De 3 a 8 semanas, según el alcance.</p>"
+    }
+  },
+  {
+    "id": "f2",
+    "order": 2,
+    "question": {
+      "pt-BR": "Posso editar o conteúdo sozinho?",
+      "en": "Can I edit the content myself?",
+      "es": "¿Puedo editar el contenido yo mismo?"
+    },
+    "answer": {
+      "pt-BR": "<p>Sim, por um painel simples.</p>",
+      "en": "<p>Yes, through a simple dashboard.</p>",
+      "es": "<p>Sí, mediante un panel sencillo.</p>"
+    }
+  },
+  {
+    "id": "f3",
+    "order": 3,
+    "question": {
+      "pt-BR": "Vocês cuidam da hospedagem?",
+      "en": "Do you handle hosting?",
+      "es": "¿Se encargan del hosting?"
+    },
+    "answer": {
+      "pt-BR": "<p>Sim, em todos os planos.</p>",
+      "en": "<p>Yes, on every plan.</p>"
+    }
+  },
+  {
+    "id": "f4",
+    "order": 4,
+    "question": {
+      "pt-BR": "Como funciona o pagamento?",
+      "en": "How does payment work?"
+    },
+    "answer": {
+      "pt-BR": "<p>Mensal ou por projeto, via PIX, boleto ou cartão.</p>"
+    }
+  }
+]

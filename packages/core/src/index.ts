@@ -5,5 +5,6 @@ export * from "./blocks/fields";
 export * from "./blocks/define";
 export * from "./content/types";
 export * from "./theme/contract";
+export { CORE_RECIPES, recipeFor } from "./theme/recipes";
 export * from "./plugins/contract";
 export type { DataSource, SiteSnapshot } from "./data/source";

@@ -56,7 +56,8 @@ In Claude Code, you can type `! npx rubrica mcp login` in the prompt itself. The
 
 | Area | Examples |
 |---|---|
-| Account and environment | See the project, the database (development or production), the role, the plugins and the block catalog |
+| Account and environment | See the project, the database (development or production), the role, the plugins, the theme and the block catalog |
+| Building pages | The site's real catalog (core blocks and your own, from `src/blocks/`), with when to use each block, what it pairs with and your theme's variants; the theme's recipes (the list of blocks of each standard page, like "About us" or "Services") |
 | Site | Read and change settings (name, appearance, navigation, social links), turn plugins on and off, **publish** (triggers the build) |
 | Pages and blocks | List, create (always as draft), change title, path and SEO; add, edit fields, move, hide and remove blocks |
 | Collections | List, read, create (draft), edit, publish and remove posts, projects, services, testimonials, FAQ, résumé, team and plans |
@@ -65,7 +66,9 @@ In Claude Code, you can type `! npx rubrica mcp login` in the prompt itself. The
 | Media | List the library and upload images from a local path |
 | Contacts | See requests and change the status (with the contact plugin on) |
 
-There are also ready prompts (`montar-pagina`, `traduzir-conteudo`, `revisar-antes-de-publicar`) and read-only resources, like the writing guide and the block catalog.
+There are also ready prompts (`montar-pagina`, `traduzir-conteudo`, `revisar-antes-de-publicar`) and read-only resources, like the writing guide, the block catalog and the recipes. `montar-pagina` starts from the theme's recipe when the page is of a known type and proposes the list of blocks before writing.
+
+The MCP reads the theme installed in the project (the one in `astro.config.ts`) to know each block's variants: a variant the theme doesn't have is refused, with the list of the ones that exist.
 
 The complete reference of tools, roles and variables is in [`docs/v2/mcp.md`](https://github.com/MierzwaMatheus/rubrica/blob/main/docs/v2/mcp.md) (in Portuguese).
 

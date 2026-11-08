@@ -36,6 +36,11 @@ export const selos = defineBlock({
   type: "selos",
   label: "Selos e certificações",
   description: "Selos, prêmios e certificações, com imagem, ano e link.",
+  guidance: {
+    use: "Mostrar selos, prêmios e certificações que dão confiança, perto dos cases ou do contato.",
+    avoid: "Para logos de clientes, use logos-clientes; para um prêmio só, texto com imagem.",
+    pairsWith: ["logos-clientes", "depoimentos", "cta"],
+  },
   category: "comum",
   fields: {
     anchor: field.text({ label: "Âncora", localized: false, maxLength: 40, help: "Para links na página (#selos). Opcional." }),
@@ -128,6 +133,7 @@ Rode `pnpm dev` (e `pnpm dev:convex`, para o backend conhecer o bloco novo). No 
 | `type` | Identificador estável, em letras minúsculas, números e hífen (`selos`, `tabela-horarios`). Fica gravado em cada página que usa o bloco: trocar depois quebra essas páginas. Não pode repetir um tipo do núcleo; use um nome bem seu, porque o núcleo pode ganhar blocos novos |
 | `label` | Nome do bloco no painel |
 | `description` | Uma frase sobre para que ele serve, mostrada no painel |
+| `guidance` | Opcional. Orientação de uso, em pt-BR: `use` (quando usar), `avoid` (quando não usar, e o que usar no lugar) e `pairsWith` (tipos de bloco que combinam com ele). O MCP entrega aos agentes no catálogo (`blocks_catalog`), para eles escolherem o bloco certo ao montar uma página. Não muda o que o bloco aceita |
 | `category` | `comum` (sites pessoais e de empresa), `pessoal` ou `empresa`: o painel só oferece o bloco no tipo certo |
 | `fields` | Os campos (abaixo) |
 | `plugin` | Opcional. Id de um plugin do núcleo (`blog`, `portfolio`...): com ele desligado, o bloco some do painel e do site |
@@ -299,7 +305,7 @@ Registre o `cupom` em `blocks` e `components` do `src/blocks/index.ts`, como o `
 
 - **Painel.** No editor de páginas, com o formulário gerado dos campos (o `help` embaixo de cada um, o `itemLabel` em cada item de lista) e a prévia ao vivo no tema em uso. Só no tipo de site da `category`, e só com o `plugin` ligado.
 - **Site.** Em qualquer tema: o componente do projeto vale por cima do tema. Sem componente registrado, o núcleo usa um genérico.
-- **MCP.** O agente grava o bloco como qualquer outro, com `type` e `fields`, e o backend valida contra a sua definição. O catálogo do MCP (`blocks_catalog`) lista só os blocos do núcleo, então conte ao agente que o bloco existe e quais campos ele tem, ou peça para ele ler `src/blocks/`.
+- **MCP.** O catálogo do MCP (`blocks_catalog`) vem do backend do projeto, então o bloco aparece para o agente como os do núcleo: rótulo, descrição, a `guidance`, os campos com os limites e as variações que o tema declarar para ele. O agente grava com `type` e `fields`; o MCP confere os campos antes, e o backend valida de novo (regras em função, como um `validate`, são conferidas pelo backend já na prévia). Publique o backend (`pnpm dev:convex`) para o MCP ver o bloco novo. Num backend de versão anterior à do catálogo, o MCP mostra só os blocos do núcleo.
 
 ## Conferir
 

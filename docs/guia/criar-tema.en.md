@@ -287,13 +287,13 @@ The default components and the pieces (`Section`, `SectionHeader`, `Heading`, `I
 
 `variants` names different designs of a block (decision 23): the panel shows only those of the theme in use, and the **first is the default**. When you switch themes, a variant the new theme lacks falls back to its default. The component reads the chosen one in `variant`.
 
-The core's default components only know how to draw the variants in `CORE_VARIANTS` (today, `grade` and `lista` for `cases`). A theme that inherits a block's default component may only declare those, in any order. A new variant needs the theme's own component, like `faixa` above. The [block catalog](./blocos.md) shows the variants each theme declares.
+The core's default components only know how to draw the variants in `CORE_VARIANTS` (today, `grade` and `lista` for `cases`, `vertical` and `horizontal` for `linha-do-tempo`). A theme that inherits a block's default component may only declare those, in any order. A new variant needs the theme's own component, like `faixa` above. The [block catalog](./blocos.md) shows the variants each theme declares, and the MCP hands them to the agent (and refuses a variant the theme doesn't have).
 
 ## Recipes
 
 A **recipe** is the list of pages and blocks a new site starts with (decision 24), per site type. `setup` uses the theme's recipe when it creates the initial content, and `migrar` uses the same one to bring over a v1 site. Without a recipe, the core's applies (`CORE_RECIPES`).
 
-Each page has a `path`, a `title` (one text per language) and `blocks`, and each block has a `type` and, optionally, `variant`, `fields` (in the stored format, with one text per language) and `source`. The safest approach is to start from the core recipe and change only what the theme changes, as in the definition example. The battery's showcase (`/vitrine/receita/...`) shows the assembled recipes.
+Each page has a `path`, a `title` (one text per language) and `blocks`, and each block has a `type` and, optionally, `variant`, `fields` (in the stored format, with one text per language) and `source`. The safest approach is to start from the core recipe and change only what the theme changes, as in the definition example. The battery's showcase (`/vitrine/receita/...`) shows the assembled recipes. The MCP also hands the recipe to agents (`page_recipes`) as a starting point to build a page of the same type: keep each page's block order consistent with the theme's design.
 
 ## Templates
 

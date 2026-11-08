@@ -404,14 +404,14 @@ export default function Settings() {
         </Card>
 
         {(draft.announcement || draft.whatsapp?.floating) && (
-          <Card>
+          <Card className="min-w-0">
             <CardHeader>
               <CardTitle>Prévia</CardTitle>
               <CardDescription>A página inicial com a faixa de aviso e o botão do WhatsApp como estão acima, antes de salvar.</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="min-w-0">
               {home ? (
-                <PreviewPane className="h-[560px] overflow-hidden rounded-md border" snapshot={snapshot} page={home} locale={editorLocale.locale} locales={locales} onLocale={setLocale} settings={draft} />
+                <PreviewPane className="h-[560px] min-w-0 overflow-hidden rounded-md border" snapshot={snapshot} page={home} locale={editorLocale.locale} locales={locales} onLocale={setLocale} settings={draft} />
               ) : (
                 <p className="text-sm text-muted-foreground">Publique a página inicial para ver a prévia aqui.</p>
               )}

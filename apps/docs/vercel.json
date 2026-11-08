@@ -4,6 +4,58 @@
   "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
   "buildCommand": "pnpm build:full",
   "outputDirectory": "dist",
+  "redirects": [
+    {
+      "source": "/docs/atualizacao",
+      "destination": "/docs/guia/migrar",
+      "permanent": true
+    },
+    {
+      "source": "/docs/templates/cores",
+      "destination": "/docs/guia/temas#esquemas-de-cor",
+      "permanent": true
+    },
+    {
+      "source": "/docs/templates/criando-um-layout",
+      "destination": "/docs/guia/temas#criar-um-tema",
+      "permanent": true
+    },
+    {
+      "source": "/docs/templates/:id",
+      "destination": "/docs/guia/temas#os-14-temas",
+      "permanent": true
+    },
+    {
+      "source": "/docs/templates",
+      "destination": "/docs/guia/temas",
+      "permanent": true
+    },
+    {
+      "source": "/en/docs/atualizacao",
+      "destination": "/en/docs/guia/migrar",
+      "permanent": true
+    },
+    {
+      "source": "/en/docs/templates/cores",
+      "destination": "/en/docs/guia/temas#color-schemes",
+      "permanent": true
+    },
+    {
+      "source": "/en/docs/templates/criando-um-layout",
+      "destination": "/en/docs/guia/temas#create-a-theme",
+      "permanent": true
+    },
+    {
+      "source": "/en/docs/templates/:id",
+      "destination": "/en/docs/guia/temas#the-14-themes",
+      "permanent": true
+    },
+    {
+      "source": "/en/docs/templates",
+      "destination": "/en/docs/guia/temas",
+      "permanent": true
+    }
+  ],
   "headers": [
     {
       "source": "/previews/(.*)/_astro/(.*)",

@@ -191,7 +191,7 @@ export function CasesBlock({ id, variant, fields, items, headingLevel, ctx }: Bl
                   </a>
                 </Heading>
                 {p.summary && <p className="rb-card__text">{p.summary}</p>}
-                {(p.client || p.year) && <p className="bento-case__meta">{[p.client, p.year].filter(Boolean).join(" · ")}</p>}
+                {(p.category || p.client || p.year) && <p className="bento-case__meta">{[p.category, p.client, p.year].filter(Boolean).join(" · ")}</p>}
                 <span className="rb-card__more" aria-hidden="true">
                   {ctx.t("case.view")}
                 </span>

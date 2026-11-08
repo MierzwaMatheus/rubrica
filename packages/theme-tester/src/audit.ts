@@ -125,7 +125,17 @@ async function collectFacts(page: Page): Promise<{ head: HeadFacts; scripts: Scr
 /** Rola até cada ilha (client:visible) e espera todas perderem o atributo `ssr`. */
 async function hydrate(page: Page, islands: number): Promise<CheckResult> {
   if (islands === 0) return { id: "hydration", ok: true, message: "sem ilhas" };
-  await page.evaluate(() => document.querySelectorAll("astro-island").forEach((i) => i.scrollIntoView({ block: "center" })));
+  // <astro-island> tem display: contents (sem caixa): rola até o conteúdo dela (ou o pai),
+  // uma ilha por vez, dando tempo ao IntersectionObserver do client:visible.
+  const count = await page.locator("astro-island").count();
+  for (let i = 0; i < count; i++) {
+    await page.evaluate((index) => {
+      const island = document.querySelectorAll("astro-island")[index];
+      const target = (island?.firstElementChild ?? island?.parentElement) as HTMLElement | null | undefined;
+      target?.scrollIntoView({ block: "center" });
+    }, i);
+    await page.waitForTimeout(150);
+  }
   try {
     await page.waitForFunction(() => [...document.querySelectorAll("astro-island")].every((i) => !i.hasAttribute("ssr")), undefined, { timeout: 10_000 });
     await page.waitForLoadState("networkidle", { timeout: 5_000 }).catch(() => undefined);

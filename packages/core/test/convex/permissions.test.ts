@@ -39,6 +39,15 @@ const MATRIX: Record<string, { roles: Role[]; run: (c: Client, i: number) => Pro
   "settings.setPlugin": { roles: ["root", "admin"], run: (c) => c.mutation(api.rubrica.settings.setPlugin, { id: "translation", enabled: true }) },
   "users.list": { roles: ["root"], run: (c) => c.query(api.rubrica.users.list, {}) },
   "audit.recent": { roles: ["root"], run: (c) => c.query(api.rubrica.audit.recent, {}) },
+  "contacts.list": { roles: ["root", "admin", "comercial"], run: (c) => c.query(api.rubrica.contacts.list, {}) },
+  "contacts.setDestinations": {
+    roles: ["root", "admin"],
+    run: (c) => c.mutation(api.rubrica.contacts.setDestinations, { telegram: false, email: { enabled: false, to: [] }, webhook: { enabled: false } }),
+  },
+  "testimonialIntake.list": { roles: ["root", "admin", "content-editor"], run: (c) => c.query(api.rubrica.testimonialIntake.list, {}) },
+  "privacy.exportData": { roles: ["root", "admin"], run: (c) => c.query(api.rubrica.privacy.exportData, { email: "a@exemplo.dev" }) },
+  "privacy.policyDraft": { roles: ["root", "admin"], run: (c) => c.query(api.rubrica.privacy.policyDraft, {}) },
+  "publish.status": { roles: [...ROLES], run: (c) => c.query(api.rubrica.publish.status, {}) },
 };
 
 describe("permissões por papel", () => {

@@ -35,12 +35,15 @@ import {
   teamFunctions,
   testimonialsFunctions,
 } from "./collections";
+import { contactsFunctions } from "./contacts";
+import { addBusinessRoutes } from "./httpRoutes";
 import { mediaFunctions } from "./media";
 import { pagesFunctions } from "./pages";
 import { resolveRuntime, type RubricaConfig } from "./runtime";
 import { ref } from "./server";
 import { settingsFunctions, textsFunctions } from "./settings";
 import { siteFunctions } from "./site";
+import { testimonialIntakeFunctions } from "./testimonialIntake";
 import { usersFunctions } from "./users";
 
 export function createRubrica(config: RubricaConfig = {}) {
@@ -68,6 +71,8 @@ export function createRubrica(config: RubricaConfig = {}) {
     routine: once(() => routineFunctions(rt)),
     plans: once(() => plansFunctions(rt)),
     team: once(() => teamFunctions(rt)),
+    contacts: once(() => contactsFunctions(rt)),
+    testimonialIntake: once(() => testimonialIntakeFunctions(rt)),
   };
 
   return {
@@ -81,12 +86,14 @@ export function createRubrica(config: RubricaConfig = {}) {
     get http() {
       const http = httpRouter();
       auth().auth.addHttpRoutes(http);
+      addBusinessRoutes(http);
       return http;
     },
     /** Para `convex/crons.ts`: `export default rubrica.crons;` */
     get crons() {
       const crons = cronJobs();
       crons.daily("rubrica: limpar registros e limites vencidos", { hourUTC: 6, minuteUTC: 0 }, ref("mutation", "audit", "cleanup"), {});
+      crons.daily("rubrica: apagar contatos fora da retencao", { hourUTC: 6, minuteUTC: 10 }, ref("mutation", "contacts", "cleanup"), {});
       return crons;
     },
     get users() {
@@ -137,6 +144,12 @@ export function createRubrica(config: RubricaConfig = {}) {
     get team() {
       return modules.team();
     },
+    get contacts() {
+      return modules.contacts();
+    },
+    get testimonialIntake() {
+      return modules.testimonialIntake();
+    },
   };
 }
 
@@ -160,6 +173,8 @@ export const RUBRICA_MODULES = [
   "routine",
   "plans",
   "team",
+  "contacts",
+  "testimonialIntake",
 ] as const satisfies readonly (keyof Rubrica)[];
 
 export type { RubricaConfig } from "./runtime";

@@ -13,6 +13,7 @@
 import type * as crons from "../crons.js";
 import type * as http from "../http.js";
 import type * as rubrica_audit from "../rubrica/audit.js";
+import type * as rubrica_contacts from "../rubrica/contacts.js";
 import type * as rubrica_faq from "../rubrica/faq.js";
 import type * as rubrica_media from "../rubrica/media.js";
 import type * as rubrica_pages from "../rubrica/pages.js";
@@ -25,6 +26,7 @@ import type * as rubrica_services from "../rubrica/services.js";
 import type * as rubrica_settings from "../rubrica/settings.js";
 import type * as rubrica_site from "../rubrica/site.js";
 import type * as rubrica_team from "../rubrica/team.js";
+import type * as rubrica_testimonialIntake from "../rubrica/testimonialIntake.js";
 import type * as rubrica_testimonials from "../rubrica/testimonials.js";
 import type * as rubrica_texts from "../rubrica/texts.js";
 import type * as rubrica_users from "../rubrica/users.js";
@@ -42,6 +44,7 @@ import type * as rubrica_users from "../rubrica/users.js";
 "crons": typeof crons,
 "http": typeof http,
 "rubrica/audit": typeof rubrica_audit,
+"rubrica/contacts": typeof rubrica_contacts,
 "rubrica/faq": typeof rubrica_faq,
 "rubrica/media": typeof rubrica_media,
 "rubrica/pages": typeof rubrica_pages,
@@ -54,6 +57,7 @@ import type * as rubrica_users from "../rubrica/users.js";
 "rubrica/settings": typeof rubrica_settings,
 "rubrica/site": typeof rubrica_site,
 "rubrica/team": typeof rubrica_team,
+"rubrica/testimonialIntake": typeof rubrica_testimonialIntake,
 "rubrica/testimonials": typeof rubrica_testimonials,
 "rubrica/texts": typeof rubrica_texts,
 "rubrica/users": typeof rubrica_users,

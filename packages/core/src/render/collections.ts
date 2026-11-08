@@ -63,6 +63,8 @@ export interface ProjectItem {
   client?: string;
   year?: number;
   role?: string;
+  /** Categoria do projeto no idioma (uma só; para agrupar ou filtrar o portfólio). */
+  category?: string;
   links: ResolvedLink[];
   /** Número de destaque do case; só existe com o rótulo no idioma. */
   metric?: { value: string; label: string };
@@ -257,7 +259,9 @@ export function resolveProject(raw: RawProject, opts: ResolveOptions, paths: Col
   const content = pick(raw.content, opts.locale);
   const cover = resolveImage(raw.cover, opts);
   const role = pick(raw.role, opts.locale);
+  const category = pick(raw.category, opts.locale);
   if (summary) item.summary = summary;
+  if (category) item.category = category;
   if (content) item.content = content;
   if (cover) item.cover = cover;
   if (role) item.role = role;

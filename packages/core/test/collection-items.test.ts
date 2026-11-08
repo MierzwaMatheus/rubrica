@@ -1,0 +1,16 @@
+/** Campos dos itens de coleção que os temas recebem (contrato aditivo da v2.0). */
+import { describe, expect, it } from "vitest";
+import { resolveProject } from "../src/render/collections";
+import type { RawProject } from "../src/content/types";
+import type { ResolveOptions } from "../src/render/resolve";
+
+const opts = (locale: string): ResolveOptions => ({ locale, locales: { locales: ["pt-BR", "en"], default: "pt-BR" } });
+
+describe("itens de coleção", () => {
+  it("projeto: categoria no idioma, sem mexer nas etiquetas; sem tradução, sem categoria", () => {
+    const raw: RawProject = { id: "p", slug: "p", title: { "pt-BR": "Case", en: "Case" }, category: { "pt-BR": "Produto" }, tags: ["fintech"] };
+    expect(resolveProject(raw, opts("pt-BR"))).toMatchObject({ category: "Produto", tags: ["fintech"] });
+    expect(resolveProject(raw, opts("en"))?.category).toBeUndefined();
+    expect("category" in resolveProject({ ...raw, category: undefined }, opts("pt-BR"))!).toBe(false);
+  });
+});

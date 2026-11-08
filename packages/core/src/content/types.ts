@@ -110,6 +110,11 @@ export interface RawProject extends Base {
   client?: string;
   year?: number;
   role?: Localized<string>;
+  /**
+   * Categoria do projeto ("Produto", "Site institucional"), por idioma. Uma só por projeto:
+   * o tema pode agrupar ou filtrar o portfólio por ela. As etiquetas continuam em `tags`.
+   */
+  category?: Localized<string>;
   links?: RawLink[];
   /** Número de destaque mostrado no card do case. */
   metric?: { value: string; label: Localized<string> };

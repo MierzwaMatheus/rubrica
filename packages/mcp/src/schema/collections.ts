@@ -88,6 +88,7 @@ export const COLLECTION_SPECS: Record<CollectionName, CollectionSpec> = {
       client: "Nome do cliente.",
       year: "Ano de entrega.",
       role: "Papel da pessoa no projeto.",
+      category: "Categoria do projeto (uma só; o tema pode agrupar o portfólio por ela).",
       links: "Links externos (site, repositório).",
     },
   },

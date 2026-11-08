@@ -192,6 +192,8 @@ export const projectFields = {
   client: v.optional(v.string()),
   year: v.optional(v.number()),
   role: v.optional(vLocalized),
+  /** Categoria do projeto (uma por projeto), por idioma. */
+  category: v.optional(vLocalized),
   links: v.optional(v.array(vLink)),
   metric: v.optional(vMetric),
   seo: v.optional(vSeo),

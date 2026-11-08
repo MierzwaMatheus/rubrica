@@ -38,6 +38,15 @@ In the table, "on" and "off" say how the plugin starts in each site type. A dash
 
 Plugins that depend on an outside service (Asaas, OpenRouter, Umami) only work once the key is set up. How to do that is in [Integrations](./integracoes.md).
 
+## What disappears when a plugin is turned off
+
+- **Listing pages.** The blog page (`/blog`), the projects page (`/portfolio` on a personal site, `/cases` on a company site, or the base you set in **Settings**), the pricing page (`/precos`) and the résumé page (`/curriculo`) are not generated while the plugin that owns them is off. They also stay out of the sitemap. The RSS feed follows the blog.
+- **Menu items.** A navigation item that points to a page that no longer exists is removed from the menu, in every language.
+- **Blocks.** A block from a disabled plugin (Posts, Cases, Testimonials, Pricing, Team, Résumé) is not rendered on any page. If the page has other blocks it stays and only the block goes away. A page whose blocks all belonged to disabled plugins is not generated either. The home page is never dropped.
+- **Data stays.** The content is still in Convex: turning the plugin back on brings everything back.
+
+Collection blocks with no items (for example Testimonials with none approved) do not leave a lone title either: the block is dropped from the page, unless that would leave the page empty (the `/cases` listing with no projects shows the theme's default empty message). Cases and Testimonials with "Mostrar os destaques" (show highlights) on show only the highlighted items; if none is highlighted, they show the first items of the list.
+
 ## Ready-made bundles
 
 When creating a **personal** site, you can pick a bundle instead of ticking plugin by plugin (`--plugins <bundle>`):

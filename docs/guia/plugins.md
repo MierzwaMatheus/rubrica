@@ -38,6 +38,15 @@ Na tabela, "ligado" e "desligado" dizem como o plugin começa em cada tipo de si
 
 Os plugins que dependem de um serviço de fora (Asaas, OpenRouter, Umami) só funcionam depois que a chave estiver configurada. Como fazer isso está em [Integrações](./integracoes.md).
 
+## O que some quando um plugin é desligado
+
+- **Páginas da listagem.** A página do blog (`/blog`), a dos projetos (`/portfolio` no site pessoal, `/cases` no de empresa, ou a base que você definiu em **Configurações**), a de preços (`/precos`) e a de currículo (`/curriculo`) não são geradas quando o plugin dono delas está desligado. Entram também no sitemap só quando existem. O feed RSS acompanha o blog.
+- **Itens do menu.** O item de navegação que aponta para uma página que não existe mais some do menu, em todos os idiomas.
+- **Blocos.** Um bloco de plugin desligado (Posts, Cases, Depoimentos, Preços, Equipe, Currículo) não aparece em nenhuma página. Se a página tem outros blocos, ela fica e só o bloco some. Uma página que só tinha blocos de plugins desligados também deixa de existir. A home nunca some.
+- **Itens, não o conteúdo.** Os dados continuam no Convex: ligar o plugin de novo traz tudo de volta.
+
+Blocos de coleção sem itens (por exemplo, Depoimentos sem nenhum aprovado) também não deixam um título solto: o bloco some da página, a não ser que a página ficasse vazia (a listagem de `/cases` sem projetos mostra o aviso padrão do tema). Cases e Depoimentos com "Mostrar os destaques" ligado exibem só os marcados como destaque; se nenhum estiver marcado, mostram os primeiros da lista.
+
 ## Pacotes prontos
 
 Na criação de um site **pessoal**, dá para escolher um pacote em vez de marcar plugin por plugin (`--plugins <pacote>`):

@@ -12,5 +12,7 @@ export default defineConfig({
   define: { __CLI_VERSION__: JSON.stringify(version) },
   // As partes puras do núcleo (receitas, plugins, idiomas) vão dentro do CLI.
   noExternal: [/^@rubrica\/core/],
+  // O AGENTS.md do monorepo vai junto para os projetos criados.
+  loader: { ".md": "text" },
   clean: true,
 });

@@ -101,6 +101,8 @@ export interface V1RubricaJson {
   fontMono?: string;
   colorMode?: "dark" | "light" | "system";
   colorModeToggle?: boolean;
+  /** Textura escolhida na v1 (grão, papel, scanlines ou nenhuma). */
+  texture?: string;
   plugins?: Record<string, boolean>;
   identity?: Partial<Record<"siteName" | "siteUrl" | "siteDescription" | "authorName" | "authorEmail" | "twitterHandle" | "lang", string>>;
 }
@@ -511,6 +513,8 @@ function convertSettings(ctx: Ctx, input: ConvertInput, plugins: Record<string, 
       tokens: Object.keys(tokens).length ? tokens : undefined,
       fontSans: c("theme_font_sans") ?? input.v1.fontSans,
       fontMono: c("theme_font_mono") ?? input.v1.fontMono,
+      // A textura da v1 passa como está (inclusive "none", que desliga a do tema).
+      texture: ["none", "grain", "paper", "scanlines"].includes(input.v1.texture ?? "") ? input.v1.texture : undefined,
     }),
     navigation: [],
     social,

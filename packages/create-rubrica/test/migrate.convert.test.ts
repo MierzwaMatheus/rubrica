@@ -135,10 +135,16 @@ describe("configurações do site", () => {
       url: "https://brunalima.design",
       locales: { locales: ["pt-BR", "en"], default: "pt-BR" },
       theme: "cyberpunk",
-      appearance: { colorMode: "dark", colorToggle: false, scheme: "neon", tokens: { "rb-accent": "#ff3366" }, fontSans: "Chakra Petch", fontMono: "JetBrains Mono" },
+      appearance: { colorMode: "dark", colorToggle: false, scheme: "neon", tokens: { "rb-accent": "#ff3366" }, fontSans: "Chakra Petch", fontMono: "JetBrains Mono", texture: "none" },
       twitterHandle: "brunalima",
       ogImage: { url: "https://imagens.exemplo.dev/og.png" },
     });
+  });
+
+  it("textura da v1 vai para a aparência; desconhecida fica de fora", () => {
+    const withTexture = (texture: string) => convertV1({ tables: v1Export().tables, v1: { ...V1_RUBRICA_JSON, texture }, theme: "poster", recipe: CORE_RECIPES.pessoal, now: NOW }).tables.siteSettings![0]!.appearance as Record<string, unknown>;
+    expect(withTexture("grain").texture).toBe("grain");
+    expect(withTexture("lava")).not.toHaveProperty("texture");
   });
 
   it("pessoa e redes do contactInfo", () => {

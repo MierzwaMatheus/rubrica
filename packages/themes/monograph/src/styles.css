@@ -77,10 +77,15 @@ h1, h2, h3, h4 { font-family: var(--rb-font-display); color: var(--rb-fg-strong)
 .mn-toc ol { list-style: none; margin: 0 auto; padding: 0; max-width: 520px; display: flex; flex-direction: column; }
 .mn-toc a { display: flex; align-items: center; min-height: 44px; text-decoration: none; font-size: 18px; }
 .mn-toc a[aria-current="page"] { color: var(--rb-accent); }
+.mn-toc__locales { max-width: 520px; margin: 12px auto 0; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; }
+.mn-toc__locales .rb-locales { flex-wrap: wrap; gap: 6px; }
+.mn-toc__locales a { display: inline-flex; align-items: center; min-height: 44px; padding-inline: 4px; text-decoration: none; color: var(--rb-muted); }
+.mn-toc__locales a[aria-current="true"] { color: var(--rb-accent); font-weight: 600; }
+@media (min-width: 960px) { .mn-toc__locales { display: none; } }
 .mn-toc .mn-ld { width: 100%; font-size: 18px; }
 @media (max-width: 959px) {
   .mn-run__in { padding: 0 20px; }
-  .mn-run__nav { display: none; }
+  .mn-run__nav, .mn-run__locales { display: none; }
   .mn-run__toc { display: block; }
 }
 
@@ -368,4 +373,9 @@ h1, h2, h3, h4 { font-family: var(--rb-font-display); color: var(--rb-fg-strong)
 }
 @media (prefers-reduced-motion: reduce) {
   .mn-root *, .mn-root *::before, .mn-root *::after { animation: none !important; }
+}
+
+@media (max-width: 559px) {
+  .mn-run__id > span { display: none; }
+  .mn-run__tools { gap: 6px; }
 }

@@ -68,6 +68,7 @@ export function MonographShell({ ctx, pageType, children, colorToggle, localeSwi
                     </li>
                   ))}
                 </ol>
+                {localeSwitcher && <div className="mn-toc__locales">{localeSwitcher}</div>}
               </nav>
             </details>
           </div>

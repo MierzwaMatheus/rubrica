@@ -16,6 +16,8 @@ Uso:
 Opções:
   --site <pessoal|empresa>   testa só um tipo de site
   --sem-lighthouse           pula o Lighthouse
+  --sem-vitrine              não acrescenta a vitrine (/vitrine: todos os blocos e variações
+                             do tema e as receitas, que passam pelas checagens de página)
   --so-lighthouse            roda só o Lighthouse (pula axe, SEO e JavaScript por página)
   --js-kb <n>                limite de JavaScript (gzip) por página com ilha (padrão ${DEFAULT_LIMITS.jsKb})
   --lh-performance <n>       mínimo de performance (padrão ${DEFAULT_LIMITS.lighthouse.performance})
@@ -39,6 +41,7 @@ export async function main(argv: string[]): Promise<number> {
       options: {
         site: { type: "string" },
         "sem-lighthouse": { type: "boolean" },
+        "sem-vitrine": { type: "boolean" },
         "so-lighthouse": { type: "boolean" },
         "js-kb": { type: "string" },
         "lh-performance": { type: "string" },
@@ -96,6 +99,7 @@ export async function main(argv: string[]): Promise<number> {
       sites: values.site ? [values.site] : undefined,
       lighthouse: !values["sem-lighthouse"],
       pages: !values["so-lighthouse"],
+      showcase: !values["sem-vitrine"],
       lighthouseRuns: num(values["lh-execucoes"], 3),
       keepDist: values["manter-dist"] ?? false,
       log: (m) => console.error(`... ${m}`),

@@ -152,6 +152,9 @@ importers:
       ajv:
         specifier: ^8.17.1
         version: 8.20.0
+      convex:
+        specifier: ^1.49.0
+        version: 1.49.0(react@19.3.1)
     devDependencies:
       '@auth/core':
         specifier: ^0.41.3
@@ -168,9 +171,6 @@ importers:
       '@types/node':
         specifier: ^22.0.0
         version: 22.20.5
-      convex:
-        specifier: ^1.49.0
-        version: 1.49.0(react@19.3.1)
       convex-test:
         specifier: ^0.0.67
         version: 0.0.67(convex@1.49.0(react@19.3.1))

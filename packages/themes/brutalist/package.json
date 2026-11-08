@@ -1,6 +1,6 @@
 {
   "name": "@rubrica/theme-brutalist",
-  "version": "2.0.0-alpha.0",
+  "version": "2.0.0",
   "description": "Tema Terminal Brutalista do Rubrica (layout brutalist da v1): monoespaçada, bordas retas e seções como linhas de comando.",
   "type": "module",
   "license": "GPL-3.0-only",

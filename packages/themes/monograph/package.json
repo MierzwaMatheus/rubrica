@@ -1,6 +1,6 @@
 {
   "name": "@rubrica/theme-monograph",
-  "version": "2.0.0-alpha.0",
+  "version": "2.0.0",
   "description": "Tema monografia do Rubrica: o site como livro (cabeçalho corrido, tipografia de livro, notas na margem).",
   "type": "module",
   "license": "GPL-3.0-only",

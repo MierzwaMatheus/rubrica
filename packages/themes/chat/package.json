@@ -1,6 +1,6 @@
 {
   "name": "@rubrica/theme-chat",
-  "version": "2.0.0-alpha.0",
+  "version": "2.0.0",
   "description": "Tema Conversa do Rubrica (layout chat da v1): o site como uma conversa, com perguntas de quem visita e respostas em balões.",
   "type": "module",
   "license": "GPL-3.0-only",

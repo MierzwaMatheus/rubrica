@@ -1,6 +1,6 @@
 {
   "name": "@rubrica/theme-magazine",
-  "version": "2.0.0-alpha.0",
+  "version": "2.0.0",
   "description": "Tema magazine do Rubrica: revista, com masthead, grade editorial e tipografia de destaque (Bodoni Moda).",
   "type": "module",
   "license": "GPL-3.0-only",

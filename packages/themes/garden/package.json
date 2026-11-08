@@ -1,6 +1,6 @@
 {
   "name": "@rubrica/theme-garden",
-  "version": "2.0.0-alpha.0",
+  "version": "2.0.0",
   "description": "Tema Jardim Digital do Rubrica (layout garden da v1): notas com estágio de crescimento, barra lateral com mapa e coluna de leitura.",
   "type": "module",
   "license": "GPL-3.0-only",

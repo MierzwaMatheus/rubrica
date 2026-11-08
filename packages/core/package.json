@@ -14,6 +14,7 @@
     "./blocks": "./src/blocks/catalog/index.ts",
     "./astro": "./src/astro/integration.ts",
     "./data": "./src/data/source.ts",
+    "./data/showcase": "./src/data/showcase.ts",
     "./render": "./src/render/index.ts",
     "./components": "./src/components/index.ts",
     "./plugins": "./src/plugins/registry.ts",

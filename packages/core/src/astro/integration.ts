@@ -23,8 +23,12 @@ import { enabledPlugins } from "../plugins/contract";
 import { CORE_PLUGINS } from "../plugins/registry";
 
 export type SourceOption =
-  /** Pasta com site.json, pages.json, texts.json e collections/*.json. */
-  | { fixtures: string }
+  /**
+   * Pasta com site.json, pages.json, texts.json e collections/*.json. `showcase` acrescenta
+   * as páginas da vitrine (todos os blocos e variações do tema, e as receitas), que a
+   * bateria de tema usa (`data/showcase.ts`).
+   */
+  | { fixtures: string; showcase?: boolean }
   /** Convex de produção (lê CONVEX_URL, PUBLIC_CONVEX_URL ou VITE_CONVEX_URL se `url` faltar). */
   | { convex: { url?: string } };
 
@@ -102,8 +106,17 @@ export default function rubrica(options: RubricaOptions): AstroIntegration {
 
         const sourceCode =
           "fixtures" in source
-            ? `import { fixtureSource } from "@rubrica/core/data";\nexport const source = fixtureSource(${JSON.stringify(abs(source.fixtures))});`
-            : `import { convexSource } from "@rubrica/core/data/convex";\nexport const source = convexSource(${JSON.stringify(source.convex.url ?? null)});`;
+            ? `import { fixtureSource } from "@rubrica/core/data";\nconst baseSource = fixtureSource(${JSON.stringify(abs(source.fixtures))});`
+            : `import { convexSource } from "@rubrica/core/data/convex";\nconst baseSource = convexSource(${JSON.stringify(source.convex.url ?? null)});`;
+        // Vitrine (só com fixtures): as páginas geradas do tema entram depois dos blocos do projeto.
+        const showcase = "fixtures" in source && source.showcase === true;
+        const exportSource = showcase
+          ? [
+              `import { withShowcase } from "@rubrica/core/data/showcase";`,
+              `import { CORE_BLOCKS as showcaseCoreBlocks } from "@rubrica/core/blocks";`,
+              "export const source = withShowcase(baseSource, theme, [...showcaseCoreBlocks, ...projectBlocks]);",
+            ].join("\n")
+          : "export const source = baseSource;";
 
         const blockImports = (options.blocks ?? []).map((m, i) => `import { blocks as projectBlocks${i} } from ${JSON.stringify(spec(m))};`);
         const componentImports = Object.entries(options.blockComponents ?? {}).map(
@@ -127,6 +140,7 @@ export default function rubrica(options: RubricaOptions): AstroIntegration {
             "export const projectComponents = {};",
             ...componentImports,
             `export const projectBlocks = [${(options.blocks ?? []).map((_, i) => `...projectBlocks${i}`).join(", ")}];`,
+            exportSource,
             "export { theme };",
           ].join("\n"),
           [VIRTUAL.styles]: [`import "@rubrica/core/styles/base.css";`, `import ${JSON.stringify(`${spec(options.theme)}/styles.css`)};`].join("\n"),

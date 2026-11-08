@@ -1,0 +1,50 @@
+{
+  "name": "@rubrica/core",
+  "version": "2.0.0-alpha.0",
+  "description": "Núcleo do Rubrica: contrato de blocos e temas, idiomas, integração Astro, backend Convex, painel e MCP.",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MierzwaMatheus/rubrica.git",
+    "directory": "packages/core"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./blocks": "./src/blocks/catalog/index.ts",
+    "./astro": "./src/astro/integration.ts",
+    "./data": "./src/data/source.ts",
+    "./render": "./src/render/index.ts",
+    "./components": "./src/components/index.ts",
+    "./plugins": "./src/plugins/registry.ts",
+    "./seo": "./src/seo/index.ts",
+    "./package.json": "./package.json",
+    "./islands": "./src/islands/index.ts",
+    "./styles/base.css": "./src/styles/base.css",
+    "./data/convex": "./src/data/convex.ts"
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "check": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "peerDependencies": {
+    "astro": "^7.4.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "@astrojs/react": "^7.1.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "astro": "^7.4.7",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1",
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.4",
+    "@astrojs/react": "^7.1.4"
+  }
+}

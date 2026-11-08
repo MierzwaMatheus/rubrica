@@ -99,6 +99,7 @@ export default defineTheme({
   description: "Catálogo de museu: rótulos à esquerda, linhas finas e tabelas com imagem que surge no hover.",
   contract: "^1",
   scheme: "sumi",
+  colorMode: "light",
   fonts,
   tokens: {
     "rb-accent": { label: "Cor de destaque", kind: "color", default: "#E96068", light: "#BA0F2B" },

@@ -285,6 +285,21 @@ importers:
         specifier: ^5.9.0
         version: 5.9.3
 
+  packages/themes/magazine:
+    devDependencies:
+      '@rubrica/core':
+        specifier: workspace:^
+        version: link:../../core
+      '@types/react':
+        specifier: ^19.2.0
+        version: 19.3.0
+      react:
+        specifier: ^19.2.1
+        version: 19.3.1
+      typescript:
+        specifier: ^5.9.0
+        version: 5.9.3
+
   packages/themes/padrao:
     devDependencies:
       '@rubrica/core':

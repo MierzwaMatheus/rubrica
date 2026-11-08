@@ -99,6 +99,8 @@ export const vPerson = v.object({
   name: v.string(),
   jobTitle: v.optional(vLocalized),
   email: v.optional(v.string()),
+  phone: v.optional(v.string()),
+  whatsapp: v.optional(v.string()),
   photo: v.optional(vImage),
 });
 

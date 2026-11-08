@@ -6,12 +6,17 @@
  * `visibility: hidden`, então os links dela não recebem foco.
  */
 import type { ShellProps } from "@rubrica/core";
-import { Img, Logo } from "@rubrica/core/components";
+import { Img, LocaleLinks, Logo } from "@rubrica/core/components";
 import { Icon, type IconName } from "./icons";
 
 export interface SidebarOptions {
   /** Avatar do perfil: `md` (5rem, padrão) ou `lg` (7rem, como no cyberpunk). */
   avatar?: "md" | "lg";
+  /**
+   * Botão "Fale comigo" também na barra do celular, ao lado do menu (como no cyberpunk).
+   * Só aparece com o plugin de contato ligado.
+   */
+  barTalk?: boolean;
 }
 
 /** Ícone do item de menu pelo último trecho do caminho (sem prefixo de idioma). */
@@ -28,7 +33,7 @@ function navIcon(href: string): IconName {
 
 const SOCIAL_ICONS: Record<string, IconName> = { github: "github", linkedin: "linkedin" };
 
-export function createSidebarShell({ avatar = "md" }: SidebarOptions = {}) {
+export function createSidebarShell({ avatar = "md", barTalk = false }: SidebarOptions = {}) {
   return function SidebarShell({ ctx, children, colorToggle, localeSwitcher }: ShellProps) {
     const { site } = ctx;
     const person = site.person;
@@ -36,8 +41,17 @@ export function createSidebarShell({ avatar = "md" }: SidebarOptions = {}) {
     const role = person?.jobTitle;
     const org = site.organization;
     const email = person?.email ?? org?.email;
-    const phone = person?.whatsapp ?? person?.phone ?? org?.whatsapp ?? org?.phone;
+    // Sem telefone na pessoa ou na empresa, vale o WhatsApp das configurações do site.
+    const siteWhatsapp = site.whatsapp;
+    const phone = person?.whatsapp ?? person?.phone ?? org?.whatsapp ?? org?.phone ?? (siteWhatsapp ? `+${siteWhatsapp.number}` : undefined);
     const whatsapp = person?.whatsapp ?? org?.whatsapp;
+    const phoneHref = whatsapp
+      ? `https://wa.me/${whatsapp.replace(/\D/g, "")}`
+      : !person?.phone && !org?.phone && siteWhatsapp
+        ? siteWhatsapp.href
+        : `tel:${(phone ?? "").replace(/[^\d+]/g, "")}`;
+    const phoneIsWhatsapp = phoneHref.startsWith("https://wa.me/");
+    const hasContact = site.plugins["contact-wizard"] === true;
     const hasResume = site.navigation.some((n) => /curr|resume/i.test(n.href));
     const talkHref = site.kind === "empresa" ? ctx.href("/contato") : `${ctx.href("/")}#contato`;
     const year = new Date().getUTCFullYear();
@@ -67,9 +81,17 @@ export function createSidebarShell({ avatar = "md" }: SidebarOptions = {}) {
               </>
             )}
           </a>
-          <label htmlFor="rb-menu" className="rb-bar__menu" aria-hidden="true">
-            <Icon name="menu" size={20} />
-          </label>
+          <div className="rb-bar__tools">
+            {barTalk && hasContact && (
+              <a className="rb-bar__talk" href={talkHref}>
+                <Icon name="message" size={14} />
+                {ctx.t("sidebar.talk")}
+              </a>
+            )}
+            <label htmlFor="rb-menu" className="rb-bar__menu" aria-hidden="true">
+              <Icon name="menu" size={20} />
+            </label>
+          </div>
         </header>
         <label htmlFor="rb-menu" className="rb-scrim" aria-hidden="true" />
 
@@ -118,7 +140,7 @@ export function createSidebarShell({ avatar = "md" }: SidebarOptions = {}) {
                   </a>
                 )}
                 {phone && (
-                  <a href={whatsapp ? `https://wa.me/${whatsapp.replace(/\D/g, "")}` : `tel:${phone.replace(/[^\d+]/g, "")}`} {...(whatsapp ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
+                  <a href={phoneHref} {...(phoneIsWhatsapp ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
                     <Icon name="phone" size={14} />
                     <span>{phone}</span>
                   </a>
@@ -141,14 +163,21 @@ export function createSidebarShell({ avatar = "md" }: SidebarOptions = {}) {
               </ul>
             )}
 
-            {colorToggle && <div className="rb-side__toggle">{colorToggle}</div>}
-            {localeSwitcher && <div className="rb-side__locales">{localeSwitcher}</div>}
+            {site.colorToggle && colorToggle && <div className="rb-side__toggle">{colorToggle}</div>}
+            {/* Seletor compacto (PT · EN), como o da v1; com dois idiomas vira uma chave por CSS. */}
+            {localeSwitcher && ctx.alternates.length > 1 && (
+              <div className="rb-side__locales">
+                <LocaleLinks ctx={ctx} compact />
+              </div>
+            )}
 
             <div className="rb-side__actions">
-              <a className="rb-side__talk" href={talkHref}>
-                <Icon name="message" size={14} />
-                {ctx.t("sidebar.talk")}
-              </a>
+              {hasContact && (
+                <a className="rb-side__talk" href={talkHref}>
+                  <Icon name="message" size={14} />
+                  {ctx.t("sidebar.talk")}
+                </a>
+              )}
               {hasResume && (
                 <a className="rb-side__cv" href={ctx.href("/curriculo")}>
                   <Icon name="file" size={14} />

@@ -244,9 +244,10 @@ describe("textos e o resto", () => {
     expect(r.report.texts.sectionKeys).toBe(3);
   });
 
-  it("tabelas pendentes vão à parte; descartadas e próprias no relatório", () => {
-    expect(Object.keys(r.pending)).toEqual(["proposals", "contactRequests"]);
-    expect(r.report.pending).toEqual([{ table: "proposals", count: 1 }, { table: "contactRequests", count: 1 }]);
+  it("o que não tem destino vai à parte; descartadas e próprias no relatório", () => {
+    // Negócio convertido (migrate.business.test.ts): sobra o depoimento em vídeo e a versão ilegível.
+    expect(Object.keys(r.pending).sort()).toEqual(["proposalVersions", "testimonialSubmissions"]);
+    expect(r.report.pending.map((p) => [p.table, p.count])).toEqual([["testimonialSubmissions", 1], ["proposalVersions", 1]]);
     expect(r.report.dropped.map((d) => d.table)).toEqual(expect.arrayContaining(["authSessions", "deployStatus", "rateLimitAttempts", "homeContent", "siteTexts"]));
     expect(r.report.unknownTables).toEqual([{ table: "newsletter", count: 1 }]);
     expect(r.report.warnings.join(" ")).toMatch(/newsletter/);

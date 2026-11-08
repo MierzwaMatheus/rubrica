@@ -18,6 +18,7 @@ import { CORE_PLUGINS, V1_PLUGIN_RENAMES } from "@rubrica/core/plugins";
 import { CORE_BLOCKS } from "@rubrica/core/blocks";
 import { SCHEMES } from "../v1/themes/schemes.js";
 import V1_TEXTS_JSON from "./v1-texts.json";
+import { BUSINESS_TABLES, convertBusiness } from "./business.js";
 
 type Doc = Record<string, any>;
 type Loc = Record<string, string>;
@@ -64,18 +65,11 @@ export const TABLE_MAP: Record<string, string> = {
   auditLog: "auditLog",
 };
 
-/** Tabelas da v1 que ainda não têm destino no núcleo desta versão: vão como estão para um arquivo à parte. */
-export const PENDING_TABLES = [
-  "proposals",
-  "proposalVersions",
-  "proposalSessions",
-  "proposalAcceptances",
-  "checkouts",
-  "contractTemplates",
-  "contactRequests",
-  "testimonialSubmissions",
-  "aiGeneratedResumes",
-];
+/**
+ * Tabelas de negócio (contatos, depoimentos enviados, comercial): convertidas em
+ * `business.ts`. O que não tem destino na v2 vai como estava para um arquivo à parte.
+ */
+export { BUSINESS_TABLES };
 
 /** Tabelas que não vão para a v2, e por quê. */
 export const DROPPED_TABLES: Record<string, string> = {
@@ -133,7 +127,8 @@ export interface MigrationReport {
   pages: PageReport[];
   texts: { sectionKeys: number; ui: { v1: string; v2: string }[]; unmapped: { key: string; pt: string }[] };
   plugins: { v1: string; v2: string | null; enabled: boolean }[];
-  pending: { table: string; count: number }[];
+  /** Documentos sem destino na v2, guardados como estavam (pendentes-v1.zip). */
+  pending: { table: string; count: number; reason: string }[];
   dropped: { table: string; count: number; reason: string }[];
   unknownTables: { table: string; count: number }[];
   warnings: string[];
@@ -144,7 +139,7 @@ export interface ConvertResult {
   tables: Record<string, Doc[]>;
   /** Tabela da v1 de onde veio cada tabela 1:1 da v2 (para manter o número da tabela). */
   sources: Record<string, string>;
-  /** Tabelas da v1 sem destino ainda, como estavam. */
+  /** Documentos da v1 sem destino na v2, como estavam (por tabela). */
   pending: Record<string, Doc[]>;
   report: MigrationReport;
 }
@@ -769,14 +764,14 @@ export function convertV1(input: ConvertInput): ConvertResult {
   put("uiTexts", "", buildUiTexts(ctx, report, now));
   report.texts.sectionKeys = [...ctx.siteTexts.keys()].filter((k) => SECTION_KEYS.has(k)).length;
 
-  const pending: Record<string, Doc[]> = {};
-  for (const table of PENDING_TABLES) {
-    if (t[table]?.length) {
-      pending[table] = t[table]!;
-      report.pending.push({ table, count: t[table]!.length });
-    }
-  }
-  const known = new Set([...Object.keys(TABLE_MAP), ...PENDING_TABLES, ...Object.keys(DROPPED_TABLES)]);
+  const business = convertBusiness(t, now);
+  for (const row of business.report.tables) put(row.v2, row.from, business.tables[row.v2]!);
+  report.dropped.push(...business.report.dropped);
+  report.pending.push(...business.report.pending);
+  ctx.warnings.push(...business.report.warnings);
+  const pending = business.pending;
+
+  const known = new Set<string>([...Object.keys(TABLE_MAP), ...BUSINESS_TABLES, ...Object.keys(DROPPED_TABLES)]);
   for (const [table, docs] of Object.entries(t)) {
     if (table.startsWith("_")) continue;
     if (table in DROPPED_TABLES) report.dropped.push({ table, count: docs.length, reason: DROPPED_TABLES[table]! });

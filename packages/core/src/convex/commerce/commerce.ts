@@ -14,8 +14,19 @@ import { vRole } from "../validators";
 import { eraseCommercePersonalData, exportCommercePersonalData } from "./personalData";
 import { guard } from "./shared";
 
-/** Origens do servidor de desenvolvimento (Astro e Vite). */
+/** Origens do servidor local (Astro e Vite), só com RUBRICA_ALLOW_LOCALHOST=true (deployment de desenvolvimento). */
 export const DEV_ORIGINS = ["http://localhost:4321", "http://127.0.0.1:4321", "http://localhost:5173", "http://localhost:3000"];
+
+/** Origens aceitas: URL do site (com e sem www), SITE_URL, RUBRICA_ALLOWED_ORIGINS e, se ligado, o servidor local. */
+export function allowedOrigins(siteUrl: string | undefined, env: Record<string, string | undefined> = process.env): string[] {
+  const extra = (env.RUBRICA_ALLOWED_ORIGINS ?? "")
+    .split(",")
+    .map((o) => o.trim())
+    .filter(Boolean)
+    .flatMap((o) => originsOf(o).slice(0, 1));
+  const local = env.RUBRICA_ALLOW_LOCALHOST === "true" ? DEV_ORIGINS : [];
+  return [...new Set([...originsOf(siteUrl), ...originsOf(env.SITE_URL), ...extra, ...local])];
+}
 
 /** A origem e a variante com/sem `www`. */
 export function originsOf(url: string | undefined | null): string[] {
@@ -33,12 +44,13 @@ const vPermission = v.union(...(Object.keys(PERMISSIONS) as Permission[]).map((p
 
 export function commerceFunctions(rt: RubricaRuntime) {
   return {
-    /** Mensagem para o dono do site no Telegram (TELEGRAM_BOT_TOKEN + TELEGRAM_ADMIN_CHAT_ID). Sem as duas, não faz nada. */
+    /** Mensagem para o dono do site no Telegram (TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID). Sem as duas, não faz nada. */
     notifyAdmin: internalAction({
       args: { message: v.string() },
       handler: async (_ctx, { message }) => {
         const token = process.env.TELEGRAM_BOT_TOKEN;
-        const chatId = process.env.TELEGRAM_ADMIN_CHAT_ID;
+        // TELEGRAM_ADMIN_CHAT_ID é o nome da v1.
+        const chatId = process.env.TELEGRAM_CHAT_ID || process.env.TELEGRAM_ADMIN_CHAT_ID;
         if (!token || !chatId) return null;
         const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
           method: "POST",
@@ -50,13 +62,10 @@ export function commerceFunctions(rt: RubricaRuntime) {
       },
     }),
 
-    /** Origens aceitas no CORS das rotas públicas: SITE_URL, a URL do site nas configurações e o servidor local. */
+    /** Origens aceitas no CORS das rotas públicas (ver `allowedOrigins`). */
     siteOrigins: internalQuery({
       args: {},
-      handler: async (ctx): Promise<string[]> => {
-        const settings = await getSettingsDoc(ctx);
-        return [...new Set([...originsOf(process.env.SITE_URL), ...originsOf(settings?.url), ...DEV_ORIGINS])];
-      },
+      handler: async (ctx): Promise<string[]> => allowedOrigins((await getSettingsDoc(ctx))?.url),
     }),
 
     /** Papel e plugins para as actions (que não leem o banco). Devolve o usuário. */

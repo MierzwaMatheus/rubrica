@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from "vitest";
 import { asaasConfig, asaasRequest, AsaasError, effectiveDueDate, isIsoDate, onlyDigits, todayInSaoPaulo } from "../../../src/convex/commerce/lib/asaasClient";
 import { installmentOptions, installmentPlan, maxInstallmentsFor } from "../../../src/convex/commerce/lib/installments";
 import { handleAsaasWebhook } from "../../../src/convex/commerce/lib/asaasWebhook";
+import { allowedOrigins } from "../../../src/convex/commerce/commerce";
 import { escapeTgHtml, hashPassword, randomId, randomToken, sha256Hex, timingSafeEqual, verifyPassword } from "../../../src/convex/commerce/lib/security";
 
 function jsonResponse(body: unknown, status = 200) {
@@ -192,5 +193,15 @@ describe("segurança", () => {
     expect(randomId()).not.toBe(randomId());
     expect(await sha256Hex("abc")).toBe("ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
     expect(escapeTgHtml(`<b>"a" & 'b'</b>`)).toBe("&lt;b&gt;&quot;a&quot; &amp; &#39;b&#39;&lt;/b&gt;");
+  });
+});
+
+describe("origens do CORS", () => {
+  it("site com e sem www, SITE_URL e RUBRICA_ALLOWED_ORIGINS; localhost só quando liberado", () => {
+    expect(allowedOrigins("https://exemplo.dev/", {})).toEqual(["https://exemplo.dev", "https://www.exemplo.dev"]);
+    const all = allowedOrigins("https://exemplo.dev", { SITE_URL: "https://site.vercel.app", RUBRICA_ALLOWED_ORIGINS: "https://a.dev/x, lixo" });
+    expect(all).toEqual(expect.arrayContaining(["https://site.vercel.app", "https://a.dev"]));
+    expect(all.some((o) => o.includes("localhost"))).toBe(false);
+    expect(allowedOrigins(undefined, { RUBRICA_ALLOW_LOCALHOST: "true" })).toContain("http://localhost:4321");
   });
 });

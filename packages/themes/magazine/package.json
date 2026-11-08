@@ -1,0 +1,27 @@
+{
+  "name": "@rubrica/theme-magazine",
+  "version": "2.0.0-alpha.0",
+  "description": "Tema magazine do Rubrica: revista, com masthead, grade editorial e tipografia de destaque (Bodoni Moda).",
+  "type": "module",
+  "license": "MIT",
+  "exports": {
+    ".": "./src/index.tsx",
+    "./styles.css": "./src/styles.css",
+    "./fonts.json": "./src/fonts.json"
+  },
+  "files": ["src"],
+  "rubrica": { "contract": "^1" },
+  "scripts": {
+    "check": "tsc --noEmit -p tsconfig.json"
+  },
+  "peerDependencies": {
+    "@rubrica/core": "workspace:^",
+    "react": "^19.2.0"
+  },
+  "devDependencies": {
+    "@rubrica/core": "workspace:^",
+    "@types/react": "^19.2.0",
+    "react": "^19.2.1",
+    "typescript": "^5.9.0"
+  }
+}

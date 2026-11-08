@@ -32,6 +32,7 @@ import {
   vRole,
   vSeo,
 } from "./validators";
+import { commerceTables } from "./commerce/schema";
 
 const collection = <F extends PropertyValidators>(fields: F) => ({ ...fields, ...lifecycleFields });
 
@@ -160,6 +161,9 @@ export const rubricaTables = {
   })
     .index("by_key", ["key"])
     .index("by_expiresAt", ["expiresAt"]),
+
+  // ── Comercial (propostas, contratos, pagamentos, currículos com IA) ─────
+  ...commerceTables,
 };
 
 /** Tabelas de coleção, pelo nome usado no conteúdo (`CollectionName`). */

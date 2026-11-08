@@ -247,7 +247,7 @@ The **announcement bar** and the **floating WhatsApp button** ([Content](./conte
 
 ### Contact dialog
 
-With `contactDialog: true`, the core adds a dialog (an HTML `popover`) to every page with the form of the home page's `contato` block, when the contact plugin is on and the site has that block in the locale. The dialog id comes in `ctx.site.contactDialog`, and the shell (or a template) opens it with `<button type="button" popoverTarget={ctx.site.contactDialog}>`, no JavaScript. Without the dialog, fall back to a link to the block (`#contato`).
+With `contactDialog: true`, the core adds a dialog (an HTML `popover`) with the contact form to every page, when the contact plugin is on. The form follows the home page's `contato` block; without that block, it's the default wizard. The dialog id comes in `ctx.site.contactDialog`, and the shell (or a template) opens it with `<button type="button" popoverTarget={ctx.site.contactDialog}>`, no JavaScript. Without the dialog, fall back to a link to the block (`#contato`). Link fields that point to contact (`contato:`, `#contato`) come with `dialog`, the dialog id: the core `LinkButton` already becomes a button, and a theme block that draws its own link should do the same.
 
 Esc and clicking outside close it. The form only loads when the dialog opens, but every page now carries Astro's small island script. The test battery opens the dialog before checking hydration and axe. `padrao` and `cyberpunk` use the dialog, like the v1 contact wizard.
 

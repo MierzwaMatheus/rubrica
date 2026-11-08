@@ -246,7 +246,7 @@ A **faixa de aviso** e o **botão flutuante do WhatsApp** ([Conteúdo](./conteud
 
 ### Janela de contato
 
-Com `contactDialog: true`, o núcleo põe em toda página uma janela (um `popover` do HTML) com o formulário do bloco `contato` da home, quando o plugin de contato está ligado e o site tem esse bloco no idioma. O id da janela chega em `ctx.site.contactDialog`, e a casca (ou um template) a abre com `<button type="button" popoverTarget={ctx.site.contactDialog}>`, sem JavaScript. Sem a janela, o botão volta a ser um link para o bloco (`#contato`).
+Com `contactDialog: true`, o núcleo põe em toda página uma janela (um `popover` do HTML) com o formulário de contato, quando o plugin de contato está ligado. O formulário segue o bloco `contato` da home; sem esse bloco, é o assistente padrão. O id da janela chega em `ctx.site.contactDialog`, e a casca (ou um template) a abre com `<button type="button" popoverTarget={ctx.site.contactDialog}>`, sem JavaScript. Sem a janela, o botão volta a ser um link para o bloco (`#contato`). Os campos de link que apontam para o contato (`contato:`, `#contato`) chegam com `dialog`, o id da janela: o `LinkButton` do núcleo já vira botão, e um bloco do tema que desenha o próprio link deve fazer o mesmo.
 
 Esc e o clique fora fecham a janela. O formulário só carrega quando ela abre, mas cada página passa a levar o script pequeno de ilha do Astro. A bateria abre a janela antes de conferir a hidratação e o axe. O `padrao` e o `cyberpunk` usam a janela, como o assistente de contato da v1.
 

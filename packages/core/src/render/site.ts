@@ -106,17 +106,18 @@ export function homeShowsAvailability(pages: readonly PageRecord[]): boolean {
 export const CONTACT_DIALOG_ID = "rb-contato-janela";
 
 /**
- * O bloco `contato` (com ilha) que a janela de contato usa no idioma: o da home, senão o
- * da primeira página que tiver um.
+ * O bloco `contato` que a janela de contato usa no idioma: o da home, senão o da primeira
+ * página que tiver um, senão um bloco padrão (assistente em etapas). Assim a janela existe
+ * mesmo num site sem seção de contato: os botões que apontam para o contato a abrem.
  */
-export function contactBlock(routes: readonly SiteRoute[], locale: Locale): ResolvedBlock | undefined {
+export function contactBlock(routes: readonly SiteRoute[], locale: Locale): ResolvedBlock {
   const pages = routes.filter((r): r is Extract<SiteRoute, { type: "page" }> => r.type === "page" && r.locale === locale);
   const home = pages.find((r) => r.page.path === "/");
   for (const r of home ? [home, ...pages] : pages) {
     const block = r.page.blocks.find((b) => b.type === "contato" && b.interactive);
     if (block) return block;
   }
-  return undefined;
+  return { id: CONTACT_DIALOG_ID, type: "contato", variant: "default", fields: { mode: "wizard" }, items: [], headingLevel: 2, index: 0, total: 1, interactive: true };
 }
 
 export function buildSite(input: BuildInput): BuiltSite {
@@ -127,6 +128,8 @@ export function buildSite(input: BuildInput): BuiltSite {
   const paths: CollectionPaths = resolvePaths(settings.kind, settings.paths);
   const blockDefs = new Map(input.blocks.map((b) => [b.type, b]));
   const whatsappNumber = siteWhatsAppNumber(settings);
+  // Janela de contato: o tema pede e o plugin de contato está ligado (não depende de um bloco).
+  const contactDialog = theme.contactDialog && plugins.has("contact-wizard") ? CONTACT_DIALOG_ID : undefined;
   const opts = (locale: Locale): ResolveOptions => {
     const message = whatsAppMessage(settings, locale);
     return {
@@ -134,6 +137,7 @@ export function buildSite(input: BuildInput): BuiltSite {
       locales: cfg,
       ...(settings.defaultPostCover?.url && { defaultPostCover: settings.defaultPostCover }),
       ...(whatsappNumber && { whatsapp: { number: whatsappNumber, ...(message && { message }) } }),
+      ...(contactDialog && { contactDialog }),
     };
   };
   // O período do aviso vale no instante do build: muda só na próxima publicação.
@@ -348,7 +352,7 @@ export function buildSite(input: BuildInput): BuiltSite {
       const label = pick(settings.whatsapp.label, locale);
       site.whatsapp = { number: whatsappNumber, href: whatsAppUrl(whatsappNumber, message), floating: settings.whatsapp.floating, ...(label && { label }) };
     }
-    if (theme.contactDialog && plugins.has("contact-wizard") && contactBlock(routes, locale)) site.contactDialog = CONTACT_DIALOG_ID;
+    if (contactDialog) site.contactDialog = contactDialog;
     if (announcementOn && settings.announcement) {
       // Sem texto no idioma, a faixa não existe nele (decisão 28): nada de cair no principal.
       const text = pick(settings.announcement.text, locale);

@@ -66,6 +66,8 @@ Two features apply to the **whole site**, in both site types, and live in **Sett
 
 **In any button or link**, use the address `whatsapp:` instead of a URL: it becomes the site's WhatsApp link with the opening message in the page's language. For a custom message, write it after the colon: `whatsapp:I want the Pro plan`. It works in block buttons, plans, the menu and the announcement link. With no number set, a `whatsapp:` link doesn't render (the button disappears instead of going nowhere). If WhatsApp isn't set here, `whatsapp:` uses the WhatsApp from the company data.
 
+**Buttons to contact.** In themes that open contact in a dialog (`padrao` and `cyberpunk`), a button or link with the address `contato:` (or `#contato`) opens the dialog with the contact form, on any page. So the call-to-action block (`cta`) and the hero can lead to contact without a contact section on the page. In other themes, `contato:` goes to the home page's contact block.
+
 On company sites, the number also goes into the organization's structured data (`contactPoint`) for Google.
 
 ### Announcement bar

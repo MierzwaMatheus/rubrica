@@ -277,7 +277,8 @@ export function CasesBlock({ id, variant, fields, items, headingLevel, ctx }: Pr
             link={ctx.t("case.view")}
           />
         </IndexRow>
-        <IndexRow label={ctx.t("index.index")} level={0} aside={ctx.t("index.total", { n: items.length })} className="ix-row--index">
+        <IndexRow label={ctx.t("index.index")} level={0} className="ix-row--index">
+          <p className="ix-count">{ctx.t("index.total", { n: items.length })}</p>
           {table(items)}
           {more}
         </IndexRow>
@@ -313,7 +314,8 @@ export function CasesBlock({ id, variant, fields, items, headingLevel, ctx }: Pr
   }
 
   return (
-    <IndexSection {...common} label={fields.title} level={headingLevel} aside={fields.intro} className="ix-s--index">
+    <IndexSection {...common} label={fields.title} level={headingLevel} className="ix-s--index">
+      {fields.intro && <p className="ix-intro">{fields.intro}</p>}
       {table(items)}
       {more}
     </IndexSection>
@@ -399,7 +401,8 @@ export function PostsRecentesBlock({ id, variant, fields, items, headingLevel, c
           />
         </IndexRow>
         {tableBody && (
-          <IndexRow label={ctx.t("index.index")} level={0} aside={ctx.t("index.total", { n: rows.length })} className="ix-row--index">
+          <IndexRow label={ctx.t("index.index")} level={0} className="ix-row--index">
+            <p className="ix-count">{ctx.t("index.total", { n: rows.length })}</p>
             {tableBody}
           </IndexRow>
         )}
@@ -408,7 +411,8 @@ export function PostsRecentesBlock({ id, variant, fields, items, headingLevel, c
   }
 
   return (
-    <IndexSection type="posts-recentes" id={id} anchor={fields.anchor} variant={variant} label={fields.title} level={headingLevel} aside={fields.intro} className="ix-s--index">
+    <IndexSection type="posts-recentes" id={id} anchor={fields.anchor} variant={variant} label={fields.title} level={headingLevel} className="ix-s--index">
+      {fields.intro && <p className="ix-intro">{fields.intro}</p>}
       {tableBody}
     </IndexSection>
   );

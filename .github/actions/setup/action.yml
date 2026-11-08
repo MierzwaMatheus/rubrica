@@ -1,0 +1,37 @@
+name: Preparar o monorepo
+description: Node 24, pnpm 10 (versão do packageManager) e dependências com lockfile congelado.
+inputs:
+  playwright:
+    description: Instala o Chromium do Playwright (com cache dos navegadores).
+    default: "false"
+runs:
+  using: composite
+  steps:
+    - uses: pnpm/action-setup@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24
+        cache: pnpm
+        cache-dependency-path: pnpm-lock.yaml
+    - run: pnpm install --frozen-lockfile
+      shell: bash
+    - name: Versão do Playwright
+      if: inputs.playwright == 'true'
+      id: pw
+      shell: bash
+      run: echo "version=$(pnpm --filter @rubrica/theme-tester exec playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
+    - name: Cache dos navegadores do Playwright
+      if: inputs.playwright == 'true'
+      id: pw-cache
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/ms-playwright
+        key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
+    - name: Chromium do Playwright
+      if: inputs.playwright == 'true' && steps.pw-cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: pnpm --filter @rubrica/theme-tester exec playwright install --with-deps chromium
+    - name: Dependências de sistema do Chromium (navegador em cache)
+      if: inputs.playwright == 'true' && steps.pw-cache.outputs.cache-hit == 'true'
+      shell: bash
+      run: pnpm --filter @rubrica/theme-tester exec playwright install-deps chromium

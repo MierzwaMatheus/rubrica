@@ -96,7 +96,7 @@ function Editor({ config, doc }: { config: CollectionConfig; doc?: CollectionDoc
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [doc]);
 
-  useEffect(() => (dirty ? block(`Há mudanças não salvas neste ${config.singular}. Sair mesmo assim?`) : undefined), [dirty, block, config.singular]);
+  useEffect(() => (dirty ? block(`Há mudanças não salvas ${config.feminine ? "nesta" : "neste"} ${config.singular}. Sair mesmo assim?`) : undefined), [dirty, block, config.singular]);
 
   const fieldVals = useMemo(() => fieldValues(config, draft), [config, draft]);
   const missing = useMemo(() => missingTranslations(config.fields, fieldVals, panel.locales.locales), [config, fieldVals, panel.locales.locales]);
@@ -109,7 +109,7 @@ function Editor({ config, doc }: { config: CollectionConfig; doc?: CollectionDoc
     if (found.fields.length || found.slug) {
       setErrors(found);
       setTab("content");
-      toast.error(`O ${config.singular} tem campos a corrigir.`);
+      toast.error(`${config.feminine ? "A" : "O"} ${config.singular} tem campos a corrigir.`);
       requestAnimationFrame(() => document.querySelector("[role=alert]")?.scrollIntoView({ block: "center", behavior: "smooth" }));
       return false;
     }
@@ -332,7 +332,9 @@ function Editor({ config, doc }: { config: CollectionConfig; doc?: CollectionDoc
             </Tabs>
             {isNew && config.defaultPublished === false && (
               <Alert>
-                <p>O {config.singular} nasce como rascunho: só entra no site depois de você publicar e de o site ser publicado.</p>
+                <p>
+                  {config.feminine ? "A" : "O"} {config.singular} nasce como rascunho: só entra no site depois de você publicar e de o site ser publicado.
+                </p>
               </Alert>
             )}
           </div>
@@ -371,7 +373,7 @@ export function CollectionEditor({ config }: { config: CollectionConfig }) {
   if (doc.deletedAt !== undefined) {
     return (
       <Alert variant="warning" className="m-6">
-        Este {config.singular} está na lixeira.{" "}
+        {config.feminine ? "Esta" : "Este"} {config.singular} está na lixeira.{" "}
         <Link to={config.base} className="underline">
           Voltar para {config.title.toLowerCase()}
         </Link>

@@ -1,6 +1,46 @@
 # Changelog
 
-O que mudou em cada versão do Rubrica (template e CLI `create-rubrica`). Detalhes de cada uma nas [notas da release](https://github.com/MierzwaMatheus/rubrica/releases). Para atualizar um projeto existente, veja [Atualizando o seu Rubrica](./docs/atualizacao.md).
+O que mudou em cada versão do Rubrica (núcleo, temas e CLI `create-rubrica`). Detalhes de cada uma nas [notas da release](https://github.com/MierzwaMatheus/rubrica/releases). Para atualizar um projeto v2, veja [Atualizar o Rubrica](./docs/guia/atualizar.md); para sair da v1, [Migrar da v1](./docs/guia/migrar.md).
+
+## 2.0.0 — 2026-11-08
+
+A v2: o Rubrica deixa de ser um template copiado para o projeto e vira um **núcleo em pacote**, com **temas** e duas linhas de site (pessoal e empresa). Atualizar passa a ser subir a versão de um pacote.
+
+**Vindo da 1.x:** não é uma atualização, é uma migração. Rode `npx create-rubrica@latest migrar` num projeto na 1.13.1, com o git limpo: ele cria a branch `rubrica-v2`, troca o código, converte os dados e lista o que você personalizou. **Nada é gravado no Convex**: o import vai para um banco de desenvolvimento novo, e a produção só com o seu "ok". Guia: [Migrar da v1](./docs/guia/migrar.md). A v1 recebe correções de bug e de segurança por 6 meses (branch `v1`); a documentação dela está em [`docs/v1`](./docs/v1/README.md).
+
+### Segurança
+Três falhas da v1 estão corrigidas na v2. Se você tem um site v1 com propostas, vale migrar (ou atualizar a v1, que também recebe a correção).
+- **Proposta com senha não vaza mais o conteúdo pela API.** Na v1, quem chamava a consulta pública da proposta recebia o conteúdo mesmo sem digitar a senha: só a página escondia. Agora, sem sessão válida, a API devolve só o estado ("bloqueada"), sem o conteúdo.
+- **O limite de senha errada agora bloqueia de verdade.** A tentativa errada lançava erro, o que desfazia a contagem de tentativas, e o limite nunca era atingido. Agora a tentativa é registrada e, passado o limite, a proposta responde `TOO_MANY_ATTEMPTS`.
+- **Um só modelo de contrato padrão.** A v1 tinha dois modelos padrão (um no código e um no banco), e a proposta podia usar um diferente do que o painel mostrava. Na v2 o padrão é um só, o do banco (marcado como padrão); o texto que vem no código serve apenas para criá-lo quando ainda não existe nenhum.
+
+### O que mudou na arquitetura
+- **Núcleo em pacote.** `@rubrica/core` traz o site (Astro), o painel (React), o backend (Convex) e o MCP. O seu projeto guarda só configuração, blocos próprios e componentes ejetados. O `convex/` do projeto vira arquivos de uma linha que reexportam o backend do núcleo.
+- **Site estático em Astro.** Acabaram a pré-renderização improvisada e a SPA: as páginas saem em HTML, com quase nenhum JavaScript (só as partes interativas viram ilhas). Imagens e fontes passam pelo tratamento do próprio Astro, e as fontes são servidas pelo próprio site.
+- **Páginas com blocos.** Cada página é uma lista de blocos tipados, com prévia ao vivo no painel. São 17 blocos de catálogo (12 comuns, 1 de pessoal e 4 de empresa). Dá para criar páginas novas pelo painel.
+- **Duas linhas de site.** `pessoal` (o portfólio de sempre) e `empresa` (quem somos, serviços, preços, equipe, cases, contato). Na empresa entram a coleção de planos, a equipe e os dados da empresa (que geram o dado estruturado `Organization`/`LocalBusiness`).
+- **14 temas, 15 esquemas de cor.** Os 13 layouts da v1 viram temas (mesmos nomes), mais o `padrao`. Cada tema é um pacote `@rubrica/theme-<nome>`. Qualquer esquema funciona em qualquer tema, e todos passam pela mesma bateria de testes (`testar-tema`: axe, `h1` único, `<head>` completo, limite de JavaScript, Lighthouse).
+- **Vários idiomas.** A lista de idiomas é configurável e o principal é à sua escolha (sem prefixo na URL). Conteúdo sem tradução só não existe naquele idioma: nada de página vazia ou erro 404 interno.
+- **Papéis de agência e cliente.** `root` é a agência, `admin` o dono do site, e há o novo papel `comercial` (propostas, contratos, checkouts, contatos e planos).
+- **Contatos e LGPD.** Os pedidos vão para o painel e, se você ligar, para o Telegram, o e-mail (Resend) e um webhook assinado (HMAC), com reenvio automático. Há consentimento registrado nos formulários, política de privacidade gerada e exportação ou exclusão dos dados de um titular.
+- **Agentes.** O servidor MCP local (`rubrica mcp`) substitui o script Python da skill `rubrica`: o agente edita páginas, blocos e coleções com o login de um usuário do painel, com **prévia antes de gravar**. As skills de escrita (`rubrica-voz`, `rubrica-case`, `rubrica-blog`, `rubrica-curriculo`, `rubrica-apresentacao`, `rubrica-pilar`) usam o MCP para gravar.
+- **Hospedagem neutra.** A Vercel continua a oficial (o `publicar` automatiza só ela), mas o projeto gera `vercel.json`, `public/_redirects` e `public/_headers` da mesma configuração, e o botão Publicar aceita o deploy hook de qualquer hospedagem.
+- **CLI novo.** Comandos `create`, `setup`, `config`, `publicar`, `senha`, `update`, `ejetar`, `verificar`, `testar-tema`, `mcp`, `migrar` e `telemetria`. Veja [Comandos do CLI](./docs/guia/cli.md).
+
+### Quebras em relação à v1
+- **O projeto não é mais uma cópia do template.** Não há `src/` do app, `templates/`, `cli/` nem `scripts/` no projeto. O `update` deixa de mesclar arquivos (e de gerar `.rubrica-new`): sobe pacotes e regenera o `convex/`.
+- **Personalizações no código não migram sozinhas.** O `migrar` as lista, e cada uma vira configuração (tokens do painel), bloco próprio (`src/blocks/`) ou componente ejetado (`ejetar`).
+- **O app deixa de ser uma SPA em Vite.** Páginas e rotas são do Astro; o painel fica em `/admin` (antes, `/login` e `/admin/*` na SPA).
+- **O plugin `playground` saiu.** O plugin `i18n` ("Tradução IA") virou `translation`: os idiomas são do núcleo, e o plugin só preenche as traduções.
+- **Textos de seção viraram campos dos blocos** (títulos, chamadas e botões); só os textos de interface continuam em "Textos".
+- **As traduções `ptBR`/`enUS` viram um mapa por idioma.** No `migrar`, o principal é `pt-BR` e as URLs `/en` continuam iguais.
+- **Pré-requisitos:** Node 22.23 ou mais novo (antes, 20).
+- **Sem textura de fundo.** A textura opcional da v1 (grão, papel, scanlines) não existe na v2; a aparência é o tema, o esquema, o modo e as fontes.
+- **O script Python da skill `rubrica` saiu:** use o MCP.
+- **Variáveis de ambiente.** Os nomes novos ficam em [`docs/v2/variaveis.md`](./docs/v2/variaveis.md); os da v1 (`TELEGRAM_ADMIN_CHAT_ID`, `VERCEL_DEPLOY_HOOK_URL`, `VITE_UMAMI_*`) continuam aceitos.
+
+### Pendências conhecidas
+Estão em [`docs/v2/pendencias.md`](./docs/v2/pendencias.md): imagens no corpo dos textos do painel, prévia ao vivo de posts e cases, tradução de um item inteiro de uma vez e a abertura do PDF do currículo com IA.
 
 ## 1.13.1 — 2026-11-07
 
@@ -312,7 +352,7 @@ CLI pensado para quem não é da área técnica: menos perguntas, nada repetido,
 Primeira versão estável. A partir daqui, dentro da 1.x, atualizar não quebra o que você personalizou nem os seus dados: campos novos no banco são sempre opcionais, e mudanças que exijam migração só entram numa versão major nova, com guia.
 
 **Vindo da 0.x:**
-- Atualize com `npx create-rubrica@latest update`. Projetos criados com o CLI até a v0.3.18 informam a versão de origem com `--from` (veja [Atualizando o seu Rubrica](./docs/atualizacao.md)); projetos de fork usam `git merge v1.0.0`.
+- Atualize com `npx create-rubrica@latest update`. Projetos criados com o CLI até a v0.3.18 informam a versão de origem com `--from` (veja [Atualizando o seu Rubrica](./docs/v1/atualizacao.md)); projetos de fork usam `git merge v1.0.0`.
 - Pagamentos agora são reais: configure `ASAAS_API_KEY` e cadastre o webhook do Asaas (README → "Configurando os pagamentos"). A integração com o Stripe foi removida.
 - O script do Umami passa a usar `VITE_UMAMI_SCRIPT_URL` e `VITE_UMAMI_WEBSITE_ID` (as variáveis antigas continuam aceitas).
 

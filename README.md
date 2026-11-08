@@ -46,7 +46,7 @@ A base técnica é coletiva. A identidade é sua.
 
 | | Pessoal | Empresa |
 |---|---|---|
-| Páginas de partida | Início, sobre, currículo, projetos, blog, depoimentos | Início, quem somos, serviços, preços, equipe, cases, contato |
+| Páginas de partida | Início, sobre, currículo, projetos, blog, depoimentos | Início, quem somos, serviços, preços, cases, blog, contato (a equipe é um bloco de "quem somos") |
 | Coleções próprias | Currículo, dia a dia | Planos e preços, equipe, dados da empresa |
 | Blocos próprios | `curriculo` | `precos`, `equipe`, `localizacao`, `logos-clientes` |
 | Em comum | Blog, projetos e cases, serviços, depoimentos, FAQ, propostas, contratos, pagamentos, contatos, LGPD, idiomas, MCP | |

@@ -60,6 +60,7 @@ No Claude Code, você pode digitar `! npx rubrica mcp login` no próprio prompt.
 | Site | Ler e mudar configurações (nome, aparência, navegação, redes), ligar e desligar plugins, **publicar** (dispara o build) |
 | Páginas e blocos | Listar, criar (sempre rascunho), mudar título, caminho e SEO; adicionar, editar campos, mover, ocultar e remover blocos |
 | Coleções | Listar, ler, criar (rascunho), editar, publicar e remover posts, projetos, serviços, depoimentos, FAQ, currículo, equipe e planos |
+| Propostas | Listar, ler, criar e editar propostas comerciais (com senha opcional no link; a senha nunca volta nas respostas), com o plugin de propostas ligado |
 | Textos de interface | Ver e personalizar textos por idioma |
 | Mídia | Listar a biblioteca e subir imagens de um caminho local |
 | Contatos | Ver pedidos e mudar o status (com o plugin de contato ligado) |
@@ -81,6 +82,7 @@ Gravar não publica: o site estático só muda no próximo build. O agente só d
 - O servidor roda como processo seu, com o login e o papel do usuário. Em **produção**, leia sempre a prévia: o conteúdo muda na hora no banco.
 - O MCP **não usa** `convex dev|deploy|run|import`: só as funções públicas do projeto, com o papel do usuário.
 - Tokens e senhas nunca saem em respostas, em recursos nem em mensagens de erro.
+- A senha de uma proposta é um argumento da ferramenta (o backend guarda só o hash) e passa pela conversa com o agente. Se isso incomoda, crie a proposta sem senha e defina a senha no painel.
 - O envio de imagens lê um arquivo local (só imagens, conferidas pelo conteúdo). Restrinja o acesso ao sistema de arquivos do agente, se isso for um problema.
 
 ## Skills: o "como escrever"

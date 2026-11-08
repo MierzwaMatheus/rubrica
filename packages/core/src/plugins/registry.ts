@@ -71,7 +71,7 @@ export const CORE_PLUGINS: PluginDefinition[] = [
     defaultEnabled: { pessoal: true, empresa: true },
     collections: ["projects"],
     admin: [{ path: "/admin/projetos", label: "Projetos", icon: "briefcase", roles: [...CONTENT] }],
-    mcpTools: ["projects_list", "projects_get", "projects_create", "projects_update"],
+    mcpTools: ["projects_list", "projects_get", "projects_create", "projects_update", "projects_publish"],
   }),
   definePlugin({
     id: "resume",
@@ -116,7 +116,7 @@ export const CORE_PLUGINS: PluginDefinition[] = [
     defaultEnabled: { empresa: true },
     collections: ["plans"],
     admin: [{ path: "/admin/planos", label: "Planos", icon: "tags", roles: [...CONTENT, "comercial"] }],
-    mcpTools: ["plans_list", "plans_upsert"],
+    mcpTools: ["plans_list", "plans_get", "plans_create", "plans_update", "plans_publish"],
   }),
   definePlugin({
     id: "team",
@@ -126,7 +126,7 @@ export const CORE_PLUGINS: PluginDefinition[] = [
     defaultEnabled: { empresa: true },
     collections: ["team"],
     admin: [{ path: "/admin/equipe", label: "Equipe", icon: "users", roles: [...CONTENT] }],
-    mcpTools: ["team_list", "team_upsert"],
+    mcpTools: ["team_list", "team_get", "team_create", "team_update", "team_publish"],
   }),
   definePlugin({
     id: "ai-resumes",

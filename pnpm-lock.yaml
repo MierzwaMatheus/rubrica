@@ -169,6 +169,25 @@ importers:
         specifier: ^3.2.4
         version: 3.2.7(@edge-runtime/vm@5.0.0)(@types/node@22.20.5)(lightningcss@1.33.0)(msw@2.15.0(@types/node@22.20.5)(typescript@5.9.3))(yaml@2.9.1)
 
+  packages/themes/cyberpunk:
+    dependencies:
+      '@rubrica/theme-padrao':
+        specifier: workspace:^
+        version: link:../padrao
+    devDependencies:
+      '@rubrica/core':
+        specifier: workspace:^
+        version: link:../../core
+      '@types/react':
+        specifier: ^19.2.0
+        version: 19.3.0
+      react:
+        specifier: ^19.2.1
+        version: 19.3.1
+      typescript:
+        specifier: ^5.9.0
+        version: 5.9.3
+
   packages/themes/padrao:
     devDependencies:
       '@rubrica/core':

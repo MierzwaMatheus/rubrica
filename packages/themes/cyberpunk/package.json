@@ -1,0 +1,30 @@
+{
+  "name": "@rubrica/theme-cyberpunk",
+  "version": "2.0.0-alpha.0",
+  "description": "Tema cyberpunk do Rubrica: layout do mmlo.com.br (sidebar com avatar grande, esquema neon, Chakra Petch).",
+  "type": "module",
+  "license": "MIT",
+  "exports": {
+    ".": "./src/index.tsx",
+    "./styles.css": "./src/styles.css",
+    "./fonts.json": "./src/fonts.json"
+  },
+  "files": ["src"],
+  "rubrica": { "contract": "^1" },
+  "scripts": {
+    "check": "tsc --noEmit -p tsconfig.json"
+  },
+  "peerDependencies": {
+    "@rubrica/core": "workspace:^",
+    "react": "^19.2.0"
+  },
+  "dependencies": {
+    "@rubrica/theme-padrao": "workspace:^"
+  },
+  "devDependencies": {
+    "@rubrica/core": "workspace:^",
+    "@types/react": "^19.2.0",
+    "react": "^19.2.1",
+    "typescript": "^5.9.0"
+  }
+}

@@ -62,4 +62,11 @@ describe("montagem do site", () => {
     expect(s.context("en", "/en").t("blog.readingTime", { minutes: 3 })).toBe("3 min read");
     expect(s.context("pt-BR", "/").t("nav.menu")).toBe("Menu");
   });
+
+  it("telefone e WhatsApp do dono chegam à casca (ctx.site.person)", async () => {
+    const snapshot = await fixtureSource(fixtures).load();
+    snapshot.site.person = { name: "Ana", phone: "+55 11 90000-0000", whatsapp: "+5511900000000" };
+    const built = await buildSite({ snapshot, theme, blocks: CORE_BLOCKS, plugins: CORE_PLUGINS });
+    expect(built.context("pt-BR", "/", []).site.person).toMatchObject({ phone: "+55 11 90000-0000", whatsapp: "+5511900000000" });
+  });
 });

@@ -9,8 +9,14 @@
  */
 import type { AstroIntegration } from "astro";
 import react from "@astrojs/react";
+import { fontProviders } from "astro/config";
+import { createRequire } from "node:module";
+import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { isAbsolute, resolve } from "node:path";
+import { fixtureSource, type DataSource } from "../data/source";
+import type { ThemeFonts } from "../theme/contract";
+import { planFonts, type FontPlan } from "../theme/fonts";
 
 export type SourceOption =
   /** Pasta com site.json, pages.json, texts.json e collections/*.json. */
@@ -39,11 +45,39 @@ const VIRTUAL = {
 
 const here = (p: string) => fileURLToPath(new URL(p, import.meta.url));
 
+/**
+ * Fontes do tema: o pacote exporta `./fonts.json` (`{ sans, mono, display }`), que o
+ * `index` do tema também importa. Procura pelo Node (dependência do projeto) e, para
+ * temas do workspace que o testador injeta por alias, pelo `RUBRICA_THEME_ALIAS`.
+ */
+export function readThemeFonts(themeSpec: string, root: string): ThemeFonts | undefined {
+  const spec = `${themeSpec}/fonts.json`;
+  let file: string | undefined;
+  try {
+    file = createRequire(resolve(root, "package.json")).resolve(spec);
+  } catch {
+    try {
+      const aliases: { find: string; replacement: string }[] = JSON.parse(process.env.RUBRICA_THEME_ALIAS ?? "[]");
+      file = aliases.find((a) => new RegExp(a.find).test(spec))?.replacement;
+    } catch {
+      /* alias malformado: sem fontes do tema */
+    }
+  }
+  if (!file || !existsSync(file)) return undefined;
+  return JSON.parse(readFileSync(file, "utf-8")) as ThemeFonts;
+}
+
+async function loadSource(source: SourceOption, abs: (p: string) => string): Promise<DataSource> {
+  if ("fixtures" in source) return fixtureSource(abs(source.fixtures));
+  const { convexSource } = await import("../data/convex");
+  return convexSource(source.convex.url ?? null);
+}
+
 export default function rubrica(options: RubricaOptions): AstroIntegration {
   return {
     name: "@rubrica/core",
     hooks: {
-      "astro:config:setup"({ config, updateConfig, injectRoute }) {
+      async "astro:config:setup"({ config, updateConfig, injectRoute }) {
         const root = fileURLToPath(config.root);
         const abs = (p: string) => (isAbsolute(p) ? p : resolve(root, p));
         const spec = (s: string) => (s.startsWith(".") ? abs(s) : s);
@@ -62,8 +96,14 @@ export default function rubrica(options: RubricaOptions): AstroIntegration {
           ([name, m], i) => `import ProjectIsland${i} from ${JSON.stringify(spec(m))};\nislands[${JSON.stringify(name)}] = ProjectIsland${i};`,
         );
 
+        // Fontes: as famílias vêm do site (aparência) ou do tema. O Astro baixa do Google Fonts
+        // no build e serve local; o <head> só recebe `<Font>` (ver Document.astro).
+        const snapshot = await (await loadSource(source, abs)).load();
+        const fontPlan: FontPlan = planFonts(snapshot.site.appearance, readThemeFonts(options.theme, root));
+
         const modules: Record<string, string> = {
           [VIRTUAL.config]: [
+            `export const fontPlan = ${JSON.stringify(fontPlan)};`,
             `import theme from ${JSON.stringify(spec(options.theme))};`,
             sourceCode,
             ...blockImports,
@@ -85,6 +125,15 @@ export default function rubrica(options: RubricaOptions): AstroIntegration {
           trailingSlash: "never",
           build: { format: "directory" },
           integrations: [react()],
+          fonts: fontPlan.fonts.map((f) => ({
+            provider: fontProviders.google(),
+            name: f.name,
+            cssVariable: f.cssVariable,
+            weights: f.weights,
+            styles: ["normal"],
+            subsets: ["latin", "latin-ext"],
+            fallbacks: f.fallbacks,
+          })),
           vite: {
             plugins: [
               {

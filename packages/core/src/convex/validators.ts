@@ -88,6 +88,8 @@ export const vAppearance = v.object({
   tokens: v.optional(v.record(v.string(), v.string())),
   fontSans: v.optional(v.string()),
   fontMono: v.optional(v.string()),
+  /** Textura da página; sem ela, a do tema. */
+  texture: v.optional(v.union(v.literal("none"), v.literal("grain"), v.literal("paper"), v.literal("scanlines"))),
 });
 
 export const vNavItem = v.object({ label: vLocalized, href: v.string() });

@@ -26,6 +26,8 @@ const SAFE_VALUE = /^[^;{}<>]*$/;
 
 const SWATCH_ROLES = ["bg", "surface", "primary", "accent", "accent2"] as const;
 
+const TEXTURE_LABELS = { none: "Nenhuma", grain: "Grão de filme", paper: "Papel", scanlines: "Scanlines (monitor antigo)" } as const;
+
 function SchemeCard({ scheme, selected, onSelect }: { scheme: ColorScheme; selected: boolean; onSelect: () => void }) {
   return (
     <button
@@ -195,6 +197,22 @@ export default function Appearance() {
               <div className="flex items-center justify-between gap-3">
                 <Label htmlFor="color-toggle">Botão para alternar claro e escuro</Label>
                 <Switch id="color-toggle" checked={draft.colorToggle} onCheckedChange={(v) => setDraft({ ...draft, colorToggle: v })} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="texture">Textura</Label>
+                <NativeSelect
+                  id="texture"
+                  value={draft.texture ?? ""}
+                  onChange={(e) => setDraft({ ...draft, texture: (e.target.value || undefined) as AppearanceValue["texture"] })}
+                >
+                  <option value="">{`Padrão do tema (${TEXTURE_LABELS[panel.theme.texture ?? "none"]})`}</option>
+                  {(Object.keys(TEXTURE_LABELS) as (keyof typeof TEXTURE_LABELS)[]).map((t) => (
+                    <option key={t} value={t}>
+                      {TEXTURE_LABELS[t]}
+                    </option>
+                  ))}
+                </NativeSelect>
+                <p className="text-xs text-muted-foreground">Uma camada fina por cima da página inteira. Some para quem pede menos transparência no sistema.</p>
               </div>
             </CardContent>
           </Card>

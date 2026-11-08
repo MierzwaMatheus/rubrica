@@ -108,6 +108,8 @@ export default function PreviewApp() {
     const head = appearanceHead({ appearance: { ...appearance, fontSans: undefined, fontMono: undefined } }, { scheme: theme.scheme });
     if (head.scheme) root.dataset.scheme = head.scheme;
     else delete root.dataset.scheme;
+    if (head.texture) root.dataset.texture = head.texture;
+    else delete root.dataset.texture;
     const plan = planFonts(appearance, theme.fonts);
     const nameOf = (variable: string) => plan.fonts.find((f) => f.cssVariable === variable)?.name;
     const fontCss = Object.entries(plan.assign)

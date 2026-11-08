@@ -245,6 +245,11 @@ export interface Person {
   photo?: RawImage;
 }
 
+/** Textura por cima da página inteira (como na v1): grão de filme, papel ou scanlines. */
+export type Texture = "none" | "grain" | "paper" | "scanlines";
+
+export const TEXTURES: readonly Texture[] = ["none", "grain", "paper", "scanlines"];
+
 export interface Appearance {
   colorMode: "dark" | "light" | "system";
   colorToggle: boolean;
@@ -259,6 +264,8 @@ export interface Appearance {
   fontSans?: string;
   /** Família do Google Fonts para código e detalhes em monoespaçada. */
   fontMono?: string;
+  /** Textura da página. Sem ela, vale a do tema (`texture`); `none` desliga. */
+  texture?: Texture;
 }
 
 export interface SiteSettings {

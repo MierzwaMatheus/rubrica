@@ -93,6 +93,31 @@ a { color: var(--rb-accent); }
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
 }
+/*
+ * Texturas (data-texture na raiz: appearance.texture, senão a do tema), como na v1: uma
+ * camada fixa por cima da página inteira, que não recebe cliques. No escuro, a mistura
+ * clareia em vez de escurecer. Some para quem pede menos transparência.
+ */
+:root {
+  --rb-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --rb-paper: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.035 .09' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");
+}
+[data-texture] body::after { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 2147483000; }
+[data-texture="grain"] body::after { background-image: var(--rb-noise); mix-blend-mode: multiply; opacity: 0.22; }
+[data-texture="paper"] body::after { background-image: var(--rb-paper), var(--rb-noise); background-size: 320px, 180px; mix-blend-mode: multiply; opacity: 0.17; }
+[data-texture="scanlines"] body::after { background: repeating-linear-gradient(0deg, rgb(0 0 0 / 0.08) 0 1px, transparent 1px 3px); }
+[data-color-mode="dark"][data-texture="grain"] body::after { mix-blend-mode: screen; opacity: 0.09; }
+[data-color-mode="dark"][data-texture="paper"] body::after { mix-blend-mode: screen; opacity: 0.07; }
+[data-color-mode="dark"][data-texture="scanlines"] body::after { background: repeating-linear-gradient(0deg, rgb(0 0 0 / 0.38) 0 1px, transparent 1px 3px); }
+@media (prefers-color-scheme: dark) {
+  [data-color-mode="system"][data-texture="grain"] body::after { mix-blend-mode: screen; opacity: 0.09; }
+  [data-color-mode="system"][data-texture="paper"] body::after { mix-blend-mode: screen; opacity: 0.07; }
+  [data-color-mode="system"][data-texture="scanlines"] body::after { background: repeating-linear-gradient(0deg, rgb(0 0 0 / 0.38) 0 1px, transparent 1px 3px); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  [data-texture] body::after { display: none; }
+}
+
 .rb-skip { position: absolute; left: -9999px; top: 0; }
 .rb-skip:focus { left: 1rem; top: 1rem; z-index: 100; background: var(--rb-bg); padding: 0.5rem 1rem; }
 

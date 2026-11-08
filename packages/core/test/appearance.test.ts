@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { appearanceHead } from "../src/theme/appearance";
+import { appearanceHead, resolveTexture } from "../src/theme/appearance";
 import { planFonts } from "../src/theme/fonts";
 
 const base = { colorMode: "dark", colorToggle: false } as const;
@@ -34,6 +34,17 @@ describe("aparência no head", () => {
     expect(css).toContain("--rb-font-sans:var(--rbf-sans)");
     expect(css).toContain("--rb-font-mono:var(--rbf-mono)");
     expect(fonts.fonts.map((f) => f.name)).toEqual(["Inter", "Fira Code"]);
+  });
+});
+
+describe("textura", () => {
+  it("a do site vence a do tema; none desliga; desconhecida é ignorada", () => {
+    expect(resolveTexture({}, {})).toBeUndefined();
+    expect(resolveTexture({}, { texture: "grain" })).toBe("grain");
+    expect(resolveTexture({ texture: "paper" }, { texture: "grain" })).toBe("paper");
+    expect(resolveTexture({ texture: "none" }, { texture: "grain" })).toBeUndefined();
+    expect(resolveTexture({ texture: "lava" as never }, {})).toBeUndefined();
+    expect(appearanceHead({ appearance: { colorMode: "dark", colorToggle: false } }, { texture: "scanlines" }).texture).toBe("scanlines");
   });
 });
 

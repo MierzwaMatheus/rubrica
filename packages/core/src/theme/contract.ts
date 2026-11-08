@@ -241,6 +241,12 @@ export interface ThemeDefinition {
    */
   colorMode?: "dark" | "light" | "system";
   /**
+   * Textura padrão do tema (a que o layout da v1 recomendava), quando o site não escolhe uma
+   * (`appearance.texture`). Uma camada fixa por cima da página, sem receber cliques; some com
+   * `prefers-reduced-transparency`. Sem ela, nenhuma.
+   */
+  texture?: import("../content/types").Texture;
+  /**
    * Fontes que o tema usa por padrão (Google Fonts), baixadas no build. O build lê as
    * mesmas famílias do `fonts.json` que o pacote do tema exporta em "./fonts.json" (o
    * `index` do tema importa esse arquivo, então há uma fonte só).

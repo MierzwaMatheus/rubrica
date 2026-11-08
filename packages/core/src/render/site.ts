@@ -82,6 +82,13 @@ function interpolate(text: string, vars?: Record<string, string | number>): stri
   return text.replace(/\{(\w+)\}/g, (m, k: string) => (k in vars ? String(vars[k]) : m));
 }
 
+/** Texto de interface do tema: idioma exato, idioma base, inglês. */
+function themeText(theme: ThemeDefinition, key: string, locale: Locale): string | undefined {
+  const entry = theme.texts?.[key];
+  if (!entry) return undefined;
+  return entry[locale] ?? entry[locale.split("-")[0]!.toLowerCase()] ?? entry.en;
+}
+
 export function buildSite(input: BuildInput): BuiltSite {
   const { snapshot, theme } = input;
   const settings = snapshot.site;
@@ -206,7 +213,7 @@ export function buildSite(input: BuildInput): BuiltSite {
   function context(locale: Locale, url: string, alternates: Alternate[] = []): RenderContext {
     const o = opts(locale);
     const t = (key: string, vars?: Record<string, string | number>) => {
-      const text = pickWithFallback(snapshot.texts[key], locale, cfg) ?? defaultUiText(key, locale) ?? key;
+      const text = pickWithFallback(snapshot.texts[key], locale, cfg) ?? themeText(theme, key, locale) ?? defaultUiText(key, locale) ?? key;
       return interpolate(text, vars);
     };
     const navigation = settings.navigation

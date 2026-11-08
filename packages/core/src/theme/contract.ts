@@ -183,6 +183,11 @@ export interface ThemeDefinition {
    * `index` do tema importa esse arquivo, então há uma fonte só).
    */
   fonts?: ThemeFonts;
+  /**
+   * Textos de interface próprios do tema (chave → texto por idioma base: `pt`, `en`, `es`).
+   * Use um prefixo com o id do tema (`chat.typing`). O site pode sobrescrever em "Textos".
+   */
+  texts?: Record<string, Record<string, string>>;
 }
 
 export function defineTheme(theme: ThemeDefinition): ThemeDefinition {

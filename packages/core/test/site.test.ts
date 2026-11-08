@@ -77,4 +77,13 @@ describe("montagem do site", () => {
     const logo = s.context("en", "/en").site.logo;
     expect(logo).toMatchObject({ src: "/logo.svg", alt: "Ana Souza", dark: { src: "/logo-dark.svg", alt: "Ana" } });
   });
+
+  it("textos do tema ficam entre os do site e os do núcleo", async () => {
+    const snapshot = await fixtureSource(fixtures).load();
+    const themed = { ...theme, texts: { "teste.ola": { pt: "Olá do tema", en: "Hi from theme" }, "nav.menu": { pt: "Navegar" } } };
+    const s = buildSite({ snapshot, theme: themed, blocks: CORE_BLOCKS, plugins: CORE_PLUGINS });
+    expect(s.context("en", "/en").t("teste.ola")).toBe("Hi from theme");
+    expect(s.context("pt-BR", "/").t("nav.menu")).toBe("Navegar");
+    expect(s.context("en", "/en").t("nav.menu")).toBe("Menu");
+  });
 });

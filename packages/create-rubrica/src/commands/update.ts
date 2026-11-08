@@ -10,6 +10,7 @@ import { convexRun, deploymentLabel, type ConvexContext } from "../utils/convex.
 import { readEnvLocal } from "../utils/env.js";
 import { errorOutput, run as defaultRun, tail, type Runner } from "../utils/exec.js";
 import { projectPackageManager, writeFiles } from "../utils/fs.js";
+import { runScript } from "../utils/packageManager.js";
 import { CORE_MODULES } from "../core-manifest.js";
 import { readConvexDir } from "../project/disk.js";
 import { installedVersion, loadInstalledCore, type InstalledCore } from "../project/introspect.js";
@@ -139,5 +140,12 @@ export async function runUpdate(argv: string[], deps: UpdateDeps): Promise<void>
   for (const e of after.plan.ejectedChanged) log.warn(`Ejetado ${e.tipo}: ${e.status === "mudou" ? `o original mudou; compare ${e.arquivo} com ${e.original}` : "o original não existe mais"}.`);
 
   await track(projectDir, "atualizacao", { de: state.version, para: coreVersion, migracoes: after.plan.migrations.length, ejetadosMudaram: after.plan.ejectedChanged.length });
-  outro(`Atualizado para o @rubrica/core ${coreVersion}. Confira com pnpm check, pnpm test e pnpm build, e faça o commit.\nO site no ar só muda quando você publicar.`);
+  const pushed = after.plan.migrations.length > 0 && !!readEnvLocal(projectDir).CONVEX_DEPLOYMENT;
+  outro(
+    [
+      `Atualizado para o @rubrica/core ${coreVersion}. Confira com ${runScript(pm, "check")}, ${runScript(pm, "test")} e ${runScript(pm, "build")}, e faça o commit.`,
+      ...(changed && !pushed ? ["O backend (convex/) mudou: publique no Convex de desenvolvimento com npx convex dev --once."] : []),
+      "O site no ar só muda quando você publicar.",
+    ].join("\n"),
+  );
 }

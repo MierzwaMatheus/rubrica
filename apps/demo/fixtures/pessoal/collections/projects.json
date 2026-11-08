@@ -1,0 +1,6 @@
+[
+  { "id": "proj1", "slug": "app-banco", "order": 1, "featured": true, "year": 2024, "client": "Banco Exemplo",
+    "title": { "pt-BR": "App de banco digital", "en": "Digital banking app" },
+    "summary": { "pt-BR": "Redesenho do onboarding.", "en": "Onboarding redesign." },
+    "sections": [{ "title": { "pt-BR": "Contexto", "en": "Context" }, "body": { "pt-BR": "<p>O onboarding perdia 60% das pessoas.</p>", "en": "<p>Onboarding lost 60% of people.</p>" } }] }
+]

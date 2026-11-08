@@ -1,0 +1,55 @@
+[
+  {
+    "id": "home", "path": "/", "system": true, "published": true, "updatedAt": 1762560000000,
+    "title": { "pt-BR": "Início", "en": "Home" },
+    "blocks": [
+      { "id": "h1", "type": "hero", "visible": true, "fields": {
+        "eyebrow": { "pt-BR": "Designer de produto", "en": "Product designer" },
+        "title": { "pt-BR": "Interfaces que as pessoas entendem na primeira vez", "en": "Interfaces people understand the first time" },
+        "subtitle": { "pt-BR": "Pesquisa, design e protótipos para produtos digitais.", "en": "Research, design and prototypes for digital products." },
+        "primaryCta": { "label": { "pt-BR": "Ver projetos", "en": "See projects" }, "href": "/portfolio" },
+        "secondaryCta": { "label": { "pt-BR": "Falar comigo", "en": "Get in touch" }, "href": "#contato" }
+      } },
+      { "id": "n1", "type": "numeros", "visible": true, "fields": {
+        "title": { "pt-BR": "Em números", "en": "By the numbers" },
+        "items": [
+          { "value": "8+", "label": { "pt-BR": "anos de experiência", "en": "years of experience" } },
+          { "value": "40", "label": { "pt-BR": "produtos lançados", "en": "products shipped" } }
+        ]
+      } },
+      { "id": "c1", "type": "cases", "visible": true, "fields": { "title": { "pt-BR": "Cases em destaque", "en": "Featured work" } } },
+      { "id": "p1", "type": "posts-recentes", "visible": true, "fields": { "title": { "pt-BR": "Do blog", "en": "From the blog" } } },
+      { "id": "x1", "type": "texto", "visible": false, "fields": { "body": { "pt-BR": "<p>Oculto</p>" } } },
+      { "id": "k1", "type": "contato", "visible": true, "fields": { "anchor": "contato", "title": { "pt-BR": "Vamos conversar", "en": "Let's talk" } } },
+      { "id": "t1", "type": "cta", "visible": true, "fields": {
+        "title": { "pt-BR": "Tem um projeto?", "en": "Have a project?" },
+        "primary": { "label": { "pt-BR": "Mande uma mensagem", "en": "Send a message" }, "href": "#contato" }
+      } }
+    ]
+  },
+  {
+    "id": "sobre", "path": "/sobre", "system": true, "published": true, "updatedAt": 1762560000000,
+    "title": { "pt-BR": "Sobre", "en": "About" },
+    "blocks": [
+      { "id": "s1", "type": "texto", "visible": true, "fields": {
+        "title": { "pt-BR": "Sobre mim", "en": "About me" },
+        "body": { "pt-BR": "<p>Trabalho com design de produto desde 2017.</p>", "en": "<p>I've worked in product design since 2017.</p>" }
+      } }
+    ]
+  },
+  {
+    "id": "blog", "path": "/blog", "system": true, "published": true, "updatedAt": 1762560000000,
+    "title": { "pt-BR": "Blog", "en": "Blog" },
+    "blocks": [{ "id": "b1", "type": "posts-recentes", "visible": true, "source": { "collection": "posts", "sort": "recent" }, "fields": {} }]
+  },
+  {
+    "id": "portfolio", "path": "/portfolio", "system": true, "published": true, "updatedAt": 1762560000000,
+    "title": { "pt-BR": "Projetos", "en": "Projects" },
+    "blocks": [{ "id": "pf1", "type": "cases", "visible": true, "source": { "collection": "projects", "sort": "order" }, "fields": {} }]
+  },
+  {
+    "id": "so-pt", "path": "/novidades", "published": true, "updatedAt": 1762560000000,
+    "title": { "pt-BR": "Novidades" },
+    "blocks": [{ "id": "np1", "type": "texto", "visible": true, "fields": { "body": { "pt-BR": "<p>Só em português.</p>" } } }]
+  }
+]

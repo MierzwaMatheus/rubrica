@@ -10,7 +10,7 @@ import { list, parseArgs } from "../utils/args.js";
 import { run as defaultRun, type Runner, errorOutput, tail } from "../utils/exec.js";
 import { isEmptyDir, writeFiles } from "../utils/fs.js";
 import { normalizeEmail, normalizeHandle, normalizeUrl, validateEmail, validateUrl } from "../utils/normalize.js";
-import { packageManagerFromUserAgent } from "../utils/packageManager.js";
+import { packageManagerFromUserAgent, runScript } from "../utils/packageManager.js";
 import { COMMON_LOCALES, normalizeLocales } from "../locales.js";
 import { defaultPlugins, pluginOptions, pluginsRecord, presetPlugins, unknownPlugins } from "../plugins.js";
 import { convexFiles } from "../project/convex.js";
@@ -247,7 +247,7 @@ export async function runCreate(argv: string[], deps: RunCreateDeps): Promise<vo
       `  cd ${folder}`,
       ...(options.install ? [] : [`  ${options.packageManager} install`]),
       "  npx create-rubrica setup     (liga o Convex, cria o login e o conteúdo inicial)",
-      `  ${options.packageManager} dev`,
+      `  ${runScript(options.packageManager, "dev")}`,
     ].join("\n"),
   );
 }

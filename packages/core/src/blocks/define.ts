@@ -25,6 +25,11 @@ export interface BlockDefinition<M extends FieldMap = FieldMap> {
    * desenhar a sua versão estática.
    */
   interactive?: boolean;
+  /**
+   * Quando o bloco `interactive` realmente monta a ilha, dados os campos já resolvidos e
+   * os plugins ligados (ex.: o botão de PDF só existe com `showDownload`). Sem ela, monta sempre.
+   */
+  islandWhen?: (fields: Record<string, unknown>, plugins: ReadonlySet<string>) => boolean;
 }
 
 export function defineBlock<const M extends FieldMap>(def: BlockDefinition<M>): BlockDefinition<M> {

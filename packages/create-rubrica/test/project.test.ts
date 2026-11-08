@@ -71,7 +71,7 @@ describe("hospedagem neutra (decisão 21)", () => {
     const json = JSON.parse(vercelJson(config));
     expect(json.buildCommand).toContain("convex deploy");
     expect(json.redirects).toEqual([{ source: "/antigo", destination: "/novo", permanent: true }]);
-    expect(json.headers.map((h: { source: string }) => h.source)).toEqual(["/(.*)", "/_astro/(.*)"]);
+    expect(json.headers.map((h: { source: string }) => h.source)).toEqual(["/((?!admin).*)", "/admin(.*)", "/_astro/(.*)"]);
   });
 
   it("_headers e _redirects com a mesma configuração", () => {
@@ -87,6 +87,45 @@ describe("hospedagem neutra (decisão 21)", () => {
     expect(CONTENT_SECURITY_POLICY).toContain("https://*.convex.site");
     expect(CONTENT_SECURITY_POLICY).toContain("frame-ancestors 'none'");
     expect(Object.keys(hostingFiles())).toEqual(["vercel.json", "public/_redirects", "public/_headers"]);
+  });
+});
+
+describe("cabeçalhos do painel", () => {
+  const adminHeaders = (rule: { headers: { key: string; value: string }[] }) => Object.fromEntries(rule.headers.map((h) => [h.key, h.value]));
+
+  it("na Vercel, o painel recebe 'self'/SAMEORIGIN e a regra do site não o alcança", () => {
+    const json = JSON.parse(vercelJson(defaultHosting()));
+    const rules = json.headers as { source: string; headers: { key: string; value: string }[] }[];
+    expect(rules.map((r) => r.source)).toEqual(["/((?!admin).*)", "/admin(.*)", "/_astro/(.*)"]);
+    const [site, admin] = rules.map(adminHeaders);
+    expect(site["X-Frame-Options"]).toBe("DENY");
+    expect(site["Content-Security-Policy"]).toContain("frame-ancestors 'none'");
+    expect(admin["X-Frame-Options"]).toBe("SAMEORIGIN");
+    expect(admin["Content-Security-Policy"]).toContain("frame-ancestors 'self'");
+    expect(admin["Strict-Transport-Security"]).toBeDefined();
+    // a regex da regra do site não casa com o painel, mas casa com o resto
+    const siteRe = new RegExp(`^${rules[0].source}$`);
+    expect(siteRe.test("/admin")).toBe(false);
+    expect(siteRe.test("/admin/preview")).toBe(false);
+    expect(siteRe.test("/")).toBe(true);
+    expect(siteRe.test("/blog/post")).toBe(true);
+  });
+
+  it("no _headers, a regra do painel solta os valores herdados da /* antes de definir os seus", () => {
+    const headers = headersFile(defaultHosting());
+    const admin = headers.slice(headers.indexOf("/admin*"), headers.indexOf("/_astro/*"));
+    expect(admin).toContain("  ! X-Frame-Options\n");
+    expect(admin).toContain("  ! Content-Security-Policy\n");
+    expect(admin).toContain("  X-Frame-Options: SAMEORIGIN");
+    expect(admin).toContain("frame-ancestors 'self'");
+    const site = headers.slice(0, headers.indexOf("/admin*"));
+    expect(site).toContain("X-Frame-Options: DENY");
+    expect(site).not.toContain("!");
+  });
+
+  it("o analytics entra na CSP do site e na do painel", () => {
+    const files = hostingFiles(defaultHosting({ analyticsOrigin: "https://cloud.umami.is" }));
+    expect(files["public/_headers"].match(/script-src 'self' 'unsafe-inline' https:\/\/cloud.umami.is/g)).toHaveLength(2);
   });
 });
 

@@ -2,22 +2,6 @@
 
 O que mudou em cada versão do Rubrica (núcleo, temas e CLI `create-rubrica`). Detalhes de cada uma nas [notas da release](https://github.com/MierzwaMatheus/rubrica/releases). Para atualizar um projeto v2, veja [Atualizar o Rubrica](./docs/guia/atualizar.md); para sair da v1, [Migrar da v1](./docs/guia/migrar.md).
 
-## 2.0.1 — 2026-11-08
-
-Correções achadas ao migrar um portfólio de verdade (mmlo.com.br) da v1 para a v2.
-
-- **`migrar`:**
-  - entende os períodos do currículo "Jan-2025 - atual", "2022 - Nov-2024" e "2015-2017";
-  - instala as dependências do zero, porque pacotes velhos da v1 quebravam o build;
-  - não apaga mais os arquivos que você criou na raiz do projeto, como `PRD.md` e `.windsurf/`;
-  - mantém os títulos de SEO da v1 (com " | nome do site", e o da home nos dois idiomas);
-  - leva a foto de perfil para o banco novo;
-  - segue a ordem do menu da v1;
-  - mantém o selo "whoami" e o telefone da barra lateral;
-  - aceita `--help`.
-- **Export:** o guia e o comando agora pedem `--prod --include-file-storage`, para trazer o conteúdo de verdade e as imagens.
-- **Tema cyberpunk:** a página de case volta a ser como a da v1 (capa com o título, etiquetas, botões e seções em cartões); o cabeçalho do celular ganha o botão de contato; e o rodapé da barra lateral fica como o da v1.
-
 ## 2.0.0 — 2026-11-08
 
 A v2: o Rubrica deixa de ser um template copiado para o projeto e vira um **núcleo em pacote**, com **temas** e duas linhas de site (pessoal e empresa). Atualizar passa a ser subir a versão de um pacote.

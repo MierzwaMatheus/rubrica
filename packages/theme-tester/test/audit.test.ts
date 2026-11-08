@@ -1,6 +1,6 @@
 import { rm } from "node:fs/promises";
 import { afterAll, describe, expect, it } from "vitest";
-import { auditSite } from "../src/audit.ts";
+import { auditSite, thirdPartyStub } from "../src/audit.ts";
 import type { PageReport } from "../src/types.ts";
 import { goodBody, makeSite, ORIGIN } from "./helpers.ts";
 
@@ -92,6 +92,17 @@ describe("auditSite", () => {
     const pages = await auditSite({ dist: dir });
     expect(failed(find(pages, "/en"))).toEqual(expect.arrayContaining(["title", "description", "canonical", "lang"]));
     expect(failed(find(pages, "/"))).toContain("hreflang");
+  });
+
+  it("conteúdo de terceiros (miniatura, iframe) recebe resposta vazia, sem rede e sem reprovar", async () => {
+    const body = `<main><h1>Vídeo e agenda</h1><img src="https://i.ytimg.com/vi/M7lc1UVf-VE/hqdefault.jpg" alt="Miniatura" width="480" height="360" style="max-width:100%;height:auto"><iframe src="https://calendly.com/exemplo/30min" title="Agenda"></iframe></main>`;
+    const dir = await makeSite([{ path: "/", body }]);
+    dirs.push(dir);
+    const pages = await auditSite({ dist: dir, only: ["/"] });
+    expect(failed(find(pages, "/"))).toEqual([]);
+    expect(thirdPartyStub("image").contentType).toBe("image/svg+xml");
+    expect(thirdPartyStub("document").body).toContain("<title>");
+    expect(thirdPartyStub("script")).toEqual({ status: 204, body: "" });
   });
 
   it("reprova rolagem horizontal, erro de console e requisição 404", async () => {

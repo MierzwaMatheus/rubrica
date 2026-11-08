@@ -5,7 +5,7 @@
 import { readFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { gzipSync } from "node:zlib";
-import { chromium, type Browser, type Page } from "playwright";
+import { chromium, type Browser, type BrowserContext, type Page } from "playwright";
 import {
   checkCanonical,
   checkDescription,
@@ -200,8 +200,29 @@ export function findOverflow(width: number): string[] {
     .concat([`scrollWidth ${doc.scrollWidth}px > ${width}px`]);
 }
 
+/** Resposta vazia e válida para cada tipo de recurso de terceiros. */
+export function thirdPartyStub(resourceType: string): { status: number; contentType?: string; body: string } {
+  if (resourceType === "image") return { status: 200, contentType: "image/svg+xml", body: '<svg xmlns="http://www.w3.org/2000/svg" width="480" height="360"/>' };
+  if (resourceType === "document") return { status: 200, contentType: "text/html; charset=utf-8", body: '<!doctype html><html lang="en"><head><title>Conteúdo de terceiros</title></head><body></body></html>' };
+  return { status: 204, body: "" };
+}
+
+/**
+ * Pedidos a outras origens (miniatura do YouTube, iframe de agenda ou de mapa) recebem uma
+ * resposta vazia e válida, sem sair para a rede: a bateria mede o tema, não o provedor, e
+ * fica igual com ou sem internet. O site em si continua servido de verdade.
+ */
+async function stubThirdParty(context: BrowserContext, base: string): Promise<void> {
+  const origin = new URL(base).origin;
+  await context.route(
+    (url) => url.origin !== origin,
+    (route) => route.fulfill(thirdPartyStub(route.request().resourceType())),
+  );
+}
+
 async function auditOne(browser: Browser, base: string, path: string, is404: boolean, limits: Limits, axe: string) {
   const context = await browser.newContext({ viewport: DESKTOP });
+  await stubThirdParty(context, base);
   const page = await context.newPage();
   const consoleErrors: string[] = [];
   const badRequests: string[] = [];
@@ -234,6 +255,7 @@ async function auditOne(browser: Browser, base: string, path: string, is404: boo
   await context.close();
 
   const mobile = await browser.newContext({ viewport: MOBILE });
+  await stubThirdParty(mobile, base);
   const mpage = await mobile.newPage();
   await mpage.goto(base + path, { waitUntil: "load" });
   const overflow = await mpage.evaluate(findOverflow, MOBILE.width);

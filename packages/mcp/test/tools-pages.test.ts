@@ -55,6 +55,30 @@ describe("páginas e blocos pelo MCP", () => {
     expect(JSON.stringify(empresa.body)).toMatch(/precos/);
   });
 
+  it("blocos novos: endereço de vídeo e de incorporação validados no block_add e no block_update_fields", async () => {
+    const { runtime, client } = await runtimeFor(t, "content-editor");
+    const video = { id: "v1", type: "video", fields: { url: "https://youtu.be/M7lc1UVf-VE", title: { "pt-BR": "Vídeo" } } };
+    await call(runtime, "pages_create", { path: "/sobre", title: { "pt-BR": "Sobre" }, blocks: [video], dryRun: false });
+    const bad = await call(runtime, "block_update_fields", { page: "/sobre", blockId: "v1", fields: { url: "https://example.com/v.mp4" }, dryRun: false });
+    expect(bad.isError).toBe(true);
+    expect(bad.body.problems).toEqual([expect.objectContaining({ blockId: "v1", path: "url", message: expect.stringContaining("YouTube ou do Vimeo") })]);
+    const writes = client.writes().length;
+    const embed = await call(runtime, "block_add", {
+      page: "/sobre",
+      block: { type: "incorporacao", fields: { url: "<iframe src='https://evil.example'></iframe>", frameTitle: { "pt-BR": "Agenda" } } },
+      dryRun: false,
+    });
+    expect(embed.isError).toBe(true);
+    expect(JSON.stringify(embed.body.problems)).toContain("Calendly");
+    expect(client.writes()).toHaveLength(writes);
+    const ok = await call(runtime, "block_add", {
+      page: "/sobre",
+      block: { type: "linha-do-tempo", fields: { items: [{ date: { "pt-BR": "2020" }, title: { "pt-BR": "Início" } }] } },
+      dryRun: false,
+    });
+    expect(ok.isError).toBe(false);
+  });
+
   it("block_update_fields mescla o texto por idioma e mostra antes/depois", async () => {
     const { runtime } = await runtimeFor(t, "content-editor");
     await call(runtime, "pages_create", { path: "/sobre", title: { "pt-BR": "Sobre" }, blocks: [hero], dryRun: false });

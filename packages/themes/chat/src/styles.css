@@ -347,3 +347,11 @@ a.ct-card:hover .ct-go { color: var(--rb-fg); }
   .ct-typing i { animation: none; opacity: 0.7; }
   .ct-card { transition: none; }
 }
+
+/* Blocos do núcleo dentro de um balão (embedded.tsx): sem o respiro de seção. */
+.ct-core > .rb-section { padding: 0; }
+.ct-core > .rb-section > .rb-container { padding: 0; max-width: none; }
+.ct-core .rb-video, .ct-core .rb-timeline { max-width: none; }
+.ct-core .rb-compare__scroll { background: var(--rb-surface); }
+.ct-core .rb-compare__corner, .ct-core .rb-compare__feature { background: var(--rb-surface); }
+.ct-core .rb-compare__hint { display: block; }

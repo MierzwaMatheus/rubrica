@@ -6,6 +6,10 @@
  */
 import { defineBlock } from "../define";
 import { field } from "../fields";
+import { EMBED_PROVIDERS, parseEmbedUrl, parseVideoUrl } from "../media";
+
+/** Domínios que os blocos põem em iframe (a CSP do CLI lê daqui) e o parse dos endereços. */
+export { BLOCK_FRAME_SOURCES, EMBED_PROVIDERS, parseEmbedUrl, parseVideoUrl } from "../media";
 
 const heading = field.text({ label: "Título", maxLength: 140 });
 const intro = field.text({ label: "Texto de apoio", multiline: true, maxLength: 400 });
@@ -314,6 +318,185 @@ export const logosClientes = defineBlock({
   },
 });
 
+const embedLabels = EMBED_PROVIDERS.map((p) => p.label).join(", ");
+
+export const video = defineBlock({
+  type: "video",
+  label: "Vídeo",
+  description: "Vídeo do YouTube ou do Vimeo. Carrega leve: miniatura e botão de play, e o player só depois do clique.",
+  category: "comum",
+  interactive: true,
+  enhances: true,
+  islandWhen: (f) => parseVideoUrl(f.url) !== undefined,
+  fields: {
+    anchor,
+    title: heading,
+    intro,
+    url: field.text({
+      label: "Endereço do vídeo",
+      localized: false,
+      required: true,
+      maxLength: 300,
+      help: "Link do YouTube (youtube.com/watch?v=…, youtu.be/…, /shorts/…) ou do Vimeo (vimeo.com/123456789).",
+    }),
+    caption: field.text({
+      label: "Legenda",
+      maxLength: 200,
+      help: "Aparece abaixo do vídeo e dá nome ao botão de play e ao player para leitores de tela. Sem ela, vale o título.",
+    }),
+    poster: field.image({
+      label: "Miniatura própria",
+      help: "Opcional no YouTube (sem ela, usa a miniatura do vídeo). No Vimeo, sem imagem aparece só o botão de play.",
+    }),
+    aspect: field.select({
+      label: "Proporção",
+      options: [
+        { value: "16:9", label: "16:9 (paisagem)" },
+        { value: "4:3", label: "4:3" },
+        { value: "1:1", label: "1:1 (quadrado)" },
+        { value: "9:16", label: "9:16 (vertical, Shorts e Reels)" },
+      ],
+      default: "16:9",
+    }),
+  },
+  validate: (f) => (parseVideoUrl(f.url) ? [] : [{ path: "url", message: "Endereço do vídeo: use um link do YouTube ou do Vimeo" }]),
+  // Cheia com miniatura própria, curta com a do YouTube, Vimeo com e sem imagem.
+  sample: (_mode, i) => (i < 2 ? { url: "https://www.youtube.com/watch?v=M7lc1UVf-VE" } : { url: "https://vimeo.com/76979871", ...(i === 3 ? { poster: undefined } : {}) }),
+});
+
+export const incorporacao = defineBlock({
+  type: "incorporacao",
+  label: "Incorporação",
+  description: `Agenda, formulário, mapa ou player de outro serviço, por endereço, só dos provedores permitidos (${embedLabels}).`,
+  category: "comum",
+  fields: {
+    anchor,
+    title: heading,
+    intro,
+    url: field.text({
+      label: "Endereço da incorporação",
+      localized: false,
+      required: true,
+      maxLength: 2000,
+      help: `O link do "incorporar" (embed) do serviço: o endereço do src, não o código HTML. Provedores aceitos: ${embedLabels}.`,
+    }),
+    frameTitle: field.text({
+      label: "Título acessível",
+      required: true,
+      maxLength: 120,
+      help: "Descreve o conteúdo para leitores de tela (ex.: \"Agenda para marcar uma conversa\").",
+    }),
+    height: field.number({ label: "Altura (px)", integer: true, min: 150, max: 2000, help: "Opcional. Sem ela, vale a altura padrão do provedor." }),
+    showLink: field.boolean({ label: "Link para abrir em nova aba", default: true, help: "Mostra, abaixo, um link para abrir o serviço fora do site." }),
+  },
+  validate: (f) =>
+    parseEmbedUrl(f.url) ? [] : [{ path: "url", message: `Endereço da incorporação: use um link de incorporação de ${embedLabels}` }],
+  sample: (mode) => ({
+    url: mode === "curto" ? "https://www.google.com/maps/embed?pb=!1m18!1m12" : "https://calendly.com/exemplo/30min",
+    ...(mode === "cheio" ? { height: 700 } : {}),
+  }),
+});
+
+export const linhaDoTempo = defineBlock({
+  type: "linha-do-tempo",
+  label: "Linha do tempo",
+  description: "Marcos em ordem: história da empresa, trajetória, etapas de um projeto.",
+  category: "comum",
+  fields: {
+    anchor,
+    title: heading,
+    intro,
+    items: field.list({
+      label: "Marcos",
+      itemLabel: "Marco",
+      required: true,
+      min: 1,
+      max: 16,
+      of: {
+        date: field.text({ label: "Data", required: true, maxLength: 40, help: "Texto livre: 2019, mar. 2021, Hoje." }),
+        title: field.text({ label: "Título", required: true, maxLength: 120 }),
+        body: field.text({ label: "Texto", multiline: true, maxLength: 600 }),
+        image: field.image({ label: "Imagem" }),
+      },
+    }),
+  },
+});
+
+export const comparativoPlanos = defineBlock({
+  type: "comparativo-planos",
+  label: "Comparativo de planos",
+  description: "Tabela que compara os planos da coleção item a item (linhas = recursos, colunas = planos), com o botão de cada plano.",
+  category: "empresa",
+  plugin: "pricing",
+  source: { collections: ["plans"], default: { collection: "plans", sort: "order" } },
+  fields: {
+    anchor,
+    title: heading,
+    intro,
+    caption: field.text({
+      label: "Legenda da tabela",
+      maxLength: 160,
+      help: "Resumo da tabela para leitores de tela (e visível acima dela). Sem ela, vale o título, só para leitores de tela.",
+    }),
+    rows: field.list({
+      label: "Recursos",
+      itemLabel: "Recurso",
+      required: true,
+      min: 1,
+      max: 40,
+      of: {
+        label: field.text({ label: "Recurso", required: true, maxLength: 120 }),
+        detail: field.text({ label: "Detalhe", maxLength: 200 }),
+        cells: field.list({
+          label: "Planos",
+          itemLabel: "Plano",
+          max: 8,
+          help: "Um valor por plano, na ordem das colunas (a mesma da lista de planos do bloco). Plano sem valor fica com um traço.",
+          of: {
+            value: field.select({
+              label: "Valor",
+              options: [
+                { value: "sim", label: "✓ Incluso" },
+                { value: "nao", label: "✗ Não incluso" },
+                { value: "texto", label: "Texto" },
+              ],
+              default: "sim",
+            }),
+            text: field.text({ label: "Texto", maxLength: 60, help: "Para o valor \"Texto\" (ex.: até 5, ilimitado)." }),
+          },
+        }),
+      },
+    }),
+    note: field.text({ label: "Observação", multiline: true, maxLength: 300 }),
+  },
+  validate: (f) => {
+    const errors: { path: string; message: string }[] = [];
+    (f.rows as { cells?: { value?: string; text?: Record<string, string> }[] }[]).forEach((row, r) =>
+      row.cells?.forEach((cell, c) => {
+        const hasText = !!cell.text && Object.values(cell.text).some((t) => t.trim());
+        if (cell.value === "texto" && !hasText) errors.push({ path: `rows.${r}.cells.${c}.text`, message: "Texto: obrigatório quando o valor é \"Texto\"" });
+      }),
+    );
+    return errors;
+  },
+  sample: (mode) => ({
+    rows: (mode === "cheio" ? ROWS_SAMPLE : ROWS_SAMPLE.slice(0, 2)).map(([label, cells], i) => ({
+      label: { "*": mode === "cheio" && i === 0 ? "Páginas do site, com textos revisados e otimizados para busca" : label },
+      ...(mode === "cheio" && i === 1 ? { detail: { "*": "Atualizações de segurança e cópias de segurança diárias." } } : {}),
+      cells: cells.map((c) => (c === "sim" || c === "nao" ? { value: c } : { value: "texto", text: { "*": c } })),
+    })),
+  }),
+});
+
+const ROWS_SAMPLE: [string, string[]][] = [
+  ["Páginas", ["até 5", "até 15", "ilimitadas"]],
+  ["Hospedagem", ["sim", "sim", "sim"]],
+  ["Blog e SEO", ["nao", "sim", "sim"]],
+  ["Suporte", ["e-mail", "prioritário", "dedicado 24/7"]],
+  ["Relatório mensal", ["nao", "sim", "sim"]],
+  ["Integrações sob medida", ["nao", "nao", "sim"]],
+];
+
 export const CORE_BLOCKS = [
   hero,
   texto,
@@ -332,6 +515,10 @@ export const CORE_BLOCKS = [
   equipe,
   localizacao,
   logosClientes,
+  video,
+  incorporacao,
+  linhaDoTempo,
+  comparativoPlanos,
 ] as const;
 
 export type CoreBlock = (typeof CORE_BLOCKS)[number];

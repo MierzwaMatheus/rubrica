@@ -30,6 +30,24 @@ export interface BlockDefinition<M extends FieldMap = FieldMap> {
    * os plugins ligados (ex.: o botão de PDF só existe com `showDownload`). Sem ela, monta sempre.
    */
   islandWhen?: (fields: Record<string, unknown>, plugins: ReadonlySet<string>) => boolean;
+  /**
+   * A ilha só melhora o HTML estático do bloco, que funciona sem ela (ex.: o vídeo vira
+   * player no clique; sem JavaScript, é um link para o provedor). A prévia do painel mostra
+   * o bloco estático no lugar do aviso de "parte interativa".
+   */
+  enhances?: boolean;
+  /**
+   * Regras entre campos ou de formato que o schema não expressa (ex.: endereço de um
+   * provedor permitido). Recebe os valores crus, já conferidos campo a campo; vale no
+   * backend, no MCP e no painel, porque roda dentro de `validateBlock`.
+   */
+  validate?: (fields: Record<string, unknown>) => FieldError[];
+  /**
+   * Campos de exemplo para a vitrine da bateria de tema, por cima dos gerados pelo schema,
+   * quando o gerado não passaria na validação (endereços, por exemplo). `mode`: instância
+   * cheia ou curta; `instance`: índice da instância (alterna exemplos).
+   */
+  sample?: (mode: "cheio" | "curto", instance: number) => Record<string, unknown>;
 }
 
 export function defineBlock<const M extends FieldMap>(def: BlockDefinition<M>): BlockDefinition<M> {
@@ -50,6 +68,7 @@ export function validateBlock(
   block: { id?: string; fields: unknown; source?: CollectionQuery },
 ): BlockValidationError[] {
   const errors: BlockValidationError[] = validateFields(def.fields, block.fields);
+  if (def.validate && errors.length === 0) errors.push(...def.validate(block.fields as Record<string, unknown>));
   if (block.source) {
     if (!def.source) errors.push({ path: "source", message: `o bloco ${def.type} não lista coleções` });
     else if (!def.source.collections.includes(block.source.collection)) {

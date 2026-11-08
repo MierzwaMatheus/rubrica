@@ -31,6 +31,10 @@ Need a section that isn't here? See [Create a block](./criar-bloco.md).
 | [`equipe`](#equipe--equipe) | Equipe | People from the collection, with photo, role and social links. | company only | `team` |
 | [`localizacao`](#localizacao--localização) | Localização | Address, opening hours and map from the company details. | company only | — |
 | [`logos-clientes`](#logos-clientes--logos-de-clientes) | Logos de clientes | A strip of client or partner logos. | company only | — |
+| [`video`](#video--vídeo) | Vídeo | A YouTube or Vimeo video. Loads light: a thumbnail and a play button, and the player only after the click. | personal and company | — |
+| [`incorporacao`](#incorporacao--incorporação) | Incorporação | A calendar, form, map or player from another service, by address, only from the allowed providers (Calendly, Cal.com, Google Calendar, Google Forms, Typeform, Tally, Google Maps, OpenStreetMap, Spotify, SoundCloud, Figma). | personal and company | — |
+| [`linha-do-tempo`](#linha-do-tempo--linha-do-tempo) | Linha do tempo | Milestones in order: the company's history, a career path, the stages of a project. | personal and company | — |
+| [`comparativo-planos`](#comparativo-planos--comparativo-de-planos) | Comparativo de planos | A table that compares the collection's plans item by item (rows = features, columns = plans), with each plan's button. | company only | `pricing` |
 
 ## `hero` — Hero
 
@@ -314,3 +318,82 @@ A strip of client or partner logos.
 | `logos[].name` | Nome | text | yes | no | up to 80 characters |
 | `logos[].image` | Logo | image | yes | the alt text | — |
 | `logos[].href` | Link | text | no | no | up to 300 characters |
+
+## `video` — Vídeo
+
+A YouTube or Vimeo video. Loads light: a thumbnail and a play button, and the player only after the click.
+
+- **Site type:** personal and company
+- **Plugin:** none: always available
+- **JavaScript:** may mount an island (the interactive part, with JavaScript in the browser); the rest is static HTML
+- **Variants:** none: a single design in each theme
+
+| Field | Panel label | Type | Required | Translatable | Help and limits |
+|---|---|---|---|---|---|
+| `anchor` | Âncora | text | no | no | Identifier for links within the page (#contact). Optional; up to 40 characters |
+| `title` | Título | text | no | yes | up to 140 characters |
+| `intro` | Texto de apoio | long text | no | yes | up to 400 characters |
+| `url` | Endereço do vídeo | text | yes | no | A YouTube link (youtube.com/watch?v=…, youtu.be/…, /shorts/…) or a Vimeo link (vimeo.com/123456789); up to 300 characters |
+| `caption` | Legenda | text | no | yes | Shown below the video and names the play button and the player for screen readers. Without it, the title is used; up to 200 characters |
+| `poster` | Miniatura própria | image | no | the alt text | Optional on YouTube (without it, the video's thumbnail is used). On Vimeo, without an image only the play button shows |
+| `aspect` | Proporção | choice | no | — | options: `16:9` (16:9 (paisagem)), `4:3` (4:3), `1:1` (1:1 (quadrado)), `9:16` (9:16 (vertical, Shorts e Reels)); default: `16:9` |
+
+## `incorporacao` — Incorporação
+
+A calendar, form, map or player from another service, by address, only from the allowed providers (Calendly, Cal.com, Google Calendar, Google Forms, Typeform, Tally, Google Maps, OpenStreetMap, Spotify, SoundCloud, Figma).
+
+- **Site type:** personal and company
+- **Plugin:** none: always available
+- **Variants:** none: a single design in each theme
+
+| Field | Panel label | Type | Required | Translatable | Help and limits |
+|---|---|---|---|---|---|
+| `anchor` | Âncora | text | no | no | Identifier for links within the page (#contact). Optional; up to 40 characters |
+| `title` | Título | text | no | yes | up to 140 characters |
+| `intro` | Texto de apoio | long text | no | yes | up to 400 characters |
+| `url` | Endereço da incorporação | text | yes | no | The service's embed link: the src address, not the HTML code. Accepted providers: Calendly, Cal.com, Google Calendar, Google Forms, Typeform, Tally, Google Maps, OpenStreetMap, Spotify, SoundCloud, Figma; up to 2000 characters |
+| `frameTitle` | Título acessível | text | yes | yes | Describes the content for screen readers (e.g. "Calendar to book a call"); up to 120 characters |
+| `height` | Altura (px) | number | no | — | Optional. Without it, the provider's default height is used; 150 to 2000; integer |
+| `showLink` | Link para abrir em nova aba | yes or no | no | — | Shows a link below to open the service outside the site; default: yes |
+
+## `linha-do-tempo` — Linha do tempo
+
+Milestones in order: the company's history, a career path, the stages of a project.
+
+- **Site type:** personal and company
+- **Plugin:** none: always available
+- **Variants:** core default component: `vertical`, `horizontal`
+
+| Field | Panel label | Type | Required | Translatable | Help and limits |
+|---|---|---|---|---|---|
+| `anchor` | Âncora | text | no | no | Identifier for links within the page (#contact). Optional; up to 40 characters |
+| `title` | Título | text | no | yes | up to 140 characters |
+| `intro` | Texto de apoio | long text | no | yes | up to 400 characters |
+| `items` | Marcos | list | yes | — | 1 to 16 items; each item: "Marco" |
+| `items[].date` | Data | text | yes | yes | Free text: 2019, Mar 2021, Today; up to 40 characters |
+| `items[].title` | Título | text | yes | yes | up to 120 characters |
+| `items[].body` | Texto | long text | no | yes | up to 600 characters |
+| `items[].image` | Imagem | image | no | the alt text | — |
+
+## `comparativo-planos` — Comparativo de planos
+
+A table that compares the collection's plans item by item (rows = features, columns = plans), with each plan's button.
+
+- **Site type:** company only
+- **Plugin:** `pricing`: the block disappears when the plugin is off
+- **Lists items from:** `plans` (default when created: in panel order)
+- **Variants:** none: a single design in each theme
+
+| Field | Panel label | Type | Required | Translatable | Help and limits |
+|---|---|---|---|---|---|
+| `anchor` | Âncora | text | no | no | Identifier for links within the page (#contact). Optional; up to 40 characters |
+| `title` | Título | text | no | yes | up to 140 characters |
+| `intro` | Texto de apoio | long text | no | yes | up to 400 characters |
+| `caption` | Legenda da tabela | text | no | yes | A summary of the table for screen readers (and shown above it). Without it, the title is used, for screen readers only; up to 160 characters |
+| `rows` | Recursos | list | yes | — | 1 to 40 items; each item: "Recurso" |
+| `rows[].label` | Recurso | text | yes | yes | up to 120 characters |
+| `rows[].detail` | Detalhe | text | no | yes | up to 200 characters |
+| `rows[].cells` | Planos | list | no | — | One value per plan, in column order (the same as the block's plan list). A plan with no value shows a dash; up to 8 items; each item: "Plano" |
+| `rows[].cells[].value` | Valor | choice | no | — | options: `sim` (✓ Incluso), `nao` (✗ Não incluso), `texto` (Texto); default: `sim` |
+| `rows[].cells[].text` | Texto | text | no | yes | For the "Text" value (e.g. up to 5, unlimited); up to 60 characters |
+| `note` | Observação | long text | no | yes | up to 300 characters |

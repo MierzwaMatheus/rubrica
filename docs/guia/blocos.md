@@ -31,6 +31,10 @@ Precisa de uma seção que não está aqui? Veja [Criar um bloco](./criar-bloco.
 | [`equipe`](#equipe--equipe) | Equipe | Pessoas da coleção, com foto, cargo e redes. | só empresa | `team` |
 | [`localizacao`](#localizacao--localização) | Localização | Endereço, horário e mapa a partir dos dados da empresa. | só empresa | — |
 | [`logos-clientes`](#logos-clientes--logos-de-clientes) | Logos de clientes | Faixa de logos de clientes ou parceiros. | só empresa | — |
+| [`video`](#video--vídeo) | Vídeo | Vídeo do YouTube ou do Vimeo. Carrega leve: miniatura e botão de play, e o player só depois do clique. | pessoal e empresa | — |
+| [`incorporacao`](#incorporacao--incorporação) | Incorporação | Agenda, formulário, mapa ou player de outro serviço, por endereço, só dos provedores permitidos (Calendly, Cal.com, Google Agenda, Google Forms, Typeform, Tally, Google Maps, OpenStreetMap, Spotify, SoundCloud, Figma). | pessoal e empresa | — |
+| [`linha-do-tempo`](#linha-do-tempo--linha-do-tempo) | Linha do tempo | Marcos em ordem: história da empresa, trajetória, etapas de um projeto. | pessoal e empresa | — |
+| [`comparativo-planos`](#comparativo-planos--comparativo-de-planos) | Comparativo de planos | Tabela que compara os planos da coleção item a item (linhas = recursos, colunas = planos), com o botão de cada plano. | só empresa | `pricing` |
 
 ## `hero` — Hero
 
@@ -314,3 +318,82 @@ Faixa de logos de clientes ou parceiros.
 | `logos[].name` | Nome | texto | sim | não | até 80 caracteres |
 | `logos[].image` | Logo | imagem | sim | o texto alternativo | — |
 | `logos[].href` | Link | texto | não | não | até 300 caracteres |
+
+## `video` — Vídeo
+
+Vídeo do YouTube ou do Vimeo. Carrega leve: miniatura e botão de play, e o player só depois do clique.
+
+- **Tipo de site:** pessoal e empresa
+- **Plugin:** nenhum: sempre disponível
+- **JavaScript:** pode montar uma ilha (a parte interativa, com JavaScript no navegador); o resto é HTML estático
+- **Variações:** nenhuma: um desenho só em cada tema
+
+| Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
+|---|---|---|---|---|---|
+| `anchor` | Âncora | texto | não | não | Identificador para links na página (#contato). Opcional; até 40 caracteres |
+| `title` | Título | texto | não | sim | até 140 caracteres |
+| `intro` | Texto de apoio | texto longo | não | sim | até 400 caracteres |
+| `url` | Endereço do vídeo | texto | sim | não | Link do YouTube (youtube.com/watch?v=…, youtu.be/…, /shorts/…) ou do Vimeo (vimeo.com/123456789); até 300 caracteres |
+| `caption` | Legenda | texto | não | sim | Aparece abaixo do vídeo e dá nome ao botão de play e ao player para leitores de tela. Sem ela, vale o título; até 200 caracteres |
+| `poster` | Miniatura própria | imagem | não | o texto alternativo | Opcional no YouTube (sem ela, usa a miniatura do vídeo). No Vimeo, sem imagem aparece só o botão de play |
+| `aspect` | Proporção | opção | não | — | opções: `16:9` (16:9 (paisagem)), `4:3` (4:3), `1:1` (1:1 (quadrado)), `9:16` (9:16 (vertical, Shorts e Reels)); padrão: `16:9` |
+
+## `incorporacao` — Incorporação
+
+Agenda, formulário, mapa ou player de outro serviço, por endereço, só dos provedores permitidos (Calendly, Cal.com, Google Agenda, Google Forms, Typeform, Tally, Google Maps, OpenStreetMap, Spotify, SoundCloud, Figma).
+
+- **Tipo de site:** pessoal e empresa
+- **Plugin:** nenhum: sempre disponível
+- **Variações:** nenhuma: um desenho só em cada tema
+
+| Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
+|---|---|---|---|---|---|
+| `anchor` | Âncora | texto | não | não | Identificador para links na página (#contato). Opcional; até 40 caracteres |
+| `title` | Título | texto | não | sim | até 140 caracteres |
+| `intro` | Texto de apoio | texto longo | não | sim | até 400 caracteres |
+| `url` | Endereço da incorporação | texto | sim | não | O link do "incorporar" (embed) do serviço: o endereço do src, não o código HTML. Provedores aceitos: Calendly, Cal.com, Google Agenda, Google Forms, Typeform, Tally, Google Maps, OpenStreetMap, Spotify, SoundCloud, Figma; até 2000 caracteres |
+| `frameTitle` | Título acessível | texto | sim | sim | Descreve o conteúdo para leitores de tela (ex.: "Agenda para marcar uma conversa"); até 120 caracteres |
+| `height` | Altura (px) | número | não | — | Opcional. Sem ela, vale a altura padrão do provedor; de 150 a 2000; inteiro |
+| `showLink` | Link para abrir em nova aba | sim ou não | não | — | Mostra, abaixo, um link para abrir o serviço fora do site; padrão: sim |
+
+## `linha-do-tempo` — Linha do tempo
+
+Marcos em ordem: história da empresa, trajetória, etapas de um projeto.
+
+- **Tipo de site:** pessoal e empresa
+- **Plugin:** nenhum: sempre disponível
+- **Variações:** componente padrão do núcleo: `vertical`, `horizontal`
+
+| Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
+|---|---|---|---|---|---|
+| `anchor` | Âncora | texto | não | não | Identificador para links na página (#contato). Opcional; até 40 caracteres |
+| `title` | Título | texto | não | sim | até 140 caracteres |
+| `intro` | Texto de apoio | texto longo | não | sim | até 400 caracteres |
+| `items` | Marcos | lista | sim | — | de 1 a 16 itens; cada item: "Marco" |
+| `items[].date` | Data | texto | sim | sim | Texto livre: 2019, mar. 2021, Hoje; até 40 caracteres |
+| `items[].title` | Título | texto | sim | sim | até 120 caracteres |
+| `items[].body` | Texto | texto longo | não | sim | até 600 caracteres |
+| `items[].image` | Imagem | imagem | não | o texto alternativo | — |
+
+## `comparativo-planos` — Comparativo de planos
+
+Tabela que compara os planos da coleção item a item (linhas = recursos, colunas = planos), com o botão de cada plano.
+
+- **Tipo de site:** só empresa
+- **Plugin:** `pricing`: o bloco some com o plugin desligado
+- **Lista itens de:** `plans` (padrão ao criar: na ordem do painel)
+- **Variações:** nenhuma: um desenho só em cada tema
+
+| Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
+|---|---|---|---|---|---|
+| `anchor` | Âncora | texto | não | não | Identificador para links na página (#contato). Opcional; até 40 caracteres |
+| `title` | Título | texto | não | sim | até 140 caracteres |
+| `intro` | Texto de apoio | texto longo | não | sim | até 400 caracteres |
+| `caption` | Legenda da tabela | texto | não | sim | Resumo da tabela para leitores de tela (e visível acima dela). Sem ela, vale o título, só para leitores de tela; até 160 caracteres |
+| `rows` | Recursos | lista | sim | — | de 1 a 40 itens; cada item: "Recurso" |
+| `rows[].label` | Recurso | texto | sim | sim | até 120 caracteres |
+| `rows[].detail` | Detalhe | texto | não | sim | até 200 caracteres |
+| `rows[].cells` | Planos | lista | não | — | Um valor por plano, na ordem das colunas (a mesma da lista de planos do bloco). Plano sem valor fica com um traço; até 8 itens; cada item: "Plano" |
+| `rows[].cells[].value` | Valor | opção | não | — | opções: `sim` (✓ Incluso), `nao` (✗ Não incluso), `texto` (Texto); padrão: `sim` |
+| `rows[].cells[].text` | Texto | texto | não | sim | Para o valor "Texto" (ex.: até 5, ilimitado); até 60 caracteres |
+| `note` | Observação | texto longo | não | sim | até 300 caracteres |

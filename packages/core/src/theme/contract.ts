@@ -22,8 +22,8 @@ import type { ResolvedImage, ResolvedLink } from "../blocks/fields";
 import type { NavItem, Organization, SiteKind, SocialLink } from "../content/types";
 import type { CollectionItems, PostItem, ProjectItem } from "../render/collections";
 
-/** Versão do contrato de blocos que este núcleo implementa (decisão 30). */
-export const CONTRACT_VERSION = "1.0.0";
+/** Versão do contrato de blocos que este núcleo implementa (decisão 30). 1.1: vídeo, incorporação, linha do tempo e comparativo de planos. */
+export const CONTRACT_VERSION = "1.1.0";
 
 export interface ResolvedNavItem {
   label: string;
@@ -297,11 +297,26 @@ export const CORE_VARIANTS: Partial<Record<string, VariantOption[]>> = {
     { value: "grade", label: "Grade" },
     { value: "lista", label: "Lista" },
   ],
+  "linha-do-tempo": [
+    { value: "vertical", label: "Vertical" },
+    { value: "horizontal", label: "Horizontal (compacta)" },
+  ],
 };
 
+/**
+ * Variações do bloco no tema: as que ele declara; sem declaração, as do componente padrão
+ * (`CORE_VARIANTS`) quando o tema herda o componente do núcleo. Assim um bloco novo do
+ * núcleo chega a todos os temas já com as suas variações (decisão 30: bloco novo é minor).
+ */
+export function variantsFor(theme: Pick<ThemeDefinition, "variants" | "blocks">, type: string): VariantOption[] {
+  const declared = theme.variants?.[type];
+  if (declared) return declared;
+  return theme.blocks?.[type] ? [] : (CORE_VARIANTS[type] ?? []);
+}
+
 /** Variação válida para o bloco no tema; desconhecida ou ausente cai na primeira. */
-export function resolveVariant(theme: ThemeDefinition, type: string, variant: string | undefined): string {
-  const options = theme.variants?.[type];
+export function resolveVariant(theme: Pick<ThemeDefinition, "variants" | "blocks">, type: string, variant: string | undefined): string {
+  const options = variantsFor(theme, type);
   if (!options?.length) return "default";
   return options.some((o) => o.value === variant) ? variant! : options[0]!.value;
 }

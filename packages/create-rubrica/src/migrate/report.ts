@@ -49,8 +49,8 @@ export function renderReport(input: ReportInput): string {
     for (const p of d.plugins) out.push(`- \`${p.v1}\` → ${p.v2 ? `\`${p.v2}\`` : "**removido na v2**"} (${p.enabled ? "ligado" : "desligado"})`);
     out.push("");
     if (d.pending.length) {
-      out.push("### Pendentes (o núcleo desta versão ainda não tem as tabelas)", "");
-      for (const p of d.pending) out.push(`- \`${p.table}\`: ${plural(p.count, "documento", "documentos")} (guardados como estão em pendentes-v1.zip)`);
+      out.push("### Sem destino na v2 (guardados como estavam em pendentes-v1.zip)", "");
+      for (const p of d.pending) out.push(`- \`${p.table}\`: ${plural(p.count, "documento", "documentos")} (${p.reason})`);
       out.push("");
     }
     if (d.dropped.length || d.unknownTables.length) {

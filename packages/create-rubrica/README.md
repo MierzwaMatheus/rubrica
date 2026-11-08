@@ -37,12 +37,12 @@ npx convex export --path .rubrica/migracao/export-v1.zip
 npx create-rubrica@latest migrar --export .rubrica/migracao/export-v1.zip
 ```
 
-O `migrar` cria a branch `rubrica-v2`, troca o código, converte o export num arquivo de import da v2 (mais os dados em fixtures, para buildar sem banco) e grava o relatório em `.rubrica/migracao/relatorio.md`. Ele não grava no Convex: o import vai para um deployment de desenvolvimento novo, rodado por você; a produção só com o seu "ok".
+O `migrar` cria a branch `rubrica-v2`, troca o código, converte o export num arquivo de import da v2 (mais os dados em fixtures, para buildar sem banco) e grava o relatório em `.rubrica/migracao/relatorio.md`. Convertem também os dados de negócio: contatos (com o consentimento marcado como anterior à v2), depoimentos enviados, propostas com versões e aceites (hash e prova intactos), modelos de contrato, checkouts (estado e ids do Asaas) e currículos com IA. O que não tem destino na v2 (depoimento em vídeo, por exemplo) vai como estava para `pendentes-v1.zip`, e o relatório diz o porquê. Ele não grava no Convex: o import vai para um deployment de desenvolvimento novo, rodado por você; a produção só com o seu "ok".
 
 ## Manutenção
 
 - Tema novo portado: acrescente o id em `PORTED_THEMES` (`src/themes.ts`).
-- Módulo novo no núcleo: rode os testes; `test/project.test.ts` acusa o manifesto (`src/core-manifest.ts`) fora do `RUBRICA_MODULES`.
+- Módulo novo no núcleo: nada a fazer. O `convex/` sai das funções do núcleo instalado no projeto; a reserva (`src/core-manifest.ts`, para projeto ainda sem `node_modules`) é lida do núcleo do monorepo no build (`scripts/core-modules.ts`). `test/project.test.ts` compara com o `apps/demo/convex`.
 - Variável de ambiente nova de integração: `INTEGRATIONS` em `src/commands/setup.ts`.
 - `pnpm --filter create-rubrica test` roda também os testes de ponta a ponta (instalam e buildam projetos de verdade); `RUBRICA_SKIP_E2E=1` os pula.
 

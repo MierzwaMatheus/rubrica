@@ -128,7 +128,7 @@ export function convertExport(exportPath: string, v1: V1RubricaJson, theme: stri
   const pending = pendingZip(result, snapshot);
   if (pending) {
     writeFileSync(join(outDir, "pendentes-v1.zip"), pending);
-    files["Tabelas pendentes (como estavam)"] = join(outDir, "pendentes-v1.zip");
+    files["Documentos sem destino na v2 (como estavam)"] = join(outDir, "pendentes-v1.zip");
   }
   const fixturesDir = join(outDir, "fixtures");
   rmSync(fixturesDir, { recursive: true, force: true });

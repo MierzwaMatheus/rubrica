@@ -18,7 +18,7 @@ import { normalizeLocales } from "../locales.js";
 import { pluginOptions, pluginsRecord, unknownPlugins } from "../plugins.js";
 import { MARK, replaceSection, themeSection } from "../project/files.js";
 import { findProjectDir, readState, settingsFromState, writeState, type RubricaState } from "../state.js";
-import { COLOR_MODES, getTheme, resolveTheme, SCHEME_IDS, SCHEME_OPTIONS, THEMES, themePackage, type ColorMode } from "../themes.js";
+import { COLOR_MODES, getTheme, initialFonts, resolveTheme, SCHEME_IDS, SCHEME_OPTIONS, THEMES, themePackage, type ColorMode } from "../themes.js";
 import { ask, canAsk, choose, chooseMany, confirm, log, outro } from "../ui.js";
 import { track } from "../telemetry.js";
 
@@ -83,6 +83,20 @@ export function applyConfigChange(current: RubricaState, change: ConfigChange): 
     state.tema = choice.tema;
     if (choice.temaDesejado) state.temaDesejado = choice.temaDesejado;
     else delete state.temaDesejado;
+    // O que seguia o tema anterior (o recomendado dele) passa a seguir o novo; o que a pessoa escolheu fica.
+    const fromId = current.temaDesejado ?? current.tema;
+    const toId = choice.temaDesejado ?? choice.tema;
+    const from = getTheme(fromId)?.recommended;
+    const to = getTheme(toId)?.recommended;
+    if (fromId !== toId && from && to) {
+      if (!change.esquema && state.aparencia.esquema === from.scheme) state.aparencia.esquema = to.scheme;
+      const followed = initialFonts(fromId);
+      if (state.aparencia.fonteSans === followed.fonteSans && state.aparencia.fonteMono === followed.fonteMono) {
+        delete state.aparencia.fonteSans;
+        delete state.aparencia.fonteMono;
+        Object.assign(state.aparencia, initialFonts(toId));
+      }
+    }
     if (themeSwap && Object.values(state.ejetados ?? {}).some((e) => e.origem === themeSwap![0])) {
       warnings.push(`Há componentes ejetados do tema anterior (${themeSwap[0]}) em src/overrides/: confira se ainda fazem sentido no tema novo.`);
     }

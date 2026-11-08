@@ -223,6 +223,17 @@ describe("páginas pela receita, preenchidas com a v1", () => {
     ]);
   });
 
+  it("depoimentos da home: destacados (showOnHome); sem nenhum marcado, todos, como na v1", () => {
+    // O export tem um "mostrar na home": o bloco fica com a fonte padrão (só destacados).
+    expect(block(byPath(run(), "/"), "depoimentos").source).toBeUndefined();
+    const tables = v1Export().tables;
+    tables.testimonials = tables.testimonials!.map((d) => ({ ...d, showOnHome: false }));
+    const r = convertV1({ tables, v1: V1_RUBRICA_JSON, theme: "cyberpunk", recipe: CORE_RECIPES.pessoal, now: NOW });
+    const source = block(byPath(r, "/"), "depoimentos").source as Record<string, unknown>;
+    expect(source).toMatchObject({ collection: "testimonials" });
+    expect(source.featured).toBeUndefined();
+  });
+
   it("bloco sem conteúdo na v1 sai em vez de ficar vazio", () => {
     const tables = v1Export().tables;
     tables.homeContent = tables.homeContent!.filter((h) => h.key !== "home_metrics" && h.key !== "about_text");
@@ -244,9 +255,10 @@ describe("textos e o resto", () => {
     expect(r.report.texts.sectionKeys).toBe(3);
   });
 
-  it("tabelas pendentes vão à parte; descartadas e próprias no relatório", () => {
-    expect(Object.keys(r.pending)).toEqual(["proposals", "contactRequests"]);
-    expect(r.report.pending).toEqual([{ table: "proposals", count: 1 }, { table: "contactRequests", count: 1 }]);
+  it("o que não tem destino vai à parte; descartadas e próprias no relatório", () => {
+    // Negócio convertido (migrate.business.test.ts): sobra o depoimento em vídeo e a versão ilegível.
+    expect(Object.keys(r.pending).sort()).toEqual(["proposalVersions", "testimonialSubmissions"]);
+    expect(r.report.pending.map((p) => [p.table, p.count])).toEqual([["testimonialSubmissions", 1], ["proposalVersions", 1]]);
     expect(r.report.dropped.map((d) => d.table)).toEqual(expect.arrayContaining(["authSessions", "deployStatus", "rateLimitAttempts", "homeContent", "siteTexts"]));
     expect(r.report.unknownTables).toEqual([{ table: "newsletter", count: 1 }]);
     expect(r.report.warnings.join(" ")).toMatch(/newsletter/);

@@ -75,7 +75,9 @@ describe("ejetar", () => {
     writeState(dir, state);
     const [status] = ejectedStatus(dir, readState(dir));
     expect(status?.status).toBe("mudou");
-    expect(status?.original?.endsWith("src/components/blocks/basic.tsx")).toBe(true);
+    // O padrao desenha o próprio hero: o original é o do tema, não o do núcleo.
+    expect(status?.original?.endsWith("src/blocks.tsx")).toBe(true);
+    expect(status?.entry.origem).toBe("@rubrica/theme-padrao");
     state.ejetados!.hero!.componente = "NaoExiste";
     writeState(dir, state);
     expect(ejectedStatus(dir, readState(dir))[0]?.status).toBe("sumiu");

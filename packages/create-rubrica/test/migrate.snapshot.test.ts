@@ -58,9 +58,14 @@ describe("snapshot (ZIP do convex export/import)", () => {
     expect(tables.find((t) => t.name === "posts")?.id).toBe(snap.tableNumbers.posts);
     expect(files[`_storage/${IDS.storage[0]}`]).toEqual(new Uint8Array([1, 2, 0]));
     expect(files["_storage/documents.jsonl"]).toBeDefined();
-    expect(files["proposals/documents.jsonl"]).toBeUndefined();
+    // Negócio: mesmos ids e mesmo número de tabela (aiGeneratedResumes → aiResumes).
+    const proposals = parseJsonl(strFromU8(files["proposals/documents.jsonl"]!));
+    expect(proposals.map((p) => p._id)).toEqual(snap.tables.proposals!.map((p) => p._id));
+    expect(tables.find((t) => t.name === "proposals")?.id).toBe(snap.tableNumbers.proposals);
+    expect(tables.find((t) => t.name === "aiResumes")?.id).toBe(snap.tableNumbers.aiGeneratedResumes);
+    expect(files["proposalSessions/documents.jsonl"]).toBeUndefined();
     const pending = unzipSync(pendingZip(result, snap)!);
-    expect(Object.keys(pending).sort()).toEqual(["_tables/documents.jsonl", "contactRequests/documents.jsonl", "proposals/documents.jsonl"]);
+    expect(Object.keys(pending).sort()).toEqual(["_tables/documents.jsonl", "proposalVersions/documents.jsonl", "testimonialSubmissions/documents.jsonl"]);
   });
 
   it("vira fixtures que a fonte de dados do núcleo lê", async () => {

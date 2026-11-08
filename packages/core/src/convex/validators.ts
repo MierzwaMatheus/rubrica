@@ -83,6 +83,8 @@ export const vLocaleConfig = v.object({
 export const vAppearance = v.object({
   colorMode: v.union(v.literal("dark"), v.literal("light"), v.literal("system")),
   colorToggle: v.boolean(),
+  /** Esquema de cor (id de `SCHEMES`, `theme/schemes.ts`). Sem ele, vale o do tema. */
+  scheme: v.optional(v.string()),
   tokens: v.optional(v.record(v.string(), v.string())),
   fontSans: v.optional(v.string()),
   fontMono: v.optional(v.string()),

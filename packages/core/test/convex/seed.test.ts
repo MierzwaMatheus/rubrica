@@ -54,10 +54,10 @@ describe("receita → páginas (puro)", () => {
     expect(nav[0]).toEqual({ label: { "pt-BR": "Início", en: "Home" }, href: "/" });
   });
 
-  it("descarta campos que o validador não conhece", () => {
-    const pruned = pruneByValidator(vSiteSettings, { ...BASE_SETTINGS, extra: 1, appearance: { ...BASE_SETTINGS.appearance, scheme: "neon" } }) as Record<string, unknown>;
+  it("descarta campos que o validador não conhece e mantém o esquema de cor", () => {
+    const pruned = pruneByValidator(vSiteSettings, { ...BASE_SETTINGS, extra: 1, appearance: { ...BASE_SETTINGS.appearance, scheme: "neon", texture: "grain" } }) as Record<string, unknown>;
     expect(pruned.extra).toBeUndefined();
-    expect(pruned.appearance).toEqual(BASE_SETTINGS.appearance);
+    expect(pruned.appearance).toEqual({ ...BASE_SETTINGS.appearance, scheme: "neon" });
     expect(pruned.name).toEqual(BASE_SETTINGS.name);
   });
 });
@@ -108,9 +108,19 @@ describe("rubrica/seed (backend)", () => {
 
   it("aceita campos novos de outra versão sem quebrar", async () => {
     const t = setup();
-    await t.mutation(internal.rubrica.seed.apply, { settings: { ...BASE_SETTINGS, futuro: true, appearance: { ...BASE_SETTINGS.appearance, scheme: "neon" } } });
+    await t.mutation(internal.rubrica.seed.apply, { settings: { ...BASE_SETTINGS, futuro: true, appearance: { ...BASE_SETTINGS.appearance, texture: "grain" } } });
     const settings = await t.run((ctx) => ctx.db.query("siteSettings").first());
     expect(settings?.appearance).toEqual(BASE_SETTINGS.appearance);
+  });
+
+  it("grava o esquema de cor do setup e o config troca (appearance.scheme)", async () => {
+    const t = setup();
+    await t.mutation(internal.rubrica.seed.apply, { settings: { ...BASE_SETTINGS, appearance: { ...BASE_SETTINGS.appearance, scheme: "neon" } } });
+    const first = await t.run((ctx) => ctx.db.query("siteSettings").first());
+    expect(first?.appearance.scheme).toBe("neon");
+    await t.mutation(internal.rubrica.seed.patchSettings, { patch: { appearance: { ...first!.appearance, scheme: "sumi", fontSans: "Inter" } } });
+    const next = await t.run((ctx) => ctx.db.query("siteSettings").first());
+    expect(next?.appearance).toMatchObject({ scheme: "sumi", fontSans: "Inter" });
   });
 
   it("patchSettings muda parte das configurações e valida", async () => {

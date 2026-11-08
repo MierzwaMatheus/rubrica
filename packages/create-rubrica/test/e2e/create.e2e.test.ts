@@ -4,7 +4,7 @@
  * Desligue com RUBRICA_SKIP_E2E=1.
  */
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { createProject, resolveCreateOptions } from "../../src/commands/create";
 import { ejectBlock } from "../../src/commands/eject";
@@ -36,6 +36,15 @@ describe.skipIf(skip)("create → install → build (ponta a ponta)", () => {
     const demoModules = readdirSync(repo("apps/demo/convex/rubrica")).sort();
     expect(readdirSync(join(dir, "convex/rubrica")).sort()).toEqual(demoModules);
     for (const f of demoModules) expect(readFileSync(join(dir, "convex/rubrica", f), "utf-8")).toBe(readFileSync(repo("apps/demo/convex/rubrica", f), "utf-8"));
+  });
+
+  it("--local usa os pacotes reais do monorepo: núcleo, tema, CLI e MCP", () => {
+    const pkg = JSON.parse(readFileSync(join(dir, "package.json"), "utf-8"));
+    expect(pkg.dependencies["@rubrica/core"]).toBe(`link:${repo("packages/core")}`);
+    expect(pkg.dependencies["@rubrica/theme-padrao"]).toBe(`link:${repo("packages/themes/padrao")}`);
+    expect(pkg.devDependencies["@rubrica/mcp"]).toBe(`link:${repo("packages/mcp")}`);
+    expect(pkg.devDependencies["create-rubrica"]).toBe(`link:${repo("packages/create-rubrica")}`);
+    expect(realpathSync(join(dir, "node_modules/@rubrica/mcp"))).toBe(realpathSync(repo("packages/mcp")));
   });
 
   it("o backend gerado empacota como no Convex", () => {

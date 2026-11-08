@@ -4,9 +4,13 @@
  *
  * `ported`: já existe o pacote `@rubrica/theme-<id>`. Enquanto um tema não é portado,
  * o site usa o `padrao` e o CLI avisa (a escolha fica guardada em `temaDesejado`).
+ *
+ * Os esquemas de cor são os do núcleo (`SCHEMES`, `appearance.scheme`). O esquema e as
+ * fontes recomendados de um tema portado são os que o pacote do tema declara (`scheme`
+ * e `fonts.json`; um teste confere); os dos outros vêm do layout da v1.
  */
+import { SCHEMES } from "@rubrica/core";
 import { LAYOUTS } from "./v1/layouts.js";
-import { SCHEMES } from "./v1/themes/schemes.js";
 import { SANS_FONTS, MONO_FONTS } from "./v1/themes/fonts.js";
 
 export type ColorMode = "light" | "dark" | "system";
@@ -18,11 +22,23 @@ export interface ThemeSpec {
   /** Layout da v1 equivalente (o `migrar` usa). */
   v1Layout: string | null;
   ported: boolean;
+  /**
+   * Escolhas iniciais do `create`. Num tema portado, as fontes são as do pacote do tema
+   * (o site não precisa gravá-las: sem `appearance.fontSans`, valem as do tema).
+   */
   recommended: { scheme: string; mode: ColorMode; fontSans: string; fontMono?: string };
 }
 
 /** Temas com pacote publicado. */
 export const PORTED_THEMES = ["padrao", "cyberpunk"] as const;
+
+/** O que cada pacote de tema declara: `scheme` no `defineTheme` e `fonts.json` (`test/alignment.test.ts`). */
+export const THEME_PACKAGE_DEFAULTS: Record<(typeof PORTED_THEMES)[number], { scheme: string; fontSans: string; fontMono?: string }> = {
+  padrao: { scheme: "neon", fontSans: "Chakra Petch", fontMono: "Chakra Petch" },
+  cyberpunk: { scheme: "neon", fontSans: "Chakra Petch", fontMono: "Chakra Petch" },
+};
+
+const isPorted = (id: string): id is (typeof PORTED_THEMES)[number] => (PORTED_THEMES as readonly string[]).includes(id);
 
 /** Tema usado quando o escolhido ainda não foi portado. */
 export const FALLBACK_THEME = "padrao";
@@ -34,20 +50,22 @@ export const THEMES: ThemeSpec[] = [
     hint: "barra lateral com foto, limpo e neutro: serve para qualquer área",
     v1Layout: null,
     ported: true,
-    recommended: { scheme: "midnight-blue", mode: "dark", fontSans: "Inter", fontMono: "JetBrains Mono" },
+    recommended: { mode: "dark", ...THEME_PACKAGE_DEFAULTS.padrao },
   },
   ...LAYOUTS.map((l) => ({
     id: l.id,
     label: l.label,
     hint: l.hint,
     v1Layout: l.id,
-    ported: (PORTED_THEMES as readonly string[]).includes(l.id),
-    recommended: {
-      scheme: l.recommended.scheme,
-      mode: l.recommended.mode,
-      fontSans: l.fonts.sans[0]!,
-      ...(l.fonts.mono && { fontMono: l.fonts.mono }),
-    },
+    ported: isPorted(l.id),
+    recommended: isPorted(l.id)
+      ? { mode: l.recommended.mode, ...THEME_PACKAGE_DEFAULTS[l.id] }
+      : {
+          scheme: l.recommended.scheme,
+          mode: l.recommended.mode,
+          fontSans: l.fonts.sans[0]!,
+          ...(l.fonts.mono && { fontMono: l.fonts.mono }),
+        },
   })),
 ];
 
@@ -83,6 +101,17 @@ export function resolveTheme(id: string): ThemeChoice {
       `O tema "${spec.label}" (${spec.id}) ainda não foi portado para a v2. ` +
       `O site usa o tema "${FALLBACK_THEME}" por enquanto; quando o ${themePackage(spec.id)} sair, troque com npx create-rubrica config.`,
   };
+}
+
+/**
+ * Fontes que o `create` grava no `rubrica.json` para um tema: nenhuma num tema portado
+ * (valem as do pacote do tema, e trocar de tema troca as fontes junto); as do layout da
+ * v1 num tema ainda não portado (o site usa o padrao, com as fontes do layout escolhido).
+ */
+export function initialFonts(id: string): { fonteSans?: string; fonteMono?: string } {
+  const spec = getTheme(id);
+  if (!spec || spec.ported) return {};
+  return { fonteSans: spec.recommended.fontSans, ...(spec.recommended.fontMono && { fonteMono: spec.recommended.fontMono }) };
 }
 
 export const SCHEME_IDS = SCHEMES.map((s) => s.id);

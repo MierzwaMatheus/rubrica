@@ -3,8 +3,10 @@
  * tabelas do schema da v1 com dados inventados (a "Bruna Lima", designer). Cobre os
  * casos que a conversão precisa tratar: traduções, imagens da biblioteca e só por URL,
  * case completo, períodos de currículo variados, plugins ligados e desligados, textos
- * personalizados (de seção, de interface e sem destino), tabelas pendentes, descartadas
- * e uma tabela própria do projeto.
+ * personalizados (de seção, de interface e sem destino), as tabelas de negócio
+ * (contatos, depoimentos enviados, propostas com versões e aceite, modelos de contrato,
+ * checkouts pago e aberto, currículo com IA), tabelas descartadas e uma tabela própria
+ * do projeto.
  */
 import type { Snapshot } from "../../src/migrate/snapshot";
 
@@ -41,7 +43,74 @@ export const PRINCIPIOS = [
   { title: "Testar cedo", description: "Protótipos na mão de quem usa.", titleTranslations: { ptBR: "Testar cedo" } },
 ];
 
+/** Tabelas de negócio: contatos, depoimentos enviados e o comercial. */
+function businessTables(testimonialId: string) {
+  const modelo = doc("contractTemplates", { name: "Contrato padrão", content: "Contrato com {{client_name}}.", isDefault: true, createdAt: T0, updatedAt: T0 + 2 });
+  const modeloVelho = doc("contractTemplates", { name: "Contrato antigo", description: "de 2023", content: "Antigo.", isDefault: true, createdAt: T0, updatedAt: T0 + 1 });
+  const aberta = doc("proposals", {
+    userId: ana._id,
+    clientName: "Padaria Pão Bom",
+    slug: "padaria-pao-bom",
+    title: "Identidade visual",
+    titleTranslations: { ptBR: "Identidade visual", enUS: "Visual identity" },
+    objective: "Marca nova para a padaria.",
+    scope: ["Logo", "Cardápio"],
+    scopeTranslations: { ptBR: ["Logo", "Cardápio"], enUS: ["Logo", "Menu"] },
+    timeline: [{ step: "Pesquisa", period: "1 semana" }],
+    deliveryDate: "2026-03-01",
+    investmentValue: 4000,
+    scopePrices: [3000, 1000],
+    originalValue: 4500,
+    giftIndexes: [],
+    paymentMethods: ["PIX", "Boleto"],
+    conditions: ["50% na entrada"],
+    conditionsTranslations: { ptBR: ["50% na entrada"], enUS: ["50% upfront"] },
+    password: "pbkdf2:00aa:11bb",
+    rescissionPolicy: "",
+    version: 2,
+    isAccepted: false,
+    expiresAt: T0 + 1_000_000,
+    createdAt: T0,
+    updatedAt: T0 + 3,
+    templateId: modelo._id,
+  });
+  const aceita = doc("proposals", { userId: ana._id, clientName: "Clínica X", slug: "clinica-x", title: "App", objective: "Agendamento", scope: ["App"], timeline: [], deliveryDate: "6 semanas", investmentValue: 20000, paymentMethods: ["Cartão"], conditions: [], rescissionPolicy: "Multa de 10%.", version: 1, isAccepted: true, acceptedAt: T0 + 50, expiresAt: T0 + 100, createdAt: T0, templateSnapshot: "Contrato congelado." });
+  const versao = doc("proposalVersions", { proposalId: aberta._id, version: 1, contentSnapshot: JSON.stringify({ title: "Identidade", investmentValue: 3500, scope: ["Logo"] }), contentSnapshotVersion: "v1", createdBy: ana._id, createdAt: T0 + 1 });
+  const versaoRuim = doc("proposalVersions", { proposalId: aberta._id, version: 0, contentSnapshot: "{quebrado", contentSnapshotVersion: "v1", createdBy: ana._id, createdAt: T0 });
+  const sessao = doc("proposalSessions", { proposalId: aceita._id, token: "tok", isUsed: true, expiresAt: T0 + 10, createdAt: T0 });
+  const snapshot = JSON.stringify({ proposal: { id: aceita._id, version: 1, title: "App" }, acceptance: { clientName: "Dra. Paula", clientDocument: "000.000.000-00", clientEmail: "paula@exemplo.dev", acceptedAt: "2023-11-14T22:13:20.050Z" } });
+  return {
+    contractTemplates: [modelo, modeloVelho],
+    proposals: [aberta, aceita],
+    proposalVersions: [versao, versaoRuim],
+    proposalSessions: [sessao],
+    proposalAcceptances: [
+      doc("proposalAcceptances", { proposalId: aceita._id, proposalVersion: 1, sessionId: sessao._id, clientName: "Dra. Paula", clientDocument: "000.000.000-00", clientEmail: "paula@exemplo.dev", clientRole: "Diretora", contentSnapshot: snapshot, contentSnapshotVersion: "v2-server", contentHash: "a".repeat(64), ipAddress: "203.0.113.7", userAgent: "Navegador de teste", acceptedAt: T0 + 50, createdAt: T0 + 50 }),
+    ],
+    checkouts: [
+      doc("checkouts", { uniqueLink: "pago-123", customerId: "cus_000001", customerName: "Dra. Paula", customerEmail: "paula@exemplo.dev", customerCpfCnpj: "00000000000", value: 20000, dueDate: "2023-12-01", billingType: "PIX", status: "paid", asaasChargeId: "pay_000001", paidChargeId: "pay_000001", paidValue: 20000, expiresAt: T0 + 100, completedAt: T0 + 60, createdAt: T0 }),
+      doc("checkouts", { uniqueLink: "aberto-456", customerName: "Padaria Pão Bom", customerEmail: "padaria@exemplo.dev", customerCpfCnpj: "00000000000191", value: 2000, dueDate: "2026-03-01", billingType: "BOLETO", status: "payment_selected", asaasChargeId: "pay_000002", bankSlipUrl: "https://sandbox.asaas.com/b/000002", expiresAt: T0 + 1_000_000, createdAt: T0 }),
+    ],
+    contactRequests: [
+      doc("contactRequests", { type: "project", status: "new", answers: { projectType: "webapp", budget: "medium", description: "Quero um app de agenda." }, contactInfo: { name: "Fulano", email: " Fulano@Exemplo.dev ", phone: "+55 11 90000-0001", company: "Fulano Ltda", linkedin: "https://linkedin.com/in/fulano" }, sourceContext: "case: App de agendamento", ipAddress: "203.0.113.8", userAgent: "UA", createdAt: T0, updatedAt: T0 }),
+      doc("contactRequests", { type: "job", status: "contacted", answers: { contractType: "pj", modality: "remote" }, contactInfo: { name: "Recrutadora", email: "rh@exemplo.dev" }, adminNotes: "Respondi por e-mail.", createdAt: T0 + 1, updatedAt: T0 + 2 }),
+      doc("contactRequests", { type: "feedback", status: "archived", answers: { message: "Lixo" }, contactInfo: { name: "Apagado", email: "apagado@exemplo.dev" }, deletedAt: T0 + 3, createdAt: T0, updatedAt: T0 + 3 }),
+    ],
+    testimonialSubmissions: [
+      doc("testimonialSubmissions", { name: "Carlos", role: "CTO", email: "carlos@exemplo.dev", type: "text", text: "Excelente trabalho.", status: "published", testimonialId, createdAt: T0, reviewedAt: T0 + 1, reviewedBy: ana._id }),
+      doc("testimonialSubmissions", { name: "Marta", role: "Cliente", company: "Loja M", email: "Marta@Exemplo.dev", type: "text", text: "Recomendo.", avatarStorageId: storage[2]!._id, status: "approved", createdAt: T0 + 2 }),
+      doc("testimonialSubmissions", { name: "Vídeo", role: "Cliente", email: "video@exemplo.dev", type: "video", videoStorageId: storage[0]!._id, status: "pending", createdAt: T0 + 3 }),
+      doc("testimonialSubmissions", { name: "Spam", role: "x", email: "spam@exemplo.dev", type: "text", text: "compre já", status: "rejected", createdAt: T0 + 4 }),
+    ],
+    aiGeneratedResumes: [
+      doc("aiGeneratedResumes", { title: "Vaga de designer sênior", locale: "en-US", jobDescription: "Senior designer.", fitScore: 82, fitComment: "Bom encaixe.", strengths: ["Pesquisa"], weaknesses: ["Motion"], cvData: { name: "Bruna Lima" }, createdBy: ana._id, createdAt: T0 }),
+    ],
+  };
+}
+
 export function v1Export(): Snapshot {
+  const carlos = doc("testimonials", { name: "Carlos", role: "CTO", roleTranslations: { ptBR: "CTO", enUS: "CTO" }, text: "Excelente trabalho.", textTranslations: { ptBR: "Excelente trabalho.", enUS: "Excellent work." }, imageUrl: "https://imagens.exemplo.dev/carlos.png", orderIndex: 0, showOnHome: true, category: "Produto", createdAt: T0 });
+  const business = businessTables(carlos._id);
   const tables: Snapshot["tables"] = {
     users: [ana, editor],
     authAccounts: [doc("authAccounts", { userId: ana._id, provider: "password", providerAccountId: "bruna@exemplo.dev", secret: "hash-ficticio" })],
@@ -108,7 +177,7 @@ export function v1Export(): Snapshot {
       doc("services", { title: "Pesquisa", description: "Entrevistas e testes.", orderIndex: 1, createdAt: T0 }),
     ],
     testimonials: [
-      doc("testimonials", { name: "Carlos", role: "CTO", roleTranslations: { ptBR: "CTO", enUS: "CTO" }, text: "Excelente trabalho.", textTranslations: { ptBR: "Excelente trabalho.", enUS: "Excellent work." }, imageUrl: "https://imagens.exemplo.dev/carlos.png", orderIndex: 0, showOnHome: true, category: "Produto", createdAt: T0 }),
+      carlos,
       doc("testimonials", { name: "Joana", role: "PM", text: "Muito cuidadosa.", orderIndex: 1, createdAt: T0 }),
     ],
     homeContent: [
@@ -179,8 +248,7 @@ export function v1Export(): Snapshot {
       doc("resumeItems", { type: "volunteer", content: { text: "Mentoria em ONG" }, orderIndex: 7, createdAt: T0 }),
       doc("resumeItems", { type: "experience", content: { role: "Estágio", period: "03/2016 - 12/2017", company: "Estúdio W", description: "" }, orderIndex: 8, createdAt: T0, deletedAt: T0 + 1 }),
     ],
-    proposals: [doc("proposals", { userId: ana._id, clientName: "Padaria", slug: "padaria", title: "Proposta", objective: "Marca", scope: [], timeline: [], deliveryDate: "2026-01-01", investmentValue: 1000, paymentMethods: [], conditions: [], rescissionPolicy: "", version: 1, isAccepted: false, expiresAt: T0, createdAt: T0 })],
-    contactRequests: [doc("contactRequests", { type: "project", status: "new", answers: {}, contactInfo: { name: "Fulano", email: "fulano@exemplo.dev" }, createdAt: T0, updatedAt: T0 })],
+    ...business,
     deployStatus: [doc("deployStatus", { pendingChanges: false, updatedAt: T0 })],
     rateLimitAttempts: [doc("rateLimitAttempts", { key: "k", identifier: "i", type: "login", attemptCount: 1, firstAttemptAt: T0, lastAttemptAt: T0, expiresAt: T0 })],
     auditLog: [doc("auditLog", { eventType: "admin.update", actorType: "user", actorId: ana._id, success: true, createdAt: T0, expiresAt: T0 + 1 })],

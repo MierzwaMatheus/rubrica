@@ -15,7 +15,7 @@ export interface PackageBump {
 
 export interface UpdatePlanInput {
   packages: PackageBump[];
-  /** Funções por módulo do núcleo que vai ficar instalado. */
+  /** Funções por módulo do núcleo que vai ficar instalado (vazio: não sei, não mexo nos módulos). */
   modules: Record<string, readonly string[]>;
   /** Conteúdo atual dos arquivos do convex/ (caminho → texto). */
   convexOnDisk: Record<string, string>;
@@ -61,8 +61,10 @@ export function planUpdate(input: UpdatePlanInput): UpdatePlan {
     if (current === undefined) create.push(path);
     else if (current !== content) write.push(path);
   }
-  // Arquivo gerado de um módulo que o núcleo não tem mais.
+  // Arquivo gerado de um módulo que o núcleo não tem mais (só com a lista do núcleo em mãos).
+  const known = Object.keys(input.modules).length > 0;
   const remove = Object.entries(input.convexOnDisk)
+    .filter(() => known)
     .filter(([path, content]) => path.startsWith("convex/rubrica/") && content.startsWith(GENERATED_HEADER) && !(path in generated))
     .map(([path]) => path);
   const owned = convexOwnedFiles();

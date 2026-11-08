@@ -27,12 +27,14 @@ export interface DelegateDeps {
   spawn?: (bin: string, args: string[]) => number;
   /** Mensagens de erro: vão para o stderr (o stdout do `mcp` é o protocolo). */
   error?: (message: string) => void;
+  /** Acha o bin (teste troca para simular o pacote ausente). */
+  findBin?: typeof findRubricaBin;
 }
 
 const defaultSpawn = (bin: string, args: string[]) => spawnSync(process.execPath, [bin, ...args], { stdio: "inherit" }).status ?? 1;
 
 export function runThemeTester(argv: string[], deps: DelegateDeps): number {
-  const bin = findRubricaBin(deps.cwd, "@rubrica/theme-tester", "theme-tester", "bin/rubrica-testar-tema.js");
+  const bin = (deps.findBin ?? findRubricaBin)(deps.cwd, "@rubrica/theme-tester", "theme-tester", "bin/rubrica-testar-tema.js");
   if (!bin) {
     (deps.error ?? console.error)(
       "A bateria de tema vem no pacote @rubrica/theme-tester, que não está instalado aqui.\n" +
@@ -45,7 +47,7 @@ export function runThemeTester(argv: string[], deps: DelegateDeps): number {
 }
 
 export function runMcp(argv: string[], deps: DelegateDeps): number {
-  const bin = findRubricaBin(deps.cwd, "@rubrica/mcp", "mcp", "bin/rubrica-mcp.js");
+  const bin = (deps.findBin ?? findRubricaBin)(deps.cwd, "@rubrica/mcp", "mcp", "bin/rubrica-mcp.js");
   if (!bin) {
     (deps.error ?? console.error)(
       "[rubrica mcp] O servidor MCP vem no pacote @rubrica/mcp, que não está instalado neste projeto.\n" +

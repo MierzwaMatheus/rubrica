@@ -159,7 +159,8 @@ body { font-family: var(--rb-font-sans); -webkit-font-smoothing: antialiased; }
 @media (prefers-reduced-motion: no-preference) {
   .ix-prev { transition: opacity 0.18s ease, transform 0.2s ease, visibility 0s linear 0.18s; }
   .ix-t tbody tr:hover .ix-prev, .ix-t tbody tr:focus-within .ix-prev { transition-delay: 0s; }
-  .ix-t tbody tr { transition: background-color 0.12s ease, color 0.12s ease; }
+  /* A transição só vale ao entrar no hover: assim a troca de modo de cor não anima as linhas. */
+  .ix-t tbody tr:hover, .ix-t tbody tr:focus-within { transition: background-color 0.12s ease, color 0.12s ease; }
 }
 
 /* filtro por etiqueta (botões de opção + CSS gerado no bloco) */

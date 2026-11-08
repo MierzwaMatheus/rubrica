@@ -195,8 +195,8 @@ describe("plugin desligado", () => {
   it("página com vários blocos: só o bloco do plugin desligado some", async () => {
     const off = build(withPlugins(await empresaSnapshot(), ["team"]));
     const page = off.routes.find((r) => r.type === "page" && r.url === "/quem-somos");
-    expect(page?.type === "page" && page.page.blocks.map((b) => b.type)).toEqual(["texto", "numeros", "lista-itens", "video"]);
-    expect(page?.type === "page" && page.page.blocks.map((b) => b.index)).toEqual([0, 1, 2, 3]);
+    expect(page?.type === "page" && page.page.blocks.map((b) => b.type)).toEqual(["texto", "linha-do-tempo", "numeros", "lista-itens", "video"]);
+    expect(page?.type === "page" && page.page.blocks.map((b) => b.index)).toEqual([0, 1, 2, 3, 4]);
   });
 
   it("bloco de cases na home some com o portfólio desligado", async () => {

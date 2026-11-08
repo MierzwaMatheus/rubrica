@@ -272,6 +272,89 @@
         }
       },
       {
+        "id": "quem-somos-historia",
+        "type": "linha-do-tempo",
+        "visible": true,
+        "variant": "horizontal",
+        "fields": {
+          "title": {
+            "pt-BR": "Nossa história",
+            "en": "Our story",
+            "es": "Nuestra historia"
+          },
+          "items": [
+            {
+              "date": {
+                "pt-BR": "2013",
+                "en": "2013",
+                "es": "2013"
+              },
+              "title": {
+                "pt-BR": "Fundação",
+                "en": "Founded",
+                "es": "Fundación"
+              },
+              "body": {
+                "pt-BR": "Três amigos abrem o estúdio numa sala emprestada.",
+                "en": "Three friends open the studio in a borrowed room.",
+                "es": "Tres amigos abren el estudio en una sala prestada."
+              }
+            },
+            {
+              "date": {
+                "pt-BR": "2016",
+                "en": "2016",
+                "es": "2016"
+              },
+              "title": {
+                "pt-BR": "Primeiro grande cliente",
+                "en": "First major client",
+                "es": "Primer gran cliente"
+              },
+              "body": {
+                "pt-BR": "O site de uma rede de clínicas leva o time a 6 pessoas.",
+                "en": "A clinic network's site grows the team to 6.",
+                "es": "El sitio de una red de clínicas lleva el equipo a 6 personas."
+              }
+            },
+            {
+              "date": {
+                "pt-BR": "2020",
+                "en": "2020",
+                "es": "2020"
+              },
+              "title": {
+                "pt-BR": "Acessibilidade como padrão",
+                "en": "Accessibility by default",
+                "es": "Accesibilidad por defecto"
+              },
+              "body": {
+                "pt-BR": "Todo projeto passa a sair com auditoria WCAG.",
+                "en": "Every project now ships with a WCAG audit.",
+                "es": "Todo proyecto sale con auditoría WCAG."
+              }
+            },
+            {
+              "date": {
+                "pt-BR": "Hoje",
+                "en": "Today",
+                "es": "Hoy"
+              },
+              "title": {
+                "pt-BR": "12 pessoas, 3 cidades",
+                "en": "12 people, 3 cities",
+                "es": "12 personas, 3 ciudades"
+              },
+              "body": {
+                "pt-BR": "Atendemos empresas pequenas e médias de todo o Brasil.",
+                "en": "We serve small and mid-sized companies across Brazil.",
+                "es": "Atendemos a pequeñas y medianas empresas de todo Brasil."
+              }
+            }
+          ]
+        }
+      },
+      {
         "id": "quem-somos-1",
         "type": "numeros",
         "visible": true,

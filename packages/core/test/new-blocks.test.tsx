@@ -5,11 +5,11 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { fileURLToPath } from "node:url";
 import { fixtureSource } from "../src/data/source";
 import { buildSite, type BuiltSite } from "../src/render/site";
-import { CORE_BLOCKS, incorporacao, video } from "../src/blocks/catalog";
+import { CORE_BLOCKS, incorporacao, linhaDoTempo, video } from "../src/blocks/catalog";
 import { validateBlock } from "../src/blocks/define";
 import { preparePageBlocks } from "../src/convex/lib/blocks";
 import { CORE_PLUGINS } from "../src/plugins/registry";
-import { defineTheme, type BlockProps } from "../src/theme/contract";
+import { defineTheme, resolveVariant, type BlockProps } from "../src/theme/contract";
 import { DEFAULT_BLOCKS, DefaultShell, VideoFrame } from "../src/components";
 import { parseVideoUrl } from "../src/blocks/media";
 import VideoIsland from "../src/islands/video";
@@ -132,5 +132,32 @@ describe("incorporação", () => {
     const html = render("incorporacao", { ctx, fields: { url: "https://tally.so/embed/wA1bCd", frameTitle: "Formulário", showLink: false } });
     expect(html).toContain('height="600"');
     expect(html).not.toContain("rb-embed__link");
+  });
+});
+
+describe("linha do tempo", () => {
+  it("lista ordenada, um h3 por marco, data antes do título", async () => {
+    const { block, ctx } = await fixtureBlock("pessoal", "/sobre", "linha-do-tempo");
+    const html = render("linha-do-tempo", { ctx, ...block });
+    expect(html).toContain('<ol class="rb-timeline">');
+    expect((html.match(/<li /g) ?? []).length).toBe(4);
+    expect((html.match(/<h3/g) ?? []).length).toBe(4);
+    expect(html.indexOf("2017")).toBeLessThan(html.indexOf("Primeiro projeto"));
+    expect(html).toContain('alt="Quadro de pesquisa com post-its"');
+  });
+
+  it("variação horizontal herdada do núcleo em tema que não declara", async () => {
+    const { block, ctx } = await fixtureBlock("empresa", "/quem-somos", "linha-do-tempo");
+    expect(block.variant).toBe("horizontal");
+    expect(render("linha-do-tempo", { ctx, ...block })).toContain("rb-timeline--horizontal");
+    expect(resolveVariant(theme, "linha-do-tempo", undefined)).toBe("vertical");
+    expect(resolveVariant(theme, "linha-do-tempo", "inexistente")).toBe("vertical");
+  });
+
+  it("marco sem título no idioma não aparece", async () => {
+    const ctx = (await load("pessoal")).context("pt-BR", "/");
+    const html = render("linha-do-tempo", { ctx, fields: { items: [{ date: "2020", title: "A" }, { date: "2021" }] } as never });
+    expect((html.match(/<li /g) ?? []).length).toBe(1);
+    expect(linhaDoTempo.fields.items.required).toBe(true);
   });
 });

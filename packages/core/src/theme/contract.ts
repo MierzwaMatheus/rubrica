@@ -274,6 +274,10 @@ export const CORE_VARIANTS: Partial<Record<string, VariantOption[]>> = {
     { value: "grade", label: "Grade" },
     { value: "lista", label: "Lista" },
   ],
+  "linha-do-tempo": [
+    { value: "vertical", label: "Vertical" },
+    { value: "horizontal", label: "Horizontal (compacta)" },
+  ],
 };
 
 /**

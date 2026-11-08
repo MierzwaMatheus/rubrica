@@ -397,6 +397,31 @@ export const incorporacao = defineBlock({
   }),
 });
 
+export const linhaDoTempo = defineBlock({
+  type: "linha-do-tempo",
+  label: "Linha do tempo",
+  description: "Marcos em ordem: história da empresa, trajetória, etapas de um projeto.",
+  category: "comum",
+  fields: {
+    anchor,
+    title: heading,
+    intro,
+    items: field.list({
+      label: "Marcos",
+      itemLabel: "Marco",
+      required: true,
+      min: 1,
+      max: 16,
+      of: {
+        date: field.text({ label: "Data", required: true, maxLength: 40, help: "Texto livre: 2019, mar. 2021, Hoje." }),
+        title: field.text({ label: "Título", required: true, maxLength: 120 }),
+        body: field.text({ label: "Texto", multiline: true, maxLength: 600 }),
+        image: field.image({ label: "Imagem" }),
+      },
+    }),
+  },
+});
+
 export const CORE_BLOCKS = [
   hero,
   texto,
@@ -417,6 +442,7 @@ export const CORE_BLOCKS = [
   logosClientes,
   video,
   incorporacao,
+  linhaDoTempo,
 ] as const;
 
 export type CoreBlock = (typeof CORE_BLOCKS)[number];

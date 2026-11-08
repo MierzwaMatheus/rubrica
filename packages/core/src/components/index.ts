@@ -5,6 +5,7 @@ import { ContatoBlock, LocalizacaoBlock } from "./blocks/contact";
 import { EquipeBlock, GaleriaBlock, ListaItensBlock, LogosClientesBlock, NumerosBlock, ServicosBlock } from "./blocks/lists";
 import { CurriculoBlock } from "./blocks/resume";
 import { IncorporacaoBlock, VideoBlock } from "./blocks/media";
+import { LinhaDoTempoBlock } from "./blocks/timeline";
 import { DefaultCase, DefaultNotFound, DefaultPost, DefaultShell } from "./shell";
 
 export * from "./primitives";
@@ -16,6 +17,7 @@ export { EquipeBlock, GaleriaBlock, ListaItensBlock, LogosClientesBlock, Numeros
 export { CurriculoBlock } from "./blocks/resume";
 export { IncorporacaoBlock, VideoBlock, VideoFrame, videoName, videoPoster, videoRatio } from "./blocks/media";
 export type { VideoFrameProps } from "./blocks/media";
+export { LinhaDoTempoBlock } from "./blocks/timeline";
 /** Utilitários puros dos blocos padrão, para os temas não copiarem. */
 export { digits, formatDays, resolveFreeHref, safeId, shorten, tagFilterCss } from "./blocks/util";
 export type { TagFilterCssOptions } from "./blocks/util";
@@ -41,6 +43,7 @@ export const DEFAULT_BLOCKS: Partial<Record<string, BlockComponent>> = {
   "logos-clientes": LogosClientesBlock,
   video: VideoBlock,
   incorporacao: IncorporacaoBlock,
+  "linha-do-tempo": LinhaDoTempoBlock,
 };
 
 /** Componente do bloco no tema, senão o padrão do núcleo, senão o genérico. */

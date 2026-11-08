@@ -306,6 +306,84 @@
         }
       },
       {
+        "id": "s-trajetoria",
+        "type": "linha-do-tempo",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "Trajetória",
+            "en": "Career path"
+          },
+          "items": [
+            {
+              "date": {
+                "pt-BR": "2017",
+                "en": "2017"
+              },
+              "title": {
+                "pt-BR": "Primeiro projeto de produto",
+                "en": "First product project"
+              },
+              "body": {
+                "pt-BR": "Comecei redesenhando o app de uma cooperativa de crédito.",
+                "en": "I started by redesigning a credit union's app."
+              }
+            },
+            {
+              "date": {
+                "pt-BR": "2019",
+                "en": "2019"
+              },
+              "title": {
+                "pt-BR": "Design de serviços",
+                "en": "Service design"
+              },
+              "body": {
+                "pt-BR": "Passei a cuidar da jornada inteira, do atendimento ao aplicativo.",
+                "en": "I took on the whole journey, from customer service to the app."
+              }
+            },
+            {
+              "date": {
+                "pt-BR": "2021",
+                "en": "2021"
+              },
+              "title": {
+                "pt-BR": "Designer sênior no Banco Exemplo",
+                "en": "Senior designer at Banco Exemplo"
+              },
+              "body": {
+                "pt-BR": "Liderei o redesenho do onboarding e estruturei a pesquisa contínua.",
+                "en": "Led the onboarding redesign and set up continuous research."
+              },
+              "image": {
+                "url": "/img/routine-1.svg",
+                "width": 800,
+                "height": 600,
+                "alt": {
+                  "pt-BR": "Quadro de pesquisa com post-its",
+                  "en": "Research board with sticky notes"
+                }
+              }
+            },
+            {
+              "date": {
+                "pt-BR": "Hoje",
+                "en": "Today"
+              },
+              "title": {
+                "pt-BR": "Projetos independentes",
+                "en": "Independent work"
+              },
+              "body": {
+                "pt-BR": "Atendo produtos digitais que querem crescer sem perder a acessibilidade.",
+                "en": "I work with digital products that want to grow without losing accessibility."
+              }
+            }
+          ]
+        }
+      },
+      {
         "id": "s3",
         "type": "galeria",
         "visible": true,

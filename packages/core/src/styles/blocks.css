@@ -170,6 +170,26 @@
 .rb-embed__link { margin: 0.75rem 0 0; }
 .rb-embed__link a { display: inline-flex; align-items: center; min-height: 44px; }
 
+/* Linha do tempo: vertical (padrão) e horizontal (compacta) */
+.rb-timeline { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.75rem; max-width: 48rem; position: relative; }
+.rb-timeline__item { position: relative; padding-left: 2rem; min-width: 0; }
+.rb-timeline__item::before {
+  content: ""; position: absolute; left: 0; top: 0.35rem; width: 0.85rem; height: 0.85rem; border-radius: 50%;
+  background: var(--rb-accent); box-shadow: 0 0 0 3px var(--rb-bg);
+}
+.rb-timeline__item::after { content: ""; position: absolute; left: calc(0.425rem - 1px); top: 1.5rem; bottom: -1.75rem; width: 2px; background: var(--rb-border); }
+.rb-timeline__item:last-child::after { display: none; }
+.rb-timeline__date { margin: 0 0 0.25rem; color: var(--rb-accent); font-family: var(--rb-font-mono); font-weight: 700; font-size: 0.9rem; }
+.rb-timeline__title { font-size: 1.15rem; line-height: 1.3; margin: 0; overflow-wrap: anywhere; }
+.rb-timeline__text { margin: 0.4rem 0 0; color: var(--rb-muted); }
+.rb-timeline__image { display: block; width: 100%; max-width: 30rem; height: auto; margin-top: 0.75rem; border-radius: var(--rb-radius); }
+.rb-timeline--horizontal { max-width: none; gap: 1.5rem 1.25rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr)); }
+.rb-timeline--horizontal .rb-timeline__item { padding: 1.5rem 0 0; }
+.rb-timeline--horizontal .rb-timeline__item::before { top: 0; left: 0; }
+.rb-timeline--horizontal .rb-timeline__item::after { top: calc(0.425rem - 1px); left: 1.25rem; right: -1.25rem; bottom: auto; width: auto; height: 2px; }
+.rb-timeline--horizontal .rb-timeline__title { font-size: 1.05rem; }
+.rb-timeline--horizontal .rb-timeline__text { font-size: 0.95rem; }
+
 /* Formulários das ilhas (contato, depoimento) */
 .rb-form { display: grid; gap: 1rem; background: var(--rb-surface); border: 1px solid var(--rb-border); border-radius: var(--rb-radius); padding: 1.25rem; }
 .rb-form fieldset { border: 0; margin: 0; padding: 0; min-width: 0; display: grid; gap: 0.75rem; }

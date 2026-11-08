@@ -17,7 +17,7 @@ import { convexFiles } from "../project/convex.js";
 import { CORE_VERSION, defaultDependencySpecs, projectFiles, type DependencySpecs } from "../project/files.js";
 import { loadInstalledCore } from "../project/introspect.js";
 import type { RubricaState } from "../state.js";
-import { COLOR_MODES, getTheme, resolveTheme, SCHEME_IDS, SCHEME_OPTIONS, THEMES, themePackage, type ColorMode } from "../themes.js";
+import { COLOR_MODES, getTheme, initialFonts, resolveTheme, SCHEME_IDS, SCHEME_OPTIONS, THEMES, themePackage, type ColorMode } from "../themes.js";
 import { ask, canAsk, choose, chooseMany, log, note, outro, spinner } from "../ui.js";
 import { track } from "../telemetry.js";
 
@@ -149,7 +149,7 @@ export async function resolveCreateOptions(argv: string[], cwd: string, env: Rec
     ...(theme.temaDesejado && { temaDesejado: theme.temaDesejado }),
     identidade: { nome, url, descricao, ...(autor && { autor }), ...(email && { email }), ...(v.twitter && { twitter: normalizeHandle(v.twitter) }) },
     idiomas,
-    aparencia: { esquema, modo, alternancia: true, fonteSans: spec.recommended.fontSans, ...(spec.recommended.fontMono && { fonteMono: spec.recommended.fontMono }) },
+    aparencia: { esquema, modo, alternancia: true, ...initialFonts(temaId) },
     plugins: pluginsRecord(tipo, selected),
   };
 

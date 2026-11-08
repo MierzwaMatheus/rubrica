@@ -3,6 +3,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { applyConfigChange, swapThemeInFiles, updateSiteUrl } from "../src/commands/config";
 import { astroConfig, packageJson } from "../src/project/files";
+import { getTheme } from "../src/themes";
 import { sampleState, tmp } from "./helpers";
 
 describe("config (puro)", () => {
@@ -11,6 +12,24 @@ describe("config (puro)", () => {
     expect(r.state.tema).toBe("cyberpunk");
     expect(r.themeSwap).toEqual(["@rubrica/theme-padrao", "@rubrica/theme-cyberpunk"]);
     expect(r.patch).toEqual({ theme: "cyberpunk", appearance: { colorMode: "dark", colorToggle: true, scheme: "fosforo" } });
+  });
+
+  it("trocar de tema troca o esquema e as fontes que seguiam o anterior; o escolhido fica", () => {
+    // padrao → cyberpunk: os dois recomendam neon, e nenhum grava fontes.
+    const a = applyConfigChange(sampleState({ aparencia: { esquema: "neon", modo: "dark", alternancia: true } }), { tema: "cyberpunk" });
+    expect(a.state.aparencia).toEqual({ esquema: "neon", modo: "dark", alternancia: true });
+    // → zine (não portado): o esquema e as fontes do layout da v1.
+    const b = applyConfigChange(a.state, { tema: "zine" });
+    expect(b.state.aparencia.esquema).toBe(getTheme("zine")!.recommended.scheme);
+    expect(b.state.aparencia.fonteSans).toBe(getTheme("zine")!.recommended.fontSans);
+    expect(b.patch.appearance).toMatchObject({ scheme: getTheme("zine")!.recommended.scheme, fontSans: getTheme("zine")!.recommended.fontSans });
+    // de volta ao cyberpunk: as fontes do zine saem (valem as do tema).
+    const c = applyConfigChange(b.state, { tema: "cyberpunk" });
+    expect(c.state.aparencia.fonteSans).toBeUndefined();
+    expect(c.state.aparencia.esquema).toBe("neon");
+    // esquema escolhido pela pessoa não muda com o tema.
+    const d = applyConfigChange(sampleState({ aparencia: { esquema: "sumi", modo: "dark", alternancia: true } }), { tema: "zine" });
+    expect(d.state.aparencia.esquema).toBe("sumi");
   });
 
   it("tema ainda não portado: fica no padrão e guarda a escolha", () => {

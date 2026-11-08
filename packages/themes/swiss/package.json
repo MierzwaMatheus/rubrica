@@ -1,0 +1,31 @@
+{
+  "name": "@rubrica/theme-swiss",
+  "version": "2.0.0-alpha.0",
+  "description": "Tema Swiss do Rubrica (layout \"swiss\" da v1): estilo tipográfico internacional, grade rígida de 12 colunas e tipografia forte.",
+  "type": "module",
+  "license": "MIT",
+  "exports": {
+    ".": "./src/index.tsx",
+    "./styles.css": "./src/styles.css",
+    "./fonts.json": "./src/fonts.json"
+  },
+  "files": [
+    "src"
+  ],
+  "rubrica": {
+    "contract": "^1"
+  },
+  "scripts": {
+    "check": "tsc --noEmit -p tsconfig.json"
+  },
+  "peerDependencies": {
+    "@rubrica/core": "workspace:^",
+    "react": "^19.2.0"
+  },
+  "devDependencies": {
+    "@rubrica/core": "workspace:^",
+    "@types/react": "^19.2.0",
+    "react": "^19.2.1",
+    "typescript": "^5.9.0"
+  }
+}

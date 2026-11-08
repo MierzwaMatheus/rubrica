@@ -194,6 +194,7 @@ describe("demonstração: LGPD, propostas e planos", () => {
     const res = s.mutate(api.checkouts.linkPlan, { planId: id }) as { href: string };
     expect(res.href).toMatch(/^\/checkout\//);
     expect((s.query(plans.get, { id }) as Doc).cta).toMatchObject({ href: res.href });
+    expect(s.query(api.checkouts.status, {})).toEqual({ asaasConfigured: true });
     expect((s.query(api.checkouts.listLinks, {}) as Doc[])[0]).toMatchObject({ planId: id, active: true });
     s.mutate(api.checkouts.unlinkPlan, { planId: id });
     expect((s.query(plans.get, { id }) as Doc).cta).toBeUndefined();

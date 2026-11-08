@@ -336,6 +336,15 @@ export function checkoutsFunctions(rt: RubricaRuntime) {
   return {
     // ── Painel ─────────────────────────────────────────────────────────────
 
+    /** O Asaas está configurado? Só o booleano: a chave nunca sai do backend. */
+    status: query({
+      args: {},
+      handler: async (ctx) => {
+        await guard(ctx, rt, "checkouts", "payments");
+        return { asaasConfigured: !!process.env.ASAAS_API_KEY?.trim() };
+      },
+    }),
+
     list: query({
       args: { status: v.optional(vCheckoutStatus), limit: v.optional(v.number()), includeDeleted: v.optional(v.boolean()) },
       handler: async (ctx, args) => {

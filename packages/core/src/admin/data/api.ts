@@ -425,6 +425,7 @@ export const api = {
     setDefault: m<{ id: string }, null>("contractTemplates", "setDefault"),
   },
   checkouts: {
+    status: q<Empty, { asaasConfigured: boolean }>("checkouts", "status"),
     list: q<{ status?: CheckoutStatus; limit?: number; includeDeleted?: boolean }, CheckoutDoc[]>("checkouts", "list"),
     create: m<Args, string>("checkouts", "create"),
     remove: m<{ id: string }, null>("checkouts", "remove"),

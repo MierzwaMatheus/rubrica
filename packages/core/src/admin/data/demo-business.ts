@@ -600,6 +600,7 @@ export function businessHandlers(host: BusinessHost): { queries: Handlers; mutat
     host.require("checkouts");
     pluginOn("payments");
   };
+  queries["checkouts:status"] = () => (paymentsGuard(), { asaasConfigured: true });
   queries["checkouts:list"] = (args) => {
     paymentsGuard();
     return plain(b.checkouts.filter((c) => (args.includeDeleted || c.deletedAt === undefined) && (!args.status || c.status === args.status)).sort((x, y) => (y.createdAt as number) - (x.createdAt as number)));

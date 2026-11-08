@@ -228,6 +228,9 @@ export const DEFAULT_UI_TEXTS: Record<string, Localized<string>> = {
   "case.client": { pt: "Cliente", en: "Client", es: "Cliente" },
   "case.year": { pt: "Ano", en: "Year", es: "Año" },
   "case.role": { pt: "Papel", en: "Role", es: "Rol" },
+  "case.myRole": { pt: "Meu papel", en: "My role", es: "Mi rol" },
+  "case.back": { pt: "Voltar ao portfólio", en: "Back to the portfolio", es: "Volver al portafolio" },
+  "case.gallery": { pt: "Imagens do projeto", en: "Project images", es: "Imágenes del proyecto" },
   "resume.download": { pt: "Baixar currículo em PDF", en: "Download résumé (PDF)", es: "Descargar CV en PDF" },
   "resume.experience": { pt: "Experiência", en: "Experience", es: "Experiencia" },
   "resume.education": { pt: "Formação", en: "Education", es: "Formación" },
@@ -325,6 +328,8 @@ export const DEFAULT_UI_TEXTS: Record<string, Localized<string>> = {
  */
 export const EMPRESA_UI_TEXTS: Record<string, Localized<string>> = {
   "sidebar.talk": { pt: "Fale conosco", en: "Talk to us", es: "Hablemos" },
+  "case.myRole": { pt: "Nosso papel", en: "Our role", es: "Nuestro rol" },
+  "case.back": { pt: "Voltar aos cases", en: "Back to the case studies", es: "Volver a los casos" },
   "whatsapp.float": { pt: "Fale conosco no WhatsApp", en: "Chat with us on WhatsApp", es: "Habla con nosotros por WhatsApp" },
   "contactForm.message": { pt: "Conte um pouco mais", en: "Tell us a bit more", es: "Cuéntanos un poco más" },
   "contactForm.you": { pt: "Como falar com você?", en: "How can we reach you?", es: "¿Cómo podemos contactarte?" },

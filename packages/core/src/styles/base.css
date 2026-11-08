@@ -164,3 +164,6 @@ a { color: var(--rb-accent); }
   [data-color-mode="system"] .rb-logo--pair .rb-logo__light { display: none; }
   [data-color-mode="system"] .rb-logo--pair .rb-logo__dark { display: inline; }
 }
+
+/* Capa sem largura/altura conhecidas: reserva a proporção para a página não pular ao carregar. */
+img.rb-case__cover:not([height]), img.rb-post__cover:not([height]) { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }

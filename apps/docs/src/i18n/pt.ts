@@ -28,7 +28,7 @@ export const pt = {
   header: {
     nav: "Seções",
     combinator: "Combinador",
-    layouts: "Layouts",
+    layouts: "Temas",
     schemes: "Esquemas",
     start: "Começar",
     docs: "Docs",

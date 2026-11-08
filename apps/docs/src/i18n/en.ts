@@ -21,7 +21,7 @@ export const en: Dict = {
   header: {
     nav: "Sections",
     combinator: "Builder",
-    layouts: "Layouts",
+    layouts: "Themes",
     schemes: "Schemes",
     start: "Get started",
     docs: "Docs",

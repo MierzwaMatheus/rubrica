@@ -216,6 +216,7 @@ export const DEFAULT_UI_TEXTS: Record<string, Localized<string>> = {
   "nav.menu": { pt: "Menu", en: "Menu", es: "Menú" },
   "sidebar.contact": { pt: "Contato", en: "Contact", es: "Contacto" },
   "sidebar.talk": { pt: "Fale comigo", en: "Talk to me", es: "Hablemos" },
+  "sidebar.downloadCV": { pt: "Baixar CV", en: "Download CV", es: "Descargar CV" },
   "nav.language": { pt: "Idioma", en: "Language", es: "Idioma" },
   "theme.toggle": { pt: "Alternar tema claro e escuro", en: "Toggle light and dark theme", es: "Cambiar tema claro y oscuro" },
   "common.readMore": { pt: "Ler mais", en: "Read more", es: "Leer más" },

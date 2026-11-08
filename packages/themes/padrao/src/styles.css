@@ -386,3 +386,10 @@ h2.rb-resume__heading { font-family: var(--rb-font-sans); }
   .rb-hero[data-variant="pagina"] ~ .rb-cases:not([data-variant="lista"]) .rb-cases__list,
   .rb-hero[data-variant="pagina"] ~ .rb-posts-recentes .rb-posts__list { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* Lista de itens sem número (princípios do "Sobre"): o marcador em V da v1 sobre o título. */
+.rb-lista__list:is(ul) > li::before {
+  content: ""; display: block; width: 1.75rem; height: 1.25rem; margin-bottom: 1rem; background: var(--rb-accent);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 20'%3E%3Cpath d='M0 0H8L14 6L20 0H28L14 14Z'/%3E%3C/svg%3E") left top / contain no-repeat;
+}
+.rb-lista__list .rb-card__text { color: var(--rb-muted); }

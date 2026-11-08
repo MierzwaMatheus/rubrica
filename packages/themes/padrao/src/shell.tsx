@@ -31,7 +31,7 @@ function navIcon(href: string): IconName {
   return "folder";
 }
 
-const SOCIAL_ICONS: Record<string, IconName> = { github: "github", linkedin: "linkedin" };
+const SOCIAL_ICONS: Record<string, IconName> = { github: "github", linkedin: "linkedin", behance: "behance" };
 
 export function createSidebarShell({ avatar = "md", barTalk = false }: SidebarOptions = {}) {
   return function SidebarShell({ ctx, children, colorToggle, localeSwitcher }: ShellProps) {
@@ -150,7 +150,7 @@ export function createSidebarShell({ avatar = "md", barTalk = false }: SidebarOp
                 )}
                 {phone && (
                   <a href={phoneHref} {...(phoneIsWhatsapp ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
-                    <Icon name="phone" size={14} />
+                    <Icon name={phoneIsWhatsapp ? "whatsapp" : "phone"} size={14} />
                     <span>{phone}</span>
                   </a>
                 )}
@@ -199,7 +199,7 @@ export function createSidebarShell({ avatar = "md", barTalk = false }: SidebarOp
               {hasResume && (
                 <a className="rb-side__cv" href={ctx.href("/curriculo")}>
                   <Icon name="file" size={14} />
-                  {ctx.t("resume.download")}
+                  {ctx.t("sidebar.downloadCV")}
                 </a>
               )}
             </div>

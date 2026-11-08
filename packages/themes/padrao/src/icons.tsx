@@ -39,6 +39,22 @@ const PATHS: Record<string, ReactNode> = {
     </>
   ),
   chevronDown: <path d="m6 9 6 6 6-6" />,
+  // WhatsApp (balão com telefone, traço no estilo do Lucide "message-circle" + "phone").
+  whatsapp: (
+    <>
+      <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
+      <path d="M9.5 9.5c.3 1.6 1.4 3.4 3.1 4.6l1.2-1.1 1.9 1-.4 1.6c-2.9.2-6.6-3.4-6.4-6.4l1.6-.4 1 1.9z" />
+    </>
+  ),
+  // Behance ("Bē"): o logotipo em traço.
+  behance: (
+    <>
+      <path d="M3 7h5a2.5 2.5 0 0 1 0 5H3z" />
+      <path d="M3 12h5.5a2.75 2.75 0 0 1 0 5.5H3z" />
+      <path d="M15 8h5" />
+      <path d="M14 14.5h7a3.5 3.5 0 1 0-1 2.45" />
+    </>
+  ),
   briefcase: (
     <>
       <path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />

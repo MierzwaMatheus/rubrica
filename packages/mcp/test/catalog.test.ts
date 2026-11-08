@@ -188,7 +188,7 @@ describe("receitas", () => {
     const r = (await call(runtime, "page_recipes")).body;
     expect(r).toMatchObject({ kind: "empresa", from: "nucleo" });
     const quem = r.pages.find((p: { path: string }) => p.path === "/quem-somos");
-    expect(quem.blocks.map((b: { type: string }) => b.type)).toEqual(["texto", "numeros", "lista-itens", "equipe"]);
+    expect(quem.blocks.map((b: { type: string }) => b.type)).toEqual(["texto", "linha-do-tempo", "numeros", "lista-itens", "equipe"]);
     expect(quem.blocks[0].exampleFields).toBeUndefined();
   });
 

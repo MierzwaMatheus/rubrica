@@ -6,6 +6,7 @@
  */
 import type { GetStaticPaths } from "astro";
 import Document from "./Document.astro";
+import ContactDialog from "./ContactDialog.astro";
 import Island from "../../islands/Island";
 import { loadSite, activeTheme, componentFor, hasIsland, islandProps } from "../runtime";
 import { islandNameFor } from "../../islands";
@@ -51,4 +52,5 @@ const pageType = route.type;
     {route.type === "post" && <Post post={route.post} html={route.post.content} related={route.related} ctx={ctx} />}
     {route.type === "case" && <Case project={route.project} related={route.related} ctx={ctx} />}
   </Shell>
+  <ContactDialog site={site} ctx={ctx} />
 </Document>

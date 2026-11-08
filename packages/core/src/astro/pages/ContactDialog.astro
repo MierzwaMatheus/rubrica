@@ -1,0 +1,35 @@
+---
+/**
+ * Janela de contato (`ResolvedSite.contactDialog`): um `popover` do HTML, aberto pelos
+ * botões do tema (`popovertarget`) sem JavaScript. Dentro, a mesma ilha do bloco `contato`
+ * (o da home), com `client:visible`: o formulário só carrega quando a janela abre.
+ */
+import Island from "../../islands/Island";
+import { islandProps } from "../runtime";
+import { contactBlock, type BuiltSite } from "../../render/site";
+import type { RenderContext } from "../../theme/contract";
+
+interface Props {
+  site: BuiltSite;
+  ctx: RenderContext;
+}
+const { site, ctx } = Astro.props;
+const id = ctx.site.contactDialog;
+const block = id ? contactBlock(site.routes, ctx.locale) : undefined;
+---
+
+{
+  id && block && (
+    <div popover id={id} class="rb-dialog" role="dialog" aria-labelledby={`${id}-titulo`}>
+      <div class="rb-dialog__head">
+        <h2 class="rb-dialog__title" id={`${id}-titulo`}>{ctx.t("sidebar.talk")}</h2>
+        <button type="button" class="rb-dialog__close" popovertarget={id} popovertargetaction="hide" aria-label={ctx.t("common.close")}>
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="rb-dialog__body">
+        <Island client:visible name="contato" props={islandProps(block, ctx)} />
+      </div>
+    </div>
+  )
+}

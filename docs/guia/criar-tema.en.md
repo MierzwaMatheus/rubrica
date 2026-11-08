@@ -125,6 +125,7 @@ export default defineTheme({
 | `texture` | no | Default texture: `grain`, `paper`, `scanlines` or `none`. A fixed layer over the page that takes no clicks and disappears with `prefers-reduced-transparency` |
 | `fonts` | no | The default fonts, imported from `fonts.json`. See [Fonts](#fonts) |
 | `texts` | no | The theme's own interface texts. See [Interface texts](#interface-texts) |
+| `contactDialog` | no | `true` opens contact in a dialog, on any page. See [Contact dialog](#contact-dialog) |
 
 ## Tokens
 
@@ -242,6 +243,13 @@ A shell can go far beyond a header with a menu: the `desktop` theme becomes a de
 ### Announcement bar and WhatsApp button
 
 The **announcement bar** and the **floating WhatsApp button** ([Content](./conteudo.en.md#whatsapp-and-announcement-bar)) belong to the core: the bar comes before the shell, the button after it, using only `--rb-*` tokens. If the shell has something fixed at the top or bottom, the theme makes room with CSS, no JavaScript: `<html>` gets `data-announcement` when there is a bar and `data-whatsapp-float` when there is a button, and the `--rb-float-bottom` and `--rb-float-right` variables move the button (`--rb-whatsapp-bg` and `--rb-whatsapp-fg` set its colors). `padrao` turns its fixed bar and sidebar into `sticky` when there is a bar; `bento` lifts the button above the dock; `chat` puts it in the quick replies bar.
+
+
+### Contact dialog
+
+With `contactDialog: true`, the core adds a dialog (an HTML `popover`) to every page with the form of the home page's `contato` block, when the contact plugin is on and the site has that block in the locale. The dialog id comes in `ctx.site.contactDialog`, and the shell (or a template) opens it with `<button type="button" popoverTarget={ctx.site.contactDialog}>`, no JavaScript. Without the dialog, fall back to a link to the block (`#contato`).
+
+Esc and clicking outside close it. The form only loads when the dialog opens, but every page now carries Astro's small island script. The test battery opens the dialog before checking hydration and axe. `padrao` and `cyberpunk` use the dialog, like the v1 contact wizard.
 
 ## Blocks
 

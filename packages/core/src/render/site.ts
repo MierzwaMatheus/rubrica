@@ -102,6 +102,23 @@ export function homeShowsAvailability(pages: readonly PageRecord[]): boolean {
   return !!home?.blocks.some((b) => b.visible && b.type === "hero" && b.fields.showAvailability === true);
 }
 
+/** Id da janela de contato (`ResolvedSite.contactDialog`). */
+export const CONTACT_DIALOG_ID = "rb-contato-janela";
+
+/**
+ * O bloco `contato` (com ilha) que a janela de contato usa no idioma: o da home, senão o
+ * da primeira página que tiver um.
+ */
+export function contactBlock(routes: readonly SiteRoute[], locale: Locale): ResolvedBlock | undefined {
+  const pages = routes.filter((r): r is Extract<SiteRoute, { type: "page" }> => r.type === "page" && r.locale === locale);
+  const home = pages.find((r) => r.page.path === "/");
+  for (const r of home ? [home, ...pages] : pages) {
+    const block = r.page.blocks.find((b) => b.type === "contato" && b.interactive);
+    if (block) return block;
+  }
+  return undefined;
+}
+
 export function buildSite(input: BuildInput): BuiltSite {
   const { snapshot, theme } = input;
   const settings = snapshot.site;
@@ -331,6 +348,7 @@ export function buildSite(input: BuildInput): BuiltSite {
       const label = pick(settings.whatsapp.label, locale);
       site.whatsapp = { number: whatsappNumber, href: whatsAppUrl(whatsappNumber, message), floating: settings.whatsapp.floating, ...(label && { label }) };
     }
+    if (theme.contactDialog && plugins.has("contact-wizard") && contactBlock(routes, locale)) site.contactDialog = CONTACT_DIALOG_ID;
     if (announcementOn && settings.announcement) {
       // Sem texto no idioma, a faixa não existe nele (decisão 28): nada de cair no principal.
       const text = pick(settings.announcement.text, locale);

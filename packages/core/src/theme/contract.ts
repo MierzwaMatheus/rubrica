@@ -59,6 +59,13 @@ export interface ResolvedSite {
   whatsapp?: ResolvedWhatsApp;
   /** Faixa de aviso no ar neste build e idioma. O núcleo a desenha antes da casca. */
   announcement?: ResolvedAnnouncement;
+  /**
+   * Id da janela de contato (`popover`) que o núcleo põe em toda página quando o tema pede
+   * (`ThemeDefinition.contactDialog`), o plugin de contato está ligado e o site tem um bloco
+   * `contato` no idioma. O tema abre a janela com `<button popoverTarget={id}>`, sem
+   * JavaScript; o formulário dela só carrega quando ela abre.
+   */
+  contactDialog?: string;
 }
 
 export interface ResolvedWhatsApp {
@@ -280,6 +287,12 @@ export interface ThemeDefinition {
    * Use um prefixo com o id do tema (`chat.typing`). O site pode sobrescrever em "Textos".
    */
   texts?: Record<string, Record<string, string>>;
+  /**
+   * O contato abre numa janela, em qualquer página (como o assistente da v1): o núcleo põe a
+   * janela com o formulário do bloco `contato` e entrega o id em `ctx.site.contactDialog`.
+   * Cada página ganha o script pequeno de ilha do Astro; o formulário só carrega ao abrir.
+   */
+  contactDialog?: boolean;
 }
 
 export function defineTheme(theme: ThemeDefinition): ThemeDefinition {

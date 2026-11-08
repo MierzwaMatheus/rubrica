@@ -220,6 +220,7 @@ export const DEFAULT_UI_TEXTS: Record<string, Localized<string>> = {
   "theme.toggle": { pt: "Alternar tema claro e escuro", en: "Toggle light and dark theme", es: "Cambiar tema claro y oscuro" },
   "common.readMore": { pt: "Ler mais", en: "Read more", es: "Leer más" },
   "common.back": { pt: "Voltar", en: "Back", es: "Volver" },
+  "common.close": { pt: "Fechar", en: "Close", es: "Cerrar" },
   "blog.readingTime": { pt: "{minutes} min de leitura", en: "{minutes} min read", es: "{minutes} min de lectura" },
   "blog.publishedAt": { pt: "Publicado em {date}", en: "Published on {date}", es: "Publicado el {date}" },
   "blog.related": { pt: "Leia também", en: "Read next", es: "Lee también" },

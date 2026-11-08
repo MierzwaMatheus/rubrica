@@ -1,6 +1,7 @@
 ---
 /** 404 no idioma principal (a hospedagem serve dist/404.html com status 404). */
 import Document from "./Document.astro";
+import ContactDialog from "./ContactDialog.astro";
 import { loadSite, activeTheme } from "../runtime";
 import { templates, LocaleLinks, ColorToggleButton } from "../../components";
 import { localizedPath } from "../../i18n";
@@ -18,4 +19,5 @@ const { Shell, NotFound } = templates(activeTheme);
     {ctx.site.colorToggle && <ColorToggleButton slot="colorToggle" label={ctx.t("theme.toggle")} />}
     <NotFound ctx={ctx} />
   </Shell>
+  <ContactDialog site={site} ctx={ctx} />
 </Document>

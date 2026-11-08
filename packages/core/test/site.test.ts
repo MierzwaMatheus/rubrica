@@ -1,0 +1,65 @@
+import { describe, expect, it } from "vitest";
+import { fileURLToPath } from "node:url";
+import { fixtureSource } from "../src/data/source";
+import { buildSite } from "../src/render/site";
+import { CORE_BLOCKS } from "../src/blocks/catalog";
+import { CORE_PLUGINS } from "../src/plugins/registry";
+import { defineTheme } from "../src/theme/contract";
+import { DefaultShell } from "../src/components";
+import { buildHead } from "../src/seo/head";
+
+const theme = defineTheme({ id: "teste", label: "Teste", contract: "^1", tokens: {}, Shell: DefaultShell, variants: { cases: [{ value: "grade", label: "Grade" }] } });
+const fixtures = fileURLToPath(new URL("../../../apps/demo/fixtures/pessoal", import.meta.url));
+
+async function site() {
+  return buildSite({ snapshot: await fixtureSource(fixtures).load(), theme, blocks: CORE_BLOCKS, plugins: CORE_PLUGINS });
+}
+
+describe("montagem do site", () => {
+  it("gera cada página só nos idiomas traduzidos", async () => {
+    const urls = (await site()).routes.map((r) => r.url).sort();
+    expect(urls).toContain("/novidades");
+    expect(urls).not.toContain("/en/novidades");
+    expect(urls).toContain("/blog/so-portugues");
+    expect(urls).not.toContain("/en/blog/so-portugues");
+    expect(urls).toContain("/en/portfolio/app-banco");
+  });
+
+  it("hero no topo leva o h1; sem hero, h1 oculto", async () => {
+    const s = await site();
+    const home = s.routes.find((r) => r.url === "/" && r.type === "page");
+    const sobre = s.routes.find((r) => r.url === "/sobre" && r.type === "page");
+    if (home?.type !== "page" || sobre?.type !== "page") throw new Error("rotas ausentes");
+    expect(home.page.needsHiddenH1).toBe(false);
+    expect(home.page.blocks[0]?.headingLevel).toBe(1);
+    expect(home.page.blocks.slice(1).every((b) => b.headingLevel === 2)).toBe(true);
+    expect(sobre.page.needsHiddenH1).toBe(true);
+  });
+
+  it("blocos ocultos somem e listas em inglês não mostram itens só em português", async () => {
+    const s = await site();
+    const home = s.routes.find((r) => r.url === "/en");
+    if (home?.type !== "page") throw new Error("rota ausente");
+    expect(home.page.blocks.map((b) => b.type)).not.toContain("texto");
+    const posts = home.page.blocks.find((b) => b.type === "posts-recentes")!;
+    expect((posts.items as { slug: string }[]).map((p) => p.slug)).toEqual(["pesquisa-com-usuarios"]);
+    expect(home.page.blocks.find((b) => b.type === "cases")?.variant).toBe("grade");
+  });
+
+  it("<head> com canonical, hreflang só dos idiomas existentes e x-default", async () => {
+    const s = await site();
+    const post = s.routes.find((r) => r.url === "/blog/so-portugues")!;
+    const tags = buildHead(post, s.settings, s.context(post.locale, post.url, post.alternates));
+    expect(tags.filter((t) => t.attrs?.hreflang)).toEqual([]);
+    expect(tags.find((t) => t.attrs?.rel === "canonical")?.attrs?.href).toBe("https://demo.userubrica.dev/blog/so-portugues");
+    const en = s.routes.find((r) => r.url === "/en/blog/pesquisa-com-usuarios")!;
+    const enTags = buildHead(en, s.settings, s.context(en.locale, en.url, en.alternates));
+    expect(enTags.filter((t) => t.attrs?.hreflang).map((t) => t.attrs!.hreflang)).toEqual(["pt-BR", "en", "x-default"]);
+  });
+
+  it("textos de interface caem no idioma do núcleo", async () => {
+    const s = await site();
+    expect(s.context("en", "/en").t("blog.readingTime", { minutes: 3 })).toBe("3 min read");
+    expect(s.context("pt-BR", "/").t("nav.menu")).toBe("Menu");
+  });
+});

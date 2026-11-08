@@ -49,5 +49,5 @@ export async function chooseMany<T extends string>(message: string, options: { v
 }
 
 export async function confirm(message: string, initial = true): Promise<boolean> {
-  return unwrap(await clack.confirm({ message, initialValue: initial }));
+  return unwrap(await clack.confirm({ message, initialValue: initial, active: "Sim", inactive: "Não" }));
 }

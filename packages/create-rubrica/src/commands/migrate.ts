@@ -38,6 +38,7 @@ import { resolveTheme, themeForV1Layout, themePackage, type ThemeChoice } from "
 import { localDependencySpecs } from "./create.js";
 import { Cancelled, canAsk, confirm, log, note, outro, spinner } from "../ui.js";
 import { track } from "../telemetry.js";
+import { runScript, type PackageManager } from "../utils/packageManager.js";
 
 /** Última versão da v1: o `migrar` só parte dela (as transformações de dados assumem o schema dela). */
 export const LAST_V1 = "1.13.1";
@@ -139,12 +140,12 @@ export function convertExport(exportPath: string, v1: V1RubricaJson, theme: stri
   return { result, files };
 }
 
-function importSteps(outDir: string): string[] {
+function importSteps(outDir: string, pm: PackageManager): string[] {
   return [
     "Crie um Convex de **desenvolvimento novo e vazio** para a v2: `npx convex dev --configure new --once` (o .env.local passa a apontar para ele; o banco da v1 fica intacto).",
     `Importe os dados nele: \`npx convex import ${join(outDir, "import-v2.zip")}\` (confira antes o CONVEX_DEPLOYMENT do .env.local).`,
     "Rode `npx create-rubrica setup` (chaves do login e variáveis; o root e as páginas já vieram no import).",
-    "Abra o site (`pnpm dev` e `pnpm dev:convex`), entre no painel com o mesmo e-mail e senha da v1 e confira as páginas.",
+    `Abra o site (\`${runScript(pm, "dev")}\` e \`${runScript(pm, "dev:convex")}\`), entre no painel com o mesmo e-mail e senha da v1 e confira as páginas.`,
     "Produção: só com o seu ok explícito, e depois de conferir o desenvolvimento. O import em produção apaga o que houver lá: combine antes.",
   ];
 }
@@ -368,7 +369,7 @@ async function runFull(projectDir: string, values: Record<string, string>, flags
     nextSteps: [
       ...(data ? [] : [`Exporte os dados da v1 (no Convex de desenvolvimento dela, antes de trocar o .env.local): \`npx convex export --path ${WORK_DIR}/export-v1.zip\`, e rode \`npx create-rubrica migrar dados --export ${WORK_DIR}/export-v1.zip\`.`]),
       `Build com os dados convertidos: ${build}. Compare com o site no ar: \`npx create-rubrica migrar conferir --v1 ${v1.identity?.siteUrl ?? "<url da v1>"} --v2 dist\`.`,
-      ...importSteps(join(WORK_DIR)),
+      ...importSteps(join(WORK_DIR), projectPackageManager(projectDir)),
       "Para cada personalização listada, siga a sugestão (bloco próprio, ejetar, tokens). Depois: pnpm check, pnpm test, commit na branch rubrica-v2.",
     ],
   };
@@ -400,7 +401,7 @@ export async function runMigrate(argv: string[], deps: MigrateDeps): Promise<voi
         return { version: "?", layout: "?" } as V1RubricaJson;
       }
     })();
-    const report = renderReport({ projectName: packageNameOf(projectDir), v1Version: v1.version ?? "?", layout: v1.layout ?? "?", theme: { tema: String(result.tables.siteSettings?.[0]?.theme ?? "?") }, data: result.report, outputs: files, nextSteps: importSteps(WORK_DIR) });
+    const report = renderReport({ projectName: packageNameOf(projectDir), v1Version: v1.version ?? "?", layout: v1.layout ?? "?", theme: { tema: String(result.tables.siteSettings?.[0]?.theme ?? "?") }, data: result.report, outputs: files, nextSteps: importSteps(WORK_DIR, projectPackageManager(projectDir)) });
     const reportPath = join(resolve(deps.cwd, args.values.saida ?? WORK_DIR), "relatorio-dados.md");
     writeFileSync(reportPath, report);
     out(report);

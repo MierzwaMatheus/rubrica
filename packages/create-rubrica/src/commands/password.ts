@@ -10,6 +10,8 @@ import { normalizeEmail, validateEmail } from "../utils/normalize.js";
 import { validatePassword } from "../utils/password.js";
 import { findProjectDir, readState } from "../state.js";
 import { ask, askSecret, Cancelled, choose, log, outro } from "../ui.js";
+import { runScript } from "../utils/packageManager.js";
+import { projectPackageManager } from "../utils/fs.js";
 
 export async function runPassword(deps: { cwd: string; runner?: Runner }): Promise<void> {
   const projectDir = findProjectDir(deps.cwd);
@@ -19,7 +21,7 @@ export async function runPassword(deps: { cwd: string; runner?: Runner }): Promi
   }
   const where = await choose("Onde você quer trocar a senha?", [
     { value: "prod", label: "No site publicado", hint: "o que está no ar" },
-    { value: "dev", label: "No site do seu computador", hint: "o que abre com pnpm dev" },
+    { value: "dev", label: "No site do seu computador", hint: `o que abre com ${runScript(projectPackageManager(projectDir), "dev")}` },
   ], "prod");
   const ctx: ConvexContext = { projectDir, prod: where === "prod", ...(deps.runner && { runner: deps.runner }) };
   log.info(`Convex: ${deploymentLabel(ctx)}`);

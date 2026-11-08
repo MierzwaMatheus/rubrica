@@ -14,3 +14,12 @@ describe("gerenciador de pacotes", () => {
     expect(runScript("pnpm", "dev")).toBe("pnpm dev");
   });
 });
+
+describe("README do projeto", () => {
+  it("mostra os comandos do gerenciador do projeto", async () => {
+    const { readme } = await import("../project/files");
+    const state = { identidade: { nome: "Roxus" }, tema: "padrao", tipo: "empresa" } as unknown as Parameters<typeof readme>[0];
+    expect(readme(state, "npm")).toContain("`npm run dev` (e `npm run dev:convex` em outro terminal)");
+    expect(readme(state)).toContain("`pnpm dev` (e `pnpm dev:convex` em outro terminal)");
+  });
+});

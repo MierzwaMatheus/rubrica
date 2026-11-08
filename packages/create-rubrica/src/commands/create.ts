@@ -179,7 +179,7 @@ export function localDependencySpecs(monorepo: string, theme: string): Dependenc
 export async function createProject(options: CreateOptions, deps: CreateDeps = {}): Promise<void> {
   const runner = deps.runner ?? defaultRun;
   const { dir, state } = options;
-  writeFiles(dir, projectFiles({ name: options.name, state, deps: options.deps }));
+  writeFiles(dir, projectFiles({ name: options.name, state, deps: options.deps, packageManager: options.packageManager }));
   log.success(`Projeto criado em ${dir} (tema ${themePackage(state.tema)}, tipo ${state.tipo}).`);
 
   if (options.git && !existsSync(join(dir, ".git"))) {

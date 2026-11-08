@@ -20,6 +20,8 @@ import { findProjectDir, readState, settingsFromState, type RubricaState } from 
 import { themePackage } from "../themes.js";
 import { ask, askSecret, Cancelled, confirm, log, note, outro, spinner } from "../ui.js";
 import { track } from "../telemetry.js";
+import { runScript } from "../utils/packageManager.js";
+import { projectPackageManager } from "../utils/fs.js";
 
 export interface SeedStatus {
   configured: boolean;
@@ -135,8 +137,8 @@ export async function applySeed(ctx: ConvexContext, state: RubricaState, loadRec
 }
 
 /** Pergunta e-mail e senha e cria o primeiro root. Devolve o e-mail. */
-export async function createRoot(ctx: ConvexContext, state: RubricaState, label = "do painel"): Promise<string> {
-  const email = normalizeEmail(await ask(`E-mail para entrar no painel ${label}:`, { initial: state.identidade.email ?? "", validate: validateEmail }));
+export async function createRoot(ctx: ConvexContext, state: RubricaState, label = ""): Promise<string> {
+  const email = normalizeEmail(await ask(`E-mail para entrar no painel${label ? ` ${label}` : ""}:`, { initial: state.identidade.email ?? "", validate: validateEmail }));
   const password = await askSecret("Senha (12 ou mais caracteres, com maiúscula, minúscula e número):", validatePassword);
   await askSecret("Repita a senha:", (v) => (v !== password ? "As senhas não coincidem" : undefined));
   convexRun(ctx, "rubrica/users:setupRoot", { email, password, ...(state.identidade.autor && { name: state.identidade.autor }) });
@@ -243,7 +245,7 @@ export async function runSetup(deps: SetupDeps): Promise<void> {
     [
       "Pronto!",
       `  Painel: /admin${adminEmail ? ` (${adminEmail})` : ""}`,
-      "  Abrir o site: pnpm dev (e pnpm dev:convex em outro terminal)",
+      `  Abrir o site: ${runScript(projectPackageManager(projectDir), "dev")} (e ${runScript(projectPackageManager(projectDir), "dev:convex")} em outro terminal)`,
       "  Colocar no ar (Vercel): npx create-rubrica publicar",
     ].join("\n"),
   );

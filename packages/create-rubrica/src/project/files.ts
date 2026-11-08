@@ -12,6 +12,7 @@ import { analyticsOrigin, type RubricaState } from "../state.js";
 import { themePackage } from "../themes.js";
 import { convexFiles, convexOwnedFiles } from "./convex.js";
 import { defaultHosting, hostingFiles, type HostingConfig } from "./hosting.js";
+import { runScript, type PackageManager } from "../utils/packageManager.js";
 
 /** Versão do núcleo com que este CLI foi feito. */
 export const CORE_VERSION: string = corePkg.version;
@@ -194,7 +195,7 @@ As instruções deste projeto ficam no \`AGENTS.md\`, que vale para qualquer age
 @AGENTS.md
 `;
 
-export function readme(state: RubricaState): string {
+export function readme(state: RubricaState, pm: PackageManager = "pnpm"): string {
   return `# ${state.identidade.nome}
 
 Site feito com o [Rubrica](https://github.com/MierzwaMatheus/rubrica) v2 (tema \`${state.tema}\`, tipo \`${state.tipo}\`).
@@ -202,7 +203,7 @@ Site feito com o [Rubrica](https://github.com/MierzwaMatheus/rubrica) v2 (tema \
 | O quê | Comando |
 |---|---|
 | Ligar o Convex, criar o admin e o conteúdo inicial | \`npx create-rubrica setup\` |
-| Abrir o site no computador | \`pnpm dev\` (e \`pnpm dev:convex\` em outro terminal) |
+| Abrir o site no computador | \`${runScript(pm, "dev")}\` (e \`${runScript(pm, "dev:convex")}\` em outro terminal) |
 | Colocar no ar (Vercel) | \`npx create-rubrica publicar\` |
 | Atualizar o Rubrica | \`npx create-rubrica update --dry-run\` |
 
@@ -219,6 +220,8 @@ export interface ProjectFilesOptions {
   modules?: Record<string, readonly string[]>;
   /** package.json anterior (o `migrar` mantém o que a pessoa tinha). */
   previousPackageJson?: Record<string, unknown>;
+  /** Gerenciador do projeto (comandos do README). Padrão: pnpm. */
+  packageManager?: PackageManager;
 }
 
 /** Tudo o que o `create` grava (o `migrar` também, depois de tirar o código da v1). */
@@ -233,7 +236,7 @@ export function projectFiles(options: ProjectFilesOptions): Record<string, strin
     ".mcp.json": MCP_JSON,
     "AGENTS.md": agentsMd,
     "CLAUDE.md": CLAUDE_MD,
-    "README.md": readme(state),
+    "README.md": readme(state, options.packageManager),
     "src/blocks/index.ts": BLOCKS_INDEX,
     ...convexOwnedFiles(),
     ...convexFiles(options.modules),

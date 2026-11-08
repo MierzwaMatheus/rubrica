@@ -220,6 +220,24 @@ describe("create --local", () => {
   });
 });
 
+describe("CSP: iframes dos blocos", () => {
+  it("frame-src libera os players de vídeo e todos os provedores de incorporação do núcleo, e nada além", async () => {
+    const { contentSecurityPolicy, frameSources } = await import("../src/project/hosting");
+    const { EMBED_PROVIDERS } = await import("@rubrica/core/blocks");
+    for (const scope of ["site", "admin"] as const) {
+      const directive = contentSecurityPolicy(undefined, scope).split("; ").find((d) => d.startsWith("frame-src "))!;
+      const sources = directive.split(" ").slice(1);
+      expect(sources).toEqual(expect.arrayContaining(["'self'", "https://www.google.com", "https://maps.google.com", "https://www.youtube-nocookie.com", "https://player.vimeo.com"]));
+      for (const p of EMBED_PROVIDERS) for (const h of p.hosts) expect(sources, `${p.id} ${h}`).toContain(`https://${h}`);
+      expect(sources).not.toContain("https://www.youtube.com");
+      expect(sources.every((s) => s === "'self'" || /^https:\/\/(\*\.)?[a-z0-9.-]+$/.test(s))).toBe(true);
+      expect(new Set(sources).size).toBe(sources.length);
+    }
+    expect(frameSources()).toContain("https://calendly.com");
+    expect(frameSources()).toContain("https://*.typeform.com");
+  });
+});
+
 describe("CSP do painel", () => {
   it("libera o Google Fonts só no painel (prévia da Aparência) e o iframe da mesma origem", async () => {
     const { contentSecurityPolicy } = await import("../src/project/hosting");

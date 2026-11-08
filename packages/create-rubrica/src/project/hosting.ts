@@ -9,6 +9,7 @@
  */
 import { appRewrites } from "@rubrica/core/plugins/app-routes";
 import { CORE_PLUGINS } from "@rubrica/core/plugins";
+import { BLOCK_FRAME_SOURCES } from "@rubrica/core/blocks";
 
 export interface Redirect {
   from: string;
@@ -55,6 +56,11 @@ export interface HostingConfig {
  *
  * Com o plugin `analytics`, a origem do script do Umami entra em script-src (o script) e
  * connect-src (os eventos vão para a mesma origem), como na v1.
+ *
+ * `frame-src` libera os iframes dos blocos do núcleo: o mapa do Google, os players de vídeo
+ * (YouTube sem cookies e Vimeo) e os provedores do bloco de incorporação. A lista vem do
+ * núcleo (`BLOCK_FRAME_SOURCES`), a mesma que valida os endereços dos blocos. As miniaturas
+ * do YouTube (`i.ytimg.com`) já cabem em `img-src https:`.
  */
 export function contentSecurityPolicy(analyticsOrigin?: string, scope: "site" | "admin" = "site"): string {
   const extra = analyticsOrigin ? ` ${analyticsOrigin}` : "";
@@ -67,7 +73,7 @@ export function contentSecurityPolicy(analyticsOrigin?: string, scope: "site" | 
     "img-src 'self' data: blob: https:",
     `font-src 'self' data:${admin ? " https://fonts.gstatic.com" : ""}`,
     `connect-src 'self'${extra} https://*.convex.cloud wss://*.convex.cloud https://*.convex.site`,
-    "frame-src 'self' https://www.google.com https://maps.google.com",
+    `frame-src ${frameSources().join(" ")}`,
     `frame-ancestors ${frameAncestors}`,
     "object-src 'none'",
     "base-uri 'self'",
@@ -76,6 +82,11 @@ export function contentSecurityPolicy(analyticsOrigin?: string, scope: "site" | 
     "manifest-src 'self'",
     "upgrade-insecure-requests",
   ].join("; ");
+}
+
+/** Origens de `frame-src`: a própria, o mapa do Google e as dos blocos do núcleo, sem repetir. */
+export function frameSources(): string[] {
+  return [...new Set(["'self'", "https://www.google.com", "https://maps.google.com", ...BLOCK_FRAME_SOURCES])];
 }
 
 export const CONTENT_SECURITY_POLICY = contentSecurityPolicy();

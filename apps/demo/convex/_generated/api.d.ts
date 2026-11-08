@@ -21,6 +21,7 @@ import type * as rubrica_posts from "../rubrica/posts.js";
 import type * as rubrica_projects from "../rubrica/projects.js";
 import type * as rubrica_resume from "../rubrica/resume.js";
 import type * as rubrica_routine from "../rubrica/routine.js";
+import type * as rubrica_seed from "../rubrica/seed.js";
 import type * as rubrica_services from "../rubrica/services.js";
 import type * as rubrica_settings from "../rubrica/settings.js";
 import type * as rubrica_site from "../rubrica/site.js";
@@ -50,6 +51,7 @@ import type * as rubrica_users from "../rubrica/users.js";
 "rubrica/projects": typeof rubrica_projects,
 "rubrica/resume": typeof rubrica_resume,
 "rubrica/routine": typeof rubrica_routine,
+"rubrica/seed": typeof rubrica_seed,
 "rubrica/services": typeof rubrica_services,
 "rubrica/settings": typeof rubrica_settings,
 "rubrica/site": typeof rubrica_site,

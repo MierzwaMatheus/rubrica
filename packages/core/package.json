@@ -24,7 +24,8 @@
     "./data/convex": "./src/data/convex.ts",
     "./convex": "./src/convex/index.ts",
     "./convex/schema": "./src/convex/schema.ts",
-    "./convex/roles": "./src/convex/lib/roles.ts"
+    "./convex/roles": "./src/convex/lib/roles.ts",
+    "./seed": "./src/convex/lib/seed.ts"
   },
   "files": [
     "src"

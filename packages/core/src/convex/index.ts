@@ -38,6 +38,7 @@ import {
 import { mediaFunctions } from "./media";
 import { pagesFunctions } from "./pages";
 import { resolveRuntime, type RubricaConfig } from "./runtime";
+import { seedFunctions } from "./seed";
 import { ref } from "./server";
 import { settingsFunctions, textsFunctions } from "./settings";
 import { siteFunctions } from "./site";
@@ -68,6 +69,7 @@ export function createRubrica(config: RubricaConfig = {}) {
     routine: once(() => routineFunctions(rt)),
     plans: once(() => plansFunctions(rt)),
     team: once(() => teamFunctions(rt)),
+    seed: once(() => seedFunctions(rt)),
   };
 
   return {
@@ -137,6 +139,10 @@ export function createRubrica(config: RubricaConfig = {}) {
     get team() {
       return modules.team();
     },
+    /** Conteúdo inicial e configurações pelo CLI (`setup`, `config`): funções internas. */
+    get seed() {
+      return modules.seed();
+    },
   };
 }
 
@@ -160,6 +166,7 @@ export const RUBRICA_MODULES = [
   "routine",
   "plans",
   "team",
+  "seed",
 ] as const satisfies readonly (keyof Rubrica)[];
 
 export type { RubricaConfig } from "./runtime";

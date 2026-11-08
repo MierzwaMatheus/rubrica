@@ -1,6 +1,7 @@
 /**
- * Carrega o conteúdo uma vez por build e monta o site. As páginas injetadas
- * (page.astro, 404, sitemap, robots) importam daqui.
+ * Carrega o conteúdo e monta o site: uma vez por build; no dev, de novo quando o conteúdo
+ * muda (ver `dev-content.ts`). As páginas injetadas (page.astro, 404, sitemap, robots)
+ * importam daqui.
  */
 // @ts-expect-error módulo virtual da integração
 import { theme, source, projectBlocks, projectComponents, fontPlan } from "virtual:rubrica/config";
@@ -19,22 +20,28 @@ import type { RenderContext } from "../theme/contract";
 import { rssFeeds } from "../seo/rss";
 import { resolveAnalytics } from "../seo/analytics";
 import type { SiteHeadOptions } from "../seo/site-head";
-
-let built: Promise<BuiltSite> | undefined;
+import { siteCache } from "./site-cache";
 
 export const activeTheme = theme as ThemeDefinition;
 export const activeFontPlan = fontPlan as import("../theme/fonts").FontPlan;
 
-export function loadSite(): Promise<BuiltSite> {
-  built ??= (source as DataSource).load().then((snapshot) =>
+const site = siteCache<BuiltSite>(() =>
+  (source as DataSource).load().then((snapshot) =>
     buildSite({
       snapshot,
       theme: activeTheme,
       blocks: [...CORE_BLOCKS, ...((projectBlocks as BlockDefinition[]) ?? [])],
       plugins: CORE_PLUGINS,
     }),
-  );
-  return built;
+  ),
+);
+
+// Dev: a integração avisa quando o conteúdo mudou (`CONTENT_CHANGED_EVENT` de dev-content.ts,
+// o mesmo evento com que o Astro limpa o cache de `getStaticPaths`). No build não há `hot`.
+(import.meta as unknown as { hot?: { on(event: string, cb: () => void): void } }).hot?.on("astro:content-changed", () => site.invalidate());
+
+export function loadSite(): Promise<BuiltSite> {
+  return site.get();
 }
 
 /** Componente do projeto (ejetado/próprio) > tema > padrão do núcleo > genérico. */

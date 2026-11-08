@@ -10,7 +10,7 @@ import type { DataSource, SiteSnapshot } from "./source";
 /** Caminho da query no `convex/` do projeto (arquivo `convex/rubrica/site.ts`). */
 export const SNAPSHOT_FUNCTION = "rubrica/site:snapshot";
 
-const snapshotRef = makeFunctionReference<"query", Record<string, never>, SiteSnapshot>(SNAPSHOT_FUNCTION);
+export const snapshotRef = makeFunctionReference<"query", Record<string, never>, SiteSnapshot>(SNAPSHOT_FUNCTION);
 
 /**
  * Endereço do Convex: o informado, senão `CONVEX_URL`, `PUBLIC_CONVEX_URL` ou

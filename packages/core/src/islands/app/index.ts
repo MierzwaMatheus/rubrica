@@ -8,7 +8,9 @@ import type { AppIslandProps } from "./ui";
 function lazyIsland(load: () => Promise<{ default: ComponentType<AppIslandProps> }>): ComponentType<AppIslandProps> {
   const Lazy = lazy(load);
   return function AppIsland(props: AppIslandProps) {
-    return createElement(Suspense, { fallback: null }, createElement(Lazy, props));
+    // Enquanto o código da página chega, o mesmo "Carregando…" do HTML estático.
+    const fallback = createElement("p", { className: "rb-app__loading", role: "status" }, props.texts["app.loading"] ?? "…");
+    return createElement(Suspense, { fallback }, createElement(Lazy, props));
   };
 }
 

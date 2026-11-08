@@ -43,8 +43,8 @@ export function hrefFor(props: AppIslandProps, island: string, params: Record<st
 export function Notice({ title, children, tone = "info", headingLevel = 1, action }: { title: string; children?: ReactNode; tone?: "info" | "success" | "danger"; headingLevel?: 1 | 2; action?: ReactNode }) {
   const H = headingLevel === 1 ? "h1" : "h2";
   return (
-    <div className={`rb-app__notice rb-app__notice--${tone}`} role={tone === "danger" ? "alert" : "status"}>
-      <H className="rb-app__notice-title">{title}</H>
+    <div className={`rb-flow__notice rb-flow__notice--${tone}`} role={tone === "danger" ? "alert" : "status"}>
+      <H className="rb-flow__notice-title">{title}</H>
       {children}
       {action && <div className="rb-actions">{action}</div>}
     </div>
@@ -57,7 +57,7 @@ export function Gate({ props, t, state, children }: { props: AppIslandProps; t: 
   if (state === "missing") return <Notice title={t("app.notFound.title")}>{<p>{t("app.missing")}</p>}</Notice>;
   if (state === "loading")
     return (
-      <p className="rb-app__loading" role="status">
+      <p className="rb-flow__loading" role="status">
         {t("app.loading")}
       </p>
     );

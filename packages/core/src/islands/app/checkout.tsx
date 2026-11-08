@@ -86,10 +86,10 @@ export default function Checkout(props: AppIslandProps) {
 
 function Header({ t, title }: { t: T; title?: string }) {
   return (
-    <header className="rb-app__header">
-      <p className="rb-app__eyebrow">{t("checkout.title")}</p>
-      <h1 className="rb-app__title">{title || t("checkout.title")}</h1>
-      <p className="rb-app__lead">{t("checkout.subtitle")}</p>
+    <header className="rb-flow__header">
+      <p className="rb-flow__eyebrow">{t("checkout.title")}</p>
+      <h1 className="rb-flow__title">{title || t("checkout.title")}</h1>
+      <p className="rb-flow__lead">{t("checkout.subtitle")}</p>
     </header>
   );
 }
@@ -160,7 +160,7 @@ function CheckoutView({ props, t, api, checkout: c }: { props: AppIslandProps; t
 
   const methodOption = (m: BillingType, title: string, hint: string) =>
     allowed(m) && (
-      <label className={`rb-app__option${method === m ? " rb-app__option--selected" : ""}`}>
+      <label className={`rb-flow__option${method === m ? " rb-flow__option--selected" : ""}`}>
         <input
           type="radio"
           name={`${uid}-method`}
@@ -175,18 +175,18 @@ function CheckoutView({ props, t, api, checkout: c }: { props: AppIslandProps; t
         />
         <span>
           <strong>{title}</strong>
-          <span className="rb-app__hint">{hint}</span>
+          <span className="rb-flow__hint">{hint}</span>
         </span>
       </label>
     );
 
   return (
-    <article className="rb-app__doc">
+    <article className="rb-flow__doc">
       <Header t={t} title={c.description} />
-      <div className="rb-app__columns">
-        <section className="rb-app__section">
+      <div className="rb-flow__columns">
+        <section className="rb-flow__section">
           <h2>{t("checkout.details")}</h2>
-          <dl className="rb-app__facts">
+          <dl className="rb-flow__facts">
             <div>
               <dt>{t("form.name")}</dt>
               <dd>{c.customerName}</dd>
@@ -198,14 +198,14 @@ function CheckoutView({ props, t, api, checkout: c }: { props: AppIslandProps; t
               </div>
             )}
             {c.description && (
-              <div className="rb-app__facts-wide">
+              <div className="rb-flow__facts-wide">
                 <dt>{t("checkout.description")}</dt>
                 <dd>{c.description}</dd>
               </div>
             )}
             <div>
               <dt>{t("checkout.value")}</dt>
-              <dd className="rb-app__total">{fmt(c.value)}</dd>
+              <dd className="rb-flow__total">{fmt(c.value)}</dd>
             </div>
             <div>
               <dt>{t("checkout.dueDate")}</dt>
@@ -214,8 +214,8 @@ function CheckoutView({ props, t, api, checkout: c }: { props: AppIslandProps; t
           </dl>
         </section>
 
-        <section className="rb-app__section">
-          <fieldset className="rb-app__fieldset">
+        <section className="rb-flow__section">
+          <fieldset className="rb-flow__fieldset">
             <legend>
               <h2>{t("checkout.method")}</h2>
             </legend>
@@ -225,27 +225,27 @@ function CheckoutView({ props, t, api, checkout: c }: { props: AppIslandProps; t
           </fieldset>
 
           {method === "CREDIT_CARD" && (
-            <fieldset className="rb-app__fieldset">
+            <fieldset className="rb-flow__fieldset">
               <legend>
                 <h3>{t("checkout.installments")}</h3>
               </legend>
               {options.map((o) => (
-                <label key={o.count} className={`rb-app__option${installment?.count === o.count ? " rb-app__option--selected" : ""}`}>
+                <label key={o.count} className={`rb-flow__option${installment?.count === o.count ? " rb-flow__option--selected" : ""}`}>
                   <input type="radio" name={`${uid}-installments`} value={o.count} checked={installment?.count === o.count} onChange={() => setInstallment(o)} />
                   <span>
                     <strong>{t("checkout.installment", { count: o.count, value: fmt(o.value) })}</strong>
-                    <span className="rb-app__hint">{o.isInterestFree ? t("checkout.interestFree") : t("checkout.withInterest", { total: fmt(o.totalValue) })}</span>
+                    <span className="rb-flow__hint">{o.isInterestFree ? t("checkout.interestFree") : t("checkout.withInterest", { total: fmt(o.totalValue) })}</span>
                   </span>
                 </label>
               ))}
-              <p className="rb-app__hint">{t("checkout.cardNotice")}</p>
+              <p className="rb-flow__hint">{t("checkout.cardNotice")}</p>
             </fieldset>
           )}
 
           {method && !instructions && (
-            <div className="rb-app__pay">
+            <div className="rb-flow__pay">
               <p>
-                {t("checkout.total")}: <strong className="rb-app__total">{fmt(total)}</strong>
+                {t("checkout.total")}: <strong className="rb-flow__total">{fmt(total)}</strong>
               </p>
               <button type="button" className="rb-button rb-button--primary" disabled={busy || (method === "CREDIT_CARD" && !installment)} onClick={() => pay()}>
                 {busy ? t("checkout.generating") : t("checkout.generate")}
@@ -277,37 +277,37 @@ function CopyButton({ t, text }: { t: T; text: string }) {
 function PixPanel({ t, locale, now, busy, pix, onRenew }: { t: T; locale: string; now: number; busy: boolean; pix: Instructions; onRenew: () => void }) {
   const expired = pix.pixExpiresAt !== undefined && pix.pixExpiresAt <= now;
   return (
-    <section className="rb-app__panel" aria-live="polite">
+    <section className="rb-flow__panel" aria-live="polite">
       <h3>{t("checkout.pixTitle")}</h3>
-      {pix.pixImage && !expired && <img className="rb-app__qr" src={`data:image/png;base64,${pix.pixImage}`} alt={t("checkout.pixQr")} width={240} height={240} />}
+      {pix.pixImage && !expired && <img className="rb-flow__qr" src={`data:image/png;base64,${pix.pixImage}`} alt={t("checkout.pixQr")} width={240} height={240} />}
       {pix.pixPayload && !expired && (
         <div className="rb-field">
           <span className="rb-field__label">{t("checkout.pixCode")}</span>
-          <p className="rb-app__code">{pix.pixPayload}</p>
+          <p className="rb-flow__code">{pix.pixPayload}</p>
           <div className="rb-actions">
             <CopyButton t={t} text={pix.pixPayload} />
           </div>
         </div>
       )}
-      {pix.pixExpiresAt !== undefined && <p className="rb-app__hint">{expired ? t("checkout.pixExpired") : t("checkout.pixValidUntil", { date: dateTimeText(pix.pixExpiresAt, locale) })}</p>}
+      {pix.pixExpiresAt !== undefined && <p className="rb-flow__hint">{expired ? t("checkout.pixExpired") : t("checkout.pixValidUntil", { date: dateTimeText(pix.pixExpiresAt, locale) })}</p>}
       {expired && (
         <button type="button" className="rb-button rb-button--primary" disabled={busy} onClick={onRenew}>
           {busy ? t("checkout.generating") : t("checkout.pixNew")}
         </button>
       )}
-      {!expired && <p className="rb-app__waiting">{t("checkout.waiting")}</p>}
+      {!expired && <p className="rb-flow__waiting">{t("checkout.waiting")}</p>}
     </section>
   );
 }
 
 function BoletoPanel({ t, boleto }: { t: T; boleto: Instructions }) {
   return (
-    <section className="rb-app__panel" aria-live="polite">
+    <section className="rb-flow__panel" aria-live="polite">
       <h3>{t("checkout.boletoTitle")}</h3>
       {boleto.bankSlipLine && (
         <div className="rb-field">
           <span className="rb-field__label">{t("checkout.boletoLine")}</span>
-          <p className="rb-app__code">{boleto.bankSlipLine}</p>
+          <p className="rb-flow__code">{boleto.bankSlipLine}</p>
           <div className="rb-actions">
             <CopyButton t={t} text={boleto.bankSlipLine} />
           </div>
@@ -320,7 +320,7 @@ function BoletoPanel({ t, boleto }: { t: T; boleto: Instructions }) {
           </a>
         </div>
       )}
-      <p className="rb-app__hint">{t("checkout.boletoNotice")}</p>
+      <p className="rb-flow__hint">{t("checkout.boletoNotice")}</p>
     </section>
   );
 }
@@ -372,24 +372,24 @@ function PlanForm({ props, t, api, link }: { props: AppIslandProps; t: T; api: A
   const input = (id: string, error?: string) => ({ id: `${uid}-${id}`, "aria-invalid": !!error, "aria-describedby": error ? `${uid}-${id}-error` : undefined });
 
   return (
-    <article className="rb-app__doc">
+    <article className="rb-flow__doc">
       <Header t={t} title={planName} />
-      <div className="rb-app__columns">
-        <section className="rb-app__section">
+      <div className="rb-flow__columns">
+        <section className="rb-flow__section">
           <h2>{t("checkout.details")}</h2>
           {description && <p>{description}</p>}
           {features.length > 0 && (
-            <ul className="rb-app__list">
+            <ul className="rb-flow__list">
               {features.map((f, i) => (
                 <li key={i}>{f}</li>
               ))}
             </ul>
           )}
-          <p className="rb-app__total">{money(link.value, locale)}</p>
+          <p className="rb-flow__total">{money(link.value, locale)}</p>
         </section>
         <form className="rb-form" onSubmit={submit} noValidate>
           <h2>{t("checkout.customer")}</h2>
-          <p className="rb-app__hint">{t("checkout.planIntro")}</p>
+          <p className="rb-flow__hint">{t("checkout.planIntro")}</p>
           <Field id={`${uid}-name`} label={t("form.name")} error={errors.name} required>
             <input {...input("name", errors.name)} type="text" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} required />
           </Field>

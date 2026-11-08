@@ -31,9 +31,9 @@ const title = titleKey ? ctx.t(titleKey) : site.settings.name[shell.locale] ?? "
 <Document route={{ type: "app", url: shell.shell, locale: shell.locale, title }} ctx={ctx} settings={site.settings}>
   <Shell ctx={ctx} pageType="notFound" collections={site.collections(shell.locale)}>
     {ctx.site.colorToggle && <ColorToggleButton slot="colorToggle" label={ctx.t("theme.toggle")} />}
-    <div class="rb-app rb-container">
+    <div class="rb-flow rb-container">
       <Island client:only="react" name={shell.island} props={appIslandProps(shell, shells, site, ctx)}>
-        <p slot="fallback" class="rb-app__loading">{ctx.t("app.loading")}</p>
+        <p slot="fallback" class="rb-flow__loading">{ctx.t("app.loading")}</p>
       </Island>
     </div>
   </Shell>

@@ -18,7 +18,7 @@ afterEach(() => {
   sessionStorage.clear();
 });
 
-const contractsInPage = () => [...document.querySelectorAll(".rb-app__contract")].map((e) => e.innerHTML).join("\n");
+const contractsInPage = () => [...document.querySelectorAll(".rb-flow__contract")].map((e) => e.innerHTML).join("\n");
 
 function setPath(path: string) {
   (window as unknown as { happyDOM: { setURL(u: string): void } }).happyDOM.setURL(`https://site.test${path}`);

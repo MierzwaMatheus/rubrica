@@ -2,71 +2,71 @@
  * Páginas do app (proposta, aceite, checkout, pagamento concluído): só tokens --rb-*,
  * sobre as peças de formulário de blocks.css (.rb-form, .rb-field, .rb-consent).
  */
-.rb-app { padding-block: clamp(2rem, 5vw, 4rem); }
-.rb-app__doc { display: grid; gap: 2rem; max-width: 56rem; margin-inline: auto; }
-.rb-app__narrow { max-width: 28rem; margin-inline: auto; }
-.rb-app__header { display: grid; gap: 0.5rem; }
-.rb-app__eyebrow { margin: 0; color: var(--rb-muted); font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; }
-.rb-app__title { margin: 0; font-family: var(--rb-font-display); color: var(--rb-fg-strong); font-size: clamp(1.75rem, 4vw, 2.75rem); line-height: 1.15; }
-.rb-app__lead { margin: 0; color: var(--rb-muted); font-size: 1.1rem; }
-.rb-app__meta { list-style: none; margin: 0.5rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
-.rb-app__meta li { border: 1px solid var(--rb-border); border-radius: 999px; padding: 0.2rem 0.75rem; font-size: 0.9rem; color: var(--rb-muted); }
-.rb-app__section { display: grid; gap: 0.75rem; align-content: start; }
-.rb-app__section h2, .rb-app__form h2, .rb-app__details h2, .rb-app__details h3 { margin: 0; color: var(--rb-fg-strong); font-size: 1.35rem; }
-.rb-app__section h3, .rb-app__panel h3 { margin: 0; font-size: 1.05rem; }
-.rb-app__pre { white-space: pre-line; margin: 0; }
-.rb-app__list { margin: 0; padding-left: 1.25rem; display: grid; gap: 0.5rem; }
-.rb-app__list li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.25rem 1rem; }
-.rb-app__price { color: var(--rb-muted); display: inline-flex; gap: 0.5rem; align-items: center; }
-.rb-app__badge { display: inline-block; border-radius: 999px; padding: 0.05rem 0.6rem; font-size: 0.8rem; font-weight: 600; background: var(--rb-subtle); color: var(--rb-fg); border: 1px solid var(--rb-border); }
-.rb-app__timeline { margin: 0; padding-left: 1.25rem; display: grid; gap: 0.5rem; }
-.rb-app__timeline li span { display: block; color: var(--rb-muted); font-size: 0.95rem; }
-.rb-app__investment { background: var(--rb-surface); border: 1px solid var(--rb-border); border-radius: var(--rb-radius); padding: clamp(1rem, 3vw, 2rem); }
-.rb-app__original { margin: 0; color: var(--rb-muted); }
-.rb-app__total { margin: 0; font-size: clamp(1.5rem, 4vw, 2.5rem); font-weight: 700; color: var(--rb-fg-strong); line-height: 1.2; }
-dd.rb-app__total { font-size: 1.5rem; }
-.rb-app__hint { color: var(--rb-muted); font-size: 0.9rem; margin: 0; }
-.rb-app__columns { display: grid; gap: 1.5rem; }
-@media (min-width: 768px) { .rb-app__columns { grid-template-columns: 1fr 1fr; } }
-.rb-app__columns ul { margin: 0.5rem 0 0; padding-left: 1.25rem; }
-.rb-app__details { border: 1px solid var(--rb-border); border-radius: var(--rb-radius); padding: 0.75rem 1rem; }
-.rb-app__details > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; }
-.rb-app__details > summary > * { display: inline; }
-.rb-app__details[open] > summary { margin-bottom: 0.75rem; }
-.rb-app__contract { max-width: none; overflow-wrap: anywhere; }
-.rb-app__contract h3, .rb-app__contract h4, .rb-app__contract h5 { margin: 1.25rem 0 0.5rem; }
-.rb-app__cta { justify-content: center; }
-.rb-app__fineprint { color: var(--rb-muted); font-size: 0.85rem; text-align: center; margin: 0; }
-.rb-app__notice { display: grid; gap: 0.5rem; border: 1px solid var(--rb-border); border-left-width: 4px; border-radius: var(--rb-radius); padding: 1rem 1.25rem; background: var(--rb-surface); max-width: 56rem; margin-inline: auto; width: 100%; }
-.rb-app__notice p { margin: 0; }
-.rb-app__notice .rb-actions { margin-top: 0.5rem; }
-.rb-app__notice-title { margin: 0; font-size: 1.15rem; font-weight: 700; color: var(--rb-fg-strong); }
-h1.rb-app__notice-title { font-size: clamp(1.35rem, 3vw, 1.75rem); }
-.rb-app__notice--success { border-left-color: var(--rb-success); }
-.rb-app__notice--danger { border-left-color: var(--rb-danger); }
-.rb-app__notice--info { border-left-color: var(--rb-accent); }
-.rb-app__loading { color: var(--rb-muted); text-align: center; }
-.rb-app__facts { display: grid; gap: 0.75rem 1.5rem; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); margin: 0; }
-.rb-app__facts dt { color: var(--rb-muted); font-size: 0.9rem; }
-.rb-app__facts dd { margin: 0; }
-.rb-app__facts-wide { grid-column: 1 / -1; }
-.rb-app__clause { margin: 0; border-left: 3px solid var(--rb-accent); padding-left: 0.75rem; }
-.rb-app__grid { display: grid; gap: 1rem; }
-@media (min-width: 640px) { .rb-app__grid { grid-template-columns: 1fr 1fr; } }
-.rb-app__signature-pad { width: 100%; height: 9rem; background: #ffffff; border: 1px solid var(--rb-border); border-radius: var(--rb-radius); touch-action: none; cursor: crosshair; }
-.rb-app__signature .rb-button { justify-self: start; cursor: pointer; font: inherit; }
-.rb-app__fieldset { border: 0; margin: 0; padding: 0; display: grid; gap: 0.5rem; min-width: 0; }
-.rb-app__fieldset legend { padding: 0; margin-bottom: 0.5rem; }
-.rb-app__fieldset legend > * { margin: 0; }
-.rb-app__option { display: flex; gap: 0.75rem; align-items: flex-start; min-height: 44px; padding: 0.75rem 1rem; border: 1px solid var(--rb-border); border-radius: var(--rb-radius); cursor: pointer; }
-.rb-app__option > span { display: grid; gap: 0.15rem; }
-.rb-app__option input { width: 1.15rem; height: 1.15rem; margin-top: 0.2rem; accent-color: var(--rb-accent); flex: none; }
-.rb-app__option--selected { border-color: var(--rb-accent); background: var(--rb-subtle); }
-.rb-app__pay { display: grid; gap: 0.75rem; margin-top: 1rem; }
-.rb-app__pay p { margin: 0; }
-.rb-app__panel { display: grid; gap: 0.75rem; margin-top: 1rem; border: 1px solid var(--rb-border); border-radius: var(--rb-radius); padding: 1rem; background: var(--rb-surface); }
-.rb-app__qr { width: min(15rem, 100%); height: auto; background: #ffffff; padding: 0.5rem; border-radius: var(--rb-radius); }
-.rb-app__code { margin: 0; font-family: var(--rb-font-mono); font-size: 0.85rem; word-break: break-all; background: var(--rb-subtle); border-radius: var(--rb-radius); padding: 0.5rem 0.75rem; }
-.rb-app__waiting { color: var(--rb-muted); margin: 0; }
-.rb-app button.rb-button { cursor: pointer; font: inherit; font-weight: 600; }
-.rb-app button.rb-button:disabled { opacity: 0.6; cursor: not-allowed; }
+.rb-flow { padding-block: clamp(2rem, 5vw, 4rem); }
+.rb-flow__doc { display: grid; gap: 2rem; max-width: 56rem; margin-inline: auto; }
+.rb-flow__narrow { max-width: 28rem; margin-inline: auto; }
+.rb-flow__header { display: grid; gap: 0.5rem; }
+.rb-flow__eyebrow { margin: 0; color: var(--rb-muted); font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.rb-flow__title { margin: 0; font-family: var(--rb-font-display); color: var(--rb-fg-strong); font-size: clamp(1.75rem, 4vw, 2.75rem); line-height: 1.15; }
+.rb-flow__lead { margin: 0; color: var(--rb-muted); font-size: 1.1rem; }
+.rb-flow__meta { list-style: none; margin: 0.5rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.rb-flow__meta li { border: 1px solid var(--rb-border); border-radius: 999px; padding: 0.2rem 0.75rem; font-size: 0.9rem; color: var(--rb-muted); }
+.rb-flow__section { display: grid; gap: 0.75rem; align-content: start; }
+.rb-flow__section h2, .rb-flow__form h2, .rb-flow__details h2, .rb-flow__details h3 { margin: 0; color: var(--rb-fg-strong); font-size: 1.35rem; }
+.rb-flow__section h3, .rb-flow__panel h3 { margin: 0; font-size: 1.05rem; }
+.rb-flow__pre { white-space: pre-line; margin: 0; }
+.rb-flow__list { margin: 0; padding-left: 1.25rem; display: grid; gap: 0.5rem; }
+.rb-flow__list li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.25rem 1rem; }
+.rb-flow__price { color: var(--rb-muted); display: inline-flex; gap: 0.5rem; align-items: center; }
+.rb-flow__badge { display: inline-block; border-radius: 999px; padding: 0.05rem 0.6rem; font-size: 0.8rem; font-weight: 600; background: var(--rb-subtle); color: var(--rb-fg); border: 1px solid var(--rb-border); }
+.rb-flow__timeline { margin: 0; padding-left: 1.25rem; display: grid; gap: 0.5rem; }
+.rb-flow__timeline li span { display: block; color: var(--rb-muted); font-size: 0.95rem; }
+.rb-flow__investment { background: var(--rb-surface); border: 1px solid var(--rb-border); border-radius: var(--rb-radius); padding: clamp(1rem, 3vw, 2rem); }
+.rb-flow__original { margin: 0; color: var(--rb-muted); }
+.rb-flow__total { margin: 0; font-size: clamp(1.5rem, 4vw, 2.5rem); font-weight: 700; color: var(--rb-fg-strong); line-height: 1.2; }
+dd.rb-flow__total { font-size: 1.5rem; }
+.rb-flow__hint { color: var(--rb-muted); font-size: 0.9rem; margin: 0; }
+.rb-flow__columns { display: grid; gap: 1.5rem; }
+@media (min-width: 768px) { .rb-flow__columns { grid-template-columns: 1fr 1fr; } }
+.rb-flow__columns ul { margin: 0.5rem 0 0; padding-left: 1.25rem; }
+.rb-flow__details { border: 1px solid var(--rb-border); border-radius: var(--rb-radius); padding: 0.75rem 1rem; }
+.rb-flow__details > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; }
+.rb-flow__details > summary > * { display: inline; }
+.rb-flow__details[open] > summary { margin-bottom: 0.75rem; }
+.rb-flow__contract { max-width: none; overflow-wrap: anywhere; }
+.rb-flow__contract h3, .rb-flow__contract h4, .rb-flow__contract h5 { margin: 1.25rem 0 0.5rem; }
+.rb-flow__cta { justify-content: center; }
+.rb-flow__fineprint { color: var(--rb-muted); font-size: 0.85rem; text-align: center; margin: 0; }
+.rb-flow__notice { display: grid; gap: 0.5rem; border: 1px solid var(--rb-border); border-left-width: 4px; border-radius: var(--rb-radius); padding: 1rem 1.25rem; background: var(--rb-surface); max-width: 56rem; margin-inline: auto; width: 100%; }
+.rb-flow__notice p { margin: 0; }
+.rb-flow__notice .rb-actions { margin-top: 0.5rem; }
+.rb-flow__notice-title { margin: 0; font-size: 1.15rem; font-weight: 700; color: var(--rb-fg-strong); }
+h1.rb-flow__notice-title { font-size: clamp(1.35rem, 3vw, 1.75rem); }
+.rb-flow__notice--success { border-left-color: var(--rb-success); }
+.rb-flow__notice--danger { border-left-color: var(--rb-danger); }
+.rb-flow__notice--info { border-left-color: var(--rb-accent); }
+.rb-flow__loading { color: var(--rb-muted); text-align: center; }
+.rb-flow__facts { display: grid; gap: 0.75rem 1.5rem; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); margin: 0; }
+.rb-flow__facts dt { color: var(--rb-muted); font-size: 0.9rem; }
+.rb-flow__facts dd { margin: 0; }
+.rb-flow__facts-wide { grid-column: 1 / -1; }
+.rb-flow__clause { margin: 0; border-left: 3px solid var(--rb-accent); padding-left: 0.75rem; }
+.rb-flow__grid { display: grid; gap: 1rem; }
+@media (min-width: 640px) { .rb-flow__grid { grid-template-columns: 1fr 1fr; } }
+.rb-flow__signature-pad { width: 100%; height: 9rem; background: #ffffff; border: 1px solid var(--rb-border); border-radius: var(--rb-radius); touch-action: none; cursor: crosshair; }
+.rb-flow__signature .rb-button { justify-self: start; cursor: pointer; font: inherit; }
+.rb-flow__fieldset { border: 0; margin: 0; padding: 0; display: grid; gap: 0.5rem; min-width: 0; }
+.rb-flow__fieldset legend { padding: 0; margin-bottom: 0.5rem; }
+.rb-flow__fieldset legend > * { margin: 0; }
+.rb-flow__option { display: flex; gap: 0.75rem; align-items: flex-start; min-height: 44px; padding: 0.75rem 1rem; border: 1px solid var(--rb-border); border-radius: var(--rb-radius); cursor: pointer; }
+.rb-flow__option > span { display: grid; gap: 0.15rem; }
+.rb-flow__option input { width: 1.15rem; height: 1.15rem; margin-top: 0.2rem; accent-color: var(--rb-accent); flex: none; }
+.rb-flow__option--selected { border-color: var(--rb-accent); background: var(--rb-subtle); }
+.rb-flow__pay { display: grid; gap: 0.75rem; margin-top: 1rem; }
+.rb-flow__pay p { margin: 0; }
+.rb-flow__panel { display: grid; gap: 0.75rem; margin-top: 1rem; border: 1px solid var(--rb-border); border-radius: var(--rb-radius); padding: 1rem; background: var(--rb-surface); }
+.rb-flow__qr { width: min(15rem, 100%); height: auto; background: #ffffff; padding: 0.5rem; border-radius: var(--rb-radius); }
+.rb-flow__code { margin: 0; font-family: var(--rb-font-mono); font-size: 0.85rem; word-break: break-all; background: var(--rb-subtle); border-radius: var(--rb-radius); padding: 0.5rem 0.75rem; }
+.rb-flow__waiting { color: var(--rb-muted); margin: 0; }
+.rb-flow button.rb-button { cursor: pointer; font: inherit; font-weight: 600; }
+.rb-flow button.rb-button:disabled { opacity: 0.6; cursor: not-allowed; }

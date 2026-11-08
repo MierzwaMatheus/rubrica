@@ -55,7 +55,7 @@ export function contractHtml(p: OpenProposal, client: ClientData | null, locale:
 
 export function ContractText({ html }: { html: string }) {
   // HTML gerado por `markdownToHtml`, que escapa todo o texto (nada do conteúdo vira tag).
-  return <div className="rb-app__contract rb-prose" dangerouslySetInnerHTML={{ __html: html }} />;
+  return <div className="rb-flow__contract rb-prose" dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
 /** Abre o contrato aceito para salvar em PDF. `false` se o navegador bloqueou a aba. */

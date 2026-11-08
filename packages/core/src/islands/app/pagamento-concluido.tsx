@@ -40,23 +40,23 @@ export default function PagamentoConcluido(props: AppIslandProps) {
         action={<a className="rb-button rb-button--secondary" href={hrefFor(props, "checkout", { uniqueLink: link })}>{t("payment.backToCheckout")}</a>}
       >
         <p>{t("payment.confirmingBody")}</p>
-        <p className="rb-app__waiting">{t("checkout.waiting")}</p>
+        <p className="rb-flow__waiting">{t("checkout.waiting")}</p>
       </Notice>
     );
   }
   const method = c.paymentMethod ? METHOD_KEY[c.paymentMethod] : undefined;
   return (
     <Notice title={t("payment.success")} tone="success" action={home}>
-      <dl className="rb-app__facts">
+      <dl className="rb-flow__facts">
         {c.description && (
-          <div className="rb-app__facts-wide">
+          <div className="rb-flow__facts-wide">
             <dt>{t("checkout.description")}</dt>
             <dd>{c.description}</dd>
           </div>
         )}
         <div>
           <dt>{t("payment.total")}</dt>
-          <dd className="rb-app__total">{fmt(c.totalValue ?? c.value)}</dd>
+          <dd className="rb-flow__total">{fmt(c.totalValue ?? c.value)}</dd>
         </div>
         {method && (
           <div>

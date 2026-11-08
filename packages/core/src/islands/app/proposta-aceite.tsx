@@ -155,16 +155,16 @@ function AcceptForm({ props, t, api, proposal: p, slug, token, onDone, onSession
   const input = (id: string, error?: string) => ({ id: `${uid}-${id}`, "aria-invalid": !!error, "aria-describedby": error ? `${uid}-${id}-error` : undefined });
 
   return (
-    <article className="rb-app__doc">
-      <header className="rb-app__header">
-        <p className="rb-app__eyebrow">{texts.title || p.clientName}</p>
-        <h1 className="rb-app__title">{t("accept.title")}</h1>
-        <p className="rb-app__lead">{t("accept.intro")}</p>
+    <article className="rb-flow__doc">
+      <header className="rb-flow__header">
+        <p className="rb-flow__eyebrow">{texts.title || p.clientName}</p>
+        <h1 className="rb-flow__title">{t("accept.title")}</h1>
+        <p className="rb-flow__lead">{t("accept.intro")}</p>
       </header>
 
-      <section className="rb-app__section">
+      <section className="rb-flow__section">
         <h2>{t("accept.summary")}</h2>
-        <dl className="rb-app__facts">
+        <dl className="rb-flow__facts">
           <div>
             <dt>{t("accept.client")}</dt>
             <dd>{p.clientName}</dd>
@@ -183,18 +183,18 @@ function AcceptForm({ props, t, api, proposal: p, slug, token, onDone, onSession
             </dd>
           </div>
           {texts.objective && (
-            <div className="rb-app__facts-wide">
+            <div className="rb-flow__facts-wide">
               <dt>{t("proposal.objective")}</dt>
-              <dd className="rb-app__pre">{texts.objective}</dd>
+              <dd className="rb-flow__pre">{texts.objective}</dd>
             </div>
           )}
         </dl>
-        <p className="rb-app__clause">{t("accept.clause")}</p>
+        <p className="rb-flow__clause">{t("accept.clause")}</p>
       </section>
 
-      <form className="rb-form rb-app__form" onSubmit={submit} noValidate>
+      <form className="rb-form rb-flow__form" onSubmit={submit} noValidate>
         <h2>{t("accept.data")}</h2>
-        <div className="rb-app__grid">
+        <div className="rb-flow__grid">
           <Field id={`${uid}-name`} label={t("accept.name")} error={errors.name} required>
             <input {...input("name", errors.name)} type="text" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} required />
           </Field>
@@ -213,7 +213,7 @@ function AcceptForm({ props, t, api, proposal: p, slug, token, onDone, onSession
         </Field>
 
         {texts.rescissionPolicy && (
-          <details className="rb-app__details">
+          <details className="rb-flow__details">
             <summary>
               <h3>{t("proposal.rescission")}</h3>
             </summary>
@@ -221,7 +221,7 @@ function AcceptForm({ props, t, api, proposal: p, slug, token, onDone, onSession
           </details>
         )}
         {contract && (
-          <details className="rb-app__details">
+          <details className="rb-flow__details">
             <summary>
               <h3>{t("proposal.readContract")}</h3>
             </summary>
@@ -318,7 +318,7 @@ function SignaturePad({ t, onChange }: { t: T; onChange: (canvas: HTMLCanvasElem
   };
 
   return (
-    <div className="rb-field rb-app__signature">
+    <div className="rb-field rb-flow__signature">
       <span className="rb-field__label" id={`${id}-label`}>
         {t("accept.signature")} ({t("form.optional").toLowerCase()})
       </span>
@@ -327,7 +327,7 @@ function SignaturePad({ t, onChange }: { t: T; onChange: (canvas: HTMLCanvasElem
       </span>
       <canvas
         ref={canvas}
-        className="rb-app__signature-pad"
+        className="rb-flow__signature-pad"
         role="img"
         aria-label={t("accept.signatureArea")}
         aria-describedby={`${id}-hint`}
@@ -363,10 +363,10 @@ function Done({ props, t, slug, acceptance, proposal, signature }: { props: AppI
       }
     >
       <p>{t("accept.doneBody")}</p>
-      <dl className="rb-app__facts">
-        <div className="rb-app__facts-wide">
+      <dl className="rb-flow__facts">
+        <div className="rb-flow__facts-wide">
           <dt>{t("contract.hash")}</dt>
-          <dd className="rb-app__code">{acceptance.contentHash}</dd>
+          <dd className="rb-flow__code">{acceptance.contentHash}</dd>
         </div>
       </dl>
       {popupBlocked && <p className="rb-field__error" role="alert">{t("contract.popup")}</p>}

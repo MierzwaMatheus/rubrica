@@ -59,11 +59,11 @@ function PasswordForm({ t, api, slug, notice, onToken }: { t: T; api: AppApi; sl
   }
 
   return (
-    <div className="rb-app__narrow">
+    <div className="rb-flow__narrow">
       <form className="rb-form" onSubmit={submit} noValidate>
-        <h1 className="rb-app__title">{t("proposal.locked.title")}</h1>
+        <h1 className="rb-flow__title">{t("proposal.locked.title")}</h1>
         <p>{t("proposal.locked.body")}</p>
-        {notice && <p className="rb-app__hint" role="status">{notice}</p>}
+        {notice && <p className="rb-flow__hint" role="status">{notice}</p>}
         <div className="rb-field">
           <label htmlFor={`${id}-password`}>{t("proposal.password")}</label>
           <input
@@ -102,10 +102,10 @@ function ProposalView({ props, t, api, proposal: p, slug, token }: { props: AppI
   const title = texts.title || t("proposal.preparedFor", { client: p.clientName });
 
   return (
-    <article className="rb-app__doc">
+    <article className="rb-flow__doc">
       {p.isAccepted && (
-        <div className="rb-app__notice rb-app__notice--success" role="status">
-          <p className="rb-app__notice-title">{t("proposal.accepted")}</p>
+        <div className="rb-flow__notice rb-flow__notice--success" role="status">
+          <p className="rb-flow__notice-title">{t("proposal.accepted")}</p>
           {accepted ? (
             <p>{t("proposal.acceptedBy", { date: dateText(accepted.acceptedAt, locale), name: accepted.clientName })}</p>
           ) : (
@@ -122,17 +122,17 @@ function ProposalView({ props, t, api, proposal: p, slug, token }: { props: AppI
         </div>
       )}
       {p.isExpired && !p.isAccepted && (
-        <div className="rb-app__notice rb-app__notice--danger" role="alert">
-          <p className="rb-app__notice-title">{t("proposal.expired", { date: dateText(p.expiresAt, locale) })}</p>
+        <div className="rb-flow__notice rb-flow__notice--danger" role="alert">
+          <p className="rb-flow__notice-title">{t("proposal.expired", { date: dateText(p.expiresAt, locale) })}</p>
           <p>{t("proposal.expiredHint")}</p>
         </div>
       )}
 
-      <header className="rb-app__header">
-        <p className="rb-app__eyebrow">{t("proposal.badge")}</p>
-        <h1 className="rb-app__title">{title}</h1>
-        <p className="rb-app__lead">{t("proposal.preparedFor", { client: p.clientName })}</p>
-        <ul className="rb-app__meta">
+      <header className="rb-flow__header">
+        <p className="rb-flow__eyebrow">{t("proposal.badge")}</p>
+        <h1 className="rb-flow__title">{title}</h1>
+        <p className="rb-flow__lead">{t("proposal.preparedFor", { client: p.clientName })}</p>
+        <ul className="rb-flow__meta">
           <li>{t("proposal.createdAt", { date: dateText(p.createdAt, locale) })}</li>
           <li>{t("proposal.validUntil", { date: dateText(p.expiresAt, locale) })}</li>
           <li>{t("proposal.version", { version: p.version })}</li>
@@ -140,16 +140,16 @@ function ProposalView({ props, t, api, proposal: p, slug, token }: { props: AppI
       </header>
 
       {texts.objective && (
-        <section className="rb-app__section">
+        <section className="rb-flow__section">
           <h2>{t("proposal.objective")}</h2>
-          <p className="rb-app__pre">{texts.objective}</p>
+          <p className="rb-flow__pre">{texts.objective}</p>
         </section>
       )}
 
       {texts.scope.length > 0 && (
-        <section className="rb-app__section">
+        <section className="rb-flow__section">
           <h2>{t("proposal.scope")}</h2>
-          <ul className="rb-app__list">
+          <ul className="rb-flow__list">
             {texts.scope.map((item, i) => {
               const price = discount.priceOf(i);
               return (
@@ -157,14 +157,14 @@ function ProposalView({ props, t, api, proposal: p, slug, token }: { props: AppI
                   <span>{item}</span>
                   {price !== undefined &&
                     (discount.isGift(i) ? (
-                      <span className="rb-app__price">
-                        <span className="rb-app__badge">{t("proposal.gift")}</span>
+                      <span className="rb-flow__price">
+                        <span className="rb-flow__badge">{t("proposal.gift")}</span>
                         <span className="rb-sr-only">{t("proposal.originalPrice")}: </span>
                         <s>{fmt(price)}</s> <span className="rb-sr-only">{t("proposal.finalPrice")}: </span>
                         {fmt(0)}
                       </span>
                     ) : (
-                      <span className="rb-app__price">{fmt(price)}</span>
+                      <span className="rb-flow__price">{fmt(price)}</span>
                     ))}
                 </li>
               );
@@ -174,10 +174,10 @@ function ProposalView({ props, t, api, proposal: p, slug, token }: { props: AppI
       )}
 
       {(texts.timeline.length > 0 || p.deliveryDate.trim()) && (
-        <section className="rb-app__section">
+        <section className="rb-flow__section">
           <h2>{t("proposal.timeline")}</h2>
           {texts.timeline.length > 0 && (
-            <ol className="rb-app__timeline">
+            <ol className="rb-flow__timeline">
               {texts.timeline.map((step, i) => (
                 <li key={i}>
                   <strong>{step.step}</strong>
@@ -190,25 +190,25 @@ function ProposalView({ props, t, api, proposal: p, slug, token }: { props: AppI
         </section>
       )}
 
-      <section className="rb-app__section rb-app__investment">
+      <section className="rb-flow__section rb-flow__investment">
         <h2>{t("proposal.investment")}</h2>
         {discount.hasDiscount && (
-          <p className="rb-app__original">
+          <p className="rb-flow__original">
             <span className="rb-sr-only">{t("proposal.originalPrice")}: </span>
-            <s>{fmt(discount.originalValue)}</s> <span className="rb-app__badge">−{discount.discountPercent}%</span>
+            <s>{fmt(discount.originalValue)}</s> <span className="rb-flow__badge">−{discount.discountPercent}%</span>
           </p>
         )}
-        <p className="rb-app__total">
+        <p className="rb-flow__total">
           {discount.hasDiscount && <span className="rb-sr-only">{t("proposal.finalPrice")}: </span>}
           {fmt(p.investmentValue)}
         </p>
         {discount.hasDiscount && (
-          <p className="rb-app__hint">
+          <p className="rb-flow__hint">
             {t("proposal.discount", { amount: fmt(discount.discountAmount), percent: discount.discountPercent })}
             {discount.giftCount > 0 && ` · ${discount.giftCount === 1 ? t("proposal.giftsOne") : t("proposal.giftsMany", { count: discount.giftCount })}`}
           </p>
         )}
-        <div className="rb-app__columns">
+        <div className="rb-flow__columns">
           {texts.paymentMethods.length > 0 && (
             <div>
               <h3>{t("proposal.paymentMethods")}</h3>
@@ -233,7 +233,7 @@ function ProposalView({ props, t, api, proposal: p, slug, token }: { props: AppI
       </section>
 
       {texts.rescissionPolicy && (
-        <details className="rb-app__details">
+        <details className="rb-flow__details">
           <summary>
             <h2>{t("proposal.rescission")}</h2>
           </summary>
@@ -242,7 +242,7 @@ function ProposalView({ props, t, api, proposal: p, slug, token }: { props: AppI
       )}
 
       {contract && (
-        <details className="rb-app__details">
+        <details className="rb-flow__details">
           <summary>
             <h2>{t("proposal.readContract")}</h2>
           </summary>
@@ -251,14 +251,14 @@ function ProposalView({ props, t, api, proposal: p, slug, token }: { props: AppI
       )}
 
       {!p.isAccepted && !p.isExpired && (
-        <div className="rb-actions rb-app__cta">
+        <div className="rb-actions rb-flow__cta">
           <a className="rb-button rb-button--primary" href={hrefFor(props, "proposta-aceite", { slug })}>
             {t("proposal.accept")}
           </a>
         </div>
       )}
 
-      <p className="rb-app__fineprint">{t("proposal.confidential")}</p>
+      <p className="rb-flow__fineprint">{t("proposal.confidential")}</p>
     </article>
   );
 }

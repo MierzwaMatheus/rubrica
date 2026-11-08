@@ -10,6 +10,7 @@
  *   conteúdo (páginas, coleções, configurações), para "substituir" não quebrar o site.
  */
 import { v } from "convex/values";
+import { resolvePaths } from "../render/collections";
 import { localePrefix } from "../i18n";
 import { requireRole } from "./auth";
 import { logUserAction } from "./audit";
@@ -134,7 +135,7 @@ export function panelFunctions(rt: RubricaRuntime) {
             const reserved = settings
               ? settings.locales.locales.map((l) => localePrefix(l, settings.locales)).filter(Boolean).map((p) => `/${p}`)
               : [];
-            const detailBases = [settings?.paths?.posts ?? "/blog", settings?.paths?.projects ?? "/portfolio"];
+            const detailBases = Object.values(resolvePaths(settings?.kind, settings?.paths));
             try {
               if (current?.system) throw new Error("O caminho de uma página do sistema não muda");
               assertValidPagePath(args.path, reserved, detailBases);

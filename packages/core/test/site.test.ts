@@ -112,3 +112,31 @@ describe("montagem do site", () => {
     expect(s.context("en", "/en").t("nav.menu")).toBe("Menu");
   });
 });
+
+const empresaFixtures = fileURLToPath(new URL("../../../apps/demo/fixtures/empresa", import.meta.url));
+
+describe("caminho do detalhe dos cases por tipo de site", () => {
+  it("empresa: detalhe em /cases; pessoal continua em /portfolio", async () => {
+    const empresa = buildSite({ snapshot: await fixtureSource(empresaFixtures).load(), theme, blocks: CORE_BLOCKS, plugins: CORE_PLUGINS });
+    const caseUrls = empresa.routes.filter((r) => r.type === "case").map((r) => r.url);
+    expect(caseUrls.length).toBeGreaterThan(0);
+    expect(caseUrls.every((u) => /^(\/en|\/es)?\/cases\/[^/]+$/.test(u))).toBe(true);
+    expect(empresa.paths.projects).toBe("/cases");
+    expect((await site()).paths.projects).toBe("/portfolio");
+  });
+
+  it("settings.paths vence o padrão do tipo", async () => {
+    const snapshot = await fixtureSource(empresaFixtures).load();
+    snapshot.site.paths = { projects: "/portfolio" };
+    const empresa = buildSite({ snapshot, theme, blocks: CORE_BLOCKS, plugins: CORE_PLUGINS });
+    expect(empresa.routes.filter((r) => r.type === "case").every((r) => r.url.includes("/portfolio/"))).toBe(true);
+  });
+
+  it("hreflang e canonical do case seguem o novo caminho", async () => {
+    const empresa = buildSite({ snapshot: await fixtureSource(empresaFixtures).load(), theme, blocks: CORE_BLOCKS, plugins: CORE_PLUGINS });
+    const r = empresa.routes.find((x) => x.type === "case" && x.alternates.length > 1)!;
+    const tags = buildHead(r, empresa.settings, empresa.context(r.locale, r.url, r.alternates));
+    expect(tags.find((t) => t.attrs?.rel === "canonical")?.attrs?.href).toContain("/cases/");
+    expect(tags.filter((t) => t.attrs?.hreflang).every((t) => String(t.attrs!.href).includes("/cases/"))).toBe(true);
+  });
+});

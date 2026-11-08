@@ -9,7 +9,7 @@ import type { CollectionName, PageRecord, SiteSettings } from "../content/types"
 import type { SiteSnapshot } from "../data/source";
 import { enabledPlugins, type PluginDefinition } from "../plugins/contract";
 import { resolveVariant, type Alternate, type RenderContext, type ResolvedSite, type ShellCollections, type ThemeDefinition } from "../theme/contract";
-import { DEFAULT_PATHS, queryCollection, resolvePost, resolveProject, resolveSeo, type CollectionPaths, type PostItem, type ProjectItem, type ResolvedSeo } from "./collections";
+import { queryCollection, resolvePaths, resolvePost, resolveProject, resolveSeo, type CollectionPaths, type PostItem, type ProjectItem, type ResolvedSeo } from "./collections";
 import { resolveFields, resolveHref, resolveImage, type ResolveOptions } from "./resolve";
 import { defaultUiText } from "../i18n/ui-texts";
 
@@ -104,7 +104,7 @@ export function buildSite(input: BuildInput): BuiltSite {
   const settings = snapshot.site;
   const cfg = settings.locales;
   const plugins = enabledPlugins(input.plugins, settings.kind, settings.plugins);
-  const paths: CollectionPaths = { ...DEFAULT_PATHS, ...settings.paths };
+  const paths: CollectionPaths = resolvePaths(settings.kind, settings.paths);
   const blockDefs = new Map(input.blocks.map((b) => [b.type, b]));
   const opts = (locale: Locale): ResolveOptions => ({ locale, locales: cfg, ...(settings.defaultPostCover?.url && { defaultPostCover: settings.defaultPostCover }) });
 

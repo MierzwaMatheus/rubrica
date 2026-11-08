@@ -9,6 +9,7 @@ import type {
   CollectionQuery,
   PricePeriod,
   RawCollections,
+  SiteKind,
   RawPlan,
   RawPost,
   RawProject,
@@ -159,7 +160,21 @@ export interface CollectionPaths {
   projects: string;
 }
 
+/** Caminhos do tipo pessoal (as URLs da v1). */
 export const DEFAULT_PATHS: CollectionPaths = { posts: "/blog", projects: "/portfolio" };
+
+/**
+ * Base padrão das páginas de detalhe por tipo de site: o detalhe segue o caminho da listagem
+ * que a receita do tipo cria (`/portfolio` no pessoal, `/cases` na empresa). `settings.paths` vence.
+ */
+export function defaultPathsFor(kind: SiteKind | undefined): CollectionPaths {
+  return kind === "empresa" ? { posts: "/blog", projects: "/cases" } : DEFAULT_PATHS;
+}
+
+/** Bases efetivas: o que o site configurou, senão o padrão do tipo. */
+export function resolvePaths(kind: SiteKind | undefined, configured?: { posts?: string; projects?: string }): CollectionPaths {
+  return { ...defaultPathsFor(kind), ...(configured?.posts && { posts: configured.posts }), ...(configured?.projects && { projects: configured.projects }) };
+}
 
 function iso(ms: number | undefined): string | undefined {
   return ms === undefined ? undefined : new Date(ms).toISOString();

@@ -5,7 +5,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { fileURLToPath } from "node:url";
 import { fixtureSource } from "../src/data/source";
 import { buildSite, type BuiltSite } from "../src/render/site";
-import { CORE_BLOCKS, incorporacao, linhaDoTempo, video } from "../src/blocks/catalog";
+import { CORE_BLOCKS, comparativoPlanos, incorporacao, linhaDoTempo, video } from "../src/blocks/catalog";
 import { validateBlock } from "../src/blocks/define";
 import { preparePageBlocks } from "../src/convex/lib/blocks";
 import { CORE_PLUGINS } from "../src/plugins/registry";
@@ -159,5 +159,54 @@ describe("linha do tempo", () => {
     const html = render("linha-do-tempo", { ctx, fields: { items: [{ date: "2020", title: "A" }, { date: "2021" }] } as never });
     expect((html.match(/<li /g) ?? []).length).toBe(1);
     expect(linhaDoTempo.fields.items.required).toBe(true);
+  });
+});
+
+describe("comparativo de planos", () => {
+  it("tabela com legenda, cabeçalhos de coluna e de linha, valores legíveis e botão com o nome do plano", async () => {
+    const { block, ctx } = await fixtureBlock("empresa", "/precos", "comparativo-planos");
+    expect(block.items).toHaveLength(3);
+    const html = render("comparativo-planos", { ctx, ...block });
+    expect(html).toContain('<caption id="precos-comparativo-caption" class="rb-compare__caption">O que cada plano inclui</caption>');
+    expect(html).toContain('role="region" aria-labelledby="precos-comparativo-caption" tabindex="0"');
+    expect((html.match(/scope="col"/g) ?? []).length).toBe(4);
+    expect((html.match(/scope="row"/g) ?? []).length).toBe(7);
+    expect(html).toContain("Essencial");
+    expect(html).toContain("Mais escolhido");
+    expect(html).toContain('<span class="rb-sr-only">Incluso</span>');
+    expect(html).toContain('<span class="rb-sr-only">Não incluso</span>');
+    expect(html).toContain("até 15");
+    expect(html).toContain('<span class="rb-sr-only">: Profissional</span>');
+    expect(html).toContain("rb-compare__col--highlighted");
+    expect(html).toContain("--rb-compare-cols:3");
+    expect(html).toContain("Deslize a tabela");
+  });
+
+  it("valor faltando vira traço com texto para leitor de tela; sem legenda, o título vai só para leitor de tela", async () => {
+    const { block, ctx } = await fixtureBlock("empresa", "/precos", "comparativo-planos");
+    const rows = [{ label: "Extra", cells: [{ value: "sim" }] }];
+    const html = render("comparativo-planos", { ctx, ...block, fields: { title: "Compare", rows } as never });
+    expect((html.match(/Não informado/g) ?? []).length).toBe(2);
+    expect(html).toContain('class="rb-sr-only">Compare</caption>');
+  });
+
+  it("lê os planos da coleção e some com o plugin de preços desligado", async () => {
+    expect(comparativoPlanos.plugin).toBe("pricing");
+    expect(comparativoPlanos.source?.collections).toEqual(["plans"]);
+    const site = await load("empresa", ["pricing"]);
+    const blocks = site.routes.flatMap((r) => (r.type === "page" ? r.page.blocks.map((b) => b.type) : []));
+    expect(blocks).not.toContain("comparativo-planos");
+  });
+
+  it("texto obrigatório quando a célula é do tipo texto", () => {
+    const rows = [{ label: { "pt-BR": "Páginas" }, cells: [{ value: "texto" }, { value: "sim" }] }];
+    expect(validateBlock(comparativoPlanos, { fields: { rows } })).toEqual([{ path: "rows.0.cells.0.text", message: expect.stringContaining("obrigatório") }]);
+    rows[0]!.cells[0] = { value: "texto", text: { "pt-BR": "até 5" } } as never;
+    expect(validateBlock(comparativoPlanos, { fields: { rows } })).toEqual([]);
+  });
+
+  it("sem planos ou sem recursos, nada", async () => {
+    const ctx = (await load("empresa")).context("pt-BR", "/");
+    expect(render("comparativo-planos", { ctx, fields: { rows: [{ label: "x" }] } as never })).toBe("");
   });
 });

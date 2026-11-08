@@ -6,6 +6,7 @@ import { EquipeBlock, GaleriaBlock, ListaItensBlock, LogosClientesBlock, Numeros
 import { CurriculoBlock } from "./blocks/resume";
 import { IncorporacaoBlock, VideoBlock } from "./blocks/media";
 import { LinhaDoTempoBlock } from "./blocks/timeline";
+import { ComparativoPlanosBlock } from "./blocks/compare";
 import { DefaultCase, DefaultNotFound, DefaultPost, DefaultShell } from "./shell";
 
 export * from "./primitives";
@@ -18,6 +19,7 @@ export { CurriculoBlock } from "./blocks/resume";
 export { IncorporacaoBlock, VideoBlock, VideoFrame, videoName, videoPoster, videoRatio } from "./blocks/media";
 export type { VideoFrameProps } from "./blocks/media";
 export { LinhaDoTempoBlock } from "./blocks/timeline";
+export { ComparativoPlanosBlock } from "./blocks/compare";
 /** Utilitários puros dos blocos padrão, para os temas não copiarem. */
 export { digits, formatDays, resolveFreeHref, safeId, shorten, tagFilterCss } from "./blocks/util";
 export type { TagFilterCssOptions } from "./blocks/util";
@@ -44,6 +46,7 @@ export const DEFAULT_BLOCKS: Partial<Record<string, BlockComponent>> = {
   video: VideoBlock,
   incorporacao: IncorporacaoBlock,
   "linha-do-tempo": LinhaDoTempoBlock,
+  "comparativo-planos": ComparativoPlanosBlock,
 };
 
 /** Componente do bloco no tema, senão o padrão do núcleo, senão o genérico. */

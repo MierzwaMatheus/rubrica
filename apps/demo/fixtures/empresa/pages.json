@@ -560,6 +560,173 @@
         }
       },
       {
+        "id": "precos-comparativo",
+        "type": "comparativo-planos",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "Compare os planos",
+            "en": "Compare plans",
+            "es": "Compara los planes"
+          },
+          "caption": {
+            "pt-BR": "O que cada plano inclui",
+            "en": "What each plan includes",
+            "es": "Qué incluye cada plan"
+          },
+          "rows": [
+            {
+              "label": {
+                "pt-BR": "Páginas",
+                "en": "Pages",
+                "es": "Páginas"
+              },
+              "cells": [
+                {
+                  "value": "texto",
+                  "text": {
+                    "pt-BR": "até 5",
+                    "en": "up to 5",
+                    "es": "hasta 5"
+                  }
+                },
+                {
+                  "value": "texto",
+                  "text": {
+                    "pt-BR": "até 15",
+                    "en": "up to 15",
+                    "es": "hasta 15"
+                  }
+                },
+                {
+                  "value": "texto",
+                  "text": {
+                    "pt-BR": "ilimitadas",
+                    "en": "unlimited",
+                    "es": "ilimitadas"
+                  }
+                }
+              ]
+            },
+            {
+              "label": {
+                "pt-BR": "Hospedagem",
+                "en": "Hosting",
+                "es": "Hosting"
+              },
+              "cells": [
+                {
+                  "value": "sim"
+                },
+                {
+                  "value": "sim"
+                },
+                {
+                  "value": "sim"
+                }
+              ]
+            },
+            {
+              "label": {
+                "pt-BR": "Blog e SEO",
+                "en": "Blog and SEO",
+                "es": "Blog y SEO"
+              },
+              "cells": [
+                {
+                  "value": "nao"
+                },
+                {
+                  "value": "sim"
+                },
+                {
+                  "value": "sim"
+                }
+              ]
+            },
+            {
+              "label": {
+                "pt-BR": "Suporte",
+                "en": "Support",
+                "es": "Soporte"
+              },
+              "detail": {
+                "pt-BR": "Tempo de resposta em dias úteis.",
+                "en": "Response time in business days.",
+                "es": "Tiempo de respuesta en días hábiles."
+              },
+              "cells": [
+                {
+                  "value": "texto",
+                  "text": {
+                    "pt-BR": "e-mail, 2 dias",
+                    "en": "email, 2 days",
+                    "es": "correo, 2 días"
+                  }
+                },
+                {
+                  "value": "texto",
+                  "text": {
+                    "pt-BR": "prioritário, 1 dia",
+                    "en": "priority, 1 day",
+                    "es": "prioritario, 1 día"
+                  }
+                },
+                {
+                  "value": "texto",
+                  "text": {
+                    "pt-BR": "dedicado",
+                    "en": "dedicated",
+                    "es": "dedicado"
+                  }
+                }
+              ]
+            },
+            {
+              "label": {
+                "pt-BR": "Relatório mensal",
+                "en": "Monthly report",
+                "es": "Informe mensual"
+              },
+              "cells": [
+                {
+                  "value": "nao"
+                },
+                {
+                  "value": "sim"
+                },
+                {
+                  "value": "sim"
+                }
+              ]
+            },
+            {
+              "label": {
+                "pt-BR": "Integrações sob medida",
+                "en": "Custom integrations",
+                "es": "Integraciones a medida"
+              },
+              "cells": [
+                {
+                  "value": "nao"
+                },
+                {
+                  "value": "nao"
+                },
+                {
+                  "value": "sim"
+                }
+              ]
+            }
+          ],
+          "note": {
+            "pt-BR": "Valores mensais, sem impostos.",
+            "en": "Monthly prices, taxes not included.",
+            "es": "Precios mensuales, sin impuestos."
+          }
+        }
+      },
+      {
         "id": "precos-1",
         "type": "faq",
         "visible": true,

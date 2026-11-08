@@ -40,6 +40,8 @@
   --rb-font-display: var(--rb-font-sans);
   --rb-radius: 0.5rem;
   --rb-container: 72rem;
+  /* Colunas de planos do comparativo: a tabela define o seu (style), este é o padrão. */
+  --rb-compare-cols: 3;
   color-scheme: dark;
 }
 [data-color-mode="light"] {

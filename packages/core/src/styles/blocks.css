@@ -190,6 +190,32 @@
 .rb-timeline--horizontal .rb-timeline__title { font-size: 1.05rem; }
 .rb-timeline--horizontal .rb-timeline__text { font-size: 0.95rem; }
 
+/* Comparativo de planos: rola dentro da própria região; a coluna dos recursos fica fixa */
+.rb-compare__hint { margin: 0 0 0.75rem; color: var(--rb-muted); font-size: 0.9rem; }
+@media (min-width: 64rem) { .rb-compare__hint { display: none; } }
+.rb-compare__scroll { overflow-x: auto; max-width: 100%; border: 1px solid var(--rb-border); border-radius: var(--rb-radius); }
+.rb-compare__scroll:focus-visible { outline: 2px solid var(--rb-accent); outline-offset: 2px; }
+.rb-compare { width: 100%; min-width: calc(10rem + var(--rb-compare-cols) * 9rem); border-collapse: collapse; }
+.rb-compare__caption { caption-side: top; text-align: start; padding: 1rem 1rem 0; font-weight: 600; }
+.rb-compare th, .rb-compare td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--rb-border); text-align: center; vertical-align: middle; }
+.rb-compare tbody tr:last-child > *, .rb-compare tfoot > tr > * { border-bottom: 0; }
+.rb-compare thead th { vertical-align: bottom; }
+.rb-compare__corner, .rb-compare__feature { text-align: start !important; position: sticky; left: 0; z-index: 1; background: var(--rb-bg); }
+.rb-compare__corner { color: var(--rb-muted); font-weight: 600; font-size: 0.9rem; }
+.rb-compare__feature { font-weight: 600; min-width: 9rem; max-width: 16rem; }
+.rb-compare__detail { display: block; margin-top: 0.2rem; color: var(--rb-muted); font-weight: 400; font-size: 0.85rem; }
+.rb-compare__plan { min-width: 8rem; }
+.rb-compare__name { display: block; font-family: var(--rb-font-display); font-size: 1.1rem; }
+.rb-compare__price { display: block; margin-top: 0.2rem; font-weight: 400; color: var(--rb-muted); font-size: 0.95rem; }
+.rb-compare__badge { display: inline-block; margin-bottom: 0.4rem; padding: 0.1rem 0.6rem; border-radius: 999px; background: var(--rb-accent); color: var(--rb-accent-fg); font-size: 0.75rem; font-weight: 700; }
+.rb-compare__col--highlighted { box-shadow: inset 2px 0 var(--rb-accent), inset -2px 0 var(--rb-accent); }
+.rb-compare thead .rb-compare__col--highlighted { box-shadow: inset 2px 0 var(--rb-accent), inset -2px 0 var(--rb-accent), inset 0 2px var(--rb-accent); }
+.rb-compare tfoot .rb-compare__col--highlighted { box-shadow: inset 2px 0 var(--rb-accent), inset -2px 0 var(--rb-accent), inset 0 -2px var(--rb-accent); }
+.rb-compare__mark { font-size: 1.15rem; font-weight: 700; }
+.rb-compare__mark--yes { color: var(--rb-accent); }
+.rb-compare__mark--no, .rb-compare__mark--none { color: var(--rb-muted); }
+.rb-compare__cta { justify-content: center; white-space: nowrap; }
+
 /* Formulários das ilhas (contato, depoimento) */
 .rb-form { display: grid; gap: 1rem; background: var(--rb-surface); border: 1px solid var(--rb-border); border-radius: var(--rb-radius); padding: 1.25rem; }
 .rb-form fieldset { border: 0; margin: 0; padding: 0; min-width: 0; display: grid; gap: 0.75rem; }

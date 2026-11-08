@@ -422,6 +422,81 @@ export const linhaDoTempo = defineBlock({
   },
 });
 
+export const comparativoPlanos = defineBlock({
+  type: "comparativo-planos",
+  label: "Comparativo de planos",
+  description: "Tabela que compara os planos da coleção item a item (linhas = recursos, colunas = planos), com o botão de cada plano.",
+  category: "empresa",
+  plugin: "pricing",
+  source: { collections: ["plans"], default: { collection: "plans", sort: "order" } },
+  fields: {
+    anchor,
+    title: heading,
+    intro,
+    caption: field.text({
+      label: "Legenda da tabela",
+      maxLength: 160,
+      help: "Resumo da tabela para leitores de tela (e visível acima dela). Sem ela, vale o título, só para leitores de tela.",
+    }),
+    rows: field.list({
+      label: "Recursos",
+      itemLabel: "Recurso",
+      required: true,
+      min: 1,
+      max: 40,
+      of: {
+        label: field.text({ label: "Recurso", required: true, maxLength: 120 }),
+        detail: field.text({ label: "Detalhe", maxLength: 200 }),
+        cells: field.list({
+          label: "Planos",
+          itemLabel: "Plano",
+          max: 8,
+          help: "Um valor por plano, na ordem das colunas (a mesma da lista de planos do bloco). Plano sem valor fica com um traço.",
+          of: {
+            value: field.select({
+              label: "Valor",
+              options: [
+                { value: "sim", label: "✓ Incluso" },
+                { value: "nao", label: "✗ Não incluso" },
+                { value: "texto", label: "Texto" },
+              ],
+              default: "sim",
+            }),
+            text: field.text({ label: "Texto", maxLength: 60, help: "Para o valor \"Texto\" (ex.: até 5, ilimitado)." }),
+          },
+        }),
+      },
+    }),
+    note: field.text({ label: "Observação", multiline: true, maxLength: 300 }),
+  },
+  validate: (f) => {
+    const errors: { path: string; message: string }[] = [];
+    (f.rows as { cells?: { value?: string; text?: Record<string, string> }[] }[]).forEach((row, r) =>
+      row.cells?.forEach((cell, c) => {
+        const hasText = !!cell.text && Object.values(cell.text).some((t) => t.trim());
+        if (cell.value === "texto" && !hasText) errors.push({ path: `rows.${r}.cells.${c}.text`, message: "Texto: obrigatório quando o valor é \"Texto\"" });
+      }),
+    );
+    return errors;
+  },
+  sample: (mode) => ({
+    rows: (mode === "cheio" ? ROWS_SAMPLE : ROWS_SAMPLE.slice(0, 2)).map(([label, cells], i) => ({
+      label: { "*": mode === "cheio" && i === 0 ? "Páginas do site, com textos revisados e otimizados para busca" : label },
+      ...(mode === "cheio" && i === 1 ? { detail: { "*": "Atualizações de segurança e cópias de segurança diárias." } } : {}),
+      cells: cells.map((c) => (c === "sim" || c === "nao" ? { value: c } : { value: "texto", text: { "*": c } })),
+    })),
+  }),
+});
+
+const ROWS_SAMPLE: [string, string[]][] = [
+  ["Páginas", ["até 5", "até 15", "ilimitadas"]],
+  ["Hospedagem", ["sim", "sim", "sim"]],
+  ["Blog e SEO", ["nao", "sim", "sim"]],
+  ["Suporte", ["e-mail", "prioritário", "dedicado 24/7"]],
+  ["Relatório mensal", ["nao", "sim", "sim"]],
+  ["Integrações sob medida", ["nao", "nao", "sim"]],
+];
+
 export const CORE_BLOCKS = [
   hero,
   texto,
@@ -443,6 +518,7 @@ export const CORE_BLOCKS = [
   video,
   incorporacao,
   linhaDoTempo,
+  comparativoPlanos,
 ] as const;
 
 export type CoreBlock = (typeof CORE_BLOCKS)[number];

@@ -30,6 +30,7 @@ const GROUPS: Record<string, string> = {
   location: "Localização",
   video: "Vídeo",
   embed: "Incorporação",
+  compare: "Comparativo de planos",
   contact: "Contato",
   contactForm: "Formulário de contato",
   testimonials: "Depoimentos",

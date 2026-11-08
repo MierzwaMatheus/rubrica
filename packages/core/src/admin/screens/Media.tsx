@@ -12,6 +12,7 @@ import { EditorLocaleProvider, LocaleTabs, LocalizedTextInput } from "../editor/
 import { errorMessage } from "../editor/model";
 import { PageHeader } from "../Layout";
 import { Loading } from "../App";
+import { contentLabel } from "../lib/labels";
 import { toast } from "../lib/toast";
 import { useUploadFile, useUploadImage } from "../lib/upload";
 import { cn } from "../lib/utils";
@@ -106,7 +107,8 @@ function MediaDialog({ media, onClose }: { media: MediaDoc; onClose: () => void 
             <ul className="list-disc pl-5 text-muted-foreground">
               {usage.map((u) => (
                 <li key={u.type + u.id}>
-                  {u.label} <span className="text-xs">({u.type})</span>
+                  {u.label}
+                  {u.type !== "siteSettings" && <span className="text-xs"> ({contentLabel(u.type)})</span>}
                 </li>
               ))}
             </ul>

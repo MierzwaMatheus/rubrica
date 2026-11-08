@@ -91,13 +91,14 @@ describe("dados pessoais (LGPD)", () => {
     await root.mutation(api.rubrica.checkouts.create, { ...CHECKOUT, customerEmail: "outra@exemplo.dev" });
 
     const exported = await t.query(internal.rubrica.commerce.exportPersonalData, { email: " MARIA@exemplo.dev " });
-    expect(exported.proposalAcceptances).toHaveLength(1);
-    expect(exported.proposalAcceptances[0]).toMatchObject({ clientName: "Maria Exemplo", signatureUrl: expect.any(String) });
-    expect(exported.proposalSessions).toHaveLength(1);
-    expect(exported.proposalSessions[0]).not.toHaveProperty("tokenHash");
-    expect(exported.checkouts.map((c) => c.customerName)).toEqual(["Maria"]);
+    expect(Object.keys(exported).sort()).toEqual(["checkouts", "proposals"]);
+    expect(exported.proposals).toHaveLength(1);
+    expect(exported.proposals![0]).toMatchObject({ clientName: "Maria Exemplo", signatureUrl: expect.any(String), proposal: { slug }, session: { ipAddress: "203.0.113.7" } });
+    expect(exported.proposals![0]).not.toHaveProperty("signatureStorageId");
+    expect(JSON.stringify(exported)).not.toMatch(/tokenHash/);
+    expect(exported.checkouts!.map((c) => c.customerName)).toEqual(["Maria"]);
 
-    expect(await t.mutation(internal.rubrica.commerce.erasePersonalData, { email: "maria@exemplo.dev" })).toEqual({ anonymized: 2 });
+    expect(await t.mutation(internal.rubrica.commerce.erasePersonalData, { email: "maria@exemplo.dev" })).toEqual({ anonymized: 2, bySource: { proposals: 1, checkouts: 1 } });
     const acceptance = (await t.run((ctx) => ctx.db.query("proposalAcceptances").first()))!;
     expect(acceptance).toMatchObject({ clientName: "[ANONIMIZADO]", clientDocument: "[ANONIMIZADO]", ipAddress: "0.0.0.0", contentHash: accepted.contentHash });
     expect(acceptance.signatureStorageId).toBeUndefined();
@@ -107,6 +108,6 @@ describe("dados pessoais (LGPD)", () => {
     expect(session.ipAddress).toBe("0.0.0.0");
     const checkouts = await t.run((ctx) => ctx.db.query("checkouts").collect());
     expect(checkouts.map((c) => c.customerName).sort()).toEqual(["A", "[ANONIMIZADO]"]);
-    expect(await t.query(internal.rubrica.commerce.exportPersonalData, { email: "maria@exemplo.dev" })).toEqual({ proposalAcceptances: [], proposalSessions: [], checkouts: [] });
+    expect(await t.query(internal.rubrica.commerce.exportPersonalData, { email: "maria@exemplo.dev" })).toEqual({ proposals: [], checkouts: [] });
   });
 });

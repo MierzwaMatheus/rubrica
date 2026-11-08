@@ -1,10 +1,11 @@
 /**
  * Dados pessoais do comercial, por e-mail do titular (LGPD: exportação e exclusão).
  *
- * Ponto de ligação com a fonte de dados pessoais do núcleo (que vem com o módulo de
- * LGPD): `commercePersonalData.export(ctx, email)` e `.erase(ctx, email)`. As mesmas
- * operações ficam expostas como funções internas em `commerce.exportPersonalData` e
- * `commerce.erasePersonalData`.
+ * Duas fontes, no formato das fontes de dados pessoais do núcleo: `proposalsPersonalData`
+ * (id `proposals`) e `checkoutsPersonalData` (id `checkouts`), cada uma com `find` e
+ * `erase`. Juntas: `exportCommercePersonalData(ctx, email)` e
+ * `eraseCommercePersonalData(ctx, email)`, expostas também como funções internas
+ * `commerce.exportPersonalData` e `commerce.erasePersonalData`.
  *
  * O que entra: aceites de proposta (e as sessões que os geraram, por causa do IP) e
  * checkouts. A proposta em si não tem e-mail (só o nome do cliente, digitado por quem
@@ -14,24 +15,21 @@
  * original), mas sem nome, documento, e-mail, IP, navegador nem assinatura; o checkout
  * continua para a contabilidade, sem os dados do pagador.
  */
-import type { Doc, MutationCtx, ReaderCtx } from "../server";
+import type { MutationCtx, ReaderCtx } from "../server";
 import { normalizeEmailAddress } from "./shared";
 
 export const ANONYMIZED = "[ANONIMIZADO]";
 export const ANONYMIZED_EMAIL = "anonimizado@example.invalid";
 
-export interface CommercePersonalDataExport {
-  proposalAcceptances: Array<Omit<Doc<"proposalAcceptances">, "signatureStorageId"> & { signatureUrl: string | null }>;
-  proposalSessions: Array<Omit<Doc<"proposalSessions">, "tokenHash">>;
-  checkouts: Array<Omit<Doc<"checkouts">, "paymentLockUntil">>;
-}
-
-/** Contrato de uma fonte de dados pessoais. */
-export interface PersonalDataSource<E = unknown> {
-  id: string;
-  label: string;
-  export(ctx: ReaderCtx, email: string): Promise<E>;
-  /** Anonimiza e devolve quantos registros mudaram. */
+/**
+ * `find` e `erase` no formato das fontes de dados pessoais do núcleo (`PersonalDataSource`
+ * de `convex/personalData.ts`, que vem com o módulo de LGPD): na junção, basta espalhar
+ * em `proposalsPolicySource` / `paymentsPolicySource` (mesmos `id` e `plugin`).
+ */
+export interface CommercePersonalDataHandlers {
+  id: "proposals" | "checkouts";
+  plugin: "proposals" | "payments";
+  find(ctx: ReaderCtx, email: string): Promise<Record<string, unknown>[]>;
   erase(ctx: MutationCtx, email: string): Promise<number>;
 }
 
@@ -64,30 +62,25 @@ function redactSnapshot(snapshot: string, now: number): string {
   }
 }
 
-export const commercePersonalData: PersonalDataSource<CommercePersonalDataExport> = {
-  id: "commerce",
-  label: "Propostas aceitas e pagamentos",
+/** Aceites de proposta (e a sessão de cada um, por causa do IP). */
+export const proposalsPersonalData: CommercePersonalDataHandlers = {
+  id: "proposals",
+  plugin: "proposals",
 
-  async export(ctx, rawEmail) {
+  async find(ctx, rawEmail) {
     const email = normalizeEmailAddress(rawEmail);
-    const acceptances = await acceptancesOf(ctx, email);
-    const sessions: CommercePersonalDataExport["proposalSessions"] = [];
-    for (const acc of acceptances) {
-      if (!acc.sessionId) continue;
-      const session = await ctx.db.get(acc.sessionId);
-      if (session) {
-        const { tokenHash: _token, ...rest } = session;
-        sessions.push(rest);
-      }
-    }
-    const proposalAcceptances = await Promise.all(
-      acceptances.map(async ({ signatureStorageId, ...acc }) => ({
-        ...acc,
-        signatureUrl: signatureStorageId ? await ctx.storage.getUrl(signatureStorageId) : null,
-      })),
+    return Promise.all(
+      (await acceptancesOf(ctx, email)).map(async ({ signatureStorageId, sessionId, ...acc }) => {
+        const session = sessionId ? await ctx.db.get(sessionId) : null;
+        const proposal = await ctx.db.get(acc.proposalId);
+        return {
+          ...acc,
+          proposal: proposal ? { slug: proposal.slug, title: proposal.title, clientName: proposal.clientName } : null,
+          session: session ? { ipAddress: session.ipAddress, userAgent: session.userAgent, createdAt: session.createdAt, expiresAt: session.expiresAt } : null,
+          signatureUrl: signatureStorageId ? await ctx.storage.getUrl(signatureStorageId) : null,
+        };
+      }),
     );
-    const checkouts = (await checkoutsOf(ctx, email)).map(({ paymentLockUntil: _lock, ...rest }) => rest);
-    return { proposalAcceptances, proposalSessions: sessions, checkouts };
   },
 
   async erase(ctx, rawEmail) {
@@ -113,7 +106,23 @@ export const commercePersonalData: PersonalDataSource<CommercePersonalDataExport
         await ctx.db.patch(acc.sessionId, { ipAddress: "0.0.0.0", userAgent: undefined });
       }
     }
-    for (const co of await checkoutsOf(ctx, email)) {
+    return count;
+  },
+};
+
+/** Checkouts (dados do pagador). */
+export const checkoutsPersonalData: CommercePersonalDataHandlers = {
+  id: "checkouts",
+  plugin: "payments",
+
+  async find(ctx, rawEmail) {
+    return (await checkoutsOf(ctx, normalizeEmailAddress(rawEmail))).map(({ paymentLockUntil: _lock, ...rest }) => rest);
+  },
+
+  async erase(ctx, rawEmail) {
+    const now = Date.now();
+    const docs = await checkoutsOf(ctx, normalizeEmailAddress(rawEmail));
+    for (const co of docs) {
       await ctx.db.patch(co._id, {
         customerName: ANONYMIZED,
         customerEmail: ANONYMIZED_EMAIL,
@@ -123,8 +132,23 @@ export const commercePersonalData: PersonalDataSource<CommercePersonalDataExport
         customerCompany: undefined,
         updatedAt: now,
       });
-      count++;
     }
-    return count;
+    return docs.length;
   },
 };
+
+export const COMMERCE_PERSONAL_DATA = [proposalsPersonalData, checkoutsPersonalData] as const;
+
+/** `personalData.export(email)`: os registros de cada fonte do comercial. */
+export async function exportCommercePersonalData(ctx: ReaderCtx, email: string): Promise<Record<string, Record<string, unknown>[]>> {
+  const out: Record<string, Record<string, unknown>[]> = {};
+  for (const source of COMMERCE_PERSONAL_DATA) out[source.id] = await source.find(ctx, email);
+  return out;
+}
+
+/** `personalData.erase(email)`: anonimiza em cada fonte do comercial. */
+export async function eraseCommercePersonalData(ctx: MutationCtx, email: string): Promise<Record<string, number>> {
+  const out: Record<string, number> = {};
+  for (const source of COMMERCE_PERSONAL_DATA) out[source.id] = await source.erase(ctx, email);
+  return out;
+}

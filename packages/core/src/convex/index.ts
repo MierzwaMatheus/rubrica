@@ -212,7 +212,14 @@ export { ROLES, PERMISSIONS, ROLE_LABELS, can, isRole, type Role, type Permissio
 export { buildSnapshot } from "./site";
 export { MODULE_DIR } from "./server";
 export { commerceTables } from "./commerce/schema";
-export { commercePersonalData, type PersonalDataSource, type CommercePersonalDataExport } from "./commerce/personalData";
+export {
+  proposalsPersonalData,
+  checkoutsPersonalData,
+  COMMERCE_PERSONAL_DATA,
+  exportCommercePersonalData,
+  eraseCommercePersonalData,
+  type CommercePersonalDataHandlers,
+} from "./commerce/personalData";
 export type { DataModel, Doc, Id, QueryCtx, MutationCtx, ActionCtx } from "./server";
 
 export type RubricaModule = (typeof RUBRICA_MODULES)[number];

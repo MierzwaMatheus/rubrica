@@ -11,7 +11,7 @@ import { getSettingsDoc } from "../plugins";
 import type { RubricaRuntime } from "../runtime";
 import { internalAction, internalMutation, internalQuery } from "../server";
 import { vRole } from "../validators";
-import { commercePersonalData } from "./personalData";
+import { eraseCommercePersonalData, exportCommercePersonalData } from "./personalData";
 import { guard } from "./shared";
 
 /** Origens do servidor de desenvolvimento (Astro e Vite). */
@@ -93,13 +93,16 @@ export function commerceFunctions(rt: RubricaRuntime) {
     /** LGPD: o que o comercial guarda sobre o e-mail (ver `personalData.ts`). */
     exportPersonalData: internalQuery({
       args: { email: v.string() },
-      handler: (ctx, args) => commercePersonalData.export(ctx, args.email),
+      handler: (ctx, args) => exportCommercePersonalData(ctx, args.email),
     }),
 
-    /** LGPD: anonimiza o que o comercial guarda sobre o e-mail. Devolve quantos registros mudaram. */
+    /** LGPD: anonimiza o que o comercial guarda sobre o e-mail. Devolve quantos registros mudaram, por fonte. */
     erasePersonalData: internalMutation({
       args: { email: v.string() },
-      handler: async (ctx, args) => ({ anonymized: await commercePersonalData.erase(ctx, args.email) }),
+      handler: async (ctx, args) => {
+        const bySource = await eraseCommercePersonalData(ctx, args.email);
+        return { anonymized: Object.values(bySource).reduce((a, b) => a + b, 0), bySource };
+      },
     }),
   };
 }

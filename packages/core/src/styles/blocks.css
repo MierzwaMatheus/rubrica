@@ -183,17 +183,21 @@
 .rb-timeline__title { font-size: 1.15rem; line-height: 1.3; margin: 0; overflow-wrap: anywhere; }
 .rb-timeline__text { margin: 0.4rem 0 0; color: var(--rb-muted); }
 .rb-timeline__image { display: block; width: 100%; max-width: 30rem; height: auto; margin-top: 0.75rem; border-radius: var(--rb-radius); }
-.rb-timeline--horizontal { max-width: none; gap: 1.5rem 1.25rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr)); }
-.rb-timeline--horizontal .rb-timeline__item { padding: 1.5rem 0 0; }
-.rb-timeline--horizontal .rb-timeline__item::before { top: 0; left: 0; }
-.rb-timeline--horizontal .rb-timeline__item::after { top: calc(0.425rem - 1px); left: 1.25rem; right: -1.25rem; bottom: auto; width: auto; height: 2px; }
-.rb-timeline--horizontal .rb-timeline__title { font-size: 1.05rem; }
-.rb-timeline--horizontal .rb-timeline__text { font-size: 0.95rem; }
+/* Horizontal só quando cabe mais de um marco por linha; em tela estreita, fica como a vertical. */
+@media (min-width: 40rem) {
+  .rb-timeline--horizontal { max-width: none; overflow-x: clip; padding-inline-start: 4px; gap: 1.5rem 1.25rem; grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr)); }
+  .rb-timeline--horizontal .rb-timeline__item { padding: 1.5rem 0 0; }
+  .rb-timeline--horizontal .rb-timeline__item::before { top: 0; left: 0; }
+  .rb-timeline--horizontal .rb-timeline__item::after { display: block; top: calc(0.425rem - 1px); left: 1.25rem; right: -1.25rem; bottom: auto; width: auto; height: 2px; }
+  .rb-timeline--horizontal .rb-timeline__title { font-size: 1.05rem; }
+  .rb-timeline--horizontal .rb-timeline__text { font-size: 0.95rem; }
+}
 
 /* Comparativo de planos: rola dentro da própria região; a coluna dos recursos fica fixa */
 .rb-compare__hint { margin: 0 0 0.75rem; color: var(--rb-muted); font-size: 0.9rem; }
 @media (min-width: 64rem) { .rb-compare__hint { display: none; } }
-.rb-compare__scroll { overflow-x: auto; max-width: 100%; border: 1px solid var(--rb-border); border-radius: var(--rb-radius); }
+/* position: relative prende os textos de leitor de tela (absolutos) dentro da rolagem. */
+.rb-compare__scroll { position: relative; overflow-x: auto; max-width: 100%; background: var(--rb-bg); color: var(--rb-fg); border: 1px solid var(--rb-border); border-radius: var(--rb-radius); }
 .rb-compare__scroll:focus-visible { outline: 2px solid var(--rb-accent); outline-offset: 2px; }
 .rb-compare { width: 100%; min-width: calc(10rem + var(--rb-compare-cols) * 9rem); border-collapse: collapse; }
 .rb-compare__caption { caption-side: top; text-align: start; padding: 1rem 1rem 0; font-weight: 600; }

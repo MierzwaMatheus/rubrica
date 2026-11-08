@@ -76,11 +76,12 @@ function rewriteText(text: string, ctx: RewriteContext): string {
 
 /**
  * Ajusta links e imagens de um Markdown do repositório para o site: docs publicados viram
- * páginas no idioma da página, o resto aponta para o GitHub. Código fica intacto.
+ * páginas no idioma da página, o resto aponta para o GitHub. Código fica intacto, mas um
+ * link com código no texto (`[\`arquivo.md\`](./arquivo.md)`) também é ajustado: o código
+ * sai do caminho enquanto os links são reescritos e volta depois.
  */
 export function rewriteDoc(md: string, ctx: RewriteContext): string {
-  return md
-    .split(/(```[\s\S]*?```|`[^`\n]*`)/g)
-    .map((chunk, i) => (i % 2 === 1 ? chunk : rewriteText(chunk, ctx)))
-    .join("");
+  const code: string[] = [];
+  const hidden = md.replace(/```[\s\S]*?```|`[^`\n]*`/g, (m) => `\u0000${code.push(m) - 1}\u0000`);
+  return rewriteText(hidden, ctx).replace(/\u0000(\d+)\u0000/g, (_, i: string) => code[Number(i)]);
 }

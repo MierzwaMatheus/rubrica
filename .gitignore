@@ -129,12 +129,6 @@ src/data/
 .claude/settings.local.json
 .claude/*.lock
 
-# Site público: gerados no build (site/scripts/build-previews.ts)
-site/.astro/
-site/public/previews/
-site/public/data/
-site/public/samples/
-
 # Python
 __pycache__/
 *.pyc

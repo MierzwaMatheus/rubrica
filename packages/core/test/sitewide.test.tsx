@@ -22,7 +22,13 @@ import type { Announcement } from "../src/content/types";
 
 const theme = defineTheme({ id: "teste", label: "Teste", contract: "^1", tokens: {}, Shell: DefaultShell });
 const fixtures = (kind: string) => fileURLToPath(new URL(`../../../apps/demo/fixtures/${kind}`, import.meta.url));
-const load = async (kind = "pessoal") => fixtureSource(fixtures(kind)).load();
+/** Fixtures da demo sem o WhatsApp e o aviso (que elas ligam para a bateria de temas): cada teste liga o que usa. */
+async function load(kind = "pessoal"): Promise<SiteSnapshot> {
+  const snapshot = await fixtureSource(fixtures(kind)).load();
+  delete snapshot.site.whatsapp;
+  delete snapshot.site.announcement;
+  return snapshot;
+}
 const build = (snapshot: SiteSnapshot, now?: number) => buildSite({ snapshot, theme, blocks: CORE_BLOCKS, plugins: CORE_PLUGINS, ...(now !== undefined && { now }) });
 
 const WHATSAPP = { number: "5511912345678", floating: true, message: { "pt-BR": "Olá! Vim pelo site.", en: "Hi! I found you on the site." } };
@@ -79,6 +85,14 @@ describe("faixa de aviso: período avaliado no build", () => {
 });
 
 describe("montagem do site", () => {
+  it("as fixtures da demo ligam os dois recursos (a bateria de temas os exercita)", async () => {
+    for (const kind of ["pessoal", "empresa"]) {
+      const { site } = await fixtureSource(fixtures(kind)).load();
+      expect(site.whatsapp?.floating).toBe(true);
+      expect(site.announcement?.enabled).toBe(true);
+    }
+  });
+
   it("ctx.site.whatsapp traz o wa.me com a mensagem do idioma", async () => {
     const snapshot = await load();
     snapshot.site.whatsapp = { ...WHATSAPP, label: { "pt-BR": "Fale comigo" } };

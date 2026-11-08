@@ -119,5 +119,34 @@
     "mapUrl": "https://maps.example/meridiano",
     "schemaType": "ProfessionalService"
   },
-  "plugins": {}
+  "plugins": {},
+  "whatsapp": {
+    "number": "5511900000000",
+    "floating": true,
+    "message": {
+      "pt-BR": "Olá! Vim pelo site e quero um orçamento.",
+      "en": "Hi! I found you through the website and would like a quote.",
+      "es": "¡Hola! Vi el sitio y quiero un presupuesto."
+    },
+    "label": {
+      "pt-BR": "Fale conosco",
+      "en": "Talk to us",
+      "es": "Habla con nosotros"
+    }
+  },
+  "announcement": {
+    "enabled": true,
+    "tone": "destaque",
+    "text": {
+      "pt-BR": "Diagnóstico gratuito de presença digital até o fim do mês.",
+      "en": "Free digital presence review until the end of the month."
+    },
+    "link": {
+      "label": {
+        "pt-BR": "Agendar pelo WhatsApp",
+        "en": "Book on WhatsApp"
+      },
+      "href": "whatsapp:Quero agendar o diagnóstico gratuito"
+    }
+  }
 }

@@ -4,6 +4,18 @@ Rubrica has two lines: **personal**, for one person's portfolio, and **company**
 
 The core, the themes, the panel and publishing are the same in both. What changes are the pages that come ready, a few blocks and plugins, and the details of who owns the site.
 
+## Who it is for, and who it is not for
+
+The company line is for businesses that **sell services**: the site presents the company and leads the visitor to ask for a quote. It fits agencies, consultancies, firms, clinics, schools, studios and service providers in general.
+
+The sales path the Rubrica covers from start to finish:
+
+1. **Present**: about us, services, case studies, team, testimonials, FAQ, blog and location.
+2. **Capture**: a step-by-step contact form (with a Telegram or e-mail alert), WhatsApp, an embedded calendar, pricing and a plan comparison.
+3. **Close**: a password-protected proposal with a contract and electronic acceptance; payment by PIX, boleto or card (Asaas) for a proposal or a plan.
+
+The Rubrica **is not an online store**. It has no product catalog, cart, stock, shipping, coupons, orders or customer login area. The checkout charges a fixed amount (a proposal's or a plan's), not a list of products. If the client also sells products, use a separate store platform and link the site to it with a button or from the menu.
+
 ## Creating a company site
 
 ```bash
@@ -19,7 +31,7 @@ An existing site can also switch type with `npx create-rubrica config --tipo emp
 | | Personal | Company |
 |---|---|---|
 | Pages that come ready | Home, About, Résumé, Portfolio, Blog, Testimonials | Home, About us, Services, Pricing, Case studies, Blog, Contact |
-| Blocks only in this type | Résumé | Pricing, Team, Location, Client logos |
+| Blocks only in this type | Résumé | Pricing, Plan comparison, Team, Location, Client logos |
 | Plugins only in this type | Résumé, Day to day, AI résumé per job | Pricing and plans, Team |
 | Who owns the site | A **person** (name, role, photo) | A **company** (legal name, tax ID, address, opening hours) |
 | For Google | Person data (`Person`) | Company data (`Organization` or `LocalBusiness`) |
@@ -33,9 +45,9 @@ The pages come built with blocks and sample text, for you to replace with the cl
 | Page | Blocks |
 |---|---|
 | Home | Opening, services, numbers, case studies, testimonials and a call to contact |
-| About us | The company story, numbers, values and the team |
+| About us | The company story, the timeline, numbers, values and the team |
 | Services | Services, frequently asked questions and a call to request a proposal |
-| Pricing | Plans and questions about the plans |
+| Pricing | Plans, the plan comparison and questions about the plans |
 | Case studies | The projects, each with its own case study page |
 | Blog | The posts, with a tag filter |
 | Contact | The contact assistant and the location (address, hours and map) |
@@ -45,6 +57,7 @@ The pages come built with blocks and sample text, for you to replace with the cl
 | Block | What for |
 |---|---|
 | Pricing (`precos`) | The plans side by side, with a highlight and each plan's button |
+| Plan comparison (`comparativo-planos`) | A table that compares the plans item by item, with each plan's button |
 | Team (`equipe`) | The company's people, with photo, role and social links |
 | Location (`localizacao`) | Address, hours and map, taken from the company details |
 | Client logos (`logos-clientes`) | A strip with the logos of clients or partners |

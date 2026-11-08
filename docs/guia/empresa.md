@@ -4,6 +4,18 @@ O Rubrica tem duas linhas: **pessoal**, para o portfólio de uma pessoa, e **emp
 
 O núcleo, os temas, o painel e a publicação são os mesmos nas duas. O que muda são as páginas que vêm prontas, alguns blocos e plugins e os dados de quem é dono do site.
 
+## Para quem é e para quem não é
+
+A linha de empresa é para quem **vende serviço**: o site apresenta a empresa e leva o visitante a pedir um orçamento. Serve bem a agências, consultorias, escritórios, clínicas, escolas, estúdios e prestadores de serviço em geral.
+
+O caminho comercial que o Rubrica cobre do começo ao fim:
+
+1. **Apresentar**: quem somos, serviços, cases, equipe, depoimentos, perguntas frequentes, blog e localização.
+2. **Captar**: formulário de contato em etapas (com aviso no Telegram ou por e-mail), WhatsApp, agenda incorporada, preços e comparativo de planos.
+3. **Fechar**: proposta com senha, contrato e aceite eletrônico; cobrança por PIX, boleto ou cartão (Asaas) de uma proposta ou de um plano.
+
+O Rubrica **não é uma loja virtual**. Não tem catálogo de produtos, carrinho, estoque, frete, cupons, pedidos nem área do cliente com login. O checkout cobra um valor fechado (o de uma proposta ou de um plano), não uma lista de produtos. Se o cliente também vende produtos, use uma plataforma de loja à parte e ligue o site a ela por um botão ou pelo menu.
+
 ## Criar um site de empresa
 
 ```bash
@@ -19,7 +31,7 @@ Um site que já existe também pode trocar de tipo com `npx create-rubrica confi
 | | Pessoal | Empresa |
 |---|---|---|
 | Páginas que vêm prontas | Início, Sobre, Currículo, Portfólio, Blog, Depoimentos | Início, Quem somos, Serviços, Preços, Cases, Blog, Contato |
-| Blocos só deste tipo | Currículo | Preços, Equipe, Localização, Logos de clientes |
+| Blocos só deste tipo | Currículo | Preços, Comparativo de planos, Equipe, Localização, Logos de clientes |
 | Plugins só deste tipo | Currículo, Dia a dia, Currículo por vaga com IA | Preços e planos, Equipe |
 | Quem é o dono do site | Uma **pessoa** (nome, cargo, foto) | Uma **empresa** (razão social, CNPJ, endereço, horário) |
 | Para o Google | Dados de pessoa (`Person`) | Dados de empresa (`Organization` ou `LocalBusiness`) |
@@ -33,9 +45,9 @@ As páginas vêm montadas com blocos e textos de exemplo, para você trocar pelo
 | Página | Blocos |
 |---|---|
 | Início | Abertura, serviços, números, cases, depoimentos e uma chamada para o contato |
-| Quem somos | A história da empresa, números, valores e a equipe |
+| Quem somos | A história da empresa, a linha do tempo, números, valores e a equipe |
 | Serviços | Serviços, perguntas frequentes e uma chamada para pedir proposta |
-| Preços | Planos e perguntas sobre os planos |
+| Preços | Planos, comparativo dos planos e perguntas sobre os planos |
 | Cases | Os projetos, cada um com a sua página de case |
 | Blog | Os posts, com filtro por etiqueta |
 | Contato | O assistente de contato e a localização (endereço, horário e mapa) |
@@ -45,6 +57,7 @@ As páginas vêm montadas com blocos e textos de exemplo, para você trocar pelo
 | Bloco | Para quê |
 |---|---|
 | Preços (`precos`) | Os planos lado a lado, com destaque e o botão de cada um |
+| Comparativo de planos (`comparativo-planos`) | Tabela que compara os planos item a item, com o botão de cada um |
 | Equipe (`equipe`) | As pessoas da empresa, com foto, cargo e redes |
 | Localização (`localizacao`) | Endereço, horário e mapa, tirados dos dados da empresa |
 | Logos de clientes (`logos-clientes`) | Uma faixa com os logos de clientes ou parceiros |

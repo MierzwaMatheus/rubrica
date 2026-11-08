@@ -26,7 +26,7 @@ import { Switch, Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { itemImage, type CollectionConfig } from "./config";
 import { allTags, planCreate, planUpdate, suggestSlug } from "./model";
 import { EditingLocaleBar, Section, SeoPanel, SlugPanel, TagsInput } from "./parts";
-import { PlanExtras } from "./PlanExtras";
+import { PlanCheckout, PlanPrice } from "./PlanExtras";
 
 const SHELL_KEYS = ["tags", "featured", "seo", "priceCents", "currency"];
 
@@ -267,6 +267,7 @@ function Editor({ config, doc }: { config: CollectionConfig; doc?: CollectionDoc
                 </TabsList>
               )}
               <TabsContent value="content" className="space-y-4">
+                {config.name === "plans" && <PlanPrice form={draft} set={set} />}
                 <Section title="Conteúdo">
                   <FieldsForm fields={config.fields} values={fieldVals} errors={fieldErrors} missing={missing} onChange={(values) => {
                       // O erro de um campo some quando a pessoa mexe nele; a próxima tentativa de salvar confere de novo.
@@ -275,7 +276,7 @@ function Editor({ config, doc }: { config: CollectionConfig; doc?: CollectionDoc
                       setDraft((d) => ({ ...omit(d, Object.keys(config.fields)), ...values }));
                     }} />
                 </Section>
-                {config.name === "plans" && <PlanExtras doc={doc} form={draft} set={set} dirty={dirty} />}
+                {config.name === "plans" && <PlanCheckout doc={doc} form={draft} dirty={dirty} />}
                 {(config.tags || config.featured) && (
                   <Section title="Organização">
                     {config.tags && <TagsInput value={(draft.tags as string[] | undefined) ?? []} onChange={(tags) => set("tags", tags.length ? tags : undefined)} suggestions={tagSuggestions} />}

@@ -72,16 +72,20 @@ function CheckoutLink({ doc, form, dirty }: { doc: CollectionDoc; form: Values; 
   );
 }
 
-export function PlanExtras({ doc, form, set, dirty }: { doc?: CollectionDoc; form: Values; set: (key: string, value: unknown) => void; dirty: boolean }) {
+/** Preço em reais, antes do restante do plano. */
+export function PlanPrice({ form, set }: { form: Values; set: (key: string, value: unknown) => void }) {
+  return (
+    <Section title="Preço" description="Valor em reais, com período de cobrança abaixo. Sem valor, vale o texto livre no lugar do preço.">
+      <PriceField cents={form.priceCents as number | undefined} currency={form.currency as string | undefined} onChange={(cents) => set("priceCents", cents)} />
+    </Section>
+  );
+}
+
+/** Link de pagamento do plano (precisa de papel e do plugin de pagamentos). */
+export function PlanCheckout({ doc, form, dirty }: { doc?: CollectionDoc; form: Values; dirty: boolean }) {
   const panel = usePanel();
   const canLink = can(panel.me.role, "checkouts") && panel.enabled.has("payments");
-  return (
-    <>
-      <Section title="Preço">
-        <PriceField cents={form.priceCents as number | undefined} currency={form.currency as string | undefined} onChange={(cents) => set("priceCents", cents)} />
-      </Section>
-      {canLink && doc && <CheckoutLink doc={doc} form={form} dirty={dirty} />}
-      {canLink && !doc && <p className="text-xs text-muted-foreground">Salve o plano para poder ligar o link de pagamento.</p>}
-    </>
-  );
+  if (!canLink) return null;
+  if (!doc) return <p className="text-xs text-muted-foreground">Salve o plano para poder ligar o link de pagamento.</p>;
+  return <CheckoutLink doc={doc} form={form} dirty={dirty} />;
 }

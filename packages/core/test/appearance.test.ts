@@ -58,6 +58,17 @@ describe("planFonts", () => {
     expect(planFonts(undefined, { sans: "Inter" }).fonts[0]?.styles).toEqual(["normal"]);
   });
 
+  it("a reserva segue o desenho da família, não o papel (a Fonts API ajusta as métricas a partir dela)", () => {
+    const plan = planFonts(undefined, { sans: "JetBrains Mono", display: "Fraunces" });
+    expect(plan.fonts.map((f) => [f.name, f.fallbacks.at(-1)])).toEqual([
+      ["JetBrains Mono", "monospace"],
+      ["Fraunces", "serif"],
+    ]);
+    expect(planFonts(undefined, { sans: "Inter", mono: "IBM Plex Mono" }).fonts.map((f) => f.fallbacks.at(-1))).toEqual(["sans-serif", "monospace"]);
+    expect(planFonts({ fontSans: "Noto Serif Display" }, undefined).fonts[0]?.fallbacks.at(-1)).toBe("serif");
+    expect(planFonts({ fontSans: "Noto Sans" }, undefined).fonts[0]?.fallbacks.at(-1)).toBe("sans-serif");
+  });
+
   it("família desconhecida usa 400 e 700; nome com caracteres perigosos é ignorado", () => {
     expect(planFonts({ fontSans: "Minha Fonte" }, undefined).fonts[0]?.weights).toEqual([400, 700]);
     expect(planFonts({ fontSans: 'x"}body{' }, undefined).fonts).toEqual([]);

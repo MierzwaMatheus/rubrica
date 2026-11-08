@@ -238,6 +238,8 @@ export const DEFAULT_UI_TEXTS: Record<string, Localized<string>> = {
   "resume.skill": { pt: "Competências", en: "Skills", es: "Habilidades" },
   "resume.certification": { pt: "Certificações", en: "Certifications", es: "Certificaciones" },
   "resume.language": { pt: "Idiomas", en: "Languages", es: "Idiomas" },
+  "resume.volunteer": { pt: "Voluntariado", en: "Volunteer work", es: "Voluntariado" },
+  "resume.soft-skill": { pt: "Competências comportamentais", en: "Soft skills", es: "Habilidades blandas" },
   "resume.present": { pt: "atual", en: "present", es: "actual" },
   "pricing.highlighted": { pt: "Mais escolhido", en: "Most popular", es: "Más elegido" },
   "location.hours": { pt: "Horário", en: "Opening hours", es: "Horario" },

@@ -43,6 +43,8 @@ export default function Curriculo({ locale, items, texts, site }: CurriculoProps
             skill: t("resume.skill"),
             certification: t("resume.certification"),
             language: t("resume.language"),
+            volunteer: t("resume.volunteer"),
+            "soft-skill": t("resume.soft-skill"),
             present: t("resume.present"),
           },
         },

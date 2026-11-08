@@ -248,8 +248,10 @@ export const faqFields = {
 
 export const vResumeKind = v.union(
   v.literal("experience"),
+  v.literal("volunteer"),
   v.literal("education"),
   v.literal("skill"),
+  v.literal("soft-skill"),
   v.literal("certification"),
   v.literal("language"),
 );

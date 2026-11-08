@@ -142,7 +142,11 @@ export interface RawFaq extends Base {
   answer: Localized<string>;
 }
 
-export type ResumeKind = "experience" | "education" | "skill" | "certification" | "language";
+/**
+ * Tipos de item do currículo. `soft-skill` são as competências comportamentais (liderança,
+ * comunicação) e `volunteer`, o trabalho voluntário: o tema os mostra à parte.
+ */
+export type ResumeKind = "experience" | "volunteer" | "education" | "skill" | "soft-skill" | "certification" | "language";
 
 export interface RawResumeItem extends Base {
   kind: ResumeKind;

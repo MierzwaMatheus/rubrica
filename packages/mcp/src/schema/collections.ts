@@ -134,7 +134,7 @@ export const COLLECTION_SPECS: Record<CollectionName, CollectionSpec> = {
     requiredText: ["title"],
     descriptions: {
       ...common,
-      kind: "Tipo: experience, education, skill, certification ou language.",
+      kind: "Tipo: experience, volunteer, education, skill, soft-skill (competência comportamental), certification ou language.",
       title: "Cargo, curso, competência…",
       organization: "Empresa ou instituição.",
       location: "Local.",

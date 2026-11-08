@@ -120,8 +120,10 @@ const FAQ_FIELDS: FieldMap = {
 
 export const RESUME_KINDS = {
   experience: "Experiência",
+  volunteer: "Voluntariado",
   education: "Formação",
   skill: "Competência",
+  "soft-skill": "Competência comportamental",
   certification: "Certificação",
   language: "Idioma",
 } as const;

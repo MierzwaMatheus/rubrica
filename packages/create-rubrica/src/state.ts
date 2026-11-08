@@ -64,6 +64,11 @@ export interface RubricaState {
   ejetados?: Record<string, EjectedComponent>;
   producao?: { convexUrl?: string; siteUrl?: string };
   telemetria?: { projeto?: string; ativa?: boolean };
+  /**
+   * Analytics (plugin `analytics`, Umami): endereço do script e id do site. A origem do
+   * script entra na CSP do `vercel.json` e do `public/_headers` (`config --analytics`).
+   */
+  analytics?: { script: string; id?: string };
   /** Projeto migrado da v1. */
   migracao?: { de: string; layoutV1: string; em: string };
   [key: string]: unknown;
@@ -143,5 +148,15 @@ export function settingsFromState(state: RubricaState): SiteSettings & { appeara
     ...(state.tipo === "empresa" && { organization: { ...(id.email && { email: id.email }) } }),
     plugins: state.plugins,
     ...(id.twitter && { twitterHandle: id.twitter }),
+    ...(state.analytics && { analytics: { scriptUrl: state.analytics.script, ...(state.analytics.id && { websiteId: state.analytics.id }) } }),
   };
+}
+
+/** Origem do script de analytics do projeto (para a CSP), se houver. */
+export function analyticsOrigin(state: Pick<RubricaState, "analytics">): string | undefined {
+  try {
+    return state.analytics?.script ? new URL(state.analytics.script).origin : undefined;
+  } catch {
+    return undefined;
+  }
 }

@@ -178,3 +178,25 @@ describe("publicar", () => {
     expect(shell.calls.filter((c) => c.some((a) => a.startsWith("vercel")))).toEqual([]);
   });
 });
+
+describe("config --analytics", () => {
+  it("grava no rubrica.json, libera a origem na CSP dos arquivos do projeto e manda ao Convex do computador", async () => {
+    const { runConfig } = await import("../src/commands/config");
+    const { hostingFiles } = await import("../src/project/hosting");
+    const dir = project();
+    mkdirSync(join(dir, "public"), { recursive: true });
+    for (const [file, content] of Object.entries(hostingFiles())) writeFileSync(join(dir, file), content);
+    const shell = new FakeShell({ "rubrica/seed:patchSettings": () => null });
+    await runConfig(["--analytics", "https://cloud.umami.is/script.js", "--analytics-id", "abc-123"], { cwd: dir, runner: shell.runner });
+    const state = JSON.parse(readFileSync(join(dir, "rubrica.json"), "utf-8"));
+    expect(state.analytics).toEqual({ script: "https://cloud.umami.is/script.js", id: "abc-123" });
+    expect(readFileSync(join(dir, "vercel.json"), "utf-8")).toContain("script-src 'self' 'unsafe-inline' https://cloud.umami.is");
+    expect(readFileSync(join(dir, "public/_headers"), "utf-8")).toContain("connect-src 'self' https://cloud.umami.is");
+    const patch = shell.fnCalls("rubrica/seed:patchSettings")[0]?.args.patch as Record<string, unknown>;
+    expect(patch.analytics).toEqual({ scriptUrl: "https://cloud.umami.is/script.js", websiteId: "abc-123" });
+
+    await runConfig(["--analytics", "desligar"], { cwd: dir, runner: shell.runner });
+    expect(readFileSync(join(dir, "vercel.json"), "utf-8")).not.toContain("umami");
+    expect(JSON.parse(readFileSync(join(dir, "rubrica.json"), "utf-8")).plugins.analytics).toBe(false);
+  });
+});

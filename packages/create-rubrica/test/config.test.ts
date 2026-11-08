@@ -45,6 +45,27 @@ describe("config (puro)", () => {
     expect(applyConfigChange(sampleState(), { tema: "magazine", modo: "dark" }).state.aparencia.modo).toBe("dark");
   });
 
+  it("--analytics liga o plugin, manda script e id ao Convex e pede a troca da CSP", () => {
+    const r = applyConfigChange(sampleState(), { analytics: "https://cloud.umami.is/script.js", analyticsId: "abc-123" });
+    expect(r.state.analytics).toEqual({ script: "https://cloud.umami.is/script.js", id: "abc-123" });
+    expect(r.state.plugins.analytics).toBe(true);
+    expect(r.patch.analytics).toEqual({ scriptUrl: "https://cloud.umami.is/script.js", websiteId: "abc-123" });
+    expect(r.patch.plugins).toMatchObject({ analytics: true });
+    expect(r.cspOrigin).toEqual({ to: "https://cloud.umami.is" });
+    // Outra origem: sai a anterior.
+    expect(applyConfigChange(r.state, { analytics: "https://stats.ana.dev/s.js" }).cspOrigin).toEqual({ from: "https://cloud.umami.is", to: "https://stats.ana.dev" });
+    // Mesma origem, outro id: a CSP não muda.
+    expect(applyConfigChange(r.state, { analyticsId: "def" }).cspOrigin).toBeUndefined();
+    // Desligar tira a origem e desliga o plugin.
+    const off = applyConfigChange(r.state, { analytics: "desligar" });
+    expect(off.state.analytics).toBeUndefined();
+    expect(off.state.plugins.analytics).toBe(false);
+    expect(off.cspOrigin).toEqual({ from: "https://cloud.umami.is" });
+    expect(() => applyConfigChange(sampleState(), { analytics: "http://x.com/s.js" })).toThrow(/https/);
+    expect(() => applyConfigChange(sampleState(), { analytics: "https://x.com/s.js", analyticsId: "<x>" })).toThrow(/Id do site/);
+    expect(applyConfigChange(sampleState(), { analytics: "https://x.com/s.js" }).warnings.join()).toMatch(/--analytics-id/);
+  });
+
   it("tema ainda não portado: fica no padrão e guarda a escolha", () => {
     const r = applyConfigChange(sampleState({ tema: "cyberpunk" }), { tema: "zine" });
     expect(r.state.tema).toBe("padrao");

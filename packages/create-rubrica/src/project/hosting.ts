@@ -30,25 +30,38 @@ export interface HostingConfig {
  * do tema inline: daí o `'unsafe-inline'` em script-src e style-src. O JavaScript das
  * ilhas vem de `/_astro/` (self). Os formulários (contato e depoimento) falam com o
  * Convex (`*.convex.site`), e o painel com `*.convex.cloud` (inclusive por WebSocket).
+ *
+ * Com o plugin `analytics`, a origem do script do Umami entra em script-src (o script) e
+ * connect-src (os eventos vão para a mesma origem), como na v1.
  */
-export const CONTENT_SECURITY_POLICY = [
-  "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
-  "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https:",
-  "font-src 'self' data:",
-  "connect-src 'self' https://*.convex.cloud wss://*.convex.cloud https://*.convex.site",
-  "frame-src 'self' https://www.google.com https://maps.google.com",
-  "frame-ancestors 'none'",
-  "object-src 'none'",
-  "base-uri 'self'",
-  "form-action 'self'",
-  "worker-src 'self' blob:",
-  "manifest-src 'self'",
-  "upgrade-insecure-requests",
-].join("; ");
+export function contentSecurityPolicy(analyticsOrigin?: string): string {
+  const extra = analyticsOrigin ? ` ${analyticsOrigin}` : "";
+  return [
+    "default-src 'self'",
+    `script-src 'self' 'unsafe-inline'${extra}`,
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob: https:",
+    "font-src 'self' data:",
+    `connect-src 'self'${extra} https://*.convex.cloud wss://*.convex.cloud https://*.convex.site`,
+    "frame-src 'self' https://www.google.com https://maps.google.com",
+    "frame-ancestors 'none'",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "worker-src 'self' blob:",
+    "manifest-src 'self'",
+    "upgrade-insecure-requests",
+  ].join("; ");
+}
 
-export function defaultHosting(): HostingConfig {
+export const CONTENT_SECURITY_POLICY = contentSecurityPolicy();
+
+export interface HostingOptions {
+  /** Origem do script de analytics (`https://cloud.umami.is`), liberada na CSP. */
+  analyticsOrigin?: string;
+}
+
+export function defaultHosting(options: HostingOptions = {}): HostingConfig {
   return {
     redirects: [],
     headers: [
@@ -60,13 +73,54 @@ export function defaultHosting(): HostingConfig {
           "X-Frame-Options": "DENY",
           "Referrer-Policy": "strict-origin-when-cross-origin",
           "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
-          "Content-Security-Policy": CONTENT_SECURITY_POLICY,
+          "Content-Security-Policy": contentSecurityPolicy(options.analyticsOrigin),
         },
       },
       // Arquivos com hash no nome: nunca mudam.
       { source: "/_astro/*", headers: { "Cache-Control": "public, max-age=31536000, immutable" } },
     ],
   };
+}
+
+/**
+ * Troca a origem do analytics numa CSP existente (script-src e connect-src), sem mexer
+ * no resto: tira a anterior (`from`) e põe a nova (`to`). Sem `to`, só tira.
+ */
+export function swapCspOrigin(csp: string, from: string | undefined, to: string | undefined): string {
+  return csp
+    .split(";")
+    .map((part) => {
+      const directive = part.trim();
+      const [name, ...sources] = directive.split(/\s+/);
+      if (name !== "script-src" && name !== "connect-src") return directive;
+      const kept = sources.filter((s) => s !== from && s !== to);
+      if (to) kept.splice(name === "script-src" ? kept.length : Math.min(1, kept.length), 0, to);
+      return [name, ...kept].join(" ");
+    })
+    .filter(Boolean)
+    .join("; ");
+}
+
+/**
+ * Aplica `swapCspOrigin` aos arquivos de hospedagem que já estão no projeto
+ * (`vercel.json` e `public/_headers`), preservando o que a pessoa mudou neles. Devolve
+ * só os arquivos que mudaram.
+ */
+export function patchHostingCsp(files: Record<string, string | undefined>, from: string | undefined, to: string | undefined): Record<string, string> {
+  const out: Record<string, string> = {};
+  const vercel = files["vercel.json"];
+  if (vercel) {
+    const json = JSON.parse(vercel) as { headers?: { source: string; headers: { key: string; value: string }[] }[] };
+    for (const rule of json.headers ?? []) for (const h of rule.headers) if (h.key.toLowerCase() === "content-security-policy") h.value = swapCspOrigin(h.value, from, to);
+    const next = `${JSON.stringify(json, null, 2)}\n`;
+    if (next !== vercel) out["vercel.json"] = next;
+  }
+  const headers = files["public/_headers"];
+  if (headers) {
+    const next = headers.replace(/^(\s*Content-Security-Policy:\s*)(.*)$/gim, (_m, key: string, value: string) => `${key}${swapCspOrigin(value, from, to)}`);
+    if (next !== headers) out["public/_headers"] = next;
+  }
+  return out;
 }
 
 const toVercel = (pattern: string) => (pattern.endsWith("*") ? `${pattern.slice(0, -1)}(.*)` : pattern);

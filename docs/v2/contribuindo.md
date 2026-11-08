@@ -43,7 +43,7 @@ apps/docs/                site de documentação (userubrica.vercel.app)
 | Build da demo (pessoal) | `pnpm --filter @rubrica/demo build` |
 | Build da demo (empresa) | `SITE=empresa pnpm --filter @rubrica/demo build` |
 | Build com outro tema | `THEME=@rubrica/theme-cyberpunk pnpm --filter @rubrica/demo build` |
-| Bateria de tema | `pnpm testar-tema padrao` (opções: `--site pessoal`, `--sem-lighthouse`, `--so-lighthouse`, `--json out.json`; `--help` lista todas) |
+| Bateria de tema | `pnpm testar-tema padrao` (opções: `--site pessoal`, `--sem-lighthouse`, `--so-lighthouse`, `--sem-vitrine`, `--json out.json`; `--help` lista todas). A vitrine (`/vitrine/...`) acrescenta uma página por bloco com todas as variações do tema e as receitas |
 | Painel (ponta a ponta, Playwright) | `pnpm --filter @rubrica/core test:e2e` (builda a demo e abre `/admin` com o backend de demonstração) |
 | Painel no navegador | `pnpm demo` e abra `/admin` (com fixtures, o painel roda em memória; entra com o acesso já preenchido) |
 | Tudo | `pnpm -r check && pnpm -r test` |

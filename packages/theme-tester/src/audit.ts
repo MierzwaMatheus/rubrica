@@ -171,6 +171,35 @@ async function hydrate(page: Page, islands: number): Promise<CheckResult> {
   }
 }
 
+/**
+ * Rolagem horizontal da PÁGINA na largura dada (roda no navegador). Reprova só quando o
+ * documento rola na horizontal; o que está dentro de um contêiner que corta ou rola na
+ * horizontal (`overflow-x` `auto`, `scroll`, `hidden` ou `clip`) não entra na lista de
+ * culpados, porque não alarga a página: uma faixa com rolagem lateral de propósito passa,
+ * e se o próprio contêiner estourar, é ele que aparece. Lista vazia = sem rolagem.
+ */
+export function findOverflow(width: number): string[] {
+  const doc = document.documentElement;
+  if (doc.scrollWidth <= width) return [];
+  const clips = (el: Element) => /^(auto|scroll|hidden|clip)$/.test(getComputedStyle(el).overflowX);
+  const insideClip = (el: Element) => {
+    for (let p = el.parentElement; p && p !== document.body && p !== doc; p = p.parentElement) if (clips(p)) return true;
+    return false;
+  };
+  const all = [...document.body.querySelectorAll("*")];
+  const wide = all.filter((el) => el.getBoundingClientRect().right > width + 1);
+  const outside = wide.filter((el) => !insideClip(el));
+  // Nenhuma caixa passa da borda: é texto que estoura a própria caixa (palavra longa num
+  // título grande). Culpado = o elemento mais interno cujo conteúdo passa da página.
+  const spills = (el: Element) => !clips(el) && el.scrollWidth > el.clientWidth + 1 && el.getBoundingClientRect().left + el.scrollWidth > width + 1;
+  const text = wide.length ? [] : all.filter((el) => spills(el) && !insideClip(el) && ![...el.children].some(spills));
+  // Sem culpado fora de contêiner (ex.: elemento absoluto que escapa do corte): lista todos.
+  return (outside.length ? outside : wide.length ? wide : text)
+    .slice(0, 5)
+    .map((el) => `${el.tagName.toLowerCase()}${el.className && typeof el.className === "string" ? "." + el.className.trim().split(/\s+/).join(".") : ""}`)
+    .concat([`scrollWidth ${doc.scrollWidth}px > ${width}px`]);
+}
+
 async function auditOne(browser: Browser, base: string, path: string, is404: boolean, limits: Limits, axe: string) {
   const context = await browser.newContext({ viewport: DESKTOP });
   const page = await context.newPage();
@@ -207,15 +236,7 @@ async function auditOne(browser: Browser, base: string, path: string, is404: boo
   const mobile = await browser.newContext({ viewport: MOBILE });
   const mpage = await mobile.newPage();
   await mpage.goto(base + path, { waitUntil: "load" });
-  const overflow = await mpage.evaluate((width) => {
-    const doc = document.documentElement;
-    if (doc.scrollWidth <= width) return [];
-    return [...document.body.querySelectorAll("*")]
-      .filter((el) => el.getBoundingClientRect().right > width + 1)
-      .slice(0, 5)
-      .map((el) => `${el.tagName.toLowerCase()}${el.className && typeof el.className === "string" ? "." + el.className.trim().split(/\s+/).join(".") : ""}`)
-      .concat([`scrollWidth ${doc.scrollWidth}px > ${width}px`]);
-  }, MOBILE.width);
+  const overflow = await mpage.evaluate(findOverflow, MOBILE.width);
   await mobile.close();
 
   const requested = [...scriptFiles].map(([url, gzipBytes]) => ({ url: url.replace(base, ""), gzipBytes }));

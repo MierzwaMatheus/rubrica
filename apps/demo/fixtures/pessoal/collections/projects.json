@@ -70,7 +70,11 @@
           }
         }
       }
-    ]
+    ],
+    "category": {
+      "pt-BR": "Produto",
+      "en": "Product"
+    }
   },
   {
     "id": "proj2",
@@ -103,6 +107,10 @@
     "content": {
       "pt-BR": "<p>Do levantamento ao protótipo de alta fidelidade.</p>",
       "en": "<p>From discovery to high-fidelity prototype.</p>"
+    },
+    "category": {
+      "pt-BR": "Produto",
+      "en": "Product"
     }
   },
   {
@@ -129,6 +137,10 @@
     },
     "summary": {
       "pt-BR": "Componentes e princípios para quatro times."
+    },
+    "category": {
+      "pt-BR": "Sistema de design",
+      "en": "Design system"
     }
   }
 ]

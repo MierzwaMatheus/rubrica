@@ -155,6 +155,7 @@ export function v1Export(): Snapshot {
         githubLink: "https://github.com/exemplo/app",
         slug: "app-de-agendamento",
         category: "Produto",
+        categoryTranslations: { ptBR: "Produto", enUS: "Product" },
         caseStudy: {
           problem: "Muitas faltas.",
           solution: "Lembretes e reagendamento fácil.",

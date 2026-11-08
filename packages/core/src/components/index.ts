@@ -7,7 +7,7 @@ import { CurriculoBlock } from "./blocks/resume";
 import { DefaultCase, DefaultNotFound, DefaultPost, DefaultShell } from "./shell";
 
 export * from "./primitives";
-export { DefaultShell, DefaultPost, DefaultCase, DefaultNotFound, LocaleLinks } from "./shell";
+export { DefaultShell, DefaultPost, DefaultCase, DefaultNotFound, LocaleLinks, localeCode } from "./shell";
 export { HeroBlock, TextoBlock, CtaBlock, GenericBlock } from "./blocks/basic";
 export { CasesBlock, DepoimentosBlock, FaqBlock, PostsRecentesBlock, PrecosBlock } from "./blocks/collections";
 export { ContatoBlock, LocalizacaoBlock } from "./blocks/contact";

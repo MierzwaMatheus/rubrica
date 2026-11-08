@@ -64,6 +64,8 @@ interface SheetProps {
   ctx: RenderContext;
   /** Número da folha (posição do bloco na página). */
   index: number;
+  /** Quantos blocos a página tem: a etiqueta mostra "03/05" (folhas de 00 até total - 1). */
+  total?: number;
   type: string;
   /** Troca o rótulo do tipo (ex.: o hero das páginas internas é a "ficha"). */
   label?: string;
@@ -75,13 +77,14 @@ interface SheetProps {
  * etiqueta e a referência ficam numa linha própria (flex com quebra). O título da seção
  * (o `h1`/`h2` do bloco) fica dentro, como conteúdo.
  */
-export function Sheet({ ctx, index, type, label, children }: SheetProps) {
+export function Sheet({ ctx, index, total, type, label, children }: SheetProps) {
   const name = label ?? ctx.t(`blueprint.sheet.${SHEET_LABELS.has(type) ? type : "generic"}`);
   return (
     <div className="bp-sheet" data-sheet={type}>
       <div className="bp-sheet-head">
         <p className="bp-tag">
-          {ctx.t("blueprint.sheet")} {pad2(index)} · {name}
+          {ctx.t("blueprint.sheet")} {pad2(index)}
+          {total !== undefined && total > 1 && `/${pad2(total - 1)}`} · {name}
         </p>
         <span className="bp-ref" aria-hidden="true">
           A{index}
@@ -99,7 +102,7 @@ export function Sheet({ ctx, index, type, label, children }: SheetProps) {
 export function sheeted(type: string, Inner: ComponentType<BlockProps<any, any>>): BlockComponent {
   function SheetedBlock(props: BlockProps<any, any>) {
     return (
-      <Sheet ctx={props.ctx} index={props.index} type={type}>
+      <Sheet ctx={props.ctx} index={props.index} total={props.total} type={type}>
         <Inner {...props} />
       </Sheet>
     );

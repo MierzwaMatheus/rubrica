@@ -93,7 +93,8 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--rb-font-display); font-weight: 500; 
 
 /* ---------- títulos de seção ---------- */
 .rb-mag .rb-section__header { max-width: none; margin-bottom: 2.5rem; text-align: center; }
-.rb-mag .rb-section__title { overflow-wrap: normal; }
+/* Palavra longa no título quebra só se não couber na coluna (no celular, com letras espaçadas). */
+.rb-mag .rb-section__title { overflow-wrap: break-word; }
 /* seções internas: rótulo em mono entre ornamentos */
 .rb-mag h2.rb-section__title, .rb-mag h2.rb-resume__heading {
   font-family: var(--rb-font-mono); font-size: 0.72rem; font-weight: 500; letter-spacing: 0.3em; text-transform: uppercase; color: var(--rb-muted); margin-bottom: 0;
@@ -156,9 +157,9 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--rb-font-display); font-weight: 500; 
 .rb-texto[data-variant="ensaio"] h2.rb-section__title { text-align: center; margin-bottom: 2rem; }
 .rb-texto[data-variant="ensaio"] .rb-prose { font-style: italic; font-size: 1.15rem; }
 .rb-texto[data-variant="ensaio"] .rb-prose > p:first-child::first-letter { float: none; font: inherit; color: inherit; margin: 0; }
-.rb-mag .rb-texto--media > .rb-container { display: grid; gap: 2rem; align-items: center; }
+.rb-mag .rb-texto--media > .rb-container { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; align-items: center; }
 .rb-mag .rb-texto__image { border-radius: 0; }
-@media (min-width: 960px) { .rb-mag .rb-texto--media > .rb-container { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 960px) { .rb-mag .rb-texto--media > .rb-container { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
 
 /* ---------- cases ---------- */
 .rb-mcases { list-style: none; margin: 0; padding: 0; }

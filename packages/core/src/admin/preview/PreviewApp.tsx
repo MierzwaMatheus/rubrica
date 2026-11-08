@@ -108,6 +108,8 @@ export default function PreviewApp() {
     const head = appearanceHead({ appearance: { ...appearance, fontSans: undefined, fontMono: undefined } }, { scheme: theme.scheme });
     if (head.scheme) root.dataset.scheme = head.scheme;
     else delete root.dataset.scheme;
+    if (head.texture) root.dataset.texture = head.texture;
+    else delete root.dataset.texture;
     const plan = planFonts(appearance, theme.fonts);
     const nameOf = (variable: string) => plan.fonts.find((f) => f.cssVariable === variable)?.name;
     const fontCss = Object.entries(plan.assign)
@@ -157,12 +159,13 @@ export default function PreviewApp() {
   if (!result) return <div style={notice}>Carregando a prévia…</div>;
   if (!result.ok) return <div style={notice}>{result.message}</div>;
 
-  const { ctx, page } = result;
+  const { ctx, page, collections } = result;
   const { Shell } = templates(theme);
   return (
     <Shell
       ctx={ctx}
       pageType="page"
+      collections={collections}
       localeSwitcher={<LocaleLinks ctx={ctx} />}
       colorToggle={ctx.site.colorToggle ? <ColorToggleButton label={ctx.t("theme.toggle")} /> : undefined}
     >
@@ -179,6 +182,7 @@ export default function PreviewApp() {
               items={b.items}
               headingLevel={b.headingLevel}
               index={b.index}
+              total={b.total}
               ctx={ctx}
               island={b.interactive ? <div style={notice}>Parte interativa (formulário, envio): funciona no site publicado.</div> : undefined}
             />

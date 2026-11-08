@@ -13,7 +13,7 @@ const { Shell, NotFound } = templates(activeTheme);
 ---
 
 <Document route={{ type: "notFound", url, locale }} ctx={ctx} settings={site.settings}>
-  <Shell ctx={ctx} pageType="notFound">
+  <Shell ctx={ctx} pageType="notFound" collections={site.collections(locale)}>
     <LocaleLinks slot="localeSwitcher" ctx={ctx} />
     {ctx.site.colorToggle && <ColorToggleButton slot="colorToggle" label={ctx.t("theme.toggle")} />}
     <NotFound ctx={ctx} />

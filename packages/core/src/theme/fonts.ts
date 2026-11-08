@@ -38,6 +38,22 @@ const WEIGHTS: Record<string, number[]> = {
   "IBM Plex Mono": [300, 400, 500, 600, 700],
 };
 
+/** Famílias conhecidas com serifa ou monoespaçadas (o resto é tratado como sem serifa). */
+const SERIF = new Set(["Playfair Display", "Bodoni Moda", "IBM Plex Serif", "Fraunces", "Source Serif 4"]);
+const MONO = new Set(["JetBrains Mono", "Fira Code", "Space Mono", "IBM Plex Mono"]);
+
+/**
+ * Fontes de reserva da família, terminando na genérica do desenho dela (não do papel): a
+ * Fonts API do Astro gera a reserva com métricas ajustadas (`size-adjust`) a partir da
+ * genérica final, então uma monoespaçada no papel de texto (brutalist) precisa de reserva
+ * monoespaçada, e uma serifada, de reserva serifada, para o texto não pular ao trocar.
+ */
+export function fontFallbacks(family: string): string[] {
+  if (MONO.has(family) || /\b(mono|code)\b/i.test(family)) return ["ui-monospace", "monospace"];
+  if (SERIF.has(family) || (/serif/i.test(family) && !/sans/i.test(family))) return ["ui-serif", "serif"];
+  return ["system-ui", "sans-serif"];
+}
+
 /** Famílias do Google Fonts sem itálico: pedir o estilo falharia o download. */
 const NO_ITALIC = new Set(["Manrope", "Space Grotesk", "Bricolage Grotesque"]);
 
@@ -98,7 +114,7 @@ export function planFonts(appearance: Pick<Appearance, "fontSans" | "fontMono"> 
         cssVariable: FONT_FACE_VARS[slot],
         weights: fontWeights(name),
         styles: ["normal"],
-        fallbacks: slot === "mono" ? ["ui-monospace", "monospace"] : ["system-ui", "sans-serif"],
+        fallbacks: slot === "mono" ? ["ui-monospace", "monospace"] : fontFallbacks(name),
       };
       byName.set(name, font);
       fonts.push(font);

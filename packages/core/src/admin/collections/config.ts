@@ -80,6 +80,7 @@ const PROJECT_FIELDS: FieldMap = {
   client: field.text({ label: "Cliente", localized: false }),
   year: field.number({ label: "Ano", integer: true, min: 1990, max: 2100 }),
   role: field.text({ label: "Seu papel", maxLength: 100, help: "Ex.: Design e front-end." }),
+  category: field.text({ label: "Categoria", maxLength: 60, help: "Uma por projeto (ex.: Produto, Site institucional). Alguns temas agrupam o portfólio por ela." }),
   metricValue: field.text({ label: "Número de destaque", localized: false, maxLength: 12, help: "Aparece no card do case. Ex.: ~50, 3x, 98%." }),
   metricLabel: field.text({ label: "O que o número mede", maxLength: 60, help: "Ex.: skills em produção. Sem os dois, o card não mostra o número." }),
   content: field.richText({ label: "Texto do case", help: "Use quando o case é um texto corrido. Com seções, deixe vazio." }),
@@ -133,6 +134,7 @@ const RESUME_FIELDS: FieldMap = {
   start: field.text({ label: "Início", localized: false, maxLength: 7, help: "AAAA-MM (ex.: 2021-03)." }),
   end: field.text({ label: "Fim", localized: false, maxLength: 7, help: "AAAA-MM. Vazio = até hoje." }),
   description: field.text({ label: "Descrição", multiline: true, maxLength: 800 }),
+  group: field.text({ label: "Grupo", maxLength: 60, help: "Agrupa as competências no currículo (ex.: Front-end, IA, Ferramentas). Opcional." }),
 };
 
 const ROUTINE_FIELDS: FieldMap = {
@@ -237,7 +239,7 @@ export const COLLECTION_CONFIGS: Record<CollectionName, CollectionConfig> = {
     plural: "projetos",
     description: "Cases e projetos, com seções, galeria, número de destaque e SEO.",
     fields: PROJECT_FIELDS,
-    docKeys: ["title", "summary", "cover", "client", "year", "role", "metric", "content", "sections", "gallery", "links", "tags", "featured", "seo"],
+    docKeys: ["title", "summary", "cover", "client", "year", "role", "category", "metric", "content", "sections", "gallery", "links", "tags", "featured", "seo"],
     required: ["title"],
     slug: true,
     seo: true,
@@ -317,7 +319,7 @@ export const COLLECTION_CONFIGS: Record<CollectionName, CollectionConfig> = {
     plural: "itens",
     description: "Experiência, formação, competências, certificações e idiomas. Alimenta a página de currículo e o PDF.",
     fields: RESUME_FIELDS,
-    docKeys: ["kind", "title", "organization", "location", "start", "end", "description"],
+    docKeys: ["kind", "title", "organization", "location", "start", "end", "description", "group"],
     required: ["kind", "title"],
     reorderable: true,
     defaultPublished: true,

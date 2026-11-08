@@ -8,7 +8,7 @@
  * topo somem e as respostas rápidas rolam de lado. O "digitando…" do fim da home é só CSS.
  */
 import { splitLocale, type ShellProps } from "@rubrica/core";
-import { Logo } from "@rubrica/core/components";
+import { LocaleLinks, Logo } from "@rubrica/core/components";
 import { Avatar, kindText } from "./chat";
 
 
@@ -16,7 +16,9 @@ export function ChatShell({ ctx, pageType, children, colorToggle }: ShellProps) 
   const { site } = ctx;
   const person = site.person;
   const name = site.kind === "pessoal" ? (person?.name ?? site.name) : site.name;
-  const status = site.kind === "pessoal" ? person?.jobTitle : site.description;
+  // Como na v1: com a disponibilidade ligada no hero da home, o status do topo é ela (com o ponto verde).
+  const available = site.availability;
+  const status = available ? ctx.t("hero.available") : site.kind === "pessoal" ? person?.jobTitle : site.description;
   const home = ctx.href("/");
   /** Caminho sem o prefixo do idioma ("/en/blog" → "/blog"). */
   const bare = (path: string) => {
@@ -46,7 +48,12 @@ export function ChatShell({ ctx, pageType, children, colorToggle }: ShellProps) 
           <span className="ct-id">
             {/* Com logo, o nome já está no `alt` dela. */}
             {site.logo ? <span className="rb-sr-only">{name}</span> : <b>{name}</b>}
-            {status && <small>{status}</small>}
+            {status && (
+              <small>
+                {available && <i className="ct-dot" aria-hidden="true" />}
+                {status}
+              </small>
+            )}
           </span>
         </a>
 
@@ -66,18 +73,8 @@ export function ChatShell({ ctx, pageType, children, colorToggle }: ShellProps) 
 
         {(otherLocales.length > 0 || colorToggle) && (
           <div className="ct-tools">
-            {otherLocales.length > 0 && (
-              <ul className="ct-langs" aria-label={ctx.t("nav.language")}>
-                {otherLocales.map((a) => (
-                  <li key={a.locale}>
-                    <a className="ct-tool ct-lang" href={a.href} hrefLang={a.locale} lang={a.locale}>
-                      <span aria-hidden="true">{a.locale.split("-")[0]!.toUpperCase()}</span>
-                      <span className="rb-sr-only">{a.label}</span>
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            )}
+            {/* Seletor compacto do núcleo: o código à vista, o nome completo no leitor de tela. O idioma atual fica oculto (CSS). */}
+            {otherLocales.length > 0 && <LocaleLinks ctx={ctx} compact className="ct-langs" />}
             {colorToggle && <div className="ct-toggle">{colorToggle}</div>}
           </div>
         )}

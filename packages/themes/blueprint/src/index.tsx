@@ -52,6 +52,8 @@ export default defineTheme({
   description: "Folhas técnicas numeradas sobre papel quadriculado, com cotas, pranchas e carimbo.",
   contract: "^1",
   scheme: "cianotipia",
+  // Textura que o layout da v1 recomendava (o site troca ou desliga em Aparência).
+  texture: "paper",
   fonts,
   tokens: {
     "rb-accent": { label: "Cor primária (traço e botões)", kind: "color", default: "#F2F5FA", light: "#1D4E89" },

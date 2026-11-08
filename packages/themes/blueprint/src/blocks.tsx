@@ -11,7 +11,7 @@
  */
 import type { CSSProperties } from "react";
 import type { BlockProps, CollectionItems } from "@rubrica/core";
-import { Heading, Html, Img, Section, SectionHeader } from "@rubrica/core/components";
+import { Heading, Html, Img, Section, SectionHeader, safeId, tagFilterCss as coreTagFilterCss } from "@rubrica/core/components";
 import { Btn, Dim, Hatch, Num, Sheet, TitleBlock, count, drawnBy, isoDate, ownerName, pad2, stampDate, stripTags, wordCount } from "./parts";
 
 type Project = CollectionItems["projects"];
@@ -31,7 +31,7 @@ const Arrow = () => <span aria-hidden="true">→</span>;
  * grande, o cargo e o carimbo de disponibilidade. Variação `folha`: a ficha de uma página
  * interna (cota, título e apoio).
  */
-export function HeroBlock({ id, variant, fields, headingLevel, index, ctx }: BlockProps<any>) {
+export function HeroBlock({ id, variant, fields, headingLevel, index, total, ctx }: BlockProps<any>) {
   const { site } = ctx;
   const person = site.person;
   const presentation = variant !== "folha";
@@ -43,7 +43,7 @@ export function HeroBlock({ id, variant, fields, headingLevel, index, ctx }: Blo
   const hasAside = Boolean(fields.image) || stamped;
 
   return (
-    <Sheet ctx={ctx} index={index} type="hero" label={presentation ? undefined : ctx.t("blueprint.sheet.page")}>
+    <Sheet ctx={ctx} index={index} total={total} type="hero" label={presentation ? undefined : ctx.t("blueprint.sheet.page")}>
       <Section id={id} type="hero" variant={variant}>
         <div className={`bp-hero${hasAside ? "" : " bp-hero--solo"}${showPerson ? " bp-hero--person" : ""}`}>
           <div>
@@ -96,10 +96,10 @@ export function HeroBlock({ id, variant, fields, headingLevel, index, ctx }: Blo
 // ---- números -------------------------------------------------------------------------
 
 /** Especificações: cada número com o código E1, E2… */
-export function NumerosBlock({ id, variant, fields, headingLevel, index, ctx }: BlockProps<any>) {
+export function NumerosBlock({ id, variant, fields, headingLevel, index, total, ctx }: BlockProps<any>) {
   const items: { value: string; label: string; description?: string }[] = fields.items ?? [];
   return (
-    <Sheet ctx={ctx} index={index} type="numeros">
+    <Sheet ctx={ctx} index={index} total={total} type="numeros">
       <Section id={id} anchor={fields.anchor} type="numeros" variant={variant}>
         <SectionHeader title={fields.title} intro={fields.intro} level={headingLevel} />
         {items.length > 0 && (
@@ -126,9 +126,9 @@ export function NumerosBlock({ id, variant, fields, headingLevel, index, ctx }: 
 // ---- cases ---------------------------------------------------------------------------
 
 /** Pranchas: cada case numerado. Variações `grade` (3 colunas) e `destaque` (a primeira ocupa duas). */
-export function CasesBlock({ id, variant, fields, items, headingLevel, index, ctx }: BlockProps<any, Project>) {
+export function CasesBlock({ id, variant, fields, items, headingLevel, index, total, ctx }: BlockProps<any, Project>) {
   return (
-    <Sheet ctx={ctx} index={index} type="cases">
+    <Sheet ctx={ctx} index={index} total={total} type="cases">
       <Section id={id} anchor={fields.anchor} type="cases" variant={variant}>
         <SectionHeader title={fields.title} intro={fields.intro} level={headingLevel} />
         {items.length > 0 ? (
@@ -136,7 +136,7 @@ export function CasesBlock({ id, variant, fields, items, headingLevel, index, ct
             <Dim label={count(ctx, "blueprint.plates", items.length)} />
             <ul className={`bp-plates${variant === "destaque" ? " bp-plates--feature" : ""}`}>
               {items.map((p, i) => {
-                const facts = [p.client, p.year].filter(Boolean).join(" · ");
+                const facts = [p.category, p.client, p.year].filter(Boolean).join(" · ");
                 return (
                   <li key={p.id} className="bp-card">
                     <Hatch image={p.cover} sizes="(min-width: 960px) 30vw, 100vw" />
@@ -186,9 +186,9 @@ export function CasesBlock({ id, variant, fields, items, headingLevel, index, ct
 // ---- serviços ------------------------------------------------------------------------
 
 /** Detalhes: cada serviço como um detalhe D1, D2… */
-export function ServicosBlock({ id, variant, fields, items, headingLevel, index, ctx }: BlockProps<any, Service>) {
+export function ServicosBlock({ id, variant, fields, items, headingLevel, index, total, ctx }: BlockProps<any, Service>) {
   return (
-    <Sheet ctx={ctx} index={index} type="servicos">
+    <Sheet ctx={ctx} index={index} total={total} type="servicos">
       <Section id={id} anchor={fields.anchor} type="servicos" variant={variant}>
         <SectionHeader title={fields.title} intro={fields.intro} level={headingLevel} />
         {items.length > 0 && (
@@ -221,9 +221,9 @@ export function ServicosBlock({ id, variant, fields, items, headingLevel, index,
 // ---- depoimentos ---------------------------------------------------------------------
 
 /** Pareceres: a citação, a linha de assinatura e quem assina. */
-export function DepoimentosBlock({ id, variant, fields, items, headingLevel, index, ctx, island }: BlockProps<any, Testimonial>) {
+export function DepoimentosBlock({ id, variant, fields, items, headingLevel, index, total, ctx, island }: BlockProps<any, Testimonial>) {
   return (
-    <Sheet ctx={ctx} index={index} type="depoimentos">
+    <Sheet ctx={ctx} index={index} total={total} type="depoimentos">
       <Section id={id} anchor={fields.anchor} type="depoimentos" variant={variant}>
         <SectionHeader title={fields.title} intro={fields.intro} level={headingLevel} />
         {items.length > 0 && (
@@ -263,13 +263,13 @@ export function DepoimentosBlock({ id, variant, fields, items, headingLevel, ind
  * parágrafo numerado pela folha (3.1, 3.2…) por contadores de CSS, e a cota com a
  * contagem de parágrafos e palavras. A imagem fica numa área hachurada ao lado.
  */
-export function TextoBlock({ id, variant, fields, headingLevel, index, ctx }: BlockProps<any>) {
+export function TextoBlock({ id, variant, fields, headingLevel, index, total, ctx }: BlockProps<any>) {
   const body: string = fields.body ?? "";
   const paragraphs = (body.match(/<p[\s>]/g) ?? []).length;
   const words = wordCount(stripTags(body));
   const image = fields.image && <Hatch image={fields.image} tall sizes="(min-width: 960px) 40vw, 100vw" />;
   return (
-    <Sheet ctx={ctx} index={index} type="texto">
+    <Sheet ctx={ctx} index={index} total={total} type="texto">
       <Section id={id} anchor={fields.anchor} type="texto" variant={variant} className={image ? "bp-texto--media" : undefined}>
         {fields.imagePosition === "start" && image}
         <div className="bp-texto__body" style={{ "--bp-sheet": `"${index}"` } as CSSProperties}>
@@ -292,11 +292,11 @@ export function TextoBlock({ id, variant, fields, headingLevel, index, ctx }: Bl
 // ---- lista de itens ------------------------------------------------------------------
 
 /** Normas: itens em caixas; numerados, cada um leva o código N-01, N-02… */
-export function ListaItensBlock({ id, variant, fields, headingLevel, index, ctx }: BlockProps<any>) {
+export function ListaItensBlock({ id, variant, fields, headingLevel, index, total, ctx }: BlockProps<any>) {
   const items: { title: string; body?: string }[] = fields.items ?? [];
   const List = fields.numbered ? "ol" : "ul";
   return (
-    <Sheet ctx={ctx} index={index} type="lista-itens">
+    <Sheet ctx={ctx} index={index} total={total} type="lista-itens">
       <Section id={id} anchor={fields.anchor} type="lista-itens" variant={variant}>
         <SectionHeader title={fields.title} intro={fields.intro} level={headingLevel} />
         {items.length > 0 && (
@@ -325,9 +325,9 @@ export function ListaItensBlock({ id, variant, fields, headingLevel, index, ctx 
 // ---- FAQ -----------------------------------------------------------------------------
 
 /** Notas gerais: perguntas e respostas à vista, numeradas. */
-export function FaqBlock({ id, variant, fields, items, headingLevel, index, ctx }: BlockProps<any, FaqEntry>) {
+export function FaqBlock({ id, variant, fields, items, headingLevel, index, total, ctx }: BlockProps<any, FaqEntry>) {
   return (
-    <Sheet ctx={ctx} index={index} type="faq">
+    <Sheet ctx={ctx} index={index} total={total} type="faq">
       <Section id={id} anchor={fields.anchor} type="faq" variant={variant}>
         <SectionHeader title={fields.title} intro={fields.intro} level={headingLevel} />
         {items.length > 0 && (
@@ -352,9 +352,9 @@ export function FaqBlock({ id, variant, fields, items, headingLevel, index, ctx 
 // ---- galeria -------------------------------------------------------------------------
 
 /** Cronograma: cada item numerado, com a imagem numa área hachurada. */
-export function GaleriaBlock({ id, variant, fields, items, headingLevel, index, ctx }: BlockProps<any, Routine>) {
+export function GaleriaBlock({ id, variant, fields, items, headingLevel, index, total, ctx }: BlockProps<any, Routine>) {
   return (
-    <Sheet ctx={ctx} index={index} type="galeria">
+    <Sheet ctx={ctx} index={index} total={total} type="galeria">
       <Section id={id} anchor={fields.anchor} type="galeria" variant={variant}>
         <SectionHeader title={fields.title} intro={fields.intro} level={headingLevel} />
         {items.length > 0 && (
@@ -391,10 +391,10 @@ export function GaleriaBlock({ id, variant, fields, items, headingLevel, index, 
 // ---- chamada -------------------------------------------------------------------------
 
 /** Ordem de serviço: a chamada com os botões e, ao lado, o carimbo do projeto. */
-export function CtaBlock({ id, variant, fields, headingLevel, index, ctx }: BlockProps<any>) {
+export function CtaBlock({ id, variant, fields, headingLevel, index, total, ctx }: BlockProps<any>) {
   const owner = ownerName(ctx);
   return (
-    <Sheet ctx={ctx} index={index} type="cta">
+    <Sheet ctx={ctx} index={index} total={total} type="cta">
       <Section id={id} anchor={fields.anchor} type="cta" variant={variant}>
         <div className="bp-os">
           <div>
@@ -440,32 +440,22 @@ export function CtaBlock({ id, variant, fields, headingLevel, index, ctx }: Bloc
 // ---- posts ---------------------------------------------------------------------------
 
 /**
- * Filtro por etiqueta SEM JavaScript (como o do núcleo): botões de opção antes da lista e
- * uma folha de estilo por bloco que esconde o que não tem a etiqueta marcada. Os ids vêm do
- * índice, nunca do texto da etiqueta. (Cópia do filtro do núcleo, que não o exporta.)
+ * Filtro por etiqueta SEM JavaScript (o do núcleo): botões de opção antes da lista e uma
+ * folha de estilo por bloco que esconde o que não tem a etiqueta marcada.
  */
-function tagFilterCss(scope: string, count: number): string {
-  const rules: string[] = [];
-  const on = "background:var(--rb-fg);color:var(--rb-bg)";
-  const ring = "outline:2px dashed var(--rb-fg);outline-offset:3px";
-  for (let i = 0; i < count; i++) {
-    const radio = `#${scope}-t${i}`;
-    rules.push(`${radio}:checked ~ .bp-posts .bp-post:not([data-tags~="t${i}"]){display:none}`);
-    rules.push(`${radio}:checked ~ .bp-layers label[for="${scope}-t${i}"]{${on}}`);
-    rules.push(`${radio}:focus-visible ~ .bp-layers label[for="${scope}-t${i}"]{${ring}}`);
-  }
-  rules.push(`#${scope}-all:checked ~ .bp-layers label[for="${scope}-all"]{${on}}`);
-  rules.push(`#${scope}-all:focus-visible ~ .bp-layers label[for="${scope}-all"]{${ring}}`);
-  return rules.join("\n");
-}
-
-const safeId = (value: string) => value.replace(/[^a-zA-Z0-9_-]/g, "_");
+const tagFilterCss = (scope: string, count: number) =>
+  coreTagFilterCss(scope, count, {
+    items: ".bp-posts .bp-post",
+    filter: ".bp-layers",
+    checked: "background:var(--rb-fg);color:var(--rb-bg)",
+    focus: "outline:2px dashed var(--rb-fg);outline-offset:3px",
+  });
 
 /**
  * Registro de revisões: o primeiro post vira prancha em destaque e os outros entram numa
  * tabela REV · DATA · TÍTULO · LEITURA (que vira lista no celular).
  */
-export function PostsRecentesBlock({ id, variant, fields, items, headingLevel, index, ctx }: BlockProps<any, Post>) {
+export function PostsRecentesBlock({ id, variant, fields, items, headingLevel, index, total, ctx }: BlockProps<any, Post>) {
   const allTags: string[] = fields.showTagFilter ? [...new Set(items.flatMap((p) => p.tags))].sort((a, b) => a.localeCompare(b, ctx.locale)) : [];
   const filter = allTags.length > 0;
   const tagIndexes = new Map(allTags.map((t, i) => [t, i] as const));
@@ -475,7 +465,7 @@ export function PostsRecentesBlock({ id, variant, fields, items, headingLevel, i
   const [featured, ...rest] = items;
 
   return (
-    <Sheet ctx={ctx} index={index} type="posts-recentes">
+    <Sheet ctx={ctx} index={index} total={total} type="posts-recentes">
       <Section id={id} anchor={fields.anchor} type="posts-recentes" variant={variant}>
         <SectionHeader title={fields.title} intro={fields.intro} level={headingLevel} />
         {featured ? (
@@ -621,7 +611,7 @@ function Description({ text }: { text?: string }) {
 }
 
 /** Ficha técnica: experiências num eixo cotado, habilidades em códigos, formação em tabela. */
-export function CurriculoBlock({ id, variant, fields, items, headingLevel, index, ctx, island }: BlockProps<any, Resume>) {
+export function CurriculoBlock({ id, variant, fields, items, headingLevel, index, total, ctx, island }: BlockProps<any, Resume>) {
   const byKind = (kind: Resume["kind"]) => items.filter((i) => i.kind === kind);
   const experiences = byKind("experience");
   const skills = byKind("skill");
@@ -663,7 +653,7 @@ export function CurriculoBlock({ id, variant, fields, items, headingLevel, index
   );
 
   return (
-    <Sheet ctx={ctx} index={index} type="curriculo">
+    <Sheet ctx={ctx} index={index} total={total} type="curriculo">
       <Section id={id} anchor={fields.anchor} type="curriculo" variant={variant}>
         <SectionHeader title={fields.title} intro={fields.intro} level={headingLevel} />
         {fields.showDownload && island ? <div className="rb-island bp-all bp-all--start">{island}</div> : null}

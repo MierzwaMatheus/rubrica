@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { appearanceHead } from "../src/theme/appearance";
+import { appearanceHead, resolveTexture } from "../src/theme/appearance";
 import { planFonts } from "../src/theme/fonts";
 
 const base = { colorMode: "dark", colorToggle: false } as const;
@@ -37,6 +37,17 @@ describe("aparência no head", () => {
   });
 });
 
+describe("textura", () => {
+  it("a do site vence a do tema; none desliga; desconhecida é ignorada", () => {
+    expect(resolveTexture({}, {})).toBeUndefined();
+    expect(resolveTexture({}, { texture: "grain" })).toBe("grain");
+    expect(resolveTexture({ texture: "paper" }, { texture: "grain" })).toBe("paper");
+    expect(resolveTexture({ texture: "none" }, { texture: "grain" })).toBeUndefined();
+    expect(resolveTexture({ texture: "lava" as never }, {})).toBeUndefined();
+    expect(appearanceHead({ appearance: { colorMode: "dark", colorToggle: false } }, { texture: "scanlines" }).texture).toBe("scanlines");
+  });
+});
+
 describe("planFonts", () => {
   it("o site vence o tema e a mesma família não é baixada duas vezes", () => {
     const plan = planFonts({ fontSans: "Chakra Petch" }, { sans: "Inter", mono: "Chakra Petch" });
@@ -56,6 +67,17 @@ describe("planFonts", () => {
     expect(planFonts({ fontSans: "Inter" }, { sans: "IBM Plex Serif", italic: ["sans"] }).fonts[0]).toMatchObject({ name: "Inter", styles: ["normal", "italic"] });
     expect(planFonts({ fontSans: "Manrope" }, { italic: ["sans"] }).fonts[0]?.styles).toEqual(["normal"]);
     expect(planFonts(undefined, { sans: "Inter" }).fonts[0]?.styles).toEqual(["normal"]);
+  });
+
+  it("a reserva segue o desenho da família, não o papel (a Fonts API ajusta as métricas a partir dela)", () => {
+    const plan = planFonts(undefined, { sans: "JetBrains Mono", display: "Fraunces" });
+    expect(plan.fonts.map((f) => [f.name, f.fallbacks.at(-1)])).toEqual([
+      ["JetBrains Mono", "monospace"],
+      ["Fraunces", "serif"],
+    ]);
+    expect(planFonts(undefined, { sans: "Inter", mono: "IBM Plex Mono" }).fonts.map((f) => f.fallbacks.at(-1))).toEqual(["sans-serif", "monospace"]);
+    expect(planFonts({ fontSans: "Noto Serif Display" }, undefined).fonts[0]?.fallbacks.at(-1)).toBe("serif");
+    expect(planFonts({ fontSans: "Noto Sans" }, undefined).fonts[0]?.fallbacks.at(-1)).toBe("sans-serif");
   });
 
   it("família desconhecida usa 400 e 700; nome com caracteres perigosos é ignorado", () => {

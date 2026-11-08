@@ -110,6 +110,11 @@ export interface RawProject extends Base {
   client?: string;
   year?: number;
   role?: Localized<string>;
+  /**
+   * Categoria do projeto ("Produto", "Site institucional"), por idioma. Uma só por projeto:
+   * o tema pode agrupar ou filtrar o portfólio por ela. As etiquetas continuam em `tags`.
+   */
+  category?: Localized<string>;
   links?: RawLink[];
   /** Número de destaque mostrado no card do case. */
   metric?: { value: string; label: Localized<string> };
@@ -148,6 +153,11 @@ export interface RawResumeItem extends Base {
   start?: string;
   end?: string;
   description?: Localized<string>;
+  /**
+   * Grupo do item no currículo, por idioma: agrupa as competências ("IA", "Front-end",
+   * "Ferramentas"), como o `group` das skills da v1. Vale para qualquer tipo.
+   */
+  group?: Localized<string>;
 }
 
 export interface RawRoutineItem extends Base {
@@ -235,6 +245,11 @@ export interface Person {
   photo?: RawImage;
 }
 
+/** Textura por cima da página inteira (como na v1): grão de filme, papel ou scanlines. */
+export type Texture = "none" | "grain" | "paper" | "scanlines";
+
+export const TEXTURES: readonly Texture[] = ["none", "grain", "paper", "scanlines"];
+
 export interface Appearance {
   colorMode: "dark" | "light" | "system";
   colorToggle: boolean;
@@ -249,6 +264,8 @@ export interface Appearance {
   fontSans?: string;
   /** Família do Google Fonts para código e detalhes em monoespaçada. */
   fontMono?: string;
+  /** Textura da página. Sem ela, vale a do tema (`texture`); `none` desliga. */
+  texture?: Texture;
 }
 
 export interface SiteSettings {

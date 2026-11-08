@@ -101,6 +101,8 @@ export interface V1RubricaJson {
   fontMono?: string;
   colorMode?: "dark" | "light" | "system";
   colorModeToggle?: boolean;
+  /** Textura escolhida na v1 (grão, papel, scanlines ou nenhuma). */
+  texture?: string;
   plugins?: Record<string, boolean>;
   identity?: Partial<Record<"siteName" | "siteUrl" | "siteDescription" | "authorName" | "authorEmail" | "twitterHandle" | "lang", string>>;
 }
@@ -399,6 +401,8 @@ function convertProjects(ctx: Ctx, docs: Doc[]): Doc[] {
       cover,
       gallery: gallery.length ? gallery : undefined,
       role: cs ? loc(cs.role, { enUS: csEn?.role }) : undefined,
+      // A categoria da v1 vai para o campo próprio e continua nas etiquetas (filtros já feitos).
+      category: str(d.category) ? loc(d.category, d.categoryTranslations) : undefined,
       links: links.length ? links : undefined,
       tags: tags.length ? tags : undefined,
       // Na v1, a home mostrava os projetos com case e slug (selectFeaturedCases).
@@ -427,7 +431,8 @@ function convertResume(ctx: Ctx, docs: Doc[]): Doc[] {
       case "education":
         return compact({ ...base, kind: "education", title: loc(c.degree, { enUS: en.degree }), organization: str(c.institution), description: loc(c.description, { enUS: en.description }), ...period(c.period) });
       case "skill":
-        return compact({ ...base, kind: "skill", title: loc(c.name, { enUS: en.name }), description: loc(c.level, { enUS: en.level }), tags: str(c.group) ? [c.group] : undefined });
+        // O grupo da v1 vai para o campo próprio e continua na etiqueta.
+        return compact({ ...base, kind: "skill", title: loc(c.name, { enUS: en.name }), description: loc(c.level, { enUS: en.level }), group: str(c.group) ? loc(c.group, { enUS: en.group }) : undefined, tags: str(c.group) ? [c.group] : undefined });
       case "soft_skill":
         return compact({ ...base, kind: "skill", title: loc(c.text, tr), tags: ["soft-skill"] });
       case "course":
@@ -508,6 +513,8 @@ function convertSettings(ctx: Ctx, input: ConvertInput, plugins: Record<string, 
       tokens: Object.keys(tokens).length ? tokens : undefined,
       fontSans: c("theme_font_sans") ?? input.v1.fontSans,
       fontMono: c("theme_font_mono") ?? input.v1.fontMono,
+      // A textura da v1 passa como está (inclusive "none", que desliga a do tema).
+      texture: ["none", "grain", "paper", "scanlines"].includes(input.v1.texture ?? "") ? input.v1.texture : undefined,
     }),
     navigation: [],
     social,

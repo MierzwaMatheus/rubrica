@@ -143,6 +143,19 @@ describe("coleções simples", () => {
     await expect(c.mutation(api.rubrica.projects.create, { title: { "pt-BR": "X" }, metric: { value: 3 } as never })).rejects.toThrow();
   });
 
+  it("projeto guarda a categoria opcional por idioma, junto das etiquetas", async () => {
+    const c = await as(t, "admin");
+    const id = await c.mutation(api.rubrica.projects.create, { title: { "pt-BR": "Case" }, category: { "pt-BR": "Produto", en: "Product" }, tags: ["fintech"] });
+    expect(await c.query(api.rubrica.projects.get, { id })).toMatchObject({ category: { "pt-BR": "Produto", en: "Product" }, tags: ["fintech"] });
+    await expect(c.mutation(api.rubrica.projects.create, { title: { "pt-BR": "X" }, category: { "pt-BR": 3 } as never })).rejects.toThrow();
+  });
+
+  it("item do currículo guarda o grupo opcional por idioma", async () => {
+    const c = await as(t, "admin");
+    const id = await c.mutation(api.rubrica.resume.create, { kind: "skill", title: { "pt-BR": "Figma" }, group: { "pt-BR": "Ferramentas" } });
+    expect((await c.query(api.rubrica.resume.get, { id }))?.group).toEqual({ "pt-BR": "Ferramentas" });
+  });
+
   it("aparência aceita o id do esquema de cor", async () => {
     const root = await as(t, "root");
     await root.mutation(api.rubrica.settings.update, { patch: { appearance: { colorMode: "dark", colorToggle: true, scheme: "paper-noir", fontSans: "Inter" } } });

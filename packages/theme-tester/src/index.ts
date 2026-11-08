@@ -1,7 +1,7 @@
 /** API da bateria: `testTheme` roda tudo para um tema e devolve o relatório. */
 import { rm } from "node:fs/promises";
 import { auditSite } from "./audit.ts";
-import { buildDemo, findRepoRoot, hasFixtures, SITE_KINDS, themeName } from "./build.ts";
+import { buildDemo, findRepoRoot, hasFixtures, isShowcasePath, SITE_KINDS, themeName } from "./build.ts";
 import { runLighthouse } from "./lighthouse.ts";
 import { readSitemap } from "./routes.ts";
 import { DEFAULT_LIMITS, type FullReport, type Limits, type SiteKind, type SiteReport } from "./types.ts";
@@ -10,6 +10,7 @@ export * from "./types.ts";
 export { auditSite } from "./audit.ts";
 export { serveStatic } from "./server.ts";
 export { runLighthouse } from "./lighthouse.ts";
+export { SHOWCASE_PREFIX, isShowcasePath } from "./build.ts";
 
 export interface TestThemeOptions {
   theme: string;
@@ -21,6 +22,11 @@ export interface TestThemeOptions {
   pages?: boolean;
   limits?: Limits;
   lighthouseRuns?: number;
+  /**
+   * Acrescenta a vitrine às fixtures: uma página por bloco com todas as variações do tema e
+   * as páginas das receitas (`/vitrine/...`). Padrão: ligada.
+   */
+  showcase?: boolean;
   /** Mantém a pasta do build em vez de apagar. */
   keepDist?: boolean;
   log?: (message: string) => void;
@@ -43,7 +49,7 @@ export async function testTheme(options: TestThemeOptions): Promise<FullReport> 
       continue;
     }
     log(`Build da demo (${kind}) com ${theme}...`);
-    const build = await buildDemo({ root, theme, kind });
+    const build = await buildDemo({ root, theme, kind, showcase: options.showcase !== false });
     try {
       if (build.error) {
         base.buildError = build.error;
@@ -51,7 +57,8 @@ export async function testTheme(options: TestThemeOptions): Promise<FullReport> 
         log(`Auditando as páginas (${kind})...`);
         if (options.pages !== false) base.pages = await auditSite({ dist: build.dist, limits });
         if (options.lighthouse !== false) {
-          const paths = (await readSitemap(build.dist)).map((e) => e.path);
+          // A vitrine é para as checagens de página; o Lighthouse mede as páginas reais.
+          const paths = (await readSitemap(build.dist)).map((e) => e.path).filter((p) => !isShowcasePath(p));
           const lh = await runLighthouse({ dist: build.dist, paths, limits, ...(options.lighthouseRuns && { maxRuns: options.lighthouseRuns }), onProgress: log });
           base.lighthouse = lh.reports;
           if (lh.missing.length) base.lighthouseSkipped = `Lighthouse: sem página de ${lh.missing.join(", ")} neste site`;

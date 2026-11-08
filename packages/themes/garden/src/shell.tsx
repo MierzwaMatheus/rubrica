@@ -130,6 +130,14 @@ export function GardenShell({ ctx, pageType, children, colorToggle }: ShellProps
           <p>
             <StageDot stage="tree" size={8} /> © {year} {site.organization?.legalName ?? site.name}. {ctx.t("footer.rights")} ·{" "}
             <a href={ctx.href("/privacidade")}>{ctx.t("footer.privacy")}</a>
+            {ctx.feeds.rss && (
+              <>
+                {" · "}
+                <a href={ctx.feeds.rss} type="application/rss+xml">
+                  {ctx.t("garden.rss")}
+                </a>
+              </>
+            )}
           </p>
           {site.social.length > 0 && (
             <ul className="gd-social">

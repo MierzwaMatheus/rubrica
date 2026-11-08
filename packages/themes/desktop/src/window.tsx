@@ -7,23 +7,13 @@
  */
 import type { CSSProperties, ReactNode } from "react";
 import type { RenderContext, ResolvedLink } from "@rubrica/core";
+import { safeId } from "@rubrica/core/components";
 
-/** Identificador seguro para `id` e seletores. */
-export function safeId(value: string): string {
-  return value.replace(/[^a-zA-Z0-9_-]/g, "_");
-}
+export { safeId, shorten } from "@rubrica/core/components";
 
 /** "3 itens" no idioma (singular e plural pelas chaves do tema). */
 export function items(ctx: RenderContext, count: number): string {
   return ctx.t(count === 1 ? "desktop.items.one" : "desktop.items.other", { count });
-}
-
-/** Corta um texto longo no limite, sem partir palavra, com reticências. */
-export function shorten(text: string, max: number): string {
-  if (text.length <= max) return text;
-  const cut = text.slice(0, max);
-  const space = cut.lastIndexOf(" ");
-  return `${cut.slice(0, space > 0 ? space : max).trimEnd()}…`;
 }
 
 /** Cores de marca em rodízio para ícones e marcadores decorativos. */

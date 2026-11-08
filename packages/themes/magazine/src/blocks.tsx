@@ -6,7 +6,7 @@
  */
 import type { ReactNode } from "react";
 import type { BlockProps, RenderContext } from "@rubrica/core";
-import { Heading, Html, Img, LinkButton, Section, SectionHeader } from "@rubrica/core/components";
+import { Heading, Html, Img, LinkButton, Section, SectionHeader, safeId, tagFilterCss as coreTagFilterCss } from "@rubrica/core/components";
 
 const num = (i: number) => String(i + 1).padStart(2, "0");
 
@@ -272,24 +272,11 @@ export function FaqBlock({ id, variant, fields, items, headingLevel, ctx }: Bloc
 /* ---------- posts ---------- */
 
 /**
- * Filtro por etiqueta sem JavaScript (mesma técnica do núcleo): botões de opção antes da
- * lista e uma folha gerada esconde os posts sem a etiqueta marcada.
+ * Filtro por etiqueta sem JavaScript (o do núcleo): botões de opção antes da lista e uma
+ * folha gerada esconde os posts sem a etiqueta marcada.
  */
-function tagFilterCss(scope: string, count: number): string {
-  const on = "background:var(--rb-fg);color:var(--rb-bg);border-color:var(--rb-fg)";
-  const ring = "outline:2px solid var(--rb-accent);outline-offset:2px";
-  const rules: string[] = [];
-  for (let i = 0; i < count; i++) {
-    rules.push(`#${scope}-t${i}:checked ~ .rb-posts__list > .rb-post:not([data-tags~="t${i}"]){display:none}`);
-    rules.push(`#${scope}-t${i}:checked ~ .rb-filter label[for="${scope}-t${i}"]{${on}}`);
-    rules.push(`#${scope}-t${i}:focus-visible ~ .rb-filter label[for="${scope}-t${i}"]{${ring}}`);
-  }
-  rules.push(`#${scope}-all:checked ~ .rb-filter label[for="${scope}-all"]{${on}}`);
-  rules.push(`#${scope}-all:focus-visible ~ .rb-filter label[for="${scope}-all"]{${ring}}`);
-  return rules.join("\n");
-}
-
-const safe = (v: string) => v.replace(/[^a-zA-Z0-9_-]/g, "_");
+const tagFilterCss = (scope: string, count: number) =>
+  coreTagFilterCss(scope, count, { checked: "background:var(--rb-fg);color:var(--rb-bg);border-color:var(--rb-fg)" });
 
 /**
  * Posts. `sumario`: o primeiro é a matéria de capa e os outros um índice numerado;
@@ -299,7 +286,7 @@ export function PostsRecentesBlock({ id, variant, fields, items, headingLevel, c
   const allTags: string[] = fields.showTagFilter ? [...new Set<string>(items.flatMap((p: any) => p.tags))].sort((a, b) => a.localeCompare(b, ctx.locale)) : [];
   const filter = allTags.length > 0;
   const tagIndexes = new Map(allTags.map((t, i) => [t, i] as const));
-  const scope = `f-${safe(id)}`;
+  const scope = `f-${safeId(id)}`;
   return (
     <Section id={id} anchor={fields.anchor} type="posts-recentes" variant={variant}>
       <SectionHeader title={fields.title} intro={fields.intro} level={headingLevel} />

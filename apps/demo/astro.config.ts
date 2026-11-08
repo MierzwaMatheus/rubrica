@@ -14,7 +14,8 @@ export default defineConfig({
   integrations: [
     rubrica({
       theme: process.env.THEME ?? "@rubrica/theme-padrao",
-      source: { fixtures: `./fixtures/${kind}` },
+      // RUBRICA_SHOWCASE=1 (a bateria de tema) acrescenta as páginas da vitrine em /vitrine.
+      source: { fixtures: `./fixtures/${kind}`, showcase: process.env.RUBRICA_SHOWCASE === "1" },
     }),
   ],
 });

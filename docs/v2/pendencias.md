@@ -5,16 +5,28 @@ Lista viva do que falta para a v2 estável, vinda das revisões. Cada item sai d
 ## Paridade com a v1 (obrigatório antes da v2.0.0; achado no piloto do mmlo)
 - **Analytics de projeto migrado**: o `migrar` não liga o plugin `analytics` nem põe a origem na CSP quando a v1 tinha `VITE_UMAMI_*` na Vercel (o CLI não lê as variáveis da Vercel). O relatório aponta para `config --analytics`.
 
-## Contrato (ajustes aditivos, antes de portar os outros 12 temas)
+## Contrato (ajustes aditivos)
 - **Terminal (ilha)**: o "Press ~" da v1 não existe no núcleo; decidir se vira plugin do tipo pessoal.
 - **Menu móvel**: a gaveta por checkbox não fecha ao seguir âncora da mesma página.
 - **Lista de temas portados no CLI**: `PORTED_THEMES` é fixa; derivar dos pacotes de tema existentes.
-- **Temas usarem os utilitários do núcleo**: `formatDays`, `safeId`, `resolveFreeHref`, `digits`, `shorten` e `tagFilterCss` já saem de `@rubrica/core/components`; os temas portados ainda têm as cópias (trocar quando os ports em paralelo terminarem).
+- **Textura no CLI**: o tema declara a textura padrão e o painel troca, mas o `create` e o `config` não têm `--textura` (a v1 tinha). O padrão do tema já vale sem o CLI gravar nada.
 
-## Temas
-- Portar os 12 layouts restantes (fase 3), depois do contrato estável no fim da fase 2.
+## Temas (campos novos do contrato ainda sem uso)
+- **Jardim**: o mapa do jardim continua só com as páginas do menu; `ShellProps.collections` já traz os projetos e posts para ele.
+- **Grupo do currículo** (`ResumeItem.group`) e **post em destaque** (`PostItem.featured`): nenhum tema agrupa as competências nem destaca post ainda.
+- **Categoria nos outros temas**: index, bento, monograph, poster e blueprint mostram; os demais seguem só com as etiquetas.
+
+## Bateria
+- **Vitrine só no idioma principal**: as páginas `/vitrine` não existem nos outros idiomas (o seletor de idioma e as traduções dos blocos ficam com as páginas da demo).
+- **Lighthouse com textura**: a camada de textura (SVG com `feTurbulence`, fixa) foi medida no poster (grão) e no blueprint (papel), site pessoal, com performance 97 a 100; falta a rodada completa nos sete temas que a usam.
 
 ## Resolvido
+- Vitrine na bateria (decisão 31): `withShowcase` (`@rubrica/core/data/showcase`) acrescenta às fixtures, sem mudar os arquivos, uma página por bloco (`/vitrine/<tipo>`) com cada variação declarada pelo tema em instâncias cheia, curta, por opção de seleção e vazia (blocos com coleção), e as páginas da receita do tema (`/vitrine/receita/...`). A bateria liga com `RUBRICA_SHOWCASE=1` (`--sem-vitrine` desliga); as páginas passam por todas as checagens, menos o Lighthouse.
+- Contrato aditivo da v2.0: `ProjectItem.category` (por idioma, no backend, no painel, no MCP e no `migrar`, que mantém a categoria também nas etiquetas), `PostItem.featured`, `ResumeItem.group` (o `group` das skills da v1), `BlockProps.total`, `ctx.feeds.rss`, `ctx.site.availability` (hero da home com "Mostrar disponibilidade"), `ShellProps.collections` (projetos e posts resumidos), `LocaleLinks` com `compact` (código à vista, nome completo no nome acessível) e textura (`ThemeDefinition.texture`, `appearance.texture`: grão, papel, scanlines, como na v1; o `migrar` leva a da v1).
+- Rolagem horizontal na bateria: só o documento conta; o que está dentro de contêiner com `overflow-x` `auto|scroll|hidden|clip` sai da lista de culpados, e texto que estoura a própria caixa aponta para o elemento.
+- Fontes de reserva: a Fonts API do Astro já gerava reservas com métricas ajustadas (`optimizedFallbacks` é o padrão); a genérica final agora segue o desenho da família (monoespaçada ou serifada), não o papel.
+- Temas usam os utilitários do núcleo (`formatDays`, `safeId`, `resolveFreeHref`, `digits`, `shorten`, `tagFilterCss`), com o mesmo HTML público (comparado o `dist` dos dois sites em 11 temas).
+- Os 14 layouts da v1 portados como temas.
 - Logo no Shell: `SiteSettings.logo` (com `dark`) → `ctx.site.logo` e o componente `Logo` do núcleo.
 - Alternância de tema em mais de um lugar: `ColorToggleButton` é estático; o tema pode pôr quantos quiser com `ctx.t("theme.toggle")`.
 - Variações dos blocos padrão: `CORE_VARIANTS` lista o que os componentes do núcleo desenham.

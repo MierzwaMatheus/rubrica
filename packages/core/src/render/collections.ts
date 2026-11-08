@@ -41,6 +41,8 @@ export interface PostItem {
   updatedAt?: string;
   readingMinutes: number;
   author?: string;
+  /** Marcado como destaque no painel (o tema pode dar mais peso ao post). */
+  featured: boolean;
   seo: ResolvedSeo;
 }
 
@@ -63,6 +65,8 @@ export interface ProjectItem {
   client?: string;
   year?: number;
   role?: string;
+  /** Categoria do projeto no idioma (uma só; para agrupar ou filtrar o portfólio). */
+  category?: string;
   links: ResolvedLink[];
   /** Número de destaque do case; só existe com o rótulo no idioma. */
   metric?: { value: string; label: string };
@@ -103,6 +107,8 @@ export interface ResumeItem {
   start?: string;
   end?: string;
   description?: string;
+  /** Grupo no idioma (ex.: as competências de "Front-end"), para o tema agrupar. */
+  group?: string;
 }
 
 export interface RoutineItem {
@@ -214,6 +220,7 @@ export function resolvePost(raw: RawPost, opts: ResolveOptions, paths: Collectio
     tags: raw.tags ?? [],
     publishedAt: iso(raw.publishedAt)!,
     readingMinutes: readingMinutes(content),
+    featured: raw.featured ?? false,
     seo: resolveSeo(raw.seo, opts),
   };
   const excerpt = pick(raw.excerpt, opts.locale);
@@ -257,7 +264,9 @@ export function resolveProject(raw: RawProject, opts: ResolveOptions, paths: Col
   const content = pick(raw.content, opts.locale);
   const cover = resolveImage(raw.cover, opts);
   const role = pick(raw.role, opts.locale);
+  const category = pick(raw.category, opts.locale);
   if (summary) item.summary = summary;
+  if (category) item.category = category;
   if (content) item.content = content;
   if (cover) item.cover = cover;
   if (role) item.role = role;
@@ -319,6 +328,7 @@ const RESOLVERS: { [C in CollectionName]: Resolver<C> } = {
       start: raw.start,
       end: raw.end,
       description: pick(raw.description, opts.locale),
+      group: pick(raw.group, opts.locale),
     });
   },
   routine: (raw, opts) => {

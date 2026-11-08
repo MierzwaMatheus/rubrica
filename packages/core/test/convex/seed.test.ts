@@ -55,7 +55,7 @@ describe("receita → páginas (puro)", () => {
   });
 
   it("descarta campos que o validador não conhece e mantém o esquema de cor", () => {
-    const pruned = pruneByValidator(vSiteSettings, { ...BASE_SETTINGS, extra: 1, appearance: { ...BASE_SETTINGS.appearance, scheme: "neon", texture: "grain" } }) as Record<string, unknown>;
+    const pruned = pruneByValidator(vSiteSettings, { ...BASE_SETTINGS, extra: 1, appearance: { ...BASE_SETTINGS.appearance, scheme: "neon", brilho: "alto" } }) as Record<string, unknown>;
     expect(pruned.extra).toBeUndefined();
     expect(pruned.appearance).toEqual({ ...BASE_SETTINGS.appearance, scheme: "neon" });
     expect(pruned.name).toEqual(BASE_SETTINGS.name);
@@ -108,7 +108,7 @@ describe("rubrica/seed (backend)", () => {
 
   it("aceita campos novos de outra versão sem quebrar", async () => {
     const t = setup();
-    await t.mutation(internal.rubrica.seed.apply, { settings: { ...BASE_SETTINGS, futuro: true, appearance: { ...BASE_SETTINGS.appearance, texture: "grain" } } });
+    await t.mutation(internal.rubrica.seed.apply, { settings: { ...BASE_SETTINGS, futuro: true, appearance: { ...BASE_SETTINGS.appearance, brilho: "alto" } } });
     const settings = await t.run((ctx) => ctx.db.query("siteSettings").first());
     expect(settings?.appearance).toEqual(BASE_SETTINGS.appearance);
   });

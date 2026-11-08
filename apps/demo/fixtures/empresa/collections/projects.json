@@ -43,7 +43,12 @@
           "es": "<p>Integrar 40 tiendas al inventario en línea.</p>"
         }
       }
-    ]
+    ],
+    "category": {
+      "pt-BR": "Comércio eletrônico",
+      "en": "E-commerce",
+      "es": "Comercio electrónico"
+    }
   },
   {
     "id": "p2",
@@ -74,6 +79,11 @@
       "pt-BR": "Matrículas pelo site passaram de 5% para 30%.",
       "en": "Website enrollments went from 5% to 30%.",
       "es": "Las matrículas por el sitio pasaron del 5% al 30%."
+    },
+    "category": {
+      "pt-BR": "Site institucional",
+      "en": "Company website",
+      "es": "Sitio institucional"
     }
   },
   {
@@ -103,6 +113,11 @@
     "summary": {
       "pt-BR": "Indicadores da fábrica em tempo real.",
       "en": "Factory indicators in real time."
+    },
+    "category": {
+      "pt-BR": "Sistema interno",
+      "en": "Internal system",
+      "es": "Sistema interno"
     }
   }
 ]

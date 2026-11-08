@@ -68,7 +68,16 @@ export interface BuildResult {
   error?: string;
 }
 
-export async function buildDemo(args: { root: string; theme: string; kind: SiteKind | string; outDir?: string }): Promise<BuildResult> {
+/**
+ * Prefixo das páginas da vitrine (`@rubrica/core/data/showcase`, `SHOWCASE_PREFIX`): todos
+ * os blocos e variações do tema e as receitas. Passam pelas checagens de página, não pelo
+ * Lighthouse.
+ */
+export const SHOWCASE_PREFIX = "/vitrine";
+
+export const isShowcasePath = (path: string) => path === SHOWCASE_PREFIX || path.startsWith(`${SHOWCASE_PREFIX}/`);
+
+export async function buildDemo(args: { root: string; theme: string; kind: SiteKind | string; outDir?: string; showcase?: boolean }): Promise<BuildResult> {
   const demo = join(args.root, "apps", "demo");
   const dist = args.outDir ?? (await mkdtemp(join(tmpdir(), `rubrica-tema-${args.kind}-`)));
   const astroBin = join(dirname(createRequire(join(demo, "package.json")).resolve("astro/package.json")), "bin", "astro.mjs");
@@ -78,6 +87,7 @@ export async function buildDemo(args: { root: string; theme: string; kind: SiteK
     SITE: args.kind,
     THEME: args.theme,
     ASTRO_TELEMETRY_DISABLED: "1",
+    RUBRICA_SHOWCASE: args.showcase === false ? "0" : "1",
     ...(aliases.length && { RUBRICA_THEME_ALIAS: JSON.stringify(aliases) }),
   };
   const bin = existsSync(astroBin) ? astroBin : join(dirname(astroBin), "astro.js");

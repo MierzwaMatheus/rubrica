@@ -12,7 +12,7 @@
  * não há como mostrar a hora certa. O lugar dele na barra ficou com o seletor de idioma.
  */
 import type { ResolvedNavItem, ShellProps } from "@rubrica/core";
-import { Logo } from "@rubrica/core/components";
+import { LocaleLinks, Logo } from "@rubrica/core/components";
 import { Glyph } from "./window";
 
 /** Último trecho do caminho, sem o prefixo do idioma. */
@@ -82,7 +82,12 @@ export function DesktopShell({ ctx, children, colorToggle, localeSwitcher }: She
         </nav>
 
         <div className="dk-bar__end">
-          {localeSwitcher && <div className="dk-bar__locales">{localeSwitcher}</div>}
+          {/* Na barra estreita, só o código do idioma (o nome completo vai para o leitor de tela). */}
+          {localeSwitcher && (
+            <div className="dk-bar__locales">
+              <LocaleLinks ctx={ctx} compact />
+            </div>
+          )}
           {colorToggle}
         </div>
       </header>

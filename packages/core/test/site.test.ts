@@ -34,6 +34,8 @@ describe("montagem do site", () => {
     expect(home.page.blocks[0]?.headingLevel).toBe(1);
     expect(home.page.blocks.slice(1).every((b) => b.headingLevel === 2)).toBe(true);
     expect(sobre.page.needsHiddenH1).toBe(true);
+    // Cada bloco sabe quantos blocos visíveis a página tem.
+    expect(home.page.blocks.every((b) => b.total === home.page.blocks.length)).toBe(true);
   });
 
   it("blocos ocultos somem e listas em inglês não mostram itens só em português", async () => {
@@ -55,6 +57,29 @@ describe("montagem do site", () => {
     const en = s.routes.find((r) => r.url === "/en/blog/pesquisa-com-usuarios")!;
     const enTags = buildHead(en, s.settings, s.context(en.locale, en.url, en.alternates));
     expect(enTags.filter((t) => t.attrs?.hreflang).map((t) => t.attrs!.hreflang)).toEqual(["pt-BR", "en", "x-default"]);
+  });
+
+  it("feed RSS e disponibilidade chegam ao contexto", async () => {
+    const s = await site();
+    expect(s.context("pt-BR", "/").feeds).toEqual({ rss: "/rss.xml" });
+    expect(s.context("en", "/en").feeds).toEqual({ rss: "/en/rss.xml" });
+    // A home da demo pessoal mostra a disponibilidade no hero.
+    expect(s.context("pt-BR", "/").site.availability).toBe(true);
+    const snapshot = await fixtureSource(fixtures).load();
+    const noBlog = buildSite({ snapshot: { ...snapshot, site: { ...snapshot.site, plugins: { ...snapshot.site.plugins, blog: false } }, pages: snapshot.pages.filter((p) => p.path !== "/") }, theme, blocks: CORE_BLOCKS, plugins: CORE_PLUGINS });
+    expect(noBlog.context("pt-BR", "/sobre").feeds).toEqual({});
+    expect(noBlog.context("pt-BR", "/sobre").site.availability).toBe(false);
+  });
+
+  it("resumo leve das coleções para a casca, no idioma", async () => {
+    const s = await site();
+    const pt = s.collections("pt-BR");
+    expect(pt.projects.map((p) => p.url)).toContain("/portfolio/app-banco");
+    expect(Object.keys(pt.projects[0]!).sort()).toEqual(expect.arrayContaining(["id", "title", "url", "tags", "featured"]));
+    expect(pt.projects[0]).not.toHaveProperty("sections");
+    expect(pt.posts.map((p) => p.url)).toContain("/blog/so-portugues");
+    expect(s.collections("en").posts.map((p) => p.url)).not.toContain("/en/blog/so-portugues");
+    expect(s.collections("pt-BR")).toBe(pt);
   });
 
   it("textos de interface caem no idioma do núcleo", async () => {

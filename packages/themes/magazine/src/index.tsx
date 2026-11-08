@@ -77,6 +77,8 @@ export default defineTheme({
   description: "Revista: masthead com o nome em letras espaçadas, grade editorial e tipografia de destaque em Bodoni Moda.",
   contract: "^1",
   scheme: "editorial-cream",
+  // Textura que o layout da v1 recomendava (o site troca ou desliga em Aparência).
+  texture: "paper",
   colorMode: "light",
   fonts,
   tokens: {

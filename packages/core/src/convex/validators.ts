@@ -88,6 +88,8 @@ export const vAppearance = v.object({
   tokens: v.optional(v.record(v.string(), v.string())),
   fontSans: v.optional(v.string()),
   fontMono: v.optional(v.string()),
+  /** Textura da página; sem ela, a do tema. */
+  texture: v.optional(v.union(v.literal("none"), v.literal("grain"), v.literal("paper"), v.literal("scanlines"))),
 });
 
 export const vNavItem = v.object({ label: vLocalized, href: v.string() });
@@ -192,6 +194,8 @@ export const projectFields = {
   client: v.optional(v.string()),
   year: v.optional(v.number()),
   role: v.optional(vLocalized),
+  /** Categoria do projeto (uma por projeto), por idioma. */
+  category: v.optional(vLocalized),
   links: v.optional(v.array(vLink)),
   metric: v.optional(vMetric),
   seo: v.optional(vSeo),
@@ -237,6 +241,8 @@ export const resumeItemFields = {
   start: v.optional(v.string()),
   end: v.optional(v.string()),
   description: v.optional(vLocalized),
+  /** Grupo do item (agrupa as competências), por idioma. */
+  group: v.optional(vLocalized),
 };
 
 export const routineFields = {

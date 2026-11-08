@@ -8,7 +8,7 @@ import type { BlockDefinition } from "../blocks/define";
 import type { CollectionName, PageRecord, SiteSettings } from "../content/types";
 import type { SiteSnapshot } from "../data/source";
 import { enabledPlugins, type PluginDefinition } from "../plugins/contract";
-import { resolveVariant, type Alternate, type RenderContext, type ResolvedSite, type ThemeDefinition } from "../theme/contract";
+import { resolveVariant, type Alternate, type RenderContext, type ResolvedSite, type ShellCollections, type ThemeDefinition } from "../theme/contract";
 import { DEFAULT_PATHS, queryCollection, resolvePost, resolveProject, resolveSeo, type CollectionPaths, type PostItem, type ProjectItem, type ResolvedSeo } from "./collections";
 import { resolveFields, resolveHref, resolveImage, type ResolveOptions } from "./resolve";
 import { defaultUiText } from "../i18n/ui-texts";
@@ -21,6 +21,8 @@ export interface ResolvedBlock {
   items: unknown[];
   headingLevel: 1 | 2;
   index: number;
+  /** Quantos blocos visíveis a página tem. */
+  total: number;
   interactive: boolean;
 }
 
@@ -62,6 +64,8 @@ export interface BuiltSite {
   paths: CollectionPaths;
   /** Contexto de renderização da rota (ou da 404 de um idioma). */
   context(locale: Locale, url: string, alternates?: Alternate[]): RenderContext;
+  /** Projetos e posts do idioma, resumidos para a casca (`ShellProps.collections`). */
+  collections(locale: Locale): ShellCollections;
 }
 
 function languageLabel(locale: Locale): string {
@@ -87,6 +91,12 @@ function themeText(theme: ThemeDefinition, key: string, locale: Locale): string 
   const entry = theme.texts?.[key];
   if (!entry) return undefined;
   return entry[locale] ?? entry[locale.split("-")[0]!.toLowerCase()] ?? entry.en;
+}
+
+/** A home publicada tem algum hero visível com "Mostrar disponibilidade"? */
+export function homeShowsAvailability(pages: readonly PageRecord[]): boolean {
+  const home = pages.find((p) => p.published && p.path === "/");
+  return !!home?.blocks.some((b) => b.visible && b.type === "hero" && b.fields.showAvailability === true);
 }
 
 export function buildSite(input: BuildInput): BuiltSite {
@@ -125,6 +135,7 @@ export function buildSite(input: BuildInput): BuiltSite {
         items,
         headingLevel: index === 0 && firstIsHero ? 1 : 2,
         index,
+        total: visible.length,
         interactive: !!def.interactive && (def.islandWhen?.(fields, plugins) ?? true),
       };
     });
@@ -204,6 +215,10 @@ export function buildSite(input: BuildInput): BuiltSite {
     }
   }
 
+  // Idiomas com post: só esses (e o principal) têm feed RSS próprio (seo/rss.ts).
+  const postLocales = new Set(routes.flatMap((r) => (r.type === "post" ? [r.locale] : [])));
+  const availability = homeShowsAvailability(snapshot.pages);
+
   const seen = new Set<string>();
   for (const r of routes) {
     if (seen.has(r.url)) throw new Error(`[rubrica] duas páginas no mesmo endereço: ${r.url}`);
@@ -235,6 +250,7 @@ export function buildSite(input: BuildInput): BuiltSite {
       plugins: Object.fromEntries([...plugins].map((p) => [p, true])),
       colorMode: settings.appearance.colorMode,
       colorToggle: settings.appearance.colorToggle,
+      availability,
     };
     const description = pickWithFallback(settings.description, locale, cfg);
     if (description) site.description = description;
@@ -274,9 +290,25 @@ export function buildSite(input: BuildInput): BuiltSite {
       alternates,
       t,
       href: (path: string) => resolveHref(path, o).href,
+      feeds: plugins.has("blog") ? { rss: localizedPath("/rss.xml", postLocales.has(locale) ? locale : cfg.default, cfg) } : {},
       formatDate: (iso, style = "long") => new Intl.DateTimeFormat(locale, { ...dateFormats[style], timeZone: "UTC" }).format(new Date(iso)),
     };
   }
 
-  return { settings, routes, plugins, paths, context };
+  const summaries = new Map<Locale, ShellCollections>();
+  function collections(locale: Locale): ShellCollections {
+    let summary = summaries.get(locale);
+    if (summary) return summary;
+    const o = opts(locale);
+    const projects = plugins.has("portfolio") ? queryCollection({ collection: "projects", sort: "order" }, snapshot.collections.projects, o, paths) : [];
+    const posts = plugins.has("blog") ? queryCollection({ collection: "posts", sort: "recent" }, snapshot.collections.posts, o, paths) : [];
+    summary = {
+      projects: projects.map((p) => ({ id: p.id, title: p.title, url: p.url, ...(p.category && { category: p.category }), tags: p.tags, featured: p.featured })),
+      posts: posts.map((p) => ({ id: p.id, title: p.title, url: p.url, publishedAt: p.publishedAt, tags: p.tags, featured: p.featured })),
+    };
+    summaries.set(locale, summary);
+    return summary;
+  }
+
+  return { settings, routes, plugins, paths, context, collections };
 }

@@ -81,6 +81,8 @@ export default defineTheme({
   description: "Colagem de fanzine: polaroides, fita adesiva, post-its, carimbos e letra à mão.",
   contract: "^1",
   scheme: "riso",
+  // Textura que o layout da v1 recomendava (o site troca ou desliga em Aparência).
+  texture: "paper",
   colorMode: "light",
   fonts,
   tokens: {

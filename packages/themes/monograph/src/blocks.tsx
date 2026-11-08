@@ -7,7 +7,7 @@
  */
 import type { ReactNode } from "react";
 import type { BlockProps, RenderContext } from "@rubrica/core";
-import { Heading, Html, Img, LinkButton, Section, SectionHeader } from "@rubrica/core/components";
+import { Heading, Html, Img, LinkButton, Section, SectionHeader, safeId, tagFilterCss as coreTagFilterCss } from "@rubrica/core/components";
 import { folios, joinAsSentence, toRoman } from "./util";
 
 /** Linha de sumário: texto ……… valor. */
@@ -152,6 +152,7 @@ export function CasesBlock({ id, variant, fields, items, headingLevel, ctx }: Bl
               <div className="mn-fig__cap">
                 <p className="mn-sc mn-fig__n">
                   {ctx.t("monograph.plate")} {toRoman(i + 1)}
+                  {p.category && ` · ${p.category}`}
                 </p>
                 <Heading level={3} className="mn-fig__title">
                   <a href={p.url} className="mn-entry-link">
@@ -176,7 +177,7 @@ export function CasesBlock({ id, variant, fields, items, headingLevel, ctx }: Bl
                 </a>
               </Heading>
               {p.summary && <p className="mn-entry-sum">{p.summary}</p>}
-              {p.tags.length > 0 && <p className="mn-entry-meta">{p.tags.slice(0, 3).join(" · ")}</p>}
+              {(p.category || p.tags.length > 0) && <p className="mn-entry-meta">{[p.category, ...p.tags.slice(0, 3)].filter(Boolean).join(" · ")}</p>}
             </li>
           ))}
         </ol>
@@ -186,27 +187,20 @@ export function CasesBlock({ id, variant, fields, items, headingLevel, ctx }: Bl
   );
 }
 
-/** Folha de estilo do filtro por etiqueta (botões de opção + `~`), como no núcleo. */
-function tagFilterCss(scope: string, count: number): string {
-  const rules: string[] = [];
-  for (let i = 0; i < count; i++) {
-    rules.push(`#${scope}-t${i}:checked ~ .mn-toc-list > .mn-entry:not([data-tags~="t${i}"]){display:none}`);
-    rules.push(`#${scope}-t${i}:checked ~ .mn-filter label[for="${scope}-t${i}"]{color:var(--rb-accent);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:5px}`);
-    rules.push(`#${scope}-t${i}:focus-visible ~ .mn-filter label[for="${scope}-t${i}"]{outline:2px solid var(--rb-accent);outline-offset:2px}`);
-  }
-  rules.push(`#${scope}-all:checked ~ .mn-filter label[for="${scope}-all"]{color:var(--rb-accent);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:5px}`);
-  rules.push(`#${scope}-all:focus-visible ~ .mn-filter label[for="${scope}-all"]{outline:2px solid var(--rb-accent);outline-offset:2px}`);
-  return rules.join("\n");
-}
-
-const safe = (v: string) => v.replace(/[^a-zA-Z0-9_-]/g, "_");
+/** Folha de estilo do filtro por etiqueta (botões de opção + `~`), a do núcleo. */
+const tagFilterCss = (scope: string, count: number) =>
+  coreTagFilterCss(scope, count, {
+    items: ".mn-toc-list > .mn-entry",
+    filter: ".mn-filter",
+    checked: "color:var(--rb-accent);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:5px",
+  });
 
 /** Posts como "Ensaios": sumário com numeral, título, tempo de leitura, subtítulo e data. */
 export function PostsRecentesBlock({ id, variant, fields, items, headingLevel, ctx }: BlockProps<any, any>) {
   const allTags: string[] = fields.showTagFilter ? [...new Set<string>(items.flatMap((p: any) => p.tags))].sort((a, b) => a.localeCompare(b, ctx.locale)) : [];
   const filter = allTags.length > 0;
   const index = new Map(allTags.map((t, i) => [t, i] as const));
-  const scope = `f-${safe(id)}`;
+  const scope = `f-${safeId(id)}`;
   return (
     <Section id={id} anchor={fields.anchor} type="posts-recentes" variant={variant}>
       <SectionHeader title={fields.title} intro={fields.intro} level={headingLevel} />

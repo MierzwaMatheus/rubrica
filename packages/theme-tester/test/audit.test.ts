@@ -102,6 +102,31 @@ describe("auditSite", () => {
     expect(failed(page)).toEqual(expect.arrayContaining(["overflow", "console", "network", "js"]));
   });
 
+  it("rolagem lateral dentro de contêiner não reprova; contêiner que estoura a página aponta para ele", async () => {
+    const strip = `<main><h1>Faixa</h1><div class="faixa" style="overflow-x:auto"><div class="larga" style="width:900px;height:10px;background:#000"></div></div></main>`;
+    const blowout = `<main><h1>Estouro</h1><div class="caixa" style="width:600px;overflow-x:hidden"><div class="filho" style="width:900px;height:10px;background:#000"></div></div></main>`;
+    const dir = await makeSite([
+      { path: "/", body: strip },
+      { path: "/estouro", body: blowout },
+    ]);
+    dirs.push(dir);
+    const pages = await auditSite({ dist: dir });
+    expect(find(pages, "/")?.checks.find((c) => c.id === "overflow")?.ok).toBe(true);
+    const overflow = find(pages, "/estouro")?.checks.find((c) => c.id === "overflow");
+    expect(overflow?.ok).toBe(false);
+    expect(overflow?.details?.join("\n")).toMatch(/div\.caixa/);
+    expect(overflow?.details?.join("\n")).not.toMatch(/div\.filho/);
+  });
+
+  it("palavra longa que estoura o título aponta para o título", async () => {
+    const body = `<main><h1>Texto</h1><h2 class="grande" style="font-size:72px;margin:0">Desenvolvimentoresponsabilidade</h2></main>`;
+    const dir = await makeSite([{ path: "/", body }]);
+    dirs.push(dir);
+    const overflow = find(await auditSite({ dist: dir }), "/")?.checks.find((c) => c.id === "overflow");
+    expect(overflow?.ok).toBe(false);
+    expect(overflow?.details?.[0]).toBe("h2.grande");
+  });
+
   it("aceita ilha hidratada e reprova ilha que não hidrata e JS acima do limite", async () => {
     const island = (src: string) => `<main><h1>Ilha</h1><astro-island ssr component-url="${src}" component-export="default" client="load" props="{}" opts="{}"></astro-island>
 <script type="module">const el=document.querySelector("astro-island");await import("${src}").then(()=>el.removeAttribute("ssr"))</script></main>`;

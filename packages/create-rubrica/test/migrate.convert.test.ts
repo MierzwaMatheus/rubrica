@@ -86,9 +86,11 @@ describe("tabelas 1:1", () => {
       { label: { "pt-BR": "Código", en: "Code" }, href: "https://github.com/exemplo/app" },
     ]);
     expect(app!.tags).toEqual(["Produto", "ux", "mobile"]);
+    expect(app!.category).toEqual({ "pt-BR": "Produto", en: "Product" });
     expect(marca!.slug).toBe("identidade-visual");
     expect(marca!.featured).toBeUndefined();
     expect(marca!.cover).toEqual({ url: "https://imagens.exemplo.dev/marca.png" });
+    expect(marca!.category).toEqual({ "pt-BR": "Marca" });
     expect(r.report.warnings.join(" ")).toMatch(/Identidade visual.*não tinha slug/);
   });
 
@@ -108,7 +110,7 @@ describe("tabelas 1:1", () => {
     expect(items[0]!.end).toBeUndefined();
     expect(items[1]!.start).toBeUndefined();
     expect(items[2]).toMatchObject({ organization: "Universidade Z", start: "2014", end: "2018" });
-    expect(items[3]).toMatchObject({ title: { "pt-BR": "Figma" }, description: { "pt-BR": "Avançado" }, tags: ["Ferramentas"] });
+    expect(items[3]).toMatchObject({ title: { "pt-BR": "Figma" }, description: { "pt-BR": "Avançado" }, group: { "pt-BR": "Ferramentas" }, tags: ["Ferramentas"] });
     expect(items[4]).toMatchObject({ title: { "pt-BR": "Comunicação", en: "Communication" }, tags: ["soft-skill"] });
     expect(items[6]).toMatchObject({ title: { "pt-BR": "Inglês", en: "English" }, description: { "pt-BR": "Fluente" } });
     expect(items[7]).toMatchObject({ title: { "pt-BR": "Mentoria em ONG" }, tags: ["voluntariado"] });
@@ -133,10 +135,16 @@ describe("configurações do site", () => {
       url: "https://brunalima.design",
       locales: { locales: ["pt-BR", "en"], default: "pt-BR" },
       theme: "cyberpunk",
-      appearance: { colorMode: "dark", colorToggle: false, scheme: "neon", tokens: { "rb-accent": "#ff3366" }, fontSans: "Chakra Petch", fontMono: "JetBrains Mono" },
+      appearance: { colorMode: "dark", colorToggle: false, scheme: "neon", tokens: { "rb-accent": "#ff3366" }, fontSans: "Chakra Petch", fontMono: "JetBrains Mono", texture: "none" },
       twitterHandle: "brunalima",
       ogImage: { url: "https://imagens.exemplo.dev/og.png" },
     });
+  });
+
+  it("textura da v1 vai para a aparência; desconhecida fica de fora", () => {
+    const withTexture = (texture: string) => convertV1({ tables: v1Export().tables, v1: { ...V1_RUBRICA_JSON, texture }, theme: "poster", recipe: CORE_RECIPES.pessoal, now: NOW }).tables.siteSettings![0]!.appearance as Record<string, unknown>;
+    expect(withTexture("grain").texture).toBe("grain");
+    expect(withTexture("lava")).not.toHaveProperty("texture");
   });
 
   it("pessoa e redes do contactInfo", () => {

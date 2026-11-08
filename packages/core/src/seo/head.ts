@@ -10,6 +10,7 @@ import { stripHtml, truncate } from "../render/text";
 import type { SiteSettings } from "../content/types";
 import { resolveImage } from "../render/resolve";
 import { siteHeadTags, type SiteHeadOptions } from "./site-head";
+import { siteWhatsAppNumber, whatsAppUrl } from "../render/sitewide";
 
 export interface HeadTag {
   tag: "title" | "meta" | "link" | "script";
@@ -45,6 +46,8 @@ function identityJsonLd(settings: SiteSettings, ctx: RenderContext): Record<stri
     };
   }
   const org = site.organization;
+  // WhatsApp da empresa (configuração do site, senão o dos dados da empresa) como canal de atendimento.
+  const whatsapp = siteWhatsAppNumber(settings);
   return {
     "@type": org?.schemaType ?? "Organization",
     "@id": `${site.url}/#organization`,
@@ -66,6 +69,9 @@ function identityJsonLd(settings: SiteSettings, ctx: RenderContext): Record<stri
     }),
     ...(org?.openingHours?.length && {
       openingHoursSpecification: org.openingHours.map((h) => ({ "@type": "OpeningHoursSpecification", dayOfWeek: h.days, opens: h.opens, closes: h.closes })),
+    }),
+    ...(whatsapp && {
+      contactPoint: [{ "@type": "ContactPoint", contactType: "customer service", telephone: `+${whatsapp}`, url: whatsAppUrl(whatsapp) }],
     }),
     ...(sameAs.length && { sameAs }),
   };

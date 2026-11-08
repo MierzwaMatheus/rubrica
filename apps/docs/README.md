@@ -38,6 +38,13 @@ node apps/docs/scripts/shot-thumbnails.mjs --base http://127.0.0.1:4800
 
 Os guias ficam em `docs/guia/`. Cada um tem o `<nome>.md` (português) e o `<nome>.en.md` (inglês). Links entre guias usam o nome em português (`./temas.md`): o site troca para o idioma da página. Para incluir um guia novo na navegação, acrescente o slug em `src/lib/docsContent.ts`. A documentação da v1 está arquivada em `docs/v1/` e não é publicada.
 
+O que confere a documentação (rode da raiz):
+
+- `pnpm docs:blocos` regera o catálogo de blocos (`docs/guia/blocos.md` e `.en.md`) a partir do `@rubrica/core` e das variações dos temas (`scripts/blocos.ts`). O inglês das descrições fica em `scripts/blocos/en.ts`. Não edite o catálogo à mão.
+- `pnpm --filter rubrica-site test` falha se o catálogo estiver desatualizado e confere os links entre os guias, com as âncoras no idioma de cada página.
+- `pnpm --filter rubrica-site check` compila os exemplos de código dos guias e do `docs/v2/contribuindo.md` (`scripts/exemplos.ts`). Todo bloco ` ```ts `/` ```tsx ` precisa de um marcador `<!-- exemplo: <cenário>/<arquivo> -->` logo antes; os cenários estão no topo do script.
+- O `build` termina conferindo os links internos do `dist` (`scripts/links-dist.ts`, também em `pnpm --filter rubrica-site links`).
+
 ## Publicar na Vercel
 
 Crie um projeto apontando para este repositório com **Root Directory** = `apps/docs`. O `vercel.json` desta pasta instala as dependências do monorepo, gera os previews e faz o build.

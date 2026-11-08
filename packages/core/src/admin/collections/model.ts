@@ -5,7 +5,7 @@
  */
 import type { FieldMap } from "../../blocks/fields";
 import { slugify } from "../../convex/lib/slug";
-import type { Locale } from "../../i18n";
+import type { Locale, Localized } from "../../i18n";
 import { missingLocales, missingTranslations, prune, sameDraft, type Values } from "../editor/model";
 import { plainText, textIn } from "../lib/format";
 
@@ -47,7 +47,7 @@ export function planCreate(form: Values, keys: readonly string[]): Values {
 }
 
 /** Slug sugerido para um título novo (o do idioma principal, senão o primeiro). */
-export function suggestSlug(title: Record<string, string> | undefined, defaultLocale: Locale): string {
+export function suggestSlug(title: Localized<string> | undefined, defaultLocale: Locale): string {
   return slugify(textIn(title, defaultLocale));
 }
 

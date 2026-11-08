@@ -89,6 +89,7 @@ export const CORE_PLUGINS: PluginDefinition[] = [
     kinds: ["pessoal"],
     defaultEnabled: { pessoal: true },
     collections: ["routine"],
+    admin: [{ path: "/admin/dia-a-dia", label: "Dia a dia", icon: "calendar-days", roles: [...CONTENT] }],
   }),
   definePlugin({
     id: "testimonials",

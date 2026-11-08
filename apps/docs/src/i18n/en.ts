@@ -217,6 +217,7 @@ export const en: Dict = {
     nav: "Documentation",
     start: "Get started",
     look: "Look and languages",
+    extend: "Extend",
     layouts: "Advanced",
     onThisPage: "On this page",
     edit: "Edit on GitHub",

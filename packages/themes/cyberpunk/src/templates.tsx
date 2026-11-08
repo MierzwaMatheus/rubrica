@@ -140,12 +140,18 @@ export function CyberpunkCase({ project, related, ctx }: CaseTemplateProps) {
               </ul>
             </>
           )}
-          {hasContact && (
-            <a className="cp-case__link cp-case__link--primary" href={talkHref}>
-              <CaseIcon name="message" size={16} />
-              {ctx.t("sidebar.talk")}
-            </a>
-          )}
+          {hasContact &&
+            (ctx.site.contactDialog ? (
+              <button type="button" className="cp-case__link cp-case__link--primary" popoverTarget={ctx.site.contactDialog}>
+                <CaseIcon name="message" size={16} />
+                {ctx.t("sidebar.talk")}
+              </button>
+            ) : (
+              <a className="cp-case__link cp-case__link--primary" href={talkHref}>
+                <CaseIcon name="message" size={16} />
+                {ctx.t("sidebar.talk")}
+              </a>
+            ))}
         </aside>
       )}
     </article>

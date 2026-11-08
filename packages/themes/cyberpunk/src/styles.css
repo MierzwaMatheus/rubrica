@@ -37,6 +37,7 @@
 .cp-case__tags li { padding: 0.125rem 0.5rem; border-radius: 0.375rem; font-size: 0.75rem; font-weight: 500; color: var(--rb-fg-strong); background: color-mix(in srgb, var(--rb-accent) 22%, var(--rb-bg)); border: 1px solid color-mix(in srgb, var(--rb-accent) 45%, var(--rb-bg)); }
 .cp-case__links { display: flex; flex-wrap: wrap; gap: 0.75rem; }
 .cp-case__link {
+  font-family: inherit; cursor: pointer;
   display: inline-flex; align-items: center; gap: 0.5rem; min-height: 44px; padding: 0 1.125rem; border-radius: 0.5rem;
   font-size: 0.875rem; font-weight: 600; text-decoration: none; color: var(--rb-fg-strong);
   background: color-mix(in srgb, var(--rb-bg) 80%, transparent); border: 1px solid color-mix(in srgb, var(--rb-fg) 22%, transparent);

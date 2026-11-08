@@ -282,7 +282,10 @@ export function CasesBlock({ id, variant, fields, items, headingLevel, index, ct
     );
   }
   const catalog = variant === "catalogo";
-  const tags = catalog ? uniqueTags(items.map((p) => p.tags), ctx.locale) : [];
+  // O catálogo filtra pela categoria (como o portfólio da v1); sem nenhuma, pelas etiquetas.
+  const byCategory = items.some((p) => p.category);
+  const keysOf = (p: ProjectItem) => (byCategory ? (p.category ? [p.category] : []) : p.tags);
+  const tags = catalog ? uniqueTags(items.map(keysOf), ctx.locale) : [];
   const tagIndex = new Map(tags.map((t, i) => [t, i] as const));
   const filter = tags.length > 0;
   const rows = (
@@ -297,7 +300,7 @@ export function CasesBlock({ id, variant, fields, items, headingLevel, index, ct
             title={p.title}
             max={featured ? 96 : 64}
             description={catalog ? p.summary : undefined}
-            tag={[featured ? ctx.t("poster.featured") : null, p.tags[0]].filter(Boolean).join(" · ") || undefined}
+            tag={[featured ? ctx.t("poster.featured") : null, p.category ?? p.tags[0]].filter(Boolean).join(" · ") || undefined}
             meta={
               (p.year || p.client) && (
                 <>
@@ -308,7 +311,7 @@ export function CasesBlock({ id, variant, fields, items, headingLevel, index, ct
             }
             action={ctx.t("case.view")}
             href={p.url}
-            tags={filter ? p.tags.map((t) => `t${tagIndex.get(t)}`).join(" ") : undefined}
+            tags={filter ? keysOf(p).map((t) => `t${tagIndex.get(t)}`).join(" ") : undefined}
           />
         );
       })}

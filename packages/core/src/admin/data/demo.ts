@@ -490,6 +490,18 @@ export type DemoStore = ReturnType<typeof createDemoStore>;
 /** `Backend` sobre o store de demonstração (ganchos React). */
 export function createDemoBackend(options: DemoOptions): { backend: Backend; store: DemoStore } {
   const store = createDemoStore(options);
+  // A sessão sobrevive ao recarregar a aba (os dados, não: voltam ao exemplo).
+  const KEY = "rubrica:demo-session";
+  try {
+    const saved = sessionStorage.getItem(KEY);
+    if (saved && store.state.users.some((u) => u.userId === saved)) store.state.session = saved;
+    store.subscribe(() => {
+      if (store.state.session) sessionStorage.setItem(KEY, store.state.session);
+      else sessionStorage.removeItem(KEY);
+    });
+  } catch {
+    /* sem sessionStorage */
+  }
   const latency = options.latency ?? 120;
   const wait = () => new Promise((r) => setTimeout(r, latency));
   const useVersion = () => useSyncExternalStore(store.subscribe, () => store.version);

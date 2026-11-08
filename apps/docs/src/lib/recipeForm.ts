@@ -1,14 +1,12 @@
 /**
  * "Crie o seu": junta as escolhas do combinador com os dados da pessoa e monta o comando
- * `npx create-rubrica@latest <pasta> --receita <código>`. Tudo acontece no navegador: nada é
- * enviado a servidor nenhum. O formato da receita é o do CLI (cli/src/recipe.ts).
+ * `npx create-rubrica@latest <pasta> --tipo ... --tema ...`. Tudo acontece no navegador:
+ * nada é enviado a servidor nenhum. As opções são as do `create` (packages/create-rubrica).
  */
-import { recipeCommand, projectNameFrom, type Recipe } from "../../../cli/src/recipe";
-import { PLUGIN_PRESETS } from "../../../cli/src/plugins";
-import { normalizeUrl, validateUrl, normalizeEmail, validateEmail } from "../../../cli/src/utils/normalize";
+import { normalizeUrl, validateUrl, normalizeEmail, validateEmail } from "../../../../packages/create-rubrica/src/utils/normalize";
 import { onChoice, type CombinatorChoice } from "./combinatorStore";
 
-const FIELDS = ["authorName", "siteName", "siteUrl", "siteDescription", "authorEmail", "twitterHandle", "profession", "specialties"] as const;
+const FIELDS = ["siteName", "siteUrl", "siteDescription", "authorEmail"] as const;
 type Field = (typeof FIELDS)[number];
 
 /** Textos montados no navegador, no idioma da página (JSON em #cs-i18n). */
@@ -24,6 +22,30 @@ interface FormText {
   siteNamePh: string;
 }
 
+interface Preset {
+  id: string;
+  plugins: string[];
+  kinds: string[];
+}
+
+const MODE_FLAG: Record<string, string> = { light: "claro", dark: "escuro" };
+
+/** Aspas simples, só quando o valor tem algo além de letras, números e . _ - : / @ , */
+function shell(value: string): string {
+  return /^[\w.:/@,+-]+$/.test(value) ? value : `'${value.replace(/'/g, `'\\''`)}'`;
+}
+
+export function projectName(value: string): string {
+  return (
+    value
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9-]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "meu-site"
+  );
+}
+
 export function initRecipeForm(): void {
   const form = document.getElementById("cs-form") as HTMLFormElement | null;
   const code = document.getElementById("cs-cmd");
@@ -31,10 +53,12 @@ export function initRecipeForm(): void {
   const folder = document.getElementById("cs-folder");
   const missing = document.getElementById("cs-missing");
   if (!form || !code || !copy || !folder || !missing) return;
-  const tx = JSON.parse(document.getElementById("cs-i18n")?.textContent || "{}") as FormText;
+  const tx = JSON.parse(document.getElementById("cs-i18n")?.textContent || "{}") as FormText & { presets: Preset[] };
 
   let visual: CombinatorChoice | null = null;
-  let preset = PLUGIN_PRESETS[0].id;
+  let kind = "pessoal";
+  let preset = "recommended";
+  const locales = new Set<string>(["pt-BR"]);
 
   const input = (f: Field) => form.querySelector<HTMLInputElement>(`[name="${f}"]`)!;
   const value = (f: Field) => input(f).value.trim();
@@ -46,51 +70,45 @@ export function initRecipeForm(): void {
     input(f).setAttribute("aria-invalid", String(Boolean(text)));
   }
 
-  function build(): Recipe {
-    const recipe: Recipe = {};
-    if (visual) {
-      recipe.layout = visual.layout;
-      recipe.scheme = visual.scheme;
-      recipe.colorMode = visual.mode;
-      recipe.colorModeToggle = visual.toggle;
-      recipe.texture = visual.texture as Recipe["texture"];
-      recipe.fontSans = visual.sans;
-      recipe.fontMono = visual.mono;
-    }
-    recipe.plugins = [...(PLUGIN_PRESETS.find((p) => p.id === preset)?.plugins ?? [])];
-
-    const identity: NonNullable<Recipe["identity"]> = {};
-    for (const f of ["authorName", "siteName", "siteDescription", "twitterHandle", "profession", "specialties"] as const) {
-      if (value(f)) identity[f] = value(f);
-    }
+  function render() {
+    const name = value("siteName");
+    const dir = projectName(name);
     const url = value("siteUrl");
     hint("siteUrl", url && validateUrl(url) ? tx.badUrl : "");
-    if (url && !validateUrl(url)) identity.siteUrl = normalizeUrl(url);
     const email = value("authorEmail");
     hint("authorEmail", email && validateEmail(email) ? tx.badEmail : "");
-    if (email && !validateEmail(email)) identity.authorEmail = normalizeEmail(email);
-    if (Object.keys(identity).length) recipe.identity = identity;
-    return recipe;
-  }
 
-  function render() {
-    const recipe = build();
-    const name = projectNameFrom(value("siteName") || value("authorName"));
-    const command = recipeCommand(name, recipe);
+    const args: string[] = [dir, "--tipo", kind];
+    if (visual) {
+      args.push("--tema", visual.layout, "--esquema", visual.scheme, "--modo", MODE_FLAG[visual.mode] ?? "escuro");
+    }
+    if (name) args.push("--nome", shell(name));
+    if (url && !validateUrl(url)) args.push("--url", shell(normalizeUrl(url)));
+    if (value("siteDescription")) args.push("--descricao", shell(value("siteDescription")));
+    if (email && !validateEmail(email)) args.push("--email", shell(normalizeEmail(email)));
+    if (!(locales.size === 1 && locales.has("pt-BR"))) args.push("--idiomas", [...locales].join(","));
+    const chosen = tx.presets.find((p) => p.id === preset && p.kinds.includes(kind));
+    if (chosen && chosen.id !== "recommended") args.push("--plugins", chosen.id);
+
+    const command = `npx create-rubrica@latest ${args.join(" ")}`;
     code!.textContent = command;
     copy!.dataset.copy = command;
-    folder!.textContent = name;
-    input("siteName").placeholder = value("authorName") || tx.siteNamePh;
+    folder!.textContent = dir;
+    input("siteName").placeholder = tx.siteNamePh;
 
     const left: string[] = [];
-    if (!recipe.identity?.authorName) left.push(tx.missingName);
-    if (!recipe.identity?.siteUrl) left.push(tx.missingUrl);
-    if (!recipe.identity?.authorEmail) left.push(tx.missingEmail);
-    missing!.textContent = left.length
-      ? tx.willAsk.replace("{list}", left.join(", ").replace(/, ([^,]*)$/, ` ${tx.and} $1`))
-      : tx.allSet;
+    if (!name) left.push(tx.missingName);
+    if (!url || validateUrl(url)) left.push(tx.missingUrl);
+    if (!email || validateEmail(email)) left.push(tx.missingEmail);
+    missing!.textContent = left.length ? tx.willAsk.replace("{list}", left.join(", ").replace(/, ([^,]*)$/, ` ${tx.and} $1`)) : tx.allSet;
 
-    form!.querySelectorAll<HTMLButtonElement>("[data-preset]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.preset === preset)));
+    form!.querySelectorAll<HTMLButtonElement>("[data-kind]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.kind === kind)));
+    form!.querySelectorAll<HTMLButtonElement>("[data-locale]").forEach((b) => b.setAttribute("aria-pressed", String(locales.has(b.dataset.locale!))));
+    form!.querySelectorAll<HTMLButtonElement>("[data-preset]").forEach((b) => {
+      const p = tx.presets.find((x) => x.id === b.dataset.preset);
+      b.hidden = !p?.kinds.includes(kind);
+      b.setAttribute("aria-pressed", String(b.dataset.preset === preset));
+    });
   }
 
   onChoice((choice) => {
@@ -100,9 +118,21 @@ export function initRecipeForm(): void {
   form.addEventListener("input", render);
   form.addEventListener("submit", (e) => e.preventDefault());
   form.addEventListener("click", (e) => {
-    const b = (e.target as HTMLElement).closest<HTMLButtonElement>("[data-preset]");
-    if (!b) return;
-    preset = b.dataset.preset!;
+    const target = e.target as HTMLElement;
+    const k = target.closest<HTMLButtonElement>("[data-kind]");
+    const l = target.closest<HTMLButtonElement>("[data-locale]");
+    const p = target.closest<HTMLButtonElement>("[data-preset]");
+    if (k) {
+      kind = k.dataset.kind!;
+      if (!tx.presets.find((x) => x.id === preset)?.kinds.includes(kind)) preset = "recommended";
+    } else if (l) {
+      const code = l.dataset.locale!;
+      // O primeiro idioma marcado é o principal; sempre fica ao menos um.
+      if (locales.has(code)) {
+        if (locales.size > 1) locales.delete(code);
+      } else locales.add(code);
+    } else if (p) preset = p.dataset.preset!;
+    else return;
     render();
   });
   render();

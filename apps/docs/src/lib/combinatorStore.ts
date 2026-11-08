@@ -7,8 +7,6 @@ export interface CombinatorChoice {
   layout: string;
   scheme: string;
   mode: "light" | "dark";
-  toggle: boolean;
-  texture: string;
   sans: string;
   mono: string;
 }

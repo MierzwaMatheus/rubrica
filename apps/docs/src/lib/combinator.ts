@@ -1,21 +1,21 @@
 /**
- * Combinador: controla o iframe com o build real de cada layout (site/public/previews).
- * Layout, modo e botão de modo recarregam o iframe (a ponte lê da URL); esquema, fontes,
- * textura e página mudam ao vivo por postMessage (site/scripts/preview-bridge.js).
+ * Combinador: controla o iframe com o build real de cada tema (public/previews/<tema>,
+ * gerado pelo site de demonstração). Tema, página e modo recarregam o iframe; esquema e
+ * fontes mudam ao vivo por postMessage (scripts/preview-bridge.js, que também guarda a
+ * escolha para as páginas seguintes do preview).
  */
 import { publishChoice } from "./combinatorStore";
 
 interface Config {
-  layouts: { id: string; label: string; recommended: { scheme: string; mode: Mode; texture: string }; fonts: { sans: string[]; mono: string } }[];
+  layouts: { id: string; label: string; recommended: { scheme: string; mode: Mode }; fonts: { sans: string[]; mono: string } }[];
   schemes: { id: string; label: string }[];
-  moods: { id: string; layout: string; scheme: string; mode: Mode; texture: string; sans: string; mono: string }[];
+  moods: { id: string; layout: string; scheme: string; mode: Mode; sans: string; mono: string }[];
   pages: { path: string; label: string }[];
   /** Textos montados aqui no navegador, no idioma da página. */
   i18n: {
-    rows: Record<"layout" | "scheme" | "mode" | "toggle" | "texture" | "sans" | "mono" | "yes" | "no", string>;
+    rows: Record<"layout" | "scheme" | "mode" | "sans" | "mono", string>;
     light: string;
     dark: string;
-    textures: Record<string, string>;
   };
 }
 type Mode = "light" | "dark" | "system";
@@ -24,8 +24,6 @@ interface State {
   layout: string;
   scheme: string;
   mode: "light" | "dark";
-  toggle: boolean;
-  texture: string;
   sans: string;
   mono: string;
   page: string;
@@ -53,8 +51,6 @@ export function initCombinator(): void {
     layout: first.layout,
     scheme: first.scheme,
     mode: first.mode === "dark" ? "dark" : "light",
-    toggle: true,
-    texture: first.texture,
     sans: first.sans,
     mono: first.mono,
     page: "/",
@@ -66,19 +62,17 @@ export function initCombinator(): void {
 
   function src(): string {
     const q = new URLSearchParams({
-      page: state.page,
       mode: state.mode,
-      toggle: state.toggle ? "1" : "0",
       scheme: state.scheme,
       sans: state.sans,
       mono: state.mono,
-      texture: state.texture,
     });
-    return `/previews/${state.layout}/index.html?${q}`;
+    const path = state.page === "/" ? "/" : `${state.page}/`;
+    return `/previews/${state.layout}${path}?${q}`;
   }
 
-  /** O que exige recarregar o app (o resto muda ao vivo). */
-  const reloadKey = () => `${state.layout}|${state.mode}|${state.toggle}`;
+  /** O que exige recarregar o app (esquema e fontes mudam ao vivo). */
+  const reloadKey = () => `${state.layout}|${state.mode}|${state.page}`;
 
   function send(msg: Record<string, unknown>) {
     frame!.contentWindow?.postMessage({ type: "rubrica-preview", ...msg }, location.origin);
@@ -100,18 +94,16 @@ export function initCombinator(): void {
     root.querySelectorAll<HTMLButtonElement>("[data-layout]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.layout === state.layout)));
     root.querySelectorAll<HTMLButtonElement>("[data-scheme]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.scheme === state.scheme)));
     root.querySelectorAll<HTMLButtonElement>("[data-mode]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === state.mode)));
-    root.querySelectorAll<HTMLButtonElement>("[data-toggle]").forEach((b) => b.setAttribute("aria-pressed", String((b.dataset.toggle === "1") === state.toggle)));
-    root.querySelectorAll<HTMLButtonElement>("[data-texture]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.texture === state.texture)));
     root.querySelectorAll<HTMLButtonElement>("[data-device]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.device === state.device)));
     root.querySelectorAll<HTMLButtonElement>("[data-page]").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.page === state.page)));
     root.querySelectorAll<HTMLButtonElement>("[data-mood]").forEach((b) => {
       const m = cfg.moods.find((x) => x.id === b.dataset.mood)!;
-      const on = m.layout === state.layout && m.scheme === state.scheme && m.mode === state.mode && m.texture === state.texture && m.sans === state.sans && m.mono === state.mono;
+      const on = m.layout === state.layout && m.scheme === state.scheme && m.mode === state.mode && m.sans === state.sans && m.mono === state.mono;
       b.setAttribute("aria-pressed", String(on));
     });
     // A seção "Crie o seu" monta o comando a partir destas escolhas.
-    const { layout, scheme, mode, toggle, texture, sans, mono } = state;
-    publishChoice({ layout, scheme, mode, toggle, texture, sans, mono });
+    const { layout, scheme, mode, sans, mono } = state;
+    publishChoice({ layout, scheme, mode, sans, mono });
     sansSel.value = state.sans;
     monoSel.value = state.mono;
     stage!.dataset.device = state.device;
@@ -122,8 +114,6 @@ export function initCombinator(): void {
       [tx.rows.layout, label(cfg.layouts, state.layout)],
       [tx.rows.scheme, label(cfg.schemes, state.scheme)],
       [tx.rows.mode, state.mode === "dark" ? tx.dark : tx.light],
-      [tx.rows.toggle, state.toggle ? tx.rows.yes : tx.rows.no],
-      [tx.rows.texture, tx.textures[state.texture] ?? state.texture],
       [tx.rows.sans, state.sans],
       [tx.rows.mono, state.mono],
     ];
@@ -155,8 +145,6 @@ export function initCombinator(): void {
     if (state.scheme !== before.scheme) live.scheme = state.scheme;
     if (state.sans !== before.sans) live.sans = state.sans;
     if (state.mono !== before.mono) live.mono = state.mono;
-    if (state.texture !== before.texture) live.texture = state.texture;
-    if (state.page !== before.page) live.page = state.page;
     if (Object.keys(live).length) send(live);
   }
 
@@ -166,8 +154,9 @@ export function initCombinator(): void {
   addEventListener("message", (e) => {
     if (e.origin !== location.origin || e.source !== frame.contentWindow) return;
     const m = e.data as { type?: string; page?: string };
-    if (m?.type === "rubrica-preview-page" && typeof m.page === "string") {
+    if (m?.type === "rubrica-preview-page" && typeof m.page === "string" && cfg.pages.some((x) => x.path === m.page)) {
       state = { ...state, page: m.page };
+      loadedKey = reloadKey();
       renderControls();
     }
   });
@@ -178,12 +167,10 @@ export function initCombinator(): void {
     const d = b.dataset;
     if (d.mood) {
       const m = cfg.moods.find((x) => x.id === d.mood)!;
-      apply({ layout: m.layout, scheme: m.scheme, mode: m.mode === "dark" ? "dark" : "light", texture: m.texture, sans: m.sans, mono: m.mono });
+      apply({ layout: m.layout, scheme: m.scheme, mode: m.mode === "dark" ? "dark" : "light", sans: m.sans, mono: m.mono });
     } else if (d.layout) apply({ layout: d.layout });
     else if (d.scheme) apply({ scheme: d.scheme });
     else if (d.mode) apply({ mode: d.mode as State["mode"] });
-    else if (d.toggle) apply({ toggle: d.toggle === "1" });
-    else if (d.texture) apply({ texture: d.texture });
     else if (d.page) apply({ page: d.page });
     else if (d.device) apply({ device: d.device as State["device"] });
   });
@@ -203,7 +190,6 @@ export function initCombinator(): void {
         layout: l.id,
         scheme: l.recommended.scheme,
         mode: l.recommended.mode === "dark" ? "dark" : "light",
-        texture: l.recommended.texture,
         sans: l.fonts.sans[0],
         mono: l.fonts.mono || state.mono,
         page: "/",

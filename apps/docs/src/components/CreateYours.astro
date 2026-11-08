@@ -1,5 +1,5 @@
 ---
-import { PLUGIN_PRESETS } from "../../../cli/src/plugins";
+import { PLUGIN_PRESETS } from "../../../../packages/create-rubrica/src/plugins";
 import { useDict, type Lang } from "../i18n";
 
 interface Props {
@@ -7,7 +7,16 @@ interface Props {
 }
 const d = useDict(Astro.props.lang);
 const t = d.create;
-const formText = { ...t.form, siteNamePh: t.siteNamePh };
+const formText = {
+  ...t.form,
+  siteNamePh: t.siteNamePh,
+  presets: PLUGIN_PRESETS.map((p) => ({ id: p.id, plugins: p.plugins, kinds: p.kinds })),
+};
+const LOCALES = [
+  { code: "pt-BR", label: "Português" },
+  { code: "en", label: "English" },
+  { code: "es", label: "Español" },
+];
 ---
 
 <section id="criar" class="section create">
@@ -20,11 +29,33 @@ const formText = { ...t.form, siteNamePh: t.siteNamePh };
 
     <form class="card" id="cs-form" novalidate aria-label={t.formAria}>
       <fieldset class="grp">
+        <legend>{t.kind}</legend>
+        <div class="presets">
+          <button type="button" class="preset" data-kind="pessoal" aria-pressed="true">
+            <span class="nm">{t.kindPersonal}</span>
+            <span class="ht">{t.kindPersonalHint}</span>
+          </button>
+          <button type="button" class="preset" data-kind="empresa" aria-pressed="false">
+            <span class="nm">{t.kindCompany}</span>
+            <span class="ht">{t.kindCompanyHint}</span>
+          </button>
+        </div>
+      </fieldset>
+
+      <fieldset class="grp">
+        <legend>{t.locales}</legend>
+        <div class="presets">
+          {LOCALES.map((l) => <button type="button" class="preset" data-locale={l.code} aria-pressed={l.code === "pt-BR" ? "true" : "false"}><span class="nm">{l.label}</span><span class="ht">{l.code}</span></button>)}
+        </div>
+        <p class="help">{t.localesHelp}</p>
+      </fieldset>
+
+      <fieldset class="grp">
         <legend>{t.plugins}</legend>
         <div class="presets">
           {
-            PLUGIN_PRESETS.map((p, i) => (
-              <button type="button" class="preset" data-preset={p.id} aria-pressed={i === 0 ? "true" : "false"}>
+            PLUGIN_PRESETS.map((p) => (
+              <button type="button" class="preset" data-preset={p.id} aria-pressed={p.id === "recommended" ? "true" : "false"}>
                 <span class="nm">{d.catalog.presets[p.id].label}</span>
                 <span class="ht">{d.catalog.presets[p.id].hint}</span>
               </button>
@@ -36,12 +67,8 @@ const formText = { ...t.form, siteNamePh: t.siteNamePh };
 
       <div class="fields">
         <label>
-          <span class="lbl">{t.authorName}</span>
-          <input name="authorName" autocomplete="name" placeholder={t.authorNamePh} />
-        </label>
-        <label>
-          <span class="lbl">{t.siteName} <i>{t.optional}</i></span>
-          <input name="siteName" placeholder={t.siteNamePh} />
+          <span class="lbl">{t.siteName}</span>
+          <input name="siteName" autocomplete="off" placeholder={t.siteNamePh} />
         </label>
         <label>
           <span class="lbl">{t.siteUrl}</span>
@@ -57,20 +84,6 @@ const formText = { ...t.form, siteNamePh: t.siteNamePh };
         <label class="wide">
           <span class="lbl">{t.description} <i>{t.optional}</i></span>
           <input name="siteDescription" placeholder={t.descriptionPh} />
-        </label>
-        <label>
-          <span class="lbl">{t.twitter} <i>{t.optional}</i></span>
-          <input name="twitterHandle" placeholder={t.twitterPh} />
-        </label>
-        <label>
-          <span class="lbl">{t.profession} <i>{t.optional}</i></span>
-          <input name="profession" placeholder={t.professionPh} />
-          <small class="note">{t.professionNote}</small>
-        </label>
-        <label>
-          <span class="lbl">{t.specialties} <i>{t.optional}</i></span>
-          <input name="specialties" placeholder={t.specialtiesPh} />
-          <small class="note">{t.specialtiesNote}</small>
         </label>
       </div>
 
@@ -146,6 +159,9 @@ const formText = { ...t.form, siteNamePh: t.siteNamePh };
   .meta {
     font-size: 13px;
     color: var(--ink-3);
+  }
+  .preset[hidden] {
+    display: none;
   }
   .presets {
     display: grid;

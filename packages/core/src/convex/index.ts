@@ -42,6 +42,10 @@ import { ref } from "./server";
 import { settingsFunctions, textsFunctions } from "./settings";
 import { siteFunctions } from "./site";
 import { usersFunctions } from "./users";
+import { commerceFunctions } from "./commerce/commerce";
+import { contractTemplatesFunctions } from "./commerce/contractTemplates";
+import { addCommerceRoutes } from "./commerce/http";
+import { proposalsFunctions } from "./commerce/proposals";
 
 export function createRubrica(config: RubricaConfig = {}) {
   const rt = resolveRuntime(config);
@@ -68,6 +72,10 @@ export function createRubrica(config: RubricaConfig = {}) {
     routine: once(() => routineFunctions(rt)),
     plans: once(() => plansFunctions(rt)),
     team: once(() => teamFunctions(rt)),
+    // Comercial (commerce/): propostas e contratos.
+    commerce: once(() => commerceFunctions(rt)),
+    proposals: once(() => proposalsFunctions(rt)),
+    contractTemplates: once(() => contractTemplatesFunctions(rt)),
   };
 
   return {
@@ -81,12 +89,14 @@ export function createRubrica(config: RubricaConfig = {}) {
     get http() {
       const http = httpRouter();
       auth().auth.addHttpRoutes(http);
+      addCommerceRoutes(http);
       return http;
     },
     /** Para `convex/crons.ts`: `export default rubrica.crons;` */
     get crons() {
       const crons = cronJobs();
       crons.daily("rubrica: limpar registros e limites vencidos", { hourUTC: 6, minuteUTC: 0 }, ref("mutation", "audit", "cleanup"), {});
+      crons.daily("rubrica: limpar sessoes de proposta", { hourUTC: 3, minuteUTC: 0 }, ref("mutation", "proposals", "cleanupExpiredSessions"), {});
       return crons;
     },
     get users() {
@@ -137,6 +147,15 @@ export function createRubrica(config: RubricaConfig = {}) {
     get team() {
       return modules.team();
     },
+    get commerce() {
+      return modules.commerce();
+    },
+    get proposals() {
+      return modules.proposals();
+    },
+    get contractTemplates() {
+      return modules.contractTemplates();
+    },
   };
 }
 
@@ -160,6 +179,9 @@ export const RUBRICA_MODULES = [
   "routine",
   "plans",
   "team",
+  "commerce",
+  "proposals",
+  "contractTemplates",
 ] as const satisfies readonly (keyof Rubrica)[];
 
 export type { RubricaConfig } from "./runtime";
@@ -169,6 +191,8 @@ export { logAudit, logUserAction, checkRateLimit, recordRateLimitAttempt, hitRat
 export { ROLES, PERMISSIONS, ROLE_LABELS, can, isRole, type Role, type Permission } from "./lib/roles";
 export { buildSnapshot } from "./site";
 export { MODULE_DIR } from "./server";
+export { commerceTables } from "./commerce/schema";
+export { commercePersonalData, type PersonalDataSource, type CommercePersonalDataExport } from "./commerce/personalData";
 export type { DataModel, Doc, Id, QueryCtx, MutationCtx, ActionCtx } from "./server";
 
 export type RubricaModule = (typeof RUBRICA_MODULES)[number];

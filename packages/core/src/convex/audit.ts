@@ -62,6 +62,7 @@ export const RATE_LIMITS = {
   contact_submit: { windowMs: 60 * 60 * 1000, perKey: 5, blockMs: 60 * 60 * 1000 },
   testimonial_submit: { windowMs: 7 * 24 * 60 * 60 * 1000, perKey: 1, blockMs: 7 * 24 * 60 * 60 * 1000 },
   webhook_invalid: { windowMs: 60 * 60 * 1000, perKey: 20, blockMs: 60 * 60 * 1000 },
+  checkout_start: { windowMs: 60 * 60 * 1000, perKey: 10, blockMs: 60 * 60 * 1000 },
 } as const;
 export type RateLimitType = keyof typeof RATE_LIMITS;
 

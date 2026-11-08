@@ -1,6 +1,7 @@
 /** Ganchos do contrato de blocos: validação entre campos e variações herdadas do núcleo. */
 import { describe, expect, it } from "vitest";
-import { defineBlock, validateBlock } from "../src/blocks/define";
+import { defineBlock, serializeBlock, validateBlock, type BlockDefinition } from "../src/blocks/define";
+import { CORE_BLOCKS } from "../src/blocks/catalog";
 import { field } from "../src/blocks/fields";
 import { CORE_VARIANTS, resolveVariant, variantsFor } from "../src/theme/contract";
 import { showcaseBlocks } from "../src/data/showcase";
@@ -52,5 +53,38 @@ describe("variações herdadas", () => {
     const blocks = showcaseBlocks(withRule, {}, ["pt-BR", "en"]);
     expect(blocks.map((b) => b.fields.url)).toEqual(["https://example.com/a", "https://example.com/b"]);
     expect(blocks[0]!.fields.label).toEqual({ "pt-BR": "Exemplo", en: "Exemplo" });
+  });
+});
+
+describe("orientação de uso (guidance)", () => {
+  const types = new Set(CORE_BLOCKS.map((b) => b.type as string));
+
+  it.each(CORE_BLOCKS.map((b) => [b.type, b] as const))("%s tem quando usar, quando não usar e com o que combina", (_type, def) => {
+    const g = (def as BlockDefinition).guidance;
+    expect(g, "guidance").toBeDefined();
+    expect(g!.use.trim().length).toBeGreaterThan(20);
+    expect(g!.avoid?.trim().length ?? 0).toBeGreaterThan(20);
+    expect(g!.pairsWith?.length ?? 0).toBeGreaterThan(0);
+    for (const t of g!.pairsWith ?? []) {
+      expect(types.has(t), `${def.type} combina com "${t}", que não é bloco do núcleo`).toBe(true);
+      expect(t).not.toBe(def.type);
+    }
+  });
+});
+
+describe("serializeBlock", () => {
+  it("só dados: sem funções nem undefined, com a orientação e o aviso de regra própria", () => {
+    const data = serializeBlock(withRule);
+    expect(data).toEqual({ type: "regra", label: "Regra", description: "", category: "comum", fields: withRule.fields, customValidation: true });
+    expect(JSON.parse(JSON.stringify(data))).toEqual(data);
+  });
+
+  it("todo bloco do núcleo atravessa sem perder campos", () => {
+    for (const def of CORE_BLOCKS as readonly BlockDefinition[]) {
+      const data = serializeBlock(def);
+      expect(data.fields).toEqual(JSON.parse(JSON.stringify(def.fields)));
+      expect(data.guidance).toEqual(def.guidance);
+      expect(Object.values(data).some((v) => typeof v === "function")).toBe(false);
+    }
   });
 });

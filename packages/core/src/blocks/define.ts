@@ -3,12 +3,28 @@ import { validateFields, type FieldError, type FieldMap } from "./fields";
 
 export type BlockCategory = "comum" | SiteKind;
 
+/**
+ * Orientação de uso do bloco, para quem monta a página (agentes pelo MCP, pessoas pela
+ * documentação): quando usar, quando não usar e com quais blocos ele combina. Texto em
+ * pt-BR, curto e prático. Não muda o que o bloco aceita nem como ele aparece.
+ */
+export interface BlockGuidance {
+  /** Quando usar: a função do bloco na página e onde ele costuma ficar. */
+  use: string;
+  /** Quando não usar, e o bloco que serve melhor nesse caso. */
+  avoid?: string;
+  /** Tipos de bloco que combinam com ele na mesma página (antes ou depois). */
+  pairsWith?: readonly string[];
+}
+
 export interface BlockDefinition<M extends FieldMap = FieldMap> {
   /** Identificador estável, em kebab-case. Mudar é quebra de contrato (major). */
   type: string;
   /** Nome no catálogo do painel. */
   label: string;
   description: string;
+  /** Orientação de uso (quando usar, quando não, com o que combina). Opcional. */
+  guidance?: BlockGuidance;
   /** `comum` aparece nos dois tipos de site; `pessoal`/`empresa` só no seu. */
   category: BlockCategory;
   fields: M;
@@ -79,4 +95,40 @@ export function validateBlock(
     }
   }
   return block.id ? errors.map((e) => ({ ...e, blockId: block.id })) : errors;
+}
+
+/**
+ * Definição de bloco só com dados (sem funções), para atravessar o Convex e chegar a quem
+ * não importa o código do projeto (o MCP): tipo, rótulo, descrição, orientação, categoria,
+ * plugin, fonte e campos. As regras em função (`validate`) não viajam: `customValidation`
+ * avisa que o backend confere mais do que os campos dizem.
+ */
+export interface SerializedBlock {
+  type: string;
+  label: string;
+  description: string;
+  guidance?: BlockGuidance;
+  category: BlockCategory;
+  fields: FieldMap;
+  source?: BlockDefinition["source"];
+  plugin?: string;
+  interactive?: boolean;
+  customValidation?: boolean;
+}
+
+export function serializeBlock(def: BlockDefinition): SerializedBlock {
+  const data: SerializedBlock = {
+    type: def.type,
+    label: def.label,
+    description: def.description,
+    ...(def.guidance && { guidance: def.guidance }),
+    category: def.category,
+    fields: def.fields,
+    ...(def.source && { source: def.source }),
+    ...(def.plugin && { plugin: def.plugin }),
+    ...(def.interactive && { interactive: true }),
+    ...(def.validate && { customValidation: true }),
+  };
+  // Ida e volta por JSON: tira `undefined` (o Convex não aceita) e qualquer função perdida.
+  return JSON.parse(JSON.stringify(data)) as SerializedBlock;
 }

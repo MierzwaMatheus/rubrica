@@ -2,6 +2,13 @@
 
 Lista viva do que falta para a v2 estável, vinda das revisões. Cada item sai daqui quando entra na `v2`.
 
+## Paridade com a v1 (obrigatório antes da v2.0.0; achado no piloto do mmlo)
+- **RSS** do blog (`/rss.xml`, por idioma), como a v1 gerava.
+- **Analytics (Umami)**: a v1 injetava o script quando configurado; na v2, plugin com o script externo e CSP.
+- **Ícones e metadados do `<head>`**: favicon (SVG/ICO), `apple-touch-icon`, `manifest.webmanifest`, `theme-color` a partir das configurações.
+- **Capa padrão de post** (quando o post não tem capa): imagem da marca nas configurações.
+- **Textos personalizados no código da v1**: o `migrar` deveria usar os arquivos de tradução do projeto v1 como segundo padrão (antes do texto do template).
+
 ## Contrato (ajustes aditivos, antes de portar os outros 12 temas)
 - **Métrica no card de case**: campo opcional `metric` no projeto (`{ value, label }` por idioma), como o "~50 skills em produção" da v1.
 - **Terminal (ilha)**: o "Press ~" da v1 não existe no núcleo; decidir se vira plugin do tipo pessoal.

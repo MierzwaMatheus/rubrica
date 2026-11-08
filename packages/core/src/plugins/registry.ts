@@ -80,6 +80,7 @@ export const CORE_PLUGINS: PluginDefinition[] = [
     kinds: ["pessoal"],
     defaultEnabled: { pessoal: true },
     collections: ["resume"],
+    pages: ["/curriculo"],
     admin: [{ path: "/admin/curriculo", label: "Currículo", icon: "graduation-cap", roles: [...CONTENT] }],
   }),
   definePlugin({
@@ -115,6 +116,7 @@ export const CORE_PLUGINS: PluginDefinition[] = [
     kinds: ["empresa"],
     defaultEnabled: { empresa: true },
     collections: ["plans"],
+    pages: ["/precos"],
     admin: [{ path: "/admin/planos", label: "Planos", icon: "tags", roles: [...CONTENT, "comercial"] }],
     mcpTools: ["plans_list", "plans_upsert"],
   }),

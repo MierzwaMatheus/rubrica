@@ -37,6 +37,12 @@ export interface PluginDefinition {
   blocks?: BlockDefinition[];
   collections?: CollectionName[];
   routes?: PluginRoute[];
+  /**
+   * Páginas fixas que só existem com o plugin ligado (ex.: `/precos`). Plugin desligado:
+   * a página não é gerada e o item de menu que aponta para ela some. A listagem de
+   * `posts` e `projects` vem das bases de `settings.paths`, não daqui.
+   */
+  pages?: string[];
   admin?: AdminScreen[];
   /** Nomes das ferramentas do MCP que o plugin acrescenta. */
   mcpTools?: string[];

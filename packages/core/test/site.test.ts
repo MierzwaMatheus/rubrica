@@ -7,6 +7,8 @@ import { CORE_PLUGINS } from "../src/plugins/registry";
 import { defineTheme } from "../src/theme/contract";
 import { DefaultShell } from "../src/components";
 import { buildHead } from "../src/seo/head";
+import { sitemapXml } from "../src/seo/sitemap";
+import { rssFeeds } from "../src/seo/rss";
 
 const theme = defineTheme({ id: "teste", label: "Teste", contract: "^1", tokens: {}, Shell: DefaultShell, variants: { cases: [{ value: "grade", label: "Grade" }] } });
 const fixtures = fileURLToPath(new URL("../../../apps/demo/fixtures/pessoal", import.meta.url));
@@ -138,5 +140,113 @@ describe("caminho do detalhe dos cases por tipo de site", () => {
     const tags = buildHead(r, empresa.settings, empresa.context(r.locale, r.url, r.alternates));
     expect(tags.find((t) => t.attrs?.rel === "canonical")?.attrs?.href).toContain("/cases/");
     expect(tags.filter((t) => t.attrs?.hreflang).every((t) => String(t.attrs!.href).includes("/cases/"))).toBe(true);
+  });
+});
+
+async function empresaSnapshot() {
+  return fixtureSource(empresaFixtures).load();
+}
+const build = (snapshot: Awaited<ReturnType<typeof empresaSnapshot>>) => buildSite({ snapshot, theme, blocks: CORE_BLOCKS, plugins: CORE_PLUGINS });
+const withPlugins = (snapshot: Awaited<ReturnType<typeof empresaSnapshot>>, off: string[]) => ({
+  ...snapshot,
+  site: { ...snapshot.site, plugins: { ...snapshot.site.plugins, ...Object.fromEntries(off.map((p) => [p, false])) } },
+});
+
+describe("plugin desligado", () => {
+  it("blog desligado: sem página /blog, sem posts, sem item de menu, sitemap e feed coerentes", async () => {
+    const on = build(await empresaSnapshot());
+    expect(on.routes.some((r) => r.url === "/blog")).toBe(true);
+    const off = build(withPlugins(await empresaSnapshot(), ["blog"]));
+    const urls = off.routes.map((r) => r.url);
+    expect(urls).not.toContain("/blog");
+    expect(urls.some((u) => u.includes("/blog"))).toBe(false);
+    expect(off.context("pt-BR", "/").site.navigation.map((n) => n.href)).not.toContain("/blog");
+    expect(on.context("pt-BR", "/").site.navigation.map((n) => n.href)).toContain("/blog");
+    expect(sitemapXml("https://x.test", off.routes)).not.toContain("/blog");
+    expect(rssFeeds(off)).toEqual([]);
+  });
+
+  it("menu em outro idioma também perde o item", async () => {
+    const off = build(withPlugins(await empresaSnapshot(), ["blog"]));
+    expect(off.context("en", "/en").site.navigation.map((n) => n.href)).not.toContain("/en/blog");
+  });
+
+  it("preços desligado: a listagem some mesmo com o FAQ sobrando, e o menu também", async () => {
+    const off = build(withPlugins(await empresaSnapshot(), ["pricing"]));
+    expect(off.routes.some((r) => r.url === "/precos")).toBe(false);
+    expect(off.context("pt-BR", "/").site.navigation.map((n) => n.href)).not.toContain("/precos");
+  });
+
+  it("portfólio desligado: some a listagem em /cases (base configurada) e o detalhe", async () => {
+    const off = build(withPlugins(await empresaSnapshot(), ["portfolio"]));
+    expect(off.routes.some((r) => r.url === "/cases" || r.type === "case")).toBe(false);
+    expect(off.context("pt-BR", "/").site.navigation.map((n) => n.href)).not.toContain("/cases");
+  });
+
+  it("página com vários blocos: só o bloco do plugin desligado some", async () => {
+    const off = build(withPlugins(await empresaSnapshot(), ["team"]));
+    const page = off.routes.find((r) => r.type === "page" && r.url === "/quem-somos");
+    expect(page?.type === "page" && page.page.blocks.map((b) => b.type)).toEqual(["texto", "numeros", "lista-itens"]);
+    expect(page?.type === "page" && page.page.blocks.map((b) => b.index)).toEqual([0, 1, 2]);
+  });
+
+  it("bloco de cases na home some com o portfólio desligado", async () => {
+    const off = build(withPlugins(await empresaSnapshot(), ["portfolio", "testimonials"]));
+    const home = off.routes.find((r) => r.type === "page" && r.url === "/");
+    const types = home?.type === "page" ? home.page.blocks.map((b) => b.type) : [];
+    expect(types).not.toContain("cases");
+    expect(types).not.toContain("depoimentos");
+    expect(types).toContain("servicos");
+  });
+
+  it("a home nunca some por causa de plugin", async () => {
+    const off = build(withPlugins(await empresaSnapshot(), ["blog", "portfolio", "testimonials", "pricing", "team"]));
+    expect(off.routes.some((r) => r.url === "/")).toBe(true);
+  });
+});
+
+describe("blocos de coleção sem itens", () => {
+  it("destaques ausentes: cai para os primeiros da lista, até o limite", async () => {
+    const snapshot = await empresaSnapshot();
+    snapshot.collections.projects = snapshot.collections.projects.map((p) => ({ ...p, featured: false }));
+    const home = build(snapshot).routes.find((r) => r.type === "page" && r.url === "/");
+    const cases = home?.type === "page" ? home.page.blocks.find((b) => b.type === "cases") : undefined;
+    expect(cases?.items.length).toBe(Math.min(3, snapshot.collections.projects.length));
+  });
+
+  it("com destaques, só eles", async () => {
+    const snapshot = await empresaSnapshot();
+    snapshot.collections.projects = snapshot.collections.projects.map((p, i) => ({ ...p, featured: i === 0 }));
+    const home = build(snapshot).routes.find((r) => r.type === "page" && r.url === "/");
+    const cases = home?.type === "page" ? home.page.blocks.find((b) => b.type === "cases") : undefined;
+    expect(cases?.items.length).toBe(1);
+  });
+
+  it("sem itens, o bloco some da página que tem outros blocos (sem título solto)", async () => {
+    const snapshot = await empresaSnapshot();
+    snapshot.collections.testimonials = [];
+    snapshot.collections.projects = [];
+    const home = build(snapshot).routes.find((r) => r.type === "page" && r.url === "/");
+    const types = home?.type === "page" ? home.page.blocks.map((b) => b.type) : [];
+    expect(types).not.toContain("depoimentos");
+    expect(types).not.toContain("cases");
+    expect(types).toContain("hero");
+  });
+
+  it("página só com a listagem vazia continua com o bloco (vazio padrão do tema)", async () => {
+    const snapshot = await empresaSnapshot();
+    snapshot.collections.projects = [];
+    const page = build(snapshot).routes.find((r) => r.type === "page" && r.url === "/cases");
+    expect(page?.type === "page" && page.page.blocks.map((b) => b.type)).toEqual(["cases"]);
+  });
+
+  it("convite de depoimento (ilha ativa) segura o bloco mesmo sem depoimentos", async () => {
+    const snapshot = await empresaSnapshot();
+    snapshot.collections.testimonials = [];
+    snapshot.site.plugins["testimonials-intake"] = true;
+    const home = snapshot.pages.find((p) => p.path === "/")!;
+    home.blocks.find((b) => b.type === "depoimentos")!.fields.allowSubmission = true;
+    const r = build(snapshot).routes.find((x) => x.type === "page" && x.url === "/");
+    expect(r?.type === "page" && r.page.blocks.some((b) => b.type === "depoimentos")).toBe(true);
   });
 });

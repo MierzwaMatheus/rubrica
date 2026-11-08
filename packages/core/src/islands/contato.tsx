@@ -4,7 +4,7 @@
  * sobre o assunto (vai em `details.topic`), a mensagem e os dados, com consentimento LGPD
  * obrigatório. Envia por `api.ts`.
  */
-import { useId, useState, type FormEvent } from "react";
+import { useEffect, useId, useState, type FormEvent } from "react";
 import { apiBase, submitJson, type ContatoRequest } from "./api";
 import { Consent, EMAIL_RE, Field, makeT, useFocusOnChange, type FormIslandProps } from "./kit";
 
@@ -14,6 +14,9 @@ type Errors = Partial<Record<"topic" | "message" | "name" | "email" | "consent",
 export default function Contato({ blockId, page, locale, fields, texts, privacyHref }: FormIslandProps) {
   const t = makeT(texts);
   const uid = useId();
+  // O HTML estático traz o formulário antes da hidratação: sem JS os botões ficam desligados.
+  const [ready, setReady] = useState(false);
+  useEffect(() => setReady(true), []);
   const mode = fields.mode === "form" ? "form" : "wizard";
   const enabled = !!apiBase();
   const [step, setStep] = useState(0);
@@ -145,11 +148,11 @@ export default function Contato({ blockId, page, locale, fields, texts, privacyH
           <span />
         )}
         {mode === "wizard" && !last ? (
-          <button type="submit" className="rb-button rb-button--primary">
+          <button type="submit" className="rb-button rb-button--primary" disabled={!ready}>
             {t("form.next")}
           </button>
         ) : (
-          <button type="submit" className="rb-button rb-button--primary" disabled={!enabled || status === "sending"}>
+          <button type="submit" className="rb-button rb-button--primary" disabled={!ready || !enabled || status === "sending"}>
             {status === "sending" ? t("form.sending") : t("form.send")}
           </button>
         )}

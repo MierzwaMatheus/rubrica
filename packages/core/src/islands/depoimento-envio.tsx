@@ -4,7 +4,7 @@
  * (o vídeo e o recorte de foto da v1 ficaram de fora), com consentimento LGPD obrigatório.
  * O depoimento chega como pendente e só aparece no site depois da aprovação no painel.
  */
-import { useId, useState, type FormEvent } from "react";
+import { useEffect, useId, useState, type FormEvent } from "react";
 import { apiBase, submitJson, type DepoimentoRequest } from "./api";
 import { Consent, EMAIL_RE, Field, makeT, useFocusOnChange, type FormIslandProps } from "./kit";
 
@@ -13,6 +13,9 @@ type Errors = Partial<Record<"name" | "email" | "quote" | "consent", string>>;
 export default function DepoimentoEnvio({ blockId, page, locale, texts, privacyHref }: FormIslandProps) {
   const t = makeT(texts);
   const uid = useId();
+  // O HTML estático traz o formulário antes da hidratação: sem JS os botões ficam desligados.
+  const [ready, setReady] = useState(false);
+  useEffect(() => setReady(true), []);
   const enabled = !!apiBase();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
@@ -99,7 +102,7 @@ export default function DepoimentoEnvio({ blockId, page, locale, texts, privacyH
         <button type="button" className="rb-button rb-button--secondary" onClick={() => setOpen(false)}>
           {t("form.cancel")}
         </button>
-        <button type="submit" className="rb-button rb-button--primary" disabled={!enabled || status === "sending"}>
+        <button type="submit" className="rb-button rb-button--primary" disabled={!ready || !enabled || status === "sending"}>
           {status === "sending" ? t("form.sending") : t("form.send")}
         </button>
       </div>

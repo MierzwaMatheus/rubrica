@@ -60,6 +60,7 @@ In Claude Code, you can type `! npx rubrica mcp login` in the prompt itself. The
 | Site | Read and change settings (name, appearance, navigation, social links), turn plugins on and off, **publish** (triggers the build) |
 | Pages and blocks | List, create (always as draft), change title, path and SEO; add, edit fields, move, hide and remove blocks |
 | Collections | List, read, create (draft), edit, publish and remove posts, projects, services, testimonials, FAQ, résumé, team and plans |
+| Proposals | List, read, create and edit commercial proposals (with an optional link password that is never returned in answers), with the proposals plugin on |
 | Interface texts | See and customize texts per language |
 | Media | List the library and upload images from a local path |
 | Contacts | See requests and change the status (with the contact plugin on) |
@@ -81,6 +82,7 @@ Writing does not publish: the static site only changes at the next build. The ag
 - The server runs as your process, with the user's login and role. In **production**, always read the preview: the content changes immediately in the database.
 - The MCP **does not use** `convex dev|deploy|run|import`: only the project's public functions, with the user's role.
 - Tokens and passwords never appear in answers, resources or error messages.
+- A proposal password is a tool argument (the backend stores only the hash) and goes through the conversation with the agent. If that is a concern, create the proposal without a password and set it in the panel.
 - Image upload reads a local file (images only, checked by content). Restrict the agent's file system access if that is a concern.
 
 ## Skills: the "how to write"

@@ -167,6 +167,17 @@ As colunas "papel" dizem quem enxerga a ferramenta (permissões de `PERMISSIONS`
 | `collection_remove` | Manda um item de qualquer coleção para a lixeira |
 | `collection_reorder` | Ordem dos itens |
 
+**Propostas** — `proposals`: root, admin, comercial, proposal-editor; só com o plugin `proposals` ligado
+
+| Ferramenta | O que faz |
+|---|---|
+| `proposals_list` | Propostas (cliente, título, situação `pending`/`accepted`/`expired`/`trash`, valor, versão, link público, validade, `hasPassword`); filtros `filter` (`all`, `accepted`, `pending`), `search`, `includeDeleted` |
+| `proposals_get` | Proposta inteira, por `id` ou `slug`. Sem a senha (só `hasPassword`), sem o aceite (dados pessoais do cliente) e sem o contrato congelado |
+| `proposals_create` | Cria a proposta (versão 1). Campos do `proposalContentFields` do backend (cliente, título, objetivo, escopo, cronograma, valores em reais, desconto e brindes, pagamento, condições, rescisão). `slug` opcional (sem ele sai do cliente + sufixo aleatório), `expiresAt` (`AAAA-MM-DD`, padrão 10 dias) e `password` |
+| `proposals_update` | Só proposta não aceita e fora da lixeira. `patch` (mesclado por idioma), `unset` (`scopePrices`, `originalValue`, `giftIndexes`, `templateId`), `expiresAt`, `password` (troca a senha e derruba as sessões) ou `removePassword`. Mudança de conteúdo ou de validade sobe a versão e guarda a anterior; trocar só a senha não versiona (como no painel) |
+
+A **senha da proposta** é argumento de `proposals_create` e `proposals_update`: segue para o backend, que guarda só o hash (PBKDF2). Ela nunca volta em resposta, prévia, aviso ou erro (a prévia mostra `(definida; oculta)`), mas passa pela conversa com o agente; quem não quer isso cria sem senha e define no painel. Sem senha, qualquer pessoa com o link vê a proposta, e a prévia avisa. Apagar, restaurar, aceite e contratos continuam só no painel. O desconto, os brindes e o preço por item são conferidos localmente com as mesmas regras do backend (`validateDiscount`), que confere de novo.
+
 **Textos de interface** — `panel` (ler), `texts`: root, admin, content-editor (gravar)
 
 | Ferramenta | O que faz |

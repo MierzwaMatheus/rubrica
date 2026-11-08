@@ -29,12 +29,19 @@ describe("delegação", () => {
     expect(calls[0]![1]).toEqual(["padrao", "--sem-lighthouse"]);
   });
 
+  it("acha o bin do mcp do monorepo e não acha pacote que não existe", () => {
+    const dir = tmp();
+    expect(findRubricaBin(repo("apps/demo"), "@rubrica/mcp", "mcp", "bin/rubrica-mcp.js")).toMatch(/packages\/mcp\/bin\/rubrica-mcp\.js$/);
+    expect(findRubricaBin(dir, "@rubrica/pacote-que-nao-existe", "pacote-que-nao-existe", "bin/x.js")).toBeNull();
+  });
+
   it("mcp ausente: mensagem clara no stderr e código de erro", () => {
     const errors: string[] = [];
-    const dir = tmp();
-    expect(findRubricaBin(dir, "@rubrica/mcp", "mcp-que-nao-existe", "bin/x.js")).toBeNull();
-    const code = runMcp(["serve"], { cwd: dir, error: (m) => errors.push(m), spawn: () => 0 });
+    const spawned: string[] = [];
+    // O @rubrica/mcp existe no workspace (e o NODE_PATH do pnpm o enxerga): simula a ausência.
+    const code = runMcp(["serve"], { cwd: tmp(), error: (m) => errors.push(m), spawn: (bin) => (spawned.push(bin), 0), findBin: () => null });
     expect(code).toBe(1);
+    expect(spawned).toEqual([]);
     expect(errors[0]).toMatch(/pnpm add -D @rubrica\/mcp/);
   });
 });

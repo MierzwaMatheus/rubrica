@@ -26,7 +26,7 @@ body { font-family: var(--rb-font-sans); -webkit-font-smoothing: antialiased; }
   background: var(--rb-bg); color: var(--rb-fg); font-family: var(--rb-font-sans);
   overflow-x: clip;
 }
-.poster-root a { color: inherit; }
+:where(.poster-root) a { color: inherit; }
 .poster-root ::selection { background: var(--rb-accent); color: var(--rb-accent-fg); }
 .poster-root :where(a, button, summary, label):focus-visible { outline: 3px solid var(--rb-fg); outline-offset: 3px; }
 .poster-root .rb-skip:focus { background: var(--rb-fg); color: var(--rb-bg); }
@@ -74,10 +74,20 @@ body { font-family: var(--rb-font-sans); -webkit-font-smoothing: antialiased; }
 }
 .poster-drawer a[aria-current="page"] { text-decoration: underline; text-decoration-thickness: 4px; text-underline-offset: 6px; }
 @media (max-width: 900px) {
+  .poster-bar-in { flex-wrap: wrap; row-gap: 0; }
+  .poster-brand { flex: 1 1 auto; }
+  .poster-bar-tools { gap: 4px; }
   .poster-links { display: none; }
   .poster-menu-btn { display: inline-flex; }
   .poster-bar-check:checked ~ .poster-drawer { display: block; }
 }
+
+/* ---------- rodapé ---------- */
+.poster-foot { border-top: 5px solid var(--rb-fg); padding-block: 28px 36px; }
+.poster-foot-in { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 14px 28px; font-family: var(--rb-font-mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; }
+.poster-foot a { display: inline-flex; align-items: center; min-height: 44px; text-underline-offset: 4px; }
+.poster-foot-links { display: flex; flex-wrap: wrap; gap: 0 20px; margin: 0; padding: 0; list-style: none; }
+.poster-foot-in > span { display: inline-flex; align-items: center; min-height: 44px; }
 
 /* ---------- tipografia gigante ---------- */
 .poster-fit { container-type: inline-size; min-width: 0; }
@@ -151,7 +161,7 @@ body { font-family: var(--rb-font-sans); -webkit-font-smoothing: antialiased; }
   align-items: end; gap: clamp(28px, 4vw, 48px) clamp(24px, 4vw, 56px);
 }
 .poster-hero-name { grid-area: nome; align-self: start; }
-.poster-hero-first { line-height: .84; }
+.poster-hero-first { line-height: .92; }
 .poster-hero-rest { line-height: .9; letter-spacing: -.01em; margin-top: .08em; }
 .poster-hero-deco { grid-area: deco; position: relative; align-self: start; width: 100%; aspect-ratio: 1; }
 .poster-disc { position: absolute; inset: 6%; border-radius: 50%; background: var(--rb-accent-2); }

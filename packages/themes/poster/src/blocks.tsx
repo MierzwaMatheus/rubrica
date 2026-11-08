@@ -56,7 +56,7 @@ export function HeroBlock({ id, variant, fields, headingLevel, ctx }: Props) {
                   </span>
                 </>
               ) : (
-                <span className="poster-giant poster-up poster-hero-first" style={fit(title, 220, K_CAPS, 3)}>
+                <span className="poster-giant poster-up poster-hero-first" style={fit(title, 220, K_CAPS, 4)}>
                   {title}
                 </span>
               )}

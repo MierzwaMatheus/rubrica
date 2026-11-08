@@ -8,11 +8,14 @@
     "preview": "astro preview"
   },
   "dependencies": {
+    "@astrojs/react": "^7.1.4",
+    "@auth/core": "^0.41.3",
+    "@convex-dev/auth": "^0.0.96",
     "@rubrica/core": "workspace:^",
     "@rubrica/theme-padrao": "workspace:^",
     "astro": "^7.4.7",
+    "convex": "^1.49.0",
     "react": "^19.2.1",
-    "react-dom": "^19.2.1",
-    "@astrojs/react": "^7.1.4"
+    "react-dom": "^19.2.1"
   }
 }

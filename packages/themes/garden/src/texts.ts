@@ -14,6 +14,7 @@ export const GARDEN_TEXTS: Record<string, Tr> = {
   "garden.nav": tr("Navegação do jardim", "Garden navigation", "Navegación del jardín"),
   "garden.legend": tr("Legenda dos estágios", "Growth stages", "Leyenda de las etapas"),
   "garden.map": tr("Mapa do jardim", "Garden map", "Mapa del jardín"),
+  "garden.rss": tr("Feed RSS", "RSS feed", "Feed RSS"),
   "garden.mapAria": tr(
     "Mapa do jardim: {pages} páginas ligadas entre si. Você está em {here}.",
     "Garden map: {pages} pages linked together. You are at {here}.",

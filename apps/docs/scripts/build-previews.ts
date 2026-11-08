@@ -89,7 +89,7 @@ function adapt(prefix: string, out: string): void {
   rmSync(join(out, "admin"), { recursive: true, force: true });
   // O rss.xml fica: o rodapé de alguns temas (ex.: garden) linka o feed.
   for (const f of ["robots.txt", "sitemap.xml", "manifest.webmanifest"]) rmSync(join(out, f), { force: true });
-  writeFileSync(join(out, "preview-bridge.js"), bridgeSource.replace("__PREFIX__", prefix));
+  writeFileSync(join(out, "preview-bridge.js"), bridgeSource.replace('var PREFIX = "__PREFIX__";', `var PREFIX = ${JSON.stringify(prefix)};`));
   for (const file of walk(out)) {
     let text = readFileSync(file, "utf-8");
     if (file.endsWith(".html")) {

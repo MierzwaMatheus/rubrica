@@ -51,9 +51,9 @@ describe("tema do projeto", () => {
     const theme = await loadProjectTheme(root);
     expect(theme).toMatchObject({ source: "tema", id: "padrao", package: "@rubrica/theme-padrao" });
     expect(themeVariants(theme, "cases").map((v) => v.value)).toEqual(["grade", "lista"]);
-    // O padrão desenha o próprio hero: sem variações do núcleo para ele.
+    // O padrão desenha o próprio hero, com as variações dele (início e cabeçalho de página).
     expect(theme.overridden).toContain("hero");
-    expect(themeVariants(theme, "hero")).toEqual([]);
+    expect(themeVariants(theme, "hero").map((v) => v.value)).toEqual(["inicio", "pagina"]);
     expect(themeRecipe(theme, "pessoal")[0]!.blocks.map((b) => b.type)).toContain("numeros");
     // O arquivo temporário não fica para trás.
     expect(readdirSync(join(root, "node_modules/.cache/rubrica-mcp"))).toEqual([]);

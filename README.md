@@ -9,14 +9,14 @@
 
 ### _Assine com a sua cara._
 
-Um sistema completo de portfólio profissional — pronto para você criar com um comando, personalizar e publicar com domínio próprio.
+Um site rápido, em HTML estático, com painel para editar sem tocar no código. Para o seu portfólio ou para o site da empresa de um cliente: você escolhe o tema, monta as páginas com blocos e publica com domínio próprio.
 
-**[Veja os 13 layouts funcionando e monte o seu →](https://userubrica.vercel.app)**
+**[Veja os 14 temas funcionando e monte o seu →](https://userubrica.vercel.app)**
 
 <br />
 
-[![License](https://img.shields.io/badge/license-GPL--3.0-4D7C5F?style=flat-square)](./LICENSE)
-[![Stack](https://img.shields.io/badge/React%20%2B%20Convex-1A1A18?style=flat-square)](https://convex.dev)
+[![Versão](https://img.shields.io/badge/vers%C3%A3o-2.0-4D7C5F?style=flat-square)](./CHANGELOG.md)
+[![Stack](https://img.shields.io/badge/Astro%20%2B%20Convex-1A1A18?style=flat-square)](https://astro.build)
 [![Deploy](https://img.shields.io/badge/deploy-Vercel-C4664A?style=flat-square)](https://vercel.com)
 [![TypeScript](https://img.shields.io/badge/TypeScript-99%25-4D7C5F?style=flat-square)](https://www.typescriptlang.org)
 [![CI](https://github.com/MierzwaMatheus/rubrica/actions/workflows/ci.yml/badge.svg)](https://github.com/MierzwaMatheus/rubrica/actions/workflows/ci.yml)
@@ -27,320 +27,144 @@ Um sistema completo de portfólio profissional — pronto para você criar com u
 
 ## O que é o Rubrica
 
-A maioria das pessoas trava na mesma encruzilhada: começar um portfólio do zero dá trabalho demais, e os construtores prontos deixam todo mundo com a mesma cara.
+A maioria das pessoas trava na mesma encruzilhada: montar um site profissional do zero dá trabalho demais, e os construtores prontos deixam todo mundo com a mesma cara.
 
-Rubrica é a base que faltava no meio do caminho. É a estrutura técnica completa — home, portfólio, blog, currículo, propostas comerciais, painel admin, pagamentos — já resolvida. Você não monta o sistema. Você escolhe a cara, preenche o conteúdo e publica.
+Rubrica é a base que faltava no meio do caminho. É a estrutura técnica completa (páginas, blog, propostas comerciais, painel, pagamentos, SEO, idiomas) já resolvida. Você não monta o sistema: escolhe a cara, preenche o conteúdo e publica.
 
 A base técnica é coletiva. A identidade é sua.
 
-> **Por que isso existe**
->
-> Rubrica foi feito para qualquer profissional criativo que leva o próprio trabalho a sério e quer que isso apareça. Dev iniciante ou sênior, designer, freelancer — a fundação já está pronta. Você foca no que importa: o seu conteúdo e a sua marca.
->
-> Presença profissional não é luxo. É o mínimo que o seu trabalho merece.
+> **Novidade da v2.** O Rubrica deixou de ser um template copiado para o seu projeto e virou um **núcleo em pacote** (`@rubrica/core`) com **temas** (`@rubrica/theme-*`). Atualizar é subir a versão de um pacote, sem mesclar arquivos. Veja o que mudou no [CHANGELOG](./CHANGELOG.md) e, se você já tem um site v1, [como migrar](./docs/guia/migrar.md).
+
+<br />
+
+## Para quem é
+
+- **Profissionais criativos** (devs, designers, freelancers) que querem um portfólio com a própria cara: linha **pessoal**.
+- **Agências e freelancers que mantêm sites de clientes**: linha **empresa**. Cada cliente tem a sua instalação (repositório, Convex e Vercel próprios), e o cliente final usa só o painel, com o papel que a agência der a ele.
+
+## As duas linhas
+
+| | Pessoal | Empresa |
+|---|---|---|
+| Páginas de partida | Início, sobre, currículo, projetos, blog, depoimentos | Início, quem somos, serviços, preços, equipe, cases, contato |
+| Coleções próprias | Currículo, dia a dia | Planos e preços, equipe, dados da empresa |
+| Blocos próprios | `curriculo` | `precos`, `equipe`, `localizacao`, `logos-clientes` |
+| Em comum | Blog, projetos e cases, serviços, depoimentos, FAQ, propostas, contratos, pagamentos, contatos, LGPD, idiomas, MCP | |
 
 <br />
 
 ## O que você coloca no ar
 
-| | Módulo | O que entrega |
+| | Recurso | O que entrega |
 |---|---|---|
-| 🏠 | **Home** | Apresentação, números de destaque, cases em destaque, serviços, depoimentos e chamada de contato |
-| 💼 | **Portfólio** | Filtro por categoria e estudos de caso com papel, contexto, decisões, métricas e aprendizados |
-| ✍️ | **Blog** | Editor rich text (TipTap), tags, busca e RSS automático |
-| 📄 | **Currículo** | Estruturado, com export em PDF otimizado para ATS |
-| 🤝 | **Propostas** | Proteção por senha, aceite eletrônico, assinatura manuscrita e contrato em PDF |
-| ⚙️ | **Admin** | CRUD de tudo via interface — sem tocar no código, inclusive cores, fontes e os textos fixos do site |
-| 🧩 | **Plugins** | Liga e desliga features que você não quer expor |
-| 🤖 | **IA** _(opcional)_ | Tradução automática e geração de CV otimizado para vagas |
-| 💳 | **Pagamentos** _(opcional)_ | Link de checkout com PIX, boleto e cartão em até 12x via Asaas. O cartão é digitado na página segura do Asaas, nunca no seu site |
-| 🔔 | **Notificações** _(opcional)_ | Telegram quando alguém aceita uma proposta ou paga |
-| 🧠 | **Skills de IA** | O seu agente (Claude Code, Codex, OpenCode) edita o site e escreve apresentação, cases, currículo e posts com a sua voz |
+| 🧱 | **Páginas com blocos** | Monte e reordene as páginas no painel, com prévia ao vivo. Crie páginas novas sem código |
+| ⚡ | **HTML estático** | Astro gera tudo no build: rápido, com SEO completo (sitemap, RSS, `hreflang`, dados estruturados) e quase nenhum JavaScript |
+| 🎨 | **14 temas e 15 esquemas de cores** | Qualquer esquema funciona em qualquer tema, claro e escuro. As fontes se trocam no painel |
+| 🌍 | **Vários idiomas** | Quantos você quiser, com o principal à sua escolha. O que não foi traduzido não aparece no idioma |
+| ✍️ | **Blog** | Editor rich text, tags, busca e RSS automático |
+| 🤝 | **Propostas e contratos** | Proteção por senha, aceite eletrônico, assinatura manuscrita e contrato em PDF |
+| 💳 | **Pagamentos** _(opcional)_ | Checkout com PIX, boleto e cartão via Asaas. O cartão é digitado na página segura do Asaas |
+| 📬 | **Contatos e LGPD** | Pedidos no painel, no Telegram, por e-mail ou num webhook, com consentimento registrado e política de privacidade gerada |
+| 👥 | **Papéis** | `root` (agência), `admin` (dono), editores e `comercial`: cada um vê só o que pode mexer |
+| 🧩 | **Plugins** | Liga e desliga o que você não quer expor |
+| 🤖 | **Agentes (MCP)** | Servidor MCP local: o Claude Code ou o Codex editam o conteúdo, com prévia antes de gravar |
 
 <br />
 
-## Templates e esquemas de cores
+## Os 14 temas
 
-Ao criar o projeto, você escolhe um de **13 layouts** e um de **15 esquemas de cores**, cada um com modo claro e escuro (ou automático, seguindo o sistema de quem visita), uma textura opcional e as fontes. Qualquer combinação funciona. No [combinador do site](https://userubrica.vercel.app/#combinador), você troca tudo isso ao vivo no app de verdade, nas 5 páginas.
+Cada tema é um pacote que muda a forma do site sem mudar o conteúdo, e todos passam pela mesma bateria de testes (acessibilidade, SEO, JavaScript por página e Lighthouse). No [combinador do site](https://userubrica.vercel.app/#combinador) você troca tema, esquema e modo ao vivo.
 
-| [Cyberpunk](./docs/templates/cyberpunk.md) | [Brutalism Terminal](./docs/templates/brutalist.md) | [Swiss Grid](./docs/templates/swiss.md) | [Bento](./docs/templates/bento.md) | [Magazine](./docs/templates/magazine.md) |
+| Padrão | Cyberpunk | Brutalism Terminal | Swiss Grid | Bento |
 |---|---|---|---|---|
-| <img src="docs/templates/img/cyberpunk/home.jpg" width="180" /> | <img src="docs/templates/img/brutalist/home.jpg" width="180" /> | <img src="docs/templates/img/swiss/home.jpg" width="180" /> | <img src="docs/templates/img/bento/home.jpg" width="180" /> | <img src="docs/templates/img/magazine/home.jpg" width="180" /> |
-| [**Desktop Retrô**](./docs/templates/desktop.md) | [**Índice**](./docs/templates/index.md) | [**Monografia**](./docs/templates/monograph.md) | [**Zine**](./docs/templates/zine.md) | |
-| <img src="docs/templates/img/desktop/home.jpg" width="180" /> | <img src="docs/templates/img/index/home.jpg" width="180" /> | <img src="docs/templates/img/monograph/home.jpg" width="180" /> | <img src="docs/templates/img/zine/home.jpg" width="180" /> | |
-| [**Blueprint**](./docs/templates/blueprint.md) | [**Jardim Digital**](./docs/templates/garden.md) | [**Conversa**](./docs/templates/chat.md) | [**Pôster Cinético**](./docs/templates/poster.md) | |
-| <img src="docs/templates/img/blueprint/home.jpg" width="180" /> | <img src="docs/templates/img/garden/home.jpg" width="180" /> | <img src="docs/templates/img/chat/home.jpg" width="180" /> | <img src="docs/templates/img/poster/home.jpg" width="180" /> | |
+| <img src="apps/docs/public/img/layouts/padrao.jpg" width="180" /> | <img src="apps/docs/public/img/layouts/cyberpunk.jpg" width="180" /> | <img src="apps/docs/public/img/layouts/brutalist.jpg" width="180" /> | <img src="apps/docs/public/img/layouts/swiss.jpg" width="180" /> | <img src="apps/docs/public/img/layouts/bento.jpg" width="180" /> |
+| **Magazine** | **Desktop Retrô** | **Índice** | **Monografia** | **Zine** |
+| <img src="apps/docs/public/img/layouts/magazine.jpg" width="180" /> | <img src="apps/docs/public/img/layouts/desktop.jpg" width="180" /> | <img src="apps/docs/public/img/layouts/index.jpg" width="180" /> | <img src="apps/docs/public/img/layouts/monograph.jpg" width="180" /> | <img src="apps/docs/public/img/layouts/zine.jpg" width="180" /> |
+| **Blueprint** | **Jardim Digital** | **Conversa** | **Pôster Cinético** | |
+| <img src="apps/docs/public/img/layouts/blueprint.jpg" width="180" /> | <img src="apps/docs/public/img/layouts/garden.jpg" width="180" /> | <img src="apps/docs/public/img/layouts/chat.jpg" width="180" /> | <img src="apps/docs/public/img/layouts/poster.jpg" width="180" /> | |
 
-- [**Guia dos templates**](./docs/templates/README.md): conceito de cada layout e o que cada página tem de exclusivo, com capturas.
-- [**Esquemas de cores**](./docs/templates/cores.md): os 15 esquemas nos dois modos, os 11 papéis de cor, o modo claro/escuro com alternância e as texturas.
+Como escolher, trocar, ejetar um componente e criar um tema: [guia de temas](./docs/guia/temas.md).
 
 <br />
 
 ## Como funciona
 
-Rubrica tem três camadas: o frontend que o mundo vê, o backend que guarda tudo, e os serviços externos que você liga só se precisar.
-
 ```mermaid
 flowchart TB
-    subgraph cliente["🌐 Frontend — React + Vite"]
-        pub["Páginas públicas<br/>home · portfólio · blog · currículo"]
-        prop["Propostas<br/>aceite + assinatura + PDF"]
-        admin["Painel admin<br/>CRUD via interface"]
+    subgraph projeto["📁 Seu projeto"]
+        cfg["astro.config.ts · rubrica.json<br/>blocos próprios · componentes ejetados"]
     end
 
-    subgraph backend["⚡ Backend — Convex"]
-        db[("Banco de dados<br/>+ storage de imagens")]
-        fn["Queries · Mutations<br/>Actions · Auth"]
-        plugins["Sistema de plugins<br/>liga/desliga features"]
+    subgraph pacotes["📦 Pacotes"]
+        core["@rubrica/core<br/>site Astro · painel · backend Convex · MCP"]
+        tema["@rubrica/theme-*<br/>casca e blocos de cada tema"]
     end
 
-    subgraph externos["🔌 Serviços externos — opcionais"]
-        ia["OpenRouter<br/>IA · tradução"]
-        pay["Asaas<br/>PIX · boleto · cartão"]
-        tg["Telegram<br/>notificações"]
+    subgraph backend["⚡ Convex"]
+        db[("Conteúdo<br/>+ imagens")]
+        fn["Funções · login · papéis"]
     end
 
-    pub --> fn
-    prop --> fn
-    admin --> fn
+    subgraph saida["🌐 Saída"]
+        site["Site estático<br/>HTML + quase nenhum JS"]
+        admin["/admin<br/>painel em React"]
+    end
+
+    subgraph externos["🔌 Opcionais"]
+        ia["OpenRouter"]
+        pay["Asaas"]
+        tg["Telegram · e-mail · webhook"]
+    end
+
+    cfg --> core
+    tema --> core
+    core --> fn
     fn --> db
-    plugins --> fn
+    db -- "no build" --> site
+    admin --> fn
     fn -.-> ia
     fn -.-> pay
     fn -.-> tg
-
-    classDef front fill:#F5F2EA,stroke:#4D7C5F,stroke-width:2px,color:#1A1A18
-    classDef back fill:#4D7C5F,stroke:#1A1A18,stroke-width:2px,color:#F5F2EA
-    classDef ext fill:#C4664A,stroke:#1A1A18,stroke-width:2px,color:#F5F2EA
-    class pub,prop,admin front
-    class db,fn,plugins back
-    class ia,pay,tg ext
 ```
+
+O build lê o conteúdo do Convex e gera todas as páginas. Salvar no painel muda o banco na hora; o site no ar muda no próximo build (o botão **Publicar** do painel dispara o rebuild). Isso funciona em qualquer hospedagem estática; a Vercel é a oficial e a única que o CLI automatiza.
 
 <br />
 
 ## Começando
 
-Precisa de **Node.js 20+** e **git**, e de contas gratuitas no **[Convex](https://convex.dev)** (banco de dados) e na **[Vercel](https://vercel.com)** (hospedagem). O CLI `create-rubrica` cria o projeto, prepara o banco, cria o seu login do painel e publica, sem copiar variável nenhuma.
+Precisa de **Node.js 22.23+** e **git**, e de contas gratuitas no **[Convex](https://convex.dev)** (backend) e na **[Vercel](https://vercel.com)** (hospedagem). O CLI `create-rubrica` cria o projeto, prepara o banco, cria o seu login do painel e publica, sem copiar variável nenhuma.
 
 ```bash
-npx create-rubrica@latest meu-portfolio   # cria o projeto
-npm run dev                               # abre em http://localhost:3000 (painel em /login)
-npx create-rubrica publicar               # põe no ar na Vercel
+npx create-rubrica@latest meu-site --tipo pessoal --tema padrao   # cria o projeto (use --tipo empresa para um site de empresa)
+cd meu-site
+pnpm dev                                                          # o site, em http://localhost:4321 (painel em /admin)
+pnpm dev:convex                                                   # o backend de desenvolvimento, em outro terminal
+npx create-rubrica publicar                                       # põe no ar na Vercel
 ```
 
 Ou monte a aparência no [combinador do site](https://userubrica.vercel.app/#combinador) e copie de lá o comando pronto, com as suas escolhas.
 
 | Guia | O que tem |
 |---|---|
-| [**Começando**](./docs/guia/comecando.md) | Do zero ao site rodando no computador, e o que preencher no painel |
-| [**Comandos do CLI**](./docs/guia/cli.md) | `create`, `setup`, `config`, `publicar`, `senha` e `update`, com todas as opções |
-| [**Publicar o site**](./docs/guia/publicar.md) | Vercel, o botão Publicar do painel, outro computador e domínio próprio |
-| [**Atualizando o seu Rubrica**](./docs/atualizacao.md) | Versões novas sem perder o que você personalizou |
+| [**Começando**](./docs/guia/comecando.md) | Do zero ao site rodando no computador |
+| [**Conteúdo e painel**](./docs/guia/conteudo.md) | Páginas com blocos, coleções, plugins e papéis |
+| [**Temas**](./docs/guia/temas.md) | Escolher, trocar, esquemas de cor, fontes, ejetar um componente e criar um tema |
+| [**Idiomas**](./docs/guia/idiomas.md) | N idiomas, o principal configurável e conteúdo sem tradução |
+| [**Publicar o site**](./docs/guia/publicar.md) | Vercel, outras hospedagens, domínio próprio |
+| [**Integrações**](./docs/guia/integracoes.md) | Telegram, e-mail, webhook, OpenRouter, Asaas, Umami e as variáveis de ambiente |
+| [**Agentes de IA**](./docs/guia/agentes.md) | MCP local e skills |
+| [**Migrar da v1**](./docs/guia/migrar.md) | Passo a passo, o que converte e o que não converte |
+| [**Comandos do CLI**](./docs/guia/cli.md) | `create`, `setup`, `config`, `publicar`, `update`, `ejetar`, `verificar`, `testar-tema`, `mcp`, `migrar` e mais |
+| [**Atualizar o Rubrica**](./docs/guia/atualizar.md) | Subir a versão, Renovate e Dependabot |
 
 A documentação também está no [site do Rubrica](https://userubrica.vercel.app/docs), em português e inglês.
 
 <br />
 
-## Caminho manual (fork)
+## Vem da v1?
 
-Para quem prefere fazer cada etapa à mão. Os passos 7 e 8 valem também para quem usou o CLI.
-
-```mermaid
-flowchart LR
-    A["1 · Fork<br/>+ clone"] --> B["2 · Convex<br/>provisiona backend"]
-    B --> C["3 · .env<br/>local"]
-    C --> D["4 · Vars no<br/>servidor Convex"]
-    D --> E["5 · pnpm dev<br/>roda local"]
-    E --> F["6 · Cria usuário<br/>root"]
-    F --> G["7 · Preenche<br/>no /admin"]
-    G --> H["8 · Personaliza<br/>o visual ⚠️"]
-    H --> I["9 · Deploy<br/>no Vercel"]
-    I --> J["10 · Domínio<br/>próprio"]
-
-    classDef step fill:#F5F2EA,stroke:#4D7C5F,stroke-width:2px,color:#1A1A18
-    classDef highlight fill:#C4664A,stroke:#1A1A18,stroke-width:2px,color:#F5F2EA
-    class A,B,C,D,E,F,G,I,J step
-    class H highlight
-```
-
-> O passo **8 não é opcional**. É o que separa o seu portfólio de "mais um".
-
-### 1 · Fork e clone
-
-```bash
-gh repo fork mierzwamatheus/rubrica --clone
-cd rubrica
-pnpm install
-```
-
-### 2 · Provisionar o Convex
-
-O Convex é o backend completo — banco, storage de imagens, autenticação e funções server-side.
-
-```bash
-npx convex dev
-```
-
-Na primeira vez, o CLI faz tudo sozinho: pede login no navegador, cria o projeto na sua conta, gera o `.env.local` com `VITE_CONVEX_URL` e `CONVEX_DEPLOY_KEY`, sobe o schema e as funções, e fica em modo watch. Deixe rodando enquanto desenvolve.
-
-### 3 · Configurar o `.env` local
-
-```bash
-cp .env.example .env
-```
-
-Quatro variáveis e a gente explica cada uma:
-
-| Variável | De onde vem | Para quê |
-|---|---|---|
-| `VITE_CONVEX_URL` | Convex Dashboard → Settings | URL do backend no frontend |
-| `CONVEX_URL` | Mesma URL acima | Usado pelos scripts de build (RSS, sitemap) |
-| `CONVEX_DEPLOY_KEY` | Convex Dashboard → Settings → Deploy Keys | Necessário para `convex deploy` no build |
-| `SITE_URL` | URL final do site | URL canônica do RSS e do sitemap |
-
-### 4 · Variáveis no servidor Convex
-
-Essas ficam **no servidor Convex**, não no `.env` local. Setam-se via CLI:
-
-```bash
-npx convex env set NOME_DA_VAR valor
-```
-
-**Obrigatórias para o sistema rodar** (o `npx create-rubrica setup` configura todas):
-
-- `JWT_PRIVATE_KEY` e `JWKS` — chaves do login
-- `SITE_URL` — URL pública do site
-- `BOOTSTRAP_ALLOWED=true` — habilita criar o primeiro usuário (você remove depois)
-
-**Obrigatória se usar o plugin `playground`:**
-
-- `PLAYGROUND_KEY_PEPPER=<32+ caracteres aleatórios>` — pepper para fingerprint de API keys
-
-**Opcionais — só se ativar a feature correspondente:**
-
-| Variável | Habilita |
-|---|---|
-| `OPENROUTER_API_KEY` | Tradução automática + geração de CV com IA |
-| `ASAAS_API_KEY` | Pagamentos via Asaas (sandbox ou produção, detectado pela chave) |
-| `ASAAS_WEBHOOK_TOKEN` | Confirmação dos pagamentos (o mesmo token cadastrado no webhook do Asaas) |
-| `TELEGRAM_BOT_TOKEN` | Notificações no Telegram |
-| `TELEGRAM_ADMIN_CHAT_ID` | Chat onde as notificações chegam |
-| `VERCEL_TOKEN`, `VERCEL_PROJECT_ID`, `VERCEL_TEAM_ID` | Botão "Publicar" do admin sem GitHub (o `npx create-rubrica publicar` configura) |
-| `VERCEL_DEPLOY_HOOK_URL` | Botão "Publicar" do admin em projeto ligado ao GitHub (tem preferência sobre o token) |
-| `VERCEL_WEBHOOK_SECRET` | Webhook de notificação de deploy |
-
-### 5 · Rodar em desenvolvimento
-
-Em outro terminal, com o `npx convex dev` ainda rodando:
-
-```bash
-pnpm dev
-```
-
-Abre em `http://localhost:3000`.
-
-### 6 · Criar seu usuário root
-
-1. Acesse `http://localhost:3000/login` com `BOOTSTRAP_ALLOWED=true` setado
-2. A tela de bootstrap aparece → crie email e senha
-3. **Remova o bootstrap imediatamente:**
-
-```bash
-npx convex env remove BOOTSTRAP_ALLOWED
-```
-
-> ⚠️ Se esquecer essa etapa, qualquer pessoa que descobrir o link consegue criar usuário root no seu sistema.
-
-> **Esqueceu a senha do painel ou ficou bloqueado?** Na pasta do projeto, rode `npx create-rubrica senha`. Ele troca a senha no site publicado ou no do seu computador e libera o login.
-
-### 7 · Preencher o conteúdo no admin
-
-Logado em `/admin`, tudo é gerenciado por interface. Você não toca no código para mudar texto, imagem ou dado.
-
-| Rota | O que você configura |
-|---|---|
-| `/admin/contact` | Nome, email, telefone, avatar, redes sociais |
-| `/admin/home` | Apresentação, números de destaque, disponibilidade, serviços e princípios de trabalho |
-| `/admin/projects` | Projetos do portfólio (imagens, categoria, links, estudo de caso com métricas) |
-| `/admin/blog` | Posts (editor rich text, tags, destaque) |
-| `/admin/resume` | Currículo (experiências, formação, skills, idiomas, certificações) |
-| `/admin/about` | Rotina diária + FAQ |
-| `/admin/depoimentos` | Depoimentos (curados ou recebidos pelo formulário público) |
-| `/admin/proposals` | Propostas comerciais com senha, aceite e contrato |
-| `/admin/contatos` | Pedidos de contato recebidos pelo site |
-| `/admin/site-config` | **Site & Aparência:** identidade, SEO, fontes e as 4 cores de cada modo |
-| `/admin/textos` | Os textos fixos do site, em português e inglês |
-| `/admin/plugins` | **Liga/desliga features** (blog, propostas, pagamentos, etc.) |
-
-#### Ou pelo seu agente de IA
-
-O repositório já vem com a skill **`rubrica`** para Claude Code, Codex e OpenCode. Com ela, o agente lê e altera o conteúdo do site por você: textos fixos (em pt-BR e en-US), identidade, SEO, cores, perfil, home, posts, imagens, contatos, plugins e a publicação.
-
-- Abra o agente na pasta do projeto e peça em linguagem comum, por exemplo: "troque o título da home e traduza para o inglês" ou "escreva um post sobre X e deixe em rascunho". No Claude Code, também dá para chamar com `/rubrica`.
-- No primeiro uso, faça o login num terminal seu (a senha nunca passa pelo agente):
-  ```bash
-  python3 .agents/skills/rubrica/scripts/rubrica.py login --email voce@exemplo.com
-  ```
-- Por padrão, a skill mexe no site do computador (o Convex do `.env.local`). Depois do `npx create-rubrica publicar`, o login pergunta se você quer entrar no site publicado ou no do computador, e o agente usa `--producao` para mexer no site no ar. Para outro Convex qualquer, defina `RUBRICA_CONVEX_URL`.
-- Onde ela mora: `.agents/skills/rubrica/` (lido pelo Codex e pelo OpenCode) e o atalho `.claude/skills/rubrica` (lido pelo Claude Code). Requer Python 3.8+.
-
-Para escrever conteúdo novo com calma, há skills estrategistas que entrevistam você, escrevem em pt-BR e en-US e entregam um plano que a `rubrica` aplica depois do seu "ok". Todas começam pela sua voz: na primeira vez, o agente manda você para a [entrevista de voz](https://userubrica.vercel.app/voz), onde você responde falando ou digitando (uns 20 minutos, nada sai do navegador) e cola o resultado na conversa.
-
-| Skill | Para quê |
-|---|---|
-| `rubrica-voz` | extrai o seu tom de voz da entrevista e monta a parte pessoal da página Sobre (fora do trabalho, dia a dia, FAQ pessoal) |
-| `rubrica-apresentacao` | frase da home, cargo, "Sobre", números de destaque, princípios de trabalho e SEO da home |
-| `rubrica-case` | transforma dados técnicos, prints e resultados num case com visão de negócio, sem inventar números |
-| `rubrica-curriculo` | experiências, formação, habilidades e idiomas, de tarefas a conquistas |
-| `rubrica-blog` | post do tema ao rascunho: briefing, suas opiniões, SEO, fontes verificadas, edição, revisão e capa |
-| `rubrica-pilar` | revisão de todo texto antes de ir ao site: sinais de texto de IA, fatos sem origem e tradução |
-
-Os planos, a entrevista e o seu perfil editorial (público, voz, palavras vetadas) ficam em `.rubrica/`, na pasta do projeto, fora do git por padrão (são dados pessoais).
-
-### 8 · Personalize o visual _(não pule)_
-
-Esta é a etapa **mais importante** depois do deploy técnico. Identidade visual é o que vai te diferenciar. Onde mexer:
-
-- **Layout, esquema, modo, textura e fontes** — teste as combinações no [combinador](https://userubrica.vercel.app/#combinador) e aplique com `npx create-rubrica config` → Aparência. No fork, copie os arquivos de `templates/layouts/<layout>/` para `src/components/` e `src/pages/`. Veja o [guia dos templates](./docs/templates/README.md) e os [esquemas de cores](./docs/templates/cores.md).
-- **Cores e fontes pelo painel** — em **Site & Aparência**, troque as 4 cores principais de cada modo (claro e escuro) e as fontes, sem mexer no código. "Usar as cores do esquema" desfaz.
-- **Textos** — o seu agente de IA, com as skills `rubrica-*`, escreve apresentação, cases, currículo e posts com a sua voz ([veja acima](#ou-pelo-seu-agente-de-ia)).
-- `public/favicon.ico` — troque pelo seu logo
-- No código: o esquema de cores fica em `src/index.css` (modo claro em `:root`, escuro em `.dark`); a estrutura em `src/components/Layout.tsx` e `src/pages/`; os componentes shadcn/ui em `src/components/ui/`.
-
-Teste com `pnpm dev` enquanto altera. Não suba sem dar a sua cara.
-
-### 9 · Deploy no Vercel
-
-> **Projeto criado pelo CLI?** Rode `npx create-rubrica publicar` na pasta do projeto: ele cria o projeto na Vercel, prepara o banco de produção, cria o admin do site publicado e publica, sem copiar variável nenhuma. Os passos abaixo são o caminho manual (e o do fork).
-
-1. Em [vercel.com/new](https://vercel.com/new), importe o repositório forkado
-2. **Framework preset:** Vite
-3. **Build command:** já vem no `vercel.json` (`npm run build:i18n && npm run build`: exporta os textos do site, publica o Convex, gera dados estáticos, RSS e sitemap, e faz o build do Vite) — não mude
-4. **Output directory:** `dist`
-5. **Adicione as env vars** (Settings → Environment Variables): `VITE_CONVEX_URL`, `CONVEX_URL`, `CONVEX_DEPLOY_KEY` _(sem essa, o build falha)_ e `SITE_URL`
-6. Clique em **Deploy**
-
-A partir daqui, todo `git push` na branch principal dispara um deploy automático.
-
-### 10 · Domínio próprio
-
-Veja [Publicar o site → Domínio próprio](./docs/guia/publicar.md#domínio-próprio).
-
-<br />
-
-## Atualizando para versões novas
-
-Atualizar não desfaz o que você personalizou. Em projeto criado pelo CLI:
-
-```bash
-npx create-rubrica@latest update --dry-run   # mostra o que mudaria
-npx create-rubrica@latest update             # aplica
-```
-
-O CLI mescla, arquivo por arquivo, as mudanças do Rubrica com as suas. Quando os dois mexeram no mesmo trecho, o seu arquivo fica intacto e a versão nova é salva ao lado, como `<arquivo>.rubrica-new`. No fork, `git fetch upstream --tags && git merge vX.Y.Z` faz o mesmo. Conteúdo e configurações do admin ficam no banco e nunca são tocados.
-
-Guia completo: [Atualizando o seu Rubrica](./docs/atualizacao.md). O que mudou em cada versão: [CHANGELOG](./CHANGELOG.md).
+`npx create-rubrica@latest migrar` leva o site para a v2 numa branch nova, converte os dados (de um export do Convex) num arquivo de import e lista o que você personalizou, com a sugestão de cada item. Ele **não grava em banco nenhum**: o import vai para um Convex de desenvolvimento novo, e a produção só com o seu "ok". Guia completo: [Migrar da v1](./docs/guia/migrar.md). A v1 recebe correções de bug e segurança por 6 meses depois do lançamento da v2 (branch `v1`); a documentação dela está arquivada em [`docs/v1`](./docs/v1/README.md).
 
 <br />
 
@@ -368,108 +192,36 @@ sequenceDiagram
 
 <br />
 
-## Quando ativar cada feature opcional
+## Estrutura do repositório
 
-| Feature | Plugin (`/admin/plugins`) | Env vars | Conta externa |
-|---|---|---|---|
-| Pagamentos (PIX, boleto e cartão) | `payments` | `ASAAS_API_KEY` + `ASAAS_WEBHOOK_TOKEN` | Asaas |
-| Geração de CV com IA | `ai-resumes` | `OPENROUTER_API_KEY` | OpenRouter |
-| Tradução automática (i18n) | `i18n` | `OPENROUTER_API_KEY` | OpenRouter |
-| Notificações Telegram | _(built-in)_ | `TELEGRAM_BOT_TOKEN` + `TELEGRAM_ADMIN_CHAT_ID` | BotFather |
-
-> **Quer só o básico?** Se você quer apenas home + projetos + currículo, desative blog, propostas, pagamentos, IA e playground em `/admin/plugins`. As rotas somem da sidebar e do roteador.
-
-### Configurando os pagamentos (Asaas)
-
-1. Crie uma conta no [sandbox do Asaas](https://sandbox.asaas.com) para testar e gere a chave em **Integrações → Chave de API**.
-2. Rode `npx create-rubrica setup` e informe a chave. O setup grava `ASAAS_API_KEY`, gera o `ASAAS_WEBHOOK_TOKEN` e mostra a URL e o token do webhook. Sem o CLI: `npx convex env set ASAAS_API_KEY ...` e `npx convex env set ASAAS_WEBHOOK_TOKEN <token aleatório>`.
-3. No Asaas, em **Integrações → Webhooks**, cadastre a URL `https://<seu-deployment>.convex.site/webhooks/asaas` com o mesmo token e os eventos de cobrança ligados. Sem o webhook, nenhum pagamento aparece como pago.
-4. Para o cliente voltar ao seu site depois de pagar com cartão, cadastre o domínio do site no Asaas em **Minha Conta → Informações**. Sem isso, o pagamento funciona, mas o cliente fica na página do Asaas.
-5. Em `/admin/payment-links`, cadastre o cliente, gere o link de checkout e mande para ele. O cliente escolhe PIX, boleto ou cartão. O cartão abre a página segura do Asaas.
-6. Funcionou no sandbox? Troque para a chave de produção (`$aact_prod_...`) e cadastre o webhook também na conta de produção.
-
-O checkout só vira **pago** quando o Asaas confirma pelo webhook. Você recebe a notificação no Telegram, se estiver configurado.
-
-<br />
-
-## Scripts úteis
-
-```bash
-pnpm dev          # dev local + convex em watch (porta 3000)
-pnpm build        # convex deploy + dados estáticos + RSS + sitemap + vite build
-pnpm build:i18n   # exporta os textos do site (Convex) para src/i18n/translations
-pnpm preview      # preview do build de produção
-pnpm check        # type-check (tsc --noEmit)
-pnpm format       # prettier
-pnpm test         # vitest
-```
-
-<br />
-
-## Estrutura do projeto
+Este repositório é um monorepo (a v1 fica na branch `v1`):
 
 ```
 rubrica/
-├── convex/              # Backend: schema, queries, mutations, actions
-├── src/
-│   ├── pages/           # Páginas públicas + /admin/*
-│   ├── components/      # Componentes (UI, admin, layout)
-│   ├── contexts/        # AuthContext, ThemeContext, PluginsContext
-│   └── index.css        # ← Personalize cores e tema aqui
-├── domain/              # Casos de uso sem framework (ex.: o gerador de RSS)
-├── scripts/             # Build-time: RSS, sitemap, fetch de dados estáticos
-├── templates/           # Layouts que o CLI aplica (veja docs/templates)
-├── site/                # Site público do Rubrica (Astro): combinador e "Crie o seu"
-├── .agents/skills/      # Skills de IA: rubrica e as estrategistas rubrica-*
-├── public/              # Assets estáticos (favicon, dados de exemplo/gerados)
-├── docs/features.md     # Referência técnica completa
-├── docs/templates/      # Guia dos layouts e das paletas, com capturas
-├── docs/atualizacao.md  # Como atualizar sem perder personalizações
-├── cli/                 # create-rubrica: create, setup, config, publicar, senha e update
-├── .github/workflows/   # CI: tipos e testes do template e do CLI, e o build do site
-├── .env.example         # Template de variáveis de ambiente
-└── vercel.json          # Build command, rewrites SPA, security headers
+├── packages/
+│   ├── core/              # @rubrica/core: integração Astro, painel, backend Convex, blocos, SEO, idiomas
+│   ├── themes/<nome>/     # @rubrica/theme-<nome>: um pacote por tema (14)
+│   ├── create-rubrica/    # o CLI
+│   ├── mcp/               # @rubrica/mcp: servidor MCP local
+│   └── theme-tester/      # @rubrica/theme-tester: a bateria de testes de tema
+├── apps/
+│   ├── demo/              # sites de demonstração (pessoal e empresa)
+│   └── docs/              # o site e a documentação (userubrica.vercel.app)
+└── docs/                  # guias (docs/guia), RFC e notas da v2 (docs/rfc, docs/v2), v1 arquivada
 ```
 
-> Procurando a referência técnica detalhada — schema do banco, lista de features, rotas, plugins, design system? Veja [`docs/features.md`](./docs/features.md).
+Quer contribuir ou criar um tema? Comece por [`docs/v2/contribuindo.md`](./docs/v2/contribuindo.md) e pelo [RFC da v2](./docs/rfc/v2.md). Comandos mais usados:
 
-<br />
-
-## Troubleshooting
-
-| Sintoma | Causa provável |
-|---|---|
-| `convex deploy` falha no Vercel | Falta `CONVEX_DEPLOY_KEY` nas env vars do Vercel |
-| Login não funciona / bootstrap não aparece | `BOOTSTRAP_ALLOWED` removido antes de criar o primeiro usuário — sete de novo, crie e remova |
-| Plugin desativado ainda aparece em produção | Falta um redeploy para regenerar `public/data/plugins.json` |
-| Botão "Publicar" do admin diz que não está configurado ou que o token não vale | Rode `npx create-rubrica publicar` na pasta do projeto: ele pede um token novo da Vercel |
-| Notificações Telegram não chegam | Você ainda não enviou `/start` para o seu bot |
-| Cliente pagou e o checkout não vira "pago" | Webhook do Asaas não cadastrado, com token diferente do `ASAAS_WEBHOOK_TOKEN` ou cadastrado na conta errada (sandbox × produção) |
-| "Pagamentos não configurados" no checkout | Falta `ASAAS_API_KEY` no Convex |
-| Imagens quebradas após deploy | IDs do Convex Storage são por deployment; ao migrar dev → prod, reupload é necessário |
-
-<br />
-
-## Uma palavra antes de você publicar
-
-Rubrica não é produto de empresa. É infraestrutura de comunidade. Quanto mais gente usa, melhora e distribui, mais sobe o nível médio de como profissionais se apresentam na web.
-
-Mas portfólio sem cara é portfólio igual. Use a base sem culpa — e use bem. Gaste o tempo que economizou na sua identidade visual e na sua copy. É ali que mora a diferença entre "mais um" e um portfólio que marca.
-
-Se o Rubrica te ajudou, considere mandar um PR. O objetivo é coletivo.
+```bash
+pnpm install
+pnpm -r check && pnpm -r test    # tipos e testes de tudo
+pnpm demo                        # abre o site de demonstração (painel em /admin, sem banco)
+pnpm testar-tema padrao          # bateria de testes de um tema
+pnpm changeset                   # registra uma mudança para a próxima versão
+```
 
 <br />
 
 ## Licença
 
-GNU GPL v3.0 — veja [`LICENSE`](./LICENSE).
-
-<br />
-
-<div align="center">
-
-Feito com ❤️ por **[Matheus Mierzwa](https://github.com/MierzwaMatheus)**
-
-_Assine com a sua cara._
-
-</div>
+Veja o arquivo [LICENSE](./LICENSE).

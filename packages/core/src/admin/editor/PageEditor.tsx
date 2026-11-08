@@ -85,7 +85,14 @@ function Editor({ page }: { page: PageDoc }) {
 
   useEffect(() => (dirty ? blockNavigation("Há mudanças não salvas nesta página. Sair mesmo assim?") : undefined), [dirty, blockNavigation]);
 
-  const setBlocks = useCallback((blocks: BlockInstance[]) => setDraft((d) => ({ ...d, blocks })), []);
+  const setBlocks = useCallback((blocks: BlockInstance[]) => {
+    setDraft((d) => {
+      // Erros do bloco que a pessoa mexeu saem: a próxima tentativa de salvar confere de novo.
+      const changed = new Set(blocks.filter((b) => !d.blocks.includes(b)).map((b) => b.id));
+      if (changed.size) setErrors((e) => (e.blocks.some((x) => x.blockId && changed.has(x.blockId)) ? { ...e, blocks: e.blocks.filter((x) => !x.blockId || !changed.has(x.blockId)) } : e));
+      return { ...d, blocks };
+    });
+  }, []);
 
   const save = useCallback(async (): Promise<boolean> => {
     setBusy("save");

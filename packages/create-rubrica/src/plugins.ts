@@ -1,70 +1,97 @@
 /**
- * Plugins que o CLI oferece e os pacotes prontos do modo rápido. É a única lista de plugins
- * do CLI: create, config e os testes leem daqui. Os ids precisam existir em
- * convex/pluginRegistry.ts (um teste confere). Como adicionar um plugin: docs/cli/manutencao.md.
+ * Plugins que o CLI oferece, tirados do registro do núcleo (`@rubrica/core/plugins`),
+ * e os pacotes prontos do modo rápido. O estado efetivo de cada plugin (padrão do tipo
+ * de site + escolha + dependências) é calculado pelo próprio núcleo.
  */
+import { CORE_PLUGINS, V1_PLUGIN_RENAMES } from "@rubrica/core/plugins";
+import type { SiteKind } from "@rubrica/core";
+
+export { CORE_PLUGINS, V1_PLUGIN_RENAMES };
+
+/** Plugins que só funcionam com a chave de um serviço externo (o setup pede). */
+export const NEEDS_KEY: Record<string, string> = {
+  payments: "Asaas",
+  "ai-resumes": "OpenRouter",
+  translation: "OpenRouter",
+};
 
 export interface PluginOption {
   id: string;
   label: string;
   description: string;
-  /** Entra no pacote recomendado. */
-  recommended: boolean;
-  /** Só funciona com a chave de um serviço externo (setup pede). Fica fora dos pacotes. */
-  needsKey: boolean;
+  requires: string[];
+  defaultEnabled: boolean;
+  needsKey?: string;
 }
 
-export const PLUGINS: PluginOption[] = [
-  { id: "contact-wizard", label: "Contato", description: "formulário para pedirem orçamento", recommended: true, needsKey: false },
-  { id: "proposals", label: "Propostas", description: "propostas comerciais com aceite online", recommended: true, needsKey: false },
-  { id: "payments", label: "Pagamentos", description: "cobrança por PIX, boleto e cartão (conta no Asaas)", recommended: false, needsKey: true },
-  { id: "blog", label: "Blog", description: "posts e artigos", recommended: true, needsKey: false },
-  { id: "portfolio", label: "Portfólio", description: "galeria de projetos e cases", recommended: true, needsKey: false },
-  { id: "resume", label: "Currículo", description: "currículo com download em PDF", recommended: true, needsKey: false },
-  { id: "about", label: "Sobre", description: "página sobre você", recommended: true, needsKey: false },
-  { id: "ai-resumes", label: "Currículo com IA", description: "gera versões do currículo por vaga (chave do OpenRouter)", recommended: false, needsKey: true },
-  { id: "audit-log", label: "Histórico do painel", description: "registra quem mudou o quê no painel", recommended: true, needsKey: false },
-  { id: "media-manager", label: "Biblioteca de imagens", description: "gerenciador de arquivos e imagens", recommended: false, needsKey: false },
-  { id: "i18n", label: "Tradução com IA", description: "traduz o conteúdo do site (chave do OpenRouter)", recommended: false, needsKey: true },
-  { id: "playground", label: "Playground", description: "área para testar prompts de IA (chave do OpenRouter)", recommended: false, needsKey: true },
-  { id: "testimonials", label: "Depoimentos", description: "depoimentos de clientes no site", recommended: true, needsKey: false },
-  { id: "testimonials-intake", label: "Coleta de depoimentos", description: "link para clientes enviarem depoimentos", recommended: true, needsKey: false },
-];
+/** Plugins do tipo de site, na ordem do registro do núcleo. */
+export function pluginOptions(kind: SiteKind): PluginOption[] {
+  return CORE_PLUGINS.filter((p) => p.kinds.includes(kind)).map((p) => ({
+    id: p.id,
+    label: p.label,
+    description: p.description,
+    requires: p.requires ?? [],
+    defaultEnabled: p.defaultEnabled[kind] ?? false,
+    ...(NEEDS_KEY[p.id] && { needsKey: NEEDS_KEY[p.id] }),
+  }));
+}
 
-export const ALL_PLUGINS: string[] = PLUGINS.map((p) => p.id);
-
-/** Plugins do backend que o CLI não oferece de propósito (ligam pelo painel admin). */
-export const UNLISTED_PLUGINS = ["contract-templates"];
+/** Plugins ligados por padrão no tipo de site. */
+export function defaultPlugins(kind: SiteKind): string[] {
+  return pluginOptions(kind)
+    .filter((p) => p.defaultEnabled)
+    .map((p) => p.id);
+}
 
 export interface PluginPreset {
   id: string;
   label: string;
   hint: string;
+  kinds: SiteKind[];
   plugins: string[];
 }
 
 export const PLUGIN_PRESETS: PluginPreset[] = [
   {
     id: "recommended",
-    label: "Completo",
-    hint: "portfólio, currículo, blog, contato, propostas e depoimentos",
-    plugins: PLUGINS.filter((p) => p.recommended).map((p) => p.id),
+    label: "Padrão do tipo de site",
+    hint: "o que o Rubrica liga por padrão",
+    kinds: ["pessoal", "empresa"],
+    plugins: [],
   },
   {
     id: "freelancer",
     label: "Para vender serviços",
     hint: "portfólio, contato, propostas e depoimentos",
-    plugins: ["contact-wizard", "proposals", "portfolio", "about", "testimonials", "testimonials-intake"],
+    kinds: ["pessoal"],
+    plugins: ["contact-wizard", "proposals", "portfolio", "about", "testimonials", "testimonials-intake", "audit-log", "media-manager"],
   },
   {
     id: "simple",
     label: "Só o portfólio",
     hint: "portfólio, currículo, sobre e contato",
+    kinds: ["pessoal"],
     plugins: ["contact-wizard", "portfolio", "resume", "about"],
   },
 ];
 
-/** `{ id: ligado? }` com todos os plugins do CLI, na ordem de PLUGINS. */
-export function pluginsRecord(selected: string[]): Record<string, boolean> {
-  return Object.fromEntries(ALL_PLUGINS.map((id) => [id, selected.includes(id)]));
+/** Plugins de um pacote pronto (o "padrão" usa o padrão do tipo de site). */
+export function presetPlugins(id: string, kind: SiteKind): string[] | undefined {
+  const preset = PLUGIN_PRESETS.find((p) => p.id === id && p.kinds.includes(kind));
+  if (!preset) return undefined;
+  return preset.id === "recommended" ? defaultPlugins(kind) : [...preset.plugins];
+}
+
+/**
+ * `{ id: ligado }` com todos os plugins do tipo de site: grava a escolha explícita,
+ * para o site não mudar se o padrão do núcleo mudar numa versão nova.
+ */
+export function pluginsRecord(kind: SiteKind, selected: string[]): Record<string, boolean> {
+  return Object.fromEntries(pluginOptions(kind).map((p) => [p.id, selected.includes(p.id)]));
+}
+
+/** Ids desconhecidos no tipo de site (para avisar). */
+export function unknownPlugins(kind: SiteKind, ids: string[]): string[] {
+  const known = new Set(pluginOptions(kind).map((p) => p.id));
+  return ids.filter((id) => !known.has(id));
 }

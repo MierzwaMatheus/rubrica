@@ -33,7 +33,7 @@ function validateSettings(settings: SiteSettingsValue): void {
   }
 }
 
-async function upsertSettings(ctx: MutationCtx, value: SiteSettingsValue, userId?: Doc<"users">["_id"]) {
+export async function upsertSettings(ctx: MutationCtx, value: SiteSettingsValue, userId?: Doc<"users">["_id"]) {
   const clean = cleanFields(siteSettingsFields, value) as SiteSettingsValue;
   validateSettings(clean);
   const existing = await getSettingsDoc(ctx);

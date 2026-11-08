@@ -25,7 +25,8 @@
     "./convex": "./src/convex/index.ts",
     "./convex/schema": "./src/convex/schema.ts",
     "./convex/roles": "./src/convex/lib/roles.ts",
-    "./convex/validators": "./src/convex/validators.ts"
+    "./convex/validators": "./src/convex/validators.ts",
+    "./seed": "./src/convex/lib/seed.ts"
   },
   "files": [
     "src"

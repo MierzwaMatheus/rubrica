@@ -43,6 +43,7 @@ import { privacyFunctions } from "./privacy";
 import { publishFunctions } from "./publish";
 import { panelFunctions } from "./panel";
 import { resolveRuntime, type RubricaConfig } from "./runtime";
+import { seedFunctions } from "./seed";
 import { ref } from "./server";
 import { settingsFunctions, textsFunctions } from "./settings";
 import { siteFunctions } from "./site";
@@ -95,6 +96,7 @@ export function createRubrica(config: RubricaConfig = {}) {
     asaas: once(() => asaasFunctions(rt)),
     aiResumes: once(() => aiResumesFunctions(rt)),
     panel: once(() => panelFunctions(rt)),
+    seed: once(() => seedFunctions(rt)),
   };
 
   return {
@@ -207,6 +209,10 @@ export function createRubrica(config: RubricaConfig = {}) {
     get panel() {
       return modules.panel();
     },
+    /** Conteúdo inicial e configurações pelo CLI (`setup`, `config`): funções internas. */
+    get seed() {
+      return modules.seed();
+    },
   };
 }
 
@@ -242,6 +248,7 @@ export const RUBRICA_MODULES = [
   "asaas",
   "aiResumes",
   "panel",
+  "seed",
 ] as const satisfies readonly (keyof Rubrica)[];
 
 export type { RubricaConfig } from "./runtime";

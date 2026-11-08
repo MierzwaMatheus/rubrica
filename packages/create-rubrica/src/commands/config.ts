@@ -1,268 +1,253 @@
-import { outro, select, multiselect, confirm, isCancel, cancel, log } from "@clack/prompts";
-import * as nodeFsPromises from "node:fs/promises";
-import * as path from "node:path";
-import { detectProject as defaultDetectProject } from "../utils/detectProject.js";
-import { readState as defaultReadState } from "../state/readState.js";
-import { writeState as defaultWriteState } from "../state/writeState.js";
-import { identityPrompt as defaultIdentityPrompt } from "../prompts/identityPrompt.js";
-import { applyRubricalConfig as defaultApplyRubricalConfig } from "../transforms/applyRubricalConfig.js";
-import { applyTheme as defaultApplyTheme } from "../transforms/applyTheme.js";
-import { applyFont as defaultApplyFont } from "../transforms/applyFont.js";
-import { applyIndexHtml as defaultApplyIndexHtml } from "../transforms/applyIndexHtml.js";
-import { applyLayout as defaultApplyLayout } from "../transforms/applyLayout.js";
-import { applyPlugins as defaultApplyPlugins } from "../transforms/applyPlugins.js";
-import { getLatestVersion as defaultGetLatestVersion, downloadRelease as defaultDownloadRelease } from "../utils/download.js";
-import { indexHtmlInput, rubricaConfigInput } from "../transforms/identityInputs.js";
-import { applyAppearance as defaultApplyAppearance } from "../transforms/applyAppearance.js";
-import { SCHEME_START } from "../themes/schemes.js";
-import { layoutPrompt, schemePrompt, appearancePrompt, fontPrompts } from "../prompts/appearancePrompt.js";
-import { ALL_PLUGINS } from "../plugins.js";
-import { pluginOptions } from "../prompts/pluginsPrompt.js";
-import { tmpdir } from "node:os";
-import { track as defaultTrack, enabledPlugins } from "../telemetry.js";
-import type { RubricaLayout, RubricaState } from "../state/readState.js";
+/**
+ * `config`: troca identidade, tipo, tema, esquema de cores, idiomas ou plugins.
+ *
+ * Grava no `rubrica.json`, ajusta o código quando precisa (tema: dependência e
+ * `astro.config.ts`; URL: `site` do Astro) e manda a mudança para o Convex do computador
+ * (`rubrica/seed:patchSettings`). A produção só com confirmação (`--producao`).
+ */
+import { readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import type { SiteKind, SiteSettings } from "@rubrica/core";
+import { list, parseArgs } from "../utils/args.js";
+import { convexRun, deploymentLabel, isMissingFunction, type ConvexContext } from "../utils/convex.js";
+import { readEnvLocal } from "../utils/env.js";
+import { errorOutput, run as defaultRun, tail, type Runner } from "../utils/exec.js";
+import { projectPackageManager } from "../utils/fs.js";
+import { normalizeEmail, normalizeUrl, validateEmail, validateUrl } from "../utils/normalize.js";
+import { normalizeLocales } from "../locales.js";
+import { pluginOptions, pluginsRecord, unknownPlugins } from "../plugins.js";
+import { MARK, replaceSection, themeSection } from "../project/files.js";
+import { findProjectDir, readState, settingsFromState, writeState, type RubricaState } from "../state.js";
+import { COLOR_MODES, getTheme, resolveTheme, SCHEME_IDS, SCHEME_OPTIONS, THEMES, themePackage, type ColorMode } from "../themes.js";
+import { ask, canAsk, choose, chooseMany, confirm, log, outro } from "../ui.js";
+import { track } from "../telemetry.js";
 
-// ---- Tipos ------------------------------------------------------------------
-
-export interface FsModule {
-  access: (path: string) => Promise<void>;
-  readFile: (path: string, encoding: string) => Promise<string>;
-  writeFile: (path: string, data: string) => Promise<void>;
-  mkdir: (path: string, options: { recursive: boolean }) => Promise<void>;
+export interface ConfigChange {
+  nome?: string;
+  url?: string;
+  descricao?: string;
+  autor?: string;
+  email?: string;
+  tipo?: SiteKind;
+  tema?: string;
+  esquema?: string;
+  modo?: ColorMode;
+  idiomas?: string[];
+  idiomaPrincipal?: string;
+  /** `+id` liga, `-id` desliga, `id` liga. */
+  plugins?: string[];
 }
 
-export interface RunConfigDeps {
-  cwd?: string;
-  fs?: FsModule;
-  detectProject?: typeof defaultDetectProject;
-  readState?: typeof defaultReadState;
-  writeState?: typeof defaultWriteState;
-  identityPrompt?: typeof defaultIdentityPrompt;
-  applyRubricalConfig?: typeof defaultApplyRubricalConfig;
-  applyTheme?: typeof defaultApplyTheme;
-  applyFont?: typeof defaultApplyFont;
-  applyIndexHtml?: typeof defaultApplyIndexHtml;
-  applyLayout?: typeof defaultApplyLayout;
-  applyPlugins?: typeof defaultApplyPlugins;
-  applyAppearance?: typeof defaultApplyAppearance;
-  downloadRelease?: typeof defaultDownloadRelease;
-  getLatestVersion?: typeof defaultGetLatestVersion;
-  track?: typeof defaultTrack;
+export interface ConfigResult {
+  state: RubricaState;
+  /** Campos do `siteSettings` que mudam. */
+  patch: Partial<SiteSettings>;
+  /** Pacote do tema trocado: [antigo, novo]. */
+  themeSwap?: [string, string];
+  warnings: string[];
 }
 
-async function existsIn(fs: { access: (p: string) => Promise<void> }, p: string): Promise<boolean> {
-  try {
-    await fs.access(p);
-    return true;
-  } catch {
-    return false;
+/** Aplica a mudança ao estado (puro). */
+export function applyConfigChange(current: RubricaState, change: ConfigChange): ConfigResult {
+  const state: RubricaState = structuredClone(current);
+  const warnings: string[] = [];
+  const id = state.identidade;
+  if (change.nome !== undefined) id.nome = change.nome.trim();
+  if (change.descricao !== undefined) id.descricao = change.descricao.trim();
+  if (change.autor !== undefined) id.autor = change.autor.trim();
+  if (change.email !== undefined) {
+    const email = normalizeEmail(change.email);
+    if (validateEmail(email)) throw new Error(validateEmail(email));
+    id.email = email;
   }
-}
-
-// ---- Comando runConfig -------------------------------------------------------
-
-export async function runConfig(deps: RunConfigDeps = {}): Promise<void> {
-  const cwd = deps.cwd ?? process.cwd();
-  const fs = deps.fs ?? (nodeFsPromises as unknown as FsModule);
-  const detectProjectFn = deps.detectProject ?? defaultDetectProject;
-  const readStateFn = deps.readState ?? defaultReadState;
-  const writeStateFn = deps.writeState ?? defaultWriteState;
-  const doIdentityPrompt = deps.identityPrompt ?? defaultIdentityPrompt;
-  const applyRubricalConfigFn = deps.applyRubricalConfig ?? defaultApplyRubricalConfig;
-  const applyThemeFn = deps.applyTheme ?? defaultApplyTheme;
-  const applyFontFn = deps.applyFont ?? defaultApplyFont;
-  const applyIndexHtmlFn = deps.applyIndexHtml ?? defaultApplyIndexHtml;
-  const applyLayoutFn = deps.applyLayout ?? defaultApplyLayout;
-  const applyPluginsFn = deps.applyPlugins ?? defaultApplyPlugins;
-  const downloadReleaseFn = deps.downloadRelease ?? defaultDownloadRelease;
-  const getLatestVersionFn = deps.getLatestVersion ?? defaultGetLatestVersion;
-  const applyAppearanceFn = deps.applyAppearance ?? defaultApplyAppearance;
-
-  // Ciclo 1: detectar projeto
-  const rubricaJsonPath = await detectProjectFn(cwd, fs);
-  const projectDir = path.dirname(rubricaJsonPath);
-
-  // Ciclo 2: ler estado atual
-  const currentState = await readStateFn(projectDir, fs as Parameters<typeof defaultReadState>[1]);
-  const stateUpdate: Partial<RubricaState> = {};
-
-  // Ciclo 3: multi-select de seções
-  const sections = await multiselect({
-    message: "O que deseja reconfigurar?",
-    options: [
-      { value: "identity", label: "Identidade (nome, URL, SEO, RSS)" },
-      { value: "appearance", label: "Aparência (esquema de cores, modo claro/escuro, textura, fontes)" },
-      { value: "layout", label: "Layout" },
-      { value: "plugins", label: "Plugins" },
-    ],
-    required: false,
-  });
-
-  if (isCancel(sections)) {
-    cancel("Operação cancelada.");
-    return;
+  if (change.url !== undefined) {
+    const url = normalizeUrl(change.url);
+    if (validateUrl(url)) throw new Error(validateUrl(url));
+    id.url = url;
   }
-
-  const selected = sections as string[];
-
-  // Ciclo 4: identidade
-  if (selected.includes("identity")) {
-    // Começa do que está salvo: a pessoa só muda o que quiser.
-    const identityData = await doIdentityPrompt(currentState.identity);
-    await applyRubricalConfigFn(
-      rubricaConfigInput(identityData, currentState.fontSans, currentState.fontMono),
-      projectDir,
-      fs as Parameters<typeof defaultApplyRubricalConfig>[2]
+  if (change.tipo && change.tipo !== state.tipo) {
+    if (change.tipo !== "pessoal" && change.tipo !== "empresa") throw new Error(`Tipo inválido: "${change.tipo}".`);
+    warnings.push(
+      `O tipo mudou para ${change.tipo}. As páginas que já existem continuam; blocos que só existem no outro tipo deixam de aparecer. ` +
+        "Monte as páginas novas pelo painel (ou pelo MCP).",
     );
-    await applyIndexHtmlFn(
-      indexHtmlInput(identityData, currentState.fontSans, currentState.fontMono),
-      path.join(projectDir, "index.html"),
-      fs as Parameters<typeof defaultApplyIndexHtml>[2]
-    );
-    stateUpdate.identity = identityData;
+    const enabled = Object.entries(state.plugins).filter(([, on]) => on).map(([p]) => p);
+    state.tipo = change.tipo;
+    state.plugins = pluginsRecord(change.tipo, enabled);
   }
-
-  // Ciclo 5: aparência
-  if (selected.includes("appearance")) {
-    const theme = await schemePrompt(currentState.layout, currentState.theme);
-    const appearance = await appearancePrompt(currentState.layout, {
-      colorMode: currentState.colorMode,
-      colorModeToggle: currentState.colorModeToggle,
-      texture: currentState.texture,
-    });
-    const { fontSans, fontMono } = await fontPrompts(currentState.layout, currentState);
-
-    const cssPath = path.join(projectDir, "src", "index.css");
-    const htmlPath = path.join(projectDir, "index.html");
-
-    await applyThemeFn(
-      { preset: theme },
-      cssPath,
-      fs as Parameters<typeof defaultApplyTheme>[2]
-    );
-    await applyAppearanceFn(appearance, htmlPath, fs as Parameters<typeof defaultApplyAppearance>[2]);
-    const css = await fs.readFile(cssPath, "utf-8").catch(() => "");
-    if (css && !css.includes(SCHEME_START)) {
-      log.warn(
-        "Este projeto é de uma versão sem modo claro/escuro: só as 4 cores principais do esquema foram aplicadas. " +
-          "Para ter os dois modos, a alternância e as texturas, atualize com `npx create-rubrica@latest update` e rode o config de novo."
-      );
+  let themeSwap: [string, string] | undefined;
+  if (change.tema) {
+    const choice = resolveTheme(change.tema);
+    if (choice.aviso) warnings.push(choice.aviso);
+    if (choice.tema !== state.tema) themeSwap = [themePackage(state.tema), themePackage(choice.tema)];
+    state.tema = choice.tema;
+    if (choice.temaDesejado) state.temaDesejado = choice.temaDesejado;
+    else delete state.temaDesejado;
+    if (themeSwap && Object.values(state.ejetados ?? {}).some((e) => e.origem === themeSwap![0])) {
+      warnings.push(`Há componentes ejetados do tema anterior (${themeSwap[0]}) em src/overrides/: confira se ainda fazem sentido no tema novo.`);
     }
-    await applyFontFn(
-      { fontSans, fontMono },
-      { css: cssPath, html: htmlPath },
-      fs as Parameters<typeof defaultApplyFont>[2]
-    );
-    // Só a fonte muda aqui; o resto das meta tags vem da identidade salva.
-    const identity = stateUpdate.identity ?? currentState.identity;
-    if (identity) {
-      await applyIndexHtmlFn(
-        indexHtmlInput(identity, fontSans, fontMono),
-        htmlPath,
-        fs as Parameters<typeof defaultApplyIndexHtml>[2]
-      );
-    }
-
-    stateUpdate.theme = theme;
-    Object.assign(stateUpdate, appearance);
-    stateUpdate.fontSans = fontSans;
-    stateUpdate.fontMono = fontMono;
   }
-
-  // Ciclo 6: layout
-  if (selected.includes("layout")) {
-    const newLayout: RubricaLayout = await layoutPrompt(currentState.layout);
-
-    const confirmed = await confirm({
-      message: "⚠ Isso sobrescreve Layout.tsx e arquivos de navegação. Customizações manuais serão perdidas. Continuar?",
-    });
-
-    if (!isCancel(confirmed) && confirmed === true) {
-      // O create apaga templates/ do projeto: os layouts vêm da release do projeto.
-      let templatesDir = path.join(projectDir, "templates");
-      let tmpDir: string | undefined;
-      if (!(await existsIn(fs, templatesDir))) {
-        tmpDir = await nodeFsPromises.mkdtemp(path.join(tmpdir(), "rubrica-config-"));
-        const version = currentState.version === "0.1.0" ? await getLatestVersionFn() : currentState.version;
-        await downloadReleaseFn(tmpDir, version.startsWith("v") ? version : `v${version}`);
-        templatesDir = path.join(tmpDir, "templates");
+  if (change.esquema) {
+    if (!SCHEME_IDS.includes(change.esquema)) throw new Error(`Esquema desconhecido: "${change.esquema}". Esquemas: ${SCHEME_IDS.join(", ")}.`);
+    state.aparencia.esquema = change.esquema;
+  }
+  if (change.modo) state.aparencia.modo = change.modo;
+  if (change.idiomas || change.idiomaPrincipal) {
+    const before = state.idiomas.lista;
+    state.idiomas = normalizeLocales(change.idiomas ?? state.idiomas.lista, change.idiomaPrincipal ?? (change.idiomas ? undefined : state.idiomas.principal));
+    const added = state.idiomas.lista.filter((l) => !before.includes(l));
+    if (added.length) warnings.push(`Idiomas novos (${added.join(", ")}): o conteúdo só aparece neles depois de traduzido (decisão 28). O painel mostra o que falta.`);
+    if (state.idiomas.principal !== current.idiomas.principal) {
+      warnings.push(`O idioma principal agora é ${state.idiomas.principal}: as URLs mudam (o principal fica sem prefixo). Considere redirecionamentos.`);
+    }
+  }
+  if (change.plugins) {
+    const plugins = { ...state.plugins };
+    const ids = change.plugins.map((p) => p.replace(/^[+-]/, ""));
+    const unknown = unknownPlugins(state.tipo, ids);
+    if (unknown.length) throw new Error(`Plugins desconhecidos para sites do tipo ${state.tipo}: ${unknown.join(", ")}.`);
+    for (const p of change.plugins) plugins[p.replace(/^[+-]/, "")] = !p.startsWith("-");
+    for (const option of pluginOptions(state.tipo)) {
+      if (plugins[option.id] && option.requires.some((r) => !plugins[r])) {
+        warnings.push(`O plugin ${option.id} precisa de ${option.requires.join(", ")} ligado; sem isso ele fica desligado.`);
       }
+    }
+    state.plugins = plugins;
+  }
+
+  const before = settingsFromState(current);
+  const after = settingsFromState(state);
+  const patch: Partial<SiteSettings> = {};
+  for (const key of Object.keys(after) as (keyof SiteSettings)[]) {
+    if (key === "navigation" || key === "social") continue;
+    if (JSON.stringify(before[key]) !== JSON.stringify(after[key])) (patch as Record<string, unknown>)[key] = after[key];
+  }
+  return { state, patch, ...(themeSwap && { themeSwap }), warnings };
+}
+
+/** Troca o tema no package.json e no astro.config.ts. */
+export function swapThemeInFiles(projectDir: string, state: RubricaState, swap: [string, string]): void {
+  const pkgPath = join(projectDir, "package.json");
+  const pkg = JSON.parse(readFileSync(pkgPath, "utf-8")) as { dependencies?: Record<string, string> };
+  const deps = pkg.dependencies ?? {};
+  const spec = deps[swap[0]] ?? deps["@rubrica/core"] ?? "latest";
+  delete deps[swap[0]];
+  // Pacotes locais (link:) apontam para a pasta do tema no monorepo.
+  deps[swap[1]] = spec.startsWith("link:") ? spec.replace(/themes\/[^/]+$/, `themes/${swap[1].replace("@rubrica/theme-", "")}`) : spec;
+  pkg.dependencies = Object.fromEntries(Object.entries(deps).sort(([a], [b]) => a.localeCompare(b)));
+  writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);
+  const configPath = join(projectDir, "astro.config.ts");
+  writeFileSync(configPath, replaceSection(readFileSync(configPath, "utf-8"), MARK.themeStart, MARK.themeEnd, themeSection(state)));
+}
+
+/** Troca o `site:` do astro.config.ts. */
+export function updateSiteUrl(projectDir: string, url: string): void {
+  const configPath = join(projectDir, "astro.config.ts");
+  const source = readFileSync(configPath, "utf-8");
+  const next = source.replace(/^(\s*site:\s*)(["'`]).*?\2(,?)/m, `$1${JSON.stringify(url)}$3`);
+  if (next === source && !source.includes(JSON.stringify(url))) log.warn(`Não achei o "site:" no astro.config.ts; ajuste para ${url} à mão.`);
+  writeFileSync(configPath, next);
+}
+
+const CONFIG_FLAGS = ["nome", "url", "descricao", "autor", "email", "tipo", "tema", "esquema", "modo", "idiomas", "idioma-principal", "plugins"] as const;
+const MODES: Record<string, ColorMode> = { escuro: "dark", dark: "dark", claro: "light", light: "light", automatico: "system", system: "system" };
+
+async function askChange(state: RubricaState): Promise<ConfigChange> {
+  const what = await choose("O que você quer mudar?", [
+    { value: "identidade", label: "Identidade", hint: "nome, endereço, descrição, e-mail" },
+    { value: "tema", label: "Tema", hint: `hoje: ${state.temaDesejado ?? state.tema}` },
+    { value: "esquema", label: "Cores", hint: `esquema ${state.aparencia.esquema ?? "do tema"}, modo ${state.aparencia.modo}` },
+    { value: "idiomas", label: "Idiomas", hint: state.idiomas.lista.join(", ") },
+    { value: "plugins", label: "Plugins" },
+    { value: "tipo", label: "Tipo do site", hint: state.tipo },
+  ]);
+  if (what === "identidade") {
+    return {
+      nome: await ask("Nome do site:", { initial: state.identidade.nome }),
+      url: await ask("Endereço do site:", { initial: state.identidade.url, validate: validateUrl }),
+      descricao: await ask("Descrição:", { initial: state.identidade.descricao }),
+      email: await ask("E-mail:", { initial: state.identidade.email ?? "", validate: (s) => (s ? validateEmail(s) : undefined) }) || undefined,
+    };
+  }
+  if (what === "tema") return { tema: await choose("Tema", THEMES.map((t) => ({ value: t.id, label: `${t.label}${t.ported ? "" : " (em breve)"}`, hint: t.hint })), state.temaDesejado ?? state.tema) };
+  if (what === "esquema") {
+    return {
+      esquema: await choose("Esquema de cores", SCHEME_OPTIONS, state.aparencia.esquema ?? getTheme(state.tema)?.recommended.scheme),
+      modo: await choose("Modo de cor", COLOR_MODES, state.aparencia.modo),
+    };
+  }
+  if (what === "idiomas") {
+    const lista = list(await ask("Idiomas, separados por vírgula (o primeiro é o principal):", { initial: state.idiomas.lista.join(", ") }));
+    return { idiomas: lista, idiomaPrincipal: lista[0] };
+  }
+  if (what === "plugins") {
+    const on = await chooseMany(
+      "Plugins ligados",
+      pluginOptions(state.tipo).map((p) => ({ value: p.id, label: p.label, hint: p.description })),
+      Object.entries(state.plugins).filter(([, v]) => v).map(([k]) => k),
+    );
+    return { plugins: pluginOptions(state.tipo).map((p) => (on.includes(p.id) ? `+${p.id}` : `-${p.id}`)) };
+  }
+  return { tipo: await choose<SiteKind>("Tipo do site", [{ value: "pessoal", label: "Pessoal" }, { value: "empresa", label: "Empresa" }], state.tipo) };
+}
+
+export async function runConfig(argv: string[], deps: { cwd: string; runner?: Runner }): Promise<void> {
+  const runner = deps.runner ?? defaultRun;
+  const args = parseArgs(argv, { values: CONFIG_FLAGS, flags: ["producao", "sem-instalar", "yes"], aliases: { "-y": "yes" } });
+  const projectDir = findProjectDir(deps.cwd);
+  const current = readState(projectDir);
+  const v = args.values;
+  const fromFlags: ConfigChange = {
+    ...(v.nome !== undefined && { nome: v.nome }),
+    ...(v.url !== undefined && { url: v.url }),
+    ...(v.descricao !== undefined && { descricao: v.descricao }),
+    ...(v.autor !== undefined && { autor: v.autor }),
+    ...(v.email !== undefined && { email: v.email }),
+    ...(v.tipo !== undefined && { tipo: v.tipo as SiteKind }),
+    ...(v.tema !== undefined && { tema: v.tema }),
+    ...(v.esquema !== undefined && { esquema: v.esquema }),
+    ...(v.modo !== undefined && { modo: MODES[v.modo.toLowerCase()] ?? (v.modo as ColorMode) }),
+    ...(v.idiomas !== undefined && { idiomas: list(v.idiomas) }),
+    ...(v["idioma-principal"] !== undefined && { idiomaPrincipal: v["idioma-principal"] }),
+    ...(v.plugins !== undefined && { plugins: list(v.plugins) }),
+  };
+  const change = Object.keys(fromFlags).length ? fromFlags : canAsk(args.flags.has("yes")) ? await askChange(current) : null;
+  if (!change) throw new Error("Diga o que mudar (ex.: --tema cyberpunk, --esquema neon, --idiomas pt-BR,en) ou rode no terminal para as perguntas.");
+
+  const result = applyConfigChange(current, change);
+  for (const w of result.warnings) log.warn(w);
+  writeState(projectDir, result.state);
+  if (change.url) updateSiteUrl(projectDir, result.state.identidade.url);
+  if (result.themeSwap) {
+    swapThemeInFiles(projectDir, result.state, result.themeSwap);
+    log.success(`Tema trocado: ${result.themeSwap[0]} → ${result.themeSwap[1]}.`);
+    if (!args.flags.has("sem-instalar")) {
+      const pm = projectPackageManager(projectDir);
       try {
-        // Layouts novos não existem nas versões antigas do projeto (os templates vêm da release dele).
-        const layoutsDir = path.join(templatesDir, "layouts");
-        if ((await existsIn(fs, layoutsDir)) && !(await existsIn(fs, path.join(layoutsDir, newLayout)))) {
-          log.warn(
-            `O layout "${newLayout}" não existe na versão ${currentState.version} deste projeto. ` +
-              "Atualize o projeto com `npx create-rubrica@latest update` e rode o config de novo."
-          );
-          return;
-        }
-        await applyLayoutFn(
-          newLayout,
-          { projectDir, templatesDir },
-          { ...(fs as object), copyFile: nodeFsPromises.copyFile, unlink: nodeFsPromises.unlink, exists: (p: string) => existsIn(fs, p) } as unknown as Parameters<typeof defaultApplyLayout>[2]
-        );
-      } finally {
-        if (tmpDir) await nodeFsPromises.rm(tmpDir, { recursive: true, force: true });
+        runner(pm, ["install"], { cwd: projectDir });
+      } catch (err) {
+        log.warn(`O ${pm} install falhou; rode à mão:\n${tail(errorOutput(err))}`);
       }
-      stateUpdate.layout = newLayout;
     }
   }
 
-  // Ciclo 7: plugins
-  if (selected.includes("plugins")) {
-    const activePlugins = Object.entries(currentState.plugins)
-      .filter(([, v]) => v)
-      .map(([k]) => k);
-
-    const selectedPlugins = await multiselect({
-      message: "Plugins ativos",
-      initialValues: activePlugins,
-      options: pluginOptions(),
-      required: false,
-    });
-
-    if (!isCancel(selectedPlugins)) {
-      const pluginsMap: Record<string, boolean> = {};
-      for (const p of ALL_PLUGINS) {
-        pluginsMap[p] = (selectedPlugins as string[]).includes(p);
+  const keys = Object.keys(result.patch);
+  if (keys.length && readEnvLocal(projectDir).CONVEX_DEPLOYMENT) {
+    const targets: ConvexContext[] = [{ projectDir, runner }];
+    if (args.flags.has("producao") && (await confirm(`Gravar também no Convex de PRODUÇÃO (${keys.join(", ")})?`, false))) targets.push({ projectDir, runner, prod: true });
+    for (const ctx of targets) {
+      log.info(`Gravando ${keys.join(", ")} no Convex: ${deploymentLabel(ctx)}`);
+      try {
+        convexRun(ctx, "rubrica/seed:patchSettings", { patch: result.patch });
+      } catch (err) {
+        if (isMissingFunction(err)) log.warn("O backend instalado não tem rubrica/seed:patchSettings: mude pelo painel ou atualize o Rubrica.");
+        else log.warn(`O Convex recusou a mudança:\n${tail(errorOutput(err))}`);
       }
-
-      await applyPluginsFn(
-        pluginsMap,
-        path.join(projectDir, "convex", "pluginRegistry.ts"),
-        fs as Parameters<typeof defaultApplyPlugins>[2]
-      );
-      stateUpdate.plugins = pluginsMap;
     }
+    if (!args.flags.has("producao") && current.producao?.convexUrl) log.info("O site publicado não mudou. Para levar a mudança para ele: npx create-rubrica config --producao (com as mesmas opções).");
+  } else if (keys.length) {
+    log.info("O projeto ainda não está ligado ao Convex: a mudança vai para o banco quando você rodar o setup.");
   }
-
-  // Ciclo 8: persistir estado
-  if (Object.keys(stateUpdate).length > 0) {
-    await writeStateFn(projectDir, stateUpdate, fs as Parameters<typeof defaultWriteState>[2]);
-
-    // Telemetria: o que mudou e os valores novos, menos a identidade (só se ela mudou).
-    const secoes = [
-      stateUpdate.identity && "identidade",
-      stateUpdate.theme !== undefined && "aparencia",
-      stateUpdate.layout !== undefined && "layout",
-      stateUpdate.plugins && "plugins",
-    ].filter((s): s is string => Boolean(s));
-    const dados: Record<string, unknown> = { secoes };
-    if (stateUpdate.layout !== undefined) dados.layout = stateUpdate.layout;
-    if (stateUpdate.theme !== undefined) {
-      Object.assign(dados, {
-        esquema: stateUpdate.theme,
-        modoCor: stateUpdate.colorMode,
-        alternancia: stateUpdate.colorModeToggle,
-        textura: stateUpdate.texture,
-        fonte: stateUpdate.fontSans,
-        mono: stateUpdate.fontMono,
-      });
-    }
-    if (stateUpdate.plugins) dados.plugins = enabledPlugins(stateUpdate.plugins);
-    await (deps.track ?? defaultTrack)(projectDir, "config", dados, { fs, notice: (message) => log.info(message) });
-  }
-
-  outro("Configuração atualizada com sucesso!");
+  await track(projectDir, "config", { campos: Object.keys(change), tema: result.state.temaDesejado ?? result.state.tema });
+  outro("Configuração atualizada.");
 }

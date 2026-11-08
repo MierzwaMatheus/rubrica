@@ -1,6 +1,6 @@
 /**
  * Telemetria anônima do CLI: quando um comando dá certo, manda as escolhas feitas
- * (layout, cores, plugins…) para o Rubrica saber o que mais se usa. Nada de nome,
+ * (tipo, tema, cores, plugins…) para o Rubrica saber o que mais se usa. Nada de nome,
  * e-mail, endereço do site, conteúdo ou chaves. O projeto ganha um id aleatório
  * (no rubrica.json) só para ligar os eventos do mesmo site: criou, configurou, publicou.
  *
@@ -13,7 +13,8 @@
 import * as nodeFsPromises from "node:fs/promises";
 import * as nodeCrypto from "node:crypto";
 import * as path from "node:path";
-import { PLUGIN_PRESETS } from "./plugins.js";
+import { PLUGIN_PRESETS, presetPlugins } from "./plugins.js";
+import type { SiteKind } from "@rubrica/core";
 import { packageManagerFromUserAgent } from "./utils/packageManager.js";
 
 export const TELEMETRY_URL = "https://necessary-chihuahua-712.convex.site/v1/eventos";
@@ -25,7 +26,7 @@ declare const __CLI_VERSION__: string | undefined;
 /** Versão do CLI, injetada no build (tsup.config.ts). */
 export const CLI_VERSION = typeof __CLI_VERSION__ === "string" ? __CLI_VERSION__ : "0.0.0";
 
-export type TelemetryType = "criacao" | "setup" | "publicacao" | "atualizacao" | "config";
+export type TelemetryType = "criacao" | "setup" | "publicacao" | "atualizacao" | "config" | "migracao" | "ejecao";
 
 export interface TelemetryFs {
   readFile: (path: string, encoding: string) => Promise<string>;
@@ -56,7 +57,7 @@ const OFF_VALUES = ["0", "false", "nao", "não", "off", "desligada", "desligado"
 const isOn = (value: string | undefined) => value !== undefined && value !== "" && !["0", "false"].includes(value.toLowerCase());
 
 export const NOTICE =
-  "O Rubrica manda, sem dados pessoais, as escolhas feitas no CLI (layout, cores, plugins) " +
+  "O Rubrica manda, sem dados pessoais, as escolhas feitas no CLI (tipo, tema, cores, plugins) " +
   "para saber o que as pessoas mais usam.\n" +
   `Para desligar neste projeto: npx create-rubrica telemetria desligar. O que vai: ${TELEMETRY_DOCS}`;
 
@@ -72,9 +73,10 @@ export function telemetryOff(env: Record<string, string | undefined>, state?: { 
 }
 
 /** Pacote pronto que bate com os plugins escolhidos, ou `custom`. */
-export function pluginPreset(plugins: string[]): string {
+export function pluginPreset(plugins: string[], kind: SiteKind = "pessoal"): string {
   const chosen = [...new Set(plugins)].sort().join(",");
-  return PLUGIN_PRESETS.find((p) => [...p.plugins].sort().join(",") === chosen)?.id ?? "custom";
+  const same = (id: string) => [...(presetPlugins(id, kind) ?? [])].sort().join(",") === chosen;
+  return PLUGIN_PRESETS.find((p) => p.kinds.includes(kind) && same(p.id))?.id ?? "custom";
 }
 
 /** Plugins ligados de um `{ id: ligado? }`. */

@@ -141,6 +141,10 @@ describe("configurações do site", () => {
     });
   });
 
+  it("mantém os caminhos da v1 (/blog e /portfolio) explícitos", () => {
+    expect(settings.paths).toEqual({ posts: "/blog", projects: "/portfolio" });
+  });
+
   it("textura da v1 vai para a aparência; desconhecida fica de fora", () => {
     const withTexture = (texture: string) => convertV1({ tables: v1Export().tables, v1: { ...V1_RUBRICA_JSON, texture }, theme: "poster", recipe: CORE_RECIPES.pessoal, now: NOW }).tables.siteSettings![0]!.appearance as Record<string, unknown>;
     expect(withTexture("grain").texture).toBe("grain");

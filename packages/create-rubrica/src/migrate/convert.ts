@@ -517,6 +517,8 @@ function convertSettings(ctx: Ctx, input: ConvertInput, plugins: Record<string, 
       texture: ["none", "grain", "paper", "scanlines"].includes(input.v1.texture ?? "") ? input.v1.texture : undefined,
     }),
     navigation: [],
+    // As URLs da v1 (/blog, /portfolio) ficam fixas, mesmo que o padrão do tipo mude.
+    paths: { posts: "/blog", projects: "/portfolio" },
     social,
     person: contact || id.authorName
       ? compact({

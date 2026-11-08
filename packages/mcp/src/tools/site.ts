@@ -12,7 +12,7 @@ import { commit, ToolInputError, type ToolDef } from "./types";
 
 /** Campos que só a agência (root) muda — espelha `TECHNICAL_SETTINGS` do backend. */
 const TECHNICAL = ["kind", "url", "locales", "theme"];
-const OBJECT_KEYS = ["appearance", "person", "organization", "paths", "icons", "themeColor", "rss", "analytics"];
+const OBJECT_KEYS = ["appearance", "person", "organization", "paths", "icons", "themeColor", "rss", "analytics", "whatsapp", "announcement"];
 
 const DESCRIPTIONS: Record<string, string> = {
   kind: "Tipo do site: pessoal ou empresa. SÓ root.",
@@ -37,6 +37,11 @@ const DESCRIPTIONS: Record<string, string> = {
   rss: "Título e descrição do feed RSS do blog, por idioma. Sem eles, o nome e a descrição do site.",
   defaultPostCover: "Capa padrão dos posts sem capa (e imagem de compartilhamento deles), 1200x630.",
   analytics: "Analytics (plugin analytics, Umami): scriptUrl (https) e websiteId. A origem precisa estar na CSP (npx create-rubrica config --analytics).",
+  whatsapp:
+    "WhatsApp do site inteiro. number: formato internacional (DDI+DDD+número; o backend guarda só os dígitos). message: mensagem já escrita na conversa, por idioma. floating: botão flutuante em todas as páginas (menos proposta/checkout). label: texto do botão, por idioma (vazio = só ícone). Em qualquer campo de link, o endereço `whatsapp:` abre a conversa com a mensagem padrão e `whatsapp:<texto>` com uma mensagem própria.",
+  "whatsapp.number": "Ex.: +55 11 91234-5678 (vira 5511912345678).",
+  announcement:
+    "Faixa de aviso no topo de todas as páginas (menos proposta/checkout). enabled liga; text por idioma (até 200 caracteres; sem texto num idioma, a faixa não aparece nele); link opcional depois do texto; tone info (discreto) ou destaque (cor principal). startsAt/endsAt: AAAA-MM-DD (dia inteiro, UTC) ou data e hora com fuso; avaliados NO BUILD: o aviso só entra ou sai do ar na próxima publicação.",
 };
 
 function stripRequired(schema: JsonSchema): JsonSchema {
@@ -61,7 +66,7 @@ export function mergeSettings(current: Record<string, unknown>, patch: Record<st
     const val = patch[key];
     if (isObj(cur) && isObj(val)) {
       const merged: Record<string, unknown> = { ...cur, ...val };
-      for (const nested of ["tokens", "address"]) {
+      for (const nested of ["tokens", "address", "message", "label", "text"]) {
         if (isObj(cur[nested]) && isObj(val[nested])) merged[nested] = { ...cur[nested], ...val[nested] };
       }
       out[key] = merged;

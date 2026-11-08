@@ -125,7 +125,7 @@ export const AUDIT_ACTIONS: Record<string, ActionDef> = {
   "auth.password_reset": {
     label: "reiniciou a senha de um usuário",
     target: false,
-    detail: (m) => (m.via === "painel" ? "pelo painel, com senha temporária" : "pelo terminal"),
+    detail: (m) => joinDetail(text(m.email), m.via === "painel" ? "pelo painel, com senha temporária" : "pelo terminal"),
   },
   "user.suspended": { label: "suspendeu o acesso de um usuário", target: false, detail: (m) => text(m.email) },
   "user.reactivated": { label: "reativou o acesso de um usuário", target: false, detail: (m) => text(m.email) },

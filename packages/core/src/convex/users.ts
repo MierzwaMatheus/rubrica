@@ -85,7 +85,7 @@ async function upsertRole(
 const refs = {
   actor: ref<"query", Record<string, never>, { userId: Id<"users">; email: string | null; role: Role | null; mustChangePassword: boolean }>("query", "users", "actor"),
   passwordAccountOf: ref<"query", { userId: Id<"users"> }, { accountId: string; email: string } | null>("query", "users", "passwordAccountOf"),
-  afterAdminReset: ref<"mutation", { userId: Id<"users">; accountId: string; actorId: Id<"users"> }, null>("mutation", "users", "afterAdminReset"),
+  afterAdminReset: ref<"mutation", { userId: Id<"users">; accountId: string; actorId: Id<"users">; email: string }, null>("mutation", "users", "afterAdminReset"),
   assignRoleInternal: ref<"mutation", { userId: Id<"users">; role: Role; createdBy?: Id<"users">; mustChangePassword?: boolean }, null>(
     "mutation",
     "users",
@@ -277,7 +277,7 @@ export function usersFunctions() {
         if (!account) throw new Error("Este usuário não entra com senha");
         const tempPassword = temporaryPassword();
         await modifyAccountCredentials(ctx, { provider: "password", account: { id: account.email, secret: tempPassword } });
-        await ctx.runMutation(refs.afterAdminReset, { userId: args.userId, accountId: account.accountId, actorId: actor.userId });
+        await ctx.runMutation(refs.afterAdminReset, { userId: args.userId, accountId: account.accountId, actorId: actor.userId, email: account.email });
         return { tempPassword, email: account.email };
       },
     }),
@@ -383,13 +383,13 @@ export function usersFunctions() {
     }),
 
     afterAdminReset: internalMutation({
-      args: { userId: v.id("users"), accountId: v.string(), actorId: v.id("users") },
-      handler: async (ctx, { userId, accountId, actorId }) => {
+      args: { userId: v.id("users"), accountId: v.string(), actorId: v.id("users"), email: v.string() },
+      handler: async (ctx, { userId, accountId, actorId, email }) => {
         await clearSignInLock(ctx, accountId);
         const doc = await roleDoc(ctx, userId);
         if (doc) await ctx.db.patch(doc._id, { mustChangePassword: true });
         const sessions = await revokeSessions(ctx, userId);
-        await logUserAction(ctx, actorId, "auth.password_reset", { type: "user", id: userId }, { via: "painel", sessions });
+        await logUserAction(ctx, actorId, "auth.password_reset", { type: "user", id: userId }, { via: "painel", email, sessions });
         return null;
       },
     }),

@@ -90,3 +90,6 @@
 .cp-case__related a svg { flex: none; color: var(--rb-muted); }
 .cp-case__related a:hover { color: var(--rb-accent-2); border-color: color-mix(in srgb, var(--rb-accent-2) 50%, transparent); }
 .cp-case__related a:hover svg { color: var(--rb-accent-2); }
+
+/* Lista de itens (princípios do "Sobre"): duas colunas, como na v1. */
+@media (min-width: 768px) { .rb-lista__list { grid-template-columns: repeat(2, 1fr); } }

@@ -223,6 +223,17 @@ describe("páginas pela receita, preenchidas com a v1", () => {
     ]);
   });
 
+  it("depoimentos da home: destacados (showOnHome); sem nenhum marcado, todos, como na v1", () => {
+    // O export tem um "mostrar na home": o bloco fica com a fonte padrão (só destacados).
+    expect(block(byPath(run(), "/"), "depoimentos").source).toBeUndefined();
+    const tables = v1Export().tables;
+    tables.testimonials = tables.testimonials!.map((d) => ({ ...d, showOnHome: false }));
+    const r = convertV1({ tables, v1: V1_RUBRICA_JSON, theme: "cyberpunk", recipe: CORE_RECIPES.pessoal, now: NOW });
+    const source = block(byPath(r, "/"), "depoimentos").source as Record<string, unknown>;
+    expect(source).toMatchObject({ collection: "testimonials" });
+    expect(source.featured).toBeUndefined();
+  });
+
   it("bloco sem conteúdo na v1 sai em vez de ficar vazio", () => {
     const tables = v1Export().tables;
     tables.homeContent = tables.homeContent!.filter((h) => h.key !== "home_metrics" && h.key !== "about_text");

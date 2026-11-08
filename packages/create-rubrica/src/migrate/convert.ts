@@ -613,6 +613,20 @@ export const UI_TEXT_MAP: Record<string, string> = {
   "home.availability.label": "hero.available",
 };
 
+/**
+ * Depoimentos da home: o bloco mostra os destacados (`featured`, o "mostrar na home" da
+ * v1). Se nenhum estava marcado na v1, a home mostrava todos: o bloco ganha uma fonte
+ * sem o filtro, senão ficaria vazio.
+ */
+function homeTestimonialsSource(ctx: Ctx, path: string, block: RecipeBlock): { source?: RecipeBlock["source"] } {
+  if (path !== "/" || block.type !== "depoimentos" || block.source) return {};
+  const list = (ctx.tables.testimonials ?? []).filter((d) => d.deletedAt === undefined);
+  if (!list.length || list.some((d) => d.showOnHome === true)) return {};
+  const { featured: _featured, ...all } = CORE_BLOCKS.find((b) => b.type === "depoimentos")?.source?.default ?? { collection: "testimonials" as const, sort: "order" as const };
+  void _featured;
+  return { source: all as RecipeBlock["source"] };
+}
+
 function buildPages(ctx: Ctx, input: ConvertInput, plugins: Record<string, boolean>, report: MigrationReport): Doc[] {
   const allowed = (type: string) => {
     const def = CORE_BLOCKS.find((b) => b.type === type);
@@ -654,7 +668,7 @@ function buildPages(ctx: Ctx, input: ConvertInput, plugins: Record<string, boole
       }
       // Campos estruturais da receita (variação, booleanos) ficam; textos de exemplo, não.
       const structural = Object.fromEntries(Object.entries(block.fields ?? {}).filter(([, v]) => typeof v === "boolean" || (typeof v === "string" && !isLocalizedValue(v))));
-      kept.push({ ...block, fields: { ...structural, ...fields } });
+      kept.push({ ...block, fields: { ...structural, ...fields }, ...homeTestimonialsSource(ctx, page.path, block) });
     }
     // Confere cada bloco com o contrato (campos obrigatórios, tamanhos): o import não passa pelas mutations.
     for (let i = kept.length - 1; i >= 0; i--) {

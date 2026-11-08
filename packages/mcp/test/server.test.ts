@@ -96,9 +96,9 @@ describe("servidor MCP", () => {
     expect(bad.isError).toBe(true);
   });
 
-  it("sem login só aparecem login, logout, whoami e o catálogo", async () => {
+  it("sem login só aparecem login, logout, whoami, o catálogo e as receitas", async () => {
     const { client } = await connect(false);
-    expect((await client.listTools()).tools.map((t) => t.name).sort()).toEqual(["blocks_catalog", "login", "logout", "whoami"]);
+    expect((await client.listTools()).tools.map((t) => t.name).sort()).toEqual(["blocks_catalog", "login", "logout", "page_recipes", "whoami"]);
     const res = await client.callTool({ name: "pages_list", arguments: {} });
     expect(res.isError).toBe(true);
     expect(JSON.parse((res.content as any)[0].text).error).toContain("rubrica mcp login");

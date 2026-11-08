@@ -1,8 +1,9 @@
 import { randomBytes } from "node:crypto";
-import { validateBlock, type BlockDefinition, type BlockInstance } from "@rubrica/core";
-import { CORE_BLOCKS } from "@rubrica/core/blocks";
+import { validateBlock, type BlockInstance, type VariantOption } from "@rubrica/core";
+import type { CatalogBlock } from "../catalog";
 import { RubricaError, type RubricaClient } from "../client";
 import { pluginEnabled, type SiteState } from "../state";
+import { themeVariants } from "../theme";
 import type { JsonSchema } from "../schema/json-schema";
 import { ToolInputError, type FieldProblem } from "./types";
 
@@ -11,15 +12,31 @@ export const prop = {
   bool: (description: string): JsonSchema => ({ type: "boolean", description }),
 };
 
-/** Blocos que o site aceita agora (tipo do site e plugins ligados). */
-export function blocksFor(state: SiteState): BlockDefinition[] {
+/** Blocos que o site aceita agora (catálogo do backend, tipo do site e plugins ligados). */
+export function blocksFor(state: SiteState): CatalogBlock[] {
   const kind = state.settings?.kind;
-  return CORE_BLOCKS.filter((b) => {
+  return state.catalog.blocks.filter((b) => {
     if (kind && b.category !== "comum" && b.category !== kind) return false;
     if (b.plugin && state.plugins.length > 0 && !pluginEnabled(state, b.plugin)) return false;
     return true;
-  }) as BlockDefinition[];
+  });
 }
+
+/** Definição de um tipo no catálogo do site (sem filtrar por tipo de site ou plugin). */
+export function findBlock(state: SiteState, type: string): CatalogBlock | undefined {
+  return state.catalog.blocks.find((b) => b.type === type);
+}
+
+/** Variações do bloco no tema instalado (a primeira é a padrão). */
+export function variantsOf(state: SiteState, type: string): VariantOption[] {
+  return themeVariants(state.theme, type);
+}
+
+export function variantList(options: readonly VariantOption[]): string {
+  return options.map((o, i) => `${o.value} (${o.label}${i === 0 ? ", padrão" : ""})`).join(", ");
+}
+
+const themeName = (state: SiteState) => state.theme.label ?? state.theme.id;
 
 export function newBlockId(type: string): string {
   return `${type}-${randomBytes(3).toString("hex")}`;
@@ -43,18 +60,48 @@ export function checkBlocks(blocks: BlockInstance[], state: SiteState): BlockChe
     if (!BLOCK_ID.test(block.id)) at("id", `id de bloco inválido: "${block.id}"`);
     else if (seen.has(block.id)) at("id", `id de bloco repetido: "${block.id}"`);
     seen.add(block.id);
-    const def = CORE_BLOCKS.find((b) => b.type === block.type) as BlockDefinition | undefined;
+    const def = findBlock(state, block.type);
     if (!def) {
-      warnings.push(`Bloco ${block.id}: o tipo "${block.type}" não está no catálogo do núcleo; só o backend confere os campos dele.`);
+      if (state.catalog.source === "backend") at("type", `tipo de bloco desconhecido: "${block.type}". Tipos do site: ${blocksFor(state).map((b) => b.type).join(", ")}`);
+      else warnings.push(`Bloco ${block.id}: o tipo "${block.type}" não está no catálogo do núcleo; só o backend confere os campos dele.`);
       continue;
     }
     if (state.settings && !allowed.has(def.type)) {
       at("type", def.plugin && !pluginEnabled(state, def.plugin) ? `o bloco ${def.type} precisa do plugin "${def.plugin}" ligado` : `o bloco ${def.type} é só de sites do tipo ${def.category}`);
       continue;
     }
+    if (block.variant !== undefined) {
+      const options = variantsOf(state, def.type);
+      const known = options.some((o) => o.value === block.variant);
+      if (!known) {
+        const message = options.length
+          ? `a variação "${block.variant}" não existe no tema ${themeName(state)} para o bloco ${def.type}. Válidas: ${variantList(options)}`
+          : `o bloco ${def.type} não tem variações no tema ${themeName(state)}; tire o "variant"`;
+        // Sem ler o tema, não dá para ter certeza: o site cai na variação padrão.
+        if (state.theme.source === "tema") at("variant", message);
+        else warnings.push(`Bloco ${block.id}: ${message} (lista do núcleo: o tema não pôde ser lido; o site usa a padrão se ela não existir).`);
+      }
+    }
     for (const e of validateBlock(def, block)) at(e.path, e.message);
+    if (def.backendRules) warnings.push(`Bloco ${block.id} (${def.type}): o projeto tem regras próprias para este bloco; o backend confere ao gravar.`);
   }
   return { problems, warnings };
+}
+
+/**
+ * Blocos do projeto com regras próprias (`validate` em função) só o backend sabe conferir:
+ * a prévia pergunta a ele (`rubrica/panel:validatePage`, sem gravar). Num backend sem essa
+ * função, fica o aviso de `checkBlocks` e a validação acontece ao gravar.
+ */
+export async function checkWithBackend(client: RubricaClient, blocks: BlockInstance[], state: SiteState, check: BlockCheck): Promise<BlockCheck> {
+  if (check.problems.length || !blocks.some((b) => findBlock(state, b.type)?.backendRules)) return check;
+  try {
+    const res = await client.query<{ blockErrors: { blockId?: string; path: string; message: string }[] }>("rubrica/panel:validatePage", { blocks });
+    const problems = res.blockErrors.map((e) => ({ ...(e.blockId ? { blockId: e.blockId } : {}), path: e.path, message: e.message }));
+    return { problems, warnings: check.warnings.filter((w) => !w.includes("o backend confere ao gravar")) };
+  } catch {
+    return check;
+  }
 }
 
 export function assertValid(check: BlockCheck, what = "Blocos inválidos"): void {

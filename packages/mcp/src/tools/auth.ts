@@ -1,4 +1,5 @@
 import { ROLE_LABELS } from "@rubrica/core/convex/roles";
+import { themeSummary } from "../guide";
 import { prop } from "./shared";
 import type { ToolDef } from "./types";
 
@@ -10,7 +11,7 @@ export const authTools: ToolDef[] = [
     name: "whoami",
     title: "Quem sou eu / estado do login",
     description:
-      "Mostra o projeto, qual Convex (dev ou produção), a conta logada, o papel, o site (tipo, idiomas, tema), os plugins ligados e as ferramentas disponíveis. Chame no começo: diga à pessoa em qual ambiente vai gravar.",
+      "Mostra o projeto, qual Convex (dev ou produção), a conta logada, o papel, o site (tipo, idiomas, tema instalado), os plugins ligados, de onde vem o catálogo de blocos e as ferramentas disponíveis. Chame no começo: diga à pessoa em qual ambiente vai gravar.",
     access: { login: false },
     input: () => ({ type: "object", properties: {}, additionalProperties: false }),
     async handler(_args, ctx) {
@@ -21,6 +22,8 @@ export const authTools: ToolDef[] = [
       else if (project.environment === "desenvolvimento" || project.environment === "local") notes.push("Convex de desenvolvimento/local: o site no ar não muda.");
       if (!ctx.runtime.hasSession()) notes.push(`Sem login. ${TERMINAL_LOGIN(project.name)}`);
       if (s.problem) notes.push(s.problem);
+      if (s.theme.problem) notes.push(s.theme.problem);
+      if (s.me && s.catalog.source === "nucleo") notes.push("O backend não informou o catálogo de blocos (versão anterior do @rubrica/core): blocks_catalog mostra só os do núcleo.");
       if (s.me?.mustChangePassword) notes.push("Esta conta precisa trocar a senha no painel antes de continuar.");
       if (options.defaultDryRun) notes.push("Gravações começam em prévia (dryRun: true); mande dryRun: false para gravar.");
       return {
@@ -41,6 +44,8 @@ export const authTools: ToolDef[] = [
               enabledPlugins: s.plugins.filter((p) => p.enabled).map((p) => p.id),
             }
           : {}),
+        theme: themeSummary(s),
+        blockCatalog: s.catalog.source,
         tools: ctx.runtime.toolNames(),
         notes,
       };

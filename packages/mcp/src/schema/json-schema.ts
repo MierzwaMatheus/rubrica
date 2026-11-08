@@ -7,13 +7,27 @@
  * As descrições são em pt-BR. Com os idiomas do site conhecidos, o texto traduzível
  * lista cada idioma como propriedade.
  */
-import type { BlockDefinition, FieldDef, FieldMap } from "@rubrica/core";
+import type { BlockDefinition, FieldDef, FieldMap, VariantOption } from "@rubrica/core";
 
 export type JsonSchema = Record<string, unknown>;
 
 export interface SchemaOptions {
   /** Idiomas do site. Sem eles, o texto traduzível aceita qualquer código. */
   locales?: readonly string[];
+  /** Variações de cada tipo de bloco no tema instalado (a primeira é a padrão). */
+  variants?: (type: string) => readonly VariantOption[];
+}
+
+/** `variant` de um bloco: as variações do tema, ou o aviso de que ele não tem nenhuma. */
+export function variantSchema(type: string, opts: SchemaOptions): JsonSchema {
+  const options = opts.variants?.(type);
+  if (!options) return { type: "string", description: "Variação declarada pelo tema (opcional)." };
+  if (!options.length) return { type: "string", description: "Este bloco não tem variações no tema do site: não mande." };
+  return {
+    type: "string",
+    enum: options.map((o) => o.value),
+    description: `Variação do tema (opcional). Sem ela, a padrão: ${options.map((o, i) => `${o.value} (${o.label}${i === 0 ? ", padrão" : ""})`).join(", ")}.`,
+  };
 }
 
 export function localizedSchema(opts: SchemaOptions, description: string, extra: JsonSchema = {}): JsonSchema {
@@ -145,7 +159,7 @@ export function blockInstanceSchema(def: BlockDefinition, opts: SchemaOptions = 
     properties: {
       id: { type: "string", pattern: "^[A-Za-z0-9_-]{1,64}$", description: "Id estável do bloco. Se faltar, o MCP gera um." },
       type: { const: def.type },
-      variant: { type: "string", description: "Variação declarada pelo tema (opcional)." },
+      variant: variantSchema(def.type, opts),
       visible: { type: "boolean", description: "Padrão: true." },
       fields: blockFieldsSchema(def, opts),
       ...(def.source ? { source: { ...sourceSchema, properties: { ...(sourceSchema.properties as JsonSchema), collection: { type: "string", enum: [...def.source.collections] } } } } : {}),
@@ -155,8 +169,11 @@ export function blockInstanceSchema(def: BlockDefinition, opts: SchemaOptions = 
   };
 }
 
-/** Qualquer bloco: os tipados e, por último, um genérico (blocos próprios do projeto, que o backend valida). */
-export function anyBlockSchema(defs: readonly BlockDefinition[], opts: SchemaOptions = {}, typed = true): JsonSchema {
+/**
+ * Qualquer bloco: os tipados e, com `withGeneric`, um genérico por último (quando o catálogo
+ * é só o do núcleo e o projeto pode ter blocos próprios, que o backend valida).
+ */
+export function anyBlockSchema(defs: readonly BlockDefinition[], opts: SchemaOptions = {}, typed = true, withGeneric = true): JsonSchema {
   const generic: JsonSchema = {
     type: "object",
     description: "Bloco de tipo próprio do projeto (sem schema local; o backend valida).",
@@ -171,7 +188,10 @@ export function anyBlockSchema(defs: readonly BlockDefinition[], opts: SchemaOpt
     required: ["type", "fields"],
   };
   if (!typed) return generic;
-  return { description: "Um bloco da página. Veja blocks_catalog para o que cada tipo faz.", anyOf: [...defs.map((d) => blockInstanceSchema(d, opts)), generic] };
+  return {
+    description: "Um bloco da página. Veja blocks_catalog para o que cada tipo faz, quando usar e as variações.",
+    anyOf: [...defs.map((d) => blockInstanceSchema(d, opts)), ...(withGeneric ? [generic] : [])],
+  };
 }
 
 // ── Validadores do Convex → JSON Schema ─────────────────────────────────────

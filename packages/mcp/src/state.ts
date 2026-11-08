@@ -5,7 +5,9 @@
 import type { SiteSettings } from "@rubrica/core";
 import type { Role } from "@rubrica/core/convex/roles";
 import { isRole } from "@rubrica/core/convex/roles";
+import { CORE_CATALOG, loadCatalog, type BlockCatalog } from "./catalog";
 import { RubricaError, type RubricaClient } from "./client";
+import { CORE_THEME, type ThemeInfo } from "./theme";
 
 export interface PluginInfo {
   id: string;
@@ -44,12 +46,16 @@ export interface SiteState {
   settings: SiteSettings | null;
   plugins: PluginInfo[];
   modules: ReadonlySet<string>;
+  /** Blocos que o backend aceita (núcleo + projeto), ou os do núcleo como reserva. */
+  catalog: BlockCatalog;
+  /** Tema instalado no projeto: variações e receitas. */
+  theme: ThemeInfo;
   loadedAt: number;
   /** Por que o estado está incompleto (rede, backend sem configuração). */
   problem?: string;
 }
 
-export const EMPTY_STATE: SiteState = { me: null, settings: null, plugins: [], modules: new Set(), loadedAt: 0 };
+export const EMPTY_STATE: SiteState = { me: null, settings: null, plugins: [], modules: new Set(), catalog: CORE_CATALOG, theme: CORE_THEME, loadedAt: 0 };
 
 export function pluginEnabled(state: SiteState, id: string): boolean {
   return state.plugins.some((p) => p.id === id && p.enabled);
@@ -77,16 +83,19 @@ export async function loadState(client: RubricaClient, hasSession: boolean): Pro
     if (!raw) return { ...EMPTY_STATE, loadedAt: Date.now(), problem: "A sessão não é mais válida. Faça o login de novo." };
     const me: Me = { ...raw, role: isRole(raw.role) ? raw.role : null };
     if (!me.role) return { ...EMPTY_STATE, me, loadedAt: Date.now(), problem: "Este usuário não tem papel no painel." };
-    const [settings, plugins, modules] = await Promise.all([
+    const [settings, plugins, modules, catalog] = await Promise.all([
       client.query<SiteSettings | null>("rubrica/settings:get", {}),
       client.query<PluginInfo[]>("rubrica/settings:plugins", {}),
       Promise.all(OPTIONAL_MODULES.map(async (m) => ((await probeModule(client, m)) ? m.id : null))),
+      loadCatalog(client),
     ]);
     return {
+      ...EMPTY_STATE,
       me,
       settings,
       plugins,
       modules: new Set(modules.filter((m): m is string => !!m)),
+      catalog,
       loadedAt: Date.now(),
       ...(settings ? {} : { problem: "O site ainda não foi configurado no Convex (rode o setup)." }),
     };

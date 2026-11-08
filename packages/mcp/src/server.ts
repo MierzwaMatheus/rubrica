@@ -9,8 +9,7 @@ import {
   ListToolsRequestSchema,
   ReadResourceRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-import { CORE_BLOCKS } from "@rubrica/core/blocks";
-import { blockResource, catalogMarkdown, INSTRUCTIONS, PROMPTS, writingGuide } from "./guide";
+import { blockResource, catalogBlocks, catalogMarkdown, INSTRUCTIONS, PROMPTS, recipesMarkdown, themeSummary, writingGuide } from "./guide";
 import type { Runtime } from "./runtime";
 
 import pkg from "../package.json" with { type: "json" };
@@ -30,14 +29,18 @@ export function createServer(runtime: Runtime): Server {
   server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: await runtime.listTools() }));
   server.setRequestHandler(CallToolRequestSchema, async (req) => (await runtime.callTool(req.params.name, (req.params.arguments ?? {}) as Record<string, unknown>)) as CallToolResult);
 
-  server.setRequestHandler(ListResourcesRequestSchema, async () => ({
-    resources: [
-      { uri: "rubrica://guia/escrita", name: "Regras de escrita", description: "Idiomas, h1 do hero, imagens e como gravar com segurança.", mimeType: "text/markdown" },
-      { uri: "rubrica://blocos/catalogo", name: "Catálogo de blocos", description: "Os tipos de bloco do site, com descrição e campos.", mimeType: "text/markdown" },
-      { uri: "rubrica://site/estado", name: "Estado do site", description: "Papel, idiomas, tema, plugins e ferramentas disponíveis agora.", mimeType: "application/json" },
-      ...CORE_BLOCKS.map((b) => ({ uri: `rubrica://blocos/${b.type}`, name: `Bloco ${b.type}`, description: b.description, mimeType: "application/json" })),
-    ],
-  }));
+  server.setRequestHandler(ListResourcesRequestSchema, async () => {
+    const state = await runtime.ensureState();
+    return {
+      resources: [
+        { uri: "rubrica://guia/escrita", name: "Regras de escrita", description: "Idiomas, h1 do hero, links (inclusive whatsapp:), faixa de aviso, imagens e como gravar com segurança.", mimeType: "text/markdown" },
+        { uri: "rubrica://blocos/catalogo", name: "Catálogo de blocos", description: "Os tipos de bloco do site (núcleo e projeto), com quando usar, variações do tema e campos.", mimeType: "text/markdown" },
+        { uri: "rubrica://receitas", name: "Receitas de página", description: "A lista de blocos de cada página padrão, na receita do tema para o tipo do site.", mimeType: "text/markdown" },
+        { uri: "rubrica://site/estado", name: "Estado do site", description: "Papel, idiomas, tema, plugins e ferramentas disponíveis agora.", mimeType: "application/json" },
+        ...catalogBlocks(state).map((b) => ({ uri: `rubrica://blocos/${b.type}`, name: `Bloco ${b.type}`, description: b.guidance?.use ?? b.description, mimeType: "application/json" })),
+      ],
+    };
+  });
 
   server.setRequestHandler(ReadResourceRequestSchema, async (req) => {
     const uri = req.params.uri;
@@ -45,6 +48,7 @@ export function createServer(runtime: Runtime): Server {
     const reply = (mimeType: string, body: string) => ({ contents: [{ uri, mimeType, text: body }] });
     if (uri === "rubrica://guia/escrita") return reply("text/markdown", writingGuide());
     if (uri === "rubrica://blocos/catalogo") return reply("text/markdown", catalogMarkdown(state));
+    if (uri === "rubrica://receitas") return reply("text/markdown", recipesMarkdown(state));
     if (uri === "rubrica://site/estado") {
       return reply(
         "application/json",
@@ -54,6 +58,8 @@ export function createServer(runtime: Runtime): Server {
             role: state.me?.role ?? null,
             convex: { host: new URL(runtime.project.convexUrl).hostname, environment: runtime.project.environment },
             site: state.settings && { kind: state.settings.kind, url: state.settings.url, locales: state.settings.locales, theme: state.settings.theme },
+            theme: themeSummary(state),
+            blockCatalog: state.catalog.source,
             plugins: state.plugins.map((p) => ({ id: p.id, enabled: p.enabled })),
             tools: runtime.toolNames(),
             ...(state.problem ? { problem: state.problem } : {}),

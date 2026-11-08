@@ -4,9 +4,14 @@ import { anyBlockSchema, localizedSchema, validatorToSchema, type JsonSchema } f
 import { vSeoJson } from "../schema/settings";
 import { contentWarnings, diffValues, mergeFields } from "../diff";
 import { RubricaError } from "../client";
-import { siteLocales } from "../state";
-import { assertValid, blocksFor, checkBlocks, filledLocales, pageRefProp, pageSummary, prop, resolvePage, toBlock, type PageDoc } from "./shared";
+import { siteLocales, type SiteState } from "../state";
+import { assertValid, blocksFor, checkBlocks, checkWithBackend, variantsOf, filledLocales, pageRefProp, pageSummary, prop, resolvePage, toBlock, type PageDoc } from "./shared";
 import { commit, ToolInputError, type ToolDef } from "./types";
+
+/** Schema de um bloco com o catálogo do site e as variações do tema. */
+function blockSchema(state: SiteState, typed: boolean): JsonSchema {
+  return anyBlockSchema(blocksFor(state), { locales: siteLocales(state), variants: (t) => variantsOf(state, t) }, typed, state.catalog.source === "nucleo");
+}
 
 const seoSchema = (locales: string[]): JsonSchema =>
   validatorToSchema(vSeoJson as never, {
@@ -59,7 +64,7 @@ export const pagesTools: ToolDef[] = [
           path: prop.string('Caminho sem idioma, em minúsculas: "/precos", "/servicos/design". Não use /admin, /blog/<slug> nem prefixos de idioma.', { pattern: "^/([a-z0-9][a-z0-9_-]*(/[a-z0-9][a-z0-9_-]*){0,3})?$" }),
           title: localizedSchema({ locales }, "Título da página (também o nome no painel)."),
           seo: seoSchema(locales),
-          blocks: { type: "array", description: "Blocos em ordem.", items: anyBlockSchema(blocksFor(state), { locales }, typed) },
+          blocks: { type: "array", description: "Blocos em ordem. Comece pela receita do tipo de página (page_recipes) quando houver.", items: blockSchema(state, typed) },
           published: prop.bool("Publica ao criar. Padrão: false (rascunho)."),
         },
         required: ["path", "title"],
@@ -70,7 +75,7 @@ export const pagesTools: ToolDef[] = [
       const locales = siteLocales(ctx.state);
       titleOf(args.title, locales);
       const blocks = (args.blocks ?? []).map((b) => toBlock(b as never));
-      const check = checkBlocks(blocks, ctx.state);
+      const check = await checkWithBackend(ctx.client, blocks, ctx.state, checkBlocks(blocks, ctx.state));
       assertValid(check, "Página inválida");
       const page = { path: args.path, title: args.title, ...(args.seo ? { seo: args.seo } : {}), blocks, published: args.published ?? false };
       return commit(ctx, {
@@ -203,7 +208,7 @@ export const pagesTools: ToolDef[] = [
       type: "object",
       properties: {
         page: pageRefProp,
-        block: anyBlockSchema(blocksFor(state), { locales: siteLocales(state) }, typed),
+        block: blockSchema(state, typed),
         index: { type: "integer", minimum: 0, description: "Posição (0 = primeiro). Padrão: no fim." },
       },
       required: ["page", "block"],
@@ -214,7 +219,7 @@ export const pagesTools: ToolDef[] = [
       const page = await resolvePage(ctx.client, args.page);
       const block = toBlock(args.block);
       if (page.blocks.some((b) => b.id === block.id)) throw new ToolInputError(`Já existe um bloco ${block.id} nesta página. Para mudar, use block_update_fields.`);
-      const check = checkBlocks([block], ctx.state);
+      const check = await checkWithBackend(ctx.client, [block], ctx.state, checkBlocks([block], ctx.state));
       assertValid(check);
       const index = Math.min(args.index ?? page.blocks.length, page.blocks.length);
       return commit(ctx, {
@@ -243,7 +248,7 @@ export const pagesTools: ToolDef[] = [
         blockId: prop.string("Id do bloco (de pages_get)."),
         fields: { type: "object", description: "Campos a mudar, no formato do bloco (blocks_catalog mostra o schema do tipo). Só os citados." },
         unset: { type: "array", items: { type: "string" }, description: "Campos opcionais a apagar." },
-        variant: prop.string("Variação do tema. \"\" volta à padrão."),
+        variant: prop.string("Variação do tema (blocks_catalog mostra as de cada bloco; uma inválida é recusada com a lista). \"\" volta à padrão."),
         source: { type: "object", description: "Troca a consulta da coleção do bloco (collection, ids, featured, tags, limit, sort)." },
         replaceLocales: prop.bool(`Troca os textos por idioma inteiros em vez de mesclar. Idiomas do site: ${siteLocales(state).join(", ") || "veja whoami"}.`),
       },
@@ -271,7 +276,7 @@ export const pagesTools: ToolDef[] = [
         ...(args.source ? { source: args.source } : {}),
       };
       if (next.variant === undefined) delete next.variant;
-      const check = checkBlocks([next], ctx.state);
+      const check = await checkWithBackend(ctx.client, [next], ctx.state, checkBlocks([next], ctx.state));
       assertValid(check);
       const changes = diffValues({ fields: current.fields, variant: current.variant, source: current.source }, { fields: next.fields, variant: next.variant, source: next.source }, locales);
       return commit(ctx, {

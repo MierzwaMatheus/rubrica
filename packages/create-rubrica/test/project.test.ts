@@ -162,6 +162,6 @@ describe("create --local", () => {
       cli: `link:${repo("packages/create-rubrica")}`,
       mcp: `link:${repo("packages/mcp")}`,
     });
-    expect(() => localDependencySpecs(repo(), "zine")).toThrow(/não existe/);
+    expect(() => localDependencySpecs(repo(), "inexistente")).toThrow(/não existe/);
   });
 });

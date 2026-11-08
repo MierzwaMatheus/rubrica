@@ -97,15 +97,16 @@ describe("migrar", () => {
     for (const gone of ["src/pages", "src/components", "vite.config.ts", "index.html", "tests", "convex/posts.ts", "convex/newsletter.ts"]) expect(existsSync(join(dir, gone)), gone).toBe(false);
     for (const kept of ["public/cv.pdf", "public/favicon.svg", "docs/notas.md", "README.md", ".env.local"]) expect(existsSync(join(dir, kept)), kept).toBe(true);
     expect(readFileSync(join(dir, ".env.local"), "utf-8")).toBe("CONVEX_DEPLOYMENT=dev:nao-mexer\n");
-    // entrou a v2 (zine ainda não portado: padrao)
-    expect(readFileSync(join(dir, "astro.config.ts"), "utf-8")).toContain('theme: "@rubrica/theme-padrao"');
+    // entrou a v2, com o tema equivalente ao layout da v1
+    expect(readFileSync(join(dir, "astro.config.ts"), "utf-8")).toContain('theme: "@rubrica/theme-zine"');
     expect(existsSync(join(dir, "convex/rubrica/posts.ts"))).toBe(true);
     const pkg = JSON.parse(readFileSync(join(dir, "package.json"), "utf-8"));
     expect(pkg.name).toBe("site-da-bruna");
     expect(pkg.dependencies["@rubrica/core"]).toBeDefined();
     expect(pkg.dependencies.react).not.toBe("^19");
     const state = JSON.parse(readFileSync(join(dir, "rubrica.json"), "utf-8"));
-    expect(state).toMatchObject({ rubrica: 2, tema: "padrao", temaDesejado: "zine", tipo: "pessoal", idiomas: { lista: ["pt-BR", "en"], principal: "pt-BR" }, aparencia: { esquema: "neon", modo: "dark" }, migracao: { de: "1.13.1", layoutV1: "zine" } });
+    expect(state.temaDesejado).toBeUndefined();
+    expect(state).toMatchObject({ rubrica: 2, tema: "zine", tipo: "pessoal", idiomas: { lista: ["pt-BR", "en"], principal: "pt-BR" }, aparencia: { esquema: "neon", modo: "dark" }, migracao: { de: "1.13.1", layoutV1: "zine" } });
     expect(state.plugins.translation).toBe(false);
     expect(state.plugins.payments).toBe(false);
     expect(readFileSync(join(dir, ".gitignore"), "utf-8")).toContain("meus-rascunhos/");
@@ -115,7 +116,7 @@ describe("migrar", () => {
     expect(existsSync(join(work, "pendentes-v1.zip"))).toBe(true);
     expect(readdirSync(join(work, "fixtures/collections"))).toContain("posts.json");
     const report = readFileSync(join(work, "relatorio.md"), "utf-8");
-    expect(report).toContain("ainda não portado");
+    expect(report).not.toContain("ainda não portado");
     expect(report).toContain("`src/components/Terminal.tsx`");
     expect(report).toContain("desenvolvimento novo e vazio");
     // a branch original continua com a v1

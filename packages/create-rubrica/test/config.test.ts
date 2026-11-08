@@ -18,12 +18,12 @@ describe("config (puro)", () => {
     // padrao → cyberpunk: os dois recomendam neon, e nenhum grava fontes.
     const a = applyConfigChange(sampleState({ aparencia: { esquema: "neon", modo: "dark", alternancia: true } }), { tema: "cyberpunk" });
     expect(a.state.aparencia).toEqual({ esquema: "neon", modo: "dark", alternancia: true });
-    // → zine (não portado): o esquema e as fontes do layout da v1.
+    // → zine (portado): o esquema que o pacote do tema declara; fontes não são gravadas.
     const b = applyConfigChange(a.state, { tema: "zine" });
-    expect(b.state.aparencia.esquema).toBe(getTheme("zine")!.recommended.scheme);
-    expect(b.state.aparencia.fonteSans).toBe(getTheme("zine")!.recommended.fontSans);
-    expect(b.patch.appearance).toMatchObject({ scheme: getTheme("zine")!.recommended.scheme, fontSans: getTheme("zine")!.recommended.fontSans });
-    // de volta ao cyberpunk: as fontes do zine saem (valem as do tema).
+    expect(b.state.aparencia.esquema).toBe("riso");
+    expect(b.state.aparencia.fonteSans).toBeUndefined();
+    expect(b.patch.appearance).toMatchObject({ scheme: "riso" });
+    // de volta ao cyberpunk: o esquema volta ao neon.
     const c = applyConfigChange(b.state, { tema: "cyberpunk" });
     expect(c.state.aparencia.fonteSans).toBeUndefined();
     expect(c.state.aparencia.esquema).toBe("neon");
@@ -66,11 +66,11 @@ describe("config (puro)", () => {
     expect(applyConfigChange(sampleState(), { analytics: "https://x.com/s.js" }).warnings.join()).toMatch(/--analytics-id/);
   });
 
-  it("tema ainda não portado: fica no padrão e guarda a escolha", () => {
+  it("todos os layouts da v1 têm tema na v2: o escolhido vale direto", () => {
     const r = applyConfigChange(sampleState({ tema: "cyberpunk" }), { tema: "zine" });
-    expect(r.state.tema).toBe("padrao");
-    expect(r.state.temaDesejado).toBe("zine");
-    expect(r.warnings.join(" ")).toMatch(/ainda não foi portado/);
+    expect(r.state.tema).toBe("zine");
+    expect(r.state.temaDesejado).toBeUndefined();
+    expect(r.warnings.join(" ")).not.toMatch(/ainda não foi portado/);
   });
 
   it("idiomas: principal primeiro, aviso de tradução e de URLs", () => {

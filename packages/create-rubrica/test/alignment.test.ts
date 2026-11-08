@@ -64,9 +64,9 @@ describe("temas ↔ pacotes do workspace", () => {
     for (const t of THEMES) expect(SCHEME_IDS, t.id).toContain(t.recommended.scheme);
   });
 
-  it("o create não grava fontes num tema portado (valem as do tema); num não portado, as do layout da v1", () => {
+  it("o create não grava fontes num tema portado (valem as do tema)", () => {
     expect(initialFonts("cyberpunk")).toEqual({});
     expect(initialFonts("padrao")).toEqual({});
-    expect(initialFonts("zine").fonteSans).toBe(getTheme("zine")!.recommended.fontSans);
+    expect(initialFonts("zine")).toEqual({});
   });
 });

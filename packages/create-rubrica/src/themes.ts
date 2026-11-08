@@ -30,7 +30,7 @@ export interface ThemeSpec {
 }
 
 /** Temas com pacote publicado. */
-export const PORTED_THEMES = ["padrao", "cyberpunk", "bento", "chat", "desktop", "index", "magazine", "monograph"] as const;
+export const PORTED_THEMES = ["padrao", "cyberpunk", "bento", "chat", "desktop", "index", "magazine", "monograph", "blueprint", "brutalist", "garden", "poster", "swiss", "zine"] as const;
 
 /**
  * O que cada pacote de tema declara: `scheme` e `colorMode` no `defineTheme` (sem
@@ -45,6 +45,12 @@ export const THEME_PACKAGE_DEFAULTS: Record<(typeof PORTED_THEMES)[number], { sc
   index: { scheme: "sumi", mode: "light", fontSans: "Instrument Sans", fontMono: "IBM Plex Mono" },
   magazine: { scheme: "editorial-cream", mode: "light", fontSans: "IBM Plex Serif", fontMono: "JetBrains Mono" },
   monograph: { scheme: "azulejo", mode: "light", fontSans: "Source Serif 4", fontMono: "IBM Plex Mono" },
+  blueprint: { scheme: "cianotipia", mode: "dark", fontSans: "IBM Plex Sans", fontMono: "IBM Plex Mono" },
+  brutalist: { scheme: "paper-noir", mode: "dark", fontSans: "JetBrains Mono", fontMono: "JetBrains Mono" },
+  garden: { scheme: "crepusculo", mode: "dark", fontSans: "Fraunces", fontMono: "IBM Plex Mono" },
+  poster: { scheme: "tropicalia", mode: "light", fontSans: "Bricolage Grotesque", fontMono: "IBM Plex Mono" },
+  swiss: { scheme: "paper-noir", mode: "light", fontSans: "Archivo" },
+  zine: { scheme: "riso", mode: "light", fontSans: "Bricolage Grotesque", fontMono: "IBM Plex Mono" },
 };
 
 const isPorted = (id: string): id is (typeof PORTED_THEMES)[number] => (PORTED_THEMES as readonly string[]).includes(id);

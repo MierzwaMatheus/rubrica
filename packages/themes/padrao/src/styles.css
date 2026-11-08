@@ -38,6 +38,7 @@ code, pre { font-family: var(--rb-font-mono); }
 .rb-bar__menu:hover { background: var(--rb-hairline); }
 .rb-bar__tools { display: flex; align-items: center; gap: 0.25rem; flex: none; }
 .rb-bar__talk {
+  border: 0; font: inherit; cursor: pointer;
   display: inline-flex; align-items: center; gap: 0.375rem; min-height: 44px; padding-inline: 0.75rem; border-radius: var(--rb-radius);
   background: var(--rb-accent); color: var(--rb-accent-fg); font-size: 0.75rem; font-weight: 600; text-decoration: none; white-space: nowrap;
 }
@@ -145,7 +146,8 @@ code, pre { font-family: var(--rb-font-mono); }
 }
 .rb-side__switch:hover::before { border-color: var(--rb-accent); }
 .rb-side__actions { display: grid; gap: 0.5rem; }
-.rb-side__actions a { display: flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 44px; border-radius: 0.375rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; text-decoration: none; text-align: center; }
+:where(.rb-side__actions button) { width: 100%; font: inherit; cursor: pointer; background: none; }
+.rb-side__actions a, .rb-side__actions button { display: flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 44px; border-radius: 0.375rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; text-decoration: none; text-align: center; }
 .rb-side__talk { font-family: var(--rb-font-mono); color: var(--rb-accent); border: 1px solid color-mix(in srgb, var(--rb-accent) 50%, transparent); background: color-mix(in srgb, var(--rb-accent) 12%, transparent); }
 .rb-side__talk:hover { background: color-mix(in srgb, var(--rb-accent) 22%, transparent); }
 .rb-side__cv { color: var(--rb-accent-2); border: 1px solid color-mix(in srgb, var(--rb-accent-2) 50%, transparent); }

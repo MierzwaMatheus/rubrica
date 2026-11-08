@@ -79,6 +79,8 @@ export default defineTheme({
     "rb-accent-2": { label: "Segunda cor", kind: "color", default: "#BEF264", light: "#4A770E" },
   },
   Shell: createSidebarShell(),
+  // O "Fale comigo" abre o contato numa janela, como o assistente da v1.
+  contactDialog: true,
   blocks: { hero: HeroBlock, servicos: ServicosBlock, depoimentos: DepoimentosBlock },
   variants: {
     cases: [

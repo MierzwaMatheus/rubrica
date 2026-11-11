@@ -19,6 +19,21 @@ export function readingMinutes(html: string): number {
   return Math.max(1, Math.ceil(countWords(html) / 200));
 }
 
+/**
+ * Texto para busca: minúsculas e sem acento ("Gestão" acha "gestao"). Os cartões de post
+ * guardam o deles em `data-search`, e a ilha de busca compara com o que a pessoa digita.
+ */
+export function searchText(...parts: (string | undefined)[]): string {
+  return parts
+    .filter(Boolean)
+    .join(" ")
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 /** Corta no limite sem partir palavra, com reticências. */
 export function truncate(text: string, max: number): string {
   if (text.length <= max) return text;

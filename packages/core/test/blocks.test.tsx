@@ -14,6 +14,7 @@ import { DEFAULT_UI_TEXTS } from "../src/i18n/ui-texts";
 import { CORE_RECIPES, recipeFor } from "../src/theme/recipes";
 import { buildResumeHtml } from "../src/islands/curriculo-pdf";
 import { islandNameFor, CORE_ISLANDS, ISLAND_META } from "../src/islands";
+import { searchText } from "../src/render/text";
 
 const theme = defineTheme({ id: "teste", label: "Teste", contract: "^1", tokens: {}, Shell: DefaultShell });
 const demo = (kind: string) => fileURLToPath(new URL(`../../../apps/demo/fixtures/${kind}`, import.meta.url));
@@ -131,7 +132,7 @@ describe("blocos padrão", () => {
 
   it("só os blocos interativos montam ilha, e só quando o recurso está ligado", async () => {
     const interactiveTypes = new Set(CORE_BLOCKS.filter((b) => b.interactive).map((b) => b.type));
-    expect([...interactiveTypes].sort()).toEqual(["contato", "curriculo", "depoimentos", "video"]);
+    expect([...interactiveTypes].sort()).toEqual(["contato", "curriculo", "depoimentos", "posts-recentes", "video"]);
     for (const kind of ["pessoal", "empresa"] as const) {
       const site = await load(kind);
       for (const route of site.routes) {
@@ -169,6 +170,21 @@ describe("blocos padrão", () => {
     expect(posts).toContain('type="radio"');
     expect(posts).toContain("rb-filter");
     expect(posts).toContain('data-tags="t');
+  });
+
+  it("busca do blog: ilha só com a busca ligada, e cada cartão leva o texto de busca sem acento", async () => {
+    const site = await load("pessoal");
+    const blog = site.routes.find((r) => r.url === "/blog" && r.type === "page");
+    if (blog?.type !== "page") throw new Error();
+    const block = blog.page.blocks[0]!;
+    expect(block.interactive).toBe(true);
+    const html = render("posts-recentes", { ctx: site.context("pt-BR", "/blog"), ...block, island: ISLAND } as never);
+    expect(html).toContain(MARK);
+    expect(html).toMatch(/data-search="[^"]*pesquisa/);
+    expect(searchText("Gestão de  IA", undefined, "Ética")).toBe("gestao de ia etica");
+    const home = site.routes.find((r) => r.url === "/" && r.type === "page");
+    if (home?.type !== "page") throw new Error();
+    expect(home.page.blocks.find((b) => b.type === "posts-recentes")?.interactive ?? false).toBe(false);
   });
 
   it("imagens trazem alt do conteúdo e dimensões", async () => {

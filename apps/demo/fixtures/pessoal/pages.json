@@ -449,6 +449,8 @@
         },
         "fields": {
           "showTagFilter": true,
+          "showSearch": true,
+          "showFeatured": true,
           "title": {
             "pt-BR": "Blog",
             "en": "Blog"

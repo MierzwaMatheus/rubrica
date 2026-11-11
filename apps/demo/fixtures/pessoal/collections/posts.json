@@ -27,7 +27,8 @@
         "pt-BR": "Post-its numa parede",
         "en": "Post-its numa parede"
       }
-    }
+    },
+    "featured": true
   },
   {
     "id": "post2",
@@ -58,6 +59,7 @@
     },
     "content": {
       "pt-BR": "<p>Só em português.</p>"
-    }
+    },
+    "featured": true
   }
 ]

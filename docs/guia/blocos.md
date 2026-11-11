@@ -207,6 +207,7 @@ Posts do blog. Com quantidade vazia, lista todos (página do blog).
 - **Tipo de site:** pessoal e empresa
 - **Plugin:** `blog`: o bloco some com o plugin desligado
 - **Lista itens de:** `posts` (padrão ao criar: 3 itens, mais novos primeiro)
+- **JavaScript:** pode montar uma ilha (a parte interativa, com JavaScript no navegador); o resto é HTML estático
 - **Variações:** temas: `chat` (`lista`, `destaque`); `garden` (`notas`, `lista`); `index` (`indice`, `destaque`); `magazine` (`sumario`, `colunas`); `zine` (`recortes`, `destaque`)
 
 | Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
@@ -216,6 +217,8 @@ Posts do blog. Com quantidade vazia, lista todos (página do blog).
 | `intro` | Texto de apoio | texto longo | não | sim | até 400 caracteres |
 | `cta` | Link para o blog | link | não | o rótulo | — |
 | `showTagFilter` | Filtro por etiqueta | sim ou não | não | — | padrão: não |
+| `showSearch` | Busca por texto | sim ou não | não | — | Campo que filtra os posts pelo título, resumo e etiquetas (página do blog); padrão: não |
+| `showFeatured` | Destaques no topo | sim ou não | não | — | Os posts marcados como destaque num carrossel acima da lista, nos temas que o desenham (página do blog); padrão: não |
 
 ## `cta` — Chamada
 

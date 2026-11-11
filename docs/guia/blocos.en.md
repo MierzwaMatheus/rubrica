@@ -208,6 +208,7 @@ Blog posts. With an empty quantity, lists them all (the blog page).
 - **Site type:** personal and company
 - **Plugin:** `blog`: the block disappears when the plugin is off
 - **Lists items from:** `posts` (default when created: 3 items, newest first)
+- **JavaScript:** may mount an island (the interactive part, with JavaScript in the browser); the rest is static HTML
 - **Variants:** themes: `chat` (`lista`, `destaque`); `garden` (`notas`, `lista`); `index` (`indice`, `destaque`); `magazine` (`sumario`, `colunas`); `zine` (`recortes`, `destaque`)
 
 | Field | Panel label | Type | Required | Translatable | Help and limits |
@@ -217,6 +218,8 @@ Blog posts. With an empty quantity, lists them all (the blog page).
 | `intro` | Texto de apoio | long text | no | yes | up to 400 characters |
 | `cta` | Link para o blog | link | no | the label | — |
 | `showTagFilter` | Filtro por etiqueta | yes or no | no | — | default: no |
+| `showSearch` | Busca por texto | yes or no | no | — | A field that filters the posts by title, summary and tags (the blog page); default: no |
+| `showFeatured` | Destaques no topo | yes or no | no | — | The posts marked as featured in a carousel above the list, in the themes that draw it (the blog page); default: no |
 
 ## `cta` — Chamada
 

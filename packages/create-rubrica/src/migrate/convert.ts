@@ -754,7 +754,13 @@ export const SECTION_FILLERS: Record<string, Record<string, Filler | Filler[]>> 
   },
   "/blog": {
     hero: (ctx) => header(ctx, "blog"),
-    "posts-recentes": (ctx, _p, recipe) => (hasHeader(recipe) ? { showTagFilter: true } : { title: ctx.t("blog.title"), intro: ctx.t("blog.subtitle"), showTagFilter: true }),
+    // O blog da v1 sempre teve os destaques em carrossel, a busca e o filtro por etiquetas.
+    "posts-recentes": (ctx, _p, recipe) => ({
+      ...(hasHeader(recipe) ? {} : { title: ctx.t("blog.title"), intro: ctx.t("blog.subtitle") }),
+      showTagFilter: true,
+      showSearch: true,
+      showFeatured: true,
+    }),
   },
   "/depoimentos": {
     hero: (ctx) => header(ctx, "testimonials"),
@@ -819,6 +825,13 @@ export const UI_TEXT_MAP: Record<string, string> = {
   "portfolio.previousImage": "gallery.prev",
   "portfolio.nextImage": "gallery.next",
   "blog.filterByTags": "blog.filter",
+  "blog.featured": "blog.featured",
+  "blog.readNow": "blog.readNow",
+  "blog.searchPlaceholder": "blog.search",
+  "blog.backToBlog": "blog.back",
+  "blog.authorCta": "blog.authorCta",
+  "blog.authorLine": "blog.authorLine",
+  "blog.relatedCase": "blog.relatedCase",
   "sidebar.language": "nav.language",
   "sidebar.menu": "nav.menu",
   "contactWizard.contact.name": "form.name",
@@ -844,6 +857,7 @@ const V1_LABELS = [
   "resume.volunteer", "resume.downloadCV", "resume.showOlder", "resume.hideOlder",
   "contactWizard.trigger", "sidebar.downloadCV", "testimonials.leaveTestimonial", "portfolio.screenshots", "blog.filterByTags", "portfolio.metrics",
   "notFound.cta",
+  "blog.featured", "blog.backToBlog", "blog.authorCta",
 ];
 
 /** Ajuste do texto da v1 ao formato da chave da v2 (a v2 mostra a contagem no próprio texto). */

@@ -19,6 +19,7 @@ import {
 } from "@rubrica/core/components";
 import type { ReactNode } from "react";
 import { Icon, type IconName } from "./icons";
+import { isBlogIndex, RssLink } from "./blog";
 
 /**
  * Hero: chip de terminal (`$ <sobretítulo> → <nome>`), título, cargo, apoio com fio
@@ -53,6 +54,8 @@ export function HeroBlock({ id, variant, fields, headingLevel, ctx }: BlockProps
           </Heading>
           {fields.subtitle && <p className="rb-hero__lead">{fields.subtitle}</p>}
         </div>
+        {/* No blog, o botão do RSS fica no canto do título, como na v1. */}
+        {isBlogIndex(ctx) && <RssLink ctx={ctx} />}
       </Section>
     );
   }

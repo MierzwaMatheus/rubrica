@@ -14,7 +14,7 @@ export { CaseMetrics, LucideIcon, lucideIcon } from "./case";
 export { DefaultShell, DefaultPost, DefaultCase, DefaultNotFound, LocaleLinks, localeCode } from "./shell";
 export { SiteAnnouncement, WhatsAppFloat, siteWideAttributes } from "./sitewide";
 export { HeroBlock, TextoBlock, CtaBlock, GenericBlock } from "./blocks/basic";
-export { CasesBlock, DepoimentosBlock, FaqBlock, PostsRecentesBlock, PrecosBlock } from "./blocks/collections";
+export { CasesBlock, DepoimentosBlock, FaqBlock, PostsRecentesBlock, PrecosBlock, postSearchText } from "./blocks/collections";
 export { ContatoBlock, LocalizacaoBlock } from "./blocks/contact";
 export { EquipeBlock, GaleriaBlock, ListaItensBlock, LogosClientesBlock, NumerosBlock, ServicosBlock } from "./blocks/lists";
 export { CurriculoBlock, groupResumeSkills, ResumeDescription, ResumeHeading, ResumePeriod } from "./blocks/resume";

@@ -394,6 +394,8 @@ describe("textos e o resto", () => {
         ["blog.filter", "Filtrar por tags", "Filter by tags"],
         ["case.metrics", "Resultados em Números", "Results by the Numbers"],
         ["notFound.home", "voltar ao início", "back to home"],
+        ["blog.featured", "Em Destaque", "Featured"],
+        ["blog.back", "Voltar para o Blog", "Back to Blog"],
       ].map(([key, pt, en]) => ({ key, value: { "pt-BR": pt, en }, updatedAt: NOW })),
     ]);
     expect(r.report.texts.unmapped).toEqual([{ key: "notFound.lines.0", pt: "> nada aqui" }]);
@@ -435,6 +437,12 @@ describe("textos e o resto", () => {
     expect(block(byPath(off, "/"), "contato").fields).toMatchObject({ mode: "channels" });
     expect(block(byPath(off, "/"), "contato").fields.presentation).toBeUndefined();
     expect(off.tables.uiTexts!.map((t) => t.key)).not.toContain("form.step");
+  });
+
+  it("o blog da v1 vem com destaques, busca e filtro por etiquetas", () => {
+    const blog = r.tables.pages!.find((p) => p.path === "/blog")!;
+    const posts = (blog.blocks as { type: string; fields: Record<string, unknown> }[]).find((b) => b.type === "posts-recentes")!;
+    expect(posts.fields).toMatchObject({ showTagFilter: true, showSearch: true, showFeatured: true });
   });
 
   it("o que não tem destino vai à parte; descartadas e próprias no relatório", () => {

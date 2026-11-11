@@ -4,6 +4,7 @@
  * Estrutura: tokens e tipografia, casca (sidebar e barra do celular), seções, cartões e
  * blocos com visual próprio (hero, números, cases, sobre, serviços, depoimentos, cta).
  */
+@import "./blog.css";
 :root {
   --rb-font-sans: "Chakra Petch", system-ui, -apple-system, "Segoe UI", sans-serif;
   --rb-font-mono: "Chakra Petch", ui-monospace, SFMono-Regular, Menlo, monospace;

@@ -55,7 +55,7 @@ const carousel = route.type === "case" ? caseCarouselProps(route.project, ctx) :
         </>
       )
     }
-    {route.type === "post" && <Post post={route.post} html={route.post.content} related={route.related} ctx={ctx} />}
+    {route.type === "post" && <Post post={route.post} html={route.post.content} related={route.related} relatedCase={route.relatedCase} ctx={ctx} />}
     {
       route.type === "case" &&
         (carousel ? (

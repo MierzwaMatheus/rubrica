@@ -222,6 +222,11 @@ export const postsRecentes = defineBlock({
   },
   category: "comum",
   plugin: "blog",
+  // A busca é uma ilha que só filtra os cartões já no HTML (sem ela, a lista inteira aparece).
+  interactive: true,
+  enhances: true,
+  islandOptIn: true,
+  islandWhen: (f) => f.showSearch === true,
   source: { collections: ["posts"], default: { collection: "posts", limit: 3, sort: "recent" } },
   fields: {
     anchor,
@@ -229,6 +234,12 @@ export const postsRecentes = defineBlock({
     intro,
     cta: field.link({ label: "Link para o blog" }),
     showTagFilter: field.boolean({ label: "Filtro por etiqueta", default: false }),
+    showSearch: field.boolean({ label: "Busca por texto", default: false, help: "Campo que filtra os posts pelo título, resumo e etiquetas (página do blog)." }),
+    showFeatured: field.boolean({
+      label: "Destaques no topo",
+      default: false,
+      help: "Os posts marcados como destaque num carrossel acima da lista, nos temas que o desenham (página do blog).",
+    }),
   },
 });
 

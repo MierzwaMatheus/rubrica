@@ -370,7 +370,7 @@ describe("textos e o resto", () => {
   const r = run();
 
   it("textos de interface personalizados → uiTexts; de seção → blocos; sem destino → relatório", () => {
-    expect(r.tables.uiTexts!.slice(0, 2)).toEqual([
+    expect(r.tables.uiTexts!.filter((t) => !/^(form\.|contactForm\.)/.test(String(t.key)))).toEqual([
       { key: "hero.available", value: { "pt-BR": "Aceitando projetos", en: "Taking projects" }, updatedAt: NOW },
       { key: "common.readMore", value: { "pt-BR": "Continuar lendo", en: "Keep reading" }, updatedAt: NOW },
       // Rótulos do currículo da v1 que diferem do padrão da v2 vêm mesmo sem personalização.

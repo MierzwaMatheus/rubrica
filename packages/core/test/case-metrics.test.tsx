@@ -80,6 +80,8 @@ describe("ilha do carrossel", () => {
     expect(html).toContain('alt="Rubrica – 1"');
     expect(html).toContain('alt="Tela B"');
     expect(html).not.toContain("<button");
+    // Imagens preguiçosas: sem o <link rel=preload> do React antes da faixa, a ilha começa pela própria faixa (client:visible).
+    expect(html.startsWith("<div class=\"rb-carousel\"")).toBe(true);
   });
 
   it("sem imagens, nada", () => {

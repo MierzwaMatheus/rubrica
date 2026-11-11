@@ -87,7 +87,7 @@ export default function Carrossel({ images, title, texts }: CarouselIslandProps)
       <ul ref={track} className="rb-carousel__track" tabIndex={0} aria-label={t("case.gallery")} onScroll={updateEdges}>
         {images.map((img, i) => (
           <li key={`${img.src}-${i}`} className="rb-carousel__slide">
-            <img src={img.src} alt={alt(img, i)} width={img.width} height={img.height} loading={i < 2 ? "eager" : "lazy"} decoding="async" />
+            <img src={img.src} alt={alt(img, i)} width={img.width} height={img.height} loading="lazy" decoding="async" />
             {ready && (
               <button type="button" className="rb-carousel__expand" onClick={() => setOpen(i)} aria-label={`${t("gallery.expand")}: ${alt(img, i)}`}>
                 <span className="rb-carousel__zoom">

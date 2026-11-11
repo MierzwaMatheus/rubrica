@@ -7,10 +7,12 @@ import { CORE_RECIPES, defineTheme, type Recipe } from "@rubrica/core";
 import fonts from "./fonts.json";
 import { CurriculoBlock, DepoimentosBlock, HeroBlock, ServicosBlock } from "./blocks";
 import { createSidebarShell } from "./shell";
+import { PadraoPost, PostsBlock } from "./blog";
 
 export { createSidebarShell } from "./shell";
 export { HeroBlock, ServicosBlock, DepoimentosBlock, CurriculoBlock } from "./blocks";
 export { Icon } from "./icons";
+export { PadraoPost, PostsBlock, RssLink, BlogIcon } from "./blog";
 
 const tr = (ptBR: string, en: string, es: string) => ({ "pt-BR": ptBR, en, es });
 
@@ -115,7 +117,9 @@ const LIST_PAGES = new Set(["/portfolio", "/blog", "/depoimentos"]);
 function withPageHeader(page: Recipe[number]): Recipe[number] {
   const [list, ...rest] = page.blocks;
   if (!LIST_PAGES.has(page.path) || !list?.fields?.title) return page;
-  const { title, intro, ...fields } = list.fields;
+  const { title, intro, ...rest0 } = list.fields;
+  // O blog da v1 tem os destaques em carrossel e a busca acima da lista.
+  const fields = page.path === "/blog" ? { ...rest0, showSearch: true, showFeatured: true } : rest0;
   return {
     ...page,
     blocks: [{ type: "hero", variant: "pagina", fields: { title, ...(intro ? { subtitle: intro } : {}) } }, { ...list, fields }, ...rest],
@@ -136,7 +140,12 @@ export default defineTheme({
   Shell: createSidebarShell(),
   // O "Fale comigo" abre o contato numa janela, como o assistente da v1.
   contactDialog: true,
-  blocks: { hero: HeroBlock, servicos: ServicosBlock, depoimentos: DepoimentosBlock, curriculo: CurriculoBlock },
+  blocks: { hero: HeroBlock, servicos: ServicosBlock, depoimentos: DepoimentosBlock, curriculo: CurriculoBlock, "posts-recentes": PostsBlock },
+  // Post como o da v1: voltar, etiquetas, subtítulo, cartão do autor e case relacionado.
+  templates: { post: PadraoPost },
+  texts: {
+    "padrao.readCase": { pt: "$ cat case.md", en: "$ cat case.md", es: "$ cat case.md" },
+  },
   variants: {
     hero: [
       { value: "inicio", label: "Início" },

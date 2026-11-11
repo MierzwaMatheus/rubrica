@@ -8,7 +8,7 @@ import type { GetStaticPaths } from "astro";
 import Document from "./Document.astro";
 import ContactDialog from "./ContactDialog.astro";
 import Island from "../../islands/Island";
-import { loadSite, activeTheme, componentFor, hasIsland, islandProps } from "../runtime";
+import { loadSite, activeTheme, componentFor, hasIsland, islandProps, caseCarouselProps } from "../runtime";
 import { islandNameFor } from "../../islands";
 import { templates, LocaleLinks, ColorToggleButton } from "../../components";
 import type { SiteRoute } from "../../render/site";
@@ -26,6 +26,7 @@ const site = await loadSite();
 const ctx = site.context(route.locale, route.url, route.alternates);
 const { Shell, Post, Case } = templates(activeTheme);
 const pageType = route.type;
+const carousel = route.type === "case" ? caseCarouselProps(route.project, ctx) : undefined;
 ---
 
 <Document route={route} ctx={ctx} settings={site.settings}>
@@ -50,7 +51,16 @@ const pageType = route.type;
       )
     }
     {route.type === "post" && <Post post={route.post} html={route.post.content} related={route.related} ctx={ctx} />}
-    {route.type === "case" && <Case project={route.project} related={route.related} ctx={ctx} />}
+    {
+      route.type === "case" &&
+        (carousel ? (
+          <Case project={route.project} related={route.related} next={route.next} ctx={ctx}>
+            <Island slot="carousel" client:visible name="carrossel" props={carousel} />
+          </Case>
+        ) : (
+          <Case project={route.project} related={route.related} next={route.next} ctx={ctx} />
+        ))
+    }
   </Shell>
   <ContactDialog site={site} ctx={ctx} />
 </Document>

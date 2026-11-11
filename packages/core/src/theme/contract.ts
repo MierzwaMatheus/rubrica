@@ -191,6 +191,13 @@ export interface PostTemplateProps {
 export interface CaseTemplateProps {
   project: ProjectItem;
   related: ProjectItem[];
+  /** Próximo case na ordem do portfólio (com volta ao início), entre os projetos com seções. */
+  next?: ProjectItem;
+  /**
+   * O carrossel das telas (a capa e a galeria) já montado como ilha, quando o tema pede
+   * (`caseCarousel`) e o projeto tem imagens. Sem JavaScript, é uma faixa com rolagem lateral.
+   */
+  carousel?: ReactNode;
   ctx: RenderContext;
 }
 
@@ -293,6 +300,11 @@ export interface ThemeDefinition {
    * Cada página ganha o script pequeno de ilha do Astro; o formulário só carrega ao abrir.
    */
   contactDialog?: boolean;
+  /**
+   * A página de case mostra as telas (a capa e a galeria) num carrossel (ilha `carrossel`,
+   * com a imagem ampliada): o núcleo monta a ilha e a entrega ao template em `carousel`.
+   */
+  caseCarousel?: boolean;
 }
 
 export function defineTheme(theme: ThemeDefinition): ThemeDefinition {

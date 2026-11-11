@@ -260,3 +260,43 @@
 button.rb-button { cursor: pointer; font: inherit; font-weight: 600; }
 
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }
+
+/* Página de case: "Resultados em números" (CaseMetrics) */
+.rb-case__metrics { margin-block: 2rem; }
+.rb-case__metricList { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr)); }
+.rb-case__metric { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.375rem; min-height: 6.25rem; padding: 1rem; text-align: center; border: 1px solid var(--rb-border); border-radius: var(--rb-radius); background: var(--rb-surface); }
+.rb-case__metricIcon { flex: none; color: var(--rb-accent); }
+.rb-case__metricValue { font-size: 1.5rem; line-height: 1.15; color: var(--rb-accent); overflow-wrap: anywhere; }
+.rb-case__metricLabel { font-size: 0.8125rem; line-height: 1.4; color: var(--rb-muted); }
+
+/* Carrossel das telas do case (ilha `carrossel`): faixa com rolagem e encaixe; sem JavaScript, rola igual. */
+.rb-carousel { position: relative; }
+.rb-carousel__track { list-style: none; margin: 0; padding: 0; display: grid; grid-auto-flow: column; grid-auto-columns: 100%; gap: 1rem; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: thin; overscroll-behavior-x: contain; }
+.rb-carousel[data-ready] .rb-carousel__track { scrollbar-width: none; }
+.rb-carousel[data-ready] .rb-carousel__track::-webkit-scrollbar { display: none; }
+.rb-carousel__track:focus-visible { outline: 2px solid var(--rb-accent); outline-offset: 2px; }
+@media (min-width: 768px) { .rb-carousel__track { grid-auto-columns: calc((100% - 1rem) / 2); } }
+.rb-carousel__slide { position: relative; scroll-snap-align: start; aspect-ratio: 16 / 9; overflow: hidden; border: 1px solid var(--rb-border); border-radius: var(--rb-radius); background: var(--rb-surface); }
+.rb-carousel__slide img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.rb-carousel__expand { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; width: 100%; padding: 0; border: 0; cursor: zoom-in; color: var(--rb-fg); background: color-mix(in srgb, var(--rb-bg) 40%, transparent); opacity: 0; transition: opacity 0.2s; }
+.rb-carousel__expand:hover, .rb-carousel__expand:focus-visible { opacity: 1; }
+.rb-carousel__expand:focus-visible { outline: 2px solid var(--rb-accent); outline-offset: -2px; }
+@media (hover: none) { .rb-carousel__expand { opacity: 1; background: transparent; align-items: flex-end; justify-content: flex-end; padding: 0.5rem; } }
+.rb-carousel__zoom { display: inline-flex; padding: 0.75rem; border-radius: 999px; border: 1px solid var(--rb-border); background: color-mix(in srgb, var(--rb-bg) 85%, transparent); }
+.rb-carousel__nav { position: absolute; inset: 0; pointer-events: none; display: flex; align-items: center; justify-content: space-between; padding-inline: 0.5rem; }
+.rb-carousel__btn { pointer-events: auto; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border-radius: 999px; border: 1px solid var(--rb-border); cursor: pointer; color: var(--rb-fg); background: color-mix(in srgb, var(--rb-bg) 75%, transparent); }
+.rb-carousel__btn:hover:not(:disabled) { background: var(--rb-accent); border-color: var(--rb-accent); color: var(--rb-accent-fg); }
+.rb-carousel__btn:disabled { opacity: 0.4; cursor: default; }
+.rb-carousel__btn:focus-visible { outline: 2px solid var(--rb-accent); outline-offset: 2px; }
+.rb-lightbox { width: calc(100vw - 1rem); height: calc(100dvh - 1rem); max-width: none; max-height: none; margin: auto; padding: 0; border: 1px solid var(--rb-border); border-radius: var(--rb-radius); color: var(--rb-fg); background: color-mix(in srgb, var(--rb-bg) 97%, transparent); }
+.rb-lightbox::backdrop { background: color-mix(in srgb, var(--rb-bg) 70%, transparent); }
+.rb-lightbox__inner { display: flex; flex-direction: column; height: 100%; }
+.rb-lightbox__bar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.25rem 0.5rem 0.25rem 1rem; border-bottom: 1px solid var(--rb-border); }
+.rb-lightbox__count { font-size: 0.875rem; color: var(--rb-muted); }
+.rb-lightbox__close { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 999px; cursor: pointer; color: var(--rb-fg); background: transparent; }
+.rb-lightbox__close:hover { background: var(--rb-surface); }
+.rb-lightbox__stage { position: relative; flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+.rb-lightbox__stage img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: var(--rb-radius); }
+.rb-lightbox__prev, .rb-lightbox__next { position: absolute; top: 50%; transform: translateY(-50%); }
+.rb-lightbox__prev { left: 1rem; }
+.rb-lightbox__next { right: 1rem; }

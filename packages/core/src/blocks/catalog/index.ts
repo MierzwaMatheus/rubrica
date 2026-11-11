@@ -276,6 +276,58 @@ export const contato = defineBlock({
       default: "wizard",
     }),
     showChannels: field.boolean({ label: "Mostrar canais de contato", default: true }),
+    presentation: field.select({
+      label: "Onde aparece",
+      options: [
+        { value: "inline", label: "Na página" },
+        { value: "dialog", label: "Numa janela, aberta pelos links para a âncora" },
+      ],
+      default: "inline",
+      help: "Na janela, o bloco não ocupa espaço na página: abre por cima dela nos links para a âncora (#contato), inclusive os da sidebar. Os canais não aparecem.",
+    }),
+    eyebrow: field.text({ label: "Sobretítulo", maxLength: 80, help: "Linha curta acima do título (ex.: portfolio / contato)." }),
+    flows: field.list({
+      label: "Assuntos do assistente",
+      itemLabel: "Assunto",
+      max: 6,
+      help: "Opcional, para o formato assistente. Cada assunto tem as próprias etapas; a primeira tela mostra os assuntos e o resumo para revisar vem no fim. Sem assuntos, o assistente pergunta o assunto, a mensagem e os dados.",
+      of: {
+        id: field.text({ label: "Identificador", localized: false, required: true, maxLength: 40, help: "Curto e sem espaços (ex.: projeto)." }),
+        emoji: field.text({ label: "Emoji", localized: false, maxLength: 16 }),
+        label: field.text({ label: "Rótulo", required: true, maxLength: 80 }),
+        steps: field.list({
+          label: "Etapas",
+          itemLabel: "Etapa",
+          max: 8,
+          help: "Sem a etapa de dados de contato, ela entra no fim.",
+          of: {
+            kind: field.select({
+              label: "Tipo",
+              options: [
+                { value: "choice", label: "Escolha entre opções" },
+                { value: "text", label: "Texto curto" },
+                { value: "textarea", label: "Texto longo (vai como mensagem)" },
+                { value: "contact", label: "Dados de contato" },
+              ],
+              default: "choice",
+            }),
+            key: field.text({
+              label: "Chave da resposta",
+              localized: false,
+              maxLength: 80,
+              help: "Nome da resposta no pedido (ex.: prazo). Em texto curto, várias chaves separadas por vírgula viram vários campos.",
+            }),
+            title: field.text({ label: "Pergunta", maxLength: 160 }),
+            options: field.text({ label: "Opções", multiline: true, maxLength: 1500, help: "Uma por linha (tipo escolha)." }),
+            placeholder: field.text({ label: "Exemplo dentro do campo", multiline: true, maxLength: 400, help: "Um por linha quando a etapa tem vários campos." }),
+            optional: field.boolean({ label: "Resposta opcional", default: false }),
+            askPhone: field.boolean({ label: "Pedir telefone", default: false, help: "Só na etapa de dados de contato." }),
+            askLinkedin: field.boolean({ label: "Pedir LinkedIn", default: false, help: "Só na etapa de dados de contato." }),
+            askCompany: field.boolean({ label: "Pedir empresa", default: false, help: "Só na etapa de dados de contato." }),
+          },
+        }),
+      },
+    }),
   },
 });
 

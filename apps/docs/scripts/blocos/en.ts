@@ -38,6 +38,19 @@ export const EN: Record<string, string> = {
   "Mostra o botão do assistente de depoimento (precisa do plugin testimonials-intake).":
     "Shows the testimonial wizard button (needs the testimonials-intake plugin).",
   "Ex.: valores sem impostos.": "E.g. prices before tax.",
+  // Contato: janela e assuntos do assistente
+  "Na janela, o bloco não ocupa espaço na página: abre por cima dela nos links para a âncora (#contato), inclusive os da sidebar. Os canais não aparecem.":
+    "In a window, the block takes no space on the page: it opens over it from links to the anchor (#contato), the sidebar's included. The channels are not shown.",
+  "Linha curta acima do título (ex.: portfolio / contato).": "A short line above the title (e.g. portfolio / contact).",
+  "Opcional, para o formato assistente. Cada assunto tem as próprias etapas; a primeira tela mostra os assuntos e o resumo para revisar vem no fim. Sem assuntos, o assistente pergunta o assunto, a mensagem e os dados.":
+    "Optional, for the wizard format. Each topic has its own steps; the first screen lists the topics and a summary to review comes at the end. With no topics, the wizard asks for the topic, the message and the details.",
+  "Curto e sem espaços (ex.: projeto).": "Short and without spaces (e.g. project).",
+  "Sem a etapa de dados de contato, ela entra no fim.": "Without a contact details step, one is added at the end.",
+  "Nome da resposta no pedido (ex.: prazo). Em texto curto, várias chaves separadas por vírgula viram vários campos.":
+    "Name of the answer in the request (e.g. timeline). In short text, several comma-separated keys become several inputs.",
+  "Uma por linha (tipo escolha).": "One per line (choice type).",
+  "Um por linha quando a etapa tem vários campos.": "One per line when the step has several inputs.",
+  "Só na etapa de dados de contato.": "Only in the contact details step.",
   // Blocos da 1.1 do contrato (vídeo, incorporação, linha do tempo, comparativo de planos)
   "Vídeo do YouTube ou do Vimeo. Carrega leve: miniatura e botão de play, e o player só depois do clique.":
     "A YouTube or Vimeo video. Loads light: a thumbnail and a play button, and the player only after the click.",

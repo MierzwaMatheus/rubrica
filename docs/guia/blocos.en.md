@@ -255,6 +255,22 @@ Contact form or wizard, with the channels (e-mail, WhatsApp, social).
 | `intro` | Texto de apoio | long text | no | yes | up to 400 characters |
 | `mode` | Formato | choice | no | — | options: `wizard` (Assistente em etapas), `form` (Formulário simples), `channels` (Só os canais, sem formulário); default: `wizard` |
 | `showChannels` | Mostrar canais de contato | yes or no | no | — | default: yes |
+| `presentation` | Onde aparece | choice | no | — | In a window, the block takes no space on the page: it opens over it from links to the anchor (#contato), the sidebar's included. The channels are not shown; options: `inline` (Na página), `dialog` (Numa janela, aberta pelos links para a âncora); default: `inline` |
+| `eyebrow` | Sobretítulo | text | no | yes | A short line above the title (e.g. portfolio / contact); up to 80 characters |
+| `flows` | Assuntos do assistente | list | no | — | Optional, for the wizard format. Each topic has its own steps; the first screen lists the topics and a summary to review comes at the end. With no topics, the wizard asks for the topic, the message and the details; up to 6 items; each item: "Assunto" |
+| `flows[].id` | Identificador | text | yes | no | Short and without spaces (e.g. project); up to 40 characters |
+| `flows[].emoji` | Emoji | text | no | no | up to 16 characters |
+| `flows[].label` | Rótulo | text | yes | yes | up to 80 characters |
+| `flows[].steps` | Etapas | list | no | — | Without a contact details step, one is added at the end; up to 8 items; each item: "Etapa" |
+| `flows[].steps[].kind` | Tipo | choice | no | — | options: `choice` (Escolha entre opções), `text` (Texto curto), `textarea` (Texto longo (vai como mensagem)), `contact` (Dados de contato); default: `choice` |
+| `flows[].steps[].key` | Chave da resposta | text | no | no | Name of the answer in the request (e.g. timeline). In short text, several comma-separated keys become several inputs; up to 80 characters |
+| `flows[].steps[].title` | Pergunta | text | no | yes | up to 160 characters |
+| `flows[].steps[].options` | Opções | long text | no | yes | One per line (choice type); up to 1500 characters |
+| `flows[].steps[].placeholder` | Exemplo dentro do campo | long text | no | yes | One per line when the step has several inputs; up to 400 characters |
+| `flows[].steps[].optional` | Resposta opcional | yes or no | no | — | default: no |
+| `flows[].steps[].askPhone` | Pedir telefone | yes or no | no | — | Only in the contact details step; default: no |
+| `flows[].steps[].askLinkedin` | Pedir LinkedIn | yes or no | no | — | Only in the contact details step; default: no |
+| `flows[].steps[].askCompany` | Pedir empresa | yes or no | no | — | Only in the contact details step; default: no |
 
 ## `galeria` — Galeria
 

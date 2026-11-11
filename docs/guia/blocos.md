@@ -255,6 +255,22 @@ Formulário ou assistente de contato, com os canais (e-mail, WhatsApp, redes).
 | `intro` | Texto de apoio | texto longo | não | sim | até 400 caracteres |
 | `mode` | Formato | opção | não | — | opções: `wizard` (Assistente em etapas), `form` (Formulário simples), `channels` (Só os canais, sem formulário); padrão: `wizard` |
 | `showChannels` | Mostrar canais de contato | sim ou não | não | — | padrão: sim |
+| `presentation` | Onde aparece | opção | não | — | Na janela, o bloco não ocupa espaço na página: abre por cima dela nos links para a âncora (#contato), inclusive os da sidebar. Os canais não aparecem; opções: `inline` (Na página), `dialog` (Numa janela, aberta pelos links para a âncora); padrão: `inline` |
+| `eyebrow` | Sobretítulo | texto | não | sim | Linha curta acima do título (ex.: portfolio / contato); até 80 caracteres |
+| `flows` | Assuntos do assistente | lista | não | — | Opcional, para o formato assistente. Cada assunto tem as próprias etapas; a primeira tela mostra os assuntos e o resumo para revisar vem no fim. Sem assuntos, o assistente pergunta o assunto, a mensagem e os dados; até 6 itens; cada item: "Assunto" |
+| `flows[].id` | Identificador | texto | sim | não | Curto e sem espaços (ex.: projeto); até 40 caracteres |
+| `flows[].emoji` | Emoji | texto | não | não | até 16 caracteres |
+| `flows[].label` | Rótulo | texto | sim | sim | até 80 caracteres |
+| `flows[].steps` | Etapas | lista | não | — | Sem a etapa de dados de contato, ela entra no fim; até 8 itens; cada item: "Etapa" |
+| `flows[].steps[].kind` | Tipo | opção | não | — | opções: `choice` (Escolha entre opções), `text` (Texto curto), `textarea` (Texto longo (vai como mensagem)), `contact` (Dados de contato); padrão: `choice` |
+| `flows[].steps[].key` | Chave da resposta | texto | não | não | Nome da resposta no pedido (ex.: prazo). Em texto curto, várias chaves separadas por vírgula viram vários campos; até 80 caracteres |
+| `flows[].steps[].title` | Pergunta | texto | não | sim | até 160 caracteres |
+| `flows[].steps[].options` | Opções | texto longo | não | sim | Uma por linha (tipo escolha); até 1500 caracteres |
+| `flows[].steps[].placeholder` | Exemplo dentro do campo | texto longo | não | sim | Um por linha quando a etapa tem vários campos; até 400 caracteres |
+| `flows[].steps[].optional` | Resposta opcional | sim ou não | não | — | padrão: não |
+| `flows[].steps[].askPhone` | Pedir telefone | sim ou não | não | — | Só na etapa de dados de contato; padrão: não |
+| `flows[].steps[].askLinkedin` | Pedir LinkedIn | sim ou não | não | — | Só na etapa de dados de contato; padrão: não |
+| `flows[].steps[].askCompany` | Pedir empresa | sim ou não | não | — | Só na etapa de dados de contato; padrão: não |
 
 ## `galeria` — Galeria
 

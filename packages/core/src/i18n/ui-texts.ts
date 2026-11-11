@@ -258,6 +258,9 @@ export const DEFAULT_UI_TEXTS: Record<string, Localized<string>> = {
   "case.view": { pt: "Ver case", en: "View case study", es: "Ver caso" },
   "blog.filter": { pt: "Filtrar por etiqueta", en: "Filter by tag", es: "Filtrar por etiqueta" },
   "testimonials.send": { pt: "Enviar um depoimento", en: "Send a testimonial", es: "Enviar un testimonio" },
+  /** Quantos depoimentos a lista mostra ("(7 depoimentos)" ao lado do apoio, na v1). */
+  "testimonials.count": { pt: "{count} depoimentos", en: "{count} testimonials", es: "{count} testimonios" },
+  "testimonials.countOne": { pt: "1 depoimento", en: "1 testimonial", es: "1 testimonio" },
   "contact.phone": { pt: "Telefone", en: "Phone", es: "Teléfono" },
   "contact.channels": { pt: "Outros canais", en: "Other channels", es: "Otros canales" },
   "contact.social": { pt: "Redes", en: "Social", es: "Redes" },
@@ -325,6 +328,9 @@ export const DEFAULT_UI_TEXTS: Record<string, Localized<string>> = {
     es: "La dirección puede haber cambiado o la página no existe en este idioma.",
   },
   "notFound.home": { pt: "Ir para a página inicial", en: "Go to the home page", es: "Ir a la página de inicio" },
+  /** Rótulo e código de erro da tela de 404 em terminal (temas padrão e cyberpunk, como a v1). */
+  "notFound.label": { pt: "Erro do sistema", en: "System error", es: "Error del sistema" },
+  "notFound.code": { pt: "ERR_ROTA_NAO_ENCONTRADA", en: "ERR_ROUTE_NOT_FOUND", es: "ERR_RUTA_NO_ENCONTRADA" },
   ...APP_UI_TEXTS,
 };
 

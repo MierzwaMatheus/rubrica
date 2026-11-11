@@ -257,6 +257,23 @@ h2.rb-section__title::after { content: " */"; content: " */" / ""; color: var(--
 .rb-faq__question::after { color: var(--rb-accent); }
 .rb-form { border-radius: 0.75rem; border-color: var(--rb-hairline); }
 .rb-contato__channels a { color: var(--rb-accent-2); }
+/* Janela de contato (o assistente da v1): opções em mono com ">", passo em verde, navegação com borda. */
+.rb-dialog { border-color: var(--rb-hairline); border-radius: 0.75rem; }
+.rb-dialog__title { font-family: var(--rb-font-sans); font-size: 1.25rem; font-weight: 700; }
+.rb-form--flows legend { font-family: var(--rb-font-mono); font-size: 0.875rem; font-weight: 400; color: var(--rb-accent-2); }
+.rb-form--flows .rb-progress { font-family: var(--rb-font-mono); font-size: 0.7rem; color: var(--rb-muted); }
+.rb-form--flows .rb-option { font-family: var(--rb-font-mono); font-size: 0.875rem; background: color-mix(in srgb, var(--rb-fg) 5%, transparent); border-color: color-mix(in srgb, var(--rb-fg) 12%, transparent); }
+.rb-form--flows .rb-option::before { content: ">"; content: ">" / ""; color: var(--rb-muted); }
+.rb-form--flows .rb-option:hover { border-color: color-mix(in srgb, var(--rb-fg) 30%, transparent); background: color-mix(in srgb, var(--rb-fg) 10%, transparent); }
+.rb-form--flows .rb-option[aria-pressed="true"] { border-color: var(--rb-accent); background: color-mix(in srgb, var(--rb-accent) 12%, transparent); box-shadow: none; }
+.rb-form--flows .rb-option[aria-pressed="true"]::before { color: var(--rb-accent); }
+.rb-form--flows .rb-summary { font-family: var(--rb-font-mono); font-size: 0.8rem; border-color: var(--rb-hairline); }
+.rb-form--flows .rb-summary__topic { color: var(--rb-accent-2); }
+.rb-form--flows .rb-form__nav { padding-top: 1rem; border-top: 1px solid var(--rb-hairline); align-items: center; }
+.rb-form--flows .rb-form__nav .rb-button { font-family: var(--rb-font-mono); font-size: 0.8rem; }
+.rb-form--flows .rb-form__nav .rb-button--secondary { border-color: transparent; color: var(--rb-muted); }
+.rb-form--flows .rb-form__nav .rb-button--secondary::before { content: "← "; content: "← " / ""; }
+.rb-form--flows .rb-form__nav .rb-button--primary::after { content: " →"; content: " →" / ""; }
 
 /* ---------- posts e cases (páginas de detalhe) ---------- */
 .rb-main__inner .rb-post.rb-container, .rb-main__inner .rb-case.rb-container { max-width: 56rem; margin-inline: 0; }

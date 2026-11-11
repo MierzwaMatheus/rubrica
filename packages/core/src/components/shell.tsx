@@ -1,6 +1,7 @@
 /** Casca e templates padrão do núcleo. Temas substituem o que quiserem. */
 import type { CaseTemplateProps, NotFoundProps, PostTemplateProps, ShellProps } from "../theme/contract";
 import { Html, Img, LinkButton, Logo } from "./primitives";
+import { CaseMetrics } from "./case";
 
 export function DefaultShell({ ctx, children, colorToggle, localeSwitcher }: ShellProps) {
   const { site } = ctx;
@@ -171,6 +172,7 @@ export function DefaultCase({ project, related, ctx }: CaseTemplateProps) {
           {s.image && <Img image={s.image} />}
         </section>
       ))}
+      <CaseMetrics metrics={project.metrics} title={ctx.t("case.metrics")} />
       {project.links.length > 0 && (
         <div className="rb-actions">
           {project.links.map((l) => (

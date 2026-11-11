@@ -118,8 +118,19 @@ export interface RawProject extends Base {
   links?: RawLink[];
   /** Número de destaque mostrado no card do case. */
   metric?: { value: string; label: Localized<string> };
+  /**
+   * Números do case ("Resultados em números"), em ordem, com ícone opcional (nome do Lucide,
+   * como `Bot` ou `shield-check`). Sem `metric`, o primeiro é o número do card.
+   */
+  metrics?: CaseMetric[];
   seo?: SeoFields;
   updatedAt?: number;
+}
+
+export interface CaseMetric {
+  value: string;
+  label: Localized<string>;
+  icon?: string;
 }
 
 export interface RawService extends Base {

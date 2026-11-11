@@ -56,11 +56,11 @@ describe.skipIf(skip)("create → install → build (ponta a ponta)", () => {
   }, 120_000);
 
   it("ejeta um bloco (com arquivo local importado) e o projeto continua compilando", () => {
-    const { entry } = ejectBlock(dir, readState(dir), "cases");
+    const { entry } = ejectBlock(dir, readState(dir), "numeros");
     expect(existsSync(join(dir, entry.arquivo))).toBe(true);
     // marca na cópia, para conferir no HTML que o site usa a cópia
-    const file = join(dir, "src/overrides/cases/blocks/collections.tsx");
-    writeFileSync(file, readFileSync(file, "utf-8").replace('type="cases" variant={variant}>', 'type="cases" variant={variant}>\n      <span data-ejetado="sim" hidden />'));
+    const file = join(dir, "src/overrides/numeros/blocks/lists.tsx");
+    writeFileSync(file, readFileSync(file, "utf-8").replace('type="numeros" variant={variant}>', 'type="numeros" variant={variant}>\n      <span data-ejetado="sim" hidden />'));
   });
 
   it("builda o site estático com os dados de exemplo", () => {

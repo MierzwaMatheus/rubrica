@@ -126,6 +126,7 @@ export default defineTheme({
 | `fonts` | não | As fontes padrão, importadas do `fonts.json`. Veja [Fontes](#fontes) |
 | `texts` | não | Textos de interface próprios. Veja [Textos de interface](#textos-de-interface) |
 | `contactDialog` | não | `true` abre o contato numa janela, em qualquer página. Veja [Janela de contato](#janela-de-contato) |
+| `caseCarousel` | não | `true` monta a ilha do carrossel das telas (a capa e a galeria) na página de case e a entrega ao template em `carousel` |
 
 ## Tokens
 
@@ -309,7 +310,7 @@ Templates opcionais para as páginas que não são feitas de blocos. Cada um ren
 | Template | Props |
 |---|---|
 | `post` | `post` (o `PostItem`), `html` (o corpo, já sanitizado no backend), `related`, `ctx` |
-| `case` | `project` (o `ProjectItem`, com as seções do case), `related`, `ctx` |
+| `case` | `project` (o `ProjectItem`, com as seções e os números do case em `metrics`), `related`, `next` (o próximo case, opcional), `carousel` (a ilha do carrossel, com `caseCarousel`), `ctx`. Os números saem prontos com `CaseMetrics` de `@rubrica/core/components` |
 | `notFound` | `ctx` |
 
 <!-- exemplo: tema/src/templates.tsx -->

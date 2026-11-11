@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { CORE_RECIPES, validateBlock, type Recipe } from "@rubrica/core";
+import { CORE_RECIPES, defaultUiText, validateBlock, type Recipe } from "@rubrica/core";
 import { CORE_BLOCKS } from "@rubrica/core/blocks";
-import { convertV1, loc, parsePeriod, sameInBoth, slugify, toHtml, v1FullTitle, v1Navigation, V1_TEXTS } from "../src/migrate/convert";
+import { convertV1, loc, parsePeriod, sameInBoth, slugify, toHtml, v1FullTitle, v1Navigation, V1_TEXTS, UI_TEXT_MAP } from "../src/migrate/convert";
 import { IDS, PRINCIPIOS, V1_RUBRICA_JSON, v1Export } from "./fixtures/v1-export";
 
 const NOW = 1_800_000_000_000;
@@ -85,12 +85,16 @@ describe("tabelas 1:1", () => {
     expect(app!.content).toEqual({ "pt-BR": "<p>Primeiro parágrafo.</p><p>Segundo parágrafo.</p>" });
     expect(app!.role).toEqual({ "pt-BR": "Designer líder", en: "Lead designer" });
     const titles = (app!.sections as { title: Record<string, string> }[]).map((s) => s.title["pt-BR"]);
-    expect(titles).toEqual(["Antes", "O Problema", "A Solução", "Os Resultados", "Resultados em Números", "Depoimento"]);
+    expect(titles).toEqual(["Antes", "O Problema", "A Solução", "Os Resultados", "Depoimento"]);
     const sections = app!.sections as { body: Record<string, string> }[];
     expect(sections[1]!.body).toEqual({ "pt-BR": "<p>Muitas faltas.</p>", en: "<p>Many no-shows.</p>" });
     expect(sections[0]!.body).toEqual({ "pt-BR": "<p>Agenda em papel.</p>" });
-    expect(sections[4]!.body["pt-BR"]).toBe("<ul><li><strong>−40%</strong> faltas</li></ul>");
-    expect(sections[5]!.body.en).toContain("It changed the clinic.");
+    expect(sections[4]!.body.en).toContain("It changed the clinic.");
+    // Números do case num campo próprio, com o ícone da v1 e o inglês pela posição (sem par, só pt).
+    expect(app!.metrics).toEqual([
+      { value: "−40%", label: { "pt-BR": "faltas", en: "no-shows" }, icon: "TrendingDown" },
+      { value: "12", label: { "pt-BR": "clínicas" } },
+    ]);
     expect(app!.cover).toMatchObject({ storageId: IDS.storage[1] });
     expect((app!.gallery as unknown[]).length).toBe(2);
     expect(app!.links).toEqual([
@@ -388,6 +392,7 @@ describe("textos e o resto", () => {
         ["testimonialForm.open", "Deixar meu depoimento", "Leave my testimonial"],
         ["case.gallery", "Screenshots", "Screenshots"],
         ["blog.filter", "Filtrar por tags", "Filter by tags"],
+        ["case.metrics", "Resultados em Números", "Results by the Numbers"],
         ["notFound.home", "voltar ao início", "back to home"],
       ].map(([key, pt, en]) => ({ key, value: { "pt-BR": pt, en }, updatedAt: NOW })),
     ]);
@@ -454,5 +459,23 @@ describe("textos e o resto", () => {
 describe("blocos das páginas", () => {
   it("todo bloco tem fields (o schema exige, mesmo vazio)", () => {
     for (const page of run().tables.pages as { blocks: { fields?: unknown }[] }[]) for (const b of page.blocks) expect(b.fields).toBeDefined();
+  });
+});
+
+describe("textos do portfólio e do case da v1", () => {
+  it("cada chave da v1 aponta para um texto que o núcleo conhece", () => {
+    for (const v2 of Object.values(UI_TEXT_MAP)) expect(defaultUiText(v2, "pt-BR"), v2).toBeDefined();
+  });
+
+  it("personalizados na v1 vão para as chaves do case", () => {
+    const { tables } = v1Export();
+    tables.siteTexts = [
+      ...(tables.siteTexts ?? []),
+      { _id: "st-cta", key: "portfolio.ctaTitle", page: "portfolio", ptBR: "Bora fazer algo assim?", enUS: "Want something like this?" },
+      { _id: "st-det", key: "portfolio.details", page: "portfolio", ptBR: "$ ls detalhes", enUS: "$ ls details" },
+    ];
+    const out = convertV1({ tables, v1: V1_RUBRICA_JSON, theme: "cyberpunk", recipe: CORE_RECIPES.pessoal, now: NOW }).tables.uiTexts!;
+    expect(out.find((t) => t.key === "case.ctaTitle")?.value).toEqual({ "pt-BR": "Bora fazer algo assim?", en: "Want something like this?" });
+    expect(out.find((t) => t.key === "case.details")?.value).toEqual({ "pt-BR": "$ ls detalhes", en: "$ ls details" });
   });
 });

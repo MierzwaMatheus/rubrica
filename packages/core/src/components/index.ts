@@ -10,6 +10,7 @@ import { ComparativoPlanosBlock } from "./blocks/compare";
 import { DefaultCase, DefaultNotFound, DefaultPost, DefaultShell } from "./shell";
 
 export * from "./primitives";
+export { CaseMetrics, LucideIcon, lucideIcon } from "./case";
 export { DefaultShell, DefaultPost, DefaultCase, DefaultNotFound, LocaleLinks, localeCode } from "./shell";
 export { SiteAnnouncement, WhatsAppFloat, siteWideAttributes } from "./sitewide";
 export { HeroBlock, TextoBlock, CtaBlock, GenericBlock } from "./blocks/basic";

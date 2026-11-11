@@ -49,7 +49,7 @@ interface RouteBase {
 export type SiteRoute =
   | (RouteBase & { type: "page"; page: ResolvedPage })
   | (RouteBase & { type: "post"; post: PostItem; related: PostItem[] })
-  | (RouteBase & { type: "case"; project: ProjectItem; related: ProjectItem[] });
+  | (RouteBase & { type: "case"; project: ProjectItem; related: ProjectItem[]; next?: ProjectItem });
 
 export interface BuildInput {
   snapshot: SiteSnapshot;
@@ -94,6 +94,19 @@ function themeText(theme: ThemeDefinition, key: string, locale: Locale): string 
   const entry = theme.texts?.[key];
   if (!entry) return undefined;
   return entry[locale] ?? entry[locale.split("-")[0]!.toLowerCase()] ?? entry.en;
+}
+
+/**
+ * Próximo case na ordem do portfólio, com volta ao início, entre os projetos com seções de
+ * case (como o "Próximo case" da v1). Projeto fora dessa lista aponta para o primeiro; com
+ * menos de dois cases, não há próximo.
+ */
+export function nextCase(projects: readonly ProjectItem[], currentId: string): ProjectItem | undefined {
+  const cases = projects.filter((p) => p.sections.length > 0);
+  const idx = cases.findIndex((p) => p.id === currentId);
+  if (idx === -1) return cases[0];
+  if (cases.length < 2) return undefined;
+  return cases[(idx + 1) % cases.length];
 }
 
 /** A home publicada tem algum hero visível com "Mostrar disponibilidade"? */
@@ -278,15 +291,16 @@ export function buildSite(input: BuildInput): BuiltSite {
       const available = cfg.locales.filter((l) => byLocale.get(l));
       for (const locale of available) {
         const project = byLocale.get(locale)!;
-        const related = queryCollection({ collection: "projects", sort: "order" }, snapshot.collections.projects, opts(locale), paths)
-          .filter((p) => p.id !== project.id)
-          .slice(0, 3);
+        const all = queryCollection({ collection: "projects", sort: "order" }, snapshot.collections.projects, opts(locale), paths);
+        const related = all.filter((p) => p.id !== project.id).slice(0, 3);
+        const next = nextCase(all, project.id);
         const r: SiteRoute = {
           type: "case",
           url: project.url,
           locale,
           project,
           related,
+          ...(next ? { next } : {}),
           alternates: alternatesFor(available, (l) => byLocale.get(l)!.url, locale),
         };
         const lm = day(raw.updatedAt);

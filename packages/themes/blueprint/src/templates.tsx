@@ -4,7 +4,7 @@
  * da v1; o título é o `h1` da página.
  */
 import type { CaseTemplateProps, NotFoundProps, PostTemplateProps } from "@rubrica/core";
-import { Html, Img } from "@rubrica/core/components";
+import { CaseMetrics, Html, Img } from "@rubrica/core/components";
 import { Dim, Hatch, ProjectStamp, TitleBlock, drawnBy, isoDate, ownerName, pad2, stampDate, type StampCell } from "./parts";
 
 export function BlueprintPost({ post, html, related, ctx }: PostTemplateProps) {
@@ -103,6 +103,7 @@ export function BlueprintCase({ project, related, ctx }: CaseTemplateProps) {
           {s.image && <Img image={s.image} className="bp-doc__img" sizes="(min-width: 960px) 800px, 100vw" />}
         </section>
       ))}
+      <CaseMetrics metrics={project.metrics} title={ctx.t("case.metrics")} className="bp-doc__metrics" />
       {project.links.length > 0 && (
         <div className="bp-row">
           {project.links.map((l) => (

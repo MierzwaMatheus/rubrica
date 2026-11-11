@@ -26,6 +26,7 @@ export { planFonts, fontWeights, hasItalic, KNOWN_FONTS } from "./theme/fonts";
 export type { FontPlan, FontStyle, PlannedFont } from "./theme/fonts";
 /** Itens de coleção já resolvidos no idioma (o que os blocos e templates recebem). */
 export type {
+  CaseMetricItem,
   CaseSectionItem,
   FaqItem,
   PlanItem,

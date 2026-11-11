@@ -131,7 +131,7 @@ Projetos ou cases da coleção, com link para a página de cada um. Mostra os de
 - **Tipo de site:** pessoal e empresa
 - **Plugin:** `portfolio`: o bloco some com o plugin desligado
 - **Lista itens de:** `projects` (padrão ao criar: só os destaques, 3 itens, na ordem do painel)
-- **Variações:** componente padrão do núcleo: `grade`, `lista` · temas: `bento` (`grade`, `destaque`); `blueprint` (`grade`, `destaque`); `brutalist` (`grade`, `lista`); `chat` (`lista`, `destaque`); `cyberpunk` (`grade`, `lista`); `desktop` (`grade`, `lista`); `garden` (`grade`, `destaque`); `index` (`indice`, `destaque`, `grade`); `magazine` (`grade`, `lista`); `monograph` (`sumario`, `pranchas`); `padrao` (`grade`, `lista`); `poster` (`cartaz`, `catalogo`, `faixa`); `swiss` (`grade`, `lista`); `zine` (`grade`, `destaque`, `lista`)
+- **Variações:** componente padrão do núcleo: `grade`, `lista` · temas: `bento` (`grade`, `destaque`); `blueprint` (`grade`, `destaque`); `brutalist` (`grade`, `lista`); `chat` (`lista`, `destaque`); `cyberpunk` (`grade`, `lista`, `pagina`); `desktop` (`grade`, `lista`); `garden` (`grade`, `destaque`); `index` (`indice`, `destaque`, `grade`); `magazine` (`grade`, `lista`); `monograph` (`sumario`, `pranchas`); `padrao` (`grade`, `lista`, `pagina`); `poster` (`cartaz`, `catalogo`, `faixa`); `swiss` (`grade`, `lista`); `zine` (`grade`, `destaque`, `lista`)
 
 | Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
 |---|---|---|---|---|---|

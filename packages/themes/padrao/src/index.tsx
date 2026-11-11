@@ -5,12 +5,12 @@
  */
 import { CORE_RECIPES, defineTheme, type Recipe } from "@rubrica/core";
 import fonts from "./fonts.json";
-import { CtaBlock, CurriculoBlock, DepoimentosBlock, FaqBlock, GaleriaBlock, HeroBlock, ServicosBlock } from "./blocks";
+import { CasesBlock, CtaBlock, CurriculoBlock, DepoimentosBlock, FaqBlock, GaleriaBlock, HeroBlock, ServicosBlock } from "./blocks";
 import { createSidebarShell } from "./shell";
 import { PadraoNotFound } from "./templates";
 
 export { createSidebarShell } from "./shell";
-export { HeroBlock, ServicosBlock, DepoimentosBlock, CurriculoBlock, CtaBlock, GaleriaBlock, FaqBlock } from "./blocks";
+export { HeroBlock, ServicosBlock, DepoimentosBlock, CurriculoBlock, CtaBlock, GaleriaBlock, FaqBlock, CasesBlock } from "./blocks";
 export { PadraoNotFound } from "./templates";
 export { Icon } from "./icons";
 
@@ -125,8 +125,9 @@ function withPageHeader(page: Recipe[number]): Recipe[number] {
   const [list, ...rest] = page.blocks;
   if (!LIST_PAGES.has(page.path) || !list?.fields?.title) return page;
   const { title, intro, ...fields } = list.fields;
-  // Depoimentos agrupados por categoria, como a página da v1.
-  const variant = page.path === "/depoimentos" ? { variant: "categorias" } : {};
+  // Depoimentos agrupados por categoria e o portfólio com a variação "pagina" dos cases
+  // (filtro por categoria e cartões com botão), como as páginas da v1.
+  const variant = page.path === "/depoimentos" ? { variant: "categorias" } : list.type === "cases" ? { variant: "pagina" } : {};
   return {
     ...page,
     blocks: [{ type: "hero", variant: "pagina", fields: { title, ...(intro ? { subtitle: intro } : {}) } }, { ...list, ...variant, fields }, ...rest],
@@ -155,7 +156,7 @@ export default defineTheme({
   Shell: createSidebarShell(),
   // O "Fale comigo" abre o contato numa janela, como o assistente da v1.
   contactDialog: true,
-  blocks: { hero: HeroBlock, servicos: ServicosBlock, depoimentos: DepoimentosBlock, curriculo: CurriculoBlock, cta: CtaBlock, galeria: GaleriaBlock, faq: FaqBlock },
+  blocks: { hero: HeroBlock, servicos: ServicosBlock, depoimentos: DepoimentosBlock, curriculo: CurriculoBlock, cta: CtaBlock, galeria: GaleriaBlock, faq: FaqBlock, cases: CasesBlock },
   templates: { notFound: PadraoNotFound },
   variants: {
     hero: [
@@ -165,6 +166,7 @@ export default defineTheme({
     cases: [
       { value: "grade", label: "Grade" },
       { value: "lista", label: "Lista" },
+      { value: "pagina", label: "Página do portfólio (filtro por categoria)" },
     ],
     texto: [
       { value: "default", label: "Padrão" },
@@ -174,6 +176,11 @@ export default defineTheme({
       { value: "default", label: "Grade" },
       { value: "categorias", label: "Por categoria (com a contagem)" },
     ],
+  },
+  // Os textos de terminal da v1 nos cartões de case.
+  texts: {
+    "case.view": { pt: "$ cat case.md", en: "$ cat case.md", es: "$ cat case.md" },
+    "case.details": { pt: "$ view --details", en: "$ view --details", es: "$ view --details" },
   },
   recipes: { pessoal: [home, ...core.filter((p) => p.path !== "/").map((p) => (p.path === "/curriculo" ? curriculo : withPersonalText(withPageHeader(p))))] },
 });

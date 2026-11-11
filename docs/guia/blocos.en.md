@@ -131,7 +131,7 @@ Projects or cases from the collection, linking to each one's page. Shows the fea
 - **Site type:** personal and company
 - **Plugin:** `portfolio`: the block disappears when the plugin is off
 - **Lists items from:** `projects` (default when created: featured only, 3 items, in panel order)
-- **Variants:** core default component: `grade`, `lista` · themes: `bento` (`grade`, `destaque`); `blueprint` (`grade`, `destaque`); `brutalist` (`grade`, `lista`); `chat` (`lista`, `destaque`); `cyberpunk` (`grade`, `lista`); `desktop` (`grade`, `lista`); `garden` (`grade`, `destaque`); `index` (`indice`, `destaque`, `grade`); `magazine` (`grade`, `lista`); `monograph` (`sumario`, `pranchas`); `padrao` (`grade`, `lista`); `poster` (`cartaz`, `catalogo`, `faixa`); `swiss` (`grade`, `lista`); `zine` (`grade`, `destaque`, `lista`)
+- **Variants:** core default component: `grade`, `lista` · themes: `bento` (`grade`, `destaque`); `blueprint` (`grade`, `destaque`); `brutalist` (`grade`, `lista`); `chat` (`lista`, `destaque`); `cyberpunk` (`grade`, `lista`, `pagina`); `desktop` (`grade`, `lista`); `garden` (`grade`, `destaque`); `index` (`indice`, `destaque`, `grade`); `magazine` (`grade`, `lista`); `monograph` (`sumario`, `pranchas`); `padrao` (`grade`, `lista`, `pagina`); `poster` (`cartaz`, `catalogo`, `faixa`); `swiss` (`grade`, `lista`); `zine` (`grade`, `destaque`, `lista`)
 
 | Field | Panel label | Type | Required | Translatable | Help and limits |
 |---|---|---|---|---|---|

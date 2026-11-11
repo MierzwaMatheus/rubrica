@@ -50,8 +50,10 @@ describe("tema do projeto", () => {
     const root = project({ "rubrica.json": JSON.stringify({ tema: "padrao" }) });
     const theme = await loadProjectTheme(root);
     expect(theme).toMatchObject({ source: "tema", id: "padrao", package: "@rubrica/theme-padrao" });
-    expect(themeVariants(theme, "cases").map((v) => v.value)).toEqual(["grade", "lista"]);
-    // O padrão desenha o próprio hero, com as variações dele (início e cabeçalho de página).
+    expect(themeVariants(theme, "cases").map((v) => v.value)).toEqual(["grade", "lista", "pagina"]);
+    // O padrão desenha o próprio hero e os próprios cases (a variação "pagina" é a página do portfólio).
+    expect(theme.overridden).toContain("cases");
+    // Hero, com as variações dele (início e cabeçalho de página).
     expect(theme.overridden).toContain("hero");
     expect(themeVariants(theme, "hero").map((v) => v.value)).toEqual(["inicio", "pagina"]);
     expect(themeRecipe(theme, "pessoal")[0]!.blocks.map((b) => b.type)).toContain("numeros");

@@ -419,12 +419,6 @@ function convertProjects(ctx: Ctx, docs: Doc[]): Doc[] {
         const body = mapLoc(loc(cs[s.field], { enUS: csEn?.[s.field] }), toHtml);
         if (hasText(body)) sections.push({ title: ctx.t(s.key), body });
       }
-      if (cs.metrics?.length) {
-        const list = (metrics: Doc[]) => `<ul>${metrics.map((m) => `<li><strong>${m.value}</strong> ${m.label}</li>`).join("")}</ul>`;
-        const body: Loc = { [PT]: list(cs.metrics) };
-        if (csEn?.metrics?.length) body[EN] = list(csEn.metrics);
-        sections.push({ title: ctx.t("portfolio.metrics"), body });
-      }
       if (cs.testimonial?.text) {
         const t = cs.testimonial as Doc;
         const quote = (text: string, role?: string) => `<blockquote><p>${text}</p><footer>${t.author}${role ? `, ${role}` : ""}</footer></blockquote>`;
@@ -436,6 +430,8 @@ function convertProjects(ctx: Ctx, docs: Doc[]): Doc[] {
         sections.push({ title: ctx.t("portfolio.testimonial"), body });
       }
     }
+    // "Resultados em números": campo próprio (com o ícone do Lucide da v1), não uma seção de texto.
+    const metrics = caseMetrics(cs?.metrics as Doc[] | undefined, csEn?.metrics as Doc[] | undefined);
     const images = (d.imageIds as string[] | undefined ?? []).map((id) => ctx.image(id)).filter(Boolean) as Doc[];
     const external = (d.externalImageUrls as string[] | undefined ?? []).map((url) => ({ url }));
     const [cover, ...gallery] = [...images, ...external];
@@ -451,6 +447,7 @@ function convertProjects(ctx: Ctx, docs: Doc[]): Doc[] {
       summary: loc(d.description, d.descriptionTranslations),
       content: mapLoc(loc(d.longDescription, d.longDescriptionTranslations), toHtml),
       sections: sections.length ? sections : undefined,
+      metrics: metrics.length ? metrics : undefined,
       cover,
       gallery: gallery.length ? gallery : undefined,
       role: cs ? loc(cs.role, { enUS: csEn?.role }) : undefined,
@@ -463,6 +460,16 @@ function convertProjects(ctx: Ctx, docs: Doc[]): Doc[] {
       order: d.orderIndex,
       ...lifecycle(d),
     });
+  });
+}
+
+/** Números do case da v1 (`caseStudy.metrics`), com o rótulo em inglês pela posição e o ícone, quando havia. */
+function caseMetrics(pt: Doc[] | undefined, en: Doc[] | undefined): Doc[] {
+  return (pt ?? []).flatMap((m, i) => {
+    const value = str(m.value === undefined ? undefined : String(m.value));
+    const label = loc(m.label, { enUS: en?.[i]?.label });
+    if (!value || !hasText(label)) return [];
+    return [compact({ value, label, icon: str(m.icon) })];
   });
 }
 
@@ -776,7 +783,7 @@ export const SECTION_KEYS = new Set([
   "testimonials.subtitle", "testimonials.viewAll", "home.greeting", "navigation.home", "navigation.about", "navigation.resume", "navigation.portfolio", "navigation.blog",
   "seo.aboutTitle", "seo.aboutDescription", "seo.resumeTitle", "seo.resumeDescription", "seo.portfolioTitle", "seo.portfolioDescription",
   "seo.blogTitle", "seo.blogDescription", "seo.testimonialsDescription", "portfolio.before", "portfolio.problem", "portfolio.solution",
-  "portfolio.decisions", "portfolio.results", "portfolio.learnings", "portfolio.metrics", "portfolio.testimonial", "portfolio.liveDemo", "portfolio.code",
+  "portfolio.decisions", "portfolio.results", "portfolio.learnings", "portfolio.testimonial", "portfolio.liveDemo", "portfolio.code",
 ]);
 
 /** Textos de interface da v1 → chave da v2 (só os personalizados vão; os outros usam o padrão da v2). */
@@ -800,6 +807,17 @@ export const UI_TEXT_MAP: Record<string, string> = {
   "sidebar.downloadCV": "sidebar.downloadCV",
   "portfolio.screenshots": "case.gallery",
   "home.cases.read": "case.view",
+  "portfolio.viewCase": "case.view",
+  "portfolio.details": "case.details",
+  "portfolio.all": "cases.all",
+  "portfolio.metrics": "case.metrics",
+  "portfolio.nextCase": "case.next",
+  "portfolio.ctaTitle": "case.ctaTitle",
+  "portfolio.ctaSubtitle": "case.ctaBody",
+  "portfolio.ctaProject": "case.ctaButton",
+  "portfolio.expandImage": "gallery.expand",
+  "portfolio.previousImage": "gallery.prev",
+  "portfolio.nextImage": "gallery.next",
   "blog.filterByTags": "blog.filter",
   "sidebar.language": "nav.language",
   "sidebar.menu": "nav.menu",
@@ -824,7 +842,7 @@ export const UI_TEXT_MAP: Record<string, string> = {
 const V1_LABELS = [
   "resume.experience", "resume.education", "resume.skills", "resume.softSkills", "resume.courses", "resume.languages",
   "resume.volunteer", "resume.downloadCV", "resume.showOlder", "resume.hideOlder",
-  "contactWizard.trigger", "sidebar.downloadCV", "testimonials.leaveTestimonial", "portfolio.screenshots", "blog.filterByTags",
+  "contactWizard.trigger", "sidebar.downloadCV", "testimonials.leaveTestimonial", "portfolio.screenshots", "blog.filterByTags", "portfolio.metrics",
   "notFound.cta",
 ];
 

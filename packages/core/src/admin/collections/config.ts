@@ -94,6 +94,16 @@ const PROJECT_FIELDS: FieldMap = {
       image: field.image({ label: "Imagem da seção" }),
     },
   }),
+  metrics: field.list({
+    label: "Resultados em números",
+    itemLabel: "Número",
+    help: "Os números do case, em ordem. Sem número de destaque, o primeiro aparece no card.",
+    of: {
+      value: field.text({ label: "Número", required: true, localized: false, maxLength: 40, help: "Ex.: ~50, 3x, 98%." }),
+      label: field.text({ label: "O que o número mede", required: true, maxLength: 100 }),
+      icon: field.text({ label: "Ícone", localized: false, maxLength: 40, help: "Nome de um ícone do Lucide (ex.: Bot, shield-check). Alguns temas mostram." }),
+    },
+  }),
   gallery: field.list({ label: "Galeria", itemLabel: "Imagem", of: { image: field.image({ label: "Imagem", required: true }) } }),
   links: linksField,
 };
@@ -252,7 +262,7 @@ export const COLLECTION_CONFIGS: Record<CollectionName, CollectionConfig> = {
     plural: "projetos",
     description: "Cases e projetos, com seções, galeria, número de destaque e SEO.",
     fields: PROJECT_FIELDS,
-    docKeys: ["title", "summary", "cover", "client", "year", "role", "category", "metric", "content", "sections", "gallery", "links", "tags", "featured", "seo"],
+    docKeys: ["title", "summary", "cover", "client", "year", "role", "category", "metric", "content", "sections", "metrics", "gallery", "links", "tags", "featured", "seo"],
     required: ["title"],
     slug: true,
     seo: true,

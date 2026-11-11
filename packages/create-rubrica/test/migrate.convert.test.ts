@@ -111,8 +111,10 @@ describe("tabelas 1:1", () => {
     expect(r.tables.testimonials![0]).toMatchObject({ quote: { "pt-BR": "Excelente trabalho.", en: "Excellent work." }, author: "Carlos", featured: true, tags: ["Produto"], avatar: { url: "https://imagens.exemplo.dev/carlos.png" } });
     expect(r.tables.testimonials![1]!.featured).toBeUndefined();
     expect(r.tables.faq![0]).toMatchObject({ question: { "pt-BR": "Trabalha remoto?", en: "Do you work remotely?" }, answer: { "pt-BR": "Sim.", en: "Yes." }, order: 0 });
-    expect(r.tables.routine![0]).toMatchObject({ title: { "pt-BR": "Café e rascunhos", en: "Coffee and sketches" }, image: { storageId: IDS.storage[1] } });
-    expect(r.report.warnings.join(" ")).toMatch(/tamanho de cada foto/);
+    // O tamanho no mosaico da v1 (spanSize) vira o span do item; 1x1 é o padrão e não vai.
+    expect(r.tables.routine![0]).toMatchObject({ title: { "pt-BR": "Café e rascunhos", en: "Coffee and sketches" }, image: { storageId: IDS.storage[1] }, span: "2x1" });
+    expect(r.tables.routine![1]).not.toHaveProperty("span");
+    expect(r.report.warnings.join(" ")).not.toMatch(/tamanho de cada foto/);
   });
 
   it("currículo: tipos da v1 → da v2, períodos e o que não deu para entender", () => {
@@ -257,6 +259,8 @@ describe("páginas pela receita, preenchidas com a v1", () => {
     expect(block(home, "texto").fields.body).toEqual({ "pt-BR": "<p>Sou designer há dez anos.</p><p>Gosto de problemas difíceis.</p>", en: "<p>I have been a designer for ten years.</p><p>I like hard problems.</p>" });
     expect(block(home, "cta").fields.title).toEqual({ "pt-BR": V1_TEXTS["home.cta.title"]!.pt, en: V1_TEXTS["home.cta.title"]!.en });
     expect(block(home, "contato").fields).toMatchObject({ anchor: "contato", mode: "wizard" });
+    // "Ver todos os depoimentos" da v1 vira o link do bloco, para a página de depoimentos.
+    expect(block(home, "depoimentos").fields.cta).toEqual({ label: { "pt-BR": V1_TEXTS["testimonials.viewAll"]!.pt, en: V1_TEXTS["testimonials.viewAll"]!.en }, href: "/depoimentos" });
     // nenhum texto de exemplo da receita sobrou
     expect(JSON.stringify(home)).not.toContain("Uma frase que diz o que você faz");
     expect(JSON.stringify(home)).not.toContain('"es"');
@@ -318,6 +322,19 @@ describe("páginas pela receita, preenchidas com a v1", () => {
     expect(block(cv, "curriculo").fields).toEqual({ showDownload: true });
   });
 
+  it("variação e bloco escondido vêm da receita do tema (contato só na janela, texto pessoal, depoimentos por categoria)", () => {
+    const recipe: Recipe = [
+      { path: "/", title: { "pt-BR": "Início" }, blocks: [{ type: "hero" }, { type: "contato", visible: false }] },
+      { path: "/sobre", title: { "pt-BR": "Sobre" }, blocks: [{ type: "texto" }, { type: "texto", variant: "pessoal" }] },
+      { path: "/depoimentos", title: { "pt-BR": "Depoimentos" }, blocks: [{ type: "hero", variant: "pagina" }, { type: "depoimentos", variant: "categorias" }] },
+    ];
+    const res = run(recipe);
+    const home = byPath(res, "/");
+    expect(home.blocks.map((b: { type: string; visible: boolean }) => [b.type, b.visible])).toEqual([["hero", true], ["contato", false]]);
+    expect(byPath(res, "/sobre").blocks.map((b: { variant?: string }) => b.variant)).toEqual([undefined, "pessoal"]);
+    expect(byPath(res, "/depoimentos").blocks[1]).toMatchObject({ type: "depoimentos", variant: "categorias" });
+  });
+
   it("receita de um tema sem algum bloco: o conteúdo dele fica no relatório como fora", () => {
     const recipe: Recipe = [{ path: "/", title: { "pt-BR": "Início" }, blocks: [{ type: "hero" }, { type: "logos-clientes" }, { type: "galeria" }] }];
     const res = run(recipe);
@@ -368,9 +385,10 @@ describe("textos e o resto", () => {
         ["resume.showOlder", "ver experiências anteriores ({count})", "show earlier experience ({count})"],
         ["resume.hideOlder", "ocultar experiências anteriores", "hide earlier experience"],
         ["sidebar.talk", "Fale comigo", "Contact me"],
-        ["testimonials.send", "Deixar meu depoimento", "Leave my testimonial"],
+        ["testimonialForm.open", "Deixar meu depoimento", "Leave my testimonial"],
         ["case.gallery", "Screenshots", "Screenshots"],
         ["blog.filter", "Filtrar por tags", "Filter by tags"],
+        ["notFound.home", "voltar ao início", "back to home"],
       ].map(([key, pt, en]) => ({ key, value: { "pt-BR": pt, en }, updatedAt: NOW })),
     ]);
     expect(r.report.texts.unmapped).toEqual([{ key: "notFound.lines.0", pt: "> nada aqui" }]);

@@ -39,6 +39,13 @@ const PATHS: Record<string, ReactNode> = {
     </>
   ),
   chevronDown: <path d="m6 9 6 6 6-6" />,
+  help: (
+    <>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+      <path d="M12 17h.01" />
+    </>
+  ),
   // WhatsApp (balão com telefone, traço no estilo do Lucide "message-circle" + "phone").
   whatsapp: (
     <>
@@ -92,6 +99,7 @@ const PATHS: Record<string, ReactNode> = {
     </>
   ),
   message: <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />,
+  close: <path d="M18 6 6 18M6 6l12 12" />,
   menu: (
     <>
       <line x1="4" x2="20" y1="12" y2="12" />

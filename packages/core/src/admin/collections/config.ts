@@ -144,6 +144,16 @@ const ROUTINE_FIELDS: FieldMap = {
   title: field.text({ label: "Título", required: true, maxLength: 100 }),
   description: field.text({ label: "Legenda", multiline: true, maxLength: 300 }),
   image: field.image({ label: "Imagem" }),
+  span: field.select({
+    label: "Tamanho no mosaico",
+    help: "Colunas x linhas, nos temas que mostram o dia a dia em mosaico. Sem escolha, 1x1.",
+    options: [
+      { value: "1x1", label: "1x1 (normal)" },
+      { value: "1x2", label: "1x2 (alta)" },
+      { value: "2x1", label: "2x1 (larga)" },
+      { value: "2x2", label: "2x2 (grande)" },
+    ],
+  }),
 };
 
 const PLAN_FIELDS: FieldMap = {
@@ -343,7 +353,7 @@ export const COLLECTION_CONFIGS: Record<CollectionName, CollectionConfig> = {
     plural: "momentos",
     description: "Galeria do dia a dia da página sobre.",
     fields: ROUTINE_FIELDS,
-    docKeys: ["title", "description", "image"],
+    docKeys: ["title", "description", "image", "span"],
     required: ["title"],
     reorderable: true,
     defaultPublished: true,

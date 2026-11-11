@@ -152,6 +152,25 @@ code, pre { font-family: var(--rb-font-mono); }
 .rb-side__talk:hover { background: color-mix(in srgb, var(--rb-accent) 22%, transparent); }
 .rb-side__cv { color: var(--rb-accent-2); border: 1px solid color-mix(in srgb, var(--rb-accent-2) 50%, transparent); }
 .rb-side__cv:hover { background: color-mix(in srgb, var(--rb-accent-2) 10%, transparent); }
+/* X para fechar a gaveta no celular, no canto como o da v1; no desktop a sidebar não fecha. */
+.rb-side__close { position: absolute; top: 0.5rem; right: 0.5rem; z-index: 1; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 0.375rem; color: var(--rb-muted); cursor: pointer; }
+.rb-side__close:hover { color: var(--rb-fg-strong); background: var(--rb-faint); }
+/*
+ * Desktop (mouse): o rodapé da sidebar com as medidas da v1, para "Fale comigo" e "Baixar CV"
+ * caberem na tela como lá. Na gaveta do celular (toque) os alvos seguem com 44 px.
+ */
+@media (min-width: 1024px) {
+  .rb-side__close { display: none; }
+  .rb-sidenav a { min-height: 2.75rem; padding-block: 0.5rem; }
+  .rb-side__foot { gap: 0.75rem; padding-block: 1.25rem; }
+  .rb-side__contact { gap: 0.25rem; }
+  .rb-side__contact a { min-height: 1.75rem; }
+  .rb-side__social a { width: 2.25rem; height: 2.25rem; }
+  .rb-side__toggle .rb-color-toggle { min-height: 2.25rem; }
+  .rb-side__locales .rb-locales a { min-height: 2rem; }
+  .rb-side__switch { height: 2rem; }
+  .rb-side__actions a, .rb-side__actions button { min-height: 2.25rem; }
+}
 
 .rb-footer { margin-top: 2rem; padding: 1.5rem 1rem 2rem; text-align: center; font-size: 0.8rem; color: var(--rb-muted); border-top: 1px solid var(--rb-hairline); }
 .rb-footer p { margin: 0; }
@@ -262,6 +281,42 @@ h2.rb-section__title::after { content: " */"; content: " */" / ""; color: var(--
 .rb-quote__text p::before { content: "\201C"; }
 .rb-quote__text p::after { content: "\201D"; }
 .rb-depoimentos .rb-island { display: flex; justify-content: center; }
+/* Título da seção na home: balão de mensagem, sem o comentário de código, como na v1. */
+.rb-depoimentos h2.rb-depoimentos__title { display: flex; align-items: center; gap: 0.75rem; font-family: var(--rb-font-sans); font-size: 1.25rem; }
+.rb-depoimentos h2.rb-depoimentos__title::before, .rb-depoimentos h2.rb-depoimentos__title::after { content: none; }
+.rb-depoimentos__title svg { flex: none; color: var(--rb-accent); }
+/* "Ver todos os depoimentos" (campo cta) e o botão de enviar (ilha), centrados como na v1. */
+.rb-depoimentos__all { margin: 2rem 0 0; text-align: center; font-size: 0.875rem; }
+.rb-depoimentos__all a { display: inline-flex; align-items: center; min-height: 44px; color: var(--rb-muted); text-decoration: underline; text-underline-offset: 4px; }
+.rb-depoimentos__all a:hover { color: var(--rb-fg); }
+.rb-depoimentos__all + .rb-island { margin-top: 0.25rem; }
+.rb-depoimentos__list + .rb-island, .rb-depoimentos__group + .rb-island { margin-top: 2rem; }
+.rb-depoimentos .rb-island button[aria-expanded="false"] {
+  gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 0.75rem; font-size: 0.875rem; font-weight: 500;
+  color: var(--rb-accent); background: color-mix(in srgb, var(--rb-accent) 5%, transparent); border: 1px solid color-mix(in srgb, var(--rb-accent) 40%, transparent);
+}
+.rb-depoimentos .rb-island button[aria-expanded="false"]:hover { background: color-mix(in srgb, var(--rb-accent) 10%, transparent); border-color: var(--rb-accent); }
+/* Estrela do "Deixar meu depoimento" (o botão é da ilha do núcleo: o ícone entra pelo CSS). */
+.rb-depoimentos .rb-island button[aria-expanded="false"]::before {
+  content: ""; flex: none; width: 1rem; height: 1rem; background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+/* Variação "categorias" (página de depoimentos): contagem, um grupo por categoria, em colunas. */
+.rb-depoimentos__count { margin: 0 0 2.5rem; font-size: 0.875rem; color: var(--rb-muted); }
+.rb-main__inner .rb-hero[data-variant="pagina"] + .rb-depoimentos[data-variant="categorias"] { margin-top: 0.5rem; }
+.rb-depoimentos__group + .rb-depoimentos__group { margin-top: 2.5rem; }
+.rb-depoimentos__category { margin: 0 0 1rem; font-family: var(--rb-font-mono); font-size: 0.875rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--rb-accent); }
+.rb-depoimentos__category span { color: var(--rb-muted); }
+.rb-depoimentos[data-variant="categorias"] .rb-depoimentos__list { display: block; columns: 1; column-gap: 1.25rem; }
+@media (min-width: 768px) { .rb-depoimentos[data-variant="categorias"] .rb-depoimentos__list { columns: 2; } }
+.rb-depoimentos[data-variant="categorias"] .rb-depoimento { break-inside: avoid; margin-bottom: 1.25rem; }
+/* Cabeçalho da página de depoimentos como o da v1: título menor, com o balão, e o apoio curto. */
+.rb-hero[data-variant="pagina"]:has(+ .rb-depoimentos[data-variant="categorias"]) .rb-hero__title { display: flex; align-items: center; gap: 0.75rem; font-size: 1.5rem; }
+.rb-hero[data-variant="pagina"]:has(+ .rb-depoimentos[data-variant="categorias"]) .rb-hero__title::before {
+  content: ""; flex: none; width: 1.25rem; height: 1.25rem; background: var(--rb-accent);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.rb-hero[data-variant="pagina"]:has(+ .rb-depoimentos[data-variant="categorias"]) .rb-hero__lead { font-size: 0.875rem; }
 
 /* ---------- fechamento (cta) ---------- */
 .rb-main__inner .rb-cta > .rb-container {
@@ -375,6 +430,75 @@ h2.rb-resume__heading { font-family: var(--rb-font-sans); }
 .rb-prose hr { border: 0; border-top: 1px solid var(--rb-hairline); margin-block: 2rem; }
 .rb-related { margin-top: 3rem; }
 .rb-notfound { padding-block: 4rem; }
+
+/* ---------- Sobre: "Fora do trabalho" (texto, variação pessoal) ---------- */
+.rb-texto[data-variant="pessoal"] .rb-prose { position: relative; overflow: hidden; max-width: none; }
+.rb-texto[data-variant="pessoal"] .rb-prose p, .rb-texto[data-variant="pessoal"] .rb-prose p:first-child { position: relative; z-index: 1; margin: 0 0 1.75rem; font-size: 1.125rem; line-height: 1.625; color: var(--rb-fg); }
+.rb-texto[data-variant="pessoal"] .rb-prose p:last-child { margin-bottom: 0; }
+/* O "</>" decorativo no canto, como o da v1. */
+.rb-texto[data-variant="pessoal"] .rb-prose::after {
+  content: ""; position: absolute; top: 1rem; right: 1rem; width: 6rem; height: 6rem; background: var(--rb-accent); opacity: 0.1; transition: opacity 0.3s;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m16 18 6-6-6-6'/%3E%3Cpath d='m8 6-6 6 6 6'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m16 18 6-6-6-6'/%3E%3Cpath d='m8 6-6 6 6 6'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.rb-texto[data-variant="pessoal"] .rb-prose:hover::after { opacity: 0.2; }
+
+/* ---------- Sobre: "Meu dia a dia" em mosaico (galeria) ---------- */
+.rb-mosaic { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 200px; gap: 1rem; }
+@media (min-width: 768px) { .rb-mosaic { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.rb-mosaic__item[data-span="1x2"] { grid-row: span 2; }
+.rb-mosaic__item[data-span="2x1"] { grid-column: span 2; }
+.rb-mosaic__item[data-span="2x2"] { grid-column: span 2; grid-row: span 2; }
+.rb-mosaic__figure {
+  position: relative; height: 100%; margin: 0; overflow: hidden; cursor: pointer; border-radius: 0.75rem;
+  border: 1px solid var(--rb-hairline); background: linear-gradient(135deg, var(--rb-faint), var(--rb-bg)); transition: border-color 0.3s;
+}
+.rb-mosaic__figure:hover, .rb-mosaic__figure:focus-visible { border-color: color-mix(in srgb, var(--rb-accent) 50%, transparent); }
+.rb-mosaic__figure:focus-visible { outline: 2px solid var(--rb-accent); outline-offset: 2px; }
+.rb-mosaic__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 0; }
+.rb-mosaic__figure::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, color-mix(in srgb, var(--rb-bg) 80%, transparent), color-mix(in srgb, var(--rb-bg) 40%, transparent) 50%, transparent); pointer-events: none; }
+.rb-mosaic__tags { position: absolute; top: 1rem; left: 1rem; right: 1rem; z-index: 1; display: flex; flex-wrap: wrap; gap: 0.5rem; list-style: none; margin: 0; padding: 0; }
+.rb-mosaic__tags li { padding: 0.125rem 0.5rem; border-radius: 0.375rem; font-size: 0.75rem; color: var(--rb-accent-fg); background: var(--rb-accent); }
+/* Legenda por cima da foto: aparece no hover, no foco e no toque (a foto recebe foco). */
+.rb-mosaic__caption {
+  position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; padding: 1.5rem;
+  text-align: center; font-size: 0.875rem; line-height: 1.6; color: var(--rb-fg-strong);
+  background: color-mix(in srgb, var(--rb-bg) 90%, transparent); backdrop-filter: blur(4px); opacity: 0; transition: opacity 0.3s;
+}
+@media (min-width: 768px) { .rb-mosaic__caption { font-size: 1rem; } }
+.rb-mosaic__figure:hover .rb-mosaic__caption, .rb-mosaic__figure:focus .rb-mosaic__caption { opacity: 1; }
+.rb-mosaic__text { font-size: 0.875em; color: var(--rb-muted); }
+
+/* ---------- Sobre: FAQ num cartão só, com "?" e seta, como na v1 ---------- */
+.rb-faq__card { display: block; max-width: none; overflow: hidden; border: 1px solid var(--rb-hairline); border-radius: 0.75rem; background: color-mix(in srgb, var(--rb-surface) 50%, transparent); }
+.rb-faq__card .rb-faq__item { border: 0; border-radius: 0; background: none; }
+.rb-faq__card .rb-faq__item + .rb-faq__item { border-top: 1px solid var(--rb-hairline); }
+.rb-faq__card .rb-faq__question { gap: 0.75rem; padding: 1rem 1.5rem; font-size: 0.875rem; font-weight: 500; color: var(--rb-fg-strong); }
+.rb-faq__card .rb-faq__question:hover { color: var(--rb-accent); }
+.rb-faq__card .rb-faq__question::after { content: none; }
+.rb-faq__icon { flex: none; color: var(--rb-accent); }
+.rb-faq__chevron { flex: none; margin-left: auto; color: var(--rb-muted); transition: transform 0.2s; }
+.rb-faq__card .rb-faq__item[open] .rb-faq__chevron { transform: rotate(180deg); }
+.rb-faq__card .rb-faq__answer { padding: 0 1.5rem 1rem; font-size: 0.875rem; color: var(--rb-fg); }
+
+/* ---------- 404 em tela de terminal (templates.tsx), como a da v1 ---------- */
+.rb-404 { position: relative; display: flex; align-items: center; justify-content: center; min-height: calc(100vh - 10rem); padding: 4rem 0; overflow: hidden; }
+.rb-404::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0.035;
+  background-image: linear-gradient(color-mix(in srgb, var(--rb-accent) 80%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--rb-accent) 80%, transparent) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+.rb-404::after { content: ""; position: absolute; top: 50%; left: 50%; width: 500px; max-width: 100%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; background: color-mix(in srgb, var(--rb-accent) 5%, transparent); filter: blur(120px); pointer-events: none; }
+.rb-404__box { position: relative; z-index: 1; width: 100%; max-width: 36rem; padding-inline: 1.5rem; }
+.rb-404__label { display: flex; align-items: center; gap: 0.5rem; margin: 0 0 1.5rem; font-family: var(--rb-font-mono); font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--rb-accent); }
+.rb-404__code { margin-left: auto; font-size: 0.625rem; letter-spacing: normal; text-transform: none; color: var(--rb-muted); }
+.rb-404__title { margin: 0 0 1rem; font-family: var(--rb-font-mono); font-size: clamp(6rem, 22vw, 9rem); font-weight: 900; line-height: 1; letter-spacing: -0.05em; color: var(--rb-fg-strong); }
+.rb-404__line { height: 1px; margin-bottom: 2rem; background: linear-gradient(to right, color-mix(in srgb, var(--rb-accent) 60%, transparent), color-mix(in srgb, var(--rb-accent) 20%, transparent), transparent); }
+.rb-404__home {
+  display: inline-flex; align-items: center; gap: 0.5rem; min-height: 44px; padding: 0 1.5rem; border-radius: 0.375rem;
+  font-family: var(--rb-font-mono); font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none;
+  color: var(--rb-accent); background: color-mix(in srgb, var(--rb-accent) 10%, transparent); border: 1px solid color-mix(in srgb, var(--rb-accent) 40%, transparent); transition: background 0.3s, border-color 0.3s;
+}
+.rb-404__home:hover { background: color-mix(in srgb, var(--rb-accent) 20%, transparent); border-color: color-mix(in srgb, var(--rb-accent) 70%, transparent); }
 
 /* Logo do site (quando configurada): no topo da sidebar e na barra do celular. */
 .rb-side__logo { display: flex; justify-content: center; padding: 1rem 1rem 0; }

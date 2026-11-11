@@ -269,11 +269,16 @@ export const resumeItemFields = {
   group: v.optional(vLocalized),
 };
 
+/** Tamanho da foto no mosaico do dia a dia (colunas x linhas), como o `span_size` da v1. */
+export const vRoutineSpan = v.union(v.literal("1x1"), v.literal("1x2"), v.literal("2x1"), v.literal("2x2"));
+
 export const routineFields = {
   ...itemFields,
   title: vLocalized,
   description: v.optional(vLocalized),
   image: v.optional(vImage),
+  /** Tamanho no mosaico (temas que desenham a galeria em mosaico). Sem valor, 1x1. */
+  span: v.optional(vRoutineSpan),
 };
 
 export const vPricePeriod = v.union(v.literal("month"), v.literal("year"), v.literal("once"), v.literal("hour"), v.literal("project"));

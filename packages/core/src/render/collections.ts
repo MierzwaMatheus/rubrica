@@ -91,6 +91,8 @@ export interface TestimonialItem {
   role?: string;
   company?: string;
   avatar?: ResolvedImage;
+  /** Etiquetas do depoimento (a categoria da v1 vem como a primeira), quando há. */
+  tags?: string[];
 }
 
 export interface FaqItem {
@@ -118,6 +120,8 @@ export interface RoutineItem {
   description?: string;
   image?: ResolvedImage;
   tags: string[];
+  /** Tamanho no mosaico (colunas x linhas), quando o item define. */
+  span?: "1x1" | "1x2" | "2x1" | "2x2";
 }
 
 export interface PlanItem {
@@ -323,6 +327,7 @@ const RESOLVERS: { [C in CollectionName]: Resolver<C> } = {
       role: pick(raw.role, opts.locale),
       company: raw.company,
       avatar: resolveImage(raw.avatar, opts),
+      tags: raw.tags?.length ? raw.tags : undefined,
     });
   },
   faq: (raw, opts) => {
@@ -355,6 +360,7 @@ const RESOLVERS: { [C in CollectionName]: Resolver<C> } = {
       description: pick(raw.description, opts.locale),
       image: resolveImage(raw.image, opts),
       tags: raw.tags ?? [],
+      span: raw.span,
     });
   },
   plans: (raw, opts) => {

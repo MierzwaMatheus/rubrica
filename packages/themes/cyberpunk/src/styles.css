@@ -9,6 +9,10 @@
   --rb-fg-strong: var(--rb-fg);
 }
 .rb-side { box-shadow: 1px 0 0 var(--rb-hairline); }
+/* Logo como o do mmlo.com.br: à esquerda, 28 px de altura, e o perfil logo abaixo. */
+.rb-side__logo { justify-content: flex-start; padding: 1.75rem 1.5rem 0.5rem; }
+.rb-side__logo .rb-logo { height: 1.75rem; }
+.rb-side__logo + .rb-profile { padding-top: 1.25rem; }
 .rb-profile__role { backdrop-filter: blur(4px); }
 .rb-avatar { box-shadow: 0 0 18px color-mix(in srgb, var(--rb-accent) 25%, transparent); }
 .rb-button--primary:hover { box-shadow: 0 0 14px color-mix(in srgb, var(--rb-accent) 40%, transparent); }

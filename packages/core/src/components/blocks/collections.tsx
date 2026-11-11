@@ -176,6 +176,7 @@ export function DepoimentosBlock({ id, variant, fields, items, headingLevel, ctx
           ))}
         </ul>
       )}
+      <SeeAll link={fields.cta} />
       {fields.allowSubmission && island ? <div className="rb-island">{island}</div> : null}
     </Section>
   );

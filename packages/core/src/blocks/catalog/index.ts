@@ -189,6 +189,7 @@ export const depoimentos = defineBlock({
       default: false,
       help: "Mostra o botão do assistente de depoimento (precisa do plugin testimonials-intake).",
     }),
+    cta: field.link({ label: "Link para todos", help: "Ex.: \"Ver todos os depoimentos\", para a página de depoimentos. Opcional." }),
   },
 });
 

@@ -37,6 +37,7 @@ export const EN: Record<string, string> = {
   "Nome de um ícone do Lucide (ex.: rocket).": "Name of a Lucide icon (e.g. rocket).",
   "Mostra o botão do assistente de depoimento (precisa do plugin testimonials-intake).":
     "Shows the testimonial wizard button (needs the testimonials-intake plugin).",
+  'Ex.: "Ver todos os depoimentos", para a página de depoimentos. Opcional.': 'E.g. "See all testimonials", to the testimonials page. Optional.',
   "Ex.: valores sem impostos.": "E.g. prices before tax.",
   // Blocos da 1.1 do contrato (vídeo, incorporação, linha do tempo, comparativo de planos)
   "Vídeo do YouTube ou do Vimeo. Carrega leve: miniatura e botão de play, e o player só depois do clique.":

@@ -105,6 +105,10 @@ export function createSidebarShell({ avatar = "md", barTalk = false }: SidebarOp
         <label htmlFor="rb-menu" className="rb-scrim" aria-hidden="true" />
 
         <aside className="rb-side">
+          {/* Fechar a gaveta no celular (o X da v1). Desmarca a mesma caixa de seleção; o teclado usa a própria caixa. */}
+          <label htmlFor="rb-menu" className="rb-side__close" aria-hidden="true">
+            <Icon name="close" size={16} />
+          </label>
           {site.logo && (
             <a href={ctx.href("/")} className="rb-side__logo">
               <Logo logo={site.logo} />

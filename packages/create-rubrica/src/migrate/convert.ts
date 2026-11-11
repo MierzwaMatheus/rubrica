@@ -694,7 +694,9 @@ export const SECTION_FILLERS: Record<string, Record<string, Filler | Filler[]>> 
       return hasText(body) ? { title: ctx.t("home.about.title"), body } : null;
     },
     servicos: (ctx) => ({ title: ctx.t("home.skills.title") }),
-    depoimentos: (ctx, plugins) => compact({ title: ctx.t("home.testimonials.title"), allowSubmission: plugins["testimonials-intake"] !== false }),
+    // "Ver todos os depoimentos" levava à página de depoimentos (que existe com o plugin ligado).
+    depoimentos: (ctx, plugins) =>
+      compact({ title: ctx.t("home.testimonials.title"), allowSubmission: plugins["testimonials-intake"] !== false, cta: hasText(ctx.t("testimonials.viewAll")) ? link(ctx.t("testimonials.viewAll"), "/depoimentos") : undefined }),
     cta: (ctx, plugins) =>
       compact({
         title: ctx.t("home.cta.title"),
@@ -768,7 +770,7 @@ export const SECTION_KEYS = new Set([
   "home.about.title", "home.skills.title", "home.testimonials.title", "home.cta.title", "home.cta.subtitle", "home.cta.project", "home.cta.job",
   "sidebar.contact", "blog.title", "blog.subtitle", "about.professional.title", "about.aboutMe.title", "about.aboutMe.text", "about.principles.title",
   "about.dailyRoutine.title", "about.faq.title", "resume.title", "resume.subtitle", "portfolio.title", "portfolio.subtitle", "testimonials.title",
-  "testimonials.subtitle", "home.greeting", "navigation.home", "navigation.about", "navigation.resume", "navigation.portfolio", "navigation.blog",
+  "testimonials.subtitle", "testimonials.viewAll", "home.greeting", "navigation.home", "navigation.about", "navigation.resume", "navigation.portfolio", "navigation.blog",
   "seo.aboutTitle", "seo.aboutDescription", "seo.resumeTitle", "seo.resumeDescription", "seo.portfolioTitle", "seo.portfolioDescription",
   "seo.blogTitle", "seo.blogDescription", "seo.testimonialsDescription", "portfolio.before", "portfolio.problem", "portfolio.solution",
   "portfolio.decisions", "portfolio.results", "portfolio.learnings", "portfolio.metrics", "portfolio.testimonial", "portfolio.liveDemo", "portfolio.code",
@@ -778,7 +780,8 @@ export const SECTION_KEYS = new Set([
 export const UI_TEXT_MAP: Record<string, string> = {
   "blog.readMore": "common.readMore",
   "common.back": "common.back",
-  "testimonials.leaveTestimonial": "testimonials.send",
+  // O botão do envio de depoimento é o da ilha (`testimonialForm.open`).
+  "testimonials.leaveTestimonial": "testimonialForm.open",
   "testimonials.empty": "common.empty",
   "resume.experience": "resume.experience",
   "resume.education": "resume.education",
@@ -805,6 +808,8 @@ export const UI_TEXT_MAP: Record<string, string> = {
   "contactWizard.rateLimited": "form.rateLimited",
   "contactWizard.back": "form.back",
   "notFound.cta": "notFound.home",
+  "notFound.label": "notFound.label",
+  "notFound.errorCode": "notFound.code",
   "portfolio.myRole": "case.role",
   "home.availability.label": "hero.available",
 };
@@ -817,6 +822,7 @@ const V1_LABELS = [
   "resume.experience", "resume.education", "resume.skills", "resume.softSkills", "resume.courses", "resume.languages",
   "resume.volunteer", "resume.downloadCV", "resume.showOlder", "resume.hideOlder",
   "contactWizard.trigger", "sidebar.downloadCV", "testimonials.leaveTestimonial", "portfolio.screenshots", "blog.filterByTags",
+  "notFound.cta",
 ];
 
 /** Ajuste do texto da v1 ao formato da chave da v2 (a v2 mostra a contagem no próprio texto). */
@@ -905,7 +911,8 @@ function buildPages(ctx: Ctx, input: ConvertInput, plugins: Record<string, boole
         title,
         seo: m.seo && Object.keys(m.seo).length ? m.seo : undefined,
         // `fields` é obrigatório no schema, mesmo vazio: fica fora do compact (que tira objetos vazios).
-        blocks: kept.map((b, i) => ({ ...compact({ id: ids[i], type: b.type, variant: b.variant, visible: true, source: b.source }), fields: b.fields ?? {} })),
+        // A receita do tema pode trazer o bloco escondido (ex.: o contato da home num tema com a janela de contato).
+        blocks: kept.map((b, i) => ({ ...compact({ id: ids[i], type: b.type, variant: b.variant, visible: b.visible !== false, source: b.source }), fields: b.fields ?? {} })),
         published: true,
         system: true,
         createdAt: now,
@@ -982,8 +989,12 @@ export function convertV1(input: ConvertInput): ConvertResult {
   );
   put("faq", "aboutFaq", (t.aboutFaq ?? []).map((d) => compact({ ...meta(d), question: loc(d.question, d.questionTranslations), answer: mapLoc(loc(d.answer, d.answerTranslations), (s) => s), order: d.displayOrder, ...lifecycle(d) })));
   const routine = t.aboutDailyRoutine ?? [];
-  if (routine.some((d) => d.spanSize && d.spanSize !== "1x1")) ctx.warnings.push("Dia a dia: o tamanho de cada foto na grade (1x2, 2x1) não existe na v2; a galeria do tema decide.");
-  put("routine", "aboutDailyRoutine", routine.map((d) => compact({ ...meta(d), title: loc(d.description, d.descriptionTranslations), image: ctx.image(d.imageId, d.imageUrl), order: d.displayOrder, ...lifecycle(d) })));
+  // O tamanho no mosaico da v1 (`spanSize`, ou `span_size` em exports antigos) vira o `span` do item.
+  const span = (d: Doc) => {
+    const s = str(d.spanSize) || str(d.span_size);
+    return s === "1x2" || s === "2x1" || s === "2x2" ? s : undefined;
+  };
+  put("routine", "aboutDailyRoutine", routine.map((d) => compact({ ...meta(d), title: loc(d.description, d.descriptionTranslations), image: ctx.image(d.imageId, d.imageUrl), span: span(d), order: d.displayOrder, ...lifecycle(d) })));
   put("resumeItems", "resumeItems", convertResume(ctx, t.resumeItems ?? []));
   put(
     "media",

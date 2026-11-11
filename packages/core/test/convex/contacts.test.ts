@@ -1,6 +1,7 @@
 // @vitest-environment edge-runtime
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { api, as, internal, seedSettings, setup, type T } from "./_setup";
+import { buildContactPayload, readFlows } from "../../src/islands/contact-flows";
 
 const SITE = "https://exemplo.dev";
 
@@ -80,6 +81,33 @@ describe("POST /rubrica/contato: validação e consentimento", () => {
     expect(doc?.consent).toMatchObject({ locale: "pt-BR", page: "/contato", policyVersion: 0 });
     expect(doc?.consent.ipHash).toMatch(/^[0-9a-f]{64}$/);
     expect(JSON.stringify(doc)).not.toContain("203.0.113.7");
+  });
+
+  it("o pedido do assistente por assuntos (janela da v1) chega ao painel com todas as respostas", async () => {
+    const [flow] = readFlows([
+      {
+        id: "project",
+        emoji: "💼",
+        label: "Tenho um projeto",
+        steps: [
+          { kind: "choice", key: "projectType", title: "Qual o tipo de projeto?", options: "Web App / SaaS\nMobile" },
+          { kind: "choice", key: "timeline", title: "Qual o prazo estimado?", options: "Urgente (< 1 mês)\nSem pressa" },
+          { kind: "textarea", key: "description", title: "Descreva o projeto" },
+          { kind: "contact", askPhone: true, askLinkedin: true, askCompany: true },
+        ],
+      },
+    ]);
+    const answers = { projectType: "Mobile", timeline: "Urgente (< 1 mês)", description: "App de agenda para clínicas." };
+    const payload = buildContactPayload(flow!, answers, { name: "Maria Lima", email: "maria@cliente.com", phone: "+55 11 99999-0000", linkedin: "linkedin.com/in/maria", company: "Clínica X" });
+    const res = await post(t, "/rubrica/contato", { name: "Maria Lima", email: "maria@cliente.com", consent: true, locale: "pt-BR", blockId: "k1", page: "/", ...payload });
+    expect(res.status).toBe(200);
+    const [doc] = await (await as(t, "comercial")).query(api.rubrica.contacts.list, {});
+    expect(doc).toMatchObject({
+      name: "Maria Lima",
+      phone: "+55 11 99999-0000",
+      message: "App de agenda para clínicas.",
+      details: { topic: "Tenho um projeto", projectType: "Mobile", timeline: "Urgente (< 1 mês)", linkedin: "linkedin.com/in/maria", empresa: "Clínica X" },
+    });
   });
 
   it("recusa consent diferente de true e campos inválidos, dizendo quais", async () => {

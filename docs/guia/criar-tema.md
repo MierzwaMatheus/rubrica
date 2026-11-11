@@ -308,7 +308,7 @@ Templates opcionais para as páginas que não são feitas de blocos. Cada um ren
 
 | Template | Props |
 |---|---|
-| `post` | `post` (o `PostItem`), `html` (o corpo, já sanitizado no backend), `related`, `ctx` |
+| `post` | `post` (o `PostItem`), `html` (o corpo, já sanitizado no backend), `related`, `relatedCase` (opcional: o projeto com case que divide uma etiqueta com o post), `ctx` |
 | `case` | `project` (o `ProjectItem`, com as seções do case), `related`, `ctx` |
 | `notFound` | `ctx` |
 

@@ -309,7 +309,7 @@ Optional templates for the pages that aren't made of blocks. Each one renders it
 
 | Template | Props |
 |---|---|
-| `post` | `post` (the `PostItem`), `html` (the body, already sanitized in the backend), `related`, `ctx` |
+| `post` | `post` (the `PostItem`), `html` (the body, already sanitized in the backend), `related`, `relatedCase` (optional: the project with a case study that shares a tag with the post), `ctx` |
 | `case` | `project` (the `ProjectItem`, with the case sections), `related`, `ctx` |
 | `notFound` | `ctx` |
 

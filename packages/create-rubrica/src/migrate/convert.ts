@@ -704,7 +704,10 @@ export const SECTION_FILLERS: Record<string, Record<string, Filler | Filler[]>> 
         primary: link(ctx.t("home.cta.project"), "#contato"),
         secondary: plugins["contact-wizard"] !== false ? link(ctx.t("home.cta.job"), "#contato") : undefined,
       }),
-    contato: (ctx, plugins) => ({ anchor: "contato", title: ctx.t("sidebar.contact"), mode: plugins["contact-wizard"] === false ? "channels" : "wizard", showChannels: true }),
+    contato: (ctx, plugins) =>
+      plugins["contact-wizard"] === false
+        ? { anchor: "contato", title: ctx.t("sidebar.contact"), mode: "channels", showChannels: true }
+        : contactWizardFields(ctx),
     "posts-recentes": (ctx) => compact({ title: ctx.t("blog.title"), cta: link(ctx.t("blog.title"), "/blog") }),
   },
   "/sobre": {
@@ -924,7 +927,140 @@ function buildPages(ctx: Ctx, input: ConvertInput, plugins: Record<string, boole
   return pages;
 }
 
-function buildUiTexts(ctx: Ctx, report: MigrationReport, now: number): Doc[] {
+// ── Assistente de contato da v1 ─────────────────────────────────────────────
+
+type V1Step = { kind: "choice" | "text" | "textarea" | "contact"; key?: string; n?: number; options?: string[]; placeholders?: string[]; askPhone?: boolean; askLinkedin?: boolean; askCompany?: boolean };
+
+/**
+ * Os quatro fluxos do ContactWizard da v1 (fixos no código; os textos vêm de
+ * `contactWizard.*`). As chaves das respostas são as da v1, as mesmas dos contatos
+ * migrados. O texto livre do networking era `topic`, que na v2 é o assunto: vira `subject`.
+ */
+const V1_WIZARD_FLOWS: { id: string; emoji: string; steps: V1Step[] }[] = [
+  {
+    id: "project",
+    emoji: "💼",
+    steps: [
+      { kind: "choice", key: "projectType", n: 1, options: ["webapp", "mobile", "landing", "system", "consulting", "other"] },
+      { kind: "choice", key: "timeline", n: 2, options: ["urgent", "short", "medium", "flexible"] },
+      { kind: "choice", key: "budget", n: 3, options: ["small", "medium", "large", "enterprise", "unknown"] },
+      { kind: "textarea", key: "description", n: 4, placeholders: ["placeholder"] },
+      { kind: "contact", askPhone: true, askLinkedin: true },
+    ],
+  },
+  {
+    id: "job",
+    emoji: "🧑‍💼",
+    steps: [
+      { kind: "choice", key: "contractType", n: 1, options: ["clt", "pj", "freelance"] },
+      { kind: "choice", key: "modality", n: 2, options: ["remote", "hybrid", "onsite"] },
+      { kind: "choice", key: "area", n: 3, options: ["frontend", "fullstack", "techlead"] },
+      { kind: "text", key: "jobCompany,jobRole", n: 4, placeholders: ["companyPlaceholder", "rolePlaceholder"] },
+      { kind: "contact", askLinkedin: true },
+    ],
+  },
+  {
+    id: "networking",
+    emoji: "🤝",
+    steps: [
+      { kind: "choice", key: "howFound", n: 1, options: ["blog", "linkedin", "referral", "portfolio"] },
+      { kind: "textarea", key: "subject", n: 2, placeholders: ["placeholder"] },
+      { kind: "contact", askLinkedin: true },
+    ],
+  },
+  {
+    id: "feedback",
+    emoji: "💬",
+    steps: [
+      { kind: "choice", key: "about", n: 1, options: ["post", "project", "general"] },
+      { kind: "textarea", key: "message", n: 2, placeholders: ["placeholder"] },
+      { kind: "contact" },
+    ],
+  },
+];
+
+/** Linhas por idioma (uma por texto); a que falta num idioma usa o português, para as linhas não desalinharem. */
+function locLines(texts: Loc[]): Loc {
+  const out: Loc = {};
+  for (const locale of [PT, EN]) {
+    const lines = texts.map((t) => t[locale] ?? t[PT] ?? "").filter(Boolean);
+    if (lines.length) out[locale] = lines.join("\n");
+  }
+  return out;
+}
+
+/** Opções de uma etapa de escolha: as do template e as que o site acrescentou (siteTexts ou arquivo). */
+function wizardOptions(ctx: Ctx, prefix: string, defaults: string[]): Loc {
+  const extra = [...ctx.siteTexts.keys(), ...Object.keys(ctx.projectTexts)]
+    .filter((k) => k.startsWith(prefix) && !k.slice(prefix.length).includes("."))
+    .map((k) => k.slice(prefix.length));
+  const ids = [...new Set([...defaults, ...extra])];
+  return locLines(ids.map((id) => ctx.t(`${prefix}${id}`)).filter(hasText));
+}
+
+/**
+ * Bloco de contato do assistente da v1: numa janela (a v1 abria o assistente num modal, sem
+ * seção de contato na página), com o caminho "portfolio / contato", o título e o apoio do
+ * assistente e os quatro fluxos como assuntos.
+ */
+function contactWizardFields(ctx: Ctx): Doc {
+  const flows = V1_WIZARD_FLOWS.map((flow) => ({
+    id: flow.id,
+    emoji: flow.emoji,
+    label: ctx.t(`contactWizard.flows.${flow.id}.label`),
+    steps: flow.steps.map((step) => {
+      if (step.kind === "contact") {
+        return compact({ kind: "contact", title: ctx.t("contactWizard.contact.title"), askPhone: step.askPhone, askLinkedin: step.askLinkedin, askCompany: step.askCompany });
+      }
+      const base = `contactWizard.${flow.id}.step${step.n}`;
+      const placeholder = step.placeholders ? locLines(step.placeholders.map((p) => ctx.t(`${base}.${p}`)).filter(hasText)) : {};
+      return compact({
+        kind: step.kind,
+        key: step.key,
+        title: ctx.t(`${base}.title`),
+        options: step.options ? wizardOptions(ctx, `${base}.options.`, step.options) : undefined,
+        placeholder: hasText(placeholder) ? placeholder : undefined,
+      });
+    }),
+  }));
+  return compact({
+    anchor: "contato",
+    presentation: "dialog",
+    eyebrow: { [PT]: "portfolio / contato", [EN]: "portfolio / contato" },
+    title: ctx.t("contactWizard.title"),
+    intro: ctx.t("contactWizard.subtitle"),
+    mode: "wizard",
+    showChannels: false,
+    flows,
+  });
+}
+
+/**
+ * Textos de interface do assistente da v1 que a janela usa ("Passo 1 de 6", "Próximo",
+ * o resumo, o sucesso). Vão sempre que o assistente está ligado, mesmo sem personalização:
+ * são o texto que o site mostrava, diferente do padrão da v2 ("Etapa", "Continuar").
+ */
+function wizardUiTexts(ctx: Ctx): { v1: string; v2: string; value: Loc }[] {
+  const step = ctx.t("contactWizard.step");
+  const of = ctx.t("contactWizard.of");
+  const stepOf: Loc = {};
+  for (const locale of [PT, EN]) if (step[locale] && of[locale]) stepOf[locale] = `${step[locale]} {current} ${of[locale]} {total}`;
+  const pairs: [string, string][] = [
+    ["contactWizard.next", "form.next"],
+    ["contactWizard.back", "form.back"],
+    ["contactWizard.submit", "form.send"],
+    ["contactWizard.submitting", "form.sending"],
+    ["contactWizard.successTitle", "contactForm.success"],
+    ["contactWizard.successBody", "contactForm.successBody"],
+    ["contactWizard.summary.title", "contactForm.summary"],
+    ["contactWizard.summary.type", "contactForm.summaryTopic"],
+    ["contactWizard.summary.contact", "contactForm.summaryContact"],
+    ["common.close", "contactForm.close"],
+  ];
+  return [{ v1: "contactWizard.step + contactWizard.of", v2: "form.step", value: stepOf }, ...pairs.map(([v1, v2]) => ({ v1, v2, value: ctx.t(v1) }))].filter((p) => hasText(p.value));
+}
+
+function buildUiTexts(ctx: Ctx, report: MigrationReport, now: number, plugins: Record<string, boolean> = {}): Doc[] {
   const out: Doc[] = [];
   const availability = ctx.home.get("availability_status") as Doc | undefined;
   const fromHome = availability?.label ? locAny(availability.label) : {};
@@ -952,6 +1088,13 @@ function buildUiTexts(ctx: Ctx, report: MigrationReport, now: number): Doc[] {
     if (Object.entries(value).every(([locale, text]) => text === defaultUiText(v2, locale as Locale))) continue;
     out.push({ key: v2, value, updatedAt: now });
     report.texts.ui.push({ v1: key, v2 });
+  }
+  if (plugins["contact-wizard"] !== false) {
+    for (const { v1, v2, value } of wizardUiTexts(ctx)) {
+      if (out.some((t) => t.key === v2)) continue;
+      out.push({ key: v2, value, updatedAt: now });
+      report.texts.ui.push({ v1, v2 });
+    }
   }
   return out;
 }
@@ -1012,7 +1155,7 @@ export function convertV1(input: ConvertInput): ConvertResult {
   settings.navigation = v1Navigation(navigationFromPages(pages as never) as Doc[]);
   put("siteSettings", "", [compact({ ...settings, updatedAt: now })]);
   put("pages", "", pages);
-  put("uiTexts", "", buildUiTexts(ctx, report, now));
+  put("uiTexts", "", buildUiTexts(ctx, report, now, plugins.record));
   report.texts.sectionKeys = [...ctx.siteTexts.keys()].filter((k) => SECTION_KEYS.has(k)).length;
   if (input.projectTexts) report.texts.projectKeys = Object.keys(input.projectTexts).filter((k) => ctx.fileCustomized(k)).length;
 

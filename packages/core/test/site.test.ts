@@ -40,6 +40,19 @@ describe("montagem do site", () => {
     expect(post("/blog/carreira-em-design").relatedCase).toBeUndefined();
   });
 
+  it("a busca do blog só vira ilha no bloco padrão ou em tema que a declara", async () => {
+    const snapshot = await fixtureSource(fixtures).load();
+    const blogBlock = (t: typeof theme) => {
+      const r = buildSite({ snapshot, theme: t, blocks: CORE_BLOCKS, plugins: CORE_PLUGINS }).routes.find((x) => x.url === "/blog");
+      if (r?.type !== "page") throw new Error("/blog");
+      return r.page.blocks.find((b) => b.type === "posts-recentes")!;
+    };
+    const Own = () => null;
+    expect(blogBlock(theme).interactive).toBe(true);
+    expect(blogBlock(defineTheme({ ...theme, blocks: { "posts-recentes": Own } })).interactive).toBe(false);
+    expect(blogBlock(defineTheme({ ...theme, blocks: { "posts-recentes": Own }, islandBlocks: ["posts-recentes"] })).interactive).toBe(true);
+  });
+
   it("hero no topo leva o h1; sem hero, h1 oculto", async () => {
     const s = await site();
     const home = s.routes.find((r) => r.url === "/" && r.type === "page");

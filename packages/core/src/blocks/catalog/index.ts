@@ -224,6 +224,7 @@ export const postsRecentes = defineBlock({
   // A busca é uma ilha que só filtra os cartões já no HTML (sem ela, a lista inteira aparece).
   interactive: true,
   enhances: true,
+  islandOptIn: true,
   islandWhen: (f) => f.showSearch === true,
   source: { collections: ["posts"], default: { collection: "posts", limit: 3, sort: "recent" } },
   fields: {

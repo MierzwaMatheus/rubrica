@@ -252,6 +252,12 @@ export interface ThemeDefinition {
   tokens: Record<string, TokenDef>;
   Shell: ComponentType<ShellProps>;
   blocks?: Partial<Record<string, BlockComponent>>;
+  /**
+   * Blocos próprios do tema que desenham a ilha de um bloco com `islandOptIn` (ex.: a busca
+   * do `posts-recentes`). Sem o tipo aqui, um bloco do tema não recebe essa ilha, e a página
+   * não carrega JavaScript à toa.
+   */
+  islandBlocks?: string[];
   templates?: {
     post?: ComponentType<PostTemplateProps>;
     case?: ComponentType<CaseTemplateProps>;

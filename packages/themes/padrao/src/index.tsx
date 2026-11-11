@@ -141,6 +141,8 @@ export default defineTheme({
   // O "Fale comigo" abre o contato numa janela, como o assistente da v1.
   contactDialog: true,
   blocks: { hero: HeroBlock, servicos: ServicosBlock, depoimentos: DepoimentosBlock, curriculo: CurriculoBlock, "posts-recentes": PostsBlock },
+  // O bloco de posts do tema desenha a busca (ilha do núcleo).
+  islandBlocks: ["posts-recentes"],
   // Post como o da v1: voltar, etiquetas, subtítulo, cartão do autor e case relacionado.
   templates: { post: PadraoPost },
   texts: {

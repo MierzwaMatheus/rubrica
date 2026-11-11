@@ -200,7 +200,8 @@ export function buildSite(input: BuildInput): BuiltSite {
         if (!blockAllowed(def, query)) return [];
         const items = query ? queryCollection(query, snapshot.collections[query.collection] as never[], o, paths) : [];
         const fields = resolveFields(def.fields, b.fields, o);
-        const interactive = !!def.interactive && (def.islandWhen?.(fields, plugins) ?? true);
+        const optedOut = !!def.islandOptIn && !!theme.blocks?.[b.type] && !theme.islandBlocks?.includes(b.type);
+        const interactive = !!def.interactive && !optedOut && (def.islandWhen?.(fields, plugins) ?? true);
         return [{ b, def, query, items, fields, interactive }];
       });
     // Bloco de coleção sem itens não vira título solto: some (um convite interativo, como o de

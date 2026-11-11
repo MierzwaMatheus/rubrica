@@ -35,6 +35,17 @@ const CONTACT_FIELD_LABELS: Record<string, string> = {
   notas: "Notas",
   atendidoPor: "Atendido por",
   situacaoV1: "Situação na v1",
+  // Respostas do assistente da v1 (contatos migrados e o assistente por assuntos que a migração monta).
+  projectType: "Tipo de projeto",
+  timeline: "Prazo",
+  budget: "Orçamento",
+  contractType: "Tipo de contrato",
+  modality: "Modalidade",
+  area: "Área",
+  jobCompany: "Empresa",
+  jobRole: "Cargo",
+  howFound: "Como me encontrou",
+  about: "Sobre",
 };
 
 /** `atendidoPor` → "Atendido por"; `budget_range` → "Budget range". */

@@ -27,6 +27,19 @@ describe("montagem do site", () => {
     expect(urls).toContain("/en/portfolio/app-banco");
   });
 
+  it("post ganha o case relacionado: o primeiro projeto com case que divide uma etiqueta", async () => {
+    const s = await site();
+    const post = (url: string) => {
+      const r = s.routes.find((x) => x.url === url);
+      if (r?.type !== "post") throw new Error(url);
+      return r;
+    };
+    // "pesquisa" está no app-banco, que tem seções de case.
+    expect(post("/blog/pesquisa-com-usuarios").relatedCase?.slug).toBe("app-banco");
+    // "carreira" não está em projeto nenhum.
+    expect(post("/blog/carreira-em-design").relatedCase).toBeUndefined();
+  });
+
   it("hero no topo leva o h1; sem hero, h1 oculto", async () => {
     const s = await site();
     const home = s.routes.find((r) => r.url === "/" && r.type === "page");

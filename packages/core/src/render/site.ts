@@ -49,7 +49,7 @@ interface RouteBase {
 
 export type SiteRoute =
   | (RouteBase & { type: "page"; page: ResolvedPage })
-  | (RouteBase & { type: "post"; post: PostItem; related: PostItem[] })
+  | (RouteBase & { type: "post"; post: PostItem; related: PostItem[]; relatedCase?: ProjectItem })
   | (RouteBase & { type: "case"; project: ProjectItem; related: ProjectItem[] });
 
 export interface BuildInput {
@@ -251,6 +251,21 @@ export function buildSite(input: BuildInput): BuiltSite {
     }
   }
 
+  /**
+   * Case relacionado ao post (como o da v1): o primeiro projeto, na ordem do portfólio, com
+   * case para ler (seções ou texto) que divide uma etiqueta com o post, sem diferenciar
+   * maiúsculas. Sem o plugin de portfólio, nenhum.
+   */
+  const withRelatedCase = (post: PostItem, locale: Locale): { relatedCase?: ProjectItem } => {
+    if (!plugins.has("portfolio")) return {};
+    const tags = new Set(post.tags.map((t) => t.trim().toLowerCase()).filter(Boolean));
+    if (!tags.size) return {};
+    const hit = queryCollection({ collection: "projects", sort: "order" }, snapshot.collections.projects, opts(locale), paths).find(
+      (p) => (p.sections.length > 0 || !!p.content) && p.tags.some((t) => tags.has(t.trim().toLowerCase())),
+    );
+    return hit ? { relatedCase: hit } : {};
+  };
+
   if (plugins.has("blog")) {
     for (const raw of snapshot.collections.posts) {
       const byLocale = new Map(cfg.locales.map((l) => [l, resolvePost(raw, opts(l), paths)] as const));
@@ -266,6 +281,7 @@ export function buildSite(input: BuildInput): BuiltSite {
           locale,
           post,
           related,
+          ...withRelatedCase(post, locale),
           alternates: alternatesFor(available, (l) => byLocale.get(l)!.url, locale),
         };
         const lm = day(raw.updatedAt ?? raw.publishedAt);

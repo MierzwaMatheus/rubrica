@@ -49,7 +49,7 @@ const pageType = route.type;
         </>
       )
     }
-    {route.type === "post" && <Post post={route.post} html={route.post.content} related={route.related} ctx={ctx} />}
+    {route.type === "post" && <Post post={route.post} html={route.post.content} related={route.related} relatedCase={route.relatedCase} ctx={ctx} />}
     {route.type === "case" && <Case project={route.project} related={route.related} ctx={ctx} />}
   </Shell>
   <ContactDialog site={site} ctx={ctx} />

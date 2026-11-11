@@ -185,6 +185,8 @@ export interface PostTemplateProps {
   /** HTML do post, sanitizado no backend. */
   html: string;
   related: PostItem[];
+  /** Projeto com case que divide uma etiqueta com o post (o "Case relacionado" da v1), se houver. */
+  relatedCase?: ProjectItem;
   ctx: RenderContext;
 }
 

@@ -207,6 +207,11 @@ export interface VariantOption {
 export interface RecipeBlock {
   type: string;
   variant?: string;
+  /**
+   * `false` cria o bloco escondido (fica na página, desligado no editor). Ex.: o `contato` da
+   * home num tema que abre o contato numa janela. Sem valor, visível.
+   */
+  visible?: boolean;
   fields?: Record<string, unknown>;
   source?: import("../content/types").CollectionQuery;
 }

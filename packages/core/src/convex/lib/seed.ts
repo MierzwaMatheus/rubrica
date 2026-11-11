@@ -93,7 +93,7 @@ export function pagesFromRecipe(recipe: Recipe, options: PagesFromRecipeOptions)
         id: ids[i]!,
         type: b.type,
         ...(b.variant && { variant: b.variant }),
-        visible: true,
+        visible: b.visible !== false,
         fields: (localizeRecipeValue(b.fields ?? {}, locales) as Record<string, unknown>) ?? {},
         ...(b.source && { source: b.source }),
       })),

@@ -178,6 +178,7 @@ Approved testimonials from the collection, with an optional invitation to send a
 | `title` | Título | text | no | yes | up to 140 characters |
 | `intro` | Texto de apoio | long text | no | yes | up to 400 characters |
 | `allowSubmission` | Convidar a enviar depoimento | yes or no | no | — | Shows the testimonial wizard button (needs the testimonials-intake plugin); default: no |
+| `cta` | Link para todos | link | no | the label | E.g. "See all testimonials", to the testimonials page. Optional |
 
 ## `faq` — Perguntas frequentes
 

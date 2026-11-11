@@ -178,6 +178,7 @@ Depoimentos aprovados da coleção, com convite opcional para enviar um novo. Mo
 | `title` | Título | texto | não | sim | até 140 caracteres |
 | `intro` | Texto de apoio | texto longo | não | sim | até 400 caracteres |
 | `allowSubmission` | Convidar a enviar depoimento | sim ou não | não | — | Mostra o botão do assistente de depoimento (precisa do plugin testimonials-intake); padrão: não |
+| `cta` | Link para todos | link | não | o rótulo | Ex.: "Ver todos os depoimentos", para a página de depoimentos. Opcional |
 
 ## `faq` — Perguntas frequentes
 

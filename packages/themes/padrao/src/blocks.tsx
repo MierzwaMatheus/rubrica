@@ -2,7 +2,7 @@
  * Blocos que, na v1 padrão, têm visual diferente do padrão do núcleo. Os outros
  * blocos herdam os componentes do núcleo e ganham o visual só pelo CSS do tema.
  */
-import type { BlockProps, ResolvedLink, ResumeItem } from "@rubrica/core";
+import type { BlockProps, ProjectItem, ResolvedLink, ResumeItem } from "@rubrica/core";
 import {
   groupResumeSkills,
   Heading,
@@ -11,8 +11,10 @@ import {
   ResumeDescription,
   ResumeHeading,
   ResumePeriod,
+  safeId,
   Section,
   SectionHeader,
+  tagFilterCss,
 } from "@rubrica/core/components";
 import type { ReactNode } from "react";
 import { Icon, type IconName } from "./icons";
@@ -333,6 +335,138 @@ export function CurriculoBlock({ id, variant, fields, items, headingLevel, ctx, 
           </div>
         )}
       </div>
+    </Section>
+  );
+}
+
+/** Etiquetas que o cartão do portfólio mostra; o resto vira "+N", como na v1. */
+export const CASE_TAGS_SHOWN = 3;
+
+/** Projeto com página de case (seções), como o `hasCaseStudy` da v1. */
+const hasCase = (p: ProjectItem) => p.sections.length > 0;
+
+function CaseMetric({ metric }: { metric: ProjectItem["metric"] }) {
+  return metric ? (
+    <p className="rb-card__metric">
+      <strong>{metric.value}</strong> <span>{metric.label}</span>
+    </p>
+  ) : null;
+}
+
+/** Cartão da home (grade/lista): o cartão inteiro é o link, com o número e "$ cat case.md". */
+function HomeCaseCard({ p, ctx }: { p: ProjectItem; ctx: BlockProps["ctx"] }) {
+  return (
+    <li className="rb-card rb-card--link">
+      {p.cover && <Img image={p.cover} className="rb-card__image" sizes="(min-width: 960px) 30vw, 100vw" />}
+      <div className="rb-card__body">
+        <Heading level={3} className="rb-card__title">
+          <a href={p.url} className="rb-card__link">
+            {p.title}
+          </a>
+        </Heading>
+        {p.summary && <p className="rb-card__text">{p.summary}</p>}
+        <CaseMetric metric={p.metric} />
+        <span className="rb-card__more" aria-hidden="true">
+          {ctx.t("case.view")}
+        </span>
+      </div>
+    </li>
+  );
+}
+
+/**
+ * Cartão da página do portfólio: capa, título, resumo, até 3 etiquetas e "+N", o número e um
+ * botão de largura total, "$ cat case.md" para quem tem case e "$ view --details" para quem não
+ * tem (os dois levam à página do projeto).
+ */
+function ListCaseCard({ p, ctx, category }: { p: ProjectItem; ctx: BlockProps["ctx"]; category?: number }) {
+  const extra = p.tags.length - CASE_TAGS_SHOWN;
+  const withCase = hasCase(p);
+  return (
+    <li className="rb-card rb-case-card" data-tags={category === undefined ? undefined : `t${category}`}>
+      {p.cover ? <Img image={{ ...p.cover, alt: "" }} className="rb-card__image" sizes="(min-width: 768px) 40vw, 100vw" /> : <span className="rb-case-card__noimage" aria-hidden="true" />}
+      <div className="rb-card__body">
+        <Heading level={3} className="rb-card__title">
+          {p.title}
+        </Heading>
+        {p.summary && <p className="rb-card__text">{p.summary}</p>}
+        {p.tags.length > 0 && (
+          <ul className="rb-tags rb-case-card__tags">
+            {p.tags.slice(0, CASE_TAGS_SHOWN).map((t) => (
+              <li key={t}>{t}</li>
+            ))}
+            {extra > 0 && <li>+{extra}</li>}
+          </ul>
+        )}
+        <CaseMetric metric={p.metric} />
+        <a href={p.url} className={`rb-case-card__action${withCase ? " rb-case-card__action--case" : ""}`}>
+          {ctx.t(withCase ? "case.view" : "case.details")}
+          <span className="rb-sr-only">: {p.title}</span>
+        </a>
+      </div>
+    </li>
+  );
+}
+
+/**
+ * Cases como na v1. Na home (grade ou lista): o "ver todos" é um link pequeno ao lado do título,
+ * e o cartão mostra o número e "$ cat case.md". Na variação `pagina` (a página do portfólio):
+ * filtro por categoria sem JavaScript (botões de opção e CSS, como o filtro do blog) e os
+ * cartões com etiquetas e botão.
+ */
+export function CasesBlock({ id, variant, fields, items, headingLevel, ctx }: BlockProps<any, ProjectItem>) {
+  const page = variant === "pagina";
+  const categories = page ? [...new Set(items.map((p) => p.category).filter((c): c is string => !!c))] : [];
+  const scope = `c-${safeId(id)}`;
+  const filter = categories.length > 0;
+  const cta: ResolvedLink | undefined = fields.cta;
+  const head = fields.title || fields.intro || cta;
+  return (
+    <Section id={id} anchor={fields.anchor} type="cases" variant={variant}>
+      {head && (
+        <div className="rb-cases__head">
+          <SectionHeader title={fields.title} intro={fields.intro} level={headingLevel} />
+          {cta && (
+            <a className="rb-cases__all" href={cta.href} {...(cta.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
+              {cta.label}
+            </a>
+          )}
+        </div>
+      )}
+      {items.length === 0 ? (
+        <p className="rb-empty">{ctx.t("common.empty")}</p>
+      ) : page ? (
+        <div className="rb-cases__page">
+          {filter && (
+            <>
+              <style dangerouslySetInnerHTML={{ __html: tagFilterCss(scope, categories.length, { items: ".rb-cases__list > .rb-case-card" }) }} />
+              <input type="radio" name={scope} id={`${scope}-all`} className="rb-sr-only" defaultChecked />
+              {categories.map((c, i) => (
+                <input key={c} type="radio" name={scope} id={`${scope}-t${i}`} className="rb-sr-only" />
+              ))}
+              <div className="rb-filter" role="group" aria-label={ctx.t("cases.filter")}>
+                <label htmlFor={`${scope}-all`}>{ctx.t("cases.all")}</label>
+                {categories.map((c, i) => (
+                  <label key={c} htmlFor={`${scope}-t${i}`}>
+                    {c}
+                  </label>
+                ))}
+              </div>
+            </>
+          )}
+          <ul className="rb-grid rb-cases__list">
+            {items.map((p) => (
+              <ListCaseCard key={p.id} p={p} ctx={ctx} category={p.category ? categories.indexOf(p.category) : undefined} />
+            ))}
+          </ul>
+        </div>
+      ) : (
+        <ul className="rb-grid rb-cases__list">
+          {items.map((p) => (
+            <HomeCaseCard key={p.id} p={p} ctx={ctx} />
+          ))}
+        </ul>
+      )}
     </Section>
   );
 }

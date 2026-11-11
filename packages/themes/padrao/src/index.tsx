@@ -5,11 +5,11 @@
  */
 import { CORE_RECIPES, defineTheme, type Recipe } from "@rubrica/core";
 import fonts from "./fonts.json";
-import { CurriculoBlock, DepoimentosBlock, HeroBlock, ServicosBlock } from "./blocks";
+import { CasesBlock, CurriculoBlock, DepoimentosBlock, HeroBlock, ServicosBlock } from "./blocks";
 import { createSidebarShell } from "./shell";
 
 export { createSidebarShell } from "./shell";
-export { HeroBlock, ServicosBlock, DepoimentosBlock, CurriculoBlock } from "./blocks";
+export { HeroBlock, ServicosBlock, DepoimentosBlock, CurriculoBlock, CasesBlock } from "./blocks";
 export { Icon } from "./icons";
 
 const tr = (ptBR: string, en: string, es: string) => ({ "pt-BR": ptBR, en, es });
@@ -116,9 +116,11 @@ function withPageHeader(page: Recipe[number]): Recipe[number] {
   const [list, ...rest] = page.blocks;
   if (!LIST_PAGES.has(page.path) || !list?.fields?.title) return page;
   const { title, intro, ...fields } = list.fields;
+  // O portfólio usa a variação "pagina" dos cases: filtro por categoria e cartões com botão, como na v1.
+  const variant = list.type === "cases" ? { variant: "pagina" } : {};
   return {
     ...page,
-    blocks: [{ type: "hero", variant: "pagina", fields: { title, ...(intro ? { subtitle: intro } : {}) } }, { ...list, fields }, ...rest],
+    blocks: [{ type: "hero", variant: "pagina", fields: { title, ...(intro ? { subtitle: intro } : {}) } }, { ...list, ...variant, fields }, ...rest],
   };
 }
 
@@ -136,7 +138,7 @@ export default defineTheme({
   Shell: createSidebarShell(),
   // O "Fale comigo" abre o contato numa janela, como o assistente da v1.
   contactDialog: true,
-  blocks: { hero: HeroBlock, servicos: ServicosBlock, depoimentos: DepoimentosBlock, curriculo: CurriculoBlock },
+  blocks: { hero: HeroBlock, servicos: ServicosBlock, depoimentos: DepoimentosBlock, curriculo: CurriculoBlock, cases: CasesBlock },
   variants: {
     hero: [
       { value: "inicio", label: "Início" },
@@ -145,7 +147,13 @@ export default defineTheme({
     cases: [
       { value: "grade", label: "Grade" },
       { value: "lista", label: "Lista" },
+      { value: "pagina", label: "Página do portfólio (filtro por categoria)" },
     ],
+  },
+  // Os textos de terminal da v1 nos cartões de case.
+  texts: {
+    "case.view": { pt: "$ cat case.md", en: "$ cat case.md", es: "$ cat case.md" },
+    "case.details": { pt: "$ view --details", en: "$ view --details", es: "$ view --details" },
   },
   recipes: { pessoal: [home, ...core.filter((p) => p.path !== "/").map((p) => (p.path === "/curriculo" ? curriculo : withPageHeader(p)))] },
 });

@@ -471,6 +471,7 @@
       {
         "id": "pf1",
         "type": "cases",
+        "variant": "pagina",
         "visible": true,
         "source": {
           "collection": "projects",

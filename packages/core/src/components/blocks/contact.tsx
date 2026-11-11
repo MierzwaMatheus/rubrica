@@ -16,14 +16,9 @@ export function ContatoBlock({ id, variant, fields, headingLevel, ctx, island }:
   const social = ctx.site.social;
   const mode = fields.mode ?? "wizard";
   const channels = fields.showChannels !== false && (email || phone || whatsapp || social.length > 0);
-  // Na janela, o bloco só leva a âncora e a ilha (título, apoio e assistente vão dentro dela).
-  if (fields.presentation === "dialog" && mode !== "channels" && island) {
-    return (
-      <Section id={id} anchor={fields.anchor} type="contato" variant={variant} className="rb-contato--dialog">
-        <div className="rb-island rb-contato__form">{island}</div>
-      </Section>
-    );
-  }
+  // "Só na janela de contato": com a janela do tema, o bloco sai da página (ela mostra o
+  // formulário dele em toda página); em tema sem janela, fica na página como sempre.
+  if (fields.presentation === "dialog" && mode !== "channels" && ctx.site.contactDialog) return null;
   return (
     <Section id={id} anchor={fields.anchor} type="contato" variant={variant} className={mode === "channels" ? "rb-contato--channels" : undefined}>
       <SectionHeader title={fields.title} intro={fields.intro} level={headingLevel} />

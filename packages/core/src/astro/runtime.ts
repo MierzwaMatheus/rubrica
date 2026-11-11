@@ -13,6 +13,7 @@ import type { BlockDefinition } from "../blocks/define";
 import type { DataSource } from "../data/source";
 import { CORE_PLUGINS } from "../plugins/registry";
 import { buildSite, type BuiltSite } from "../render/site";
+export { onlyInDialog } from "../render/site";
 import type { BlockComponent, ThemeDefinition } from "../theme/contract";
 import { blockComponent as themeBlockComponent } from "../components";
 import { ISLAND_META, islandNameFor } from "../islands";

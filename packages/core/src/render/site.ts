@@ -134,6 +134,15 @@ export function contactBlock(routes: readonly SiteRoute[], locale: Locale): Reso
   return { id: CONTACT_DIALOG_ID, type: "contato", variant: "default", fields: { mode: "wizard" }, items: [], headingLevel: 2, index: 0, total: 1, interactive: true };
 }
 
+/**
+ * Bloco `contato` "só na janela" (`presentation: "dialog"`) num site com a janela de contato
+ * do tema: ele não sai na página, só dentro da janela (que usa os campos dele). Sem a janela
+ * (tema sem `contactDialog`) ou no formato só canais, o bloco fica na página.
+ */
+export function onlyInDialog(block: { type: string; fields: Record<string, unknown> }, ctx: { site: { contactDialog?: string } }): boolean {
+  return block.type === "contato" && block.fields.presentation === "dialog" && block.fields.mode !== "channels" && !!ctx.site.contactDialog;
+}
+
 export function buildSite(input: BuildInput): BuiltSite {
   const { snapshot, theme } = input;
   const settings = snapshot.site;

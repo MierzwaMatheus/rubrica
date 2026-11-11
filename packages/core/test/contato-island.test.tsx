@@ -148,23 +148,44 @@ describe("ilha do contato com assuntos", () => {
     expect(screen.getAllByRole("radio")).toHaveLength(4);
   });
 
-  it("na janela: título e sobretítulo dentro do <dialog>, abre no link para a âncora e fecha", async () => {
+  it("na janela de contato do núcleo: apoio no lugar do título da etapa, Fechar fecha a janela, recomeça depois do envio", async () => {
     document.body.innerHTML = "";
-    const link = document.createElement("a");
-    link.href = "/#contato";
-    link.textContent = "Fale comigo";
-    document.body.append(link);
-    render(<Contato {...props({ mode: "wizard", presentation: "dialog", anchor: "contato", eyebrow: "portfolio / contato", title: "Como posso te ajudar?", intro: "Escolha o que melhor descreve o seu interesse", flows: FLOWS })} />);
-    const dialog = document.querySelector("dialog")!;
-    expect(dialog.open).toBe(false);
-    expect(dialog.querySelector("h2")!.textContent).toBe("Como posso te ajudar?");
-    expect(dialog.querySelector(".rb-dialog__eyebrow")!.textContent).toBe("portfolio / contato");
-    expect(dialog.querySelector("legend")!.textContent).toBe("Escolha o que melhor descreve o seu interesse");
+    const pop = document.createElement("div");
+    pop.id = "rb-contato-janela";
+    const hide = vi.fn(() => pop.dispatchEvent(Object.assign(new Event("toggle"), { newState: "closed" })));
+    Object.assign(pop, { hidePopover: hide });
+    document.body.append(pop);
+    const fields = { mode: "wizard", presentation: "dialog", title: "Como posso te ajudar?", intro: "Escolha o que melhor descreve o seu interesse", flows: FLOWS };
+    render(<Contato {...props(fields)} dialog="rb-contato-janela" />, { container: pop });
+    // Sem <dialog> próprio: a janela é a do núcleo.
+    expect(document.querySelector("dialog")).toBeNull();
+    expect(pop.querySelector("legend")!.textContent).toBe("Escolha o que melhor descreve o seu interesse");
+    fireEvent.click(screen.getByRole("button", { name: "Fechar" }));
+    expect(hide).toHaveBeenCalledTimes(1);
+    // Fechar sem enviar mantém o que foi escolhido.
+    await waitFor(() => expect((screen.getByRole("button", { name: /Tenho um projeto/ }) as HTMLButtonElement).disabled).toBe(false));
+    fireEvent.click(screen.getByRole("button", { name: /Tenho um projeto/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Voltar" }));
+    expect(screen.getByRole("button", { name: /Tenho um projeto/ }).getAttribute("aria-pressed")).toBe("true");
 
-    fireEvent.click(link);
-    expect(dialog.open).toBe(true);
-    // Primeira etapa: "Fechar" no lugar de "Voltar".
-    fireEvent.click(screen.getAllByRole("button", { name: "Fechar" }).at(-1)!);
-    expect(dialog.open).toBe(false);
+    // Envio pelo assunto de emprego (sem texto longo) e fechar: a janela volta à primeira tela.
+    fireEvent.click(screen.getByRole("button", { name: /Oportunidade de emprego/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Remoto" }));
+    fireEvent.click(screen.getByRole("button", { name: "Continuar" }));
+    fireEvent.change(screen.getByRole("textbox", { name: "Nome da empresa" }), { target: { value: "Acme" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "Título do cargo" }), { target: { value: "Dev" } });
+    fireEvent.click(screen.getByRole("button", { name: "Continuar" }));
+    fireEvent.change(screen.getByRole("textbox", { name: /Nome/ }), { target: { value: "Ana" } });
+    fireEvent.change(screen.getByRole("textbox", { name: /E-mail/ }), { target: { value: "ana@exemplo.com" } });
+    fireEvent.click(screen.getByRole("checkbox"));
+    fireEvent.click(screen.getByRole("button", { name: "Continuar" }));
+    fireEvent.click(screen.getByRole("button", { name: "Enviar" }));
+    await screen.findByText("Mensagem enviada.");
+    const body = JSON.parse(fetchMock.mock.calls[0]![1].body as string);
+    expect(body.message).toBe("Qual a modalidade?: Remoto\nEmpresa e cargo ofertado: Acme · Dev");
+    expect(validateContact(body).ok).toBe(true);
+    fireEvent.click(screen.getByRole("button", { name: "Fechar" }));
+    await waitFor(() => expect(pop.querySelector("legend")?.textContent).toBe("Escolha o que melhor descreve o seu interesse"));
+    expect(screen.getByRole("button", { name: /Oportunidade de emprego/ }).getAttribute("aria-pressed")).toBe("false");
   });
 });

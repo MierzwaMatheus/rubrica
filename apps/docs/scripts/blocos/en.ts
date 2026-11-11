@@ -40,8 +40,8 @@ export const EN: Record<string, string> = {
   'Ex.: "Ver todos os depoimentos", para a página de depoimentos. Opcional.': 'E.g. "See all testimonials", to the testimonials page. Optional.',
   "Ex.: valores sem impostos.": "E.g. prices before tax.",
   // Contato: janela e assuntos do assistente
-  "Na janela, o bloco não ocupa espaço na página: abre por cima dela nos links para a âncora (#contato), inclusive os da sidebar. Os canais não aparecem.":
-    "In a window, the block takes no space on the page: it opens over it from links to the anchor (#contato), the sidebar's included. The channels are not shown.",
+  "Só na janela: com um tema que tem janela de contato (padrão, cyberpunk), o bloco sai da página e a janela, que abre em toda página pelos botões de contato, mostra o formulário, o título e o sobretítulo dele. Em tema sem janela, o bloco fica na página.":
+    "Window only: with a theme that has a contact window (padrao, cyberpunk), the block leaves the page and the window, which opens on every page from the contact buttons, shows its form, title and eyebrow. With a theme without a window, the block stays on the page.",
   "Linha curta acima do título (ex.: portfolio / contato).": "A short line above the title (e.g. portfolio / contact).",
   "Opcional, para o formato assistente. Cada assunto tem as próprias etapas; a primeira tela mostra os assuntos e o resumo para revisar vem no fim. Sem assuntos, o assistente pergunta o assunto, a mensagem e os dados.":
     "Optional, for the wizard format. Each topic has its own steps; the first screen lists the topics and a summary to review comes at the end. With no topics, the wizard asks for the topic, the message and the details.",

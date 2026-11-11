@@ -259,7 +259,7 @@ Formulário ou assistente de contato, com os canais (e-mail, WhatsApp, redes).
 | `intro` | Texto de apoio | texto longo | não | sim | até 400 caracteres |
 | `mode` | Formato | opção | não | — | opções: `wizard` (Assistente em etapas), `form` (Formulário simples), `channels` (Só os canais, sem formulário); padrão: `wizard` |
 | `showChannels` | Mostrar canais de contato | sim ou não | não | — | padrão: sim |
-| `presentation` | Onde aparece | opção | não | — | Na janela, o bloco não ocupa espaço na página: abre por cima dela nos links para a âncora (#contato), inclusive os da sidebar. Os canais não aparecem; opções: `inline` (Na página), `dialog` (Numa janela, aberta pelos links para a âncora); padrão: `inline` |
+| `presentation` | Onde aparece | opção | não | — | Só na janela: com um tema que tem janela de contato (padrão, cyberpunk), o bloco sai da página e a janela, que abre em toda página pelos botões de contato, mostra o formulário, o título e o sobretítulo dele. Em tema sem janela, o bloco fica na página; opções: `inline` (Na página), `dialog` (Só na janela de contato); padrão: `inline` |
 | `eyebrow` | Sobretítulo | texto | não | sim | Linha curta acima do título (ex.: portfolio / contato); até 80 caracteres |
 | `flows` | Assuntos do assistente | lista | não | — | Opcional, para o formato assistente. Cada assunto tem as próprias etapas; a primeira tela mostra os assuntos e o resumo para revisar vem no fim. Sem assuntos, o assistente pergunta o assunto, a mensagem e os dados; até 6 itens; cada item: "Assunto" |
 | `flows[].id` | Identificador | texto | sim | não | Curto e sem espaços (ex.: projeto); até 40 caracteres |

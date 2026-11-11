@@ -292,10 +292,10 @@ export const contato = defineBlock({
       label: "Onde aparece",
       options: [
         { value: "inline", label: "Na página" },
-        { value: "dialog", label: "Numa janela, aberta pelos links para a âncora" },
+        { value: "dialog", label: "Só na janela de contato" },
       ],
       default: "inline",
-      help: "Na janela, o bloco não ocupa espaço na página: abre por cima dela nos links para a âncora (#contato), inclusive os da sidebar. Os canais não aparecem.",
+      help: "Só na janela: com um tema que tem janela de contato (padrão, cyberpunk), o bloco sai da página e a janela, que abre em toda página pelos botões de contato, mostra o formulário, o título e o sobretítulo dele. Em tema sem janela, o bloco fica na página.",
     }),
     eyebrow: field.text({ label: "Sobretítulo", maxLength: 80, help: "Linha curta acima do título (ex.: portfolio / contato)." }),
     flows: field.list({

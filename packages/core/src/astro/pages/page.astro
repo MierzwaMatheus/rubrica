@@ -8,7 +8,7 @@ import type { GetStaticPaths } from "astro";
 import Document from "./Document.astro";
 import ContactDialog from "./ContactDialog.astro";
 import Island from "../../islands/Island";
-import { loadSite, activeTheme, componentFor, hasIsland, islandProps, caseCarouselProps } from "../runtime";
+import { loadSite, activeTheme, componentFor, hasIsland, islandProps, onlyInDialog, caseCarouselProps } from "../runtime";
 import { islandNameFor } from "../../islands";
 import { templates, LocaleLinks, ColorToggleButton } from "../../components";
 import type { SiteRoute } from "../../render/site";
@@ -39,14 +39,11 @@ const carousel = route.type === "case" ? caseCarouselProps(route.project, ctx) :
           {route.page.needsHiddenH1 && <h1 class="rb-sr-only">{route.page.title}</h1>}
           {route.page.blocks.map((b) => {
             const Block = componentFor(b.type);
+            // Contato "só na janela": a janela de contato do tema (ContactDialog) mostra o formulário dele; na página não sai nada.
+            if (onlyInDialog(b, ctx)) return null;
             return b.interactive && hasIsland(b.type) ? (
               <Block id={b.id} variant={b.variant} fields={b.fields} items={b.items} headingLevel={b.headingLevel} index={b.index} total={b.total} ctx={ctx}>
-                {/* Ilha em janela (contato) não aparece até abrir: hidrata no ocioso para ouvir os links. */}
-                {b.fields.presentation === "dialog" ? (
-                  <Island slot="island" client:idle name={islandNameFor(b.type)} props={islandProps(b, ctx)} />
-                ) : (
-                  <Island slot="island" client:visible name={islandNameFor(b.type)} props={islandProps(b, ctx)} />
-                )}
+                <Island slot="island" client:visible name={islandNameFor(b.type)} props={islandProps(b, ctx)} />
               </Block>
             ) : (
               <Block id={b.id} variant={b.variant} fields={b.fields} items={b.items} headingLevel={b.headingLevel} index={b.index} total={b.total} ctx={ctx} />

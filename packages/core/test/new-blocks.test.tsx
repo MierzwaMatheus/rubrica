@@ -4,7 +4,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { fileURLToPath } from "node:url";
 import { fixtureSource } from "../src/data/source";
-import { buildSite, type BuiltSite } from "../src/render/site";
+import { buildSite, onlyInDialog, type BuiltSite } from "../src/render/site";
 import { CORE_BLOCKS, comparativoPlanos, incorporacao, linhaDoTempo, video } from "../src/blocks/catalog";
 import { validateBlock } from "../src/blocks/define";
 import { preparePageBlocks } from "../src/convex/lib/blocks";
@@ -39,18 +39,20 @@ async function fixtureBlock(kind: "pessoal" | "empresa", url: string, type: stri
 
 const yt = "https://www.youtube.com/watch?v=M7lc1UVf-VE";
 
-describe("contato numa janela", () => {
-  it("só a âncora e a ilha: sem título nem canais na página; o catálogo aceita os assuntos", async () => {
+describe("contato só na janela", () => {
+  it("só na janela: com a janela do tema, nada na página; sem ela, o bloco fica; o catálogo aceita os assuntos", async () => {
     const { block, ctx } = await fixtureBlock("pessoal", "/", "contato");
     const fields = { ...block.fields, presentation: "dialog" };
-    const html = render("contato", { ctx, ...block, fields, island: createElement("i", { id: "ilha" }) });
-    expect(html).toContain('id="contato"');
-    expect(html).toContain("rb-contato--dialog");
+    const island = createElement("i", { id: "ilha" });
+    const withDialog = { ...ctx, site: { ...ctx.site, contactDialog: "rb-contato-janela" } };
+    expect(render("contato", { ctx: withDialog, ...block, fields, island })).toBe("");
+    expect(onlyInDialog({ type: "contato", fields }, withDialog)).toBe(true);
+    expect(onlyInDialog({ type: "contato", fields: { ...fields, mode: "channels" } }, withDialog)).toBe(false);
+    // Tema sem janela: o bloco segue na página, com título e formulário.
+    const html = render("contato", { ctx: { ...ctx, site: { ...ctx.site, contactDialog: undefined } }, ...block, fields, island });
+    expect(html).toContain("<h2");
     expect(html).toContain('<i id="ilha">');
-    expect(html).not.toContain("<h2");
-    expect(html).not.toContain("rb-contato__channels");
-    // Sem ilha (plugin desligado), volta a ser o bloco na página.
-    expect(render("contato", { ctx, ...block, fields })).toContain("<h2");
+    expect(onlyInDialog({ type: "contato", fields }, { site: {} })).toBe(false);
     const def = CORE_BLOCKS.find((b) => b.type === "contato")!;
     const raw = {
       presentation: "dialog",

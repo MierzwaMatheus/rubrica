@@ -259,7 +259,7 @@ Contact form or wizard, with the channels (e-mail, WhatsApp, social).
 | `intro` | Texto de apoio | long text | no | yes | up to 400 characters |
 | `mode` | Formato | choice | no | — | options: `wizard` (Assistente em etapas), `form` (Formulário simples), `channels` (Só os canais, sem formulário); default: `wizard` |
 | `showChannels` | Mostrar canais de contato | yes or no | no | — | default: yes |
-| `presentation` | Onde aparece | choice | no | — | In a window, the block takes no space on the page: it opens over it from links to the anchor (#contato), the sidebar's included. The channels are not shown; options: `inline` (Na página), `dialog` (Numa janela, aberta pelos links para a âncora); default: `inline` |
+| `presentation` | Onde aparece | choice | no | — | Window only: with a theme that has a contact window (padrao, cyberpunk), the block leaves the page and the window, which opens on every page from the contact buttons, shows its form, title and eyebrow. With a theme without a window, the block stays on the page; options: `inline` (Na página), `dialog` (Só na janela de contato); default: `inline` |
 | `eyebrow` | Sobretítulo | text | no | yes | A short line above the title (e.g. portfolio / contact); up to 80 characters |
 | `flows` | Assuntos do assistente | list | no | — | Optional, for the wizard format. Each topic has its own steps; the first screen lists the topics and a summary to review comes at the end. With no topics, the wizard asks for the topic, the message and the details; up to 6 items; each item: "Assunto" |
 | `flows[].id` | Identificador | text | yes | no | Short and without spaces (e.g. project); up to 40 characters |

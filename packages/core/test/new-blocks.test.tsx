@@ -39,6 +39,28 @@ async function fixtureBlock(kind: "pessoal" | "empresa", url: string, type: stri
 
 const yt = "https://www.youtube.com/watch?v=M7lc1UVf-VE";
 
+describe("contato numa janela", () => {
+  it("só a âncora e a ilha: sem título nem canais na página; o catálogo aceita os assuntos", async () => {
+    const { block, ctx } = await fixtureBlock("pessoal", "/", "contato");
+    const fields = { ...block.fields, presentation: "dialog" };
+    const html = render("contato", { ctx, ...block, fields, island: createElement("i", { id: "ilha" }) });
+    expect(html).toContain('id="contato"');
+    expect(html).toContain("rb-contato--dialog");
+    expect(html).toContain('<i id="ilha">');
+    expect(html).not.toContain("<h2");
+    expect(html).not.toContain("rb-contato__channels");
+    // Sem ilha (plugin desligado), volta a ser o bloco na página.
+    expect(render("contato", { ctx, ...block, fields })).toContain("<h2");
+    const def = CORE_BLOCKS.find((b) => b.type === "contato")!;
+    const raw = {
+      presentation: "dialog",
+      eyebrow: { "pt-BR": "portfolio / contato" },
+      flows: [{ id: "project", emoji: "💼", label: { "pt-BR": "Tenho um projeto" }, steps: [{ kind: "choice", key: "projectType", title: { "pt-BR": "Tipo?" }, options: { "pt-BR": "A\nB" } }, { kind: "contact", askPhone: true }] }],
+    };
+    expect(validateBlock(def, { fields: raw })).toEqual([]);
+  });
+});
+
 describe("vídeo", () => {
   it("sem JavaScript, a miniatura do YouTube é um link para o vídeo no provedor; nada de iframe", async () => {
     const { block, ctx } = await fixtureBlock("pessoal", "/sobre", "video");

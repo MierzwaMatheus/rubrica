@@ -255,6 +255,53 @@
 .rb-form__nav { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: space-between; }
 .rb-form__progress { color: var(--rb-muted); font-size: 0.9rem; margin: 0; }
 .rb-form button.rb-button { cursor: pointer; font: inherit; font-weight: 600; }
+
+/* Assistente por assuntos (campo flows do contato): opções em botão, progresso e resumo. */
+.rb-options { display: grid; gap: 0.75rem; }
+.rb-options--chips { gap: 0.5rem; }
+@media (min-width: 640px) { .rb-options--chips { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.rb-options .rb-field__error { grid-column: 1 / -1; }
+.rb-option {
+  display: flex; align-items: center; gap: 0.6rem; width: 100%; min-height: 44px; padding: 0.75rem 1rem; text-align: left;
+  font: inherit; color: var(--rb-fg); background: var(--rb-subtle); border: 1px solid var(--rb-border); border-radius: var(--rb-radius); cursor: pointer;
+}
+.rb-option:hover { border-color: var(--rb-muted); }
+.rb-option:focus-visible { outline: 2px solid var(--rb-accent); outline-offset: 2px; }
+.rb-option[aria-pressed="true"] { border-color: var(--rb-accent); box-shadow: inset 0 0 0 1px var(--rb-accent); }
+.rb-option:disabled { cursor: default; }
+.rb-option__emoji { flex: none; }
+.rb-progress { display: grid; gap: 0.35rem; }
+.rb-progress p { display: flex; justify-content: space-between; gap: 1rem; margin: 0; }
+.rb-progress__track { display: block; height: 4px; border-radius: 999px; background: var(--rb-border); overflow: hidden; }
+.rb-progress__bar { display: block; height: 100%; background: var(--rb-accent); transition: width 0.3s ease; }
+@media (prefers-reduced-motion: reduce) { .rb-progress__bar { transition: none; } }
+.rb-summary { display: grid; gap: 0.6rem; margin: 0; padding: 1rem; border: 1px solid var(--rb-border); border-radius: var(--rb-radius); background: var(--rb-subtle); overflow-wrap: anywhere; }
+.rb-summary > div { display: grid; gap: 0.1rem; }
+.rb-summary dt { color: var(--rb-muted); font-size: 0.85rem; }
+.rb-summary dd { margin: 0; white-space: pre-line; }
+.rb-summary__contact { padding-top: 0.6rem; border-top: 1px solid var(--rb-border); }
+.rb-form__nav--center { justify-content: center; }
+
+/* Contato numa janela: o bloco não ocupa espaço; a âncora fica fixa no topo para o link não rolar a página. */
+.rb-section.rb-contato--dialog { position: fixed; top: 0; left: 0; width: 0; height: 0; padding: 0; margin: 0; overflow: visible; }
+.rb-contato--dialog .rb-container, .rb-contato--dialog .rb-island { padding: 0; margin: 0; }
+.rb-dialog {
+  width: min(42rem, calc(100vw - 2rem)); max-height: calc(100dvh - 2rem); padding: 0; margin: auto;
+  color: var(--rb-fg); background: var(--rb-bg); border: 1px solid var(--rb-border); border-radius: var(--rb-radius); overflow: auto;
+}
+.rb-dialog::backdrop { background: color-mix(in srgb, var(--rb-bg) 75%, transparent); backdrop-filter: blur(2px); }
+.rb-dialog__box { position: relative; padding: 1.5rem; }
+.rb-dialog__close {
+  position: absolute; top: 0.5rem; right: 0.5rem; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px;
+  color: var(--rb-muted); background: none; border: 0; border-radius: var(--rb-radius); cursor: pointer;
+}
+.rb-dialog__close:hover { color: var(--rb-fg); }
+.rb-dialog__close:focus-visible { outline: 2px solid var(--rb-accent); outline-offset: -2px; }
+.rb-dialog__header { margin: 0 2.5rem 1.25rem 0; }
+.rb-dialog__eyebrow { margin: 0 0 0.25rem; font-family: var(--rb-font-mono); font-size: 0.8rem; color: var(--rb-muted); }
+.rb-dialog__eyebrow > span:first-child .rb-dialog__crumb { color: var(--rb-accent); }
+.rb-dialog__title { margin: 0; font-size: 1.35rem; color: var(--rb-fg-strong); }
+.rb-dialog .rb-form { padding: 0; background: none; border: 0; }
 .rb-form button.rb-button:disabled { opacity: 0.6; cursor: not-allowed; }
 .rb-form__notice { border: 1px dashed var(--rb-border); border-radius: var(--rb-radius); padding: 1rem; color: var(--rb-muted); }
 button.rb-button { cursor: pointer; font: inherit; font-weight: 600; }

@@ -152,6 +152,25 @@ code, pre { font-family: var(--rb-font-mono); }
 .rb-side__talk:hover { background: color-mix(in srgb, var(--rb-accent) 22%, transparent); }
 .rb-side__cv { color: var(--rb-accent-2); border: 1px solid color-mix(in srgb, var(--rb-accent-2) 50%, transparent); }
 .rb-side__cv:hover { background: color-mix(in srgb, var(--rb-accent-2) 10%, transparent); }
+/* X para fechar a gaveta no celular, no canto como o da v1; no desktop a sidebar não fecha. */
+.rb-side__close { position: absolute; top: 0.5rem; right: 0.5rem; z-index: 1; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 0.375rem; color: var(--rb-muted); cursor: pointer; }
+.rb-side__close:hover { color: var(--rb-fg-strong); background: var(--rb-faint); }
+/*
+ * Desktop (mouse): o rodapé da sidebar com as medidas da v1, para "Fale comigo" e "Baixar CV"
+ * caberem na tela como lá. Na gaveta do celular (toque) os alvos seguem com 44 px.
+ */
+@media (min-width: 1024px) {
+  .rb-side__close { display: none; }
+  .rb-sidenav a { min-height: 2.75rem; padding-block: 0.5rem; }
+  .rb-side__foot { gap: 0.75rem; padding-block: 1.25rem; }
+  .rb-side__contact { gap: 0.25rem; }
+  .rb-side__contact a { min-height: 1.75rem; }
+  .rb-side__social a { width: 2.25rem; height: 2.25rem; }
+  .rb-side__toggle .rb-color-toggle { min-height: 2.25rem; }
+  .rb-side__locales .rb-locales a { min-height: 2rem; }
+  .rb-side__switch { height: 2rem; }
+  .rb-side__actions a, .rb-side__actions button { min-height: 2.25rem; }
+}
 
 .rb-footer { margin-top: 2rem; padding: 1.5rem 1rem 2rem; text-align: center; font-size: 0.8rem; color: var(--rb-muted); border-top: 1px solid var(--rb-hairline); }
 .rb-footer p { margin: 0; }

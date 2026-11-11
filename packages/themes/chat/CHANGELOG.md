@@ -1,5 +1,11 @@
 # @rubrica/theme-chat
 
+## 2.0.1
+
+### Patch Changes
+
+- 7664a0a: Blog: com mais de 10 etiquetas, o filtro fica recolhido em "Filtrar por etiqueta (N)", sem JavaScript, em vez de um paredão de botões acima dos posts. Currículo: a descrição de cada item vira texto rico (HTML sanitizado ao gravar), como na v1; descrições em HTML vindas da v1 aparecem formatadas em todos os temas, não mais com as tags na tela.
+
 ## 2.0.0
 
 ### Major Changes

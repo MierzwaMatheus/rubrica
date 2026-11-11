@@ -1,6 +1,6 @@
 {
   "name": "@rubrica/mcp",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Servidor MCP local do Rubrica: o agente edita páginas, blocos e coleções do site pelo Convex do projeto, com o login de um usuário do painel.",
   "type": "module",
   "license": "GPL-3.0-only",

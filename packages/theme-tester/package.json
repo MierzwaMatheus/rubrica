@@ -1,6 +1,6 @@
 {
   "name": "@rubrica/theme-tester",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Bateria de testes de tema do Rubrica (axe, SEO, JavaScript por página, Lighthouse).",
   "type": "module",
   "license": "GPL-3.0-only",

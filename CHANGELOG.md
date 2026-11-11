@@ -2,6 +2,22 @@
 
 O que mudou em cada versão do Rubrica (núcleo, temas e CLI `create-rubrica`). Detalhes de cada uma nas [notas da release](https://github.com/MierzwaMatheus/rubrica/releases). Para atualizar um projeto v2, veja [Atualizar o Rubrica](./docs/guia/atualizar.md); para sair da v1, [Migrar da v1](./docs/guia/migrar.md).
 
+## 2.1.0 — 2026-11-11
+
+Os temas **padrão** e **cyberpunk** ficam iguais ao layout da v1, página por página, e o conversor `migrar` leva o que faltava dos dados da v1. Tudo o que entrou é opcional: quem não usa os campos novos não vê diferença. Contrato de tema 1.3.
+
+### Novidades
+- **Contato:** o assistente aceita assuntos com etapas próprias (escolha, texto, dados de contato) e abre na janela de contato do tema, em qualquer página. O painel mostra as respostas de cada pedido com nome.
+- **Blog:** carrossel dos posts em destaque, busca por título, resumo e etiquetas, botão do RSS e cartões como os da v1 (`showFeatured` e `showSearch` no bloco de posts).
+- **Post:** voltar ao blog, etiquetas, subtítulo, cartão do autor e o case relacionado.
+- **Portfólio e case:** filtro por categoria e cartões com etiquetas, número de destaque e botão; números do case com ícone (`metrics` nos projetos), telas num carrossel com imagem ampliada e o convite com o próximo case.
+- **Sobre, depoimentos e 404:** texto pessoal, mosaico do dia a dia (`span` nas fotos), FAQ num cartão, depoimentos agrupados por categoria com link para a página deles, e a 404 de terminal.
+- **Casca:** sidebar mais compacta no desktop e botão de fechar a gaveta no celular.
+
+### Correções
+- **Datas dos posts no fuso do site:** um post publicado à noite no Brasil não aparece mais com a data do dia seguinte. O tempo de leitura arredonda para cima, como na v1.
+- **Projeto ligado por `link:`** (ex.: `create --local`): os ícones das páginas de case não quebram mais o React no servidor de desenvolvimento.
+
 ## 2.0.0 — 2026-11-08
 
 A v2: o Rubrica deixa de ser um template copiado para o projeto e vira um **núcleo em pacote**, com **temas** e duas linhas de site (pessoal e empresa). Atualizar passa a ser subir a versão de um pacote.

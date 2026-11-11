@@ -1,6 +1,6 @@
 {
   "name": "@rubrica/theme-blueprint",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Tema Blueprint do Rubrica (layout blueprint da v1): folhas técnicas numeradas sobre papel quadriculado, com cotas, pranchas e carimbo.",
   "type": "module",
   "license": "GPL-3.0-only",

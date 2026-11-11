@@ -1,6 +1,6 @@
 {
   "name": "@rubrica/theme-cyberpunk",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Tema cyberpunk do Rubrica: layout do mmlo.com.br (sidebar com logo e avatar à moda do mmlo, esquema neon, Chakra Petch).",
   "type": "module",
   "license": "GPL-3.0-only",

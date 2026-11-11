@@ -1,6 +1,6 @@
 {
   "name": "@rubrica/theme-zine",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Tema Zine do Rubrica (layout \"zine\" da v1): fanzine de colagem com polaroides, fita adesiva, post-its, carimbos e letra à mão.",
   "type": "module",
   "license": "GPL-3.0-only",

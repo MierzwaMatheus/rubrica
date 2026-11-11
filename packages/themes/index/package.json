@@ -1,6 +1,6 @@
 {
   "name": "@rubrica/theme-index",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Tema Índice do Rubrica (layout \"index\" da v1): catálogo de museu, rótulos à esquerda e tabelas com imagem que surge no hover.",
   "type": "module",
   "license": "GPL-3.0-only",

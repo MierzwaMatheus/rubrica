@@ -1,6 +1,6 @@
 {
   "name": "@rubrica/theme-desktop",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Tema desktop do Rubrica (layout Desktop Retrô da v1): cada seção é uma janela sobre a área de trabalho, com barra de menu e ícones.",
   "type": "module",
   "license": "GPL-3.0-only",

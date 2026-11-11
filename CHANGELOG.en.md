@@ -2,6 +2,22 @@
 
 What changed in each version of Rubrica (core, themes and the `create-rubrica` CLI). Details for each one are in the [release notes](https://github.com/MierzwaMatheus/rubrica/releases). To update a v2 project, see [Updating Rubrica](./docs/guia/atualizar.md); to leave v1, [Migrating from v1](./docs/guia/migrar.md).
 
+## 2.1.0 — 2026-11-11
+
+The **padrao** and **cyberpunk** themes now match the v1 layout page by page, and the `migrar` converter carries what was missing from the v1 data. Everything new is optional: projects that don't use the new fields see no change. Theme contract 1.3.
+
+### New
+- **Contact:** the wizard takes topics with their own steps (choice, text, contact details) and opens in the theme's contact window, on any page. The admin shows each request's answers by name.
+- **Blog:** a carousel of featured posts, search by title, summary and tags, an RSS button and v1-style cards (`showFeatured` and `showSearch` on the posts block).
+- **Post:** back to the blog, tags, subtitle, an author card and the related case study.
+- **Portfolio and case study:** a category filter and cards with tags, a highlight number and a button; case numbers with icons (`metrics` on projects), screenshots in a carousel with an enlarged view, and the closing invitation with the next case study.
+- **About, testimonials and 404:** the personal text, a day-to-day mosaic (`span` on the photos), the FAQ in one card, testimonials grouped by category with a link to their page, and the terminal 404.
+- **Shell:** a more compact desktop sidebar and a close button on the mobile drawer.
+
+### Fixes
+- **Post dates in the site's time zone:** a post published at night in Brazil no longer shows the next day's date. Reading time rounds up, as in v1.
+- **Projects linked with `link:`** (e.g. `create --local`): the icons on case study pages no longer break React in the dev server.
+
 ## 2.0.0 — 2026-11-08
 
 v2: Rubrica stops being a template copied into your project and becomes a **core in a package**, with **themes** and two site lines (personal and company). Updating becomes bumping a package version.

@@ -1,6 +1,6 @@
 {
   "name": "@rubrica/theme-bento",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Tema Bento do Rubrica (layout bento da v1): mosaico de cartões em grade de 12 colunas e dock flutuante de navegação.",
   "type": "module",
   "license": "GPL-3.0-only",

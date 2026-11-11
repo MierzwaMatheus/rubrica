@@ -68,7 +68,7 @@ Título e texto livre, com imagem opcional ao lado.
 - **Combina com:** [`numeros`](#numeros--números), [`lista-itens`](#lista-itens--lista-de-itens), [`galeria`](#galeria--galeria), [`cta`](#cta--chamada)
 - **Tipo de site:** pessoal e empresa
 - **Plugin:** nenhum: sempre disponível
-- **Variações:** temas: `brutalist` (`simples`, `numerado`); `chat` (`mensagens`, `pergunta`); `magazine` (`coluna`, `ensaio`); `poster` (`declaracao`, `corrido`); `zine` (`carta`, `postit`)
+- **Variações:** temas: `brutalist` (`simples`, `numerado`); `chat` (`mensagens`, `pergunta`); `cyberpunk` (`default`, `pessoal`); `magazine` (`coluna`, `ensaio`); `padrao` (`default`, `pessoal`); `poster` (`declaracao`, `corrido`); `zine` (`carta`, `postit`)
 
 | Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
 |---|---|---|---|---|---|
@@ -170,7 +170,7 @@ Depoimentos aprovados da coleção, com convite opcional para enviar um novo. Mo
 - **Plugin:** `testimonials`: o bloco some com o plugin desligado
 - **Lista itens de:** `testimonials` (padrão ao criar: só os destaques, 6 itens, na ordem do painel)
 - **JavaScript:** pode montar uma ilha (a parte interativa, com JavaScript no navegador); o resto é HTML estático
-- **Variações:** nenhuma: um desenho só em cada tema
+- **Variações:** temas: `cyberpunk` (`default`, `categorias`); `padrao` (`default`, `categorias`)
 
 | Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
 |---|---|---|---|---|---|

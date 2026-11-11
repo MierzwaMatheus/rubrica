@@ -68,7 +68,7 @@ Title and free text, with an optional image beside it.
 - **Pairs well with:** [`numeros`](#numeros--números), [`lista-itens`](#lista-itens--lista-de-itens), [`galeria`](#galeria--galeria), [`cta`](#cta--chamada)
 - **Site type:** personal and company
 - **Plugin:** none: always available
-- **Variants:** themes: `brutalist` (`simples`, `numerado`); `chat` (`mensagens`, `pergunta`); `magazine` (`coluna`, `ensaio`); `poster` (`declaracao`, `corrido`); `zine` (`carta`, `postit`)
+- **Variants:** themes: `brutalist` (`simples`, `numerado`); `chat` (`mensagens`, `pergunta`); `cyberpunk` (`default`, `pessoal`); `magazine` (`coluna`, `ensaio`); `padrao` (`default`, `pessoal`); `poster` (`declaracao`, `corrido`); `zine` (`carta`, `postit`)
 
 | Field | Panel label | Type | Required | Translatable | Help and limits |
 |---|---|---|---|---|---|
@@ -170,7 +170,7 @@ Approved testimonials from the collection, with an optional invitation to send a
 - **Plugin:** `testimonials`: the block disappears when the plugin is off
 - **Lists items from:** `testimonials` (default when created: featured only, 6 items, in panel order)
 - **JavaScript:** may mount an island (the interactive part, with JavaScript in the browser); the rest is static HTML
-- **Variants:** none: a single design in each theme
+- **Variants:** themes: `cyberpunk` (`default`, `categorias`); `padrao` (`default`, `categorias`)
 
 | Field | Panel label | Type | Required | Translatable | Help and limits |
 |---|---|---|---|---|---|

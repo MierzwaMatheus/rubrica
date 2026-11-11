@@ -39,7 +39,12 @@ const pageType = route.type;
             const Block = componentFor(b.type);
             return b.interactive && hasIsland(b.type) ? (
               <Block id={b.id} variant={b.variant} fields={b.fields} items={b.items} headingLevel={b.headingLevel} index={b.index} total={b.total} ctx={ctx}>
-                <Island slot="island" client:visible name={islandNameFor(b.type)} props={islandProps(b, ctx)} />
+                {/* Ilha em janela (contato) não aparece até abrir: hidrata no ocioso para ouvir os links. */}
+                {b.fields.presentation === "dialog" ? (
+                  <Island slot="island" client:idle name={islandNameFor(b.type)} props={islandProps(b, ctx)} />
+                ) : (
+                  <Island slot="island" client:visible name={islandNameFor(b.type)} props={islandProps(b, ctx)} />
+                )}
               </Block>
             ) : (
               <Block id={b.id} variant={b.variant} fields={b.fields} items={b.items} headingLevel={b.headingLevel} index={b.index} total={b.total} ctx={ctx} />

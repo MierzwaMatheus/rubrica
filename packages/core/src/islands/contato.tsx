@@ -5,8 +5,8 @@
  *   `details.topic`), a mensagem e os dados.
  * - Com assuntos, o assistente da v1: escolher o assunto já avança, cada assunto tem as
  *   próprias etapas (escolhas, textos, dados de contato) e o resumo para revisar no fim.
- * - Com `presentation: "dialog"`, tudo isso fica numa janela (`<dialog>`) que abre nos
- *   links para a âncora do bloco (#contato), sem rolar a página.
+ * - Na janela de contato do tema (prop `dialog`), o "Fechar" fecha a janela e o título da
+ *   primeira etapa é o texto de apoio do bloco.
  *
  * Consentimento LGPD obrigatório. Envia por `api.ts`.
  */
@@ -485,125 +485,46 @@ function FlowWizard({ flows, blockId, page, locale, privacyHref, t, onClose, onS
   );
 }
 
-// ── Janela ──────────────────────────────────────────────────────────────────
-
-const trimSlash = (p: string) => p.replace(/\/+$/, "") || "/";
+// ── Na janela de contato do núcleo ──────────────────────────────────────────
 
 /**
- * Janela do contato: abre nos cliques em links para `#<âncora>` desta página (sem rolar
- * nem criar entrada no histórico), no `hashchange` e quando a página já abre com a âncora
- * (o "Fale comigo" de outras páginas leva para `/#contato`). Esc, o X, o "Fechar" e o
- * clique fora fecham; ao fechar, a âncora sai do endereço.
+ * Dentro da janela de contato (`ContactDialog.astro`, um `popover`), a ilha recebe o id
+ * dela: o "Fechar" da primeira etapa e do fim fecha a janela, e depois de um envio a
+ * janela recomeça do zero quando fecha.
  */
-function ContactDialog({ anchor, eyebrow, title, t, children }: { anchor: string; eyebrow?: string; title?: string; t: T; children: (close: () => void, onSent: () => void) => ReactNode }) {
-  const uid = useId();
-  const ref = useRef<HTMLDialogElement | null>(null);
+export default function Contato(props: FormIslandProps & { dialog?: string }) {
+  const t = makeT(props.texts);
+  const { fields, dialog } = props;
+  const flows = fields.mode === "form" ? [] : readFlows(fields.flows);
   const sent = useRef(false);
   const [session, setSession] = useState(0);
 
-  const close = () => ref.current?.close();
-
   useEffect(() => {
-    const dialog = ref.current;
-    if (!dialog) return;
-    const hash = `#${anchor}`;
-    const open = () => {
-      if (dialog.open) return;
-      if (typeof dialog.showModal === "function") dialog.showModal();
-      else dialog.setAttribute("open", "");
-    };
-    const isOwnLink = (a: HTMLAnchorElement) => {
-      const url = new URL(a.getAttribute("href") ?? "", location.href);
-      return url.hash === hash && url.origin === location.origin && trimSlash(url.pathname) === trimSlash(location.pathname);
-    };
-    const onClick = (e: MouseEvent) => {
-      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-      const a = (e.target as Element | null)?.closest?.("a[href]");
-      if (a instanceof HTMLAnchorElement && isOwnLink(a)) {
-        e.preventDefault();
-        open();
-      }
-    };
-    const onHash = () => {
-      if (location.hash === hash) open();
-    };
-    const onClose = () => {
-      if (location.hash === hash) history.replaceState(history.state, "", location.pathname + location.search);
-      if (sent.current) {
+    const el = dialog ? document.getElementById(dialog) : null;
+    if (!el) return;
+    const onToggle = (e: Event) => {
+      if ((e as Event & { newState?: string }).newState === "closed" && sent.current) {
         sent.current = false;
         setSession((n) => n + 1);
       }
     };
-    document.addEventListener("click", onClick);
-    window.addEventListener("hashchange", onHash);
-    dialog.addEventListener("close", onClose);
-    if (location.hash === hash) open();
-    return () => {
-      document.removeEventListener("click", onClick);
-      window.removeEventListener("hashchange", onHash);
-      dialog.removeEventListener("close", onClose);
-    };
-  }, [anchor]);
+    el.addEventListener("toggle", onToggle);
+    return () => el.removeEventListener("toggle", onToggle);
+  }, [dialog]);
 
-  const parts = eyebrow ? eyebrow.split("/").map((p) => p.trim()).filter(Boolean) : [];
-  return (
-    <dialog
-      ref={ref}
-      className="rb-dialog rb-contato__dialog"
-      aria-labelledby={title ? `${uid}-title` : undefined}
-      aria-label={title ? undefined : t("contactForm.title")}
-      onClick={(e) => {
-        // Clique no fundo (fora da caixa) fecha.
-        if (e.target === e.currentTarget) close();
-      }}
-    >
-      <div className="rb-dialog__box">
-        <button type="button" className="rb-dialog__close" aria-label={t("contactForm.close")} onClick={close}>
-          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-            <path d="M18 6 6 18M6 6l12 12" />
-          </svg>
-        </button>
-        {(parts.length > 0 || title) && (
-          <header className="rb-dialog__header">
-            {parts.length > 0 && (
-              <p className="rb-dialog__eyebrow">
-                {parts.map((p, i) => (
-                  <span key={`${p}-${i}`}>
-                    {i > 0 && (
-                      <span className="rb-dialog__sep" aria-hidden="true">
-                        {" / "}
-                      </span>
-                    )}
-                    <span className="rb-dialog__crumb">{p}</span>
-                  </span>
-                ))}
-              </p>
-            )}
-            {title && (
-              <h2 className="rb-dialog__title" id={`${uid}-title`}>
-                {title}
-              </h2>
-            )}
-          </header>
-        )}
-        <div key={session}>{children(close, () => (sent.current = true))}</div>
-      </div>
-    </dialog>
-  );
-}
-
-export default function Contato(props: FormIslandProps) {
-  const t = makeT(props.texts);
-  const { fields } = props;
-  const flows = fields.mode === "form" ? [] : readFlows(fields.flows);
-  const str = (v: unknown) => (typeof v === "string" && v.trim() ? v.trim() : undefined);
-  const wizard = (onClose?: () => void, onSent?: () => void, firstHeading?: string) =>
-    flows.length > 0 ? <FlowWizard {...props} t={t} flows={flows} onClose={onClose} onSent={onSent} firstHeading={firstHeading} /> : <SimpleWizard {...props} t={t} onClose={onClose} onSent={onSent} />;
-
-  if (fields.presentation !== "dialog") return wizard();
-  return (
-    <ContactDialog anchor={str(fields.anchor) ?? `b-${props.blockId}`} eyebrow={str(fields.eyebrow)} title={str(fields.title)} t={t}>
-      {(close, onSent) => wizard(close, onSent, str(fields.intro))}
-    </ContactDialog>
+  const close = dialog
+    ? () => {
+        const el = document.getElementById(dialog) as (HTMLElement & { hidePopover?: () => void }) | null;
+        el?.hidePopover?.();
+      }
+    : undefined;
+  const onSent = () => {
+    sent.current = true;
+  };
+  const intro = dialog && typeof fields.intro === "string" && fields.intro.trim() ? fields.intro.trim() : undefined;
+  return flows.length > 0 ? (
+    <FlowWizard key={session} {...props} t={t} flows={flows} onClose={close} onSent={onSent} firstHeading={intro} />
+  ) : (
+    <SimpleWizard key={session} {...props} t={t} onClose={close} onSent={onSent} />
   );
 }

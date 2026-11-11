@@ -17,19 +17,39 @@ interface Props {
 const { site, ctx } = Astro.props;
 const id = ctx.site.contactDialog;
 const block = id ? contactBlock(site.routes, ctx.locale) : undefined;
+// Bloco "só na janela" (`presentation: "dialog"`): a janela leva o título e o sobretítulo dele
+// (o "Como posso te ajudar?" e o "portfolio / contato" da v1); senão, o "Fale comigo" do tema.
+const text = (v: unknown) => (typeof v === "string" && v.trim() ? v.trim() : undefined);
+const own = block?.fields.presentation === "dialog";
+const title = (own && text(block?.fields.title)) || ctx.t("sidebar.talk");
+const crumbs = (own && text(block?.fields.eyebrow)?.split("/").map((p) => p.trim()).filter(Boolean)) || [];
 ---
 
 {
   id && block && (
     <div popover id={id} class="rb-dialog" role="dialog" aria-labelledby={`${id}-titulo`}>
       <div class="rb-dialog__head">
-        <h2 class="rb-dialog__title" id={`${id}-titulo`}>{ctx.t("sidebar.talk")}</h2>
+        <div class="rb-dialog__heading">
+          {
+            crumbs.length > 0 && (
+              <p class="rb-dialog__eyebrow">
+                {crumbs.map((c, i) => (
+                  <>
+                    {i > 0 && <span class="rb-dialog__sep" aria-hidden="true"> / </span>}
+                    <span class="rb-dialog__crumb">{c}</span>
+                  </>
+                ))}
+              </p>
+            )
+          }
+          <h2 class="rb-dialog__title" id={`${id}-titulo`}>{title}</h2>
+        </div>
         <button type="button" class="rb-dialog__close" popovertarget={id} popovertargetaction="hide" aria-label={ctx.t("common.close")}>
           <span aria-hidden="true">×</span>
         </button>
       </div>
       <div class="rb-dialog__body">
-        <Island client:visible name="contato" props={islandProps(block, ctx)} />
+        <Island client:visible name="contato" props={{ ...islandProps(block, ctx), dialog: id }} />
       </div>
     </div>
   )

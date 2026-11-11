@@ -205,6 +205,9 @@ export const vCaseSection = v.object({ title: vLocalized, body: vLocalized, imag
 /** Número de destaque do case ("~50", "3x"), mostrado no card. */
 export const vMetric = v.object({ value: v.string(), label: vLocalized });
 
+/** Um número do case ("Resultados em números"): valor, o que mede e, opcional, um ícone do Lucide. */
+export const vCaseMetric = v.object({ value: v.string(), label: vLocalized, icon: v.optional(v.string()) });
+
 export const projectFields = {
   ...itemFields,
   title: vLocalized,
@@ -220,6 +223,8 @@ export const projectFields = {
   category: v.optional(vLocalized),
   links: v.optional(v.array(vLink)),
   metric: v.optional(vMetric),
+  /** Números do case, em ordem; sem `metric`, o primeiro vira o número do card. */
+  metrics: v.optional(v.array(vCaseMetric)),
   seo: v.optional(vSeo),
 };
 

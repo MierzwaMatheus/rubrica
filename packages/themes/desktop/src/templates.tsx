@@ -3,7 +3,7 @@
  * ("Post.txt", "Case.doc"). O 404 é uma caixa de diálogo de erro.
  */
 import type { CaseTemplateProps, NotFoundProps, PostTemplateProps, RenderContext } from "@rubrica/core";
-import { Html, Img } from "@rubrica/core/components";
+import { CaseMetrics, Html, Img } from "@rubrica/core/components";
 import { ButtonRow, DeskButton, Square, Window } from "./window";
 
 function Related({ id, title, list }: { id: string; title: string; list: { id: string; url: string; title: string }[] }) {
@@ -106,6 +106,7 @@ export function DesktopCase({ project, related, ctx }: CaseTemplateProps) {
               {s.image && <Img image={s.image} className="dk-frame" sizes="(min-width: 1024px) 800px, 100vw" />}
             </section>
           ))}
+          <CaseMetrics metrics={project.metrics} title={ctx.t("case.metrics")} className="dk-doc__section" />
           {project.links.length > 0 && (
             <ButtonRow>
               {project.links.map((l, i) => (

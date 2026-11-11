@@ -53,6 +53,13 @@ export interface CaseSectionItem {
   image?: ResolvedImage;
 }
 
+/** Um número do case no idioma; `icon` é o nome do Lucide que o conteúdo deu. */
+export interface CaseMetricItem {
+  value: string;
+  label: string;
+  icon?: string;
+}
+
 export interface ProjectItem {
   id: string;
   slug: string;
@@ -69,8 +76,13 @@ export interface ProjectItem {
   /** Categoria do projeto no idioma (uma só; para agrupar ou filtrar o portfólio). */
   category?: string;
   links: ResolvedLink[];
-  /** Número de destaque do case; só existe com o rótulo no idioma. */
+  /**
+   * Número de destaque do case (card); só existe com o rótulo no idioma. Sem o campo
+   * próprio, é o primeiro de `metrics`.
+   */
   metric?: { value: string; label: string };
+  /** Números do case ("Resultados em números"), os que têm rótulo no idioma. */
+  metrics: CaseMetricItem[];
   tags: string[];
   featured: boolean;
   seo: ResolvedSeo;
@@ -271,6 +283,7 @@ export function resolveProject(raw: RawProject, opts: ResolveOptions, paths: Col
     sections,
     gallery: images(raw.gallery, opts),
     links: links(raw.links, opts),
+    metrics: caseMetrics(raw.metrics, opts),
     tags: raw.tags ?? [],
     featured: raw.featured ?? false,
     seo: resolveSeo(raw.seo, opts),
@@ -289,7 +302,16 @@ export function resolveProject(raw: RawProject, opts: ResolveOptions, paths: Col
   if (raw.year) item.year = raw.year;
   const metricLabel = raw.metric ? pick(raw.metric.label, opts.locale) : undefined;
   if (raw.metric?.value && metricLabel) item.metric = { value: raw.metric.value, label: metricLabel };
+  else if (item.metrics[0]) item.metric = { value: item.metrics[0].value, label: item.metrics[0].label };
   return item;
+}
+
+function caseMetrics(raw: RawProject["metrics"], opts: ResolveOptions): CaseMetricItem[] {
+  return (raw ?? []).flatMap((m) => {
+    const label = pick(m.label, opts.locale);
+    if (!m.value || !label) return [];
+    return [m.icon ? { value: m.value, label, icon: m.icon } : { value: m.value, label }];
+  });
 }
 
 type Resolver<C extends CollectionName> = (raw: RawCollections[C], opts: ResolveOptions, paths: CollectionPaths) => CollectionItems[C] | undefined;

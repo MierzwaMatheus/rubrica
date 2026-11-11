@@ -4,7 +4,7 @@
  * eram compartilhadas por todos os layouts; aqui ganham a moldura do tema.
  */
 import type { CaseTemplateProps, NotFoundProps, PostTemplateProps } from "@rubrica/core";
-import { Html, Img } from "@rubrica/core/components";
+import { CaseMetrics, Html, Img } from "@rubrica/core/components";
 import { PosterButton, PosterRow } from "./parts";
 import { K_CAPS, fit } from "./util";
 
@@ -83,6 +83,7 @@ export function PosterCase({ project, related, ctx }: CaseTemplateProps) {
           {s.image && <Img image={s.image} className="poster-article-cover" sizes="(min-width: 960px) 1000px, 100vw" />}
         </section>
       ))}
+      <CaseMetrics metrics={project.metrics} title={ctx.t("case.metrics")} className="poster-case-sec" />
       {project.links.length > 0 && (
         <div className="poster-btns poster-after">
           {project.links.map((l, i) => (

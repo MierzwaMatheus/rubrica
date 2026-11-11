@@ -240,9 +240,10 @@ export function PostsBlock({ id, variant, fields, items, headingLevel, ctx, isla
           {filter && <style dangerouslySetInnerHTML={{ __html: css }} />}
           {filter && (
             <>
-              <input type="radio" name={scope} id={`${scope}-all`} className="rb-sr-only" defaultChecked />
+              {/* O rótulo visível fica no painel (fechado, ele some da árvore): o nome vai também aqui. */}
+              <input type="radio" name={scope} id={`${scope}-all`} className="rb-sr-only" aria-label={ctx.t("blog.allTags")} defaultChecked />
               {allTags.map((t, i) => (
-                <input key={t} type="radio" name={scope} id={`${scope}-t${i}`} className="rb-sr-only" />
+                <input key={t} type="radio" name={scope} id={`${scope}-t${i}`} className="rb-sr-only" aria-label={t} />
               ))}
             </>
           )}

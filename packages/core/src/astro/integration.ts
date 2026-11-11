@@ -229,7 +229,9 @@ export default function rubrica(options: RubricaOptions): AstroIntegration {
                 },
               },
             ],
-            ssr: { noExternal: ["@rubrica/core", /^@rubrica\/theme-/] },
+            // `lucide-react` (ícones dos números do case) passa pelo Vite no servidor: externo, com o
+            // núcleo ligado por `link:`, ele carregaria o React da cópia do núcleo e quebraria os hooks.
+            ssr: { noExternal: ["@rubrica/core", /^@rubrica\/theme-/, "lucide-react"] },
             // Dev: dependências do painel e das ilhas otimizadas na partida (ver dev-deps.ts).
             optimizeDeps: { include: optimizeDepsInclude({ admin: options.admin !== false }) },
             resolve: { dedupe: DEDUPE },

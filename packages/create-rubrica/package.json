@@ -1,6 +1,6 @@
 {
   "name": "create-rubrica",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "CLI do Rubrica v2: cria, configura, publica, atualiza e migra sites feitos com @rubrica/core",
   "type": "module",
   "bin": {

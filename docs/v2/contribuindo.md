@@ -187,6 +187,16 @@ export function contactDigestFunctions(rt: RubricaRuntime) {
 - Comentários e textos de interface do código em **pt-BR**, com acentuação.
 - Nunca faça commit de `.env*`, segredos ou dados reais de clientes. Fixtures são fictícios.
 
+## Publicar uma versão
+
+A publicação é do GitHub Actions (`.github/workflows/release.yml`), sem token e sem confirmação em duas etapas: o npm confia neste repositório (publicação confiável, OIDC).
+
+1. Os changesets entram na `main` com as mudanças.
+2. Com o CI verde, a release abre ou atualiza a PR **"chore(release): versões"**, com as versões e os CHANGELOGs dos pacotes. Antes do merge, acrescente nela a entrada da versão no `CHANGELOG.md` e no `CHANGELOG.en.md` da raiz.
+3. O merge dessa PR publica no npm o que ainda não está lá e envia as tags.
+
+`create-rubrica` e `@rubrica/mcp` compilam o `dist` antes de publicar (`prepublishOnly`). Pacote novo: cadastre no npmjs.com, em *Settings → Trusted publishing*, o repositório `MierzwaMatheus/rubrica` e o workflow `release.yml`. A primeira versão de um pacote que ainda não existe no npm precisa sair à mão (`npm publish` no pacote); depois disso, ela é do workflow.
+
 ## Antes de entregar
 
 1. `pnpm -r check` e `pnpm -r test` passando.

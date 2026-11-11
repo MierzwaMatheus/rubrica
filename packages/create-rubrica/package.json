@@ -36,6 +36,7 @@
   },
   "scripts": {
     "build": "tsup",
+    "prepublishOnly": "pnpm run build",
     "check": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
     "dev": "tsup --watch"

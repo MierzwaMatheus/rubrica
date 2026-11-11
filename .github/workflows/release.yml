@@ -1,0 +1,66 @@
+name: Release
+
+# Publica os pacotes no npm a partir da main, sem token: publicação confiável do npm
+# (trusted publishing, OIDC). Cada pacote precisa ter este repositório e este arquivo
+# (`release.yml`) cadastrados como publicador confiável no npmjs.com.
+#
+# - Com changesets pendentes: abre ou atualiza a PR "chore(release): versões" com as versões
+#   e os CHANGELOGs. Fazer o merge dela é o que dispara a publicação.
+# - Sem changesets pendentes: publica as versões que ainda não estão no npm e envia as tags.
+#
+# Roda só depois que o CI passa na main, no mesmo commit que ele testou.
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: write # commit da PR de versões e tags
+  pull-requests: write # PR de versões
+  id-token: write # publicação confiável no npm (e a procedência dos pacotes)
+
+jobs:
+  release:
+    name: Versões e publicação
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          fetch-depth: 0
+      - uses: ./.github/actions/setup
+
+      - name: Changesets pendentes
+        id: pending
+        run: echo "count=$(find .changeset -name '*.md' ! -name 'README.md' | wc -l)" >> "$GITHUB_OUTPUT"
+
+      - name: PR de versões
+        if: steps.pending.outputs.count != '0'
+        uses: changesets/action@v1
+        with:
+          version: pnpm changeset version
+          commit: "chore(release): versões"
+          title: "chore(release): versões"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # A publicação confiável pede o npm 11.5.1 ou mais novo (o Node 24 pode trazer um anterior).
+      - name: npm com publicação confiável
+        if: steps.pending.outputs.count == '0'
+        run: npm install -g npm@11.6.2
+
+      - name: Publicar no npm
+        if: steps.pending.outputs.count == '0'
+        run: |
+          pnpm changeset publish
+          git push origin --tags
+        env:
+          NPM_CONFIG_PROVENANCE: "true"

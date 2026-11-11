@@ -72,9 +72,7 @@ const home: Recipe[number] = {
         secondary: { label: tr("Tenho uma vaga", "I have a role", "Tengo una vacante"), href: "#contato" },
       },
     },
-    // Na v1 o contato da home abre só na janela ("Fale comigo"): o bloco vem escondido e
-    // fica no editor para quem quiser a seção visível.
-    { type: "contato", visible: false, fields: { anchor: "contato", title: tr("Contato", "Contact", "Contacto"), mode: "wizard", showChannels: true } },
+    { type: "contato", fields: { anchor: "contato", title: tr("Contato", "Contact", "Contacto"), mode: "wizard", showChannels: true } },
   ],
 };
 

@@ -250,3 +250,30 @@ describe("CSP do painel", () => {
     expect(admin).toContain("frame-ancestors 'self'");
   });
 });
+
+describe("versão instalada", () => {
+  it("lê a versão nova depois de o pacote mudar de pasta (sem o cache do require.resolve)", async () => {
+    const { mkdtempSync, mkdirSync, writeFileSync, symlinkSync, rmSync } = await import("node:fs");
+    const { tmpdir } = await import("node:os");
+    const { join } = await import("node:path");
+    const { installedVersion } = await import("../src/project/introspect");
+    const dir = mkdtempSync(join(tmpdir(), "rubrica-versao-"));
+    try {
+      writeFileSync(join(dir, "package.json"), "{}");
+      for (const v of ["2.0.0", "2.1.0"]) {
+        mkdirSync(join(dir, "store", v), { recursive: true });
+        writeFileSync(join(dir, "store", v, "package.json"), JSON.stringify({ name: "@rubrica/core", version: v }));
+      }
+      mkdirSync(join(dir, "node_modules", "@rubrica"), { recursive: true });
+      const link = join(dir, "node_modules", "@rubrica", "core");
+      symlinkSync(join(dir, "store", "2.0.0"), link, "dir");
+      expect(installedVersion(dir, "@rubrica/core")).toBe("2.0.0");
+      // O pnpm troca o link para a versão nova; o processo continua o mesmo.
+      rmSync(link);
+      symlinkSync(join(dir, "store", "2.1.0"), link, "dir");
+      expect(installedVersion(dir, "@rubrica/core")).toBe("2.1.0");
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+});

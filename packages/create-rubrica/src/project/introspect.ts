@@ -70,21 +70,24 @@ export interface CoreMigration {
 }
 
 /**
- * Pasta de um pacote instalado. Os temas não exportam o "./package.json", então,
- * se o `require.resolve` recusar, procura `node_modules/<pacote>` subindo as pastas.
+ * Pasta de um pacote instalado: procura `node_modules/<pacote>` subindo as pastas e, só se
+ * não achar, pergunta ao `require.resolve`. Nessa ordem porque o Node guarda o caminho
+ * resolvido em cache dentro do processo: depois do `update` instalar a versão nova, o
+ * `require.resolve` ainda devolveria a pasta da antiga (que o pnpm mantém no disco).
  */
 export function findPackageDir(fromDir: string, pkg: string): string | null {
+  let dir = fromDir;
+  for (;;) {
+    const candidate = join(dir, "node_modules", pkg);
+    if (existsSync(join(candidate, "package.json"))) return candidate;
+    const parent = dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
   try {
     return dirname(createRequire(join(fromDir, "package.json")).resolve(`${pkg}/package.json`));
   } catch {
-    let dir = fromDir;
-    for (;;) {
-      const candidate = join(dir, "node_modules", pkg);
-      if (existsSync(join(candidate, "package.json"))) return candidate;
-      const parent = dirname(dir);
-      if (parent === dir) return null;
-      dir = parent;
-    }
+    return null;
   }
 }
 

@@ -12,6 +12,7 @@ import { resolveVariant, type Alternate, type RenderContext, type ResolvedSite, 
 import { queryCollection, resolvePaths, resolvePost, resolveProject, resolveSeo, type CollectionPaths, type PostItem, type ProjectItem, type ResolvedSeo } from "./collections";
 import { resolveFields, resolveHref, resolveImage, resolveLink, type ResolveOptions } from "./resolve";
 import { defaultUiText } from "../i18n/ui-texts";
+import { formatSiteDate, siteTimeZone } from "./dates";
 import { announcementActive, siteWhatsAppNumber, whatsAppMessage, whatsAppUrl } from "./sitewide";
 
 export interface ResolvedBlock {
@@ -124,6 +125,8 @@ export function buildSite(input: BuildInput): BuiltSite {
   const { snapshot, theme } = input;
   const settings = snapshot.site;
   const cfg = settings.locales;
+  // Fuso das datas (dia de publicação dos posts): pelo idioma principal (render/dates.ts).
+  const timeZone = siteTimeZone(cfg.default);
   const plugins = enabledPlugins(input.plugins, settings.kind, settings.plugins);
   const paths: CollectionPaths = resolvePaths(settings.kind, settings.paths);
   const blockDefs = new Map(input.blocks.map((b) => [b.type, b]));
@@ -373,11 +376,6 @@ export function buildSite(input: BuildInput): BuiltSite {
       site.person = person;
     }
 
-    const dateFormats: Record<string, Intl.DateTimeFormatOptions> = {
-      long: { day: "numeric", month: "long", year: "numeric" },
-      short: { day: "2-digit", month: "2-digit", year: "numeric" },
-      month: { month: "short", year: "numeric" },
-    };
 
     return {
       locale,
@@ -388,7 +386,7 @@ export function buildSite(input: BuildInput): BuiltSite {
       t,
       href: (path: string) => resolveHref(path, o).href,
       feeds: plugins.has("blog") ? { rss: localizedPath("/rss.xml", postLocales.has(locale) ? locale : cfg.default, cfg) } : {},
-      formatDate: (iso, style = "long") => new Intl.DateTimeFormat(locale, { ...dateFormats[style], timeZone: "UTC" }).format(new Date(iso)),
+      formatDate: (iso, style = "long") => formatSiteDate(iso, locale, timeZone, style),
     };
   }
 

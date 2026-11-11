@@ -59,8 +59,11 @@ jobs:
 
       - name: Publicar no npm
         if: steps.pending.outputs.count == '0'
+        # As tags dos pacotes que saíram vão para o GitHub mesmo se outro pacote falhar.
         run: |
-          pnpm changeset publish
+          status=0
+          pnpm changeset publish || status=$?
           git push origin --tags
+          exit $status
         env:
           NPM_CONFIG_PROVENANCE: "true"

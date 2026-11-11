@@ -63,7 +63,7 @@
     "@types/node": "^22.0.0",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
-    "astro": "^7.4.7",
+    "astro": "^7.4.11",
     "convex": "^1.49.0",
     "convex-test": "^0.0.67",
     "happy-dom": "^21.0.4",

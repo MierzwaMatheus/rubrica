@@ -277,12 +277,49 @@ describe("textos e o resto", () => {
   const r = run();
 
   it("textos de interface personalizados → uiTexts; de seção → blocos; sem destino → relatório", () => {
-    expect(r.tables.uiTexts).toEqual([
+    expect(r.tables.uiTexts!.slice(0, 2)).toEqual([
       { key: "hero.available", value: { "pt-BR": "Aceitando projetos", en: "Taking projects" }, updatedAt: NOW },
       { key: "common.readMore", value: { "pt-BR": "Continuar lendo", en: "Keep reading" }, updatedAt: NOW },
     ]);
     expect(r.report.texts.unmapped).toEqual([{ key: "notFound.lines.0", pt: "> nada aqui" }]);
     expect(r.report.texts.sectionKeys).toBe(3);
+  });
+
+  it("assistente de contato da v1: janela com os quatro fluxos e os textos dele em uiTexts", () => {
+    const contato = block(byPath(r, "/"), "contato");
+    expect(contato.fields).toMatchObject({
+      anchor: "contato",
+      presentation: "dialog",
+      mode: "wizard",
+      eyebrow: { "pt-BR": "portfolio / contato", en: "portfolio / contato" },
+      title: { "pt-BR": V1_TEXTS["contactWizard.title"]!.pt, en: V1_TEXTS["contactWizard.title"]!.en },
+      intro: { "pt-BR": V1_TEXTS["contactWizard.subtitle"]!.pt, en: V1_TEXTS["contactWizard.subtitle"]!.en },
+    });
+    const flows = contato.fields.flows;
+    expect(flows.map((f: { id: string; emoji: string }) => `${f.emoji} ${f.id}`)).toEqual(["💼 project", "🧑‍💼 job", "🤝 networking", "💬 feedback"]);
+    const [project, job] = flows;
+    expect(project.label).toEqual({ "pt-BR": "Tenho um projeto", en: "I have a project" });
+    expect(project.steps.map((st: { kind: string; key?: string }) => `${st.kind}:${st.key ?? ""}`)).toEqual(["choice:projectType", "choice:timeline", "choice:budget", "textarea:description", "contact:"]);
+    expect(project.steps[0].options["pt-BR"].split("\n")).toEqual(["Web App / SaaS", "Mobile", "Landing Page", "Sistema Interno", "Consultoria Técnica", "Outro"]);
+    expect(project.steps[0].options.en.split("\n")).toHaveLength(6);
+    expect(project.steps[4]).toEqual({ kind: "contact", title: { "pt-BR": "Seus dados de contato", en: "Your contact details" }, askPhone: true, askLinkedin: true });
+    expect(job.steps[3]).toMatchObject({ kind: "text", key: "jobCompany,jobRole", placeholder: { "pt-BR": "Nome da empresa\nTítulo do cargo" } });
+    // O bloco passa na validação do catálogo.
+    expect(validateBlock(CORE_BLOCKS.find((b) => b.type === "contato")!, { fields: contato.fields })).toEqual([]);
+    const ui = Object.fromEntries(r.tables.uiTexts!.map((t) => [t.key, t.value]));
+    expect(ui["form.step"]).toEqual({ "pt-BR": "Passo {current} de {total}", en: "Step {current} of {total}" });
+    expect(ui["form.next"]).toEqual({ "pt-BR": "Próximo", en: "Next" });
+    expect(ui["contactForm.summary"]).toEqual({ "pt-BR": "Revise e envie", en: "Review and send" });
+    expect(ui["contactForm.close"]).toEqual({ "pt-BR": "Fechar", en: V1_TEXTS["common.close"]!.en });
+  });
+
+  it("assistente desligado: o contato fica só com os canais, sem textos do assistente", () => {
+    const input = v1Export();
+    input.tables.homeContent = [...(input.tables.homeContent ?? []), { _id: "hc-off", key: "contact_wizard_enabled", value: false }];
+    const off = convertV1({ tables: input.tables, v1: V1_RUBRICA_JSON, theme: "cyberpunk", recipe: CORE_RECIPES.pessoal, now: NOW });
+    expect(block(byPath(off, "/"), "contato").fields).toMatchObject({ mode: "channels" });
+    expect(block(byPath(off, "/"), "contato").fields.presentation).toBeUndefined();
+    expect(off.tables.uiTexts!.map((t) => t.key)).not.toContain("form.step");
   });
 
   it("o que não tem destino vai à parte; descartadas e próprias no relatório", () => {

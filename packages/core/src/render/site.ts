@@ -12,6 +12,7 @@ import { resolveVariant, type Alternate, type RenderContext, type ResolvedSite, 
 import { queryCollection, resolvePaths, resolvePost, resolveProject, resolveSeo, type CollectionPaths, type PostItem, type ProjectItem, type ResolvedSeo } from "./collections";
 import { resolveFields, resolveHref, resolveImage, resolveLink, type ResolveOptions } from "./resolve";
 import { defaultUiText } from "../i18n/ui-texts";
+import { formatSiteDate, siteTimeZone } from "./dates";
 import { announcementActive, siteWhatsAppNumber, whatsAppMessage, whatsAppUrl } from "./sitewide";
 
 export interface ResolvedBlock {
@@ -48,8 +49,8 @@ interface RouteBase {
 
 export type SiteRoute =
   | (RouteBase & { type: "page"; page: ResolvedPage })
-  | (RouteBase & { type: "post"; post: PostItem; related: PostItem[] })
-  | (RouteBase & { type: "case"; project: ProjectItem; related: ProjectItem[] });
+  | (RouteBase & { type: "post"; post: PostItem; related: PostItem[]; relatedCase?: ProjectItem })
+  | (RouteBase & { type: "case"; project: ProjectItem; related: ProjectItem[]; next?: ProjectItem });
 
 export interface BuildInput {
   snapshot: SiteSnapshot;
@@ -96,20 +97,55 @@ function themeText(theme: ThemeDefinition, key: string, locale: Locale): string 
   return entry[locale] ?? entry[locale.split("-")[0]!.toLowerCase()] ?? entry.en;
 }
 
+/**
+ * Próximo case na ordem do portfólio, com volta ao início, entre os projetos com seções de
+ * case (como o "Próximo case" da v1). Projeto fora dessa lista aponta para o primeiro; com
+ * menos de dois cases, não há próximo.
+ */
+export function nextCase(projects: readonly ProjectItem[], currentId: string): ProjectItem | undefined {
+  const cases = projects.filter((p) => p.sections.length > 0);
+  const idx = cases.findIndex((p) => p.id === currentId);
+  if (idx === -1) return cases[0];
+  if (cases.length < 2) return undefined;
+  return cases[(idx + 1) % cases.length];
+}
+
 /** A home publicada tem algum hero visível com "Mostrar disponibilidade"? */
 export function homeShowsAvailability(pages: readonly PageRecord[]): boolean {
   const home = pages.find((p) => p.published && p.path === "/");
   return !!home?.blocks.some((b) => b.visible && b.type === "hero" && b.fields.showAvailability === true);
 }
 
+/** Id da janela de contato (`ResolvedSite.contactDialog`). */
+export const CONTACT_DIALOG_ID = "rb-contato-janela";
+
+/**
+ * O bloco `contato` que a janela de contato usa no idioma: o da home, senão o da primeira
+ * página que tiver um, senão um bloco padrão (assistente em etapas). Assim a janela existe
+ * mesmo num site sem seção de contato: os botões que apontam para o contato a abrem.
+ */
+export function contactBlock(routes: readonly SiteRoute[], locale: Locale): ResolvedBlock {
+  const pages = routes.filter((r): r is Extract<SiteRoute, { type: "page" }> => r.type === "page" && r.locale === locale);
+  const home = pages.find((r) => r.page.path === "/");
+  for (const r of home ? [home, ...pages] : pages) {
+    const block = r.page.blocks.find((b) => b.type === "contato" && b.interactive);
+    if (block) return block;
+  }
+  return { id: CONTACT_DIALOG_ID, type: "contato", variant: "default", fields: { mode: "wizard" }, items: [], headingLevel: 2, index: 0, total: 1, interactive: true };
+}
+
 export function buildSite(input: BuildInput): BuiltSite {
   const { snapshot, theme } = input;
   const settings = snapshot.site;
   const cfg = settings.locales;
+  // Fuso das datas (dia de publicação dos posts): pelo idioma principal (render/dates.ts).
+  const timeZone = siteTimeZone(cfg.default);
   const plugins = enabledPlugins(input.plugins, settings.kind, settings.plugins);
   const paths: CollectionPaths = resolvePaths(settings.kind, settings.paths);
   const blockDefs = new Map(input.blocks.map((b) => [b.type, b]));
   const whatsappNumber = siteWhatsAppNumber(settings);
+  // Janela de contato: o tema pede e o plugin de contato está ligado (não depende de um bloco).
+  const contactDialog = theme.contactDialog && plugins.has("contact-wizard") ? CONTACT_DIALOG_ID : undefined;
   const opts = (locale: Locale): ResolveOptions => {
     const message = whatsAppMessage(settings, locale);
     return {
@@ -117,6 +153,7 @@ export function buildSite(input: BuildInput): BuiltSite {
       locales: cfg,
       ...(settings.defaultPostCover?.url && { defaultPostCover: settings.defaultPostCover }),
       ...(whatsappNumber && { whatsapp: { number: whatsappNumber, ...(message && { message }) } }),
+      ...(contactDialog && { contactDialog }),
     };
   };
   // O período do aviso vale no instante do build: muda só na próxima publicação.
@@ -176,7 +213,8 @@ export function buildSite(input: BuildInput): BuiltSite {
         if (!blockAllowed(def, query)) return [];
         const items = query ? queryCollection(query, snapshot.collections[query.collection] as never[], o, paths) : [];
         const fields = resolveFields(def.fields, b.fields, o);
-        const interactive = !!def.interactive && (def.islandWhen?.(fields, plugins) ?? true);
+        const optedOut = !!def.islandOptIn && !!theme.blocks?.[b.type] && !theme.islandBlocks?.includes(b.type);
+        const interactive = !!def.interactive && !optedOut && (def.islandWhen?.(fields, plugins) ?? true);
         return [{ b, def, query, items, fields, interactive }];
       });
     // Bloco de coleção sem itens não vira título solto: some (um convite interativo, como o de
@@ -227,6 +265,21 @@ export function buildSite(input: BuildInput): BuiltSite {
     }
   }
 
+  /**
+   * Case relacionado ao post (como o da v1): o primeiro projeto, na ordem do portfólio, com
+   * case para ler (seções ou texto) que divide uma etiqueta com o post, sem diferenciar
+   * maiúsculas. Sem o plugin de portfólio, nenhum.
+   */
+  const withRelatedCase = (post: PostItem, locale: Locale): { relatedCase?: ProjectItem } => {
+    if (!plugins.has("portfolio")) return {};
+    const tags = new Set(post.tags.map((t) => t.trim().toLowerCase()).filter(Boolean));
+    if (!tags.size) return {};
+    const hit = queryCollection({ collection: "projects", sort: "order" }, snapshot.collections.projects, opts(locale), paths).find(
+      (p) => (p.sections.length > 0 || !!p.content) && p.tags.some((t) => tags.has(t.trim().toLowerCase())),
+    );
+    return hit ? { relatedCase: hit } : {};
+  };
+
   if (plugins.has("blog")) {
     for (const raw of snapshot.collections.posts) {
       const byLocale = new Map(cfg.locales.map((l) => [l, resolvePost(raw, opts(l), paths)] as const));
@@ -242,6 +295,7 @@ export function buildSite(input: BuildInput): BuiltSite {
           locale,
           post,
           related,
+          ...withRelatedCase(post, locale),
           alternates: alternatesFor(available, (l) => byLocale.get(l)!.url, locale),
         };
         const lm = day(raw.updatedAt ?? raw.publishedAt);
@@ -257,15 +311,16 @@ export function buildSite(input: BuildInput): BuiltSite {
       const available = cfg.locales.filter((l) => byLocale.get(l));
       for (const locale of available) {
         const project = byLocale.get(locale)!;
-        const related = queryCollection({ collection: "projects", sort: "order" }, snapshot.collections.projects, opts(locale), paths)
-          .filter((p) => p.id !== project.id)
-          .slice(0, 3);
+        const all = queryCollection({ collection: "projects", sort: "order" }, snapshot.collections.projects, opts(locale), paths);
+        const related = all.filter((p) => p.id !== project.id).slice(0, 3);
+        const next = nextCase(all, project.id);
         const r: SiteRoute = {
           type: "case",
           url: project.url,
           locale,
           project,
           related,
+          ...(next ? { next } : {}),
           alternates: alternatesFor(available, (l) => byLocale.get(l)!.url, locale),
         };
         const lm = day(raw.updatedAt);
@@ -331,6 +386,7 @@ export function buildSite(input: BuildInput): BuiltSite {
       const label = pick(settings.whatsapp.label, locale);
       site.whatsapp = { number: whatsappNumber, href: whatsAppUrl(whatsappNumber, message), floating: settings.whatsapp.floating, ...(label && { label }) };
     }
+    if (contactDialog) site.contactDialog = contactDialog;
     if (announcementOn && settings.announcement) {
       // Sem texto no idioma, a faixa não existe nele (decisão 28): nada de cair no principal.
       const text = pick(settings.announcement.text, locale);
@@ -351,11 +407,6 @@ export function buildSite(input: BuildInput): BuiltSite {
       site.person = person;
     }
 
-    const dateFormats: Record<string, Intl.DateTimeFormatOptions> = {
-      long: { day: "numeric", month: "long", year: "numeric" },
-      short: { day: "2-digit", month: "2-digit", year: "numeric" },
-      month: { month: "short", year: "numeric" },
-    };
 
     return {
       locale,
@@ -366,7 +417,7 @@ export function buildSite(input: BuildInput): BuiltSite {
       t,
       href: (path: string) => resolveHref(path, o).href,
       feeds: plugins.has("blog") ? { rss: localizedPath("/rss.xml", postLocales.has(locale) ? locale : cfg.default, cfg) } : {},
-      formatDate: (iso, style = "long") => new Intl.DateTimeFormat(locale, { ...dateFormats[style], timeZone: "UTC" }).format(new Date(iso)),
+      formatDate: (iso, style = "long") => formatSiteDate(iso, locale, timeZone, style),
     };
   }
 

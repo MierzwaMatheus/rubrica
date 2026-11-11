@@ -13,7 +13,12 @@ export interface ResolveOptions {
   defaultPostCover?: RawImage;
   /** WhatsApp do site, para os links `whatsapp:` (número só com dígitos e a mensagem no idioma). */
   whatsapp?: { number: string; message?: string };
+  /** Id da janela de contato, quando o site tem uma: os links para o contato a abrem. */
+  contactDialog?: string;
 }
+
+/** Links para o contato: a âncora do bloco (`#contato`, `/#contato`) ou o endereço `contato:`. */
+export const CONTACT_HREF = /^(\/?#contato|contato:)$/i;
 
 const EXTERNAL = /^(https?:|mailto:|tel:|\/\/)/i;
 
@@ -35,6 +40,8 @@ export function resolveHref(href: string, opts: ResolveOptions): { href: string;
     const url = resolveWhatsAppHref(href, opts.whatsapp?.number, opts.whatsapp?.message);
     return url ? { href: url, external: true } : { href: "", external: false };
   }
+  // `contato:` sem a janela leva ao bloco de contato da home.
+  if (/^contato:$/i.test(href)) return resolveHref("/#contato", opts);
   if (EXTERNAL.test(href)) return { href, external: /^(https?:|\/\/)/i.test(href) };
   if (href.startsWith("#")) return { href, external: false };
   const [path = "/", hash] = href.split("#");
@@ -47,7 +54,8 @@ export function resolveLink(raw: RawLink | undefined, opts: ResolveOptions): Res
   const label = pick(raw.label, opts.locale);
   if (!label) return undefined;
   const resolved = resolveHref(raw.href, opts);
-  return resolved.href ? { label, ...resolved } : undefined;
+  if (!resolved.href) return undefined;
+  return opts.contactDialog && CONTACT_HREF.test(raw.href.trim()) ? { label, ...resolved, dialog: opts.contactDialog } : { label, ...resolved };
 }
 
 export function resolveText(raw: Localized<string> | string | undefined, opts: ResolveOptions): string | undefined {

@@ -33,13 +33,13 @@ Mostra o tema equivalente ao seu layout e a lista das **personalizações** do s
 
 ### 2. Exporte os dados da v1
 
-Rode na pasta do projeto, **com o `.env.local` ainda apontando para o banco da v1**:
+Rode na pasta do projeto. Exporte do banco que tem o conteúdo de verdade, que em geral é a **produção** (`--prod`). O `--include-file-storage` traz as imagens junto:
 
 ```bash
-npx convex export --path .rubrica/migracao/export-v1.zip
+npx convex export --prod --include-file-storage --path .rubrica/migracao/export-v1.zip
 ```
 
-O export é só leitura: não altera o banco da v1.
+O export é só leitura: não altera o banco da v1. Se o `.env.local` não aponta para o projeto da v1, use `--deployment <nome>` (o nome do deployment de produção aparece no painel do Convex) no lugar de `--prod`.
 
 ### 3. Migre
 

@@ -43,6 +43,12 @@ describe("receita → páginas (puro)", () => {
     expect(pages[0]!.blocks.some((b) => b.type === "cases")).toBe(false);
   });
 
+  it("bloco com visible: false na receita entra escondido", () => {
+    const recipe: Recipe = [{ path: "/", title: { "pt-BR": "Início" }, blocks: [{ type: "texto", fields: { body: { "pt-BR": "x" } } }, { type: "contato", visible: false }] }];
+    const [home] = pagesFromRecipe(recipe, { locales });
+    expect(home!.blocks.map((b) => b.visible)).toEqual([true, false]);
+  });
+
   it("pula página sem título em nenhum idioma do site", () => {
     const recipe: Recipe = [{ path: "/so-es", title: { es: "Solo" }, blocks: [{ type: "texto", fields: { body: { es: "x" } } }] }];
     expect(pagesFromRecipe(recipe, { locales })).toEqual([]);

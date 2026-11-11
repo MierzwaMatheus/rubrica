@@ -1,7 +1,7 @@
 /** Campos dos itens de coleção que os temas recebem (contrato aditivo da v2.0). */
 import { describe, expect, it } from "vitest";
 import { queryCollection, resolveItem, resolvePost, resolveProject } from "../src/render/collections";
-import type { RawPost, RawProject, RawResumeItem } from "../src/content/types";
+import type { RawPost, RawProject, RawResumeItem, RawRoutineItem, RawTestimonial } from "../src/content/types";
 import type { ResolveOptions } from "../src/render/resolve";
 
 const opts = (locale: string): ResolveOptions => ({ locale, locales: { locales: ["pt-BR", "en"], default: "pt-BR" } });
@@ -24,6 +24,18 @@ describe("itens de coleção", () => {
     const raw: RawResumeItem = { id: "r", kind: "skill", title: { "pt-BR": "Figma", en: "Figma" }, group: { "pt-BR": "Ferramentas", en: "Tools" } };
     expect(resolveItem("resume", raw, opts("en"))?.group).toBe("Tools");
     expect(resolveItem("resume", { ...raw, group: undefined }, opts("pt-BR"))).not.toHaveProperty("group");
+  });
+
+  it("dia a dia: tamanho no mosaico só quando o item define", () => {
+    const raw: RawRoutineItem = { id: "d", title: { "pt-BR": "Café" }, span: "2x1" };
+    expect(resolveItem("routine", raw, opts("pt-BR"))?.span).toBe("2x1");
+    expect(resolveItem("routine", { ...raw, span: undefined }, opts("pt-BR"))).not.toHaveProperty("span");
+  });
+
+  it("depoimento: etiquetas (a categoria) só quando há", () => {
+    const raw: RawTestimonial = { id: "t", quote: { "pt-BR": "Ótimo" }, author: "Ana", tags: ["Clientes"] };
+    expect(resolveItem("testimonials", raw, opts("pt-BR"))?.tags).toEqual(["Clientes"]);
+    expect(resolveItem("testimonials", { ...raw, tags: [] }, opts("pt-BR"))).not.toHaveProperty("tags");
   });
 
   it("consulta com destaques: só eles; sem nenhum, a lista na ordem do bloco, até o limite", () => {

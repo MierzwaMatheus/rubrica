@@ -8,7 +8,9 @@
     "client": "Banco Exemplo",
     "tags": [
       "mobile",
-      "pesquisa"
+      "pesquisa",
+      "fintech",
+      "acessibilidade"
     ],
     "cover": {
       "url": "/img/cover-1.svg",
@@ -74,7 +76,53 @@
     "category": {
       "pt-BR": "Produto",
       "en": "Product"
-    }
+    },
+    "metrics": [
+      {
+        "value": "−32%",
+        "label": {
+          "pt-BR": "desistências no cadastro",
+          "en": "sign-up drop-offs"
+        },
+        "icon": "TrendingDown"
+      },
+      {
+        "value": "4 min",
+        "label": {
+          "pt-BR": "para abrir a conta",
+          "en": "to open an account"
+        },
+        "icon": "Timer"
+      },
+      {
+        "value": "12",
+        "label": {
+          "pt-BR": "entrevistas com clientes",
+          "en": "customer interviews"
+        },
+        "icon": "Users"
+      }
+    ],
+    "gallery": [
+      {
+        "url": "/img/cover-2.svg",
+        "width": 800,
+        "height": 500,
+        "alt": {
+          "pt-BR": "Tela do cadastro",
+          "en": "Sign-up screen"
+        }
+      },
+      {
+        "url": "/img/cover-3.svg",
+        "width": 800,
+        "height": 500,
+        "alt": {
+          "pt-BR": "Tela de confirmação",
+          "en": "Confirmation screen"
+        }
+      }
+    ]
   },
   {
     "id": "proj2",

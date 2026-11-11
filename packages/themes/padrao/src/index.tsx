@@ -5,12 +5,16 @@
  */
 import { CORE_RECIPES, defineTheme, type Recipe } from "@rubrica/core";
 import fonts from "./fonts.json";
-import { DepoimentosBlock, HeroBlock, ServicosBlock } from "./blocks";
+import { CasesBlock, CtaBlock, CurriculoBlock, DepoimentosBlock, FaqBlock, GaleriaBlock, HeroBlock, ServicosBlock } from "./blocks";
 import { createSidebarShell } from "./shell";
+import { PadraoNotFound } from "./templates";
+import { PadraoPost, PostsBlock } from "./blog";
 
 export { createSidebarShell } from "./shell";
-export { HeroBlock, ServicosBlock, DepoimentosBlock } from "./blocks";
+export { HeroBlock, ServicosBlock, DepoimentosBlock, CurriculoBlock, CtaBlock, GaleriaBlock, FaqBlock, CasesBlock } from "./blocks";
+export { PadraoNotFound } from "./templates";
 export { Icon } from "./icons";
+export { PadraoPost, PostsBlock, RssLink, BlogIcon } from "./blog";
 
 const tr = (ptBR: string, en: string, es: string) => ({ "pt-BR": ptBR, en, es });
 
@@ -53,7 +57,14 @@ const home: Recipe[number] = {
       },
     },
     { type: "servicos", fields: { title: tr("O que eu faço", "What I do", "Lo que hago") } },
-    { type: "depoimentos", fields: { title: tr("O que falam sobre mim", "What people say about me", "Lo que dicen de mí"), allowSubmission: true } },
+    {
+      type: "depoimentos",
+      fields: {
+        title: tr("O que falam sobre mim", "What people say about me", "Lo que dicen de mí"),
+        allowSubmission: true,
+        cta: { label: tr("Ver todos os depoimentos →", "View all testimonials →", "Ver todos los testimonios →"), href: "/depoimentos" },
+      },
+    },
     {
       type: "cta",
       fields: {
@@ -67,6 +78,74 @@ const home: Recipe[number] = {
   ],
 };
 
+/**
+ * Currículo como o da v1: cabeçalho da página, o resumo profissional, os números, o PDF e
+ * as duas colunas do currículo (o bloco `curriculo` sem título: o cabeçalho já é o h1).
+ */
+const curriculo: Recipe[number] = {
+  path: "/curriculo",
+  title: tr("Currículo", "Résumé", "Currículum"),
+  blocks: [
+    {
+      type: "hero",
+      variant: "pagina",
+      fields: {
+        title: tr("Currículo", "Résumé", "Currículum"),
+        subtitle: tr("Onde trabalhei, o que estudei e com o que trabalho.", "Where I've worked, what I studied and what I work with.", "Dónde trabajé, qué estudié y con qué trabajo."),
+      },
+    },
+    {
+      type: "texto",
+      fields: {
+        body: tr(
+          "<p>Um parágrafo sobre você: o que faz, onde, e um ou dois resultados com <strong>números</strong>.</p>",
+          "<p>One paragraph about you: what you do, where, and one or two results with <strong>numbers</strong>.</p>",
+          "<p>Un párrafo sobre ti: qué haces, dónde, y uno o dos resultados con <strong>números</strong>.</p>",
+        ),
+      },
+    },
+    {
+      type: "numeros",
+      fields: {
+        items: [
+          { value: "8+", label: tr("anos de experiência", "years of experience", "años de experiencia") },
+          { value: "40", label: tr("projetos entregues", "projects delivered", "proyectos entregados") },
+          { value: "15", label: tr("clientes atendidos", "clients served", "clientes atendidos") },
+        ],
+      },
+    },
+    { type: "curriculo", fields: { showDownload: true } },
+  ],
+};
+
+/**
+ * Páginas de lista (portfólio, blog, depoimentos) com o cabeçalho da v1: o título e o apoio do
+ * bloco da lista sobem para um hero "pagina" (h1 visível), e a lista fica sem título.
+ */
+const LIST_PAGES = new Set(["/portfolio", "/blog", "/depoimentos"]);
+function withPageHeader(page: Recipe[number]): Recipe[number] {
+  const [list, ...rest] = page.blocks;
+  if (!LIST_PAGES.has(page.path) || !list?.fields?.title) return page;
+  const { title, intro, ...rest0 } = list.fields;
+  // O blog da v1 tem os destaques em carrossel e a busca acima da lista.
+  const fields = page.path === "/blog" ? { ...rest0, showSearch: true, showFeatured: true } : rest0;
+  // Depoimentos agrupados por categoria e o portfólio com a variação "pagina" dos cases
+  // (filtro por categoria e cartões com botão), como as páginas da v1.
+  const variant = page.path === "/depoimentos" ? { variant: "categorias" } : list.type === "cases" ? { variant: "pagina" } : {};
+  return {
+    ...page,
+    blocks: [{ type: "hero", variant: "pagina", fields: { title, ...(intro ? { subtitle: intro } : {}) } }, { ...list, ...variant, fields }, ...rest],
+  };
+}
+
+/** "Fora do trabalho" no Sobre: o texto pessoal da v1 (cartão largo, parágrafos iguais, `</>` decorativo). */
+function withPersonalText(page: Recipe[number]): Recipe[number] {
+  if (page.path !== "/sobre") return page;
+  const textos = page.blocks.filter((b) => b.type === "texto");
+  const pessoal = textos[1];
+  return pessoal ? { ...page, blocks: page.blocks.map((b) => (b === pessoal ? { ...b, variant: "pessoal" } : b)) } : page;
+}
+
 export default defineTheme({
   id: "padrao",
   label: "Padrão",
@@ -79,12 +158,37 @@ export default defineTheme({
     "rb-accent-2": { label: "Segunda cor", kind: "color", default: "#BEF264", light: "#4A770E" },
   },
   Shell: createSidebarShell(),
-  blocks: { hero: HeroBlock, servicos: ServicosBlock, depoimentos: DepoimentosBlock },
+  // O "Fale comigo" abre o contato numa janela, como o assistente da v1.
+  contactDialog: true,
+  blocks: { hero: HeroBlock, servicos: ServicosBlock, depoimentos: DepoimentosBlock, curriculo: CurriculoBlock, cta: CtaBlock, galeria: GaleriaBlock, faq: FaqBlock, cases: CasesBlock, "posts-recentes": PostsBlock },
+  // O bloco de posts do tema desenha a busca (ilha do núcleo).
+  islandBlocks: ["posts-recentes"],
+  // 404 de terminal e post como o da v1: voltar, etiquetas, subtítulo, cartão do autor e case relacionado.
+  templates: { notFound: PadraoNotFound, post: PadraoPost },
   variants: {
+    hero: [
+      { value: "inicio", label: "Início" },
+      { value: "pagina", label: "Cabeçalho de página" },
+    ],
     cases: [
       { value: "grade", label: "Grade" },
       { value: "lista", label: "Lista" },
+      { value: "pagina", label: "Página do portfólio (filtro por categoria)" },
+    ],
+    texto: [
+      { value: "default", label: "Padrão" },
+      { value: "pessoal", label: "Pessoal (cartão largo, parágrafos iguais)" },
+    ],
+    depoimentos: [
+      { value: "default", label: "Grade" },
+      { value: "categorias", label: "Por categoria (com a contagem)" },
     ],
   },
-  recipes: { pessoal: [home, ...core.filter((p) => p.path !== "/")] },
+  // Os textos de terminal da v1 nos cartões de case.
+  texts: {
+    "case.view": { pt: "$ cat case.md", en: "$ cat case.md", es: "$ cat case.md" },
+    "case.details": { pt: "$ view --details", en: "$ view --details", es: "$ view --details" },
+    "padrao.readCase": { pt: "$ cat case.md", en: "$ cat case.md", es: "$ cat case.md" },
+  },
+  recipes: { pessoal: [home, ...core.filter((p) => p.path !== "/").map((p) => (p.path === "/curriculo" ? curriculo : withPersonalText(withPageHeader(p))))] },
 });

@@ -14,7 +14,7 @@
  * - Ids dos documentos de tabelas 1:1 (usuários, posts, projetos…) são mantidos, para as
  *   referências (autor, papel, imagem) continuarem valendo depois do import.
  */
-import { isWhatsAppNumber, normalizeWhatsAppNumber, validateBlock, type Recipe, type RecipeBlock } from "@rubrica/core";
+import { defaultUiText, isWhatsAppNumber, normalizeWhatsAppNumber, validateBlock, type Locale, type Recipe, type RecipeBlock } from "@rubrica/core";
 import { blockIds, isLocalizedValue, localizeRecipeValue, navigationFromPages } from "@rubrica/core/seed";
 import { CORE_PLUGINS, V1_PLUGIN_RENAMES } from "@rubrica/core/plugins";
 import { CORE_BLOCKS } from "@rubrica/core/blocks";
@@ -109,6 +109,8 @@ export interface V1RubricaJson {
 
 export interface ConvertInput {
   tables: Record<string, Doc[]>;
+  /** Documentos de `_storage` do export (com o `internalId` que aparece nas URLs antigas). */
+  storage?: Doc[];
   /** `rubrica.json` da v1 (layout, esquema, fontes, identidade). */
   v1: V1RubricaJson;
   /** Tema da v2 (id) que o site vai usar. */
@@ -174,6 +176,33 @@ export function loc(base?: unknown, translations?: unknown): Loc {
   return out;
 }
 
+/**
+ * Título de SEO como a v1 mostrava (componente SEO da v1): "<título> | <nome do site>",
+ * a menos que já contenha o nome. Na v2, um `seo.title` preenchido sai como está, então o
+ * sufixo vem para o dado.
+ */
+export function v1FullTitle(title: Loc, siteTitle: string | undefined): Loc {
+  if (!siteTitle) return title;
+  const out: Loc = {};
+  for (const [l, t] of Object.entries(title)) if (t) out[l] = t.includes(siteTitle) ? t : `${t} | ${siteTitle}`;
+  return out;
+}
+
+/** Texto que a v1 guardava sem tradução (siteConfig) e mostrava igual nos dois idiomas. */
+export function sameInBoth(value: Loc): Loc {
+  const v = value[PT] ?? value[EN];
+  return v ? { [PT]: v, [EN]: value[EN] ?? v } : value;
+}
+
+/**
+ * Menu como o da v1: Início, Currículo, Portfólio, Sobre e Blog, nessa ordem (a sidebar da
+ * v1). As outras páginas (depoimentos, privacidade) existem, mas não estavam no menu.
+ */
+const V1_NAV_ORDER = ["/", "/curriculo", "/portfolio", "/sobre", "/blog"];
+export function v1Navigation(items: Doc[]): Doc[] {
+  return V1_NAV_ORDER.map((href) => items.find((n) => n.href === href)).filter((n): n is Doc => !!n);
+}
+
 /** Valor que pode ser texto ou `{ ptBR, enUS }` (homeContent). */
 function locAny(value: unknown): Loc {
   if (typeof value === "string") return loc(value);
@@ -229,11 +258,16 @@ const PRESENT = /atual|presente|present|hoje|now|current|o momento|em andamento/
 
 /** "jan/2020 – atual", "03/2019 - 12/2021", "2018 - 2020" → { start, end } no formato da v2. */
 export function parsePeriod(period: string): { start?: string; end?: string; ok: boolean } {
-  const parts = period.split(/\s+(?:-|–|—|a|até|to)\s+|\s*[–—]\s*|\s+-\s+/i).map((p) => p.trim()).filter(Boolean);
+  // "2015-2017": anos colados ao hífen, sem espaço.
+  const years = /^(\d{4})\s*-\s*(\d{4})$/.exec(period.trim());
+  const parts = years
+    ? [years[1]!, years[2]!]
+    : period.split(/\s+(?:-|–|—|a|até|to)\s+|\s*[–—]\s*|\s+-\s+/i).map((p) => p.trim()).filter(Boolean);
   const one = (p: string): string | undefined => {
     const numeric = /^(\d{1,2})[/.-](\d{4})$/.exec(p);
     if (numeric) return `${numeric[2]}-${numeric[1]!.padStart(2, "0")}`;
-    const named = /^([a-zç]{3})[a-zç]*\.?[\s/de]*(\d{4})$/i.exec(p.normalize("NFD").replace(/[̀-ͯ]/g, ""));
+    // "Jan 2025", "jan/2025", "janeiro de 2025", "Jan-2025".
+    const named = /^([a-zç]{3})[a-zç]*\.?[\s/de-]*(\d{4})$/i.exec(p.normalize("NFD").replace(/[̀-ͯ]/g, ""));
     if (named && MONTHS[named[1]!.toLowerCase()]) return `${named[2]}-${MONTHS[named[1]!.toLowerCase()]}`;
     const year = /^(\d{4})$/.exec(p);
     return year ? year[1] : undefined;
@@ -258,10 +292,15 @@ class Ctx {
   config = new Map<string, unknown>();
   contact: Doc | undefined;
 
+  /** `internalId` (o UUID das URLs `/api/storage/<uuid>` da v1) → id do arquivo, que o import mantém. */
+  storageByUrlId = new Map<string, string>();
+
   constructor(
     readonly tables: Record<string, Doc[]>,
     readonly projectTexts: Record<string, { pt?: string; en?: string }> = {},
+    storage: Doc[] = [],
   ) {
+    for (const f of storage) if (typeof f.internalId === "string" && typeof f._id === "string") this.storageByUrlId.set(f.internalId, f._id);
     for (const f of tables.imageFolders ?? []) this.folders.set(f._id, f.path);
     for (const m of tables.imageMetadata ?? []) this.media.set(m._id, m);
     for (const t of tables.siteTexts ?? []) this.siteTexts.set(t.key, t);
@@ -270,13 +309,26 @@ class Ctx {
     this.contact = (tables.contactInfo ?? [])[0];
   }
 
+  /** O `site_title` da v1, que o componente SEO punha no fim dos títulos. */
+  get siteTitle(): string | undefined {
+    return str(this.config.get("site_title"));
+  }
+
   /** Imagem da biblioteca da v1 (id do imageMetadata), ou só a URL. */
+  /** Arquivo do export a partir de uma URL do storage da v1 (que deixa de existir com o banco velho). */
+  storageIdFromUrl(url?: string): string | undefined {
+    const m = /\/api\/storage\/([0-9a-f-]{36})/i.exec(str(url) ?? "");
+    return m ? this.storageByUrlId.get(m[1]!.toLowerCase()) : undefined;
+  }
+
   image(imageId?: string, url?: string): Doc | undefined {
     const m = imageId ? this.media.get(imageId) : undefined;
     if (!m && !str(url)) return undefined;
+    // Sem metadado, mas a URL é do storage da v1: aponta para o arquivo importado.
+    const fromUrl = m?.storageId ? undefined : this.storageIdFromUrl(url);
     return compact({
-      url: str(url) ?? "",
-      storageId: m?.storageId,
+      url: fromUrl ? "" : (str(url) ?? ""),
+      storageId: m?.storageId ?? fromUrl,
       alt: m?.altText ? loc(m.altText) : undefined,
       width: m?.width,
       height: m?.height,
@@ -329,7 +381,7 @@ function convertPosts(ctx: Ctx, docs: Doc[]): Doc[] {
       content: loc(d.content, d.contentTranslations),
       cover: ctx.image(d.imageId, d.imageUrl),
       seo: compact({
-        title: loc(d.seoTitle, d.seoTitleTranslations),
+        title: v1FullTitle(loc(d.seoTitle, d.seoTitleTranslations), ctx.siteTitle),
         description: loc(d.seoDescription, d.seoDescriptionTranslations),
         image: ctx.image(d.ogImageId, d.ogImageUrl),
       }),
@@ -367,12 +419,6 @@ function convertProjects(ctx: Ctx, docs: Doc[]): Doc[] {
         const body = mapLoc(loc(cs[s.field], { enUS: csEn?.[s.field] }), toHtml);
         if (hasText(body)) sections.push({ title: ctx.t(s.key), body });
       }
-      if (cs.metrics?.length) {
-        const list = (metrics: Doc[]) => `<ul>${metrics.map((m) => `<li><strong>${m.value}</strong> ${m.label}</li>`).join("")}</ul>`;
-        const body: Loc = { [PT]: list(cs.metrics) };
-        if (csEn?.metrics?.length) body[EN] = list(csEn.metrics);
-        sections.push({ title: ctx.t("portfolio.metrics"), body });
-      }
       if (cs.testimonial?.text) {
         const t = cs.testimonial as Doc;
         const quote = (text: string, role?: string) => `<blockquote><p>${text}</p><footer>${t.author}${role ? `, ${role}` : ""}</footer></blockquote>`;
@@ -384,13 +430,16 @@ function convertProjects(ctx: Ctx, docs: Doc[]): Doc[] {
         sections.push({ title: ctx.t("portfolio.testimonial"), body });
       }
     }
+    // "Resultados em números": campo próprio (com o ícone do Lucide da v1), não uma seção de texto.
+    const metrics = caseMetrics(cs?.metrics as Doc[] | undefined, csEn?.metrics as Doc[] | undefined);
     const images = (d.imageIds as string[] | undefined ?? []).map((id) => ctx.image(id)).filter(Boolean) as Doc[];
     const external = (d.externalImageUrls as string[] | undefined ?? []).map((url) => ({ url }));
     const [cover, ...gallery] = [...images, ...external];
     const links: Doc[] = [];
     if (str(d.demoLink)) links.push({ label: ctx.t("portfolio.liveDemo"), href: d.demoLink });
     if (str(d.githubLink)) links.push({ label: ctx.t("portfolio.code"), href: d.githubLink });
-    const tags = [...new Set([...(str(d.category) ? [d.category as string] : []), ...(d.tags ?? [])])];
+    // A categoria vai para o campo próprio (não repete como etiqueta, como na v1).
+    const tags = [...new Set((d.tags ?? []) as string[])];
     return compact({
       ...meta(d),
       slug,
@@ -398,6 +447,7 @@ function convertProjects(ctx: Ctx, docs: Doc[]): Doc[] {
       summary: loc(d.description, d.descriptionTranslations),
       content: mapLoc(loc(d.longDescription, d.longDescriptionTranslations), toHtml),
       sections: sections.length ? sections : undefined,
+      metrics: metrics.length ? metrics : undefined,
       cover,
       gallery: gallery.length ? gallery : undefined,
       role: cs ? loc(cs.role, { enUS: csEn?.role }) : undefined,
@@ -410,6 +460,16 @@ function convertProjects(ctx: Ctx, docs: Doc[]): Doc[] {
       order: d.orderIndex,
       ...lifecycle(d),
     });
+  });
+}
+
+/** Números do case da v1 (`caseStudy.metrics`), com o rótulo em inglês pela posição e o ícone, quando havia. */
+function caseMetrics(pt: Doc[] | undefined, en: Doc[] | undefined): Doc[] {
+  return (pt ?? []).flatMap((m, i) => {
+    const value = str(m.value === undefined ? undefined : String(m.value));
+    const label = loc(m.label, { enUS: en?.[i]?.label });
+    if (!value || !hasText(label)) return [];
+    return [compact({ value, label, icon: str(m.icon) })];
   });
 }
 
@@ -434,14 +494,14 @@ function convertResume(ctx: Ctx, docs: Doc[]): Doc[] {
         // O grupo da v1 vai para o campo próprio e continua na etiqueta.
         return compact({ ...base, kind: "skill", title: loc(c.name, { enUS: en.name }), description: loc(c.level, { enUS: en.level }), group: str(c.group) ? loc(c.group, { enUS: en.group }) : undefined, tags: str(c.group) ? [c.group] : undefined });
       case "soft_skill":
-        return compact({ ...base, kind: "skill", title: loc(c.text, tr), tags: ["soft-skill"] });
+        return compact({ ...base, kind: "soft-skill", title: loc(c.text, tr) });
       case "course":
         return compact({ ...base, kind: "certification", title: loc(c.text, tr) });
       case "language":
         return compact({ ...base, kind: "language", title: loc(c.name, tr.enUS ? { enUS: typeof tr.enUS === "string" ? tr.enUS : tr.enUS.name } : undefined), description: str(c.level) ? loc(c.level) : undefined });
       case "volunteer":
-        if (str(c.text)) return compact({ ...base, kind: "experience", title: loc(c.text, tr), tags: ["voluntariado"] });
-        return compact({ ...base, kind: "experience", title: loc(c.role, { enUS: en.role }), organization: str(c.company), description: loc(c.description, { enUS: en.description }), tags: ["voluntariado"], ...period(c.period) });
+        if (str(c.text)) return compact({ ...base, kind: "volunteer", title: loc(c.text, tr) });
+        return compact({ ...base, kind: "volunteer", title: loc(c.role, { enUS: en.role }), organization: str(c.company), description: loc(c.description, { enUS: en.description }), ...period(c.period) });
       default:
         ctx.warnings.push(`Currículo: item do tipo desconhecido "${d.type}" ficou de fora.`);
         return null;
@@ -511,9 +571,10 @@ function convertSettings(ctx: Ctx, input: ConvertInput, plugins: Record<string, 
     if (!fromScheme) tokens[token] = hex;
   }
   if (ctx.config.get("theme_colors_per_mode") === true) ctx.warnings.push("As cores separadas por modo (claro/escuro) do painel da v1 não foram convertidas: ajuste em Aparência.");
+  // A ordem da sidebar da v1: GitHub, LinkedIn, Behance.
   const social = [
-    ["linkedin", contact?.linkedinUrl],
     ["github", contact?.githubUrl],
+    ["linkedin", contact?.linkedinUrl],
     ["behance", contact?.behanceUrl],
   ]
     .filter(([, url]) => str(url))
@@ -546,7 +607,9 @@ function convertSettings(ctx: Ctx, input: ConvertInput, plugins: Record<string, 
           name: str(contact?.name) ?? id.authorName ?? "",
           jobTitle: contact ? loc(contact.role, contact.roleTranslations) : undefined,
           email: contact?.showEmail ? str(contact.email) : undefined,
-          photo: contact?.avatarStorageId || str(contact?.avatarUrl) ? compact({ url: str(contact?.avatarUrl) ?? "", storageId: contact?.avatarStorageId }) : undefined,
+          photo: contact?.avatarStorageId ? { url: "", storageId: contact.avatarStorageId } : ctx.image(undefined, str(contact?.avatarUrl)),
+          // A sidebar da v1 mostrava o telefone (com o ícone do WhatsApp) quando "mostrar" estava ligado.
+          whatsapp: contact?.showPhone ? str(contact.phone) : undefined,
         })
       : undefined,
     plugins,
@@ -557,11 +620,61 @@ function convertSettings(ctx: Ctx, input: ConvertInput, plugins: Record<string, 
 }
 
 /** Campos de cada bloco das páginas fixas, a partir da v1. `null`: o bloco sai (sem conteúdo). */
-type Filler = (ctx: Ctx, plugins: Record<string, boolean>) => Doc | null;
+type Filler = (ctx: Ctx, plugins: Record<string, boolean>, recipe?: RecipeBlock[]) => Doc | null;
 
 const link = (label: Loc, href: string) => (hasText(label) ? { label, href } : undefined);
 
-const ABOUT_TEXT = (ctx: Ctx) => mapLoc(locAny(ctx.home.get("about_text")), toHtml);
+/** O "sobre" da home em HTML, com os números de resultado em negrito (a home e o Sobre da v1 destacavam). */
+const ABOUT_TEXT = (ctx: Ctx) =>
+  mapLoc(locAny(ctx.home.get("about_text")), (text) =>
+    /<(p|h[1-6]|ul|ol|div|blockquote)[\s>]/i.test(text)
+      ? text
+      : text
+          .split(/\n\s*\n/)
+          .map((p) => p.trim())
+          .filter(Boolean)
+          .map((p) => `<p>${highlightNumbersHtml(p).replace(/\n/g, "<br>")}</p>`)
+          .join(""),
+  );
+
+// Número seguido de uma unidade de resultado ("50 skills", "3 horas"), como o highlightNumbers
+// da v1 (src/utils/homeContent.ts): anos e versões soltas não entram, porque não têm unidade.
+const RESULT_UNITS = [
+  "skills", "automações", "áreas", "chamados", "horas", "minutos", "meses", "anos", "iniciativas", "pessoas", "times", "sistemas", "projetos",
+  "automations", "areas", "tickets", "hours", "minutes", "months", "years", "initiatives", "people", "teams", "systems", "projects",
+];
+const NUMBER_WITH_UNIT = new RegExp(`(?<![\\p{L}\\d.])~?\\d+(?:[.,]\\d+)*\\+?\\s(?:${RESULT_UNITS.join("|")})(?![\\p{L}])`, "gu");
+
+/** Escapa o texto e põe os números com unidade em <strong>, como a v1 destacava. */
+export function highlightNumbersHtml(text: string): string {
+  const escape = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  let out = "";
+  let last = 0;
+  for (const m of text.matchAll(NUMBER_WITH_UNIT)) {
+    out += escape(text.slice(last, m.index)) + `<strong>${escape(m[0])}</strong>`;
+    last = m.index! + m[0].length;
+  }
+  return out + escape(text.slice(last));
+}
+
+/** Resumo do currículo da v1: o primeiro parágrafo do "sobre" da home, com os números em negrito. */
+const RESUME_SUMMARY = (ctx: Ctx): Loc =>
+  mapLoc(locAny(ctx.home.get("about_text")), (text) => {
+    const first = text.split(/\n\s*\n/).map((p) => p.trim()).find(Boolean);
+    return first ? `<p>${highlightNumbersHtml(first)}</p>` : "";
+  });
+
+/** A receita da página abre com um cabeçalho (hero)? */
+const hasHeader = (recipe?: RecipeBlock[]) => recipe?.[0]?.type === "hero";
+/** Cabeçalho de página com o título e o apoio da v1 (`<prefixo>.title` e `.subtitle`). */
+const header = (ctx: Ctx, prefix: string): Doc => compact({ title: ctx.t(`${prefix}.title`), subtitle: hasText(ctx.t(`${prefix}.subtitle`)) ? ctx.t(`${prefix}.subtitle`) : undefined });
+
+/** Números da home (home_metrics): a v1 mostrava os mesmos na home e no currículo. */
+const HOME_METRICS: Filler = (ctx) => {
+  const metrics = (ctx.home.get("home_metrics") as Doc[] | undefined) ?? [];
+  if (!metrics.length) return null;
+  return { items: metrics.slice(0, 8).map((m) => ({ value: String(m.value), label: loc(m.label, m.labelTranslations) })) };
+};
 
 /** Por página e tipo de bloco (com a ocorrência quando o tipo repete na página). */
 export const SECTION_FILLERS: Record<string, Record<string, Filler | Filler[]>> = {
@@ -571,7 +684,8 @@ export const SECTION_FILLERS: Record<string, Record<string, Filler | Filler[]>> 
       const availability = ctx.home.get("availability_status") as Doc | undefined;
       const title = ctx.t("home.hero.headline");
       return compact({
-        eyebrow: ctx.contact ? loc(ctx.contact.role, ctx.contact.roleTranslations) : undefined,
+        // O selo da v1 é o texto home.greeting ("whoami"), não o cargo (que aparece abaixo).
+        eyebrow: ctx.t("home.greeting"),
         title: hasText(title) ? title : loc(ctx.home.get("hero_title")),
         subtitle: ctx.t("home.hero.description"),
         primaryCta: plugins.portfolio !== false ? link(ctx.t("home.hero.ctaCases"), "#cases") : undefined,
@@ -580,18 +694,16 @@ export const SECTION_FILLERS: Record<string, Record<string, Filler | Filler[]>> 
         showAvailability: availability?.available === true,
       });
     },
-    numeros: (ctx) => {
-      const metrics = (ctx.home.get("home_metrics") as Doc[] | undefined) ?? [];
-      if (!metrics.length) return null;
-      return { items: metrics.slice(0, 8).map((m) => ({ value: String(m.value), label: loc(m.label, m.labelTranslations) })) };
-    },
+    numeros: HOME_METRICS,
     cases: (ctx) => compact({ anchor: "cases", title: ctx.t("home.cases.title"), cta: link(ctx.t("home.cases.viewAll"), "/portfolio") }),
     texto: (ctx) => {
       const body = ABOUT_TEXT(ctx);
       return hasText(body) ? { title: ctx.t("home.about.title"), body } : null;
     },
     servicos: (ctx) => ({ title: ctx.t("home.skills.title") }),
-    depoimentos: (ctx, plugins) => compact({ title: ctx.t("home.testimonials.title"), allowSubmission: plugins["testimonials-intake"] !== false }),
+    // "Ver todos os depoimentos" levava à página de depoimentos (que existe com o plugin ligado).
+    depoimentos: (ctx, plugins) =>
+      compact({ title: ctx.t("home.testimonials.title"), allowSubmission: plugins["testimonials-intake"] !== false, cta: hasText(ctx.t("testimonials.viewAll")) ? link(ctx.t("testimonials.viewAll"), "/depoimentos") : undefined }),
     cta: (ctx, plugins) =>
       compact({
         title: ctx.t("home.cta.title"),
@@ -619,24 +731,52 @@ export const SECTION_FILLERS: Record<string, Record<string, Filler | Filler[]>> 
     "lista-itens": (ctx) => {
       const items = ((ctx.home.get("work_principles") as Doc[] | undefined) ?? []).filter((p) => str(p.title));
       if (!items.length) return null;
-      return { title: ctx.t("about.principles.title"), numbered: true, items: items.slice(0, 12).map((p) => compact({ title: loc(p.title, p.titleTranslations), body: loc(p.description, p.descriptionTranslations) })) };
+      return { title: ctx.t("about.principles.title"), numbered: false, items: items.slice(0, 12).map((p) => compact({ title: loc(p.title, p.titleTranslations), body: loc(p.description, p.descriptionTranslations) })) };
     },
     galeria: (ctx) => ({ title: ctx.t("about.dailyRoutine.title") }),
     faq: (ctx) => ({ title: ctx.t("about.faq.title") }),
   },
-  "/curriculo": { curriculo: (ctx) => ({ title: ctx.t("resume.title"), intro: ctx.t("resume.subtitle"), showDownload: true }) },
-  "/portfolio": { cases: (ctx) => ({ title: ctx.t("portfolio.title"), intro: ctx.t("portfolio.subtitle") }) },
-  "/blog": { "posts-recentes": (ctx) => ({ title: ctx.t("blog.title"), intro: ctx.t("blog.subtitle"), showTagFilter: true }) },
-  "/depoimentos": { depoimentos: (ctx, plugins) => compact({ title: ctx.t("testimonials.title"), intro: ctx.t("testimonials.subtitle"), allowSubmission: plugins["testimonials-intake"] !== false }) },
+  // A página da v1: título e apoio, o resumo (1º parágrafo do "sobre"), os números e o PDF no
+  // topo, depois o currículo. Numa receita sem o cabeçalho (hero), o título fica no currículo.
+  "/curriculo": {
+    hero: (ctx) => header(ctx, "resume"),
+    texto: (ctx) => {
+      const body = RESUME_SUMMARY(ctx);
+      return hasText(body) ? { body } : null;
+    },
+    numeros: HOME_METRICS,
+    curriculo: (ctx, _plugins, recipe) => (hasHeader(recipe) ? { showDownload: true } : { title: ctx.t("resume.title"), intro: ctx.t("resume.subtitle"), showDownload: true }),
+  },
+  // Páginas de lista: com um cabeçalho (hero) na receita, o título e o apoio da v1 vão para ele.
+  "/portfolio": {
+    hero: (ctx) => header(ctx, "portfolio"),
+    cases: (ctx, _p, recipe) => (hasHeader(recipe) ? {} : { title: ctx.t("portfolio.title"), intro: ctx.t("portfolio.subtitle") }),
+  },
+  "/blog": {
+    hero: (ctx) => header(ctx, "blog"),
+    // O blog da v1 sempre teve os destaques em carrossel, a busca e o filtro por etiquetas.
+    "posts-recentes": (ctx, _p, recipe) => ({
+      ...(hasHeader(recipe) ? {} : { title: ctx.t("blog.title"), intro: ctx.t("blog.subtitle") }),
+      showTagFilter: true,
+      showSearch: true,
+      showFeatured: true,
+    }),
+  },
+  "/depoimentos": {
+    hero: (ctx) => header(ctx, "testimonials"),
+    depoimentos: (ctx, plugins, recipe) =>
+      compact({ ...(hasHeader(recipe) ? {} : { title: ctx.t("testimonials.title"), intro: ctx.t("testimonials.subtitle") }), allowSubmission: plugins["testimonials-intake"] !== false }),
+  },
 };
 
 /** Título e SEO de cada página fixa. */
 const PAGE_META: Record<string, (ctx: Ctx) => { title: Loc; seo?: Doc }> = {
-  "/": (ctx) => ({ title: ctx.t("navigation.home"), seo: compact({ title: loc(ctx.config.get("seo_home_title")), description: loc(ctx.config.get("seo_home_description")) }) }),
-  "/sobre": (ctx) => ({ title: ctx.t("navigation.about"), seo: compact({ title: ctx.t("seo.aboutTitle"), description: ctx.t("seo.aboutDescription") }) }),
-  "/curriculo": (ctx) => ({ title: ctx.t("navigation.resume"), seo: compact({ title: ctx.t("seo.resumeTitle"), description: ctx.t("seo.resumeDescription") }) }),
-  "/portfolio": (ctx) => ({ title: ctx.t("navigation.portfolio"), seo: compact({ title: ctx.t("seo.portfolioTitle"), description: ctx.t("seo.portfolioDescription") }) }),
-  "/blog": (ctx) => ({ title: ctx.t("navigation.blog"), seo: compact({ title: ctx.t("seo.blogTitle"), description: ctx.t("seo.blogDescription") }) }),
+  // O título e a descrição da home ficavam no siteConfig, sem tradução: valiam nos dois idiomas.
+  "/": (ctx) => ({ title: ctx.t("navigation.home"), seo: compact({ title: sameInBoth(loc(ctx.config.get("seo_home_title"))), description: sameInBoth(loc(ctx.config.get("seo_home_description"))) }) }),
+  "/sobre": (ctx) => ({ title: ctx.t("navigation.about"), seo: compact({ title: v1FullTitle(ctx.t("seo.aboutTitle"), ctx.siteTitle), description: ctx.t("seo.aboutDescription") }) }),
+  "/curriculo": (ctx) => ({ title: ctx.t("navigation.resume"), seo: compact({ title: v1FullTitle(ctx.t("seo.resumeTitle"), ctx.siteTitle), description: ctx.t("seo.resumeDescription") }) }),
+  "/portfolio": (ctx) => ({ title: ctx.t("navigation.portfolio"), seo: compact({ title: v1FullTitle(ctx.t("seo.portfolioTitle"), ctx.siteTitle), description: ctx.t("seo.portfolioDescription") }) }),
+  "/blog": (ctx) => ({ title: ctx.t("navigation.blog"), seo: compact({ title: v1FullTitle(ctx.t("seo.blogTitle"), ctx.siteTitle), description: ctx.t("seo.blogDescription") }) }),
   "/depoimentos": (ctx) => ({ title: ctx.t("testimonials.title"), seo: compact({ description: ctx.t("seo.testimonialsDescription") }) }),
 };
 
@@ -646,17 +786,18 @@ export const SECTION_KEYS = new Set([
   "home.about.title", "home.skills.title", "home.testimonials.title", "home.cta.title", "home.cta.subtitle", "home.cta.project", "home.cta.job",
   "sidebar.contact", "blog.title", "blog.subtitle", "about.professional.title", "about.aboutMe.title", "about.aboutMe.text", "about.principles.title",
   "about.dailyRoutine.title", "about.faq.title", "resume.title", "resume.subtitle", "portfolio.title", "portfolio.subtitle", "testimonials.title",
-  "testimonials.subtitle", "navigation.home", "navigation.about", "navigation.resume", "navigation.portfolio", "navigation.blog",
+  "testimonials.subtitle", "testimonials.viewAll", "home.greeting", "navigation.home", "navigation.about", "navigation.resume", "navigation.portfolio", "navigation.blog",
   "seo.aboutTitle", "seo.aboutDescription", "seo.resumeTitle", "seo.resumeDescription", "seo.portfolioTitle", "seo.portfolioDescription",
   "seo.blogTitle", "seo.blogDescription", "seo.testimonialsDescription", "portfolio.before", "portfolio.problem", "portfolio.solution",
-  "portfolio.decisions", "portfolio.results", "portfolio.learnings", "portfolio.metrics", "portfolio.testimonial", "portfolio.liveDemo", "portfolio.code",
+  "portfolio.decisions", "portfolio.results", "portfolio.learnings", "portfolio.testimonial", "portfolio.liveDemo", "portfolio.code",
 ]);
 
 /** Textos de interface da v1 → chave da v2 (só os personalizados vão; os outros usam o padrão da v2). */
 export const UI_TEXT_MAP: Record<string, string> = {
   "blog.readMore": "common.readMore",
   "common.back": "common.back",
-  "testimonials.leaveTestimonial": "testimonials.send",
+  // O botão do envio de depoimento é o da ilha (`testimonialForm.open`).
+  "testimonials.leaveTestimonial": "testimonialForm.open",
   "testimonials.empty": "common.empty",
   "resume.experience": "resume.experience",
   "resume.education": "resume.education",
@@ -664,8 +805,33 @@ export const UI_TEXT_MAP: Record<string, string> = {
   "resume.courses": "resume.certification",
   "resume.languages": "resume.language",
   "resume.downloadCV": "resume.download",
+  "resume.softSkills": "resume.soft-skill",
+  "resume.volunteer": "resume.volunteer",
+  "resume.showOlder": "resume.showOlder",
+  "resume.hideOlder": "resume.hideOlder",
+  "contactWizard.trigger": "sidebar.talk",
+  "sidebar.downloadCV": "sidebar.downloadCV",
+  "portfolio.screenshots": "case.gallery",
   "home.cases.read": "case.view",
+  "portfolio.viewCase": "case.view",
+  "portfolio.details": "case.details",
+  "portfolio.all": "cases.all",
+  "portfolio.metrics": "case.metrics",
+  "portfolio.nextCase": "case.next",
+  "portfolio.ctaTitle": "case.ctaTitle",
+  "portfolio.ctaSubtitle": "case.ctaBody",
+  "portfolio.ctaProject": "case.ctaButton",
+  "portfolio.expandImage": "gallery.expand",
+  "portfolio.previousImage": "gallery.prev",
+  "portfolio.nextImage": "gallery.next",
   "blog.filterByTags": "blog.filter",
+  "blog.featured": "blog.featured",
+  "blog.readNow": "blog.readNow",
+  "blog.searchPlaceholder": "blog.search",
+  "blog.backToBlog": "blog.back",
+  "blog.authorCta": "blog.authorCta",
+  "blog.authorLine": "blog.authorLine",
+  "blog.relatedCase": "blog.relatedCase",
   "sidebar.language": "nav.language",
   "sidebar.menu": "nav.menu",
   "contactWizard.contact.name": "form.name",
@@ -676,8 +842,27 @@ export const UI_TEXT_MAP: Record<string, string> = {
   "contactWizard.rateLimited": "form.rateLimited",
   "contactWizard.back": "form.back",
   "notFound.cta": "notFound.home",
+  "notFound.label": "notFound.label",
+  "notFound.errorCode": "notFound.code",
   "portfolio.myRole": "case.role",
   "home.availability.label": "hero.available",
+};
+
+/**
+ * Rótulos da v1 que vêm mesmo sem personalização ("Habilidades", "Baixar CV (PDF)", "Fale
+ * comigo"), quando diferem do padrão da v2: o site migrado fica com as palavras da v1.
+ */
+const V1_LABELS = [
+  "resume.experience", "resume.education", "resume.skills", "resume.softSkills", "resume.courses", "resume.languages",
+  "resume.volunteer", "resume.downloadCV", "resume.showOlder", "resume.hideOlder",
+  "contactWizard.trigger", "sidebar.downloadCV", "testimonials.leaveTestimonial", "portfolio.screenshots", "blog.filterByTags", "portfolio.metrics",
+  "notFound.cta",
+  "blog.featured", "blog.backToBlog", "blog.authorCta",
+];
+
+/** Ajuste do texto da v1 ao formato da chave da v2 (a v2 mostra a contagem no próprio texto). */
+const UI_TEXT_ADAPT: Record<string, (s: string) => string> = {
+  "resume.showOlder": (s) => (s.includes("{count}") ? s : `${s} ({count})`),
 };
 
 /**
@@ -728,7 +913,7 @@ function buildPages(ctx: Ctx, input: ConvertInput, plugins: Record<string, boole
         dropped.push({ type: block.type, reason: "a v1 não tinha esta seção nesta página" });
         continue;
       }
-      const fields = fill(ctx, plugins);
+      const fields = fill(ctx, plugins, page.blocks);
       if (!fields) {
         dropped.push({ type: block.type, reason: "sem conteúdo na v1" });
         continue;
@@ -760,7 +945,9 @@ function buildPages(ctx: Ctx, input: ConvertInput, plugins: Record<string, boole
         path: page.path,
         title,
         seo: m.seo && Object.keys(m.seo).length ? m.seo : undefined,
-        blocks: kept.map((b, i) => compact({ id: ids[i], type: b.type, variant: b.variant, visible: true, fields: b.fields ?? {}, source: b.source })),
+        // `fields` é obrigatório no schema, mesmo vazio: fica fora do compact (que tira objetos vazios).
+        // A receita do tema pode trazer o bloco escondido (ex.: o contato da home num tema com a janela de contato).
+        blocks: kept.map((b, i) => ({ ...compact({ id: ids[i], type: b.type, variant: b.variant, visible: b.visible !== false, source: b.source }), fields: b.fields ?? {} })),
         published: true,
         system: true,
         createdAt: now,
@@ -919,11 +1106,20 @@ function buildUiTexts(ctx: Ctx, report: MigrationReport, now: number, plugins: R
     const v2 = UI_TEXT_MAP[key];
     if (v2) {
       if (out.some((t) => t.key === v2)) continue;
-      out.push({ key: v2, value: ctx.t(key), updatedAt: now });
+      out.push({ key: v2, value: adaptText(key, ctx.t(key)), updatedAt: now });
       report.texts.ui.push({ v1: key, v2 });
     } else if (!key.startsWith("admin.")) {
       report.texts.unmapped.push({ key, pt: String(ctx.siteTexts.get(key)?.ptBR ?? ctx.projectTexts[key]?.pt ?? "").slice(0, 120) });
     }
+  }
+  for (const key of V1_LABELS) {
+    const v2 = UI_TEXT_MAP[key]!;
+    if (out.some((t) => t.key === v2)) continue;
+    const value = adaptText(key, ctx.t(key));
+    if (!hasText(value)) continue;
+    if (Object.entries(value).every(([locale, text]) => text === defaultUiText(v2, locale as Locale))) continue;
+    out.push({ key: v2, value, updatedAt: now });
+    report.texts.ui.push({ v1: key, v2 });
   }
   if (plugins["contact-wizard"] !== false) {
     for (const { v1, v2, value } of wizardUiTexts(ctx)) {
@@ -935,9 +1131,14 @@ function buildUiTexts(ctx: Ctx, report: MigrationReport, now: number, plugins: R
   return out;
 }
 
+function adaptText(key: string, value: Loc): Loc {
+  const adapt = UI_TEXT_ADAPT[key];
+  return adapt ? mapLoc(value, adapt) : value;
+}
+
 export function convertV1(input: ConvertInput): ConvertResult {
   const t = input.tables;
-  const ctx = new Ctx(t, input.projectTexts);
+  const ctx = new Ctx(t, input.projectTexts, input.storage);
   const report: MigrationReport = { tables: [], pages: [], texts: { sectionKeys: 0, ui: [], unmapped: [] }, plugins: [], pending: [], dropped: [], unknownTables: [], warnings: ctx.warnings };
   const now = input.now ?? Date.now();
   const out: Record<string, Doc[]> = {};
@@ -963,8 +1164,12 @@ export function convertV1(input: ConvertInput): ConvertResult {
   );
   put("faq", "aboutFaq", (t.aboutFaq ?? []).map((d) => compact({ ...meta(d), question: loc(d.question, d.questionTranslations), answer: mapLoc(loc(d.answer, d.answerTranslations), (s) => s), order: d.displayOrder, ...lifecycle(d) })));
   const routine = t.aboutDailyRoutine ?? [];
-  if (routine.some((d) => d.spanSize && d.spanSize !== "1x1")) ctx.warnings.push("Dia a dia: o tamanho de cada foto na grade (1x2, 2x1) não existe na v2; a galeria do tema decide.");
-  put("routine", "aboutDailyRoutine", routine.map((d) => compact({ ...meta(d), title: loc(d.description, d.descriptionTranslations), image: ctx.image(d.imageId, d.imageUrl), order: d.displayOrder, ...lifecycle(d) })));
+  // O tamanho no mosaico da v1 (`spanSize`, ou `span_size` em exports antigos) vira o `span` do item.
+  const span = (d: Doc) => {
+    const s = str(d.spanSize) || str(d.span_size);
+    return s === "1x2" || s === "2x1" || s === "2x2" ? s : undefined;
+  };
+  put("routine", "aboutDailyRoutine", routine.map((d) => compact({ ...meta(d), title: loc(d.description, d.descriptionTranslations), image: ctx.image(d.imageId, d.imageUrl), span: span(d), order: d.displayOrder, ...lifecycle(d) })));
   put("resumeItems", "resumeItems", convertResume(ctx, t.resumeItems ?? []));
   put(
     "media",
@@ -979,7 +1184,7 @@ export function convertV1(input: ConvertInput): ConvertResult {
   report.plugins = plugins.report;
   const settings = convertSettings(ctx, input, plugins.record);
   const pages = buildPages(ctx, input, plugins.record, report);
-  settings.navigation = navigationFromPages(pages as never) as Doc[];
+  settings.navigation = v1Navigation(navigationFromPages(pages as never) as Doc[]);
   put("siteSettings", "", [compact({ ...settings, updatedAt: now })]);
   put("pages", "", pages);
   put("uiTexts", "", buildUiTexts(ctx, report, now, plugins.record));

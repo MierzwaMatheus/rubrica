@@ -53,6 +53,11 @@ export interface BlockDefinition<M extends FieldMap = FieldMap> {
    */
   enhances?: boolean;
   /**
+   * A ilha veio depois dos temas: ela só monta com o componente padrão do núcleo ou num
+   * tema que declara o tipo em `islandBlocks` (os outros desenham o bloco sem ela).
+   */
+  islandOptIn?: boolean;
+  /**
    * Regras entre campos ou de formato que o schema não expressa (ex.: endereço de um
    * provedor permitido). Recebe os valores crus, já conferidos campo a campo; vale no
    * backend, no MCP e no painel, porque roda dentro de `validateBlock`.

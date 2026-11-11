@@ -14,7 +14,8 @@ export interface ResumeDocument {
   locale: string;
   items: ResumeItem[];
   /** Títulos das seções, por tipo de item, e o texto de "atual". */
-  labels: Record<"experience" | "education" | "skill" | "certification" | "language" | "present", string>;
+  labels: Record<"experience" | "education" | "skill" | "certification" | "language" | "present", string> &
+    Partial<Record<"volunteer" | "soft-skill", string>>;
 }
 
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -24,8 +25,19 @@ function period(item: ResumeItem, present: string): string {
   return `${item.start ?? ""} – ${item.end ?? present}`;
 }
 
+/** Texto rico (HTML) em texto de PDF legível por ATS: a lista vira lista, o resto, um parágrafo. */
+function htmlDescription(raw: string): string {
+  const strip = (s: string) => s.replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
+  const items = [...raw.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/gi)].map((m) => strip(m[1] ?? "")).filter(Boolean);
+  const text = strip(raw.replace(/<(ul|ol)[^>]*>[\s\S]*?<\/\1>/gi, " "));
+  // O HTML já vem sanitizado; aqui ele vira texto, então as entidades voltam a ser escapadas.
+  const unescape = (s: string) => s.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, "&");
+  return `${text ? `<p>${esc(unescape(text))}</p>` : ""}${items.length ? `<ul>${items.map((i) => `<li>${esc(unescape(i))}</li>`).join("")}</ul>` : ""}`;
+}
+
 function description(text: string | undefined): string {
   if (!text) return "";
+  if (/<[a-z][\s\S]*>/i.test(text)) return htmlDescription(text);
   const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
   const bullets = lines.filter((l) => /^[-•]\s/.test(l));
   if (bullets.length && bullets.length === lines.length) return `<ul>${bullets.map((l) => `<li>${esc(l.replace(/^[-•]\s+/, ""))}</li>`).join("")}</ul>`;
@@ -49,6 +61,7 @@ function entries(items: ResumeItem[], present: string): string {
 export function buildResumeHtml(doc: ResumeDocument): string {
   const by = (kind: ResumeItem["kind"]) => doc.items.filter((i) => i.kind === kind);
   const skills = by("skill").map((i) => esc(i.title));
+  const softSkills = by("soft-skill").map((i) => esc(i.title));
   const languages = by("language")
     .map((i) => `<p><strong>${esc(i.title)}</strong>${i.description ? `: ${esc(i.description)}` : ""}</p>`)
     .join("");
@@ -84,10 +97,12 @@ li { font-size: 10.5pt; margin-bottom: 2px; }
 ${doc.jobTitle ? `<div class="header-role">${esc(doc.jobTitle)}</div>` : ""}
 <div class="header-contact">${doc.contact.map(esc).join(" &nbsp;|&nbsp; ")}</div>
 ${section(doc.labels.skill, skills.length ? `<p>${skills.join(", ")}</p>` : "")}
+${section(doc.labels["soft-skill"] ?? doc.labels.skill, softSkills.length ? `<p>${softSkills.join(", ")}</p>` : "")}
 ${section(doc.labels.experience, entries(by("experience"), doc.labels.present))}
 ${section(doc.labels.education, entries(by("education"), doc.labels.present))}
 ${section(doc.labels.certification, certs ? `<ul>${certs}</ul>` : "")}
 ${section(doc.labels.language, languages)}
+${section(doc.labels.volunteer ?? doc.labels.experience, entries(by("volunteer"), doc.labels.present))}
 </body>
 </html>`;
 }

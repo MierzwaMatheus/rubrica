@@ -10,19 +10,20 @@ import { ComparativoPlanosBlock } from "./blocks/compare";
 import { DefaultCase, DefaultNotFound, DefaultPost, DefaultShell } from "./shell";
 
 export * from "./primitives";
+export { CaseMetrics, LucideIcon, lucideIcon } from "./case";
 export { DefaultShell, DefaultPost, DefaultCase, DefaultNotFound, LocaleLinks, localeCode } from "./shell";
 export { SiteAnnouncement, WhatsAppFloat, siteWideAttributes } from "./sitewide";
 export { HeroBlock, TextoBlock, CtaBlock, GenericBlock } from "./blocks/basic";
-export { CasesBlock, DepoimentosBlock, FaqBlock, PostsRecentesBlock, PrecosBlock } from "./blocks/collections";
+export { CasesBlock, DepoimentosBlock, FaqBlock, PostsRecentesBlock, PrecosBlock, postSearchText } from "./blocks/collections";
 export { ContatoBlock, LocalizacaoBlock } from "./blocks/contact";
 export { EquipeBlock, GaleriaBlock, ListaItensBlock, LogosClientesBlock, NumerosBlock, ServicosBlock } from "./blocks/lists";
-export { CurriculoBlock } from "./blocks/resume";
+export { CurriculoBlock, groupResumeSkills, ResumeDescription, ResumeHeading, ResumePeriod } from "./blocks/resume";
 export { IncorporacaoBlock, VideoBlock, VideoFrame, videoName, videoPoster, videoRatio } from "./blocks/media";
 export type { VideoFrameProps } from "./blocks/media";
 export { LinhaDoTempoBlock } from "./blocks/timeline";
 export { ComparativoPlanosBlock } from "./blocks/compare";
 /** Utilitários puros dos blocos padrão, para os temas não copiarem. */
-export { digits, formatDays, resolveFreeHref, safeId, shorten, tagFilterCss } from "./blocks/util";
+export { digits, formatDays, isHtmlText, resolveFreeHref, safeId, shorten, tagFilterCss } from "./blocks/util";
 export type { TagFilterCssOptions } from "./blocks/util";
 
 /** Componentes padrão por tipo de bloco. Tipo sem entrada usa `GenericBlock`. */

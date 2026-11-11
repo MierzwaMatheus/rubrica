@@ -12,7 +12,7 @@
  *   de um balão.
  */
 import type { BlockProps, CollectionItems, ResolvedLink } from "@rubrica/core";
-import { Heading, Html, Img, digits, formatDays, safeId } from "@rubrica/core/components";
+import { Heading, Html, Img, digits, formatDays, safeId, isHtmlText } from "@rubrica/core/components";
 import { CHAT_CORE_BLOCKS } from "./embedded";
 import { Ask, askFor, Avatar, Bubble, BubbleLink, ChatSection, FileDown, kindText, LinkCard, MapPin, Pill, splitBlocks } from "./chat";
 
@@ -537,6 +537,7 @@ function Period({ item, ctx }: { item: Resume; ctx: BlockProps["ctx"] }) {
 
 function Description({ text }: { text?: string }) {
   if (!text) return null;
+  if (isHtmlText(text)) return <Html html={text} className="rb-prose rb-resume__desc" />;
   const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
   if (lines.every((l) => /^[-•]\s/.test(l))) {
     return (

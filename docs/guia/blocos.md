@@ -45,7 +45,7 @@ Primeira dobra: título principal, apoio, botões e imagem. Leva o h1 quando é 
 - **Combina com:** [`numeros`](#numeros--números), [`logos-clientes`](#logos-clientes--logos-de-clientes), [`cases`](#cases--cases), [`servicos`](#servicos--serviços)
 - **Tipo de site:** pessoal e empresa
 - **Plugin:** nenhum: sempre disponível
-- **Variações:** temas: `blueprint` (`apresentacao`, `folha`); `monograph` (`folha-de-rosto`, `capitulo`)
+- **Variações:** temas: `blueprint` (`apresentacao`, `folha`); `cyberpunk` (`inicio`, `pagina`); `monograph` (`folha-de-rosto`, `capitulo`); `padrao` (`inicio`, `pagina`)
 
 | Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
 |---|---|---|---|---|---|
@@ -68,7 +68,7 @@ Título e texto livre, com imagem opcional ao lado.
 - **Combina com:** [`numeros`](#numeros--números), [`lista-itens`](#lista-itens--lista-de-itens), [`galeria`](#galeria--galeria), [`cta`](#cta--chamada)
 - **Tipo de site:** pessoal e empresa
 - **Plugin:** nenhum: sempre disponível
-- **Variações:** temas: `brutalist` (`simples`, `numerado`); `chat` (`mensagens`, `pergunta`); `magazine` (`coluna`, `ensaio`); `poster` (`declaracao`, `corrido`); `zine` (`carta`, `postit`)
+- **Variações:** temas: `brutalist` (`simples`, `numerado`); `chat` (`mensagens`, `pergunta`); `cyberpunk` (`default`, `pessoal`); `magazine` (`coluna`, `ensaio`); `padrao` (`default`, `pessoal`); `poster` (`declaracao`, `corrido`); `zine` (`carta`, `postit`)
 
 | Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
 |---|---|---|---|---|---|
@@ -131,7 +131,7 @@ Projetos ou cases da coleção, com link para a página de cada um. Mostra os de
 - **Tipo de site:** pessoal e empresa
 - **Plugin:** `portfolio`: o bloco some com o plugin desligado
 - **Lista itens de:** `projects` (padrão ao criar: só os destaques, 3 itens, na ordem do painel)
-- **Variações:** componente padrão do núcleo: `grade`, `lista` · temas: `bento` (`grade`, `destaque`); `blueprint` (`grade`, `destaque`); `brutalist` (`grade`, `lista`); `chat` (`lista`, `destaque`); `cyberpunk` (`grade`, `lista`); `desktop` (`grade`, `lista`); `garden` (`grade`, `destaque`); `index` (`indice`, `destaque`, `grade`); `magazine` (`grade`, `lista`); `monograph` (`sumario`, `pranchas`); `padrao` (`grade`, `lista`); `poster` (`cartaz`, `catalogo`, `faixa`); `swiss` (`grade`, `lista`); `zine` (`grade`, `destaque`, `lista`)
+- **Variações:** componente padrão do núcleo: `grade`, `lista` · temas: `bento` (`grade`, `destaque`); `blueprint` (`grade`, `destaque`); `brutalist` (`grade`, `lista`); `chat` (`lista`, `destaque`); `cyberpunk` (`grade`, `lista`, `pagina`); `desktop` (`grade`, `lista`); `garden` (`grade`, `destaque`); `index` (`indice`, `destaque`, `grade`); `magazine` (`grade`, `lista`); `monograph` (`sumario`, `pranchas`); `padrao` (`grade`, `lista`, `pagina`); `poster` (`cartaz`, `catalogo`, `faixa`); `swiss` (`grade`, `lista`); `zine` (`grade`, `destaque`, `lista`)
 
 | Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
 |---|---|---|---|---|---|
@@ -170,7 +170,7 @@ Depoimentos aprovados da coleção, com convite opcional para enviar um novo. Mo
 - **Plugin:** `testimonials`: o bloco some com o plugin desligado
 - **Lista itens de:** `testimonials` (padrão ao criar: só os destaques, 6 itens, na ordem do painel)
 - **JavaScript:** pode montar uma ilha (a parte interativa, com JavaScript no navegador); o resto é HTML estático
-- **Variações:** nenhuma: um desenho só em cada tema
+- **Variações:** temas: `cyberpunk` (`default`, `categorias`); `padrao` (`default`, `categorias`)
 
 | Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
 |---|---|---|---|---|---|
@@ -178,6 +178,7 @@ Depoimentos aprovados da coleção, com convite opcional para enviar um novo. Mo
 | `title` | Título | texto | não | sim | até 140 caracteres |
 | `intro` | Texto de apoio | texto longo | não | sim | até 400 caracteres |
 | `allowSubmission` | Convidar a enviar depoimento | sim ou não | não | — | Mostra o botão do assistente de depoimento (precisa do plugin testimonials-intake); padrão: não |
+| `cta` | Link para todos | link | não | o rótulo | Ex.: "Ver todos os depoimentos", para a página de depoimentos. Opcional |
 
 ## `faq` — Perguntas frequentes
 
@@ -207,6 +208,7 @@ Posts do blog. Com quantidade vazia, lista todos (página do blog).
 - **Tipo de site:** pessoal e empresa
 - **Plugin:** `blog`: o bloco some com o plugin desligado
 - **Lista itens de:** `posts` (padrão ao criar: 3 itens, mais novos primeiro)
+- **JavaScript:** pode montar uma ilha (a parte interativa, com JavaScript no navegador); o resto é HTML estático
 - **Variações:** temas: `chat` (`lista`, `destaque`); `garden` (`notas`, `lista`); `index` (`indice`, `destaque`); `magazine` (`sumario`, `colunas`); `zine` (`recortes`, `destaque`)
 
 | Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
@@ -216,6 +218,8 @@ Posts do blog. Com quantidade vazia, lista todos (página do blog).
 | `intro` | Texto de apoio | texto longo | não | sim | até 400 caracteres |
 | `cta` | Link para o blog | link | não | o rótulo | — |
 | `showTagFilter` | Filtro por etiqueta | sim ou não | não | — | padrão: não |
+| `showSearch` | Busca por texto | sim ou não | não | — | Campo que filtra os posts pelo título, resumo e etiquetas (página do blog); padrão: não |
+| `showFeatured` | Destaques no topo | sim ou não | não | — | Os posts marcados como destaque num carrossel acima da lista, nos temas que o desenham (página do blog); padrão: não |
 
 ## `cta` — Chamada
 

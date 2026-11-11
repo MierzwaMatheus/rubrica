@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { CORE_RECIPES, validateBlock, type Recipe } from "@rubrica/core";
+import { CORE_RECIPES, defaultUiText, validateBlock, type Recipe } from "@rubrica/core";
 import { CORE_BLOCKS } from "@rubrica/core/blocks";
-import { convertV1, loc, parsePeriod, slugify, toHtml, V1_TEXTS } from "../src/migrate/convert";
+import { convertV1, loc, parsePeriod, sameInBoth, slugify, toHtml, v1FullTitle, v1Navigation, V1_TEXTS, UI_TEXT_MAP } from "../src/migrate/convert";
 import { IDS, PRINCIPIOS, V1_RUBRICA_JSON, v1Export } from "./fixtures/v1-export";
 
 const NOW = 1_800_000_000_000;
@@ -17,9 +17,21 @@ describe("ajudantes", () => {
     expect(loc("", { enUS: "  " })).toEqual({});
   });
 
+  it("títulos de SEO como a v1 mostrava", () => {
+    expect(v1FullTitle({ "pt-BR": "Sobre Mim", en: "About Me" }, "Matheus Mierzwa")).toEqual({ "pt-BR": "Sobre Mim | Matheus Mierzwa", en: "About Me | Matheus Mierzwa" });
+    expect(v1FullTitle({ "pt-BR": "Matheus Mierzwa | Lead" }, "Matheus Mierzwa")).toEqual({ "pt-BR": "Matheus Mierzwa | Lead" });
+    expect(v1FullTitle({ "pt-BR": "Blog" }, undefined)).toEqual({ "pt-BR": "Blog" });
+    expect(sameInBoth({ "pt-BR": "Matheus Mierzwa | Lead" })).toEqual({ "pt-BR": "Matheus Mierzwa | Lead", en: "Matheus Mierzwa | Lead" });
+  });
+
   it("períodos do currículo", () => {
     expect(parsePeriod("jan/2020 – atual")).toEqual({ start: "2020-01", ok: true });
     expect(parsePeriod("2014 - 2018")).toEqual({ start: "2014", end: "2018", ok: true });
+    // Formatos de um portfólio real (mmlo): mês e ano com hífen, anos colados.
+    expect(parsePeriod("Jan-2025 - atual")).toEqual({ start: "2025-01", ok: true });
+    expect(parsePeriod("Nov-2024 - Jan-2025")).toEqual({ start: "2024-11", end: "2025-01", ok: true });
+    expect(parsePeriod("2022 - Nov-2024")).toEqual({ start: "2022", end: "2024-11", ok: true });
+    expect(parsePeriod("2015-2017")).toEqual({ start: "2015", end: "2017", ok: true });
     expect(parsePeriod("03/2016 - 12/2017")).toEqual({ start: "2016-03", end: "2017-12", ok: true });
     expect(parsePeriod("Mar 2019 - Present")).toEqual({ start: "2019-03", ok: true });
     expect(parsePeriod("setembro de 2021 a dezembro de 2022")).toEqual({ start: "2021-09", end: "2022-12", ok: true });
@@ -73,19 +85,23 @@ describe("tabelas 1:1", () => {
     expect(app!.content).toEqual({ "pt-BR": "<p>Primeiro parágrafo.</p><p>Segundo parágrafo.</p>" });
     expect(app!.role).toEqual({ "pt-BR": "Designer líder", en: "Lead designer" });
     const titles = (app!.sections as { title: Record<string, string> }[]).map((s) => s.title["pt-BR"]);
-    expect(titles).toEqual(["Antes", "O Problema", "A Solução", "Os Resultados", "Resultados em Números", "Depoimento"]);
+    expect(titles).toEqual(["Antes", "O Problema", "A Solução", "Os Resultados", "Depoimento"]);
     const sections = app!.sections as { body: Record<string, string> }[];
     expect(sections[1]!.body).toEqual({ "pt-BR": "<p>Muitas faltas.</p>", en: "<p>Many no-shows.</p>" });
     expect(sections[0]!.body).toEqual({ "pt-BR": "<p>Agenda em papel.</p>" });
-    expect(sections[4]!.body["pt-BR"]).toBe("<ul><li><strong>−40%</strong> faltas</li></ul>");
-    expect(sections[5]!.body.en).toContain("It changed the clinic.");
+    expect(sections[4]!.body.en).toContain("It changed the clinic.");
+    // Números do case num campo próprio, com o ícone da v1 e o inglês pela posição (sem par, só pt).
+    expect(app!.metrics).toEqual([
+      { value: "−40%", label: { "pt-BR": "faltas", en: "no-shows" }, icon: "TrendingDown" },
+      { value: "12", label: { "pt-BR": "clínicas" } },
+    ]);
     expect(app!.cover).toMatchObject({ storageId: IDS.storage[1] });
     expect((app!.gallery as unknown[]).length).toBe(2);
     expect(app!.links).toEqual([
       { label: { "pt-BR": "Demo ao Vivo", en: "Live Demo" }, href: "https://app.exemplo.dev" },
       { label: { "pt-BR": "Código", en: "Code" }, href: "https://github.com/exemplo/app" },
     ]);
-    expect(app!.tags).toEqual(["Produto", "ux", "mobile"]);
+    expect(app!.tags).toEqual(["ux", "mobile"]);
     expect(app!.category).toEqual({ "pt-BR": "Produto", en: "Product" });
     expect(marca!.slug).toBe("identidade-visual");
     expect(marca!.featured).toBeUndefined();
@@ -99,21 +115,25 @@ describe("tabelas 1:1", () => {
     expect(r.tables.testimonials![0]).toMatchObject({ quote: { "pt-BR": "Excelente trabalho.", en: "Excellent work." }, author: "Carlos", featured: true, tags: ["Produto"], avatar: { url: "https://imagens.exemplo.dev/carlos.png" } });
     expect(r.tables.testimonials![1]!.featured).toBeUndefined();
     expect(r.tables.faq![0]).toMatchObject({ question: { "pt-BR": "Trabalha remoto?", en: "Do you work remotely?" }, answer: { "pt-BR": "Sim.", en: "Yes." }, order: 0 });
-    expect(r.tables.routine![0]).toMatchObject({ title: { "pt-BR": "Café e rascunhos", en: "Coffee and sketches" }, image: { storageId: IDS.storage[1] } });
-    expect(r.report.warnings.join(" ")).toMatch(/tamanho de cada foto/);
+    // O tamanho no mosaico da v1 (spanSize) vira o span do item; 1x1 é o padrão e não vai.
+    expect(r.tables.routine![0]).toMatchObject({ title: { "pt-BR": "Café e rascunhos", en: "Coffee and sketches" }, image: { storageId: IDS.storage[1] }, span: "2x1" });
+    expect(r.tables.routine![1]).not.toHaveProperty("span");
+    expect(r.report.warnings.join(" ")).not.toMatch(/tamanho de cada foto/);
   });
 
   it("currículo: tipos da v1 → da v2, períodos e o que não deu para entender", () => {
     const items = r.tables.resumeItems!;
-    expect(items.map((i) => i.kind)).toEqual(["experience", "experience", "education", "skill", "skill", "certification", "language", "experience", "experience"]);
+    expect(items.map((i) => i.kind)).toEqual(["experience", "experience", "education", "skill", "soft-skill", "certification", "language", "volunteer", "experience"]);
     expect(items[0]).toMatchObject({ title: { "pt-BR": "Designer líder", en: "Lead designer" }, organization: "Clínica X", start: "2020-01" });
     expect(items[0]!.end).toBeUndefined();
     expect(items[1]!.start).toBeUndefined();
     expect(items[2]).toMatchObject({ organization: "Universidade Z", start: "2014", end: "2018" });
     expect(items[3]).toMatchObject({ title: { "pt-BR": "Figma" }, description: { "pt-BR": "Avançado" }, group: { "pt-BR": "Ferramentas" }, tags: ["Ferramentas"] });
-    expect(items[4]).toMatchObject({ title: { "pt-BR": "Comunicação", en: "Communication" }, tags: ["soft-skill"] });
+    expect(items[4]).toMatchObject({ title: { "pt-BR": "Comunicação", en: "Communication" } });
+    expect(items[4]!.tags).toBeUndefined();
     expect(items[6]).toMatchObject({ title: { "pt-BR": "Inglês", en: "English" }, description: { "pt-BR": "Fluente" } });
-    expect(items[7]).toMatchObject({ title: { "pt-BR": "Mentoria em ONG" }, tags: ["voluntariado"] });
+    expect(items[7]).toMatchObject({ title: { "pt-BR": "Mentoria em ONG" } });
+    expect(items[7]!.tags).toBeUndefined();
     expect(items[8]!.deletedAt).toBeDefined();
     expect(r.report.warnings.join(" ")).toMatch(/verão de 2019/);
   });
@@ -151,9 +171,33 @@ describe("configurações do site", () => {
     expect(withTexture("lava")).not.toHaveProperty("texture");
   });
 
+  it("foto da pessoa com URL do storage da v1 aponta para o arquivo importado; telefone vai para a sidebar", () => {
+    const { tables } = v1Export();
+    tables.contactInfo = [{ ...tables.contactInfo![0]!, avatarStorageId: undefined, avatarUrl: "https://velho-123.convex.cloud/api/storage/8003b0d9-bb6a-4759-beb6-caf538ade1f7", phone: "+55 11 98823-2537", showPhone: true }];
+    const storage = [{ _id: "kg2foto", internalId: "8003b0d9-bb6a-4759-beb6-caf538ade1f7" }];
+    const person = convertV1({ tables, storage, v1: V1_RUBRICA_JSON, theme: "cyberpunk", recipe: CORE_RECIPES.pessoal, now: NOW }).tables.siteSettings![0]!.person as Record<string, unknown>;
+    expect(person.photo).toEqual({ url: "", storageId: "kg2foto" });
+    expect(person.whatsapp).toBe("+55 11 98823-2537");
+    // Sem o arquivo no export, a URL antiga fica (melhor que nada).
+    const semArquivo = convertV1({ tables, v1: V1_RUBRICA_JSON, theme: "cyberpunk", recipe: CORE_RECIPES.pessoal, now: NOW }).tables.siteSettings![0]!.person as Record<string, unknown>;
+    expect((semArquivo.photo as { url: string }).url).toContain("/api/storage/");
+  });
+
+  it("menu na ordem da sidebar da v1, sem as páginas que não estavam nele", () => {
+    const items = ["/", "/sobre", "/curriculo", "/portfolio", "/blog", "/depoimentos"].map((href) => ({ href, label: { "pt-BR": href } }));
+    expect(v1Navigation(items).map((n) => n.href)).toEqual(["/", "/curriculo", "/portfolio", "/sobre", "/blog"]);
+    const nav = run().tables.siteSettings![0]!.navigation as { href: string }[];
+    expect(nav.map((n) => n.href)).not.toContain("/depoimentos");
+  });
+
+  it("o selo do hero é o home.greeting da v1 (whoami), não o cargo", () => {
+    const home = (run().tables.pages as { path: string; blocks: { type: string; fields: Record<string, unknown> }[] }[]).find((p) => p.path === "/")!;
+    expect(home.blocks.find((b) => b.type === "hero")!.fields.eyebrow).toEqual({ "pt-BR": "whoami", en: "whoami" });
+  });
+
   it("pessoa e redes do contactInfo", () => {
     expect(settings.person).toEqual({ name: "Bruna Lima", jobTitle: { "pt-BR": "Designer de produto", en: "Product designer" }, email: "contato@brunalima.design", photo: { url: "", storageId: IDS.storage[1] } });
-    expect(settings.social).toEqual([{ network: "linkedin", url: "https://linkedin.com/in/brunalima" }, { network: "github", url: "https://github.com/brunalima" }]);
+    expect(settings.social).toEqual([{ network: "github", url: "https://github.com/brunalima" }, { network: "linkedin", url: "https://linkedin.com/in/brunalima" }]);
   });
 
   it("WhatsApp do contactInfo (com Mostrar ligado) vira o WhatsApp do site, sem botão flutuante", () => {
@@ -184,8 +228,9 @@ describe("configurações do site", () => {
   });
 
   it("menu a partir das páginas fixas, com os rótulos da v1", () => {
-    expect(settings.navigation.map((n: { href: string }) => n.href)).toEqual(["/", "/sobre", "/curriculo", "/portfolio", "/blog", "/depoimentos"]);
-    expect(settings.navigation[1].label).toEqual({ "pt-BR": "Sobre Mim", en: V1_TEXTS["navigation.about"]!.en });
+    // Ordem da sidebar da v1; depoimentos não estava no menu.
+    expect(settings.navigation.map((n: { href: string }) => n.href)).toEqual(["/", "/curriculo", "/portfolio", "/sobre", "/blog"]);
+    expect(settings.navigation[3].label).toEqual({ "pt-BR": "Sobre Mim", en: V1_TEXTS["navigation.about"]!.en });
   });
 });
 
@@ -204,10 +249,11 @@ describe("páginas pela receita, preenchidas com a v1", () => {
   it("home: hero com o texto personalizado, números, cases, sobre e chamada", () => {
     const home = byPath(r, "/");
     expect(home.title).toEqual({ "pt-BR": "Início", en: V1_TEXTS["navigation.home"]!.en });
-    expect(home.seo).toEqual({ title: { "pt-BR": "Bruna Lima · Designer de produto" } });
+    expect(home.seo).toEqual({ title: { "pt-BR": "Bruna Lima · Designer de produto", en: "Bruna Lima · Designer de produto" } });
     const hero = block(home, "hero").fields;
     expect(hero.title).toEqual({ "pt-BR": "Desenho produtos que as pessoas entendem.", en: "I design products people understand." });
-    expect(hero.eyebrow).toEqual({ "pt-BR": "Designer de produto", en: "Product designer" });
+    // O selo é o home.greeting da v1; o cargo fica na pessoa.
+    expect(hero.eyebrow).toEqual({ "pt-BR": "whoami", en: "whoami" });
     expect(hero.subtitle).toEqual({ "pt-BR": V1_TEXTS["home.hero.description"]!.pt, en: V1_TEXTS["home.hero.description"]!.en });
     expect(hero.tags).toEqual([{ label: { "pt-BR": "Figma" } }, { label: { "pt-BR": "Pesquisa" } }]);
     expect(hero.showAvailability).toBe(true);
@@ -217,6 +263,8 @@ describe("páginas pela receita, preenchidas com a v1", () => {
     expect(block(home, "texto").fields.body).toEqual({ "pt-BR": "<p>Sou designer há dez anos.</p><p>Gosto de problemas difíceis.</p>", en: "<p>I have been a designer for ten years.</p><p>I like hard problems.</p>" });
     expect(block(home, "cta").fields.title).toEqual({ "pt-BR": V1_TEXTS["home.cta.title"]!.pt, en: V1_TEXTS["home.cta.title"]!.en });
     expect(block(home, "contato").fields).toMatchObject({ anchor: "contato", mode: "wizard" });
+    // "Ver todos os depoimentos" da v1 vira o link do bloco, para a página de depoimentos.
+    expect(block(home, "depoimentos").fields.cta).toEqual({ label: { "pt-BR": V1_TEXTS["testimonials.viewAll"]!.pt, en: V1_TEXTS["testimonials.viewAll"]!.en }, href: "/depoimentos" });
     // nenhum texto de exemplo da receita sobrou
     expect(JSON.stringify(home)).not.toContain("Uma frase que diz o que você faz");
     expect(JSON.stringify(home)).not.toContain('"es"');
@@ -240,6 +288,55 @@ describe("páginas pela receita, preenchidas com a v1", () => {
     const priv = byPath(r, "/privacidade");
     expect(Object.keys(priv.title)).toEqual(["pt-BR", "en"]);
     expect(r.report.pages.find((p) => p.path === "/privacidade")?.blocks).toEqual(["texto"]);
+  });
+
+  it("currículo da receita do núcleo: título e apoio no bloco do currículo", () => {
+    const cv = byPath(r, "/curriculo");
+    expect(cv.blocks.map((b: { type: string }) => b.type)).toEqual(["curriculo"]);
+    expect(block(cv, "curriculo").fields).toMatchObject({ title: { "pt-BR": V1_TEXTS["resume.title"]!.pt }, showDownload: true });
+  });
+
+  it("currículo com cabeçalho (receita do padrao/cyberpunk): título, resumo com números em negrito, números e o currículo sem título", () => {
+    const recipe: Recipe = [
+      {
+        path: "/curriculo",
+        title: { "pt-BR": "Currículo" },
+        blocks: [
+          { type: "hero", variant: "pagina", fields: { title: { "pt-BR": "Exemplo" } } },
+          { type: "texto", fields: { body: { "pt-BR": "<p>Exemplo</p>" } } },
+          { type: "numeros", fields: { items: [{ value: "1", label: { "pt-BR": "x" } }] } },
+          { type: "curriculo", fields: { showDownload: true } },
+        ],
+      },
+    ];
+    const tables = v1Export().tables;
+    tables.homeContent = tables.homeContent!.map((h) =>
+      h.key === "about_text" ? { ...h, value: { ptBR: "Em 4 meses, entreguei 50 skills para 8 áreas em 2026 & cia.\n\nOutro parágrafo.", enUS: "In 4 months I shipped 50 skills.\n\nMore." } } : h,
+    );
+    const cv = convertV1({ tables, v1: V1_RUBRICA_JSON, theme: "cyberpunk", recipe, now: NOW }).tables.pages!.find((p) => p.path === "/curriculo")!;
+    expect(cv.blocks.map((b: { type: string }) => b.type)).toEqual(["hero", "texto", "numeros", "curriculo"]);
+    expect(block(cv, "hero")).toMatchObject({ variant: "pagina", fields: { title: { "pt-BR": V1_TEXTS["resume.title"]!.pt, en: V1_TEXTS["resume.title"]!.en }, subtitle: { "pt-BR": V1_TEXTS["resume.subtitle"]!.pt } } });
+    // Só o 1º parágrafo; números com unidade em negrito (o ano solto não), texto escapado.
+    expect(block(cv, "texto").fields.body).toEqual({
+      "pt-BR": "<p>Em <strong>4 meses</strong>, entreguei <strong>50 skills</strong> para <strong>8 áreas</strong> em 2026 &amp; cia.</p>",
+      en: "<p>In <strong>4 months</strong> I shipped <strong>50 skills</strong>.</p>",
+    });
+    expect(block(cv, "texto").fields.title).toBeUndefined();
+    expect(block(cv, "numeros").fields.items).toEqual([{ value: "10+", label: { "pt-BR": "anos", en: "years" } }, { value: "60", label: { "pt-BR": "projetos" } }]);
+    expect(block(cv, "curriculo").fields).toEqual({ showDownload: true });
+  });
+
+  it("variação e bloco escondido vêm da receita do tema (contato só na janela, texto pessoal, depoimentos por categoria)", () => {
+    const recipe: Recipe = [
+      { path: "/", title: { "pt-BR": "Início" }, blocks: [{ type: "hero" }, { type: "contato", visible: false }] },
+      { path: "/sobre", title: { "pt-BR": "Sobre" }, blocks: [{ type: "texto" }, { type: "texto", variant: "pessoal" }] },
+      { path: "/depoimentos", title: { "pt-BR": "Depoimentos" }, blocks: [{ type: "hero", variant: "pagina" }, { type: "depoimentos", variant: "categorias" }] },
+    ];
+    const res = run(recipe);
+    const home = byPath(res, "/");
+    expect(home.blocks.map((b: { type: string; visible: boolean }) => [b.type, b.visible])).toEqual([["hero", true], ["contato", false]]);
+    expect(byPath(res, "/sobre").blocks.map((b: { variant?: string }) => b.variant)).toEqual([undefined, "pessoal"]);
+    expect(byPath(res, "/depoimentos").blocks[1]).toMatchObject({ type: "depoimentos", variant: "categorias" });
   });
 
   it("receita de um tema sem algum bloco: o conteúdo dele fica no relatório como fora", () => {
@@ -277,9 +374,29 @@ describe("textos e o resto", () => {
   const r = run();
 
   it("textos de interface personalizados → uiTexts; de seção → blocos; sem destino → relatório", () => {
-    expect(r.tables.uiTexts!.slice(0, 2)).toEqual([
+    expect(r.tables.uiTexts!.filter((t) => !/^(form\.|contactForm\.)/.test(String(t.key)))).toEqual([
       { key: "hero.available", value: { "pt-BR": "Aceitando projetos", en: "Taking projects" }, updatedAt: NOW },
       { key: "common.readMore", value: { "pt-BR": "Continuar lendo", en: "Keep reading" }, updatedAt: NOW },
+      // Rótulos do currículo da v1 que diferem do padrão da v2 vêm mesmo sem personalização.
+      ...[
+        ["resume.experience", "Experiência Profissional", "Professional Experience"],
+        ["resume.education", "Formação Acadêmica", "Academic Education"],
+        ["resume.skill", "Habilidades", "Skills"],
+        ["resume.soft-skill", "Soft Skills", "Soft Skills"],
+        ["resume.certification", "Cursos e Certificações", "Courses and Certifications"],
+        ["resume.volunteer", "Voluntariado", "Volunteer Work"],
+        ["resume.download", "Baixar CV (PDF)", "Download CV (PDF)"],
+        ["resume.showOlder", "ver experiências anteriores ({count})", "show earlier experience ({count})"],
+        ["resume.hideOlder", "ocultar experiências anteriores", "hide earlier experience"],
+        ["sidebar.talk", "Fale comigo", "Contact me"],
+        ["testimonialForm.open", "Deixar meu depoimento", "Leave my testimonial"],
+        ["case.gallery", "Screenshots", "Screenshots"],
+        ["blog.filter", "Filtrar por tags", "Filter by tags"],
+        ["case.metrics", "Resultados em Números", "Results by the Numbers"],
+        ["notFound.home", "voltar ao início", "back to home"],
+        ["blog.featured", "Em Destaque", "Featured"],
+        ["blog.back", "Voltar para o Blog", "Back to Blog"],
+      ].map(([key, pt, en]) => ({ key, value: { "pt-BR": pt, en }, updatedAt: NOW })),
     ]);
     expect(r.report.texts.unmapped).toEqual([{ key: "notFound.lines.0", pt: "> nada aqui" }]);
     expect(r.report.texts.sectionKeys).toBe(3);
@@ -322,6 +439,12 @@ describe("textos e o resto", () => {
     expect(off.tables.uiTexts!.map((t) => t.key)).not.toContain("form.step");
   });
 
+  it("o blog da v1 vem com destaques, busca e filtro por etiquetas", () => {
+    const blog = r.tables.pages!.find((p) => p.path === "/blog")!;
+    const posts = (blog.blocks as { type: string; fields: Record<string, unknown> }[]).find((b) => b.type === "posts-recentes")!;
+    expect(posts.fields).toMatchObject({ showTagFilter: true, showSearch: true, showFeatured: true });
+  });
+
   it("o que não tem destino vai à parte; descartadas e próprias no relatório", () => {
     // Negócio convertido (migrate.business.test.ts): sobra o depoimento em vídeo e a versão ilegível.
     expect(Object.keys(r.pending).sort()).toEqual(["proposalVersions", "testimonialSubmissions"]);
@@ -338,5 +461,29 @@ describe("textos e o resto", () => {
     const b = convertV1({ tables: input.tables, v1: V1_RUBRICA_JSON, theme: "cyberpunk", recipe: CORE_RECIPES.pessoal, now: NOW });
     expect(a).toEqual(b);
     expect(input.tables).toEqual(copy);
+  });
+});
+
+describe("blocos das páginas", () => {
+  it("todo bloco tem fields (o schema exige, mesmo vazio)", () => {
+    for (const page of run().tables.pages as { blocks: { fields?: unknown }[] }[]) for (const b of page.blocks) expect(b.fields).toBeDefined();
+  });
+});
+
+describe("textos do portfólio e do case da v1", () => {
+  it("cada chave da v1 aponta para um texto que o núcleo conhece", () => {
+    for (const v2 of Object.values(UI_TEXT_MAP)) expect(defaultUiText(v2, "pt-BR"), v2).toBeDefined();
+  });
+
+  it("personalizados na v1 vão para as chaves do case", () => {
+    const { tables } = v1Export();
+    tables.siteTexts = [
+      ...(tables.siteTexts ?? []),
+      { _id: "st-cta", key: "portfolio.ctaTitle", page: "portfolio", ptBR: "Bora fazer algo assim?", enUS: "Want something like this?" },
+      { _id: "st-det", key: "portfolio.details", page: "portfolio", ptBR: "$ ls detalhes", enUS: "$ ls details" },
+    ];
+    const out = convertV1({ tables, v1: V1_RUBRICA_JSON, theme: "cyberpunk", recipe: CORE_RECIPES.pessoal, now: NOW }).tables.uiTexts!;
+    expect(out.find((t) => t.key === "case.ctaTitle")?.value).toEqual({ "pt-BR": "Bora fazer algo assim?", en: "Want something like this?" });
+    expect(out.find((t) => t.key === "case.details")?.value).toEqual({ "pt-BR": "$ ls detalhes", en: "$ ls details" });
   });
 });

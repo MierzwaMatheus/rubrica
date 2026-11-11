@@ -8,6 +8,60 @@ const PATHS: Record<string, ReactNode> = {
       <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
     </>
   ),
+  graduation: (
+    <>
+      <path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z" />
+      <path d="M22 10v6" />
+      <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5" />
+    </>
+  ),
+  award: (
+    <>
+      <path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526" />
+      <circle cx="12" cy="8" r="6" />
+    </>
+  ),
+  heart: <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />,
+  code: (
+    <>
+      <path d="m16 18 6-6-6-6" />
+      <path d="m8 6-6 6 6 6" />
+    </>
+  ),
+  languages: (
+    <>
+      <path d="m5 8 6 6" />
+      <path d="m4 14 6-6 2-3" />
+      <path d="M2 5h12" />
+      <path d="M7 2h1" />
+      <path d="m22 22-5-10-5 10" />
+      <path d="M14 18h6" />
+    </>
+  ),
+  chevronDown: <path d="m6 9 6 6 6-6" />,
+  help: (
+    <>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+      <path d="M12 17h.01" />
+    </>
+  ),
+  // WhatsApp (balão com telefone, traço no estilo do Lucide "message-circle" + "phone").
+  whatsapp: (
+    <>
+      <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
+      <path d="M9.5 9.5c.3 1.6 1.4 3.4 3.1 4.6l1.2-1.1 1.9 1-.4 1.6c-2.9.2-6.6-3.4-6.4-6.4l1.6-.4 1 1.9z" />
+    </>
+  ),
+  // Behance ("Bē"): o logotipo em traço.
+  behance: (
+    <>
+      <path d="M3 7h5a2.5 2.5 0 0 1 0 5H3z" />
+      <path d="M3 12h5.5a2.75 2.75 0 0 1 0 5.5H3z" />
+      <path d="M15 8h5" />
+      <path d="M14 14.5h7a3.5 3.5 0 1 0-1 2.45" />
+    </>
+  ),
   briefcase: (
     <>
       <path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
@@ -45,6 +99,7 @@ const PATHS: Record<string, ReactNode> = {
     </>
   ),
   message: <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />,
+  close: <path d="M18 6 6 18M6 6l12 12" />,
   menu: (
     <>
       <line x1="4" x2="20" y1="12" y2="12" />

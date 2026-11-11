@@ -45,7 +45,7 @@ Opening section: main title, supporting text, buttons and image. Carries the h1 
 - **Pairs well with:** [`numeros`](#numeros--números), [`logos-clientes`](#logos-clientes--logos-de-clientes), [`cases`](#cases--cases), [`servicos`](#servicos--serviços)
 - **Site type:** personal and company
 - **Plugin:** none: always available
-- **Variants:** themes: `blueprint` (`apresentacao`, `folha`); `monograph` (`folha-de-rosto`, `capitulo`)
+- **Variants:** themes: `blueprint` (`apresentacao`, `folha`); `cyberpunk` (`inicio`, `pagina`); `monograph` (`folha-de-rosto`, `capitulo`); `padrao` (`inicio`, `pagina`)
 
 | Field | Panel label | Type | Required | Translatable | Help and limits |
 |---|---|---|---|---|---|
@@ -68,7 +68,7 @@ Title and free text, with an optional image beside it.
 - **Pairs well with:** [`numeros`](#numeros--números), [`lista-itens`](#lista-itens--lista-de-itens), [`galeria`](#galeria--galeria), [`cta`](#cta--chamada)
 - **Site type:** personal and company
 - **Plugin:** none: always available
-- **Variants:** themes: `brutalist` (`simples`, `numerado`); `chat` (`mensagens`, `pergunta`); `magazine` (`coluna`, `ensaio`); `poster` (`declaracao`, `corrido`); `zine` (`carta`, `postit`)
+- **Variants:** themes: `brutalist` (`simples`, `numerado`); `chat` (`mensagens`, `pergunta`); `cyberpunk` (`default`, `pessoal`); `magazine` (`coluna`, `ensaio`); `padrao` (`default`, `pessoal`); `poster` (`declaracao`, `corrido`); `zine` (`carta`, `postit`)
 
 | Field | Panel label | Type | Required | Translatable | Help and limits |
 |---|---|---|---|---|---|
@@ -131,7 +131,7 @@ Projects or cases from the collection, linking to each one's page. Shows the fea
 - **Site type:** personal and company
 - **Plugin:** `portfolio`: the block disappears when the plugin is off
 - **Lists items from:** `projects` (default when created: featured only, 3 items, in panel order)
-- **Variants:** core default component: `grade`, `lista` · themes: `bento` (`grade`, `destaque`); `blueprint` (`grade`, `destaque`); `brutalist` (`grade`, `lista`); `chat` (`lista`, `destaque`); `cyberpunk` (`grade`, `lista`); `desktop` (`grade`, `lista`); `garden` (`grade`, `destaque`); `index` (`indice`, `destaque`, `grade`); `magazine` (`grade`, `lista`); `monograph` (`sumario`, `pranchas`); `padrao` (`grade`, `lista`); `poster` (`cartaz`, `catalogo`, `faixa`); `swiss` (`grade`, `lista`); `zine` (`grade`, `destaque`, `lista`)
+- **Variants:** core default component: `grade`, `lista` · themes: `bento` (`grade`, `destaque`); `blueprint` (`grade`, `destaque`); `brutalist` (`grade`, `lista`); `chat` (`lista`, `destaque`); `cyberpunk` (`grade`, `lista`, `pagina`); `desktop` (`grade`, `lista`); `garden` (`grade`, `destaque`); `index` (`indice`, `destaque`, `grade`); `magazine` (`grade`, `lista`); `monograph` (`sumario`, `pranchas`); `padrao` (`grade`, `lista`, `pagina`); `poster` (`cartaz`, `catalogo`, `faixa`); `swiss` (`grade`, `lista`); `zine` (`grade`, `destaque`, `lista`)
 
 | Field | Panel label | Type | Required | Translatable | Help and limits |
 |---|---|---|---|---|---|
@@ -170,7 +170,7 @@ Approved testimonials from the collection, with an optional invitation to send a
 - **Plugin:** `testimonials`: the block disappears when the plugin is off
 - **Lists items from:** `testimonials` (default when created: featured only, 6 items, in panel order)
 - **JavaScript:** may mount an island (the interactive part, with JavaScript in the browser); the rest is static HTML
-- **Variants:** none: a single design in each theme
+- **Variants:** themes: `cyberpunk` (`default`, `categorias`); `padrao` (`default`, `categorias`)
 
 | Field | Panel label | Type | Required | Translatable | Help and limits |
 |---|---|---|---|---|---|
@@ -178,6 +178,7 @@ Approved testimonials from the collection, with an optional invitation to send a
 | `title` | Título | text | no | yes | up to 140 characters |
 | `intro` | Texto de apoio | long text | no | yes | up to 400 characters |
 | `allowSubmission` | Convidar a enviar depoimento | yes or no | no | — | Shows the testimonial wizard button (needs the testimonials-intake plugin); default: no |
+| `cta` | Link para todos | link | no | the label | E.g. "See all testimonials", to the testimonials page. Optional |
 
 ## `faq` — Perguntas frequentes
 
@@ -207,6 +208,7 @@ Blog posts. With an empty quantity, lists them all (the blog page).
 - **Site type:** personal and company
 - **Plugin:** `blog`: the block disappears when the plugin is off
 - **Lists items from:** `posts` (default when created: 3 items, newest first)
+- **JavaScript:** may mount an island (the interactive part, with JavaScript in the browser); the rest is static HTML
 - **Variants:** themes: `chat` (`lista`, `destaque`); `garden` (`notas`, `lista`); `index` (`indice`, `destaque`); `magazine` (`sumario`, `colunas`); `zine` (`recortes`, `destaque`)
 
 | Field | Panel label | Type | Required | Translatable | Help and limits |
@@ -216,6 +218,8 @@ Blog posts. With an empty quantity, lists them all (the blog page).
 | `intro` | Texto de apoio | long text | no | yes | up to 400 characters |
 | `cta` | Link para o blog | link | no | the label | — |
 | `showTagFilter` | Filtro por etiqueta | yes or no | no | — | default: no |
+| `showSearch` | Busca por texto | yes or no | no | — | A field that filters the posts by title, summary and tags (the blog page); default: no |
+| `showFeatured` | Destaques no topo | yes or no | no | — | The posts marked as featured in a carousel above the list, in the themes that draw it (the blog page); default: no |
 
 ## `cta` — Chamada
 

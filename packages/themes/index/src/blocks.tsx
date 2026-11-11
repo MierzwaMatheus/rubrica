@@ -4,7 +4,7 @@
  * `ctx.t("index.*")` (declarados em `texts`).
  */
 import type { BlockProps, CollectionItems, ResolvedImage } from "@rubrica/core";
-import { Heading, Html, Img } from "@rubrica/core/components";
+import { Heading, Html, Img, isHtmlText } from "@rubrica/core/components";
 import { IndexRow, IndexSection, IndexTable, UnderLink, catalogNumber, plainText, type IndexColumn } from "./parts";
 import { digits, formatDays, resolveFreeHref, safeId, tagFilterCss } from "./util";
 
@@ -699,12 +699,15 @@ function periodOf(item: ResumeItem, ctx: Props["ctx"]): string {
 
 /** Primeira linha da descrição, sem o marcador, para o resumo da ficha. */
 function firstLine(text?: string): string {
-  const line = (text ?? "").split("\n").map((l) => l.trim()).find(Boolean) ?? "";
+  // Texto rico (HTML): o primeiro bloco, sem as tags.
+  const plain = (text ?? "").replace(/<\/(p|li|h[2-6])>/gi, "\n").replace(/<[^>]+>/g, "");
+  const line = plain.split("\n").map((l) => l.trim()).find(Boolean) ?? "";
   return line.replace(/^[-•]\s+/, "");
 }
 
 function Description({ text }: { text?: string }) {
   if (!text) return null;
+  if (isHtmlText(text)) return <Html html={text} className="rb-prose rb-resume__desc" />;
   const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
   const bullets = lines.filter((l) => /^[-•]\s/.test(l));
   if (bullets.length === lines.length) {

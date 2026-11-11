@@ -1,7 +1,9 @@
 import type { ComponentType } from "react";
+import Carrossel from "./carrossel";
 import Contato from "./contato";
 import Curriculo from "./curriculo";
 import DepoimentoEnvio from "./depoimento-envio";
+import PostsBusca from "./posts-busca";
 import Video from "./video";
 import { APP_ISLANDS, APP_TEXT_PREFIXES } from "./app";
 
@@ -12,9 +14,11 @@ import { APP_ISLANDS, APP_TEXT_PREFIXES } from "./app";
  * pelo script /_rubrica/color-mode.js, para não carregar React em toda página.
  */
 export const CORE_ISLANDS: Record<string, ComponentType<any>> = {
+  carrossel: Carrossel,
   contato: Contato,
   curriculo: Curriculo,
   "depoimento-envio": DepoimentoEnvio,
+  "posts-recentes": PostsBusca,
   video: Video,
   // Páginas do app (rotas `kind: "app"` dos plugins), carregadas sob demanda.
   ...APP_ISLANDS,
@@ -34,10 +38,12 @@ export function islandNameFor(blockType: string): string {
  * de uma rota do app. Ilha do projeto sem entrada aqui recebe só o básico.
  */
 export const ISLAND_META: Record<string, { textPrefixes: string[]; items?: boolean; title?: string }> = {
+  carrossel: { textPrefixes: ["gallery.", "case.gallery"] },
   contato: { textPrefixes: ["form.", "contactForm."] },
   curriculo: { textPrefixes: ["resume."], items: true },
   "depoimento-envio": { textPrefixes: ["form.", "testimonialForm."] },
   video: { textPrefixes: ["video.", "common.external"] },
+  "posts-recentes": { textPrefixes: ["blog.search"] },
   proposta: { textPrefixes: APP_TEXT_PREFIXES, title: "proposal.title" },
   "proposta-aceite": { textPrefixes: APP_TEXT_PREFIXES, title: "accept.title" },
   checkout: { textPrefixes: APP_TEXT_PREFIXES, title: "checkout.title" },

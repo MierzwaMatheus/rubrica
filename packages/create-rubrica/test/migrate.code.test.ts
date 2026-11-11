@@ -95,7 +95,7 @@ describe("migrar", () => {
     expect(run("git", ["branch", "--show-current"], { cwd: dir }).trim()).toBe("rubrica-v2");
     // saiu o template da v1, ficaram public/, docs/, README e o .env.local
     for (const gone of ["src/pages", "src/components", "vite.config.ts", "index.html", "tests", "convex/posts.ts", "convex/newsletter.ts"]) expect(existsSync(join(dir, gone)), gone).toBe(false);
-    for (const kept of ["public/cv.pdf", "public/favicon.svg", "docs/notas.md", "README.md", ".env.local"]) expect(existsSync(join(dir, kept)), kept).toBe(true);
+    for (const kept of ["public/cv.pdf", "public/favicon.svg", "docs/notas.md", "README.md", ".env.local", "PRD.md", ".windsurf/rules/solid.md"]) expect(existsSync(join(dir, kept)), kept).toBe(true);
     expect(readFileSync(join(dir, ".env.local"), "utf-8")).toBe("CONVEX_DEPLOYMENT=dev:nao-mexer\n");
     // entrou a v2, com o tema equivalente ao layout da v1
     expect(readFileSync(join(dir, "astro.config.ts"), "utf-8")).toContain('theme: "@rubrica/theme-zine"');

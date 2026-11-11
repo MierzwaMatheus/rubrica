@@ -162,7 +162,7 @@ export function v1Export(): Snapshot {
           results: "Menos faltas.",
           role: "Designer líder",
           context: "Agenda em papel.",
-          metrics: [{ label: "faltas", value: "−40%" }],
+          metrics: [{ label: "faltas", value: "−40%", icon: "TrendingDown" }, { label: "clínicas", value: "12" }],
           testimonial: { text: "Mudou a clínica.", author: "Dra. Paula", role: "Diretora" },
         },
         caseStudyTranslations: {

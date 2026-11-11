@@ -14,6 +14,7 @@ import { DEFAULT_UI_TEXTS } from "../src/i18n/ui-texts";
 import { CORE_RECIPES, recipeFor } from "../src/theme/recipes";
 import { buildResumeHtml } from "../src/islands/curriculo-pdf";
 import { islandNameFor, CORE_ISLANDS, ISLAND_META } from "../src/islands";
+import { searchText } from "../src/render/text";
 
 const theme = defineTheme({ id: "teste", label: "Teste", contract: "^1", tokens: {}, Shell: DefaultShell });
 const demo = (kind: string) => fileURLToPath(new URL(`../../../apps/demo/fixtures/${kind}`, import.meta.url));
@@ -55,6 +56,29 @@ describe("blocos padrão", () => {
     expect(withMetric).toContain("rb-card__metric");
     expect(withMetric).toContain("<strong>~50</strong> skills em produção");
     expect(render("cases", { ctx, items: [project()] as never })).not.toContain("rb-card__metric");
+  });
+
+  it("curriculo: agrupa as competências, separa comportamentais e voluntariado e sobe os títulos sem título no bloco", async () => {
+    const ctx = (await load("pessoal")).context("pt-BR", "/");
+    const items = [
+      { id: "1", kind: "skill", title: "React", group: "Front-end" },
+      { id: "2", kind: "skill", title: "Claude Code", group: "IA" },
+      { id: "3", kind: "skill", title: "Vite", group: "Front-end" },
+      { id: "4", kind: "skill", title: "Git" },
+      { id: "5", kind: "soft-skill", title: "Liderança" },
+      { id: "6", kind: "volunteer", title: "Professor voluntário" },
+      { id: "7", kind: "experience", title: "Tech Lead" },
+    ] as never;
+    const html = render("curriculo", { ctx, items, fields: { title: "Currículo" } });
+    // Ordem dos grupos: a da primeira aparição; sem grupo, por último.
+    expect(html.indexOf("Front-end")).toBeLessThan(html.indexOf(">IA<"));
+    expect(html.indexOf(">IA<")).toBeLessThan(html.indexOf(">Git<"));
+    expect(html).toContain('<h4 class="rb-resume__groupName">Front-end</h4>');
+    expect(html).toMatch(/rb-resume__group--soft-skill[^>]*><h3[^>]*>Competências comportamentais<\/h3>/);
+    expect(html).toMatch(/rb-resume__group--volunteer[^>]*><h3[^>]*>Voluntariado<\/h3>/);
+    const untitled = render("curriculo", { ctx, items, fields: {} });
+    expect(untitled).toMatch(/<h2[^>]*>Experiência<\/h2>/);
+    expect(untitled).toContain('<h3 class="rb-card__title">Tech Lead</h3>');
   });
 
   it("título da seção no nível pedido, e itens em h3", async () => {
@@ -108,7 +132,7 @@ describe("blocos padrão", () => {
 
   it("só os blocos interativos montam ilha, e só quando o recurso está ligado", async () => {
     const interactiveTypes = new Set(CORE_BLOCKS.filter((b) => b.interactive).map((b) => b.type));
-    expect([...interactiveTypes].sort()).toEqual(["contato", "curriculo", "depoimentos", "video"]);
+    expect([...interactiveTypes].sort()).toEqual(["contato", "curriculo", "depoimentos", "posts-recentes", "video"]);
     for (const kind of ["pessoal", "empresa"] as const) {
       const site = await load(kind);
       for (const route of site.routes) {
@@ -146,6 +170,21 @@ describe("blocos padrão", () => {
     expect(posts).toContain('type="radio"');
     expect(posts).toContain("rb-filter");
     expect(posts).toContain('data-tags="t');
+  });
+
+  it("busca do blog: ilha só com a busca ligada, e cada cartão leva o texto de busca sem acento", async () => {
+    const site = await load("pessoal");
+    const blog = site.routes.find((r) => r.url === "/blog" && r.type === "page");
+    if (blog?.type !== "page") throw new Error();
+    const block = blog.page.blocks[0]!;
+    expect(block.interactive).toBe(true);
+    const html = render("posts-recentes", { ctx: site.context("pt-BR", "/blog"), ...block, island: ISLAND } as never);
+    expect(html).toContain(MARK);
+    expect(html).toMatch(/data-search="[^"]*pesquisa/);
+    expect(searchText("Gestão de  IA", undefined, "Ética")).toBe("gestao de ia etica");
+    const home = site.routes.find((r) => r.url === "/" && r.type === "page");
+    if (home?.type !== "page") throw new Error();
+    expect(home.page.blocks.find((b) => b.type === "posts-recentes")?.interactive ?? false).toBe(false);
   });
 
   it("imagens trazem alt do conteúdo e dimensões", async () => {
@@ -257,6 +296,26 @@ describe("ilhas", () => {
     expect(html).toContain("Competências");
     expect(html).not.toContain("Formação");
   });
+
+  it("o PDF do currículo põe competências comportamentais e voluntariado à parte e lê descrição em HTML", () => {
+    const html = buildResumeHtml({
+      name: "Ana",
+      contact: [],
+      locale: "pt-BR",
+      labels: { experience: "Experiência", education: "Formação", skill: "Competências", certification: "Certificações", language: "Idiomas", present: "atual", volunteer: "Voluntariado", "soft-skill": "Comportamentais" },
+      items: [
+        { id: "1", kind: "experience", title: "Designer", description: "<p>Liderei o <strong>time</strong> &amp; a área.</p><ul><li><strong>Hub:</strong> SSO</li><li>B</li></ul>" },
+        { id: "2", kind: "soft-skill", title: "Liderança" },
+        { id: "3", kind: "volunteer", title: "Professor voluntário" },
+      ],
+    });
+    expect(html).toContain("<p>Liderei o time &amp; a área.</p>");
+    expect(html).toContain("<li>Hub: SSO</li>");
+    expect(html).not.toContain("&lt;strong&gt;");
+    expect(html).toContain("<h2>Comportamentais</h2><hr/><p>Liderança</p>");
+    expect(html).toContain("<h2>Voluntariado</h2>");
+    expect(html.indexOf("Voluntariado")).toBeGreaterThan(html.indexOf("Idiomas"));
+  });
 });
 
 describe("estilos", () => {
@@ -296,4 +355,13 @@ describe("estilos", () => {
       expect(ratio(t["--rb-accent-fg"]!, t["--rb-accent"]!), "texto do botão").toBeGreaterThanOrEqual(4.5);
     });
   }
+});
+
+describe("descrição do currículo em HTML", () => {
+  it("mostra como HTML (texto rico, ou vindo da v1), não como texto com as tags", async () => {
+    const { isHtmlText } = await import("../src/components/blocks/util");
+    expect(isHtmlText("<p>Fundei a área de <strong>IA</strong></p>")).toBe(true);
+    expect(isHtmlText("- item\n- outro")).toBe(false);
+    expect(isHtmlText("Liderei 3 < 5 times")).toBe(false);
+  });
 });

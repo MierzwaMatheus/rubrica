@@ -11,7 +11,7 @@
  */
 import type { CSSProperties } from "react";
 import type { BlockProps, CollectionItems } from "@rubrica/core";
-import { Heading, Html, Img, Section, SectionHeader, safeId, tagFilterCss as coreTagFilterCss } from "@rubrica/core/components";
+import { Heading, Html, Img, Section, SectionHeader, safeId, tagFilterCss as coreTagFilterCss, isHtmlText } from "@rubrica/core/components";
 import { Btn, Dim, Hatch, Num, Sheet, TitleBlock, count, drawnBy, isoDate, ownerName, pad2, stampDate, stripTags, wordCount } from "./parts";
 
 type Project = CollectionItems["projects"];
@@ -594,6 +594,7 @@ function axisTicks(min: number, max: number): number[] {
 
 function Description({ text }: { text?: string }) {
   if (!text) return null;
+  if (isHtmlText(text)) return <Html html={text} className="rb-prose rb-resume__desc" />;
   const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
   const bullets = lines.filter((l) => /^[-•]\s/.test(l));
   if (bullets.length === lines.length) {

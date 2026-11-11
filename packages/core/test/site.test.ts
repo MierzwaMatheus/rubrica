@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { fileURLToPath } from "node:url";
 import { fixtureSource } from "../src/data/source";
-import { buildSite } from "../src/render/site";
+import { buildSite, contactBlock, CONTACT_DIALOG_ID } from "../src/render/site";
 import { CORE_BLOCKS } from "../src/blocks/catalog";
 import { CORE_PLUGINS } from "../src/plugins/registry";
 import { defineTheme } from "../src/theme/contract";
@@ -25,6 +25,32 @@ describe("montagem do site", () => {
     expect(urls).toContain("/blog/so-portugues");
     expect(urls).not.toContain("/en/blog/so-portugues");
     expect(urls).toContain("/en/portfolio/app-banco");
+  });
+
+  it("post ganha o case relacionado: o primeiro projeto com case que divide uma etiqueta", async () => {
+    const s = await site();
+    const post = (url: string) => {
+      const r = s.routes.find((x) => x.url === url);
+      if (r?.type !== "post") throw new Error(url);
+      return r;
+    };
+    // "pesquisa" está no app-banco, que tem seções de case.
+    expect(post("/blog/pesquisa-com-usuarios").relatedCase?.slug).toBe("app-banco");
+    // "carreira" não está em projeto nenhum.
+    expect(post("/blog/carreira-em-design").relatedCase).toBeUndefined();
+  });
+
+  it("a busca do blog só vira ilha no bloco padrão ou em tema que a declara", async () => {
+    const snapshot = await fixtureSource(fixtures).load();
+    const blogBlock = (t: typeof theme) => {
+      const r = buildSite({ snapshot, theme: t, blocks: CORE_BLOCKS, plugins: CORE_PLUGINS }).routes.find((x) => x.url === "/blog");
+      if (r?.type !== "page") throw new Error("/blog");
+      return r.page.blocks.find((b) => b.type === "posts-recentes")!;
+    };
+    const Own = () => null;
+    expect(blogBlock(theme).interactive).toBe(true);
+    expect(blogBlock(defineTheme({ ...theme, blocks: { "posts-recentes": Own } })).interactive).toBe(false);
+    expect(blogBlock(defineTheme({ ...theme, blocks: { "posts-recentes": Own }, islandBlocks: ["posts-recentes"] })).interactive).toBe(true);
   });
 
   it("hero no topo leva o h1; sem hero, h1 oculto", async () => {
@@ -97,6 +123,22 @@ describe("montagem do site", () => {
     const s = await site();
     expect(s.context("en", "/en").t("blog.readingTime", { minutes: 3 })).toBe("3 min read");
     expect(s.context("pt-BR", "/").t("nav.menu")).toBe("Menu");
+  });
+
+  it("janela de contato: com o tema pedindo e o plugin ligado, mesmo sem bloco de contato", async () => {
+    const snapshot = await fixtureSource(fixtures).load();
+    const withDialog = defineTheme({ ...theme, contactDialog: true });
+    const on = buildSite({ snapshot, theme: withDialog, blocks: CORE_BLOCKS, plugins: CORE_PLUGINS });
+    expect(on.context("pt-BR", "/blog", []).site.contactDialog).toBe(CONTACT_DIALOG_ID);
+    expect(contactBlock(on.routes, "pt-BR").id).not.toBe(CONTACT_DIALOG_ID); // usa o bloco da home
+    expect((await site()).context("pt-BR", "/", []).site.contactDialog).toBeUndefined();
+    const off = buildSite({ snapshot: { ...snapshot, site: { ...snapshot.site, plugins: { ...snapshot.site.plugins, "contact-wizard": false } } }, theme: withDialog, blocks: CORE_BLOCKS, plugins: CORE_PLUGINS });
+    expect(off.context("pt-BR", "/", []).site.contactDialog).toBeUndefined();
+    // Sem seção de contato, a janela continua, com o assistente padrão.
+    const noBlock = { ...snapshot, pages: snapshot.pages.map((p) => ({ ...p, blocks: p.blocks.filter((b) => b.type !== "contato") })) };
+    const bare = buildSite({ snapshot: noBlock, theme: withDialog, blocks: CORE_BLOCKS, plugins: CORE_PLUGINS });
+    expect(bare.context("pt-BR", "/", []).site.contactDialog).toBe(CONTACT_DIALOG_ID);
+    expect(contactBlock(bare.routes, "pt-BR")).toMatchObject({ id: CONTACT_DIALOG_ID, type: "contato", fields: { mode: "wizard" } });
   });
 
   it("telefone e WhatsApp do dono chegam à casca (ctx.site.person)", async () => {

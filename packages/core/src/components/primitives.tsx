@@ -34,6 +34,14 @@ export function Img({ image, className, sizes, priority }: { image: ResolvedImag
 }
 
 export function LinkButton({ link, variant = "primary", className }: { link: ResolvedLink; variant?: "primary" | "secondary" | "ghost"; className?: string }) {
+  // Link para o contato com a janela de contato no site: o botão abre a janela (sem JavaScript).
+  if (link.dialog) {
+    return (
+      <button type="button" popoverTarget={link.dialog} className={`rb-button rb-button--${variant}${className ? ` ${className}` : ""}`}>
+        {link.label}
+      </button>
+    );
+  }
   return (
     <a
       href={link.href}

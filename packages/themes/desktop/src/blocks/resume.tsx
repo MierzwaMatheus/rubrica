@@ -1,3 +1,4 @@
+import { Html, isHtmlText } from "@rubrica/core/components";
 /**
  * Currículo como na v1: o Currículo.txt no topo (com o PDF), a experiência numa janela
  * em modo lista (período, cargo, empresa), as competências no Painel de Controle e as
@@ -22,6 +23,7 @@ function period(item: ResumeItem, ctx: Ctx): string | undefined {
 
 function Description({ text }: { text?: string }) {
   if (!text) return null;
+  if (isHtmlText(text)) return <Html html={text} className="rb-prose rb-resume__desc" />;
   const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
   if (lines.every((l) => /^[-•]\s/.test(l))) {
     return (

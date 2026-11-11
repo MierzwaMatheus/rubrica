@@ -449,6 +449,8 @@
         },
         "fields": {
           "showTagFilter": true,
+          "showSearch": true,
+          "showFeatured": true,
           "title": {
             "pt-BR": "Blog",
             "en": "Blog"
@@ -471,6 +473,7 @@
       {
         "id": "pf1",
         "type": "cases",
+        "variant": "pagina",
         "visible": true,
         "source": {
           "collection": "projects",

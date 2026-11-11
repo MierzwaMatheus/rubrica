@@ -28,7 +28,7 @@ import { loadInstalledCore, loadThemeRecipe } from "../project/introspect.js";
 import { convertV1, type ConvertResult, type V1RubricaJson } from "../migrate/convert.js";
 import { readV1ProjectTexts, SAVED_TEXTS_FILE, type ReadTexts } from "../migrate/v1-translations.js";
 import { listCustomizations, type Customization } from "../migrate/customizations.js";
-import { importZip, pendingZip, readSnapshot } from "../migrate/snapshot.js";
+import { importZip, pendingZip, readSnapshot, storageDocs } from "../migrate/snapshot.js";
 import { toFixtures } from "../migrate/fixtures.js";
 import { renderReport, type ReportInput } from "../migrate/report.js";
 import { MAIN_PAGES, comparePage, fetchPage, formatComparison, readDistPage } from "../migrate/compare.js";
@@ -122,7 +122,7 @@ interface DataOutputs {
 /** Converte o export e grava import, pendentes, fixtures (na pasta `outDir`). */
 export function convertExport(exportPath: string, v1: V1RubricaJson, theme: string, recipe: Recipe, outDir: string, storageUrl?: (id: string) => string, texts?: ReadTexts): DataOutputs {
   const snapshot = readSnapshot(exportPath);
-  const result = convertV1({ tables: snapshot.tables, v1, theme, recipe, ...(texts?.texts && { projectTexts: texts.texts }) });
+  const result = convertV1({ tables: snapshot.tables, storage: storageDocs(snapshot), v1, theme, recipe, ...(texts?.texts && { projectTexts: texts.texts }) });
   result.report.warnings.push(...(texts?.warnings ?? []));
   mkdirSync(outDir, { recursive: true });
   const files: Record<string, string> = {};
@@ -150,11 +150,19 @@ function importSteps(outDir: string, pm: PackageManager): string[] {
   ];
 }
 
-async function customizationsFor(projectDir: string, v1: V1RubricaJson, packageName: string, deps: MigrateDeps, templateDir?: string): Promise<{ list?: Customization[]; error?: string }> {
+async function customizationsFor(
+  projectDir: string,
+  v1: V1RubricaJson,
+  packageName: string,
+  deps: MigrateDeps,
+  templateDir?: string,
+): Promise<{ list?: Customization[]; templateRoots?: Set<string>; error?: string }> {
   const dir = mkdtempSync(join(tmpdir(), "rubrica-v1-pristine-"));
   try {
     await (deps.pristine ?? defaultPristine)(dir, v1, packageName, templateDir);
-    return { list: listCustomizations(projectDir, dir, gitFiles(projectDir, deps.runner ?? defaultRun)) };
+    // O que fica na raiz do template da v1: só isso sai do projeto (o resto é da pessoa).
+    const templateRoots = new Set(readdirSync(dir));
+    return { list: listCustomizations(projectDir, dir, gitFiles(projectDir, deps.runner ?? defaultRun)), templateRoots };
   } catch (err) {
     return { error: `${(err as Error).message}${templateDir ? "" : " (sem internet? passe --template-v1 <pasta com o repositório do Rubrica>)"}` };
   } finally {
@@ -192,7 +200,7 @@ async function runReport(projectDir: string, values: Record<string, string>, dep
   if (values.export) {
     const snapshot = readSnapshot(resolve(deps.cwd, values.export));
     const texts = readV1ProjectTexts(projectDir, resolve(projectDir, WORK_DIR));
-    data = convertV1({ tables: snapshot.tables, v1, theme: theme.tema, recipe: CORE_RECIPES.pessoal, ...(texts.texts && { projectTexts: texts.texts }) }).report;
+    data = convertV1({ tables: snapshot.tables, storage: storageDocs(snapshot), v1, theme: theme.tema, recipe: CORE_RECIPES.pessoal, ...(texts.texts && { projectTexts: texts.texts }) }).report;
     data.warnings.push(...texts.warnings);
   }
   const report = renderReport({
@@ -206,7 +214,7 @@ async function runReport(projectDir: string, values: Record<string, string>, dep
     nextSteps: [
       v1.version === LAST_V1 ? "A v1 está na última versão: dá para migrar." : `Atualize a v1 para a ${LAST_V1} antes (npx create-rubrica@1 update).`,
       "Faça commit de tudo e rode `npx create-rubrica@latest migrar` (cria a branch rubrica-v2; nada muda na branch atual).",
-      ...(values.export ? [] : ["Exporte os dados do Convex de desenvolvimento da v1 (`npx convex export --path .rubrica/migracao/export-v1.zip`) para ver no relatório o que eles viram."]),
+      ...(values.export ? [] : ["Exporte os dados da v1 do banco com o conteúdo de verdade, em geral a produção (`npx convex export --prod --include-file-storage --path .rubrica/migracao/export-v1.zip`; o export só lê) para ver no relatório o que eles viram."]),
     ],
   });
   if (values.saida) writeFileSync(resolve(deps.cwd, values.saida), report);
@@ -226,7 +234,7 @@ async function runCompare(values: Record<string, string>, deps: MigrateDeps): Pr
 }
 
 async function runData(projectDir: string, values: Record<string, string>, deps: MigrateDeps): Promise<DataOutputs> {
-  if (!values.export) throw new Cancelled(`Uso: npx create-rubrica migrar dados --export <arquivo.zip>. Para gerar o export: npx convex export --path ${WORK_DIR}/export-v1.zip`);
+  if (!values.export) throw new Cancelled(`Uso: npx create-rubrica migrar dados --export <arquivo.zip>. Para gerar o export (só lê; em geral da produção): npx convex export --prod --include-file-storage --path ${WORK_DIR}/export-v1.zip`);
   const raw = JSON.parse(readFileSync(join(projectDir, STATE_FILE), "utf-8")) as Record<string, unknown>;
   const migrated = raw.rubrica === 2 ? (raw as RubricaState) : null;
   const v1: V1RubricaJson = migrated ? (raw.v1 as V1RubricaJson | undefined) ?? { layout: migrated.migracao?.layoutV1 ?? "", version: migrated.migracao?.de } : readV1(projectDir);
@@ -297,7 +305,18 @@ async function runFull(projectDir: string, values: Record<string, string>, flags
   // 3. Código.
   const previous = JSON.parse(readFileSync(join(projectDir, "package.json"), "utf-8")) as Record<string, unknown>;
   const oldGitignore = existsSync(join(projectDir, ".gitignore")) ? readFileSync(join(projectDir, ".gitignore"), "utf-8") : "";
-  for (const entry of readdirSync(projectDir)) if (!KEEP.has(entry)) rmSync(join(projectDir, entry), { recursive: true, force: true });
+  // Sai o que é do template da v1. Arquivos e pastas que a pessoa criou na raiz (PRD.md,
+  // .windsurf/, notas) ficam. Sem o template de referência, vale só a lista fixa.
+  const kept: string[] = [];
+  for (const entry of readdirSync(projectDir)) {
+    if (KEEP.has(entry)) continue;
+    if (custom.templateRoots && !custom.templateRoots.has(entry)) {
+      kept.push(entry);
+      continue;
+    }
+    rmSync(join(projectDir, entry), { recursive: true, force: true });
+  }
+  if (kept.length) log.info(`Ficaram na raiz (não são do template da v1): ${kept.join(", ")}`);
   rmSync(join(projectDir, "public", "data"), { recursive: true, force: true });
   const state = v2StateFrom(v1, theme);
   const depSpecs: DependencySpecs = values.local ? localDependencySpecs(resolve(deps.cwd, values.local), theme.tema) : defaultDependencySpecs();
@@ -317,6 +336,9 @@ async function runFull(projectDir: string, values: Record<string, string>, flags
   if (!flags.has("sem-instalar")) {
     s.start(`Instalando com o ${pm}...`);
     try {
+      // O node_modules da v1 pode ter pacotes soltos na raiz (ex.: um cookie 0.x) que o
+      // build da v2 pega no lugar dos certos: instala do zero.
+      rmSync(join(projectDir, "node_modules"), { recursive: true, force: true });
       runner(pm, ["install"], { cwd: projectDir });
       s.stop("Instalado.");
       const core = await loadInstalledCore(projectDir);
@@ -367,7 +389,7 @@ async function runFull(projectDir: string, values: Record<string, string>, flags
     ...(custom.error && { customizationsError: custom.error }),
     outputs: { ...(data?.files ?? {}), Relatório: join(outDir, "relatorio.md") },
     nextSteps: [
-      ...(data ? [] : [`Exporte os dados da v1 (no Convex de desenvolvimento dela, antes de trocar o .env.local): \`npx convex export --path ${WORK_DIR}/export-v1.zip\`, e rode \`npx create-rubrica migrar dados --export ${WORK_DIR}/export-v1.zip\`.`]),
+      ...(data ? [] : [`Exporte os dados da v1 do banco com o conteúdo de verdade, em geral a produção (o export só lê): \`npx convex export --prod --include-file-storage --path ${WORK_DIR}/export-v1.zip\`, e rode \`npx create-rubrica migrar dados --export ${WORK_DIR}/export-v1.zip\`.`]),
       `Build com os dados convertidos: ${build}. Compare com o site no ar: \`npx create-rubrica migrar conferir --v1 ${v1.identity?.siteUrl ?? "<url da v1>"} --v2 dist\`.`,
       ...importSteps(join(WORK_DIR), projectPackageManager(projectDir)),
       "Para cada personalização listada, siga a sugestão (bloco próprio, ejetar, tokens). Depois: pnpm check, pnpm test, commit na branch rubrica-v2.",
@@ -379,8 +401,28 @@ async function runFull(projectDir: string, values: Record<string, string>, flags
   outro(`Migração preparada na branch ${BRANCH}. Relatório: ${WORK_DIR}/relatorio.md\nO Convex não foi tocado: siga os próximos passos do relatório.`);
 }
 
+export const MIGRATE_HELP = `Uso: npx create-rubrica@latest migrar [opções]
+
+Leva um projeto da v1 (1.13.1) para a v2, numa branch nova (rubrica-v2). O Convex não é tocado.
+
+  --relatorio            só mostra o que vai acontecer (tema, personalizações, dados), sem gravar
+  --export <zip>         export da v1 (npx convex export --prod --include-file-storage --path .rubrica/migracao/export-v1.zip)
+  --yes, -y              não pede confirmação
+  --sem-instalar         não instala as dependências
+  --sem-build            não faz o build de conferência
+  --saida <pasta>        onde gravar os arquivos da migração (padrão: .rubrica/migracao)
+
+  migrar dados --export <zip>        só converte os dados (sem trocar o código)
+  migrar conferir --v1 <url> --v2 dist   compara título, h1 e texto das páginas
+
+Guia: https://userubrica.vercel.app/docs/guia/migrar`;
+
 export async function runMigrate(argv: string[], deps: MigrateDeps): Promise<void> {
   const out = deps.out ?? ((t: string) => console.log(t));
+  if (argv.includes("--help") || argv.includes("-h")) {
+    out(MIGRATE_HELP);
+    return;
+  }
   const args = parseArgs(argv, {
     values: ["export", "template-v1", "saida", "v1", "v2", "local", "convex-url"],
     flags: ["relatorio", "yes", "sem-instalar", "sem-build"],

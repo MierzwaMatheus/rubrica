@@ -102,3 +102,6 @@ export function tagFilterCss(scope: string, count: number, options: TagFilterCss
   rules.push(`#${scope}-all:focus-visible ~ ${filter} label[for="${scope}-all"]{${ring}}`);
   return rules.join("\n");
 }
+
+/** Texto com HTML (texto rico do painel, ou da v1): mostrar como HTML, não como texto. */
+export const isHtmlText = (text: string): boolean => /<\/?(p|ul|ol|li|strong|em|b|i|h[2-6]|br|a|blockquote|code)\b/i.test(text);

@@ -205,6 +205,9 @@ export const vCaseSection = v.object({ title: vLocalized, body: vLocalized, imag
 /** Número de destaque do case ("~50", "3x"), mostrado no card. */
 export const vMetric = v.object({ value: v.string(), label: vLocalized });
 
+/** Um número do case ("Resultados em números"): valor, o que mede e, opcional, um ícone do Lucide. */
+export const vCaseMetric = v.object({ value: v.string(), label: vLocalized, icon: v.optional(v.string()) });
+
 export const projectFields = {
   ...itemFields,
   title: vLocalized,
@@ -220,6 +223,8 @@ export const projectFields = {
   category: v.optional(vLocalized),
   links: v.optional(v.array(vLink)),
   metric: v.optional(vMetric),
+  /** Números do case, em ordem; sem `metric`, o primeiro vira o número do card. */
+  metrics: v.optional(v.array(vCaseMetric)),
   seo: v.optional(vSeo),
 };
 
@@ -248,8 +253,10 @@ export const faqFields = {
 
 export const vResumeKind = v.union(
   v.literal("experience"),
+  v.literal("volunteer"),
   v.literal("education"),
   v.literal("skill"),
+  v.literal("soft-skill"),
   v.literal("certification"),
   v.literal("language"),
 );
@@ -267,11 +274,16 @@ export const resumeItemFields = {
   group: v.optional(vLocalized),
 };
 
+/** Tamanho da foto no mosaico do dia a dia (colunas x linhas), como o `span_size` da v1. */
+export const vRoutineSpan = v.union(v.literal("1x1"), v.literal("1x2"), v.literal("2x1"), v.literal("2x2"));
+
 export const routineFields = {
   ...itemFields,
   title: vLocalized,
   description: v.optional(vLocalized),
   image: v.optional(vImage),
+  /** Tamanho no mosaico (temas que desenham a galeria em mosaico). Sem valor, 1x1. */
+  span: v.optional(vRoutineSpan),
 };
 
 export const vPricePeriod = v.union(v.literal("month"), v.literal("year"), v.literal("once"), v.literal("hour"), v.literal("project"));

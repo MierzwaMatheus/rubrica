@@ -94,6 +94,16 @@ const PROJECT_FIELDS: FieldMap = {
       image: field.image({ label: "Imagem da seção" }),
     },
   }),
+  metrics: field.list({
+    label: "Resultados em números",
+    itemLabel: "Número",
+    help: "Os números do case, em ordem. Sem número de destaque, o primeiro aparece no card.",
+    of: {
+      value: field.text({ label: "Número", required: true, localized: false, maxLength: 40, help: "Ex.: ~50, 3x, 98%." }),
+      label: field.text({ label: "O que o número mede", required: true, maxLength: 100 }),
+      icon: field.text({ label: "Ícone", localized: false, maxLength: 40, help: "Nome de um ícone do Lucide (ex.: Bot, shield-check). Alguns temas mostram." }),
+    },
+  }),
   gallery: field.list({ label: "Galeria", itemLabel: "Imagem", of: { image: field.image({ label: "Imagem", required: true }) } }),
   links: linksField,
 };
@@ -120,8 +130,10 @@ const FAQ_FIELDS: FieldMap = {
 
 export const RESUME_KINDS = {
   experience: "Experiência",
+  volunteer: "Voluntariado",
   education: "Formação",
   skill: "Competência",
+  "soft-skill": "Competência comportamental",
   certification: "Certificação",
   language: "Idioma",
 } as const;
@@ -133,7 +145,8 @@ const RESUME_FIELDS: FieldMap = {
   location: field.text({ label: "Local", maxLength: 80 }),
   start: field.text({ label: "Início", localized: false, maxLength: 7, help: "AAAA-MM (ex.: 2021-03)." }),
   end: field.text({ label: "Fim", localized: false, maxLength: 7, help: "AAAA-MM. Vazio = até hoje." }),
-  description: field.text({ label: "Descrição", multiline: true, maxLength: 800 }),
+  // Texto rico: experiências longas, com listas e destaques (como na v1).
+  description: field.richText({ label: "Descrição" }),
   group: field.text({ label: "Grupo", maxLength: 60, help: "Agrupa as competências no currículo (ex.: Front-end, IA, Ferramentas). Opcional." }),
 };
 
@@ -141,6 +154,16 @@ const ROUTINE_FIELDS: FieldMap = {
   title: field.text({ label: "Título", required: true, maxLength: 100 }),
   description: field.text({ label: "Legenda", multiline: true, maxLength: 300 }),
   image: field.image({ label: "Imagem" }),
+  span: field.select({
+    label: "Tamanho no mosaico",
+    help: "Colunas x linhas, nos temas que mostram o dia a dia em mosaico. Sem escolha, 1x1.",
+    options: [
+      { value: "1x1", label: "1x1 (normal)" },
+      { value: "1x2", label: "1x2 (alta)" },
+      { value: "2x1", label: "2x1 (larga)" },
+      { value: "2x2", label: "2x2 (grande)" },
+    ],
+  }),
 };
 
 const PLAN_FIELDS: FieldMap = {
@@ -239,7 +262,7 @@ export const COLLECTION_CONFIGS: Record<CollectionName, CollectionConfig> = {
     plural: "projetos",
     description: "Cases e projetos, com seções, galeria, número de destaque e SEO.",
     fields: PROJECT_FIELDS,
-    docKeys: ["title", "summary", "cover", "client", "year", "role", "category", "metric", "content", "sections", "gallery", "links", "tags", "featured", "seo"],
+    docKeys: ["title", "summary", "cover", "client", "year", "role", "category", "metric", "content", "sections", "metrics", "gallery", "links", "tags", "featured", "seo"],
     required: ["title"],
     slug: true,
     seo: true,
@@ -340,7 +363,7 @@ export const COLLECTION_CONFIGS: Record<CollectionName, CollectionConfig> = {
     plural: "momentos",
     description: "Galeria do dia a dia da página sobre.",
     fields: ROUTINE_FIELDS,
-    docKeys: ["title", "description", "image"],
+    docKeys: ["title", "description", "image", "span"],
     required: ["title"],
     reorderable: true,
     defaultPublished: true,

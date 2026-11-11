@@ -118,8 +118,19 @@ export interface RawProject extends Base {
   links?: RawLink[];
   /** Número de destaque mostrado no card do case. */
   metric?: { value: string; label: Localized<string> };
+  /**
+   * Números do case ("Resultados em números"), em ordem, com ícone opcional (nome do Lucide,
+   * como `Bot` ou `shield-check`). Sem `metric`, o primeiro é o número do card.
+   */
+  metrics?: CaseMetric[];
   seo?: SeoFields;
   updatedAt?: number;
+}
+
+export interface CaseMetric {
+  value: string;
+  label: Localized<string>;
+  icon?: string;
 }
 
 export interface RawService extends Base {
@@ -142,7 +153,11 @@ export interface RawFaq extends Base {
   answer: Localized<string>;
 }
 
-export type ResumeKind = "experience" | "education" | "skill" | "certification" | "language";
+/**
+ * Tipos de item do currículo. `soft-skill` são as competências comportamentais (liderança,
+ * comunicação) e `volunteer`, o trabalho voluntário: o tema os mostra à parte.
+ */
+export type ResumeKind = "experience" | "volunteer" | "education" | "skill" | "soft-skill" | "certification" | "language";
 
 export interface RawResumeItem extends Base {
   kind: ResumeKind;
@@ -160,10 +175,15 @@ export interface RawResumeItem extends Base {
   group?: Localized<string>;
 }
 
+/** Tamanho da foto no mosaico: colunas x linhas. */
+export type RoutineSpan = "1x1" | "1x2" | "2x1" | "2x2";
+
 export interface RawRoutineItem extends Base {
   title: Localized<string>;
   description?: Localized<string>;
   image?: RawImage;
+  /** Tamanho no mosaico (temas que desenham a galeria em mosaico). Sem valor, 1x1. */
+  span?: RoutineSpan;
 }
 
 export type PricePeriod = "month" | "year" | "once" | "hour" | "project";

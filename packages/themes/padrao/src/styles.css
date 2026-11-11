@@ -4,6 +4,7 @@
  * Estrutura: tokens e tipografia, casca (sidebar e barra do celular), seções, cartões e
  * blocos com visual próprio (hero, números, cases, sobre, serviços, depoimentos, cta).
  */
+@import "./blog.css";
 :root {
   --rb-font-sans: "Chakra Petch", system-ui, -apple-system, "Segoe UI", sans-serif;
   --rb-font-mono: "Chakra Petch", ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -36,6 +37,13 @@ code, pre { font-family: var(--rb-font-mono); }
 .rb-bar__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .rb-bar__menu { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: var(--rb-radius); color: var(--rb-fg-strong); cursor: pointer; }
 .rb-bar__menu:hover { background: var(--rb-hairline); }
+.rb-bar__tools { display: flex; align-items: center; gap: 0.25rem; flex: none; }
+.rb-bar__talk {
+  border: 0; font: inherit; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 0.375rem; min-height: 44px; padding-inline: 0.75rem; border-radius: var(--rb-radius);
+  background: var(--rb-accent); color: var(--rb-accent-fg); font-size: 0.75rem; font-weight: 600; text-decoration: none; white-space: nowrap;
+}
+.rb-bar__talk:hover { background: color-mix(in srgb, var(--rb-accent) 90%, var(--rb-bg)); }
 
 .rb-scrim { display: none; position: fixed; inset: 0; z-index: 55; background: color-mix(in srgb, var(--rb-bg) 75%, transparent); }
 .rb-menu__input:checked ~ .rb-scrim { display: block; }
@@ -120,13 +128,50 @@ code, pre { font-family: var(--rb-font-mono); }
 .rb-side__toggle .rb-color-toggle:hover { color: var(--rb-accent-2); }
 .rb-side__locales .rb-locales { justify-content: center; gap: 0.25rem; }
 .rb-side__locales .rb-locales a { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; padding-inline: 0.5rem; font-size: 0.75rem; font-weight: 500; color: var(--rb-muted); text-decoration: none; }
+.rb-side__locales .rb-locales a:hover { color: var(--rb-fg-strong); }
 .rb-side__locales .rb-locales a[aria-current="true"] { color: var(--rb-accent-2); font-weight: 700; }
+/*
+ * Dois idiomas: "PT ( ) EN", como a chave da v1. A chave (.rb-side__switch) é um link para
+ * o outro idioma, centrado entre os códigos; a bolinha fica do lado do idioma atual.
+ */
+.rb-side__locales { position: relative; }
+.rb-side__locales:has(.rb-side__switch) .rb-locales { justify-content: space-between; }
+.rb-side__switch { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center; width: 3.25rem; height: 44px; }
+.rb-side__switch::before {
+  content: ""; width: 2.25rem; height: 1.25rem; border-radius: 999px; border: 1px solid var(--rb-hairline);
+  background: radial-gradient(circle at 0.625rem 50%, var(--rb-muted) 0.375rem, transparent 0.4rem) var(--rb-faint);
+}
+.rb-side__switch[data-on]::before {
+  background: radial-gradient(circle at calc(100% - 0.625rem) 50%, var(--rb-accent-fg) 0.375rem, transparent 0.4rem) var(--rb-accent);
+  border-color: var(--rb-accent);
+}
+.rb-side__switch:hover::before { border-color: var(--rb-accent); }
 .rb-side__actions { display: grid; gap: 0.5rem; }
-.rb-side__actions a { display: flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 44px; border-radius: 0.375rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; text-decoration: none; text-align: center; }
+:where(.rb-side__actions button) { width: 100%; font: inherit; cursor: pointer; background: none; }
+.rb-side__actions a, .rb-side__actions button { display: flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 44px; border-radius: 0.375rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; text-decoration: none; text-align: center; }
 .rb-side__talk { font-family: var(--rb-font-mono); color: var(--rb-accent); border: 1px solid color-mix(in srgb, var(--rb-accent) 50%, transparent); background: color-mix(in srgb, var(--rb-accent) 12%, transparent); }
 .rb-side__talk:hover { background: color-mix(in srgb, var(--rb-accent) 22%, transparent); }
 .rb-side__cv { color: var(--rb-accent-2); border: 1px solid color-mix(in srgb, var(--rb-accent-2) 50%, transparent); }
 .rb-side__cv:hover { background: color-mix(in srgb, var(--rb-accent-2) 10%, transparent); }
+/* X para fechar a gaveta no celular, no canto como o da v1; no desktop a sidebar não fecha. */
+.rb-side__close { position: absolute; top: 0.5rem; right: 0.5rem; z-index: 1; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 0.375rem; color: var(--rb-muted); cursor: pointer; }
+.rb-side__close:hover { color: var(--rb-fg-strong); background: var(--rb-faint); }
+/*
+ * Desktop (mouse): o rodapé da sidebar com as medidas da v1, para "Fale comigo" e "Baixar CV"
+ * caberem na tela como lá. Na gaveta do celular (toque) os alvos seguem com 44 px.
+ */
+@media (min-width: 1024px) {
+  .rb-side__close { display: none; }
+  .rb-sidenav a { min-height: 2.75rem; padding-block: 0.5rem; }
+  .rb-side__foot { gap: 0.75rem; padding-block: 1.25rem; }
+  .rb-side__contact { gap: 0.25rem; }
+  .rb-side__contact a { min-height: 1.75rem; }
+  .rb-side__social a { width: 2.25rem; height: 2.25rem; }
+  .rb-side__toggle .rb-color-toggle { min-height: 2.25rem; }
+  .rb-side__locales .rb-locales a { min-height: 2rem; }
+  .rb-side__switch { height: 2rem; }
+  .rb-side__actions a, .rb-side__actions button { min-height: 2.25rem; }
+}
 
 .rb-footer { margin-top: 2rem; padding: 1.5rem 1rem 2rem; text-align: center; font-size: 0.8rem; color: var(--rb-muted); border-top: 1px solid var(--rb-hairline); }
 .rb-footer p { margin: 0; }
@@ -237,6 +282,42 @@ h2.rb-section__title::after { content: " */"; content: " */" / ""; color: var(--
 .rb-quote__text p::before { content: "\201C"; }
 .rb-quote__text p::after { content: "\201D"; }
 .rb-depoimentos .rb-island { display: flex; justify-content: center; }
+/* Título da seção na home: balão de mensagem, sem o comentário de código, como na v1. */
+.rb-depoimentos h2.rb-depoimentos__title { display: flex; align-items: center; gap: 0.75rem; font-family: var(--rb-font-sans); font-size: 1.25rem; }
+.rb-depoimentos h2.rb-depoimentos__title::before, .rb-depoimentos h2.rb-depoimentos__title::after { content: none; }
+.rb-depoimentos__title svg { flex: none; color: var(--rb-accent); }
+/* "Ver todos os depoimentos" (campo cta) e o botão de enviar (ilha), centrados como na v1. */
+.rb-depoimentos__all { margin: 2rem 0 0; text-align: center; font-size: 0.875rem; }
+.rb-depoimentos__all a { display: inline-flex; align-items: center; min-height: 44px; color: var(--rb-muted); text-decoration: underline; text-underline-offset: 4px; }
+.rb-depoimentos__all a:hover { color: var(--rb-fg); }
+.rb-depoimentos__all + .rb-island { margin-top: 0.25rem; }
+.rb-depoimentos__list + .rb-island, .rb-depoimentos__group + .rb-island { margin-top: 2rem; }
+.rb-depoimentos .rb-island button[aria-expanded="false"] {
+  gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 0.75rem; font-size: 0.875rem; font-weight: 500;
+  color: var(--rb-accent); background: color-mix(in srgb, var(--rb-accent) 5%, transparent); border: 1px solid color-mix(in srgb, var(--rb-accent) 40%, transparent);
+}
+.rb-depoimentos .rb-island button[aria-expanded="false"]:hover { background: color-mix(in srgb, var(--rb-accent) 10%, transparent); border-color: var(--rb-accent); }
+/* Estrela do "Deixar meu depoimento" (o botão é da ilha do núcleo: o ícone entra pelo CSS). */
+.rb-depoimentos .rb-island button[aria-expanded="false"]::before {
+  content: ""; flex: none; width: 1rem; height: 1rem; background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+/* Variação "categorias" (página de depoimentos): contagem, um grupo por categoria, em colunas. */
+.rb-depoimentos__count { margin: 0 0 2.5rem; font-size: 0.875rem; color: var(--rb-muted); }
+.rb-main__inner .rb-hero[data-variant="pagina"] + .rb-depoimentos[data-variant="categorias"] { margin-top: 0.5rem; }
+.rb-depoimentos__group + .rb-depoimentos__group { margin-top: 2.5rem; }
+.rb-depoimentos__category { margin: 0 0 1rem; font-family: var(--rb-font-mono); font-size: 0.875rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--rb-accent); }
+.rb-depoimentos__category span { color: var(--rb-muted); }
+.rb-depoimentos[data-variant="categorias"] .rb-depoimentos__list { display: block; columns: 1; column-gap: 1.25rem; }
+@media (min-width: 768px) { .rb-depoimentos[data-variant="categorias"] .rb-depoimentos__list { columns: 2; } }
+.rb-depoimentos[data-variant="categorias"] .rb-depoimento { break-inside: avoid; margin-bottom: 1.25rem; }
+/* Cabeçalho da página de depoimentos como o da v1: título menor, com o balão, e o apoio curto. */
+.rb-hero[data-variant="pagina"]:has(+ .rb-depoimentos[data-variant="categorias"]) .rb-hero__title { display: flex; align-items: center; gap: 0.75rem; font-size: 1.5rem; }
+.rb-hero[data-variant="pagina"]:has(+ .rb-depoimentos[data-variant="categorias"]) .rb-hero__title::before {
+  content: ""; flex: none; width: 1.25rem; height: 1.25rem; background: var(--rb-accent);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.rb-hero[data-variant="pagina"]:has(+ .rb-depoimentos[data-variant="categorias"]) .rb-hero__lead { font-size: 0.875rem; }
 
 /* ---------- fechamento (cta) ---------- */
 .rb-main__inner .rb-cta > .rb-container {
@@ -250,9 +331,83 @@ h2.rb-section__title::after { content: " */"; content: " */" / ""; color: var(--
 .rb-cta .rb-actions { margin-top: 1.5rem; }
 
 /* ---------- currículo, FAQ, contato ---------- */
-.rb-resume__heading { color: var(--rb-accent); font-size: 1.5rem; }
-.rb-resume__item .rb-card__meta { color: var(--rb-accent-2); font-weight: 500; }
-.rb-resume__item .rb-card__title { color: var(--rb-fg-strong); font-size: 1.25rem; }
+/* Currículo como o da v1 (blocks.tsx): coluna estreita, duas colunas no desktop. */
+.rb-main__inner:has(> .rb-curriculo) { max-width: 62rem; }
+.rb-resume__download { margin: 0 0 3rem; }
+.rb-resume__download .rb-button {
+  display: inline-flex; align-items: center; gap: 0.5rem; min-height: 44px; padding: 0.75rem 1.5rem; border-radius: 0.5rem;
+  background: var(--rb-accent); border-color: var(--rb-accent); color: var(--rb-accent-fg); font-weight: 600;
+}
+.rb-resume__download .rb-button::before {
+  content: ""; width: 1rem; height: 1rem; background: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 15V3'/%3E%3Cpath d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'/%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.rb-resume__download .rb-button:hover { background: color-mix(in srgb, var(--rb-accent) 90%, var(--rb-bg)); }
+.rb-resume__cols { display: grid; gap: 3rem 2rem; }
+@media (min-width: 768px) { .rb-resume__cols[data-side] { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); } }
+.rb-resume__main, .rb-resume__side { display: grid; gap: 3rem; align-content: start; }
+.rb-curriculo .rb-resume__group { margin: 0; }
+.rb-resume__heading { display: flex; align-items: center; gap: 0.5rem; margin: 0 0 1.5rem; color: var(--rb-accent); font-size: 1.5rem; line-height: 1.25; }
+h2.rb-resume__heading { font-family: var(--rb-font-sans); }
+.rb-resume__heading svg { flex: none; }
+.rb-resume__list { gap: 1.5rem; }
+.rb-curriculo .rb-resume__item { padding: 1.5rem; background: var(--rb-surface); border: 1px solid var(--rb-hairline); }
+.rb-curriculo .rb-resume__item:hover { border-color: color-mix(in srgb, var(--rb-accent) 50%, transparent); }
+.rb-resume__item .rb-card__title { margin: 0 0 0.375rem; color: var(--rb-fg-strong); font-size: 1.25rem; line-height: 1.4; }
+.rb-resume__item .rb-card__meta { margin: 0 0 0.375rem; color: var(--rb-accent-2); font-weight: 500; }
+.rb-resume__item .rb-resume__period { margin: 0; font-size: 0.875rem; font-weight: 400; color: var(--rb-muted); }
+.rb-resume__item .rb-resume__desc, .rb-resume__item .rb-resume__bullets, .rb-resume__item > .rb-card__text { margin-top: 1.5rem; }
+/* Descrição rica como a da v1: blocos colados (sem margem), listas com 0.5rem entre itens. */
+.rb-resume__desc { max-width: none; font-size: 1rem; line-height: 1.625; color: color-mix(in srgb, var(--rb-fg) 90%, transparent); }
+.rb-curriculo .rb-resume__desc > *, .rb-curriculo .rb-resume__desc li > * { margin-block: 0; }
+.rb-curriculo .rb-resume__desc ul, .rb-curriculo .rb-resume__desc ol { margin: 0; padding-left: 1.5rem; display: grid; gap: 0.5rem; }
+.rb-curriculo .rb-resume__desc ul { list-style: disc; }
+.rb-curriculo .rb-resume__desc li { margin: 0; padding-left: 0.5rem; line-height: 1.625; }
+.rb-curriculo .rb-resume__desc :is(h2, h3, h4) { margin: 0; font-size: 1rem; line-height: 1.625; }
+
+/* Experiências anteriores: <details> que abre sem JavaScript, com o texto trocando pelo estado. */
+.rb-resume__older { margin-top: 1.5rem; }
+.rb-resume__older > summary {
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 44px; padding: 0.75rem; cursor: pointer; list-style: none;
+  border: 1px solid var(--rb-hairline); border-radius: 0.5rem; font-family: var(--rb-font-mono); font-size: 0.875rem; color: var(--rb-muted);
+}
+.rb-resume__older > summary::-webkit-details-marker { display: none; }
+.rb-resume__older > summary:hover { color: var(--rb-fg-strong); border-color: color-mix(in srgb, var(--rb-accent) 40%, transparent); }
+.rb-resume__older > summary svg { transition: transform 0.2s; }
+.rb-resume__older[open] > summary svg { transform: rotate(180deg); }
+.rb-resume__older[open] .rb-resume__show, .rb-resume__older:not([open]) .rb-resume__hide { display: none; }
+.rb-resume__older > .rb-resume__list { margin-top: 1.5rem; }
+
+/* Itens simples (cursos, voluntariado, idiomas). */
+.rb-resume__lines { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; }
+.rb-resume__line { padding: 1rem; border-radius: 0.5rem; background: var(--rb-surface); border: 1px solid var(--rb-hairline); transition: border-color 0.3s; }
+.rb-resume__main .rb-resume__line:hover { border-color: color-mix(in srgb, var(--rb-accent-2) 50%, transparent); }
+.rb-resume__lineTitle { margin: 0; font-size: 1rem; font-weight: 400; line-height: 1.5; color: color-mix(in srgb, var(--rb-fg) 90%, transparent); }
+.rb-resume__lineMeta { margin: 0.25rem 0 0; font-size: 0.875rem; color: var(--rb-muted); }
+.rb-resume__line .rb-resume__desc, .rb-resume__line .rb-card__text, .rb-resume__line .rb-resume__bullets { margin-top: 0.5rem; font-size: 0.875rem; }
+.rb-resume__group--language .rb-resume__lineTitle { font-weight: 500; color: var(--rb-fg-strong); }
+.rb-resume__group--language .rb-resume__lineMeta { color: var(--rb-accent-2); }
+
+/* Competências: grupos com rótulo em caixa alta e chips; as comportamentais com borda de destaque. */
+.rb-curriculo .rb-resume__skillGroups { gap: 1.25rem; }
+.rb-curriculo .rb-resume__groupName { margin: 0 0 0.5rem; font-family: var(--rb-font-mono); font-size: 0.75rem; font-weight: 400; letter-spacing: 0.05em; color: var(--rb-muted); }
+.rb-resume__chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.rb-resume__chips li { padding: 0.25rem 0.75rem; border-radius: 0.375rem; font-size: 0.875rem; line-height: 1.43; color: var(--rb-fg); background: var(--rb-faint); border: 1px solid var(--rb-hairline); }
+.rb-resume__chips--outline li { padding: 0.25rem 0.75rem; font-size: 0.75rem; font-weight: 600; color: color-mix(in srgb, var(--rb-fg) 90%, transparent); background: none; border-color: color-mix(in srgb, var(--rb-accent) 50%, transparent); }
+.rb-resume__chips--outline li:hover { background: color-mix(in srgb, var(--rb-accent) 10%, transparent); }
+
+/* Cabeçalho de página (hero "pagina") e o texto logo depois dele, com fio lateral (o resumo da v1). */
+.rb-hero[data-variant="pagina"] .rb-hero__title { margin: 0; font-size: 1.875rem; line-height: 1.2; }
+.rb-hero__lead { margin: 0.5rem 0 0; font-size: 1rem; line-height: 1.5; color: var(--rb-muted); }
+.rb-main__inner .rb-hero[data-variant="pagina"] + .rb-section { margin-top: 2rem; }
+/* Com um resumo logo depois (o currículo), o cabeçalho é maior, como na v1. */
+.rb-hero[data-variant="pagina"]:has(+ .rb-texto) .rb-hero__title { font-size: clamp(2.25rem, 5vw, 3rem); line-height: 1.1; }
+.rb-hero[data-variant="pagina"]:has(+ .rb-texto) .rb-hero__lead { margin-top: 1rem; font-size: 1.25rem; }
+.rb-main__inner .rb-hero[data-variant="pagina"] + .rb-texto { margin-top: 3rem; }
+.rb-hero[data-variant="pagina"] + .rb-texto .rb-prose { max-width: none; padding: 0 0 0 1.5rem; border: 0; border-left: 2px solid color-mix(in srgb, var(--rb-accent) 50%, transparent); border-radius: 0; background: none; }
+.rb-hero[data-variant="pagina"] + .rb-texto .rb-prose p { font-size: 1.125rem; line-height: 1.7; color: var(--rb-fg); }
+.rb-hero[data-variant="pagina"] + .rb-texto + .rb-numeros, .rb-hero[data-variant="pagina"] + .rb-texto + .rb-numeros + .rb-curriculo { margin-top: 1.5rem; }
+.rb-hero[data-variant="pagina"] ~ .rb-numeros .rb-numeros__value { font-size: 1.5rem; }
 .rb-faq__item { border-color: var(--rb-hairline); border-radius: 0.75rem; }
 .rb-faq__question::after { color: var(--rb-accent); }
 .rb-form { border-radius: 0.75rem; border-color: var(--rb-hairline); }
@@ -294,7 +449,128 @@ h2.rb-section__title::after { content: " */"; content: " */" / ""; color: var(--
 .rb-related { margin-top: 3rem; }
 .rb-notfound { padding-block: 4rem; }
 
+/* ---------- Sobre: "Fora do trabalho" (texto, variação pessoal) ---------- */
+.rb-texto[data-variant="pessoal"] .rb-prose { position: relative; overflow: hidden; max-width: none; }
+.rb-texto[data-variant="pessoal"] .rb-prose p, .rb-texto[data-variant="pessoal"] .rb-prose p:first-child { position: relative; z-index: 1; margin: 0 0 1.75rem; font-size: 1.125rem; line-height: 1.625; color: var(--rb-fg); }
+.rb-texto[data-variant="pessoal"] .rb-prose p:last-child { margin-bottom: 0; }
+/* O "</>" decorativo no canto, como o da v1. */
+.rb-texto[data-variant="pessoal"] .rb-prose::after {
+  content: ""; position: absolute; top: 1rem; right: 1rem; width: 6rem; height: 6rem; background: var(--rb-accent); opacity: 0.1; transition: opacity 0.3s;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m16 18 6-6-6-6'/%3E%3Cpath d='m8 6-6 6 6 6'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m16 18 6-6-6-6'/%3E%3Cpath d='m8 6-6 6 6 6'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.rb-texto[data-variant="pessoal"] .rb-prose:hover::after { opacity: 0.2; }
+
+/* ---------- Sobre: "Meu dia a dia" em mosaico (galeria) ---------- */
+.rb-mosaic { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 200px; gap: 1rem; }
+@media (min-width: 768px) { .rb-mosaic { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.rb-mosaic__item[data-span="1x2"] { grid-row: span 2; }
+.rb-mosaic__item[data-span="2x1"] { grid-column: span 2; }
+.rb-mosaic__item[data-span="2x2"] { grid-column: span 2; grid-row: span 2; }
+.rb-mosaic__figure {
+  position: relative; height: 100%; margin: 0; overflow: hidden; cursor: pointer; border-radius: 0.75rem;
+  border: 1px solid var(--rb-hairline); background: linear-gradient(135deg, var(--rb-faint), var(--rb-bg)); transition: border-color 0.3s;
+}
+.rb-mosaic__figure:hover, .rb-mosaic__figure:focus-visible { border-color: color-mix(in srgb, var(--rb-accent) 50%, transparent); }
+.rb-mosaic__figure:focus-visible { outline: 2px solid var(--rb-accent); outline-offset: 2px; }
+.rb-mosaic__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 0; }
+.rb-mosaic__figure::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, color-mix(in srgb, var(--rb-bg) 80%, transparent), color-mix(in srgb, var(--rb-bg) 40%, transparent) 50%, transparent); pointer-events: none; }
+.rb-mosaic__tags { position: absolute; top: 1rem; left: 1rem; right: 1rem; z-index: 1; display: flex; flex-wrap: wrap; gap: 0.5rem; list-style: none; margin: 0; padding: 0; }
+.rb-mosaic__tags li { padding: 0.125rem 0.5rem; border-radius: 0.375rem; font-size: 0.75rem; color: var(--rb-accent-fg); background: var(--rb-accent); }
+/* Legenda por cima da foto: aparece no hover, no foco e no toque (a foto recebe foco). */
+.rb-mosaic__caption {
+  position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; padding: 1.5rem;
+  text-align: center; font-size: 0.875rem; line-height: 1.6; color: var(--rb-fg-strong);
+  background: color-mix(in srgb, var(--rb-bg) 90%, transparent); backdrop-filter: blur(4px); opacity: 0; transition: opacity 0.3s;
+}
+@media (min-width: 768px) { .rb-mosaic__caption { font-size: 1rem; } }
+.rb-mosaic__figure:hover .rb-mosaic__caption, .rb-mosaic__figure:focus .rb-mosaic__caption { opacity: 1; }
+.rb-mosaic__text { font-size: 0.875em; color: var(--rb-muted); }
+
+/* ---------- Sobre: FAQ num cartão só, com "?" e seta, como na v1 ---------- */
+.rb-faq__card { display: block; max-width: none; overflow: hidden; border: 1px solid var(--rb-hairline); border-radius: 0.75rem; background: color-mix(in srgb, var(--rb-surface) 50%, transparent); }
+.rb-faq__card .rb-faq__item { border: 0; border-radius: 0; background: none; }
+.rb-faq__card .rb-faq__item + .rb-faq__item { border-top: 1px solid var(--rb-hairline); }
+.rb-faq__card .rb-faq__question { gap: 0.75rem; padding: 1rem 1.5rem; font-size: 0.875rem; font-weight: 500; color: var(--rb-fg-strong); }
+.rb-faq__card .rb-faq__question:hover { color: var(--rb-accent); }
+.rb-faq__card .rb-faq__question::after { content: none; }
+.rb-faq__icon { flex: none; color: var(--rb-accent); }
+.rb-faq__chevron { flex: none; margin-left: auto; color: var(--rb-muted); transition: transform 0.2s; }
+.rb-faq__card .rb-faq__item[open] .rb-faq__chevron { transform: rotate(180deg); }
+.rb-faq__card .rb-faq__answer { padding: 0 1.5rem 1rem; font-size: 0.875rem; color: var(--rb-fg); }
+
+/* ---------- 404 em tela de terminal (templates.tsx), como a da v1 ---------- */
+.rb-404 { position: relative; display: flex; align-items: center; justify-content: center; min-height: calc(100vh - 10rem); padding: 4rem 0; overflow: hidden; }
+.rb-404::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0.035;
+  background-image: linear-gradient(color-mix(in srgb, var(--rb-accent) 80%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--rb-accent) 80%, transparent) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+.rb-404::after { content: ""; position: absolute; top: 50%; left: 50%; width: 500px; max-width: 100%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; background: color-mix(in srgb, var(--rb-accent) 5%, transparent); filter: blur(120px); pointer-events: none; }
+.rb-404__box { position: relative; z-index: 1; width: 100%; max-width: 36rem; padding-inline: 1.5rem; }
+.rb-404__label { display: flex; align-items: center; gap: 0.5rem; margin: 0 0 1.5rem; font-family: var(--rb-font-mono); font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--rb-accent); }
+.rb-404__code { margin-left: auto; font-size: 0.625rem; letter-spacing: normal; text-transform: none; color: var(--rb-muted); }
+.rb-404__title { margin: 0 0 1rem; font-family: var(--rb-font-mono); font-size: clamp(6rem, 22vw, 9rem); font-weight: 900; line-height: 1; letter-spacing: -0.05em; color: var(--rb-fg-strong); }
+.rb-404__line { height: 1px; margin-bottom: 2rem; background: linear-gradient(to right, color-mix(in srgb, var(--rb-accent) 60%, transparent), color-mix(in srgb, var(--rb-accent) 20%, transparent), transparent); }
+.rb-404__home {
+  display: inline-flex; align-items: center; gap: 0.5rem; min-height: 44px; padding: 0 1.5rem; border-radius: 0.375rem;
+  font-family: var(--rb-font-mono); font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none;
+  color: var(--rb-accent); background: color-mix(in srgb, var(--rb-accent) 10%, transparent); border: 1px solid color-mix(in srgb, var(--rb-accent) 40%, transparent); transition: background 0.3s, border-color 0.3s;
+}
+.rb-404__home:hover { background: color-mix(in srgb, var(--rb-accent) 20%, transparent); border-color: color-mix(in srgb, var(--rb-accent) 70%, transparent); }
+
 /* Logo do site (quando configurada): no topo da sidebar e na barra do celular. */
 .rb-side__logo { display: flex; justify-content: center; padding: 1rem 1rem 0; }
 .rb-side__logo .rb-logo { height: 2.25rem; }
 .rb-bar__logo { height: 1.75rem; }
+
+/* Listas das páginas de portfólio e blog (depois do cabeçalho de página): duas colunas, como na v1. */
+@media (min-width: 768px) {
+  .rb-hero[data-variant="pagina"] ~ .rb-cases:not([data-variant="lista"]) .rb-cases__list,
+  .rb-hero[data-variant="pagina"] ~ .rb-posts-recentes .rb-posts__list { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Lista de itens sem número (princípios do "Sobre"): o marcador em V da v1 sobre o título. */
+.rb-lista__list:is(ul) > li::before {
+  content: ""; display: block; width: 1.75rem; height: 1.25rem; margin-bottom: 1rem; background: var(--rb-accent);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 20'%3E%3Cpath d='M0 0H8L14 6L20 0H28L14 14Z'/%3E%3C/svg%3E") left top / contain no-repeat;
+}
+.rb-lista__list .rb-card__text { color: var(--rb-muted); }
+
+/* ---------- cases (blocks.tsx, CasesBlock), como na v1 ---------- */
+/* O texto do link já traz o "$" ("$ cat case.md"). */
+.rb-cases .rb-card__more::before { content: none; }
+.rb-cases__head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.5rem 1rem; margin-bottom: 2rem; }
+.rb-cases__head .rb-section__header { margin-bottom: 0; }
+.rb-cases__all { display: inline-flex; align-items: center; gap: 0.25rem; min-height: 44px; font-family: var(--rb-font-mono); font-size: 0.875rem; color: var(--rb-muted); text-decoration: none; }
+.rb-cases__all::after { content: "→"; content: "→" / ""; }
+.rb-cases__all:hover { color: var(--rb-fg-strong); }
+.rb-cases .rb-card__metric { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem; margin: 1rem 0 0; }
+.rb-cases .rb-card__metric strong { font-size: 1.25rem; line-height: 1.2; color: var(--rb-accent); }
+.rb-cases .rb-card__metric span { font-size: 0.75rem; color: var(--rb-muted); }
+
+/* Página do portfólio (variação "pagina"): filtro por categoria e cartões com botão. */
+.rb-cases[data-variant="pagina"] .rb-filter { gap: 0.5rem; margin-bottom: 2rem; }
+.rb-cases[data-variant="pagina"] .rb-filter label { min-height: 44px; padding: 0 1rem; border-radius: 0.375rem; font-size: 0.875rem; font-weight: 500; color: var(--rb-muted); background: var(--rb-faint); border: 1px solid var(--rb-faint); transition: background 0.3s, color 0.3s; }
+.rb-cases[data-variant="pagina"] .rb-filter label:hover { color: var(--rb-fg-strong); background: color-mix(in srgb, var(--rb-fg) 10%, transparent); }
+@media (min-width: 768px) { .rb-cases[data-variant="pagina"] .rb-cases__list { grid-template-columns: repeat(2, 1fr); } }
+.rb-case-card { display: flex; flex-direction: column; padding: 0; overflow: hidden; }
+.rb-case-card:hover { border-color: color-mix(in srgb, var(--rb-accent) 50%, transparent); box-shadow: 0 0 20px color-mix(in srgb, var(--rb-accent) 15%, transparent); }
+.rb-case-card .rb-card__image { display: block; width: 100%; height: 12rem; max-height: none; margin: 0; border-radius: 0; object-fit: cover; transition: transform 0.5s; }
+.rb-case-card:hover .rb-card__image { transform: scale(1.1); }
+.rb-case-card__noimage { display: block; height: 12rem; background: var(--rb-faint); }
+.rb-case-card .rb-card__body { display: flex; flex-direction: column; flex: 1; padding: 1.5rem; }
+.rb-case-card .rb-card__title { margin-bottom: 0.5rem; font-size: 1.25rem; transition: color 0.3s; }
+.rb-case-card:hover .rb-card__title { color: var(--rb-accent); }
+.rb-case-card .rb-card__text { margin: 0 0 1rem; }
+/* As etiquetas descem para o pé do cartão: os botões ficam alinhados entre os cartões. */
+.rb-cases .rb-card__body > .rb-case-card__tags { display: flex; margin: auto 0 1.5rem; gap: 0.5rem; }
+.rb-case-card .rb-card__metric { margin: 0 0 1.25rem; }
+.rb-case-card__action {
+  display: flex; align-items: center; justify-content: center; min-height: 44px; margin-top: auto; padding: 0.5rem 1rem; border-radius: 0.375rem;
+  font-family: var(--rb-font-mono); font-size: 0.875rem; font-weight: 500; text-decoration: none; text-align: center;
+  color: var(--rb-accent-2); background: var(--rb-faint); border: 1px solid color-mix(in srgb, var(--rb-fg) 10%, transparent);
+  transition: background 0.3s, color 0.3s, border-color 0.3s;
+}
+.rb-case-card__action--case { color: var(--rb-accent); background: color-mix(in srgb, var(--rb-accent) 10%, transparent); border-color: color-mix(in srgb, var(--rb-accent) 30%, transparent); }
+.rb-case-card__action:hover { color: var(--rb-accent-fg); background: var(--rb-accent); border-color: var(--rb-accent); }
+.rb-case-card__action:focus-visible { outline: 2px solid var(--rb-accent); outline-offset: 2px; }

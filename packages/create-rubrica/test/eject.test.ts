@@ -35,9 +35,9 @@ describe("achar o componente", () => {
 
   it("sem bloco no tema, usa o padrão do núcleo", () => {
     const dir = installedProject();
-    const source = findComponentSource(dir, "@rubrica/theme-padrao", "cases");
+    const source = findComponentSource(dir, "@rubrica/theme-padrao", "precos");
     expect(source?.pkg).toBe("@rubrica/core");
-    expect(source?.component).toBe("CasesBlock");
+    expect(source?.component).toBe("PrecosBlock");
     expect(source?.file.endsWith("src/components/blocks/collections.tsx")).toBe(true);
   });
 });
@@ -45,18 +45,18 @@ describe("achar o componente", () => {
 describe("ejetar", () => {
   it("copia o arquivo e os locais, troca os imports internos pelos públicos e registra", () => {
     const dir = installedProject();
-    const { state, entry } = ejectBlock(dir, readState(dir), "cases");
-    const copied = readFileSync(join(dir, "src/overrides/cases/blocks/collections.tsx"), "utf-8");
+    const { state, entry } = ejectBlock(dir, readState(dir), "precos");
+    const copied = readFileSync(join(dir, "src/overrides/precos/blocks/collections.tsx"), "utf-8");
     expect(copied).not.toMatch(/from "\.\.\//);
     expect(copied).toContain('from "@rubrica/core/components"');
     expect(copied).toContain('from "@rubrica/core/blocks"');
     expect(copied).toContain('from "./util"');
-    expect(readFileSync(join(dir, "src/overrides/cases/blocks/util.tsx"), "utf-8")).toContain('from "@rubrica/core/components"');
-    expect(readFileSync(join(dir, "src/overrides/cases/index.tsx"), "utf-8")).toContain('export { CasesBlock as default } from "./blocks/collections";');
-    expect(entry).toMatchObject({ tipo: "cases", origem: "@rubrica/core", componente: "CasesBlock", arquivo: "src/overrides/cases/index.tsx", arquivoOrigem: "src/components/blocks/collections.tsx" });
-    expect(readState(dir).ejetados?.cases?.hash).toBe(entry.hash);
+    expect(readFileSync(join(dir, "src/overrides/precos/blocks/util.tsx"), "utf-8")).toContain('from "@rubrica/core/components"');
+    expect(readFileSync(join(dir, "src/overrides/precos/index.tsx"), "utf-8")).toContain('export { PrecosBlock as default } from "./blocks/collections";');
+    expect(entry).toMatchObject({ tipo: "precos", origem: "@rubrica/core", componente: "PrecosBlock", arquivo: "src/overrides/precos/index.tsx", arquivoOrigem: "src/components/blocks/collections.tsx" });
+    expect(readState(dir).ejetados?.precos?.hash).toBe(entry.hash);
     expect(readFileSync(join(dir, "astro.config.ts"), "utf-8")).toBe(astroConfig(state));
-    expect(readFileSync(join(dir, "astro.config.ts"), "utf-8")).toContain('"cases": "./src/overrides/cases/index.tsx"');
+    expect(readFileSync(join(dir, "astro.config.ts"), "utf-8")).toContain('"precos": "./src/overrides/precos/index.tsx"');
   });
 
   it("recusa ejetar de novo sem --forcar", () => {
@@ -85,14 +85,14 @@ describe("ejetar", () => {
 
   it("se o tema passa a implementar um bloco ejetado do núcleo, o original continua sendo o do núcleo", () => {
     const dir = installedProject();
-    ejectBlock(dir, readState(dir), "cases");
-    // Tema que agora desenha o bloco "cases" com outro componente.
+    ejectBlock(dir, readState(dir), "precos");
+    // Tema que agora desenha o bloco "precos" com outro componente.
     const theme = join(dir, "node_modules/@rubrica/theme-padrao");
     rmSync(theme);
     mkdirSync(join(theme, "src"), { recursive: true });
     writeFileSync(join(theme, "package.json"), JSON.stringify({ name: "@rubrica/theme-padrao", version: "9.9.9" }));
-    writeFileSync(join(theme, "src/index.ts"), "export const theme = { blocks: { cases: TemaCases } };\n");
-    writeFileSync(join(theme, "src/cases.tsx"), "export function TemaCases() { return null; }\n");
+    writeFileSync(join(theme, "src/index.ts"), "export const theme = { blocks: { precos: TemaPrecos } };\n");
+    writeFileSync(join(theme, "src/precos.tsx"), "export function TemaPrecos() { return null; }\n");
     const [status] = ejectedStatus(dir, readState(dir));
     expect(status?.status).toBe("igual");
     expect(status?.entry.origem).toBe("@rubrica/core");

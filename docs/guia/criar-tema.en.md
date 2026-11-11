@@ -125,6 +125,8 @@ export default defineTheme({
 | `texture` | no | Default texture: `grain`, `paper`, `scanlines` or `none`. A fixed layer over the page that takes no clicks and disappears with `prefers-reduced-transparency` |
 | `fonts` | no | The default fonts, imported from `fonts.json`. See [Fonts](#fonts) |
 | `texts` | no | The theme's own interface texts. See [Interface texts](#interface-texts) |
+| `contactDialog` | no | `true` opens contact in a dialog, on any page. See [Contact dialog](#contact-dialog) |
+| `caseCarousel` | no | `true` mounts the screenshot carousel island (cover and gallery) on case pages and hands it to the template in `carousel` |
 
 ## Tokens
 
@@ -243,6 +245,13 @@ A shell can go far beyond a header with a menu: the `desktop` theme becomes a de
 
 The **announcement bar** and the **floating WhatsApp button** ([Content](./conteudo.en.md#whatsapp-and-announcement-bar)) belong to the core: the bar comes before the shell, the button after it, using only `--rb-*` tokens. If the shell has something fixed at the top or bottom, the theme makes room with CSS, no JavaScript: `<html>` gets `data-announcement` when there is a bar and `data-whatsapp-float` when there is a button, and the `--rb-float-bottom` and `--rb-float-right` variables move the button (`--rb-whatsapp-bg` and `--rb-whatsapp-fg` set its colors). `padrao` turns its fixed bar and sidebar into `sticky` when there is a bar; `bento` lifts the button above the dock; `chat` puts it in the quick replies bar.
 
+
+### Contact dialog
+
+With `contactDialog: true`, the core adds a dialog (an HTML `popover`) with the contact form to every page, when the contact plugin is on. The form follows the home page's `contato` block; without that block, it's the default wizard. The dialog id comes in `ctx.site.contactDialog`, and the shell (or a template) opens it with `<button type="button" popoverTarget={ctx.site.contactDialog}>`, no JavaScript. Without the dialog, fall back to a link to the block (`#contato`). Link fields that point to contact (`contato:`, `#contato`) come with `dialog`, the dialog id: the core `LinkButton` already becomes a button, and a theme block that draws its own link should do the same.
+
+Esc and clicking outside close it. The form only loads when the dialog opens, but every page now carries Astro's small island script. The test battery opens the dialog before checking hydration and axe. `padrao` and `cyberpunk` use the dialog, like the v1 contact wizard.
+
 ## Blocks
 
 `blocks` has one component per block type, only for those the theme wants to draw. The others **inherit** the core's default component and get their look from CSS (each section has the `rb-<type>` class and the `data-block` and `data-variant` attributes). A block the core adds later also shows up in the theme, with the default component.
@@ -301,8 +310,8 @@ Optional templates for the pages that aren't made of blocks. Each one renders it
 
 | Template | Props |
 |---|---|
-| `post` | `post` (the `PostItem`), `html` (the body, already sanitized in the backend), `related`, `ctx` |
-| `case` | `project` (the `ProjectItem`, with the case sections), `related`, `ctx` |
+| `post` | `post` (the `PostItem`), `html` (the body, already sanitized in the backend), `related`, `relatedCase` (optional: the project with a case study that shares a tag with the post), `ctx` |
+| `case` | `project` (the `ProjectItem`, with the case sections and its numbers in `metrics`), `related`, `next` (the next case study, optional), `carousel` (the carousel island, with `caseCarousel`), `ctx`. `CaseMetrics` from `@rubrica/core/components` renders the numbers |
 | `notFound` | `ctx` |
 
 <!-- exemplo: tema/src/templates.tsx -->

@@ -42,3 +42,13 @@ describe("gerenciador com --local", () => {
     rmSync(parent, { recursive: true, force: true });
   });
 });
+
+describe("migrar --help", () => {
+  it("mostra as opções em vez de recusar", async () => {
+    const { runMigrate, MIGRATE_HELP } = await import("../src/commands/migrate");
+    const lines: string[] = [];
+    await runMigrate(["--help"], { cwd: tmp("rubrica-help-"), out: (t: string) => lines.push(t) } as never);
+    expect(lines.join("\n")).toBe(MIGRATE_HELP);
+    expect(MIGRATE_HELP).toContain("--include-file-storage");
+  });
+});

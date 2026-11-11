@@ -5,7 +5,7 @@
  * herdam os componentes do núcleo e ganham o visual de cartão pelo CSS.
  */
 import type { BlockProps, ResolvedImage } from "@rubrica/core";
-import { Heading, Img, LinkButton, Logo, Section, SectionHeader, digits } from "@rubrica/core/components";
+import { Heading, Img, LinkButton, Logo, Section, SectionHeader, digits, Html, isHtmlText } from "@rubrica/core/components";
 import { Icon, type IconName } from "./icons";
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -310,6 +310,7 @@ function Period({ item, ctx }: { item: any; ctx: BlockProps["ctx"] }) {
 
 function Description({ text }: { text?: string }) {
   if (!text) return null;
+  if (isHtmlText(text)) return <Html html={text} className="rb-prose rb-resume__desc" />;
   const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
   const bullets = lines.filter((l) => /^[-•]\s/.test(l));
   if (bullets.length === lines.length) {

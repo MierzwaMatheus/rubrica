@@ -89,6 +89,10 @@ export const COLLECTION_SPECS: Record<CollectionName, CollectionSpec> = {
       year: "Ano de entrega.",
       role: "Papel da pessoa no projeto.",
       category: "Categoria do projeto (uma só; o tema pode agrupar o portfólio por ela).",
+      metrics: "Números do case (\"Resultados em números\"), em ordem. Sem `metric`, o primeiro vai para o card.",
+      "metrics[].value": "O número, como texto (~50, 3x, 98%).",
+      "metrics[].label": "O que o número mede.",
+      "metrics[].icon": "Opcional: nome de um ícone do Lucide (Bot, shield-check).",
       links: "Links externos (site, repositório).",
     },
   },
@@ -134,7 +138,7 @@ export const COLLECTION_SPECS: Record<CollectionName, CollectionSpec> = {
     requiredText: ["title"],
     descriptions: {
       ...common,
-      kind: "Tipo: experience, education, skill, certification ou language.",
+      kind: "Tipo: experience, volunteer, education, skill, soft-skill (competência comportamental), certification ou language.",
       title: "Cargo, curso, competência…",
       organization: "Empresa ou instituição.",
       location: "Local.",
@@ -153,7 +157,7 @@ export const COLLECTION_SPECS: Record<CollectionName, CollectionSpec> = {
     plugin: "about",
     labelFields: ["title"],
     requiredText: ["title"],
-    descriptions: { ...common, title: "Título.", description: "Texto curto.", image: "Foto." },
+    descriptions: { ...common, title: "Título.", description: "Texto curto.", image: "Foto.", span: "Tamanho no mosaico, colunas x linhas (1x1, 1x2, 2x1 ou 2x2). Sem valor, 1x1." },
   },
   plans: {
     name: "plans",

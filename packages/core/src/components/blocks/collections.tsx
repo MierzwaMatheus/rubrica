@@ -5,6 +5,7 @@ import type { cases as casesDef, depoimentos as depoimentosDef, faq as faqDef, p
 import type { FaqItem, PlanItem, PostItem, ProjectItem, TestimonialItem } from "../../render/collections";
 import { Heading, Html, Img, LinkButton, Section, SectionHeader } from "../primitives";
 import { safeId, tagFilterCss } from "./util";
+import { searchText } from "../../render/text";
 
 type CasesFields = ResolvedFields<typeof casesDef.fields>;
 type PostsFields = ResolvedFields<typeof postsDef.fields>;
@@ -64,10 +65,15 @@ export function CasesBlock({ id, variant, fields, items, headingLevel, ctx }: Bl
   );
 }
 
+/** O que a busca do blog compara (`data-search` do cartão): título, resumo e etiquetas. */
+export function postSearchText(post: PostItem): string {
+  return searchText(post.title, post.excerpt, ...post.tags);
+}
+
 function PostCard({ post, ctx, tagIndexes }: { post: PostItem; ctx: BlockProps["ctx"]; tagIndexes?: Map<string, number> }) {
   const tags = tagIndexes ? post.tags.map((t) => `t${tagIndexes.get(t)}`).join(" ") : undefined;
   return (
-    <li className="rb-card rb-card--link rb-post" data-tags={tags}>
+    <li className="rb-card rb-card--link rb-post" data-tags={tags} data-search={postSearchText(post)}>
       {post.cover && <Img image={post.cover} className="rb-card__image" sizes="(min-width: 960px) 30vw, 100vw" />}
       <div className="rb-card__body">
         <p className="rb-card__meta">
@@ -93,33 +99,52 @@ function PostCard({ post, ctx, tagIndexes }: { post: PostItem; ctx: BlockProps["
   );
 }
 
-export function PostsRecentesBlock({ id, variant, fields, items, headingLevel, ctx }: BlockProps<PostsFields, PostItem>) {
+/** Quantas etiquetas o filtro do blog mostra abertas; mais que isso, ele recolhe. */
+export const TAG_FILTER_OPEN_MAX = 10;
+
+export function PostsRecentesBlock({ id, variant, fields, items, headingLevel, ctx, island }: BlockProps<PostsFields, PostItem>) {
   const allTags = fields.showTagFilter ? [...new Set(items.flatMap((p) => p.tags))].sort((a, b) => a.localeCompare(b, ctx.locale)) : [];
   const filter = allTags.length > 0;
   const tagIndexes = new Map(allTags.map((t, i) => [t, i] as const));
   const scope = `f-${safeId(id)}`;
+  /** Acima disso, o filtro fica recolhido: um paredão de etiquetas empurra os posts para baixo. */
+  const collapsed = allTags.length > TAG_FILTER_OPEN_MAX;
+  const filterGroup = (
+    <div className="rb-filter" role="group" aria-label={ctx.t("blog.filter")}>
+      <label htmlFor={`${scope}-all`}>{ctx.t("blog.allTags")}</label>
+      {allTags.map((t, i) => (
+        <label key={t} htmlFor={`${scope}-t${i}`}>
+          {t}
+        </label>
+      ))}
+    </div>
+  );
   return (
     <Section id={id} anchor={fields.anchor} type="posts-recentes" variant={variant}>
       <SectionHeader title={fields.title} intro={fields.intro} level={headingLevel} />
       {items.length > 0 ? (
         <div className="rb-posts">
-          {filter && <style dangerouslySetInnerHTML={{ __html: tagFilterCss(scope, allTags.length) }} />}
+          {filter && <style dangerouslySetInnerHTML={{ __html: tagFilterCss(scope, allTags.length, collapsed ? { filter: ".rb-filter-more" } : {}) }} />}
           {filter && (
             <>
               <input type="radio" name={scope} id={`${scope}-all`} className="rb-sr-only" defaultChecked />
               {allTags.map((t, i) => (
                 <input key={t} type="radio" name={scope} id={`${scope}-t${i}`} className="rb-sr-only" />
               ))}
-              <div className="rb-filter" role="group" aria-label={ctx.t("blog.filter")}>
-                <label htmlFor={`${scope}-all`}>{ctx.t("blog.allTags")}</label>
-                {allTags.map((t, i) => (
-                  <label key={t} htmlFor={`${scope}-t${i}`}>
-                    {t}
-                  </label>
-                ))}
-              </div>
+              {collapsed ? (
+                // Muitas etiquetas: recolhidas atrás de "Filtrar por etiqueta", como na v1, sem JavaScript.
+                <details className="rb-filter-more">
+                  <summary>
+                    {ctx.t("blog.filter")} ({allTags.length})
+                  </summary>
+                  {filterGroup}
+                </details>
+              ) : (
+                filterGroup
+              )}
             </>
           )}
+          {island && <div className="rb-island rb-posts__search">{island}</div>}
           <ul className="rb-grid rb-posts__list">
             {items.map((p) => (
               <PostCard key={p.id} post={p} ctx={ctx} tagIndexes={filter ? tagIndexes : undefined} />
@@ -158,6 +183,7 @@ export function DepoimentosBlock({ id, variant, fields, items, headingLevel, ctx
           ))}
         </ul>
       )}
+      <SeeAll link={fields.cta} />
       {fields.allowSubmission && island ? <div className="rb-island">{island}</div> : null}
     </Section>
   );

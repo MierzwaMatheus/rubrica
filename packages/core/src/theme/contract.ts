@@ -59,6 +59,13 @@ export interface ResolvedSite {
   whatsapp?: ResolvedWhatsApp;
   /** Faixa de aviso no ar neste build e idioma. O núcleo a desenha antes da casca. */
   announcement?: ResolvedAnnouncement;
+  /**
+   * Id da janela de contato (`popover`) que o núcleo põe em toda página quando o tema pede
+   * (`ThemeDefinition.contactDialog`), o plugin de contato está ligado e o site tem um bloco
+   * `contato` no idioma. O tema abre a janela com `<button popoverTarget={id}>`, sem
+   * JavaScript; o formulário dela só carrega quando ela abre.
+   */
+  contactDialog?: string;
 }
 
 export interface ResolvedWhatsApp {
@@ -178,12 +185,21 @@ export interface PostTemplateProps {
   /** HTML do post, sanitizado no backend. */
   html: string;
   related: PostItem[];
+  /** Projeto com case que divide uma etiqueta com o post (o "Case relacionado" da v1), se houver. */
+  relatedCase?: ProjectItem;
   ctx: RenderContext;
 }
 
 export interface CaseTemplateProps {
   project: ProjectItem;
   related: ProjectItem[];
+  /** Próximo case na ordem do portfólio (com volta ao início), entre os projetos com seções. */
+  next?: ProjectItem;
+  /**
+   * O carrossel das telas (a capa e a galeria) já montado como ilha, quando o tema pede
+   * (`caseCarousel`) e o projeto tem imagens. Sem JavaScript, é uma faixa com rolagem lateral.
+   */
+  carousel?: ReactNode;
   ctx: RenderContext;
 }
 
@@ -200,6 +216,11 @@ export interface VariantOption {
 export interface RecipeBlock {
   type: string;
   variant?: string;
+  /**
+   * `false` cria o bloco escondido (fica na página, desligado no editor). Ex.: o `contato` da
+   * home num tema que abre o contato numa janela. Sem valor, visível.
+   */
+  visible?: boolean;
   fields?: Record<string, unknown>;
   source?: import("../content/types").CollectionQuery;
 }
@@ -243,6 +264,12 @@ export interface ThemeDefinition {
   tokens: Record<string, TokenDef>;
   Shell: ComponentType<ShellProps>;
   blocks?: Partial<Record<string, BlockComponent>>;
+  /**
+   * Blocos próprios do tema que desenham a ilha de um bloco com `islandOptIn` (ex.: a busca
+   * do `posts-recentes`). Sem o tipo aqui, um bloco do tema não recebe essa ilha, e a página
+   * não carrega JavaScript à toa.
+   */
+  islandBlocks?: string[];
   templates?: {
     post?: ComponentType<PostTemplateProps>;
     case?: ComponentType<CaseTemplateProps>;
@@ -280,6 +307,17 @@ export interface ThemeDefinition {
    * Use um prefixo com o id do tema (`chat.typing`). O site pode sobrescrever em "Textos".
    */
   texts?: Record<string, Record<string, string>>;
+  /**
+   * O contato abre numa janela, em qualquer página (como o assistente da v1): o núcleo põe a
+   * janela com o formulário do bloco `contato` e entrega o id em `ctx.site.contactDialog`.
+   * Cada página ganha o script pequeno de ilha do Astro; o formulário só carrega ao abrir.
+   */
+  contactDialog?: boolean;
+  /**
+   * A página de case mostra as telas (a capa e a galeria) num carrossel (ilha `carrossel`,
+   * com a imagem ampliada): o núcleo monta a ilha e a entrega ao template em `carousel`.
+   */
+  caseCarousel?: boolean;
 }
 
 export function defineTheme(theme: ThemeDefinition): ThemeDefinition {

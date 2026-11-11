@@ -37,6 +37,7 @@ export const EN: Record<string, string> = {
   "Nome de um ícone do Lucide (ex.: rocket).": "Name of a Lucide icon (e.g. rocket).",
   "Mostra o botão do assistente de depoimento (precisa do plugin testimonials-intake).":
     "Shows the testimonial wizard button (needs the testimonials-intake plugin).",
+  'Ex.: "Ver todos os depoimentos", para a página de depoimentos. Opcional.': 'E.g. "See all testimonials", to the testimonials page. Optional.',
   "Ex.: valores sem impostos.": "E.g. prices before tax.",
   // Contato: janela e assuntos do assistente
   "Na janela, o bloco não ocupa espaço na página: abre por cima dela nos links para a âncora (#contato), inclusive os da sidebar. Os canais não aparecem.":
@@ -51,6 +52,10 @@ export const EN: Record<string, string> = {
   "Uma por linha (tipo escolha).": "One per line (choice type).",
   "Um por linha quando a etapa tem vários campos.": "One per line when the step has several inputs.",
   "Só na etapa de dados de contato.": "Only in the contact details step.",
+  "Campo que filtra os posts pelo título, resumo e etiquetas (página do blog).":
+    "A field that filters the posts by title, summary and tags (the blog page).",
+  "Os posts marcados como destaque num carrossel acima da lista, nos temas que o desenham (página do blog).":
+    "The posts marked as featured in a carousel above the list, in the themes that draw it (the blog page).",
   // Blocos da 1.1 do contrato (vídeo, incorporação, linha do tempo, comparativo de planos)
   "Vídeo do YouTube ou do Vimeo. Carrega leve: miniatura e botão de play, e o player só depois do clique.":
     "A YouTube or Vimeo video. Loads light: a thumbnail and a play button, and the player only after the click.",

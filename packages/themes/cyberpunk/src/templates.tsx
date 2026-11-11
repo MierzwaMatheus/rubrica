@@ -3,10 +3,13 @@
  * camada da cor da página, para o texto ter contraste), título, etiquetas em chips e os
  * links do projeto como botões; "Voltar ao portfólio" acima; o papel e cada seção do case
  * em cartões com ícone e cor pelo assunto (antes, problema, solução, decisões,
- * resultados...). Sem JavaScript: a galeria é uma grade de imagens.
+ * resultados...); "Resultados em números" com ícones, sem cartão em volta; as telas num carrossel
+ * (ilha do núcleo, que começa pela capa) e, no fim, o convite "Precisa de algo parecido?" com o
+ * próximo case.
  */
 import type { CaseTemplateProps, ResolvedLink } from "@rubrica/core";
-import { Html, Img } from "@rubrica/core/components";
+import { CaseMetrics, Html, Img } from "@rubrica/core/components";
+import type { ReactNode } from "react";
 import { CaseIcon, type CaseIconName } from "./icons";
 
 /** Assunto da seção, pelo título (em qualquer idioma base): dá o ícone e a cor do cartão. */
@@ -42,7 +45,7 @@ function listingHref(url: string): string {
   return url.replace(/\/[^/]+\/?$/, "") || "/";
 }
 
-export function CyberpunkCase({ project, related, ctx }: CaseTemplateProps) {
+export function CyberpunkCase({ project, next, carousel, ctx }: CaseTemplateProps) {
   const hasContact = ctx.site.plugins["contact-wizard"] === true;
   const talkHref = ctx.site.kind === "empresa" ? ctx.href("/contato") : `${ctx.href("/")}#contato`;
   // Como na v1: com seções de case, o resumo e o texto longo não aparecem (o case conta a história);
@@ -100,64 +103,82 @@ export function CyberpunkCase({ project, related, ctx }: CaseTemplateProps) {
 
       {!hasCase && project.content && <Html html={project.content} className="rb-prose cp-case__content" />}
 
-      {project.sections.map((s, i) => {
-        const { tone, icon } = caseTone(s.title);
-        return (
-          <section key={i} className="cp-case__card" data-tone={tone}>
-            <h2 className="cp-case__cardTitle">
-              <CaseIcon name={icon} />
-              {s.title}
-            </h2>
-            <Html html={s.body} className="rb-prose cp-case__body" />
-            {s.image && <Img image={s.image} className="cp-case__sectionImg" sizes="(min-width: 1024px) 52rem, 100vw" />}
+      {caseBody(project.sections, {
+        metrics: <CaseMetrics key="metrics" metrics={project.metrics} title={ctx.t("case.metrics")} className="cp-case__metrics" />,
+        gallery: carousel ? (
+          <section key="gallery" className="cp-case__gallery">
+            <h2 className="cp-case__heading">{ctx.t("case.gallery")}</h2>
+            {carousel}
           </section>
-        );
+        ) : null,
       })}
 
-      {project.gallery.length > 0 && (
-        <section className="cp-case__gallery">
-          <h2 className="cp-case__heading">{ctx.t("case.gallery")}</h2>
-          <ul>
-            {project.gallery.map((img, i) => (
-              <li key={`${img.src}-${i}`}>
-                <Img image={img} sizes="(min-width: 768px) 28rem, 100vw" />
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {(related.length > 0 || hasContact) && (
+      {(next || hasContact) && (
         <aside className="cp-case__next">
-          {related.length > 0 && (
-            <>
-              <h2 className="cp-case__heading">{ctx.t("case.related")}</h2>
-              <ul className="cp-case__related">
-                {related.map((p) => (
-                  <li key={p.id}>
-                    <a href={p.url}>
-                      <span>{p.title}</span>
-                      <CaseIcon name="arrow-right" size={16} />
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
-          {hasContact &&
-            (ctx.site.contactDialog ? (
-              <button type="button" className="cp-case__link cp-case__link--primary" popoverTarget={ctx.site.contactDialog}>
-                <CaseIcon name="message" size={16} />
-                {ctx.t("sidebar.talk")}
-              </button>
-            ) : (
-              <a className="cp-case__link cp-case__link--primary" href={talkHref}>
-                <CaseIcon name="message" size={16} />
-                {ctx.t("sidebar.talk")}
+          <p className="cp-case__prompt">
+            <span aria-hidden="true">$</span>
+            {ctx.t("cyberpunk.case.prompt")}
+          </p>
+          <h2 className="cp-case__heading">{ctx.t("case.ctaTitle")}</h2>
+          <p className="cp-case__ctaBody">{ctx.t("case.ctaBody")}</p>
+          <div className="cp-case__links">
+            {hasContact &&
+              (ctx.site.contactDialog ? (
+                <button type="button" className="cp-case__link cp-case__link--primary" popoverTarget={ctx.site.contactDialog}>
+                  <CaseIcon name="message" size={16} />
+                  {ctx.t("case.ctaButton")}
+                </button>
+              ) : (
+                <a className="cp-case__link cp-case__link--primary" href={talkHref}>
+                  <CaseIcon name="message" size={16} />
+                  {ctx.t("case.ctaButton")}
+                </a>
+              ))}
+            {next && (
+              <a className="cp-case__link cp-case__nextLink" href={next.url}>
+                <span>
+                  {ctx.t("case.next")}: <strong>{next.title}</strong>
+                </span>
+                <CaseIcon name="arrow-right" size={16} />
               </a>
-            ))}
+            )}
+          </div>
         </aside>
       )}
     </article>
   );
+}
+
+/**
+ * As seções do case na ordem da v1: a narrativa, os números antes dos aprendizados, as telas
+ * antes do depoimento. Sem aprendizados nem depoimento, números e telas vão para o fim.
+ */
+function caseBody(sections: CaseTemplateProps["project"]["sections"], parts: { metrics: ReactNode; gallery: ReactNode }): ReactNode[] {
+  const out: ReactNode[] = [];
+  let metrics = false;
+  let gallery = false;
+  sections.forEach((s, i) => {
+    const { tone, icon } = caseTone(s.title);
+    if (!metrics && (tone === "learnings" || tone === "testimonial")) {
+      out.push(parts.metrics);
+      metrics = true;
+    }
+    if (!gallery && tone === "testimonial") {
+      out.push(parts.gallery);
+      gallery = true;
+    }
+    out.push(
+      <section key={i} className="cp-case__card" data-tone={tone}>
+        <h2 className="cp-case__cardTitle">
+          <CaseIcon name={icon} />
+          {s.title}
+        </h2>
+        <Html html={s.body} className="rb-prose cp-case__body" />
+        {s.image && <Img image={s.image} className="cp-case__sectionImg" sizes="(min-width: 1024px) 52rem, 100vw" />}
+      </section>,
+    );
+  });
+  if (!metrics) out.push(parts.metrics);
+  if (!gallery) out.push(parts.gallery);
+  return out;
 }

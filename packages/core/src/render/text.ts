@@ -14,9 +14,9 @@ export function countWords(html: string): number {
   return text ? text.split(" ").length : 0;
 }
 
-/** Minutos de leitura a 200 palavras por minuto, no mínimo 1. */
+/** Minutos de leitura a 200 palavras por minuto, arredondados para cima (como a v1), no mínimo 1. */
 export function readingMinutes(html: string): number {
-  return Math.max(1, Math.round(countWords(html) / 200));
+  return Math.max(1, Math.ceil(countWords(html) / 200));
 }
 
 /** Corta no limite sem partir palavra, com reticências. */

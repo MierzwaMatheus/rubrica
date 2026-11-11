@@ -99,10 +99,10 @@ export function allTags(items: readonly ListItem[]): string[] {
   return [...new Set(items.filter((i) => i.deletedAt === undefined).flatMap((i) => i.tags ?? []))].sort((a, b) => a.localeCompare(b));
 }
 
-/** Leitura estimada de um texto em HTML (200 palavras/min). */
+/** Leitura estimada de um texto em HTML (200 palavras/min, para cima, como o site mostra). */
 export function readingMinutes(html: string): number {
   const words = plainText(html).split(/\s+/).filter(Boolean).length;
-  return Math.max(1, Math.round(words / 200));
+  return Math.max(1, Math.ceil(words / 200));
 }
 
 /** Nova ordem depois de mover o item `id` uma posição (para a lista de `reorder`). */

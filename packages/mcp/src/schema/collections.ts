@@ -153,7 +153,7 @@ export const COLLECTION_SPECS: Record<CollectionName, CollectionSpec> = {
     plugin: "about",
     labelFields: ["title"],
     requiredText: ["title"],
-    descriptions: { ...common, title: "Título.", description: "Texto curto.", image: "Foto." },
+    descriptions: { ...common, title: "Título.", description: "Texto curto.", image: "Foto.", span: "Tamanho no mosaico, colunas x linhas (1x1, 1x2, 2x1 ou 2x2). Sem valor, 1x1." },
   },
   plans: {
     name: "plans",

@@ -164,10 +164,15 @@ export interface RawResumeItem extends Base {
   group?: Localized<string>;
 }
 
+/** Tamanho da foto no mosaico: colunas x linhas. */
+export type RoutineSpan = "1x1" | "1x2" | "2x1" | "2x2";
+
 export interface RawRoutineItem extends Base {
   title: Localized<string>;
   description?: Localized<string>;
   image?: RawImage;
+  /** Tamanho no mosaico (temas que desenham a galeria em mosaico). Sem valor, 1x1. */
+  span?: RoutineSpan;
 }
 
 export type PricePeriod = "month" | "year" | "once" | "hour" | "project";

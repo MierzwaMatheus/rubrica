@@ -5,11 +5,13 @@
  */
 import { CORE_RECIPES, defineTheme, type Recipe } from "@rubrica/core";
 import fonts from "./fonts.json";
-import { CurriculoBlock, DepoimentosBlock, HeroBlock, ServicosBlock } from "./blocks";
+import { CtaBlock, CurriculoBlock, DepoimentosBlock, FaqBlock, GaleriaBlock, HeroBlock, ServicosBlock } from "./blocks";
 import { createSidebarShell } from "./shell";
+import { PadraoNotFound } from "./templates";
 
 export { createSidebarShell } from "./shell";
-export { HeroBlock, ServicosBlock, DepoimentosBlock, CurriculoBlock } from "./blocks";
+export { HeroBlock, ServicosBlock, DepoimentosBlock, CurriculoBlock, CtaBlock, GaleriaBlock, FaqBlock } from "./blocks";
+export { PadraoNotFound } from "./templates";
 export { Icon } from "./icons";
 
 const tr = (ptBR: string, en: string, es: string) => ({ "pt-BR": ptBR, en, es });
@@ -53,7 +55,14 @@ const home: Recipe[number] = {
       },
     },
     { type: "servicos", fields: { title: tr("O que eu faço", "What I do", "Lo que hago") } },
-    { type: "depoimentos", fields: { title: tr("O que falam sobre mim", "What people say about me", "Lo que dicen de mí"), allowSubmission: true } },
+    {
+      type: "depoimentos",
+      fields: {
+        title: tr("O que falam sobre mim", "What people say about me", "Lo que dicen de mí"),
+        allowSubmission: true,
+        cta: { label: tr("Ver todos os depoimentos →", "View all testimonials →", "Ver todos los testimonios →"), href: "/depoimentos" },
+      },
+    },
     {
       type: "cta",
       fields: {
@@ -63,7 +72,9 @@ const home: Recipe[number] = {
         secondary: { label: tr("Tenho uma vaga", "I have a role", "Tengo una vacante"), href: "#contato" },
       },
     },
-    { type: "contato", fields: { anchor: "contato", title: tr("Contato", "Contact", "Contacto"), mode: "wizard", showChannels: true } },
+    // Na v1 o contato da home abre só na janela ("Fale comigo"): o bloco vem escondido e
+    // fica no editor para quem quiser a seção visível.
+    { type: "contato", visible: false, fields: { anchor: "contato", title: tr("Contato", "Contact", "Contacto"), mode: "wizard", showChannels: true } },
   ],
 };
 
@@ -116,10 +127,20 @@ function withPageHeader(page: Recipe[number]): Recipe[number] {
   const [list, ...rest] = page.blocks;
   if (!LIST_PAGES.has(page.path) || !list?.fields?.title) return page;
   const { title, intro, ...fields } = list.fields;
+  // Depoimentos agrupados por categoria, como a página da v1.
+  const variant = page.path === "/depoimentos" ? { variant: "categorias" } : {};
   return {
     ...page,
-    blocks: [{ type: "hero", variant: "pagina", fields: { title, ...(intro ? { subtitle: intro } : {}) } }, { ...list, fields }, ...rest],
+    blocks: [{ type: "hero", variant: "pagina", fields: { title, ...(intro ? { subtitle: intro } : {}) } }, { ...list, ...variant, fields }, ...rest],
   };
+}
+
+/** "Fora do trabalho" no Sobre: o texto pessoal da v1 (cartão largo, parágrafos iguais, `</>` decorativo). */
+function withPersonalText(page: Recipe[number]): Recipe[number] {
+  if (page.path !== "/sobre") return page;
+  const textos = page.blocks.filter((b) => b.type === "texto");
+  const pessoal = textos[1];
+  return pessoal ? { ...page, blocks: page.blocks.map((b) => (b === pessoal ? { ...b, variant: "pessoal" } : b)) } : page;
 }
 
 export default defineTheme({
@@ -136,7 +157,8 @@ export default defineTheme({
   Shell: createSidebarShell(),
   // O "Fale comigo" abre o contato numa janela, como o assistente da v1.
   contactDialog: true,
-  blocks: { hero: HeroBlock, servicos: ServicosBlock, depoimentos: DepoimentosBlock, curriculo: CurriculoBlock },
+  blocks: { hero: HeroBlock, servicos: ServicosBlock, depoimentos: DepoimentosBlock, curriculo: CurriculoBlock, cta: CtaBlock, galeria: GaleriaBlock, faq: FaqBlock },
+  templates: { notFound: PadraoNotFound },
   variants: {
     hero: [
       { value: "inicio", label: "Início" },
@@ -146,6 +168,14 @@ export default defineTheme({
       { value: "grade", label: "Grade" },
       { value: "lista", label: "Lista" },
     ],
+    texto: [
+      { value: "default", label: "Padrão" },
+      { value: "pessoal", label: "Pessoal (cartão largo, parágrafos iguais)" },
+    ],
+    depoimentos: [
+      { value: "default", label: "Grade" },
+      { value: "categorias", label: "Por categoria (com a contagem)" },
+    ],
   },
-  recipes: { pessoal: [home, ...core.filter((p) => p.path !== "/").map((p) => (p.path === "/curriculo" ? curriculo : withPageHeader(p)))] },
+  recipes: { pessoal: [home, ...core.filter((p) => p.path !== "/").map((p) => (p.path === "/curriculo" ? curriculo : withPersonalText(withPageHeader(p))))] },
 });

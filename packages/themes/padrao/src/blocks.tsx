@@ -2,10 +2,11 @@
  * Blocos que, na v1 padrão, têm visual diferente do padrão do núcleo. Os outros
  * blocos herdam os componentes do núcleo e ganham o visual só pelo CSS do tema.
  */
-import type { BlockProps, ResolvedLink, ResumeItem } from "@rubrica/core";
+import type { BlockProps, FaqItem, ResolvedLink, ResumeItem, RoutineItem, TestimonialItem } from "@rubrica/core";
 import {
   groupResumeSkills,
   Heading,
+  Html,
   Img,
   LinkButton,
   ResumeDescription,
@@ -136,33 +137,160 @@ export function ServicosBlock({ id, variant, fields, items, headingLevel }: Bloc
   );
 }
 
-/** Depoimentos: autor em cima (foto, nome, cargo na cor de destaque), citação em itálico. */
-export function DepoimentosBlock({ id, variant, fields, items, headingLevel, island }: BlockProps<any, any>) {
+/** Cartão do depoimento: autor em cima (foto, nome, cargo na cor de destaque), citação em itálico. */
+function DepoimentoCard({ t }: { t: TestimonialItem }) {
+  return (
+    <li className="rb-card rb-depoimento">
+      <Icon name="quote" size={32} className="rb-depoimento__mark" />
+      <figure className="rb-quote">
+        <figcaption className="rb-quote__author">
+          {t.avatar && <Img image={t.avatar} className="rb-quote__avatar" sizes="48px" />}
+          <span>
+            <strong>{t.author}</strong>
+            {(t.role || t.company) && <span className="rb-quote__role">{[t.role, t.company].filter(Boolean).join(", ")}</span>}
+          </span>
+        </figcaption>
+        <blockquote className="rb-quote__text">
+          <p>{t.quote}</p>
+        </blockquote>
+      </figure>
+    </li>
+  );
+}
+
+/** Agrupa pela primeira etiqueta (a categoria), na ordem em que cada uma aparece; sem etiqueta, no fim. */
+function byCategory(items: TestimonialItem[]): { category?: string; items: TestimonialItem[] }[] {
+  const groups = new Map<string, TestimonialItem[]>();
+  const rest: TestimonialItem[] = [];
+  for (const item of items) {
+    const key = item.tags?.[0]?.trim();
+    if (!key) rest.push(item);
+    else groups.set(key, [...(groups.get(key) ?? []), item]);
+  }
+  const out: { category?: string; items: TestimonialItem[] }[] = [...groups].map(([category, list]) => ({ category, items: list }));
+  if (rest.length) out.push({ items: rest });
+  return out;
+}
+
+/**
+ * Depoimentos como os da v1. Na home: título com ícone de balão (sem o `/* *\/`), a grade,
+ * o link "Ver todos" (campo `cta`) e o botão de enviar. Na variação `categorias` (a página de
+ * depoimentos): a contagem e um grupo por categoria (`// CLIENTES`), em colunas.
+ */
+export function DepoimentosBlock({ id, variant, fields, items, headingLevel, ctx, island }: BlockProps<any, TestimonialItem>) {
+  const grouped = variant === "categorias";
+  const groups = grouped ? byCategory(items) : [{ items }];
+  const groupLevel = Math.min(fields.title ? headingLevel + 1 : headingLevel, 3) as 2 | 3;
   return (
     <Section id={id} anchor={fields.anchor} type="depoimentos" variant={variant}>
+      {(fields.title || fields.intro) && (
+        <header className="rb-section__header">
+          {fields.title && (
+            <Heading level={headingLevel} className="rb-section__title rb-depoimentos__title">
+              <Icon name="message" size={20} />
+              {fields.title}
+            </Heading>
+          )}
+          {fields.intro && <p className="rb-section__intro">{fields.intro}</p>}
+        </header>
+      )}
+      {grouped && items.length > 0 && (
+        <p className="rb-depoimentos__count">({items.length === 1 ? ctx.t("testimonials.countOne") : ctx.t("testimonials.count", { count: items.length })})</p>
+      )}
+      {groups.map((g, i) =>
+        g.items.length > 0 ? (
+          <div key={g.category ?? `sem-${i}`} className="rb-depoimentos__group">
+            {g.category && (
+              <Heading level={groupLevel} className="rb-depoimentos__category">
+                <span aria-hidden="true">// </span>
+                {g.category}
+              </Heading>
+            )}
+            <ul className="rb-grid rb-depoimentos__list">
+              {g.items.map((t) => (
+                <DepoimentoCard key={t.id} t={t} />
+              ))}
+            </ul>
+          </div>
+        ) : null,
+      )}
+      {fields.cta && (
+        <p className="rb-depoimentos__all">
+          <a href={fields.cta.href}>{fields.cta.label}</a>
+        </p>
+      )}
+      {fields.allowSubmission && island ? <div className="rb-island">{island}</div> : null}
+    </Section>
+  );
+}
+
+/** Fechamento (cta) com ícone nos botões, como o da v1: balão no principal, maleta no secundário. */
+export function CtaBlock({ id, variant, fields, headingLevel }: BlockProps<any>) {
+  return (
+    <Section id={id} anchor={fields.anchor} type="cta" variant={variant}>
+      <SectionHeader title={fields.title} intro={fields.body} level={headingLevel} />
+      <div className="rb-actions">
+        {fields.primary && <CtaLink link={fields.primary} className="rb-button rb-button--primary" icon="message" />}
+        {fields.secondary && <CtaLink link={fields.secondary} className="rb-button rb-button--secondary" icon="briefcase" />}
+      </div>
+    </Section>
+  );
+}
+
+/**
+ * Galeria do dia a dia como o mosaico da v1: 3 colunas no desktop e 2 no celular, linhas de
+ * 200 px, cada foto com o tamanho do item (`span`: 1x2, 2x1, 2x2). Só a imagem; a legenda
+ * aparece por cima no hover, no foco e no toque (sem JavaScript: a foto recebe foco).
+ */
+export function GaleriaBlock({ id, variant, fields, items, headingLevel }: BlockProps<any, RoutineItem>) {
+  return (
+    <Section id={id} anchor={fields.anchor} type="galeria" variant={variant}>
       <SectionHeader title={fields.title} intro={fields.intro} level={headingLevel} />
       {items.length > 0 && (
-        <ul className="rb-grid rb-depoimentos__list">
-          {items.map((t: any) => (
-            <li key={t.id} className="rb-card rb-depoimento">
-              <Icon name="quote" size={32} className="rb-depoimento__mark" />
-              <figure className="rb-quote">
-                <figcaption className="rb-quote__author">
-                  {t.avatar && <Img image={t.avatar} className="rb-quote__avatar" sizes="48px" />}
-                  <span>
-                    <strong>{t.author}</strong>
-                    {(t.role || t.company) && <span className="rb-quote__role">{[t.role, t.company].filter(Boolean).join(", ")}</span>}
-                  </span>
+        <ul className="rb-mosaic">
+          {items.map((item) => (
+            <li key={item.id} className="rb-mosaic__item" data-span={item.span && item.span !== "1x1" ? item.span : undefined}>
+              <figure className="rb-mosaic__figure" tabIndex={0}>
+                {item.image && <Img image={{ ...item.image, alt: item.image.alt || "" }} className="rb-mosaic__img" sizes="(min-width: 1024px) 30vw, 50vw" />}
+                {item.tags.length > 0 && (
+                  <ul className="rb-mosaic__tags">
+                    {item.tags.map((t) => (
+                      <li key={t}>{t}</li>
+                    ))}
+                  </ul>
+                )}
+                <figcaption className="rb-mosaic__caption">
+                  <span className="rb-mosaic__title">{item.title}</span>
+                  {item.description && <span className="rb-mosaic__text">{item.description}</span>}
                 </figcaption>
-                <blockquote className="rb-quote__text">
-                  <p>{t.quote}</p>
-                </blockquote>
               </figure>
             </li>
           ))}
         </ul>
       )}
-      {fields.allowSubmission && island ? <div className="rb-island">{island}</div> : null}
+    </Section>
+  );
+}
+
+/** Perguntas como as da v1: um cartão só, ícone "?" em cada pergunta e seta para baixo. */
+export function FaqBlock({ id, variant, fields, items, headingLevel }: BlockProps<any, FaqItem>) {
+  return (
+    <Section id={id} anchor={fields.anchor} type="faq" variant={variant}>
+      <SectionHeader title={fields.title} intro={fields.intro} level={headingLevel} />
+      {items.length > 0 && (
+        <div className="rb-faq__list rb-faq__card">
+          {items.map((q) => (
+            <details key={q.id} className="rb-faq__item">
+              <summary className="rb-faq__question">
+                <Icon name="help" size={20} className="rb-faq__icon" />
+                <span>{q.question}</span>
+                <Icon name="chevronDown" size={16} className="rb-faq__chevron" />
+              </summary>
+              <Html html={q.answer} className="rb-faq__answer rb-prose" />
+            </details>
+          ))}
+        </div>
+      )}
     </Section>
   );
 }

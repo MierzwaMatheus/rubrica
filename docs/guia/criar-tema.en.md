@@ -126,6 +126,7 @@ export default defineTheme({
 | `fonts` | no | The default fonts, imported from `fonts.json`. See [Fonts](#fonts) |
 | `texts` | no | The theme's own interface texts. See [Interface texts](#interface-texts) |
 | `contactDialog` | no | `true` opens contact in a dialog, on any page. See [Contact dialog](#contact-dialog) |
+| `caseCarousel` | no | `true` mounts the screenshot carousel island (cover and gallery) on case pages and hands it to the template in `carousel` |
 
 ## Tokens
 
@@ -310,7 +311,7 @@ Optional templates for the pages that aren't made of blocks. Each one renders it
 | Template | Props |
 |---|---|
 | `post` | `post` (the `PostItem`), `html` (the body, already sanitized in the backend), `related`, `ctx` |
-| `case` | `project` (the `ProjectItem`, with the case sections), `related`, `ctx` |
+| `case` | `project` (the `ProjectItem`, with the case sections and its numbers in `metrics`), `related`, `next` (the next case study, optional), `carousel` (the carousel island, with `caseCarousel`), `ctx`. `CaseMetrics` from `@rubrica/core/components` renders the numbers |
 | `notFound` | `ctx` |
 
 <!-- exemplo: tema/src/templates.tsx -->

@@ -433,8 +433,12 @@ export function businessHandlers(host: BusinessHost): { queries: Handlers; mutat
     const p = b.publish;
     const publishing = !!p.lastTriggeredAt && (p.lastPublishedAt ?? 0) < p.lastTriggeredAt;
     const pending = pendingChanges();
+    const settledStatus = pending > 0 ? "pending" : "published";
     return {
-      status: publishing ? "publishing" : pending > 0 ? "pending" : "published",
+      status: publishing ? "publishing" : settledStatus,
+      settledStatus,
+      // O build de demonstração sempre avisa que terminou: a janela só cobre o caso de ele não avisar.
+      publishingUntil: publishing ? p.lastTriggeredAt! + 5 * 60_000 : null,
       configured: true,
       pendingChanges: pending,
       lastTriggeredAt: p.lastTriggeredAt ?? null,

@@ -5,7 +5,8 @@
  *
  * Estados:
  * - `publicando`: o hook foi chamado e o build ainda não avisou que terminou (aviso em
- *   `POST /rubrica/publicacao/concluida`, ou presumido depois de `PUBLISHING_WINDOW_MS`);
+ *   `POST /rubrica/publicacao/concluida`, que a integração do Astro manda no fim do build
+ *   quando tem o segredo, ou presumido depois de `PUBLISHING_WINDOW_MS`);
  * - `pendente`: há mudanças no conteúdo desde a última publicação. As mudanças saem do
  *   registro de atividades (`auditLog`), então qualquer módulo que registra a ação
  *   já conta, sem marcar nada à parte;
@@ -13,14 +14,27 @@
  * - `falhou`: a última chamada ao hook deu erro.
  *
  * Limite: uma chamada por `MIN_INTERVAL_MS` (contando as que falharam).
+ *
+ * A parte que depende do relógio fica com quem lê: uma query do Convex só roda de novo
+ * quando os dados mudam, então um `Date.now()` aqui deixaria o painel aberto em
+ * "publicando" para sempre. O `status` devolve `publishingUntil` (até quando presumir o
+ * build rodando) e `settledStatus` (o estado depois disso), e o painel decide com o
+ * próprio relógio (`currentPublishState`, em `lib/publishState.ts`). O campo `status`
+ * continua valendo para quem lê uma vez só (MCP).
  */
 import { v } from "convex/values";
 import { actionUserId, requireRole } from "./auth";
 import { logAudit } from "./audit";
+import { currentPublishState, type SettledPublishState } from "./lib/publishState";
 import { action, internalMutation, query, ref, type Doc, type Id, type MutationCtx, type ReaderCtx } from "./server";
 
 export const MIN_INTERVAL_MS = 60_000;
-export const PUBLISHING_WINDOW_MS = 15 * 60_000;
+/**
+ * Quanto tempo presumir o build rodando sem o aviso de fim. Um build do Rubrica na Vercel
+ * leva de 30 s a 2 min; 5 min cobre os sites maiores e a fila do provedor sem deixar o
+ * painel preso em "publicando" quando o aviso não vem.
+ */
+export const PUBLISHING_WINDOW_MS = 5 * 60_000;
 
 /** Alvos de `admin.*` que aparecem no site (coleções e páginas). */
 const SITE_TARGETS = new Set(["page", "posts", "projects", "services", "testimonials", "faq", "resume", "routine", "plans", "team"]);
@@ -57,19 +71,22 @@ async function pendingChanges(ctx: ReaderCtx, since: number | undefined): Promis
   return Math.min(entries.filter(affectsSite).length, 100);
 }
 
-export type PublishState = "unconfigured" | "publishing" | "pending" | "published" | "failed";
+export { currentPublishState, type PublishState, type PublishTiming, type SettledPublishState } from "./lib/publishState";
 
 async function computeStatus(ctx: ReaderCtx) {
   const state = await getState(ctx);
   const now = Date.now();
   const pending = await pendingChanges(ctx, state?.publishedUpTo);
   const configured = !!deployHookUrl();
-  const publishing =
-    !!state?.lastTriggeredAt && (state.lastPublishedAt ?? 0) < state.lastTriggeredAt && now - state.lastTriggeredAt < PUBLISHING_WINDOW_MS;
   const failed = !!state?.lastErrorAt && state.lastErrorAt >= (state.lastTriggeredAt ?? 0);
-  const status: PublishState = !configured ? "unconfigured" : publishing ? "publishing" : failed ? "failed" : pending > 0 ? "pending" : "published";
+  // Só depende dos dados: o hook foi chamado, o build não avisou e nada falhou depois.
+  const awaitingBuild = !!state?.lastTriggeredAt && (state.lastPublishedAt ?? 0) < state.lastTriggeredAt && !failed;
+  const publishingUntil = awaitingBuild ? state!.lastTriggeredAt! + PUBLISHING_WINDOW_MS : null;
+  const settledStatus: SettledPublishState = !configured ? "unconfigured" : failed ? "failed" : pending > 0 ? "pending" : "published";
   return {
-    status,
+    status: currentPublishState({ settledStatus, publishingUntil }, now),
+    settledStatus,
+    publishingUntil,
     configured,
     pendingChanges: pending,
     lastTriggeredAt: state?.lastTriggeredAt ?? null,

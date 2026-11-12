@@ -31,7 +31,7 @@ npx convex env set NAME value --prod     # in the production database
 | `SITE_URL` | The live site address. Used for the payment return and in the list of addresses allowed to send forms |
 | `RUBRICA_IP_SALT` | A random value used to store IPs and emails from the forms in a protected way. **Set it in production** and do not change it later: changing it resets the submission limits |
 | `RUBRICA_ALLOW_LOCALHOST` | `true` lets the site on your computer send forms. **Development database only** |
-| `RUBRICA_DEPLOY_CALLBACK_SECRET` | Optional. Secret for the "build finished" notice, so the panel's "publishing" state ends right away |
+| `RUBRICA_DEPLOY_CALLBACK_SECRET` | Optional. Secret for the "build finished" notice, so the panel's "publishing" state ends right away (without it, it ends 5 minutes after the click). `setup` creates it on Convex and `publicar` copies it to Vercel |
 
 ### Forms and contacts
 

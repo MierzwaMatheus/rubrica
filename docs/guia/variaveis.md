@@ -31,7 +31,7 @@ npx convex env set NOME valor --prod     # no banco de produção
 | `SITE_URL` | Endereço do site no ar. Entra na volta do pagamento e na lista de endereços que podem mandar formulários |
 | `RUBRICA_IP_SALT` | Um valor aleatório usado para guardar IPs e e-mails de forma protegida nos formulários. **Defina em produção** e não troque depois: trocar zera os limites de envio |
 | `RUBRICA_ALLOW_LOCALHOST` | `true` deixa o site do seu computador mandar formulários. **Só no banco de desenvolvimento** |
-| `RUBRICA_DEPLOY_CALLBACK_SECRET` | Opcional. Segredo do aviso de que o build terminou, para o "publicando" do painel acabar na hora |
+| `RUBRICA_DEPLOY_CALLBACK_SECRET` | Opcional. Segredo do aviso de que o build terminou, para o "publicando" do painel acabar na hora (sem ele, acaba 5 minutos depois do clique). O `setup` cria no Convex e o `publicar` copia para a Vercel |
 
 ### Formulários e contatos
 

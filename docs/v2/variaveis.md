@@ -33,7 +33,7 @@ Envios que falham tentam de novo depois de 1 min, 5 min, 30 min e 2 h. Depois di
 | Variável | Para quê |
 |---|---|
 | `RUBRICA_DEPLOY_HOOK_URL` | Deploy hook do provedor de hospedagem (Vercel, Netlify, Cloudflare Pages…). O botão "publicar" faz um `POST` sem corpo nele. Aceita também `VERCEL_DEPLOY_HOOK_URL`, o nome da v1 |
-| `RUBRICA_DEPLOY_CALLBACK_SECRET` | Opcional. Segredo do aviso de fim de build: o provedor (ou um passo no fim do build) chama `POST <CONVEX_SITE_URL>/rubrica/publicacao/concluida` com o cabeçalho `X-Rubrica-Secret` (ou `?secret=`). Sem ele, o estado "publicando" termina sozinho em 15 minutos |
+| `RUBRICA_DEPLOY_CALLBACK_SECRET` | Opcional. Segredo do aviso de fim de build: `POST <CONVEX_SITE_URL>/rubrica/publicacao/concluida` com o cabeçalho `X-Rubrica-Secret` (ou `?secret=`). Vai no Convex (o `setup` cria) e no ambiente do build (o `publicar` grava na Vercel): no `astro:build:done`, a integração do núcleo chama a rota sozinha, com o endereço `.convex.site` de `CONVEX_SITE_URL` ou derivado do `CONVEX_URL`; pula builds de prévia e nunca falha o build. Sem ele, o estado "publicando" termina sozinho 5 minutos depois do clique (`PUBLISHING_WINDOW_MS`: um build na Vercel leva de 30 s a 2 min, e a folga cobre sites maiores e a fila do provedor). O painel decide o fim da janela com o relógio dele, já que a query do Convex só roda de novo quando os dados mudam |
 
 ## Tradução com IA (plugin `translation`)
 

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { CORE_RECIPES, defaultUiText, validateBlock, type Recipe } from "@rubrica/core";
 import { CORE_BLOCKS } from "@rubrica/core/blocks";
-import { convertV1, loc, parsePeriod, sameInBoth, slugify, toHtml, v1FullTitle, v1Navigation, V1_TEXTS, UI_TEXT_MAP } from "../src/migrate/convert";
+import { convertV1, loc, mediaFolderPath, parsePeriod, sameInBoth, slugify, toHtml, v1FullTitle, v1Navigation, V1_TEXTS, UI_TEXT_MAP } from "../src/migrate/convert";
 import { IDS, PRINCIPIOS, V1_RUBRICA_JSON, v1Export } from "./fixtures/v1-export";
 
 const NOW = 1_800_000_000_000;
@@ -136,6 +136,15 @@ describe("tabelas 1:1", () => {
     expect(items[7]!.tags).toBeUndefined();
     expect(items[8]!.deletedAt).toBeDefined();
     expect(r.report.warnings.join(" ")).toMatch(/verão de 2019/);
+  });
+
+  it("mídia: pasta da v1 (sem barra) vira o caminho normalizado da v2", () => {
+    expect(mediaFolderPath("portfolio/toca")).toBe("/portfolio/toca");
+    expect(mediaFolderPath("sobre_mim")).toBe("/sobre_mim");
+    expect(mediaFolderPath("/blog/")).toBe("/blog");
+    expect(mediaFolderPath("fotos & vídeos/2026.1")).toBe("/fotos - vídeos/2026-1");
+    expect(mediaFolderPath("a/b/c/d/e/f/g")).toBe("/a/b/c/d/e/f");
+    expect(mediaFolderPath(undefined)).toBe("/");
   });
 
   it("mídia: pasta pelo caminho e storageId mantido", () => {

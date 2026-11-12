@@ -4,18 +4,18 @@
  * avisando onde ela é usada.
  */
 import { useRef, useState } from "react";
-import { Folder, FolderPlus, Replace, Trash2, Upload } from "lucide-react";
+import { Replace, Trash2, Upload } from "lucide-react";
 import type { Localized } from "../../i18n";
 import { api, type MediaDoc } from "../data/api";
 import { useMutation, useQuery } from "../data/backend";
 import { EditorLocaleProvider, LocaleTabs, LocalizedTextInput } from "../editor/fields";
+import { folderLabel, MediaFolderNav } from "../editor/MediaFolders";
 import { errorMessage } from "../editor/model";
 import { PageHeader } from "../Layout";
 import { Loading } from "../App";
 import { contentLabel } from "../lib/labels";
 import { toast } from "../lib/toast";
 import { useUploadFile, useUploadImage } from "../lib/upload";
-import { cn } from "../lib/utils";
 import { usePanel } from "../panel";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
@@ -157,15 +157,11 @@ function MediaDialog({ media, onClose }: { media: MediaDoc; onClose: () => void 
 
 export default function Media() {
   const [folder, setFolder] = useState<string>();
-  const folders = useQuery(api.media.folders, {});
   const media = useQuery(api.media.list, folder ? { folder } : {});
   const upload = useUploadImage();
   const input = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState<string>();
   const [open, setOpen] = useState<MediaDoc>();
-  const [newFolder, setNewFolder] = useState("");
-  const [extraFolders, setExtraFolders] = useState<string[]>([]);
-  const allFolders = [...new Set([...(folders ?? []).map((f) => f.path), ...extraFolders])].sort();
 
   async function send(files: FileList | null) {
     if (!files?.length) return;
@@ -199,38 +195,7 @@ export default function Media() {
         }
       />
       <div className="grid gap-6 p-6 md:grid-cols-[200px_1fr]">
-        <nav aria-label="Pastas" className="space-y-1">
-          {[undefined, ...allFolders].map((f) => (
-            <button
-              key={f ?? "all"}
-              type="button"
-              onClick={() => setFolder(f)}
-              aria-current={folder === f ? "true" : undefined}
-              className={cn("flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm hover:bg-accent", folder === f && "bg-accent font-medium")}
-            >
-              <Folder className="size-4" />
-              <span className="flex-1 truncate">{f ?? "Todas"}</span>
-              <span className="text-xs text-muted-foreground">{f ? folders?.find((x) => x.path === f)?.count ?? 0 : folders?.reduce((n, x) => n + x.count, 0)}</span>
-            </button>
-          ))}
-          <form
-            className="flex gap-1 pt-2"
-            onSubmit={(e) => {
-              e.preventDefault();
-              const path = `/${newFolder.trim().replace(/^\/+|\/+$/g, "")}`;
-              if (path.length > 1) {
-                setExtraFolders((x) => [...x, path]);
-                setFolder(path);
-                setNewFolder("");
-              }
-            }}
-          >
-            <Input aria-label="Nova pasta" placeholder="nova pasta" value={newFolder} onChange={(e) => setNewFolder(e.target.value)} className="h-8" />
-            <Button type="submit" variant="outline" size="icon-sm" aria-label="Criar pasta">
-              <FolderPlus />
-            </Button>
-          </form>
-        </nav>
+        <MediaFolderNav value={folder} onChange={setFolder} />
         <div
           onDragOver={(e) => e.preventDefault()}
           onDrop={(e) => {
@@ -251,7 +216,7 @@ export default function Media() {
                     {m.url ? <img src={m.url} alt={m.alt?.[Object.keys(m.alt)[0] ?? ""] ?? ""} loading="lazy" className="aspect-square w-full bg-muted object-cover" /> : <div className="aspect-square bg-muted" />}
                     <span className="block truncate px-2 pt-1.5 text-xs font-medium">{m.name}</span>
                     <span className="block px-2 pb-1.5 text-xs text-muted-foreground">
-                      {m.width && m.height ? `${m.width}×${m.height}` : "—"} · {m.folder}
+                      {m.width && m.height ? `${m.width}×${m.height}` : "—"} · {folderLabel(m.folder)}
                     </span>
                   </button>
                 </li>

@@ -165,9 +165,27 @@ describe("publicar", () => {
     expect(shell.fnCalls("rubrica/users:setupRoot")[0]?.prod).toBe(true);
     expect(shell.fnCalls("rubrica/seed:apply")[0]?.prod).toBe(true);
     const envAdds = shell.calls.filter((c) => c.includes("env") && c.includes("add")).map((c) => c[c.indexOf("add") + 1]);
-    expect(envAdds).toEqual(["CONVEX_DEPLOY_KEY", "CONVEX_URL", "SITE_URL"]);
+    expect(envAdds).toEqual(["CONVEX_DEPLOY_KEY", "CONVEX_URL", "SITE_URL", "RUBRICA_DEPLOY_CALLBACK_SECRET"]);
+    // O segredo do aviso de fim de build é o mesmo no Convex de produção e no build da Vercel.
+    const secretAdd = shell.calls.find((c) => c.includes("add") && c.includes("RUBRICA_DEPLOY_CALLBACK_SECRET"))!;
+    expect(shell.env.prod.RUBRICA_DEPLOY_CALLBACK_SECRET).toBeTruthy();
+    expect(secretAdd[secretAdd.indexOf("--value") + 1]).toBe(shell.env.prod.RUBRICA_DEPLOY_CALLBACK_SECRET);
+    expect(secretAdd).toContain("--sensitive");
     expect(JSON.parse(readFileSync(join(dir, "rubrica.json"), "utf-8")).producao).toEqual({ convexUrl: "https://feliz-gato-123.convex.cloud", siteUrl: "https://site-da-ana.vercel.app" });
     expect(shell.calls.some((c) => c.includes("deploy") && c.includes("--prod") && c.some((a) => a.startsWith("vercel")))).toBe(true);
+  });
+
+  it("publicar de novo leva o segredo do aviso de fim de build para a Vercel (e cria se faltar)", async () => {
+    const dir = project();
+    mkdirSync(join(dir, ".vercel"), { recursive: true });
+    writeFileSync(join(dir, ".vercel/project.json"), JSON.stringify({ projectId: "prj_1" }));
+    const shell = backend();
+    shell.env.prod.RUBRICA_DEPLOY_HOOK_URL = "https://api.vercel.com/v1/integrations/deploy/prj_1/x";
+    answers.push(true);
+    await runPublish({ cwd: dir, runner: shell.runner, randomBytes: bytes, env: {} });
+    expect(shell.env.prod.RUBRICA_DEPLOY_CALLBACK_SECRET).toBe(bytes(32).toString("hex"));
+    const secretAdd = shell.calls.find((c) => c.includes("add") && c.includes("RUBRICA_DEPLOY_CALLBACK_SECRET"))!;
+    expect(secretAdd.slice(secretAdd.indexOf("add"))).toEqual(["add", "RUBRICA_DEPLOY_CALLBACK_SECRET", "production", "--value", bytes(32).toString("hex"), "--yes", "--force", "--sensitive"]);
   });
 
   it("não publica sem confirmação", async () => {

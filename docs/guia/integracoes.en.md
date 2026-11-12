@@ -38,7 +38,7 @@ Deliveries that fail retry after 1 min, 5 min, 30 min and 2 h; after that they s
 | Variable | What for |
 |---|---|
 | `RUBRICA_DEPLOY_HOOK_URL` | The host's deploy hook URL. The panel's **Publish** button makes a body-less `POST` to it. Vercel, Netlify and Cloudflare Pages have a "deploy hook" or "build hook" |
-| `RUBRICA_DEPLOY_CALLBACK_SECRET` | Optional. Secret for the end-of-build notice (`POST <CONVEX_SITE_URL>/rubrica/publicacao/concluida`, with the `X-Rubrica-Secret` header). Without it, the "publishing" state ends on its own after 15 minutes |
+| `RUBRICA_DEPLOY_CALLBACK_SECRET` | Optional. Secret for the end-of-build notice (`POST <CONVEX_SITE_URL>/rubrica/publicacao/concluida`, with the `X-Rubrica-Secret` header). `setup` creates it on Convex and `publicar` copies it to the Vercel build; with it in the build environment, Rubrica itself tells the panel when the build finishes. Without it, the "publishing" state ends on its own 5 minutes after the click |
 
 ## AI translation (`translation` plugin)
 

@@ -7,9 +7,9 @@ import { api } from "./data/api";
 import { useAuth, useBackend, useQuery } from "./data/backend";
 import { QuietBoundary } from "./lib/boundary";
 import { PublishBar } from "./PublishBar";
-import { MenuIcon } from "./lib/icons";
 import { Link, useRouter } from "./lib/router";
 import { cn } from "./lib/utils";
+import { SidebarNav } from "./SidebarNav";
 import { usePanel } from "./panel";
 import { buildMenu } from "./routes";
 import { Button } from "./ui/button";
@@ -56,35 +56,13 @@ export function Layout({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const menu = buildMenu({ role: panel.me.role, kind: panel.kind, enabled: panel.enabled, plugins: panel.plugins });
   const siteName = panel.settings ? pickWithFallback(panel.settings.name, panel.locales.default, panel.locales) : undefined;
-  const isCurrent = (p: string) => (p === "/admin" ? path === "/admin" : path === p || path.startsWith(`${p}/`));
-
   const nav = (
-    <nav aria-label="Menu do painel" className="flex flex-1 flex-col gap-4 overflow-y-auto p-3">
-      {menu.map((section) => (
-        <div key={section.group}>
-          <p className="px-2 pb-1 text-xs font-semibold tracking-wide text-muted-foreground uppercase">{section.group}</p>
-          <ul className="space-y-0.5">
-            {section.items.map((item) => (
-              <li key={item.path}>
-                <Link
-                  to={item.path}
-                  onClick={() => setOpen(false)}
-                  aria-current={isCurrent(item.path) ? "page" : undefined}
-                  className={cn(
-                    "flex min-h-8 items-center gap-2.5 rounded-md px-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground",
-                    isCurrent(item.path) && "bg-accent font-medium text-foreground",
-                  )}
-                >
-                  <MenuIcon name={item.icon} className="size-4" />
-                  {item.label}
-                  {item.path === "/admin/contatos" && can(panel.me.role, "contacts") && <QuietBoundary><UnreadBadge /></QuietBoundary>}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
-    </nav>
+    <SidebarNav
+      menu={menu}
+      path={path}
+      onNavigate={() => setOpen(false)}
+      extra={(item) => item.path === "/admin/contatos" && can(panel.me.role, "contacts") && <QuietBoundary><UnreadBadge /></QuietBoundary>}
+    />
   );
 
   return (

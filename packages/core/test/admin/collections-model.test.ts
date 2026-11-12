@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { field } from "../../src/blocks/fields";
-import { allTags, filterItems, itemMissingLocales, matchesSearch, moveId, planCreate, planUpdate, readingMinutes, suggestSlug } from "../../src/admin/collections/model";
+import { allTags, filterItems, groupItems, groupValue, itemMissingLocales, matchesSearch, moveId, moveIdWithin, pickTab, planCreate, planUpdate, readingMinutes, suggestSlug, tabCounts } from "../../src/admin/collections/model";
 
 describe("planUpdate", () => {
   const keys = ["title", "excerpt", "cover", "tags"];
@@ -78,5 +78,49 @@ describe("textos", () => {
   it("estima a leitura", () => {
     expect(readingMinutes("<p>curto</p>")).toBe(1);
     expect(readingMinutes(`<p>${"palavra ".repeat(600)}</p>`)).toBe(3);
+  });
+});
+
+describe("abas da lista", () => {
+  const items = [
+    { _id: "e1", kind: "experience" },
+    { _id: "s1", kind: "skill", group: { "pt-BR": "Front-end" } },
+    { _id: "e2", kind: "experience" },
+    { _id: "s2", kind: "skill", group: { "pt-BR": "IA" } },
+    { _id: "s3", kind: "skill", group: { "pt-BR": "Front-end" } },
+    { _id: "e3", kind: "experience", deletedAt: 1 },
+    { _id: "s4", kind: "skill" },
+  ];
+  const ids = items.map((i) => i._id);
+  const kindOf = (id: string) => items.find((i) => i._id === id)?.kind;
+
+  it("conta os itens de cada aba sem a lixeira", () => {
+    expect(tabCounts(items, "kind", ["experience", "skill", "language"])).toEqual({ experience: 2, skill: 4, language: 0 });
+  });
+
+  it("escolhe a aba do endereço só se ela existe", () => {
+    expect(pickTab(["experience", "skill"], "skill")).toBe("skill");
+    expect(pickTab(["experience", "skill"], "outra")).toBe("experience");
+    expect(pickTab(["experience", "skill"], null)).toBe("experience");
+  });
+
+  it("move dentro do tipo trocando com o vizinho do mesmo tipo e mantém os outros no lugar", () => {
+    const same = (id: string) => kindOf(id) === "skill";
+    expect(moveIdWithin(ids, "s2", -1, same)).toEqual(["e1", "s2", "e2", "s1", "s3", "e3", "s4"]);
+    expect(moveIdWithin(ids, "s1", 1, same)).toEqual(["e1", "s2", "e2", "s1", "s3", "e3", "s4"]);
+    // Primeiro e último do tipo não saem do lugar.
+    expect(moveIdWithin(ids, "s1", -1, same)).toEqual(ids);
+    expect(moveIdWithin(ids, "s4", 1, same)).toEqual(ids);
+  });
+
+  it("agrupa pelo campo na ordem de aparição, com o valor no idioma principal", () => {
+    const skills = items.filter((i) => i.kind === "skill");
+    expect(groupItems(skills, "group", "pt-BR").map((g) => [g.group, g.items.map((i) => i._id)])).toEqual([
+      ["Front-end", ["s1", "s3"]],
+      ["IA", ["s2"]],
+      ["", ["s4"]],
+    ]);
+    expect(groupValue({ group: { en: "AI" } }, "group", "pt-BR")).toBe("AI");
+    expect(groupValue({ group: " Ferramentas " }, "group", "pt-BR")).toBe("Ferramentas");
   });
 });

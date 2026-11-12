@@ -28,6 +28,7 @@ import { CONTENT_CHANGED_EVENT, contentChangeTracker, subscribeConvex, subscribe
 import { APP_SHELL_BASE, appRoutes, appShells, type AppShell } from "../plugins/app-routes";
 import { localePrefix } from "../i18n";
 import { appRewriteMiddleware } from "./app-dev";
+import { notifyBuildDone } from "./publish-notice";
 
 export type SourceOption =
   /**
@@ -116,6 +117,8 @@ export default function rubrica(options: RubricaOptions): AstroIntegration {
   let dev: DevContent | undefined;
   // Rotas do app dos plugins ligados (proposta, checkout): páginas no build e reescrita no dev.
   let appPages: AppShell[] = [];
+  // Build com o Convex: no fim, avisa o painel que a publicação terminou (ver publish-notice.ts).
+  let buildConvexUrl: { url: string | undefined } | undefined;
   return {
     name: "@rubrica/core",
     hooks: {
@@ -127,6 +130,7 @@ export default function rubrica(options: RubricaOptions): AstroIntegration {
         // Endereço do Convex: o da opção, senão o do ambiente ou dos .env* do projeto.
         const env = projectEnv(root, command === "dev" ? "development" : "production");
         const convexUrl = "convex" in source ? findConvexUrl(source.convex.url, env) : undefined;
+        if (command === "build" && "convex" in source) buildConvexUrl = { url: convexUrl };
 
         // API dos formulários das ilhas: com fixtures (demonstração) fica desligada.
         const apiUrl = "convex" in source ? findApiUrl({ ...env, ...(convexUrl ? { CONVEX_URL: convexUrl } : {}) }) : undefined;
@@ -259,6 +263,9 @@ export default function rubrica(options: RubricaOptions): AstroIntegration {
           injectRoute({ pattern: "/rss.xml", entrypoint: here("./pages/rss.xml.ts"), prerender: true });
           injectRoute({ pattern: "/[prefix]/rss.xml", entrypoint: here("./pages/rss-locale.xml.ts"), prerender: true });
         }
+      },
+      async "astro:build:done"({ logger }) {
+        if (buildConvexUrl) await notifyBuildDone({ convexUrl: buildConvexUrl.url, logger });
       },
       // Dev: o site reflete o que se salva no painel, sem reiniciar (ver dev-content.ts).
       "astro:server:setup"({ server, logger }) {

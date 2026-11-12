@@ -38,7 +38,7 @@ Envios que falham tentam de novo depois de 1 min, 5 min, 30 min e 2 h; depois fi
 | Variável | Para quê |
 |---|---|
 | `RUBRICA_DEPLOY_HOOK_URL` | URL do deploy hook da hospedagem. O botão **Publicar** do painel faz um `POST` sem corpo nela. Vercel, Netlify e Cloudflare Pages têm "deploy hook" ou "build hook" |
-| `RUBRICA_DEPLOY_CALLBACK_SECRET` | Opcional. Segredo do aviso de fim de build (`POST <CONVEX_SITE_URL>/rubrica/publicacao/concluida`, com o cabeçalho `X-Rubrica-Secret`). Sem ele, o estado "publicando" termina sozinho em 15 minutos |
+| `RUBRICA_DEPLOY_CALLBACK_SECRET` | Opcional. Segredo do aviso de fim de build (`POST <CONVEX_SITE_URL>/rubrica/publicacao/concluida`, com o cabeçalho `X-Rubrica-Secret`). O `setup` cria no Convex e o `publicar` copia para o build da Vercel; com ele no ambiente do build, o próprio Rubrica avisa o painel quando o build termina. Sem ele, o estado "publicando" termina sozinho 5 minutos depois do clique |
 
 ## Tradução com IA (plugin `translation`)
 

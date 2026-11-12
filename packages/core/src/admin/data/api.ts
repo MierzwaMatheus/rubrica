@@ -6,6 +6,7 @@
 import { makeFunctionReference, type FunctionReference } from "convex/server";
 import type { BlockInstance, CollectionName, SeoFields, SiteKind, SiteSettings } from "../../content/types";
 import type { Localized } from "../../i18n";
+import type { PublishState, SettledPublishState } from "../../convex/lib/publishState";
 import type { Role } from "../../convex/lib/roles";
 import type { SiteSnapshot } from "../../data/source";
 import type { BlockError } from "../editor/model";
@@ -170,9 +171,14 @@ export interface PolicyStatus {
   updatedAt: number | null;
 }
 
-export type PublishState = "unconfigured" | "publishing" | "pending" | "published" | "failed";
+export type { PublishState, SettledPublishState } from "../../convex/lib/publishState";
 export interface PublishStatus {
+  /** O estado quando a query rodou. O painel usa `currentPublishState` com o relógio dele. */
   status: PublishState;
+  /** O estado depois do build em andamento (ou sem build). */
+  settledStatus: SettledPublishState;
+  /** Até quando presumir o build rodando; `null` sem build em andamento. */
+  publishingUntil: number | null;
   configured: boolean;
   pendingChanges: number;
   lastTriggeredAt: number | null;

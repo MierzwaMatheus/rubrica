@@ -24,18 +24,22 @@ import { usePanel } from "../panel";
 import { Button } from "../ui/button";
 import { Alert, Badge, Spinner } from "../ui/form";
 import { Switch, Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { itemImage, type CollectionConfig } from "./config";
+import { itemImage, listHref, type CollectionConfig } from "./config";
 import { allTags, planCreate, planUpdate, suggestSlug } from "./model";
 import { EditingLocaleBar, Section, SeoPanel, SlugPanel, TagsInput } from "./parts";
 import { PlanCheckout, PlanPrice } from "./PlanExtras";
 
 const SHELL_KEYS = ["tags", "featured", "seo", "priceCents", "currency"];
 
-/** Valores iniciais de um item novo (selects com padrão já escolhido). */
-export function initialForm(config: CollectionConfig): Values {
+/**
+ * Valores iniciais de um item novo (selects com padrão já escolhido). `tab` é a aba de onde
+ * a pessoa veio (`?aba=`): o item já nasce com o valor dela no campo das abas.
+ */
+export function initialForm(config: CollectionConfig, tab?: string | null): Values {
   const out: Values = {};
   for (const [key, def] of Object.entries(config.fields)) if (def.kind === "select" && def.default) out[key] = def.default;
   if (config.name === "plans") out.currency = "BRL";
+  if (config.tabs && tab && config.tabs.options.some((o) => o.value === tab)) out[config.tabs.field] = tab;
   return out;
 }
 
@@ -63,7 +67,7 @@ export function formErrors(config: CollectionConfig, form: Values): { fields: Fi
 
 function Editor({ config, doc }: { config: CollectionConfig; doc?: CollectionDoc }) {
   const panel = usePanel();
-  const { navigate, block } = useRouter();
+  const { navigate, block, search } = useRouter();
   const col = api.collection(config.name);
   const create = useMutation(col.create);
   const update = useMutation(col.update);
@@ -72,7 +76,7 @@ function Editor({ config, doc }: { config: CollectionConfig; doc?: CollectionDoc
   const remove = useMutation(col.remove);
   const siblings = useQuery(col.list, {});
 
-  const start = useMemo(() => (doc ? docToForm(config, doc) : initialForm(config)), []); // eslint-disable-line react-hooks/exhaustive-deps
+  const start = useMemo(() => (doc ? docToForm(config, doc) : initialForm(config, search.get("aba"))), []); // eslint-disable-line react-hooks/exhaustive-deps
   const [base, setBase] = useState<Values>(start);
   const [draft, setDraft] = useState<Values>(start);
   const [locale, setLocale] = useState(panel.locales.default);
@@ -182,7 +186,7 @@ function Editor({ config, doc }: { config: CollectionConfig; doc?: CollectionDoc
     try {
       await remove({ id: doc._id });
       toast.success("Na lixeira.");
-      navigate(config.base, { force: true });
+      navigate(listHref(config, doc), { force: true });
     } catch (e) {
       toast.error(errorMessage(e));
       setBusy(null);
@@ -220,7 +224,7 @@ function Editor({ config, doc }: { config: CollectionConfig; doc?: CollectionDoc
           actions={
             <>
               <Button asChild variant="ghost" size="sm">
-                <Link to={config.base}>
+                <Link to={listHref(config, doc ?? draft)}>
                   <ArrowLeft /> {config.title}
                 </Link>
               </Button>

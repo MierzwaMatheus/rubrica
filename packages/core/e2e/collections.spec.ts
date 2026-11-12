@@ -3,10 +3,17 @@ import { mkdirSync } from "node:fs";
 
 const SHOTS = process.env.SCREENSHOT_DIR;
 
+/** Abre os grupos recolhidos do menu lateral (eles começam fechados, menos o da tela aberta). */
+async function openMenuGroups(page: Page) {
+  const closed = page.getByRole("navigation", { name: "Menu do painel" }).locator('button[aria-expanded="false"]');
+  while ((await closed.count()) > 0) await closed.first().click();
+}
+
 async function login(page: Page) {
   await page.goto("/admin");
   await page.getByRole("button", { name: "Entrar" }).click();
   await expect(page.getByRole("heading", { level: 1, name: /^Olá/ })).toBeVisible();
+  await openMenuGroups(page);
 }
 
 const demoState = <T>(page: Page, fn: string) => page.evaluate(`(${fn})(window.__rubricaDemo.state)`) as Promise<T>;
@@ -184,6 +191,8 @@ test("menu por papel: editora vê conteúdo, não vê contatos nem privacidade n
   await page.getByLabel("E-mail").fill("editora@rubrica.dev");
   await page.getByLabel("Senha").fill("Editora2026!x");
   await page.getByRole("button", { name: "Entrar" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: /^Olá/ })).toBeVisible();
+  await openMenuGroups(page);
   const menu = page.getByRole("navigation", { name: "Menu do painel" });
   await expect(menu.getByRole("link", { name: "Blog" })).toBeVisible();
   await expect(menu.getByRole("link", { name: /Contatos/ })).toHaveCount(0);

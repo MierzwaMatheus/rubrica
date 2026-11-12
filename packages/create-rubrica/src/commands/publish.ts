@@ -20,6 +20,7 @@ import { applySeed, COPIED_TO_PRODUCTION, createRoot, ensureAuthKeys, ensureBase
 
 const NOTHING = "Nada foi publicado.";
 const DEPLOY_KEY_NAME = "rubrica-vercel";
+const CALLBACK_SECRET = "RUBRICA_DEPLOY_CALLBACK_SECRET";
 const VERCELIGNORE = ".env*\n!.env.example\nnode_modules\n.rubrica\n";
 
 export interface PublishDeps {
@@ -101,6 +102,24 @@ export async function runPublish(deps: PublishDeps): Promise<void> {
     if (copied.length) log.info(`Levei para o site publicado as integrações do computador: ${copied.join(", ")}.`);
   };
 
+  /**
+   * Aviso de fim de build: o mesmo `RUBRICA_DEPLOY_CALLBACK_SECRET` no Convex de produção e
+   * no build da Vercel, para a integração do Astro avisar o painel quando o build termina
+   * (sem ele, o "publicando" do painel só acaba depois de alguns minutos).
+   */
+  const syncBuildNotice = () => {
+    let secret = convexEnvGet(prod, CALLBACK_SECRET);
+    if (!secret) {
+      secret = randomBytes(32).toString("hex");
+      convexEnvSet(prod, CALLBACK_SECRET, secret);
+    }
+    try {
+      vercel(["env", "add", CALLBACK_SECRET, "production", "--value", secret, "--yes", "--force", "--sensitive"]);
+    } catch (err) {
+      log.warn(`Não deu para gravar o ${CALLBACK_SECRET} na Vercel (o painel sai de "publicando" sozinho em alguns minutos):\n${tail(errorOutput(err))}`);
+    }
+  };
+
   /** Botão Publicar do painel: o deploy hook da Vercel (precisa do projeto ligado a um repositório Git). */
   const configurePublishButton = async () => {
     if (convexEnvGet(prod, "RUBRICA_DEPLOY_HOOK_URL")) return;
@@ -128,6 +147,7 @@ export async function runPublish(deps: PublishDeps): Promise<void> {
     if (!(await confirm("Publicar de novo com as mudanças que você fez?", true))) throw new Cancelled(NOTHING);
     ensureLogin();
     syncIntegrations();
+    syncBuildNotice();
     await configurePublishButton();
     deploy();
     const siteUrl = productionUrl();
@@ -213,6 +233,7 @@ export async function runPublish(deps: PublishDeps): Promise<void> {
   for (const [key, value, sensitive] of vercelEnv) {
     vercel(["env", "add", key, "production", "--value", value, "--yes", "--force", ...(sensitive ? ["--sensitive"] : [])]);
   }
+  syncBuildNotice();
   updateState(projectDir, { producao: { convexUrl: urls.convexUrl, siteUrl } });
   await configurePublishButton();
   deploy();

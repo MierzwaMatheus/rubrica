@@ -1,5 +1,18 @@
 # @rubrica/core
 
+## 2.1.2
+
+### Patch Changes
+
+- c84b333: Painel: os grupos do menu lateral (Site, Conteúdo, Comercial, Administração) são recolhíveis, como na v1. O Início fica fora dos grupos, sempre à vista; o grupo da tela aberta abre sozinho e o painel lembra no navegador quais grupos ficaram abertos. O cabeçalho de cada grupo é um botão (`aria-expanded`, teclado e foco visível), na barra fixa e na gaveta do celular; grupo sem tela para o papel ou com os plugins desligados continua sumindo.
+- 5af5e74: Currículo em abas no painel, como na v1. A tela do currículo separa os itens por tipo (Experiência, Formação, Competências, Comportamentais, Certificações, Idiomas e Voluntariado), com a contagem de cada aba, e lista só o tipo escolhido. A aba fica no endereço (`?aba=`), então recarregar, voltar e sair do editor abrem nela. As setas de ordem mexem só nos itens da aba, sem tirar os outros tipos do lugar; nas competências, a lista se agrupa pelo campo **Grupo**, com um subtítulo por grupo, e a ordem anda dentro do grupo. "Novo item" numa aba já vem com o tipo dela. As listas de coleção ganham a opção interna `tabs` (campo de seleção, abas e agrupamento opcional), que outras coleções podem usar.
+- 5f3bcc0: Pastas da mídia. As pastas migradas da v1 apareciam na tela de Mídia com a contagem certa, mas abriam vazias ("Nenhuma imagem nesta pasta"): o `migrar` gravava o caminho sem a barra inicial (`portfolio/toca`) e o filtro procura `/portfolio/toca`.
+
+  - **Núcleo:** o filtro de pasta (`media.list`) acha também as imagens gravadas sem a barra, e a lista de pastas junta as duas formas. Migração de dados nova, `media-folder-slash` (`rubrica/media:normalizeFolders`), que grava o caminho normalizado; o `update` a roda no Convex de desenvolvimento, e na produção ela sai com `npx convex run --prod rubrica/media:normalizeFolders`. O modal de escolher imagem ganha a navegação por pastas da tela de Mídia (Todas, Sem pasta e cada pasta com a quantidade, criar pasta) e envia a imagem para a pasta aberta. A pasta raiz aparece como "Sem pasta".
+  - **`migrar`:** grava a pasta de cada imagem já no formato da v2 (`/portfolio/toca`), trocando por "-" o que o nome de pasta não aceita.
+
+- 06cb78a: O painel não fica mais preso em "Publicando…". O `status` da publicação devolve até quando presumir o build rodando (`publishingUntil`) e o estado depois dele (`settledStatus`), e o painel decide com o próprio relógio, conferido a cada 10 s: antes, a query só rodava de novo quando algum dado mudava, e o painel aberto não via a janela acabar. A janela sem o aviso de fim de build cai de 15 para 5 minutos, e uma falha depois do clique encerra o "publicando". O aviso de fim de build passa a ser automático: no fim do `astro build`, a integração do núcleo chama `/rubrica/publicacao/concluida` quando o build tem o `RUBRICA_DEPLOY_CALLBACK_SECRET` (pula prévias e nunca falha o build), e o `publicar` grava esse segredo, o mesmo do Convex de produção, nas variáveis da Vercel. Sites já publicados: rode `npx create-rubrica publicar` uma vez para levar o segredo à Vercel.
+
 ## 2.1.1
 
 ### Patch Changes

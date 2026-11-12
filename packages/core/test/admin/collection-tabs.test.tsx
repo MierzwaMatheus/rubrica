@@ -5,7 +5,8 @@ import { getFunctionName } from "convex/server";
 import { BackendContext, type Backend } from "../../src/admin/data/backend";
 import { RouterProvider } from "../../src/admin/lib/router";
 import { CollectionList } from "../../src/admin/collections/CollectionList";
-import { COLLECTION_CONFIGS } from "../../src/admin/collections/config";
+import { initialForm } from "../../src/admin/collections/CollectionEditor";
+import { COLLECTION_CONFIGS, listHref } from "../../src/admin/collections/config";
 
 vi.mock("../../src/admin/lib/toast", () => ({ toast: { error: vi.fn(), success: vi.fn() }, Toaster: () => null }));
 vi.mock("../../src/admin/panel", () => ({
@@ -110,5 +111,24 @@ describe("currículo em abas", () => {
       fireEvent.click(screen.getByRole("button", { name: "Descer React" }));
     });
     expect(reorder).toHaveBeenCalledWith({ ids: ["e1", "s3", "e2", "s2", "s1", "l1"] });
+  });
+});
+
+describe("editor com abas", () => {
+  const resume = COLLECTION_CONFIGS.resume;
+
+  it("o item novo nasce com o tipo da aba de onde veio", () => {
+    expect(initialForm(resume, "language").kind).toBe("language");
+    // Sem aba, ou aba que não existe, fica o padrão do campo.
+    expect(initialForm(resume, null).kind).toBe("experience");
+    expect(initialForm(resume, "outra").kind).toBe("experience");
+    // Coleção sem abas ignora o parâmetro.
+    expect(initialForm(COLLECTION_CONFIGS.faq, "language")).toEqual({});
+  });
+
+  it("voltar para a lista abre na aba do item", () => {
+    expect(listHref(resume, { kind: "soft-skill" })).toBe("/admin/curriculo?aba=soft-skill");
+    expect(listHref(resume, {})).toBe("/admin/curriculo");
+    expect(listHref(COLLECTION_CONFIGS.faq, { kind: "skill" })).toBe("/admin/faq");
   });
 });

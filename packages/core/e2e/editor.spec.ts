@@ -11,11 +11,18 @@ async function login(page: Page, email?: string, password?: string) {
   await expect(page.getByRole("heading", { level: 1, name: /^Olá/ })).toBeVisible();
 }
 
+/** Abre os grupos recolhidos do menu lateral (eles começam fechados, menos o da tela aberta). */
+async function openMenuGroups(page: Page) {
+  const closed = page.getByRole("navigation", { name: "Menu do painel" }).locator('button[aria-expanded="false"]');
+  while ((await closed.count()) > 0) await closed.first().click();
+}
+
 const preview = (page: Page) => page.frameLocator('iframe[title="Prévia da página"]');
 const demoState = <T>(page: Page, fn: string) => page.evaluate(`(${fn})(window.__rubricaDemo.state)`) as Promise<T>;
 
 test("editor de páginas: editar, prévia ao vivo, validação, reordenar, ocultar e salvar", async ({ page }) => {
   await login(page);
+  await openMenuGroups(page);
   await page.getByRole("link", { name: "Páginas", exact: true }).click();
   await page.locator("main").getByRole("link", { name: "Início", exact: true }).click();
   await expect(page).toHaveURL(/\/admin\/paginas\/editar\?id=home/);
@@ -93,6 +100,7 @@ test("criar página livre e abrir no editor", async ({ page }) => {
 
 test("menu e telas filtrados pelo papel", async ({ page }) => {
   await login(page, "editora@rubrica.dev", "Editora2026!x");
+  await openMenuGroups(page);
   const menu = page.getByRole("navigation", { name: "Menu do painel" });
   await expect(menu.getByRole("link", { name: "Páginas" })).toBeVisible();
   await expect(menu.getByRole("link", { name: "Usuários" })).toHaveCount(0);

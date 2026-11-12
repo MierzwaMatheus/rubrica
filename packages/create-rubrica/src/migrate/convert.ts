@@ -240,6 +240,20 @@ const lifecycle = (d: Doc, published = true) => ({
   deletedBy: d.deletedBy,
 });
 
+/**
+ * Caminho da pasta da v1 ("portfolio/toca", sem barra) no formato da v2 ("/portfolio/toca"),
+ * o mesmo do `normalizeFolder` do núcleo: letras, números, `_`, `-` e espaço, até 6 níveis
+ * de até 60 caracteres. O resto vira "-"; sem nome, a imagem fica sem pasta ("/").
+ */
+export function mediaFolderPath(path: unknown): string {
+  const parts = (typeof path === "string" ? path : "")
+    .split("/")
+    .map((p) => p.trim().replace(/[^\p{L}\p{N}_ -]/gu, "-").slice(0, 60).trim())
+    .filter(Boolean)
+    .slice(0, 6);
+  return parts.length ? `/${parts.join("/")}` : "/";
+}
+
 export function slugify(text: string): string {
   return text
     .normalize("NFD")
@@ -301,7 +315,7 @@ class Ctx {
     storage: Doc[] = [],
   ) {
     for (const f of storage) if (typeof f.internalId === "string" && typeof f._id === "string") this.storageByUrlId.set(f.internalId, f._id);
-    for (const f of tables.imageFolders ?? []) this.folders.set(f._id, f.path);
+    for (const f of tables.imageFolders ?? []) this.folders.set(f._id, mediaFolderPath(f.path));
     for (const m of tables.imageMetadata ?? []) this.media.set(m._id, m);
     for (const t of tables.siteTexts ?? []) this.siteTexts.set(t.key, t);
     for (const h of tables.homeContent ?? []) this.home.set(h.key, h.value);

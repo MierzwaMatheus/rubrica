@@ -8,7 +8,7 @@ import { v } from "convex/values";
 import { requireRole } from "./auth";
 import { hitRateLimit, logUserAction } from "./audit";
 import { cleanByValidator } from "./lib/clean";
-import { mutation, query, type Doc, type Id, type QueryCtx } from "./server";
+import { internalMutation, mutation, query, type Doc, type Id, type QueryCtx } from "./server";
 import { vLocalized } from "./validators";
 
 /** Até 20 MB. Acima disso o build fica lento para otimizar. */
@@ -20,6 +20,35 @@ export function normalizeFolder(folder: string | undefined): string {
   const path = clean.startsWith("/") ? clean : `/${clean}`;
   if (path !== "/" && !/^(\/[\p{L}\p{N}_ -]{1,60}){1,6}$/u.test(path)) throw new Error(`Pasta inválida: "${folder}"`);
   return path;
+}
+
+/**
+ * Caminho de pasta gravado fora do formato (o `migrar` até a 2.1.1 gravava as pastas
+ * da v1 sem a barra inicial: "portfolio/toca") → o normalizado ("/portfolio/toca").
+ * Nunca lança: o que a validação recusa vira "-" e passa de 6 níveis é cortado.
+ */
+export function repairFolder(folder: string | undefined): string {
+  try {
+    return normalizeFolder(folder);
+  } catch {
+    const parts = (folder ?? "")
+      .split("/")
+      .map((p) => p.trim().replace(/[^\p{L}\p{N}_ -]/gu, "-").slice(0, 60).trim())
+      .filter(Boolean)
+      .slice(0, 6);
+    return parts.length ? `/${parts.join("/")}` : "/";
+  }
+}
+
+/** Imagens de uma pasta, inclusive as gravadas sem a barra inicial (antes da migração). */
+async function inFolder(ctx: QueryCtx, folder: string) {
+  const path = normalizeFolder(folder);
+  const byIndex = (value: string) =>
+    ctx.db
+      .query("media")
+      .withIndex("by_folder", (q) => q.eq("folder", value))
+      .collect();
+  return path === "/" ? byIndex(path) : [...(await byIndex(path)), ...(await byIndex(path.slice(1)))];
 }
 
 async function withUrl(ctx: QueryCtx, doc: Doc<"media">) {
@@ -87,12 +116,7 @@ export function mediaFunctions() {
       args: { folder: v.optional(v.string()) },
       handler: async (ctx, args) => {
         await requireRole(ctx, "media");
-        const docs = args.folder
-          ? await ctx.db
-              .query("media")
-              .withIndex("by_folder", (q) => q.eq("folder", normalizeFolder(args.folder)))
-              .collect()
-          : await ctx.db.query("media").collect();
+        const docs = args.folder ? await inFolder(ctx, args.folder) : await ctx.db.query("media").collect();
         docs.sort((a, b) => b.createdAt - a.createdAt);
         return Promise.all(docs.map((d) => withUrl(ctx, d)));
       },
@@ -104,7 +128,10 @@ export function mediaFunctions() {
       handler: async (ctx) => {
         await requireRole(ctx, "media");
         const counts = new Map<string, number>();
-        for (const doc of await ctx.db.query("media").collect()) counts.set(doc.folder, (counts.get(doc.folder) ?? 0) + 1);
+        for (const doc of await ctx.db.query("media").collect()) {
+          const path = repairFolder(doc.folder);
+          counts.set(path, (counts.get(path) ?? 0) + 1);
+        }
         return [...counts].map(([path, count]) => ({ path, count })).sort((a, b) => a.path.localeCompare(b.path));
       },
     }),
@@ -148,6 +175,24 @@ export function mediaFunctions() {
      * Apaga a imagem do storage e da biblioteca. O conteúdo que ainda a usa continua
      * com a URL antiga (que deixa de funcionar): o painel deve avisar antes.
      */
+    /**
+     * Migração de dados (2.1.2): grava a pasta de cada imagem no formato normalizado.
+     * Idempotente; roda pelo `update` do CLI (`npx convex run rubrica/media:normalizeFolders`).
+     */
+    normalizeFolders: internalMutation({
+      args: {},
+      handler: async (ctx) => {
+        let fixed = 0;
+        for (const doc of await ctx.db.query("media").collect()) {
+          const folder = repairFolder(doc.folder);
+          if (folder === doc.folder) continue;
+          await ctx.db.patch(doc._id, { folder });
+          fixed++;
+        }
+        return { fixed };
+      },
+    }),
+
     remove: mutation({
       args: { id: v.id("media") },
       handler: async (ctx, args) => {

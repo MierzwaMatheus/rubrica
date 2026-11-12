@@ -18,7 +18,8 @@ const doc = (table: string, fields: Record<string, unknown>) => ({ _id: id(table
 const ana = doc("users", { email: "bruna@exemplo.dev", name: "Bruna Lima" });
 const editor = doc("users", { email: "edu@exemplo.dev", name: "Edu" });
 const storage = [doc("_storage", { sha256: "a", size: 3, contentType: "image/png" }), doc("_storage", { sha256: "b", size: 3, contentType: "image/png" }), doc("_storage", { sha256: "c", size: 3, contentType: "image/jpeg" })];
-const folder = doc("imageFolders", { name: "blog", path: "/blog", createdAt: T0 });
+// A v1 grava o caminho sem a barra inicial (`imageFolders.create`).
+const folder = doc("imageFolders", { name: "blog", path: "blog", createdAt: T0 });
 const img = (i: number, name: string, extra: Record<string, unknown> = {}) =>
   doc("imageMetadata", { storageId: storage[i]!._id, displayName: name, altText: `Imagem ${name}`, width: 1200, height: 630, fileSize: 3, mimeType: "image/png", createdAt: T0, createdBy: ana._id, ...extra });
 const capa = img(0, "capa-post", { folderId: folder._id });

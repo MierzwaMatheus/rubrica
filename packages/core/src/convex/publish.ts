@@ -19,12 +19,13 @@
  * quando os dados mudam, então um `Date.now()` aqui deixaria o painel aberto em
  * "publicando" para sempre. O `status` devolve `publishingUntil` (até quando presumir o
  * build rodando) e `settledStatus` (o estado depois disso), e o painel decide com o
- * próprio relógio (`currentPublishState`). O campo `status` continua valendo para quem lê
- * uma vez só (MCP).
+ * próprio relógio (`currentPublishState`, em `lib/publishState.ts`). O campo `status`
+ * continua valendo para quem lê uma vez só (MCP).
  */
 import { v } from "convex/values";
 import { actionUserId, requireRole } from "./auth";
 import { logAudit } from "./audit";
+import { currentPublishState, type SettledPublishState } from "./lib/publishState";
 import { action, internalMutation, query, ref, type Doc, type Id, type MutationCtx, type ReaderCtx } from "./server";
 
 export const MIN_INTERVAL_MS = 60_000;
@@ -70,20 +71,7 @@ async function pendingChanges(ctx: ReaderCtx, since: number | undefined): Promis
   return Math.min(entries.filter(affectsSite).length, 100);
 }
 
-export type PublishState = "unconfigured" | "publishing" | "pending" | "published" | "failed";
-export type SettledPublishState = Exclude<PublishState, "publishing">;
-
-/** Os campos do estado de que o cálculo depende (o painel recebe os mesmos). */
-export interface PublishTiming {
-  settledStatus: SettledPublishState;
-  publishingUntil: number | null;
-}
-
-/** O estado neste instante: "publicando" até `publishingUntil`, depois o `settledStatus`. */
-export function currentPublishState(s: PublishTiming, now: number): PublishState {
-  if (s.settledStatus === "unconfigured") return "unconfigured";
-  return s.publishingUntil !== null && now < s.publishingUntil ? "publishing" : s.settledStatus;
-}
+export { currentPublishState, type PublishState, type PublishTiming, type SettledPublishState } from "./lib/publishState";
 
 async function computeStatus(ctx: ReaderCtx) {
   const state = await getState(ctx);

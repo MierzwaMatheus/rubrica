@@ -50,9 +50,9 @@ export function resolveOpenGroups(stored: OpenGroups, active: MenuGroup | undefi
 export const SIDEBAR_STORAGE_KEY = "rubrica:admin-menu-groups";
 
 /** Lê o estado guardado; sem armazenamento ou com valor estragado, nada guardado. */
-export function readOpenGroups(storage: Pick<Storage, "getItem"> | undefined = globalThis.localStorage): OpenGroups {
+export function readOpenGroups(storage?: Pick<Storage, "getItem">): OpenGroups {
   try {
-    const raw = storage?.getItem(SIDEBAR_STORAGE_KEY);
+    const raw = (storage ?? globalThis.localStorage)?.getItem(SIDEBAR_STORAGE_KEY);
     if (!raw) return {};
     const parsed: unknown = JSON.parse(raw);
     if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return {};
@@ -64,9 +64,9 @@ export function readOpenGroups(storage: Pick<Storage, "getItem"> | undefined = g
   }
 }
 
-export function writeOpenGroups(open: OpenGroups, storage: Pick<Storage, "setItem"> | undefined = globalThis.localStorage): void {
+export function writeOpenGroups(open: OpenGroups, storage?: Pick<Storage, "setItem">): void {
   try {
-    storage?.setItem(SIDEBAR_STORAGE_KEY, JSON.stringify(open));
+    (storage ?? globalThis.localStorage)?.setItem(SIDEBAR_STORAGE_KEY, JSON.stringify(open));
   } catch {
     /* sem armazenamento: o estado vale só nesta visita */
   }

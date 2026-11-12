@@ -7,14 +7,15 @@ import { useMutation, useQuery } from "../data/backend";
 import { errorMessage } from "../editor/model";
 import { PageHeader } from "../Layout";
 import { Loading } from "../App";
-import { Link } from "../lib/router";
+import { Link, useRouter } from "../lib/router";
 import { toast } from "../lib/toast";
 import { formatDate, plainText } from "../lib/format";
 import { localeName, usePanel } from "../panel";
 import { Button } from "../ui/button";
 import { Badge, Input, NativeSelect } from "../ui/form";
+import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 import { itemImage, type CollectionConfig } from "./config";
-import { allTags, filterItems, itemMissingLocales, moveId, type ListItem, type StatusFilter } from "./model";
+import { allTags, filterItems, groupItems, groupValue, itemMissingLocales, moveIdWithin, pickTab, tabCounts, type ListItem, type StatusFilter } from "./model";
 
 const STATUS_LABELS: Record<StatusFilter, string> = { all: "Todos", published: "Publicados", draft: "Rascunhos", trash: "Lixeira" };
 
@@ -165,6 +166,7 @@ function Row({
 
 export function CollectionList({ config, extraActions, banner }: { config: CollectionConfig; extraActions?: ReactNode; banner?: ReactNode }) {
   const panel = usePanel();
+  const { search, navigate } = useRouter();
   const col = api.collection(config.name);
   const docs = useQuery(col.list, { includeDeleted: true });
   const reorder = useMutation(col.reorder);
@@ -172,21 +174,47 @@ export function CollectionList({ config, extraActions, banner }: { config: Colle
   const locale = panel.locales.default;
   const labelOf = (d: CollectionDoc) => config.label(d, locale, panel.locales.default);
 
+  // Abas (ex.: tipos do currículo): a aba fica no endereço (`?aba=`), para o recarregar e o voltar.
+  const tabs = config.tabs;
+  const tabValues = useMemo(() => tabs?.options.map((o) => o.value) ?? [], [tabs]);
+  const tab = tabs ? pickTab(tabValues, search.get("aba")) : undefined;
+  const inTab = (d: Record<string, unknown>) => !tabs || d[tabs.field] === tab;
+  const counts = useMemo(() => (tabs ? tabCounts((docs ?? []) as ListItem[], tabs.field, tabValues) : {}), [docs, tabs, tabValues]);
+
   const live = useMemo(() => (docs ?? []).filter((d) => d.deletedAt === undefined), [docs]);
-  const shown = useMemo(() => sortItems(config, filterItems((docs ?? []) as ListItem[] as CollectionDoc[], filters, labelOf)), [docs, filters, config]); // eslint-disable-line react-hooks/exhaustive-deps
+  const tabDocs = useMemo(() => (docs ?? []).filter(inTab), [docs, tab]); // eslint-disable-line react-hooks/exhaustive-deps
+  const tabLive = tabDocs.filter((d) => d.deletedAt === undefined);
+  const shown = useMemo(() => sortItems(config, filterItems(tabDocs as ListItem[] as CollectionDoc[], filters, labelOf)), [tabDocs, filters, config]); // eslint-disable-line react-hooks/exhaustive-deps
   const tags = useMemo(() => allTags((docs ?? []) as ListItem[]), [docs]);
-  const trashCount = (docs ?? []).length - live.length;
+  const trashCount = tabDocs.length - tabLive.length;
   const filtered = !!filters.search || !!filters.tag || filters.status !== "all";
   const canReorder = config.reorderable && !filtered;
+  // Subtítulos por grupo só quando algum item da aba tem grupo.
+  const groupBy = tabs?.groupBy && shown.some((d) => groupValue(d, tabs.groupBy!, locale)) ? tabs.groupBy : undefined;
+  const sections = groupBy ? groupItems(shown, groupBy, locale) : [{ group: "", items: shown }];
 
-  async function move(id: string, delta: -1 | 1) {
-    const ids = moveId(live.map((d) => d._id), id, delta);
+  async function move(doc: CollectionDoc, delta: -1 | 1) {
+    const byId = new Map(live.map((d) => [d._id, d]));
+    const same = (id: string) => {
+      const other = byId.get(id);
+      return !!other && inTab(other) && (!groupBy || groupValue(other, groupBy, locale) === groupValue(doc, groupBy, locale));
+    };
+    const ids = moveIdWithin(live.map((d) => d._id), doc._id, delta, same);
     try {
       await reorder({ ids });
     } catch (e) {
       toast.error(errorMessage(e));
     }
   }
+
+  const newHref = `${config.base}?novo=1${tab ? `&aba=${encodeURIComponent(tab)}` : ""}`;
+  const list = (items: CollectionDoc[], label: string) => (
+    <ul className="divide-y rounded-lg border bg-card" aria-label={label}>
+      {items.map((doc, i) => (
+        <Row key={doc._id} config={config} doc={doc} index={i} total={items.length} reorder={canReorder && filters.status !== "trash"} trash={filters.status === "trash"} onMove={(d) => move(doc, d)} />
+      ))}
+    </ul>
+  );
 
   return (
     <>
@@ -197,7 +225,7 @@ export function CollectionList({ config, extraActions, banner }: { config: Colle
           <>
             {extraActions}
             <Button asChild>
-              <Link to={`${config.base}?novo=1`}>
+              <Link to={newHref}>
                 <Plus /> {config.feminine ? "Nova" : "Novo"} {config.singular}
               </Link>
             </Button>
@@ -206,6 +234,18 @@ export function CollectionList({ config, extraActions, banner }: { config: Colle
       />
       {banner}
       <div className="space-y-4 p-6">
+        {tabs && tab && (
+          <Tabs value={tab} onValueChange={(value) => navigate(`${config.base}?aba=${encodeURIComponent(value)}`, { replace: true })}>
+            <TabsList aria-label={`Tipos de ${config.singular}`} className="h-auto max-w-full flex-wrap justify-start">
+              {tabs.options.map((o) => (
+                <TabsTrigger key={o.value} value={o.value} className="flex-none">
+                  {o.label}
+                  <span className="rounded-full bg-muted-foreground/15 px-1.5 text-xs tabular-nums">{counts[o.value] ?? 0}</span>
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        )}
         <div className="flex flex-wrap items-center gap-2">
           <div className="relative min-w-52 max-w-sm flex-1">
             <Search className="pointer-events-none absolute top-2.5 left-2.5 size-4 text-muted-foreground" aria-hidden="true" />
@@ -230,21 +270,24 @@ export function CollectionList({ config, extraActions, banner }: { config: Colle
             </NativeSelect>
           )}
           <p className="ml-auto text-sm text-muted-foreground">
-            {shown.length} de {live.length} {live.length === 1 ? config.singular : config.plural}
+            {shown.length} de {tabLive.length} {tabLive.length === 1 ? config.singular : config.plural}
           </p>
         </div>
         {docs === undefined ? (
           <Loading />
         ) : shown.length === 0 ? (
           <p className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
-            {filtered ? "Nada encontrado com esses filtros." : config.empty}
+            {filtered ? "Nada encontrado com esses filtros." : tab ? "Nenhum item nesta aba ainda." : config.empty}
           </p>
+        ) : groupBy ? (
+          sections.map((s) => (
+            <section key={s.group} className="space-y-2">
+              <h2 className="text-sm font-semibold text-muted-foreground">{s.group || "Sem grupo"}</h2>
+              {list(s.items, s.group || "Sem grupo")}
+            </section>
+          ))
         ) : (
-          <ul className="divide-y rounded-lg border bg-card" aria-label={config.title}>
-            {shown.map((doc, i) => (
-              <Row key={doc._id} config={config} doc={doc} index={i} total={shown.length} reorder={canReorder && filters.status !== "trash"} trash={filters.status === "trash"} onMove={(d) => move(doc._id, d)} />
-            ))}
-          </ul>
+          list(shown, config.title)
         )}
         {config.reorderable && !canReorder && <p className="text-xs text-muted-foreground">Limpe a busca e os filtros para mudar a ordem.</p>}
       </div>

@@ -35,6 +35,11 @@ export interface CollectionConfig {
   featured?: boolean;
   /** Ordem manual (setas). Posts ordenam por data de publicação. */
   reorderable: boolean;
+  /**
+   * Abas na lista, uma por valor de um campo de seleção (ex.: o tipo do item do currículo).
+   * Cada aba lista e ordena só os seus itens; o item novo já vem com o valor da aba.
+   */
+  tabs?: CollectionTabs;
   defaultPublished: boolean;
   /** Onde o campo de capa/foto está (miniatura da lista). */
   imageKey?: string;
@@ -50,6 +55,21 @@ export interface CollectionConfig {
   empty: string;
   /** O que dizer ao mandar para a lixeira. */
   trashNote: string;
+}
+
+export interface CollectionTabs {
+  /** Campo de seleção que separa as abas. */
+  field: string;
+  /** Abas, na ordem: valor do campo e rótulo. */
+  options: { value: string; label: string }[];
+  /** Campo que, quando preenchido em algum item da aba, agrupa a lista com subtítulos. */
+  groupBy?: string;
+}
+
+/** Endereço da lista, já na aba do item (quando a coleção tem abas). */
+export function listHref(config: CollectionConfig, values?: Record<string, unknown>): string {
+  const value = config.tabs && values?.[config.tabs.field];
+  return typeof value === "string" && config.tabs!.options.some((o) => o.value === value) ? `${config.base}?aba=${encodeURIComponent(value)}` : config.base;
 }
 
 const L = (value: unknown): Localized<string> | undefined => (value && typeof value === "object" ? (value as Localized<string>) : undefined);
@@ -137,6 +157,17 @@ export const RESUME_KINDS = {
   certification: "Certificação",
   language: "Idioma",
 } as const;
+
+/** Abas do currículo no painel, na ordem da v1. */
+const RESUME_TABS: CollectionTabs["options"] = [
+  { value: "experience", label: "Experiência" },
+  { value: "education", label: "Formação" },
+  { value: "skill", label: "Competências" },
+  { value: "soft-skill", label: "Comportamentais" },
+  { value: "certification", label: "Certificações" },
+  { value: "language", label: "Idiomas" },
+  { value: "volunteer", label: "Voluntariado" },
+];
 
 const RESUME_FIELDS: FieldMap = {
   kind: field.select({ label: "Tipo", required: true, options: Object.entries(RESUME_KINDS).map(([value, label]) => ({ value, label })), default: "experience" }),
@@ -345,6 +376,7 @@ export const COLLECTION_CONFIGS: Record<CollectionName, CollectionConfig> = {
     docKeys: ["kind", "title", "organization", "location", "start", "end", "description", "group"],
     required: ["kind", "title"],
     reorderable: true,
+    tabs: { field: "kind", options: RESUME_TABS, groupBy: "group" },
     defaultPublished: true,
     label: text("title"),
     subtitle: (doc) => {

@@ -251,6 +251,19 @@ export const RUBRICA_MODULES = [
   "seed",
 ] as const satisfies readonly (keyof Rubrica)[];
 
+/**
+ * Migrações de dados do núcleo. O `update` do CLI lista as que vieram depois da versão
+ * do projeto e roda cada uma com `npx convex run <fn>` (desenvolvimento; produção à mão).
+ */
+export const RUBRICA_DATA_MIGRATIONS = [
+  {
+    id: "media-folder-slash",
+    since: "2.1.2",
+    description: "Normaliza a pasta das imagens migradas da v1 (\"portfolio/toca\" → \"/portfolio/toca\"), que não abriam no filtro de pastas",
+    fn: "rubrica/media:normalizeFolders",
+  },
+] as const;
+
 export type { RubricaConfig } from "./runtime";
 export { rubricaTables, COLLECTION_TABLES } from "./schema";
 export { requireAuth, requireRole, getUserRole, MAX_FAILED_SIGN_INS_PER_HOUR } from "./auth";

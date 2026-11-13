@@ -2,6 +2,21 @@
 
 What changed in each version of Rubrica (core, themes and the `create-rubrica` CLI). Details for each one are in the [release notes](https://github.com/MierzwaMatheus/rubrica/releases). To update a v2 project, see [Updating Rubrica](./docs/guia/atualizar.md); to leave v1, [Migrating from v1](./docs/guia/migrar.md).
 
+## 2.2.0 — 2026-11-13
+
+The proposal, the acceptance page and the contract PDF are back to everything v1 had, with a new look in the theme's colors. Nothing changes for proposals that already set their own payment options and cancellation policy.
+
+### New
+- **Proposal:** an introduction letter at the top (UI text `proposal.intro`, editable under Texts), a lead text and badge for the investment, a footer with the site name and a new card layout with icons, a timeline and the investment highlighted.
+- **v1 defaults:** with no payment options, the proposal and the contract show the default ones, calculated from the final price (PIX with 10% off, 50/50, credit card in 3 interest-free installments and in 12). With no cancellation policy, the default one applies, with jurisdiction in the city of the site's address. Both are UI texts (`proposal.pay.*` and `proposal.rescissionDefault`).
+- **Acceptance:** the contract is shown open, with the reading notice and the confirmations; the acceptance clause gets a heading. The signature is required again, with the option to use the typed name for people who can't draw.
+- **Contract PDF:** the provider's header, a title band, a signature box with line and caption, technical evidence (hash, IP, browser, version, reference and UTC time), a legal footer and A4 pages.
+
+### Fixes
+- **Every proposal has a contract:** without a custom template, or with the templates plugin off, the default template applies.
+- **Cancellation policy in the admin:** no longer required (empty uses the default) and accepts long texts (previously 800 characters).
+- **`migrar`:** carries the v1 proposal introduction.
+
 ## 2.1.0 — 2026-11-11
 
 The **padrao** and **cyberpunk** themes now match the v1 layout page by page, and the `migrar` converter carries what was missing from the v1 data. Everything new is optional: projects that don't use the new fields see no change. Theme contract 1.3.

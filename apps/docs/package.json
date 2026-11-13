@@ -24,7 +24,7 @@
     "@rubrica/core": "workspace:^",
     "@types/node": "^22.20.5",
     "@types/react": "^19.2.0",
-    "convex": "^1.49.0",
+    "convex": "^1.50.0",
     "react": "^19.2.1",
     "tsx": "^4.23.15",
     "typescript": "^5.9.3"

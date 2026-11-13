@@ -124,6 +124,8 @@ O corpo do post é **HTML**. Use só `h2 h3 p ul ol li strong em a code pre bloc
 - **Desconto** (opcional): `originalValue`, o valor antes do desconto, maior que `investmentValue`. Na proposta aparece o original riscado, o desconto em R$ e % e o valor final. Para tirar, mande `originalValue: null` (com `giftIndexes: []`, se houver brinde).
 - **Brinde**: `giftIndexes`, as posições (a partir de 0) dos itens do `scope` que saem sem custo. Cada brinde precisa ter preço em `scopePrices` e de um `originalValue`, e a soma dos brindes não pode passar do desconto (`originalValue − investmentValue`). Na proposta, o item aparece com o badge "Brinde", o preço riscado e R$ 0,00.
 - Não invente preço nem desconto: valores vêm da pessoa. Ao propor um desconto, mostre a conta (original, desconto, final) e espere o "ok".
+- **Padrões da página** (como na v1): sem `paymentMethods`, a proposta e o contrato mostram as formas padrão calculadas sobre o valor final (PIX com 10% de desconto, 50/50, 3x sem juros, 12x com juros); sem `rescissionPolicy`, a política de rescisão padrão, com o foro na cidade do endereço do site. Toda proposta tem contrato: sem modelo próprio, vale o padrão.
+- **Carta de apresentação** (seção "Apresentação", no topo da proposta) e as frases do investimento e do rodapé são textos de interface, iguais para todas as propostas: `proposal.intro` (`{name}` vira o nome do dono do site), `proposal.investmentLead`, `proposal.easyPayment`, `proposal.copyright`. A política padrão é `proposal.rescissionDefault` (`{jurisdiction}` vira o foro) e as formas de pagamento padrão, `proposal.pay.*`.
 - `proposals:resetPassword` fica fora (ver Limites).
 
 ## Contatos e o resto

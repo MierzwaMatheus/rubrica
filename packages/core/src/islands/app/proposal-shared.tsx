@@ -1,8 +1,8 @@
 /** O que a página da proposta e a do aceite dividem: sessão da senha, contrato e o PDF. */
 import { useCallback, useEffect, useState } from "react";
-import { contractVariables, fillContract, type Acceptance, type ClientData, type OpenProposal } from "./contract";
+import { contractVariables, fillContract, jurisdictionCity, type Acceptance, type ClientData, type OpenProposal } from "./contract";
 import { openContractPdf } from "./contract-pdf";
-import { dateTimeText, formatDocument, pickText } from "./format";
+import { dateText, formatDocument, pickText } from "./format";
 import { markdownToHtml } from "./markdown";
 import type { T } from "./ui";
 
@@ -48,9 +48,9 @@ export function proposalArgs(slug: string | undefined, session: { ready: boolean
 }
 
 /** Contrato preenchido, em HTML escapado. `null` se a proposta não tem contrato. */
-export function contractHtml(p: OpenProposal, client: ClientData | null, locale: string, fallback: string, baseLevel = 3): string | null {
+export function contractHtml(t: T, p: OpenProposal, client: ClientData | null, locale: string, fallback: string, baseLevel = 3): string | null {
   if (!p.contract?.trim()) return null;
-  return markdownToHtml(fillContract(p.contract, contractVariables(p, client, locale, fallback)), baseLevel);
+  return markdownToHtml(fillContract(p.contract, contractVariables(p, client, locale, fallback, t)), baseLevel);
 }
 
 export function ContractText({ html }: { html: string }) {
@@ -58,28 +58,61 @@ export function ContractText({ html }: { html: string }) {
   return <div className="rb-flow__contract rb-prose" dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
+/** Cor de destaque do tema do site, para o PDF. */
+function themeAccent(): string | undefined {
+  try {
+    return getComputedStyle(document.documentElement).getPropertyValue("--rb-accent").trim() || undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/** Data e hora com segundos e fuso (o registro do aceite). */
+const preciseTime = (ms: number, locale: string) => new Date(ms).toLocaleString(locale, { dateStyle: "short", timeStyle: "long" });
+
 /** Abre o contrato aceito para salvar em PDF. `false` se o navegador bloqueou a aba. */
 export function downloadContract(t: T, p: OpenProposal, acceptance: Acceptance, locale: string, fallback: string, signatureUrl?: string | null): boolean {
   const client: ClientData = { ...acceptance };
-  const html = contractHtml(p, client, locale, fallback, 2) ?? "";
-  const record = [
-    { label: t("accept.name"), value: acceptance.clientName },
-    { label: t("accept.document"), value: formatDocument(acceptance.clientDocument) },
-    { label: t("form.email"), value: acceptance.clientEmail },
-    ...(acceptance.clientRole ? [{ label: t("accept.role"), value: acceptance.clientRole }] : []),
-    ...(acceptance.clientDeclaration ? [{ label: t("accept.declaration"), value: acceptance.clientDeclaration }] : []),
-    { label: t("contract.acceptedAt"), value: dateTimeText(acceptance.acceptedAt, locale) },
-    { label: t("contract.version"), value: String(acceptance.proposalVersion) },
-    ...(acceptance.ipAddress ? [{ label: t("contract.ip"), value: acceptance.ipAddress }] : []),
-    { label: t("contract.hash"), value: acceptance.contentHash },
-  ];
+  const html = contractHtml(t, p, client, locale, fallback, 2) ?? "";
+  const org = p.contractor.organization;
+  const person = p.contractor.person;
+  const contractorName = org?.legalName || person?.name || pickText(p.contractor.name, locale, fallback);
+  const city = jurisdictionCity(p);
+  const contractorEmail = org?.email || person?.email;
+  const title = pickText(p.title, locale, fallback) || t("contract.title");
   return openContractPdf({
     locale,
-    title: pickText(p.title, locale, fallback) || t("contract.title"),
+    title,
+    accent: themeAccent(),
+    contractor: contractorName ? { name: contractorName, lines: [city, contractorEmail].filter((l): l is string => !!l) } : undefined,
+    kicker: t("contract.kicker"),
+    subtitle: t("contract.subtitle", { client: p.clientName, version: acceptance.proposalVersion, date: dateText(acceptance.acceptedAt, locale) }),
     contractHtml: html,
-    recordTitle: t("contract.record"),
-    record,
-    signatureLabel: t("accept.signature"),
-    signatureUrl: signatureUrl ?? acceptance.signatureUrl,
+    signature: {
+      title: t("contract.signatureTitle"),
+      rows: [
+        { label: t("contract.acceptedAt"), value: preciseTime(acceptance.acceptedAt, locale) },
+        { label: t("accept.name"), value: acceptance.clientName },
+        { label: t("accept.document"), value: formatDocument(acceptance.clientDocument) },
+        { label: t("form.email"), value: acceptance.clientEmail },
+        ...(acceptance.clientRole ? [{ label: t("accept.role"), value: acceptance.clientRole }] : []),
+        ...(acceptance.clientDeclaration ? [{ label: t("accept.declaration"), value: acceptance.clientDeclaration }] : []),
+      ],
+      url: signatureUrl ?? acceptance.signatureUrl,
+      alt: t("accept.signature"),
+      caption: t("contract.signedBy", { name: acceptance.clientName }),
+    },
+    evidence: {
+      title: t("contract.evidence"),
+      rows: [
+        { label: t("contract.hash"), value: acceptance.contentHash },
+        { label: t("contract.ip"), value: acceptance.ipAddress || t("contract.notInformed") },
+        { label: t("contract.userAgent"), value: acceptance.userAgent || t("contract.notInformed") },
+        { label: t("contract.version"), value: String(acceptance.proposalVersion) },
+        { label: t("contract.reference"), value: p.slug.toUpperCase() },
+        { label: t("contract.utc"), value: new Date(acceptance.acceptedAt).toISOString() },
+      ],
+    },
+    legal: t("contract.legal"),
   });
 }

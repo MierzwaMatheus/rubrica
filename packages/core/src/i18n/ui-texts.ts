@@ -4,6 +4,7 @@
  * suas. As chaves aqui são por idioma base (`pt`, `en`, `es`).
  */
 import type { Locale, Localized } from "./index";
+import { RESCISSION_DEFAULT } from "./rescission-default";
 
 /**
  * Páginas do app (proposta, aceite, checkout, pagamento concluído; `plugins/app-routes.ts`).
@@ -70,6 +71,28 @@ const APP_UI_TEXTS: Record<string, Localized<string>> = {
   "proposal.accept": { pt: "Aceitar a proposta", en: "Accept the proposal", es: "Aceptar la propuesta" },
   "proposal.downloadContract": { pt: "Baixar o contrato (PDF)", en: "Download the contract (PDF)", es: "Descargar el contrato (PDF)" },
   "proposal.confidential": { pt: "Proposta confidencial, destinada apenas a quem a recebeu.", en: "Confidential proposal, intended only for its recipient.", es: "Propuesta confidencial, destinada solo a quien la recibió." },
+  "proposal.copyright": { pt: "© {year} {name}. Todos os direitos reservados.", en: "© {year} {name}. All rights reserved.", es: "© {year} {name}. Todos los derechos reservados." },
+  "proposal.introTitle": { pt: "Apresentação", en: "Introduction", es: "Presentación" },
+  "proposal.intro": {
+    pt: "Olá, tudo bem?\n\nAntes de tudo, agradeço o interesse! Sou {name}.\n\nMeu objetivo é simples: transformar sua visão em uma solução que seja ao mesmo tempo elegante, escalável e inteligente. Abaixo está tudo o que preparei para o seu projeto.",
+    en: "Hi, how are you?\n\nFirst of all, thank you for your interest! I'm {name}.\n\nMy goal is simple: turn your vision into a solution that is elegant, scalable and smart at the same time. Below is everything I've prepared for your project.",
+    es: "Hola, ¿cómo estás?\n\nAntes que nada, ¡gracias por tu interés! Soy {name}.\n\nMi objetivo es simple: transformar tu visión en una solución que sea elegante, escalable e inteligente a la vez. Abajo está todo lo que preparé para tu proyecto.",
+  },
+  "proposal.investmentTotal": { pt: "Investimento total", en: "Total investment", es: "Inversión total" },
+  "proposal.investmentLead": {
+    pt: "Um investimento estratégico para elevar o nível do seu negócio e alcançar novos resultados.",
+    en: "A strategic investment to take your business to the next level and reach new results.",
+    es: "Una inversión estratégica para llevar tu negocio a otro nivel y alcanzar nuevos resultados.",
+  },
+  "proposal.easyPayment": { pt: "Pagamento facilitado", en: "Flexible payment", es: "Pago facilitado" },
+  "proposal.pay.pix": { pt: "PIX: {value} ({percent}% de desconto)", en: "PIX: {value} ({percent}% off)", es: "PIX: {value} ({percent}% de descuento)" },
+  "proposal.pay.split": { pt: "50/50: 50% no início e 50% na entrega", en: "50/50: 50% upfront and 50% on delivery", es: "50/50: 50% al inicio y 50% en la entrega" },
+  "proposal.pay.installments": { pt: "Cartão de crédito em até {count}x sem juros ({value}/mês)", en: "Credit card in up to {count} interest-free installments ({value}/month)", es: "Tarjeta de crédito en hasta {count} cuotas sin interés ({value}/mes)" },
+  "proposal.pay.installmentsInterest": { pt: "Cartão de crédito em até {count}x com juros", en: "Credit card in up to {count} installments with interest", es: "Tarjeta de crédito en hasta {count} cuotas con interés" },
+  "proposal.rescissionDefault": RESCISSION_DEFAULT,
+  "proposal.jurisdictionCity": { pt: "da comarca de {city}", en: "of {city}", es: "de {city}" },
+  "proposal.jurisdictionDefault": { pt: "do domicílio da Contratada", en: "of the Provider's domicile", es: "del domicilio de la Contratada" },
+  "proposal.goToAccept": { pt: "Pronto para começar? O aceite é eletrônico e leva um minuto.", en: "Ready to start? Acceptance is electronic and takes a minute.", es: "¿Listo para empezar? La aceptación es electrónica y lleva un minuto." },
 
   "accept.title": { pt: "Aceite da proposta", en: "Accept the proposal", es: "Aceptación de la propuesta" },
   "accept.intro": {
@@ -81,6 +104,29 @@ const APP_UI_TEXTS: Record<string, Localized<string>> = {
     pt: "Esta proposta, quando aceita eletronicamente, constitui contrato válido entre as partes, nos termos do Código Civil Brasileiro.",
     en: "Once accepted electronically, this proposal is a binding contract between the parties under the Brazilian Civil Code.",
     es: "Esta propuesta, una vez aceptada electrónicamente, constituye un contrato válido entre las partes según el Código Civil brasileño.",
+  },
+  "accept.clauseTitle": { pt: "Cláusula de aceite eletrônico", en: "Electronic acceptance clause", es: "Cláusula de aceptación electrónica" },
+  "accept.readWarning": {
+    pt: "Leia o contrato com atenção antes de assinar. Ele traz o escopo, os valores, os prazos e as regras de rescisão. Em caso de dúvida, fale comigo antes de aceitar.",
+    en: "Read the contract carefully before signing. It sets out the scope, prices, deadlines and cancellation rules. If anything is unclear, get in touch before accepting.",
+    es: "Lee el contrato con atención antes de firmar. Contiene el alcance, los valores, los plazos y las reglas de rescisión. Si tienes dudas, escríbeme antes de aceptar.",
+  },
+  "accept.confirmTitle": { pt: "Ao aceitar, você confirma que:", en: "By accepting, you confirm that:", es: "Al aceptar, confirmas que:" },
+  "accept.confirmRead": { pt: "leu e compreendeu todo o contrato;", en: "you have read and understood the whole contract;", es: "leíste y comprendiste todo el contrato;" },
+  "accept.confirmAgree": { pt: "concorda com todas as cláusulas e condições;", en: "you agree to all its clauses and conditions;", es: "aceptas todas las cláusulas y condiciones;" },
+  "accept.confirmAuthority": { pt: "está autorizado(a) a celebrar este contrato;", en: "you are authorized to enter into this contract;", es: "estás autorizado(a) a celebrar este contrato;" },
+  "accept.confirmValidity": {
+    pt: "sua assinatura eletrônica tem a mesma validade jurídica de uma assinatura física.",
+    en: "your electronic signature has the same legal validity as a handwritten one.",
+    es: "tu firma electrónica tiene la misma validez jurídica que una firma física.",
+  },
+  "accept.signatureTyped": { pt: "Usar meu nome digitado como assinatura", en: "Use my typed name as my signature", es: "Usar mi nombre escrito como firma" },
+  "accept.signHere": { pt: "Assine aqui", en: "Sign here", es: "Firma aquí" },
+  "accept.signatureRequired": { pt: "Desenhe sua assinatura para continuar.", en: "Draw your signature to continue.", es: "Dibuja tu firma para continuar." },
+  "accept.signatureError": {
+    pt: "Não foi possível enviar a assinatura. Confira a conexão e tente de novo.",
+    en: "Couldn't upload your signature. Check your connection and try again.",
+    es: "No se pudo enviar la firma. Revisa la conexión e inténtalo de nuevo.",
   },
   "accept.data": { pt: "Seus dados", en: "Your details", es: "Tus datos" },
   "accept.name": { pt: "Nome completo", en: "Full name", es: "Nombre completo" },
@@ -105,9 +151,9 @@ const APP_UI_TEXTS: Record<string, Localized<string>> = {
   "accept.consentRequired": { pt: "Para aceitar, confirme que leu e concorda com os termos.", en: "To accept, confirm that you have read and agree to the terms.", es: "Para aceptar, confirma que leíste y aceptas los términos." },
   "accept.signature": { pt: "Assinatura", en: "Signature", es: "Firma" },
   "accept.signatureHint": {
-    pt: "Opcional: assine com o mouse ou o dedo. A imagem entra no PDF do contrato.",
-    en: "Optional: sign with your mouse or finger. The image goes into the contract PDF.",
-    es: "Opcional: firma con el mouse o el dedo. La imagen se incluye en el PDF del contrato.",
+    pt: "Assine com o mouse, a caneta ou o dedo, ou use o nome digitado acima. A assinatura entra no PDF do contrato.",
+    en: "Sign with your mouse, pen or finger, or use the name typed above. Your signature goes into the contract PDF.",
+    es: "Firma con el mouse, el lápiz o el dedo, o usa el nombre escrito arriba. La firma se incluye en el PDF del contrato.",
   },
   "accept.signatureArea": { pt: "Área para desenhar a assinatura", en: "Area to draw your signature", es: "Área para dibujar la firma" },
   "accept.signatureClear": { pt: "Limpar assinatura", en: "Clear signature", es: "Borrar firma" },
@@ -127,6 +173,20 @@ const APP_UI_TEXTS: Record<string, Localized<string>> = {
   "contract.version": { pt: "Versão da proposta", en: "Proposal version", es: "Versión de la propuesta" },
   "contract.ip": { pt: "Endereço IP", en: "IP address", es: "Dirección IP" },
   "contract.hash": { pt: "Código do conteúdo aceito (SHA-256)", en: "Code of the accepted content (SHA-256)", es: "Código del contenido aceptado (SHA-256)" },
+  "contract.kicker": { pt: "Contrato de prestação de serviços", en: "Services agreement", es: "Contrato de prestación de servicios" },
+  "contract.subtitle": { pt: "{client} · Versão {version} · {date}", en: "{client} · Version {version} · {date}", es: "{client} · Versión {version} · {date}" },
+  "contract.signatureTitle": { pt: "Assinatura eletrônica", en: "Electronic signature", es: "Firma electrónica" },
+  "contract.signedBy": { pt: "Assinatura eletrônica de {name}", en: "Electronic signature of {name}", es: "Firma electrónica de {name}" },
+  "contract.evidence": { pt: "Evidências técnicas", en: "Technical evidence", es: "Evidencias técnicas" },
+  "contract.userAgent": { pt: "Navegador (User-Agent)", en: "Browser (User-Agent)", es: "Navegador (User-Agent)" },
+  "contract.reference": { pt: "Referência", en: "Reference", es: "Referencia" },
+  "contract.utc": { pt: "Data e hora (UTC)", en: "Date and time (UTC)", es: "Fecha y hora (UTC)" },
+  "contract.notInformed": { pt: "Não informado", en: "Not provided", es: "No informado" },
+  "contract.legal": {
+    pt: "Contrato eletrônico com validade jurídica, celebrado nos termos do Código Civil (art. 107) e da MP 2.200-2/2001. O código SHA-256 garante a integridade do conteúdo aceito: qualquer alteração gera outro código.",
+    en: "Legally binding electronic contract under the Brazilian Civil Code (art. 107) and Provisional Measure 2.200-2/2001. The SHA-256 code guarantees the integrity of the accepted content: any change produces a different code.",
+    es: "Contrato electrónico con validez jurídica, celebrado según el Código Civil brasileño (art. 107) y la MP 2.200-2/2001. El código SHA-256 garantiza la integridad del contenido aceptado: cualquier cambio genera otro código.",
+  },
   "contract.popup": { pt: "Não foi possível abrir o contrato. Permita pop-ups e tente de novo.", en: "Couldn't open the contract. Allow pop-ups and try again.", es: "No se pudo abrir el contrato. Permite las ventanas emergentes e inténtalo de nuevo." },
 
   "checkout.title": { pt: "Pagamento", en: "Payment", es: "Pago" },
@@ -394,7 +454,17 @@ export const EMPRESA_UI_TEXTS: Record<string, Localized<string>> = {
     en: "Thanks for reaching out. We'll reply as soon as we can.",
     es: "Gracias por escribir. Responderemos lo antes posible.",
   },
+  "accept.readWarning": {
+    pt: "Leia o contrato com atenção antes de assinar. Ele traz o escopo, os valores, os prazos e as regras de rescisão. Em caso de dúvida, fale conosco antes de aceitar.",
+    en: "Read the contract carefully before signing. It sets out the scope, prices, deadlines and cancellation rules. If anything is unclear, get in touch with us before accepting.",
+    es: "Lee el contrato con atención antes de firmar. Contiene el alcance, los valores, los plazos y las reglas de rescisión. Si tienes dudas, escríbenos antes de aceptar.",
+  },
   "proposal.expiredHint": { pt: "Fale conosco para receber uma versão atualizada.", en: "Get in touch with us for an updated version.", es: "Escríbenos para recibir una versión actualizada." },
+  "proposal.intro": {
+    pt: "Olá, tudo bem?\n\nAntes de tudo, agradecemos o interesse! Somos a {name}.\n\nNosso objetivo é simples: transformar sua visão em uma solução que seja ao mesmo tempo elegante, escalável e inteligente. Abaixo está tudo o que preparamos para o seu projeto.",
+    en: "Hi, how are you?\n\nFirst of all, thank you for your interest! We're {name}.\n\nOur goal is simple: turn your vision into a solution that is elegant, scalable and smart at the same time. Below is everything we've prepared for your project.",
+    es: "Hola, ¿cómo estás?\n\nAntes que nada, ¡gracias por tu interés! Somos {name}.\n\nNuestro objetivo es simple: transformar tu visión en una solución que sea elegante, escalable e inteligente a la vez. Abajo está todo lo que preparamos para tu proyecto.",
+  },
   "checkout.error.NOT_CONFIGURED": {
     pt: "Os pagamentos ainda não estão configurados neste site. Fale conosco para combinar outra forma de pagamento.",
     en: "Payments aren't set up on this site yet. Get in touch with us to arrange another way to pay.",

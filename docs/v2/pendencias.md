@@ -56,7 +56,6 @@ Os 17 problemas do QA e os do setup foram corrigidos na v2. Ficaram para 2.0.x:
 - **Evento `admin.delete` do Asaas** (`commerce/asaas.ts`) usa o mesmo nome da lixeira e aparece como "mandou para a lixeira" em Atividades, embora apague de verdade no Asaas.
 - **Links soltos para página de plugin desligado** (botão "Ver todos", link no texto) continuam no HTML.
 - **Sites empresa já publicados sem `paths`** passam o detalhe do case de `/portfolio/<slug>` para `/cases/<slug>` sem redirecionamento (não há nenhum ainda; vale para quem testou a v2 antes do lançamento).
-- **Assinatura desenhada no aceite** ficou opcional (acessibilidade); na v1 era obrigatória.
 - **Domínios de incorporação em projetos existentes**: o `frame-src` gerado com os provedores do bloco de incorporação e do vídeo só chega a projetos novos (mesma causa do `vercel.json`/`_headers` acima).
 - **Aviso de cookies para incorporações** (Calendly e outros gravam cookies próprios): não há consentimento antes de carregar o iframe.
 - **Avaliações do Google/Trustpilot** ficaram fora da lista de incorporação: são widgets com script.

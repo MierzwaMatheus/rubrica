@@ -187,6 +187,18 @@ export function contactDigestFunctions(rt: RubricaRuntime) {
 - Comentários e textos de interface do código em **pt-BR**, com acentuação.
 - Nunca faça commit de `.env*`, segredos ou dados reais de clientes. Fixtures são fictícios.
 
+## O que o CI testa
+
+O CI (`.github/workflows/ci.yml`) roda tipos e testes e o build da demo em todo PR e push na `main`. A bateria dos temas (`testar-tema`) roda só nos temas que a mudança afeta, escolhidos por `.github/scripts/ci-temas.mjs`:
+
+| Mudou | Bateria |
+|---|---|
+| Um tema (`packages/themes/<tema>/`) | Esse tema, com Lighthouse |
+| Núcleo, theme-tester, demo, dependências ou o CI | A amostra (padrão, cyberpunk, brutalist e chat), sem Lighthouse |
+| Só documentação, changeset, changelog ou versão | Nenhum tema |
+
+A bateria completa (todos os temas, com Lighthouse) roda toda noite e no disparo manual (*Actions → CI → Run workflow*). Um tema novo entra na noturna sozinho; se ele representar um estilo que a amostra não cobre, acrescente-o em `AMOSTRA`.
+
 ## Publicar uma versão
 
 A publicação é do GitHub Actions (`.github/workflows/release.yml`), sem token e sem confirmação em duas etapas: o npm confia neste repositório (publicação confiável, OIDC).

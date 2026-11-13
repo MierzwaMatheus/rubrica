@@ -6,9 +6,13 @@ on:
     branches: [main]
   push:
     branches: [main]
+  # Bateria completa (todos os temas, com Lighthouse) toda noite, às 3h de Brasília, e sob demanda.
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -47,58 +51,44 @@ jobs:
           SITE=${{ matrix.site }} pnpm --filter @rubrica/demo build
 
   themes:
-    name: Lista de temas
+    name: Temas a testar
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.list.outputs.matrix }}
+      any: ${{ steps.list.outputs.any }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # o diff contra a base precisa do histórico
+      # Só os temas que a mudança afeta (`.github/scripts/ci-temas.mjs`); todos no agendamento noturno e no disparo manual.
       - id: list
-        run: |
-          themes=$(for f in packages/themes/*/package.json; do node -p "require('./$f').name"; done | jq -R . | jq -sc .)
-          echo "matrix=$themes" >> "$GITHUB_OUTPUT"
+        env:
+          BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          HEAD: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          TODOS: ${{ (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && '--todos' || '' }}
+        run: node .github/scripts/ci-temas.mjs "$BASE" "$HEAD" $TODOS
 
   battery:
     name: Bateria (${{ matrix.theme }})
     needs: themes
+    if: needs.themes.outputs.any == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        theme: ${{ fromJSON(needs.themes.outputs.matrix) }}
+        include: ${{ fromJSON(needs.themes.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
         with:
           playwright: "true"
-      - name: axe, SEO, JavaScript por página e hidratação
-        run: pnpm testar-tema ${{ matrix.theme }} --sem-lighthouse --json "$RUNNER_TEMP/bateria.json"
+      # Um job por tema: axe, SEO, JavaScript por página e hidratação; o Lighthouse junto quando o tema mudou (ou à noite).
+      - name: Bateria do tema
+        run: pnpm testar-tema ${{ matrix.theme }} ${{ !matrix.lighthouse && '--sem-lighthouse' || '' }} --json "$RUNNER_TEMP/bateria.json"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: bateria-${{ strategy.job-index }}
           path: ${{ runner.temp }}/bateria.json
-          if-no-files-found: ignore
-
-  lighthouse:
-    name: Lighthouse (${{ matrix.theme }})
-    needs: themes
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    strategy:
-      fail-fast: false
-      matrix:
-        theme: ${{ fromJSON(needs.themes.outputs.matrix) }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup
-        with:
-          playwright: "true"
-      - run: pnpm testar-tema ${{ matrix.theme }} --so-lighthouse --json "$RUNNER_TEMP/lighthouse.json"
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: lighthouse-${{ strategy.job-index }}
-          path: ${{ runner.temp }}/lighthouse.json
           if-no-files-found: ignore

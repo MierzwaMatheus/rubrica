@@ -1114,6 +1114,12 @@ function buildUiTexts(ctx: Ctx, report: MigrationReport, now: number, plugins: R
     out.push({ key: "hero.available", value: fromHome, updatedAt: now });
     report.texts.ui.push({ v1: "homeContent.availability_status", v2: "hero.available" });
   }
+  // Carta de apresentação da proposta (v1: contactInfo.proposalIntro, só em português).
+  const intro = typeof ctx.contact?.proposalIntro === "string" ? ctx.contact.proposalIntro.trim() : "";
+  if (intro) {
+    out.push({ key: "proposal.intro", value: { [PT]: intro }, updatedAt: now });
+    report.texts.ui.push({ v1: "contactInfo.proposalIntro", v2: "proposal.intro" });
+  }
   for (const key of ctx.textKeys()) {
     if (!ctx.customized(key)) continue;
     if (SECTION_KEYS.has(key)) continue;

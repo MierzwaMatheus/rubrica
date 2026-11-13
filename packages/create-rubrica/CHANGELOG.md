@@ -1,5 +1,11 @@
 # create-rubrica
 
+## 2.1.3
+
+### Patch Changes
+
+- 2472b55: `migrar` leva a carta de apresentação da proposta da v1 (`contactInfo.proposalIntro`) para o texto de interface `proposal.intro`.
+
 ## 2.1.2
 
 ### Patch Changes

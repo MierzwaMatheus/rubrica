@@ -1,5 +1,11 @@
 # @rubrica/mcp
 
+## 2.0.3
+
+### Patch Changes
+
+- 81288a2: `proposals_create` e `proposals_update` explicam o que acontece com as formas de pagamento e a política de rescisão vazias (os padrões da página).
+
 ## 2.0.2
 
 ### Patch Changes

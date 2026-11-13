@@ -1,6 +1,6 @@
 {
   "name": "@rubrica/core",
-  "version": "2.1.2",
+  "version": "2.2.0",
   "description": "Núcleo do Rubrica: contrato de blocos e temas, idiomas, integração Astro, backend Convex, painel e MCP.",
   "type": "module",
   "license": "GPL-3.0-only",

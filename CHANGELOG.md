@@ -2,6 +2,21 @@
 
 O que mudou em cada versão do Rubrica (núcleo, temas e CLI `create-rubrica`). Detalhes de cada uma nas [notas da release](https://github.com/MierzwaMatheus/rubrica/releases). Para atualizar um projeto v2, veja [Atualizar o Rubrica](./docs/guia/atualizar.md); para sair da v1, [Migrar da v1](./docs/guia/migrar.md).
 
+## 2.2.0 — 2026-11-13
+
+A proposta, o aceite e o contrato em PDF voltam a ter tudo o que a v1 tinha, com um visual novo nas cores do tema. Nada muda para quem já preenche as próprias formas de pagamento e a própria política de rescisão.
+
+### Novidades
+- **Proposta:** carta de apresentação no topo (texto de interface `proposal.intro`, editável em Textos), texto e selo do investimento, rodapé com o nome do site e um visual novo em cards, com ícones, linha do tempo e o investimento em destaque.
+- **Padrões da v1:** sem formas de pagamento, a proposta e o contrato mostram as formas padrão calculadas sobre o valor final (PIX com 10% de desconto, 50/50, cartão em 3x sem juros e em 12x). Sem política de rescisão, vale a padrão, com o foro na cidade do endereço do site. Os dois são textos de interface (`proposal.pay.*` e `proposal.rescissionDefault`).
+- **Aceite:** o contrato aparece aberto, com o aviso de leitura e as confirmações; a cláusula de aceite ganha título. A assinatura volta a ser obrigatória, com a opção de usar o nome digitado para quem não consegue desenhar.
+- **PDF do contrato:** cabeçalho de quem contrata, faixa do título, quadro da assinatura com linha e legenda, evidências técnicas (hash, IP, navegador, versão, referência e horário UTC), rodapé jurídico e página A4.
+
+### Correções
+- **Toda proposta tem contrato:** sem modelo próprio, ou com o plugin de modelos desligado, vale o modelo padrão.
+- **Rescisão no painel:** deixa de ser obrigatória (vazia usa a padrão) e aceita textos longos (antes, 800 caracteres).
+- **`migrar`:** leva a carta de apresentação da proposta da v1.
+
 ## 2.1.0 — 2026-11-11
 
 Os temas **padrão** e **cyberpunk** ficam iguais ao layout da v1, página por página, e o conversor `migrar` leva o que faltava dos dados da v1. Tudo o que entrou é opcional: quem não usa os campos novos não vê diferença. Contrato de tema 1.3.

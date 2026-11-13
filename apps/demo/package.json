@@ -16,7 +16,7 @@
     "@rubrica/core": "workspace:^",
     "@rubrica/theme-padrao": "workspace:^",
     "astro": "^7.4.11",
-    "convex": "^1.49.0",
+    "convex": "^1.50.0",
     "react": "^19.2.1",
     "react-dom": "^19.2.1"
   },

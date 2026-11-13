@@ -6,6 +6,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import type { Id } from "../../../src/convex/server";
 import { as, seedSettings, setup, type T } from "../_setup";
+import { DEFAULT_CONTRACT_TEMPLATE } from "../../../src/convex/commerce/lib/defaultContract";
 import { ACCEPTANCE, PROPOSAL, api, internal, notifications, post } from "./_commerce";
 
 type Client = Awaited<ReturnType<typeof as>>;
@@ -275,12 +276,12 @@ describe("modelos de contrato", () => {
     expect(await t.mutation(internal.rubrica.contractTemplates.seedDefault, {})).toBeNull();
   });
 
-  it("plugin desligado: lista vazia e a proposta fica sem contrato", async () => {
+  it("plugin desligado: lista vazia e a proposta usa o contrato padrão", async () => {
     await root.mutation(api.rubrica.contractTemplates.create, { name: "A", content: "a" });
     const { slug } = await createProposal();
     await seedSettings(t, { plugins: { "contract-templates": false } });
     expect(await root.query(api.rubrica.contractTemplates.list, {})).toEqual([]);
     await expect(root.mutation(api.rubrica.contractTemplates.create, { name: "B", content: "b" })).rejects.toThrow(/desligado/);
-    expect(await t.query(api.rubrica.proposals.getPublic, { slug })).toMatchObject({ contract: null });
+    expect(await t.query(api.rubrica.proposals.getPublic, { slug })).toMatchObject({ contract: DEFAULT_CONTRACT_TEMPLATE });
   });
 });

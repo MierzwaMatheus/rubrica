@@ -8,7 +8,7 @@ import { validateDiscount } from "../../convex/commerce/lib/proposalDiscount";
 import type { ProposalContent, ProposalDoc } from "../data/api";
 import { prune, type Values } from "../editor/model";
 
-const textItem = (label: string) => field.list({ label, itemLabel: "Item", of: { text: field.text({ label: "Texto", required: true, maxLength: 300 }) } });
+const textItem = (label: string, help?: string) => field.list({ label, help, itemLabel: "Item", of: { text: field.text({ label: "Texto", required: true, maxLength: 300 }) } });
 
 export const PROPOSAL_FIELDS: FieldMap = {
   clientName: field.text({ label: "Cliente", required: true, localized: false, maxLength: 120 }),
@@ -34,9 +34,9 @@ export const PROPOSAL_FIELDS: FieldMap = {
   deliveryDate: field.text({ label: "Entrega", required: true, localized: false, maxLength: 120, help: "Texto livre: 15/03/2027 ou 6 semanas após o aceite." }),
   investmentValue: field.number({ label: "Valor final (R$)", required: true, min: 0 }),
   originalValue: field.number({ label: "Valor original antes do desconto (R$)", min: 0, help: "Preencha para mostrar o desconto na proposta. Precisa ser maior que o valor final." }),
-  paymentMethods: textItem("Formas de pagamento"),
+  paymentMethods: textItem("Formas de pagamento", "Vazio: a proposta mostra as formas padrão (PIX com 10% de desconto, 50/50, cartão em 3x sem juros e em 12x)."),
   conditions: textItem("Condições"),
-  rescissionPolicy: field.text({ label: "Rescisão", required: true, multiline: true, maxLength: 800 }),
+  rescissionPolicy: field.text({ label: "Rescisão", multiline: true, maxLength: 12000, help: "Markdown. Vazio: a proposta mostra a política padrão (texto de interface proposal.rescissionDefault)." }),
 };
 
 /** Chaves que o backend aceita apagar com `unset`. */

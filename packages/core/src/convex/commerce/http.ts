@@ -122,7 +122,7 @@ export function addCommerceRoutes(http: HttpRouter): void {
     const blocked = await limit(ctx, "proposal_accept", `${args.slug}:${ip}`);
     if (blocked) return blocked;
     const result = (await ctx.runMutation(refs.accept, { ...args, ipAddress: ip, userAgent })) as { acceptanceId: string; contentHash: string };
-    return { status: 200, body: { id: result.acceptanceId, contentHash: result.contentHash, ipAddress: ip } };
+    return { status: 200, body: { id: result.acceptanceId, contentHash: result.contentHash, ipAddress: ip, userAgent } };
   });
 
   const start = publicRoute(async (ctx, body, { ip }) => {

@@ -22,6 +22,7 @@ import { anyText, filledLocales } from "../lib/text";
 import { getSettingsDoc, isPluginOn, requirePlugin } from "../plugins";
 import type { RubricaRuntime } from "../runtime";
 import { internalMutation, mutation, query, type Doc, type Id, type MutationCtx, type ReaderCtx } from "../server";
+import { DEFAULT_CONTRACT_TEMPLATE } from "./lib/defaultContract";
 import { validateDiscount } from "./lib/proposalDiscount";
 import { escapeTgHtml, hashPassword, isEmail, randomId, randomToken, sha256Hex, verifyPassword } from "./lib/security";
 import { clip, commerceError, formatBRL, guard, normalizeEmailAddress, notifyAdmin } from "./shared";
@@ -94,10 +95,14 @@ async function sessionFor(ctx: ReaderCtx, proposalId: Id<"proposals">, token: st
   return session;
 }
 
-/** Contrato da proposta: o congelado no aceite, senão o modelo escolhido, senão o padrão. */
-async function contractText(ctx: ReaderCtx, rt: RubricaRuntime, proposal: Doc<"proposals">): Promise<string | null> {
+/**
+ * Contrato da proposta: o congelado no aceite, senão o modelo escolhido, senão o padrão do
+ * painel, senão o modelo da v1. Toda proposta tem contrato (como na v1); o plugin
+ * `contract-templates` só libera os modelos próprios.
+ */
+async function contractText(ctx: ReaderCtx, rt: RubricaRuntime, proposal: Doc<"proposals">): Promise<string> {
   if (proposal.templateSnapshot !== undefined) return proposal.templateSnapshot;
-  if (!(await isPluginOn(ctx, rt, "contract-templates"))) return null;
+  if (!(await isPluginOn(ctx, rt, "contract-templates"))) return DEFAULT_CONTRACT_TEMPLATE;
   const chosen = proposal.templateId ? await ctx.db.get(proposal.templateId) : null;
   const template =
     chosen ??
@@ -105,7 +110,7 @@ async function contractText(ctx: ReaderCtx, rt: RubricaRuntime, proposal: Doc<"p
       .query("contractTemplates")
       .withIndex("by_is_default", (q) => q.eq("isDefault", true))
       .first());
-  return template?.content ?? null;
+  return template?.content ?? DEFAULT_CONTRACT_TEMPLATE;
 }
 
 /** Proposta sem a senha (o painel recebe `hasPassword`). */
@@ -574,7 +579,7 @@ export function proposalsFunctions(rt: RubricaRuntime) {
           isAccepted: true,
           acceptedAt: now,
           updatedAt: now,
-          ...(contract !== null ? { templateSnapshot: contract } : {}),
+          templateSnapshot: contract,
         });
         if (session) await ctx.db.patch(session._id, { isUsed: true });
 

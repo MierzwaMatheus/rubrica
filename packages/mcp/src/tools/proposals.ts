@@ -39,9 +39,9 @@ const DESCRIPTIONS: Record<string, string> = {
   scopePrices: "Preço de cada item do escopo, na mesma ordem (null = sem preço). Precisa ter o mesmo tamanho de scope.",
   originalValue: "Valor antes do desconto, em reais. Precisa ser maior que investmentValue.",
   giftIndexes: "Posições (a partir de 0) dos itens do escopo dados de brinde. Exige originalValue e preço nesses itens; a soma não passa do desconto.",
-  paymentMethods: "Formas de pagamento. Cada item é um texto por idioma.",
+  paymentMethods: "Formas de pagamento. Cada item é um texto por idioma. Lista vazia: a página e o contrato mostram as formas padrão, calculadas sobre o valor final (PIX com 10% de desconto, 50/50, cartão em 3x sem juros com o valor da parcela e em 12x com juros); os textos delas são de interface (proposal.pay.*).",
   conditions: "Condições comerciais. Cada item é um texto por idioma.",
-  rescissionPolicy: "Política de rescisão.",
+  rescissionPolicy: "Política de rescisão, em Markdown. Vazia (`{}`): a página e o contrato usam a política padrão (texto de interface proposal.rescissionDefault), com o foro na cidade do endereço da empresa do site.",
   templateId: "Id de um modelo de contrato (contracts_list). Sem ele vale o modelo padrão.",
 };
 

@@ -6,7 +6,8 @@ import PropostaAceite from "../src/islands/app/proposta-aceite";
 import Checkout from "../src/islands/app/checkout";
 import PagamentoConcluido from "../src/islands/app/pagamento-concluido";
 import { appBackend, FN, HTTP, type AppApi, type HttpResult } from "../src/islands/app/client";
-import { contractVariables, fillContract, type OpenProposal } from "../src/islands/app/contract";
+import { contractVariables, fillContract, proposalTexts, type OpenProposal } from "../src/islands/app/contract";
+import { makeT } from "../src/islands/kit";
 import { markdownToHtml } from "../src/islands/app/markdown";
 import type { AppIslandProps } from "../src/islands/app/ui";
 import { APP_TEXT_PREFIXES } from "../src/islands/app";
@@ -109,6 +110,10 @@ describe("página da proposta", () => {
     expect(calls.watch.at(-1)).toEqual([FN.proposal, { slug: "acme", token: "tok" }]);
     expect(sessionStorage.getItem("rubrica:proposta:acme")).toBe("tok");
     expect(document.body.textContent).toContain("Vender mais pelo site.");
+    expect(screen.getByRole("heading", { name: "Apresentação" })).toBeTruthy();
+    expect(document.body.textContent).toContain("Antes de tudo, agradeço o interesse! Sou Estúdio.");
+    expect(screen.getByRole("heading", { name: "Investimento total" })).toBeTruthy();
+    expect(document.body.textContent).toContain(`© ${new Date().getFullYear()} Estúdio. Todos os direitos reservados.`);
     expect(document.body.textContent).toContain("Versão 2");
     expect(document.body.textContent).toContain("Brinde");
     expect(document.body.textContent).toContain("Desconto de R$");
@@ -186,8 +191,12 @@ describe("aceite da proposta", () => {
   it("valida, envia o aceite pela rota HTTP e mostra o código do registro", async () => {
     setPath("/proposta/acme/aceitar");
     sessionStorage.setItem("rubrica:proposta:acme", "tok");
+    const proto = HTMLCanvasElement.prototype as unknown as Record<string, unknown>;
+    proto.toBlob = (cb: (b: Blob) => void) => cb(new Blob(["png"], { type: "image/png" }));
+    proto.toDataURL = () => "data:image/png;base64,AAAA";
     const { api, calls } = fakeApi({
       queries: { [FN.proposal]: () => open },
+      mutation: async () => "https://upload.test",
       post: () => ({ status: 200, body: { id: "a1", contentHash: "f".repeat(64), ipAddress: "1.2.3.4" } }),
     });
     render(<PropostaAceite {...props("/proposta/:slug/aceitar", api)} />);
@@ -202,6 +211,18 @@ describe("aceite da proposta", () => {
     fireEvent.change(screen.getByLabelText(/CPF ou CNPJ/), { target: { value: "12345678901" } });
     fireEvent.change(screen.getByLabelText(/^E-mail/), { target: { value: "m@acme.test" } });
     fireEvent.click(screen.getByRole("checkbox"));
+    // Sem assinatura, não segue.
+    fireEvent.click(screen.getByRole("button", { name: "Aceitar a proposta" }));
+    expect(await screen.findByText("Desenhe sua assinatura para continuar.")).toBeTruthy();
+    expect(calls.post).toHaveLength(0);
+    // Alternativa pelo teclado: o nome digitado vira a assinatura (e dá para limpar).
+    fireEvent.click(screen.getByRole("button", { name: "Usar meu nome digitado como assinatura" }));
+    expect(screen.queryByText("Desenhe sua assinatura para continuar.")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Limpar assinatura" }));
+    const pad = screen.getByRole("img", { name: "Área para desenhar a assinatura" });
+    fireEvent.pointerDown(pad, { clientX: 10, clientY: 10 });
+    fireEvent.pointerUp(pad);
+    expect(screen.queryByText("Desenhe sua assinatura para continuar.")).toBeNull();
     // O contrato já aparece com os dados de quem aceita.
     expect(contractsInPage()).toContain("Maria Silva, inscrito(a) no CPF sob nº 123.456.789-01");
     await act(async () => {
@@ -209,7 +230,7 @@ describe("aceite da proposta", () => {
     });
     expect(await screen.findByRole("heading", { name: "Proposta aceita." })).toBeTruthy();
     expect(screen.getByText("f".repeat(64))).toBeTruthy();
-    expect(calls.post[0]).toEqual([HTTP.accept, { slug: "acme", token: "tok", clientName: "Maria Silva", clientDocument: "12345678901", clientEmail: "m@acme.test", locale: "pt-BR" }]);
+    expect(calls.post[0]).toEqual([HTTP.accept, { slug: "acme", token: "tok", clientName: "Maria Silva", clientDocument: "12345678901", clientEmail: "m@acme.test", locale: "pt-BR", signatureStorageId: "storage-1" }]);
   });
 
   it("sem a sessão da senha: manda abrir a proposta primeiro", async () => {
@@ -358,7 +379,7 @@ describe("contrato e Markdown", () => {
   });
 
   it("o modelo padrão fica sem variáveis por preencher", () => {
-    const vars = contractVariables(open, { clientName: "Maria", clientDocument: "12345678901", clientEmail: "m@x.test", acceptedAt: Date.UTC(2026, 0, 2, 15) }, "pt-BR", "pt-BR");
+    const vars = contractVariables(open, { clientName: "Maria", clientDocument: "12345678901", clientEmail: "m@x.test", acceptedAt: Date.UTC(2026, 0, 2, 15) }, "pt-BR", "pt-BR", makeT(texts()));
     const filled = fillContract(DEFAULT_CONTRACT_TEMPLATE, vars);
     expect(filled).not.toMatch(/\{\{/);
     expect(filled).toContain("**CONTRATADA:** Estúdio Ltda, inscrito no CNPJ sob nº 12.345.678/0001-90");
@@ -366,6 +387,23 @@ describe("contrato e Markdown", () => {
     expect(filled).toContain("foro da comarca de Curitiba – PR");
     expect(filled).toContain("**Aceite registrado em:** 02/01/2026");
     expect(fillContract("{{desconhecida}}", vars)).toBe("{{desconhecida}}");
+  });
+
+  it("sem formas de pagamento nem rescisão: entram os padrões da v1, com o foro da cidade do site", () => {
+    const t = makeT(texts());
+    const bare = { ...open, paymentMethods: [], rescissionPolicy: {} };
+    const out = proposalTexts(bare, "pt-BR", "pt-BR", t);
+    expect(out.paymentMethods).toHaveLength(4);
+    expect(out.paymentMethods[0]).toMatch(/^PIX: R\$\s?2\.700,00 \(10% de desconto\)$/);
+    expect(out.paymentMethods[2]).toMatch(/3x sem juros \(R\$\s?1\.000,00\/mês\)/);
+    expect(out.rescissionPolicy).toContain("foro da comarca de Curitiba – PR");
+    expect(out.defaults).toEqual({ paymentMethods: true, rescissionPolicy: true });
+    const noCity = proposalTexts({ ...bare, contractor: { ...open.contractor, organization: null } }, "pt-BR", "pt-BR", t);
+    expect(noCity.rescissionPolicy).toContain("foro do domicílio da Contratada");
+    // Com as da proposta, ficam as da proposta.
+    expect(proposalTexts(open, "pt-BR", "pt-BR", t).paymentMethods).toEqual(["PIX"]);
+    // No contrato também.
+    expect(fillContract("{{payment_methods}}", contractVariables(bare, null, "pt-BR", "pt-BR", t))).toContain("- 50/50: 50% no início e 50% na entrega");
   });
 
   it("endereço das rotas HTTP: o PUBLIC_RUBRICA_API ou o .convex.site do Convex", () => {

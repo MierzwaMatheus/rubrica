@@ -6,7 +6,10 @@
  */
 import type { Localized } from "../../i18n";
 import { summarizeDiscount } from "../../convex/commerce/lib/proposalDiscount";
-import { formatDocument, onlyDigits, pickText } from "./format";
+import { formatDocument, money, onlyDigits, pickText } from "./format";
+
+/** Tradução dos textos de interface (`makeT`), para os padrões da proposta. */
+type Translate = (key: string, vars?: Record<string, string | number>) => string;
 
 export interface ProposalStatus {
   slug: string;
@@ -62,6 +65,7 @@ export interface Acceptance {
   proposalVersion: number;
   contentHash: string;
   ipAddress?: string;
+  userAgent?: string;
   signatureUrl?: string | null;
 }
 
@@ -79,27 +83,59 @@ const list = (items: string[]) => items.filter(Boolean).map((i) => `- ${i}`).joi
 /** Preenchimento das variáveis sem valor: um traço para completar à mão. */
 const BLANK = "________";
 
-/** Textos da proposta no idioma (com a reserva de `pickText`). */
-export function proposalTexts(p: OpenProposal, locale: string, fallback: string) {
+/** Desconto do PIX e parcelas das formas de pagamento geradas (as da v1). */
+export const PAYMENT_DEFAULTS = { pixDiscountPercent: 10, installmentsNoInterest: 3, installmentsWithInterest: 12 };
+
+/**
+ * Formas de pagamento de quando a proposta não traz as suas (como a v1): PIX com desconto,
+ * 50/50 e cartão. Os textos são de interface (`proposal.pay.*`), o site pode trocar.
+ */
+export function defaultPaymentMethods(t: Translate, value: number, locale: string): string[] {
+  const { pixDiscountPercent, installmentsNoInterest, installmentsWithInterest } = PAYMENT_DEFAULTS;
+  if (!(value > 0)) return [];
+  return [
+    t("proposal.pay.pix", { value: money(value * (1 - pixDiscountPercent / 100), locale), percent: pixDiscountPercent }),
+    t("proposal.pay.split"),
+    t("proposal.pay.installments", { count: installmentsNoInterest, value: money(value / installmentsNoInterest, locale) }),
+    t("proposal.pay.installmentsInterest", { count: installmentsWithInterest }),
+  ];
+}
+
+/** Cidade do foro (a da empresa do site), ou `""` sem endereço. */
+export function jurisdictionCity(p: OpenProposal): string {
+  const addr = p.contractor.organization?.address;
+  return addr?.locality ? [addr.locality, addr.region].filter(Boolean).join(" – ") : "";
+}
+
+/**
+ * Textos da proposta no idioma (com a reserva de `pickText`). Sem formas de pagamento ou
+ * sem política de rescisão, entram os padrões (como na v1); `defaults` diz quais entraram.
+ */
+export function proposalTexts(p: OpenProposal, locale: string, fallback: string, t: Translate) {
   const text = (v: Localized<string> | undefined) => pickText(v, locale, fallback);
+  const paymentMethods = p.paymentMethods.map(text).filter(Boolean);
+  const rescissionPolicy = text(p.rescissionPolicy).trim();
+  const city = jurisdictionCity(p);
+  const jurisdiction = city ? t("proposal.jurisdictionCity", { city }) : t("proposal.jurisdictionDefault");
   return {
     title: text(p.title),
     objective: text(p.objective),
     scope: p.scope.map(text),
-    timeline: p.timeline.map((t) => ({ step: text(t.step), period: text(t.period) })),
-    paymentMethods: p.paymentMethods.map(text).filter(Boolean),
+    timeline: p.timeline.map((s) => ({ step: text(s.step), period: text(s.period) })),
+    paymentMethods: paymentMethods.length ? paymentMethods : defaultPaymentMethods(t, p.investmentValue, locale),
     conditions: p.conditions.map(text).filter(Boolean),
-    rescissionPolicy: text(p.rescissionPolicy),
+    rescissionPolicy: rescissionPolicy || t("proposal.rescissionDefault", { jurisdiction }),
+    defaults: { paymentMethods: !paymentMethods.length, rescissionPolicy: !rescissionPolicy },
   };
 }
 
-export function contractVariables(p: OpenProposal, client: ClientData | null, locale: string, fallback: string): Record<string, string> {
-  const texts = proposalTexts(p, locale, fallback);
+export function contractVariables(p: OpenProposal, client: ClientData | null, locale: string, fallback: string, t: Translate): Record<string, string> {
+  const texts = proposalTexts(p, locale, fallback, t);
   const discount = summarizeDiscount(p);
   const org = p.contractor.organization;
   const contractorDoc = org?.taxId ? onlyDigits(org.taxId) : "";
   const address = org?.address ? [org.address.street, org.address.locality, org.address.region, org.address.postalCode, org.address.country].filter(Boolean).join(", ") : "";
-  const jurisdiction = org?.address?.locality ? [org.address.locality, org.address.region].filter(Boolean).join(" – ") : "";
+  const jurisdiction = jurisdictionCity(p);
   const doc = client?.clientDocument ? formatDocument(client.clientDocument) : "";
   const docType = onlyDigits(doc).length === 14 ? "CNPJ" : "CPF";
   const scope = texts.scope.map((item, i) => {

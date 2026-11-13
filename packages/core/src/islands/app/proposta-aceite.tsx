@@ -1,7 +1,7 @@
 /**
  * `/proposta/<slug>/aceitar` (port de `ProposalAccept.tsx` + `ContractModal.tsx` da v1):
- * dados de quem aceita → contrato preenchido com eles → assinatura desenhada (opcional) →
- * aceite. O servidor registra IP, navegador, o conteúdo aceito e o hash dele; a página
+ * dados de quem aceita → contrato preenchido com eles (aberto, com o aviso e as confirmações
+ * da v1) → assinatura desenhada (obrigatória, como na v1) → aceite. O servidor registra IP, navegador, o conteúdo aceito e o hash dele; a página
  * mostra o código e baixa o contrato em PDF.
  */
 import { useEffect, useId, useRef, useState, type FormEvent, type PointerEvent as ReactPointerEvent } from "react";
@@ -14,7 +14,7 @@ import { markdownToHtml } from "./markdown";
 import { ContractText, contractHtml, downloadContract, proposalArgs, useProposalToken } from "./proposal-shared";
 import { Gate, Notice, baseState, hrefFor, useAppApi, useParams, type AppIslandProps, type T } from "./ui";
 
-type Errors = Partial<Record<"name" | "document" | "email" | "consent", string>>;
+type Errors = Partial<Record<"name" | "document" | "email" | "consent" | "signature", string>>;
 
 export default function PropostaAceite(props: AppIslandProps) {
   const t = makeT(props.texts);
@@ -60,7 +60,7 @@ function AcceptForm({ props, t, api, proposal: p, slug, token, onDone, onSession
 }) {
   const { locale, defaultLocale: fallback } = props;
   const uid = useId();
-  const texts = proposalTexts(p, locale, fallback);
+  const texts = proposalTexts(p, locale, fallback, t);
   const discount = summarizeDiscount(p);
   const [name, setName] = useState("");
   const [document, setDocument] = useState("");
@@ -72,15 +72,17 @@ function AcceptForm({ props, t, api, proposal: p, slug, token, onDone, onSession
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState<string>();
   const signature = useRef<HTMLCanvasElement | null>(null);
+  const [signed, setSigned] = useState(false);
 
   const client = { clientName: name.trim(), clientDocument: document, clientEmail: email.trim(), clientRole: role.trim() || undefined, clientDeclaration: declaration.trim() || undefined };
-  const contract = contractHtml(p, client.clientName ? client : null, locale, fallback);
+  const contract = contractHtml(t, p, client.clientName ? client : null, locale, fallback);
 
   function validate(): Errors {
     const e: Errors = {};
     if (!name.trim()) e.name = t("form.required");
     if (!isDocument(document)) e.document = t("accept.documentInvalid");
     if (!EMAIL_RE.test(email.trim())) e.email = t("form.invalidEmail");
+    if (!signed || !signature.current) e.signature = t("accept.signatureRequired");
     if (!consent) e.consent = t("accept.consentRequired");
     return e;
   }
@@ -92,21 +94,20 @@ function AcceptForm({ props, t, api, proposal: p, slug, token, onDone, onSession
     if (Object.keys(e).length) return;
     setBusy(true);
     setFailure(undefined);
-    // A assinatura desenhada é opcional; se o envio dela falhar, o aceite segue sem ela.
+    // A assinatura é obrigatória (como na v1): sem o envio dela, o aceite não segue.
     let signatureStorageId: string | undefined;
     let signatureData: string | undefined;
-    const canvas = signature.current;
-    if (canvas) {
-      try {
-        const blob = await canvasBlob(canvas);
-        if (blob) {
-          const uploadUrl = (await api.mutation(FN.signatureUploadUrl, token ? { slug, token } : { slug })) as string;
-          signatureStorageId = await api.upload(uploadUrl, blob);
-          signatureData = canvas.toDataURL("image/png");
-        }
-      } catch {
-        signatureStorageId = undefined;
-      }
+    const canvas = signature.current!;
+    try {
+      const blob = await canvasBlob(canvas);
+      if (!blob) throw new Error("sem imagem");
+      const uploadUrl = (await api.mutation(FN.signatureUploadUrl, token ? { slug, token } : { slug })) as string;
+      signatureStorageId = await api.upload(uploadUrl, blob);
+      signatureData = canvas.toDataURL("image/png");
+    } catch {
+      setBusy(false);
+      setFailure(t("accept.signatureError"));
+      return;
     }
     const res = await api.post(HTTP.accept, {
       slug,
@@ -131,6 +132,7 @@ function AcceptForm({ props, t, api, proposal: p, slug, token, onDone, onSession
           proposalVersion: p.version,
           contentHash: res.body.contentHash,
           ipAddress: typeof res.body.ipAddress === "string" ? res.body.ipAddress : undefined,
+          userAgent: typeof res.body.userAgent === "string" ? res.body.userAgent : navigator.userAgent,
         },
       });
     }
@@ -155,7 +157,7 @@ function AcceptForm({ props, t, api, proposal: p, slug, token, onDone, onSession
   const input = (id: string, error?: string) => ({ id: `${uid}-${id}`, "aria-invalid": !!error, "aria-describedby": error ? `${uid}-${id}-error` : undefined });
 
   return (
-    <article className="rb-flow__doc">
+    <article className="rb-flow__doc rb-proposal">
       <header className="rb-flow__header">
         <p className="rb-flow__eyebrow">{texts.title || p.clientName}</p>
         <h1 className="rb-flow__title">{t("accept.title")}</h1>
@@ -189,7 +191,11 @@ function AcceptForm({ props, t, api, proposal: p, slug, token, onDone, onSession
             </div>
           )}
         </dl>
-        <p className="rb-flow__clause">{t("accept.clause")}</p>
+      </section>
+
+      <section className="rb-proposal__card rb-proposal__clause">
+        <h2 className="rb-proposal__heading">{t("accept.clauseTitle")}</h2>
+        <p>{t("accept.clause")}</p>
       </section>
 
       <form className="rb-form rb-flow__form" onSubmit={submit} noValidate>
@@ -212,24 +218,42 @@ function AcceptForm({ props, t, api, proposal: p, slug, token, onDone, onSession
           <textarea id={`${uid}-declaration`} rows={3} value={declaration} onChange={(e) => setDeclaration(e.target.value)} aria-describedby={`${uid}-declaration-hint`} />
         </Field>
 
-        {texts.rescissionPolicy && (
-          <details className="rb-flow__details">
-            <summary>
-              <h3>{t("proposal.rescission")}</h3>
-            </summary>
-            <ContractText html={markdownToHtml(texts.rescissionPolicy, 4)} />
-          </details>
-        )}
+        <details className="rb-flow__details">
+          <summary>
+            <h3>{t("proposal.rescission")}</h3>
+          </summary>
+          <ContractText html={markdownToHtml(texts.rescissionPolicy, 4)} />
+        </details>
         {contract && (
-          <details className="rb-flow__details">
-            <summary>
-              <h3>{t("proposal.readContract")}</h3>
-            </summary>
-            <ContractText html={contract} />
-          </details>
+          <section className="rb-proposal__contract" aria-labelledby={`${uid}-contract`}>
+            <h3 id={`${uid}-contract`}>{t("contract.title")}</h3>
+            <p className="rb-proposal__warning" role="note">{t("accept.readWarning")}</p>
+            <div className="rb-proposal__contract-scroll" tabIndex={0} aria-labelledby={`${uid}-contract`}>
+              <ContractText html={contract} />
+            </div>
+          </section>
         )}
 
-        <SignaturePad t={t} onChange={(c) => (signature.current = c)} />
+        <div className="rb-proposal__confirm">
+          <p>{t("accept.confirmTitle")}</p>
+          <ul>
+            <li>{t("accept.confirmRead")}</li>
+            <li>{t("accept.confirmAgree")}</li>
+            <li>{t("accept.confirmAuthority")}</li>
+            <li>{t("accept.confirmValidity")}</li>
+          </ul>
+        </div>
+
+        <SignaturePad
+          t={t}
+          typedName={name.trim()}
+          error={errors.signature}
+          onChange={(c) => {
+            signature.current = c;
+            setSigned(!!c);
+            if (c) setErrors((e) => ({ ...e, signature: undefined }));
+          }}
+        />
 
         <div className="rb-field">
           <div className="rb-consent">
@@ -260,8 +284,12 @@ function AcceptForm({ props, t, api, proposal: p, slug, token, onDone, onSession
   );
 }
 
-/** Assinatura desenhada com o mouse, a caneta ou o dedo. Avisa o canvas quando há traço (ou `null` ao limpar). */
-function SignaturePad({ t, onChange }: { t: T; onChange: (canvas: HTMLCanvasElement | null) => void }) {
+/**
+ * Assinatura desenhada com o mouse, a caneta ou o dedo, ou o nome digitado (para quem não
+ * consegue desenhar: alternativa pelo teclado). Avisa o canvas quando há assinatura (ou
+ * `null` ao limpar).
+ */
+function SignaturePad({ t, typedName, error, onChange }: { t: T; typedName: string; error?: string; onChange: (canvas: HTMLCanvasElement | null) => void }) {
   const id = useId();
   const canvas = useRef<HTMLCanvasElement>(null);
   const drawing = useRef(false);
@@ -275,7 +303,7 @@ function SignaturePad({ t, onChange }: { t: T; onChange: (canvas: HTMLCanvasElem
     el.width = el.offsetWidth * ratio;
     el.height = el.offsetHeight * ratio;
     ctx.scale(ratio, ratio);
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 2.2;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
     // O fundo da área é sempre branco (vira papel no PDF): traço escuro fixo.
@@ -287,10 +315,10 @@ function SignaturePad({ t, onChange }: { t: T; onChange: (canvas: HTMLCanvasElem
     return { x: e.clientX - r.left, y: e.clientY - r.top };
   };
   const down = (e: ReactPointerEvent<HTMLCanvasElement>) => {
-    const ctx = e.currentTarget.getContext("2d");
-    if (!ctx) return;
     e.currentTarget.setPointerCapture?.(e.pointerId);
     drawing.current = true;
+    const ctx = e.currentTarget.getContext?.("2d");
+    if (!ctx) return;
     const { x, y } = point(e);
     ctx.beginPath();
     ctx.moveTo(x, y);
@@ -312,35 +340,72 @@ function SignaturePad({ t, onChange }: { t: T; onChange: (canvas: HTMLCanvasElem
   };
   const clear = () => {
     const el = canvas.current;
-    el?.getContext("2d")?.clearRect(0, 0, el.width, el.height);
+    el?.getContext?.("2d")?.clearRect(0, 0, el.width, el.height);
     setEmpty(true);
     onChange(null);
+  };
+  const useTyped = () => {
+    const el = canvas.current;
+    if (!el || !typedName) return;
+    const ctx = el.getContext?.("2d");
+    if (ctx) {
+      ctx.clearRect(0, 0, el.width, el.height);
+      const w = el.offsetWidth || 320;
+      const h = el.offsetHeight || 144;
+      let size = Math.min(48, h * 0.4);
+      ctx.fillStyle = "#111111";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      const font = (px: number) => `italic ${px}px "Brush Script MT", "Segoe Script", "Snell Roundhand", cursive`;
+      ctx.font = font(size);
+      while (size > 14 && ctx.measureText(typedName).width > w * 0.9) ctx.font = font((size -= 2));
+      ctx.fillText(typedName, w / 2, h / 2);
+    }
+    setEmpty(false);
+    onChange(el);
   };
 
   return (
     <div className="rb-field rb-flow__signature">
       <span className="rb-field__label" id={`${id}-label`}>
-        {t("accept.signature")} ({t("form.optional").toLowerCase()})
+        {t("accept.signature")}
+        <span aria-hidden="true"> *</span>
       </span>
       <span className="rb-field__hint" id={`${id}-hint`}>
         {t("accept.signatureHint")}
       </span>
-      <canvas
-        ref={canvas}
-        className="rb-flow__signature-pad"
-        role="img"
-        aria-label={t("accept.signatureArea")}
-        aria-describedby={`${id}-hint`}
-        onPointerDown={down}
-        onPointerMove={move}
-        onPointerUp={up}
-        onPointerLeave={up}
-      />
-      {!empty && (
-        <button type="button" className="rb-button rb-button--ghost" onClick={clear}>
+      <div className="rb-proposal__pad">
+        <canvas
+          ref={canvas}
+          className="rb-flow__signature-pad"
+          role="img"
+          aria-label={t("accept.signatureArea")}
+          aria-describedby={error ? `${id}-hint ${id}-error` : `${id}-hint`}
+          aria-invalid={!!error}
+          onPointerDown={down}
+          onPointerMove={move}
+          onPointerUp={up}
+          onPointerLeave={up}
+        />
+        {empty && (
+          <span className="rb-proposal__pad-placeholder" aria-hidden="true">
+            {t("accept.signHere")}
+          </span>
+        )}
+      </div>
+      {error && (
+        <span className="rb-field__error" id={`${id}-error`} role="alert">
+          {error}
+        </span>
+      )}
+      <div className="rb-actions">
+        <button type="button" className="rb-button rb-button--ghost" onClick={useTyped} disabled={!typedName}>
+          {t("accept.signatureTyped")}
+        </button>
+        <button type="button" className="rb-button rb-button--ghost" onClick={clear} disabled={empty}>
           {t("accept.signatureClear")}
         </button>
-      )}
+      </div>
     </div>
   );
 }

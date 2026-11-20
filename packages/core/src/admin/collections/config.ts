@@ -5,10 +5,11 @@
  * itens de plano, métrica). Puro: testável sem React.
  */
 import { field, type FieldMap } from "../../blocks/fields";
-import type { CollectionName } from "../../content/types";
+import type { CaseBrand, CollectionName } from "../../content/types";
 import { needsSectionsMigration, sectionsToBlocks } from "../../content/legacy";
 import type { Localized } from "../../i18n";
 import type { Values } from "../editor/model";
+import { cleanBrand } from "./brand";
 import { PERIOD_LABELS, textIn } from "../lib/format";
 
 type Doc = Record<string, unknown>;
@@ -235,11 +236,12 @@ function projectToForm(doc: Doc): Values {
 }
 
 function projectFromForm(form: Values): Values {
-  const { gallery, metricValue, metricLabel, ...rest } = form as Values & { gallery?: { image: unknown }[]; metricValue?: string; metricLabel?: Localized<string> };
+  const { gallery, metricValue, metricLabel, brand, ...rest } = form as Values & { gallery?: { image: unknown }[]; metricValue?: string; metricLabel?: Localized<string>; brand?: CaseBrand };
   const hasLabel = !!metricLabel && Object.values(metricLabel).some((s) => s?.trim());
   return dropEmpty({
     ...rest,
     gallery: gallery?.length ? gallery.map((g) => g.image) : undefined,
+    brand: cleanBrand(brand),
     metric: metricValue?.trim() && hasLabel ? { value: metricValue.trim(), label: metricLabel } : undefined,
   });
 }

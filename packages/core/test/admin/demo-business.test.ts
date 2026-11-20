@@ -84,6 +84,37 @@ describe("demonstração: coleções", () => {
   });
 });
 
+describe("demonstração: projeto com corpo em blocos e cara do cliente", () => {
+  const t = (s: string) => ({ "pt-BR": s });
+  const brand = { enabled: true, light: { background: "#ffffff", foreground: "#111111", accent: "#7a1f2b" }, fontDisplay: "Syne" };
+
+  it("grava blocks (com o HTML limpo) e brand, e o snapshot publicado leva os dois", async () => {
+    const s = await store();
+    const projects = api.collection("projects");
+    const blocks = [{ id: "a", type: "texto", visible: true, fields: { body: t('<p onclick="x">Oi</p>') } }];
+    const id = s.mutate(projects.create, { title: t("Case"), blocks, brand, published: true }) as string;
+    const doc = s.query(projects.get, { id }) as Doc;
+    expect((doc.blocks as { fields: Record<string, unknown> }[])[0]!.fields.body).toEqual(t("<p>Oi</p>"));
+    expect(doc.brand).toEqual(brand);
+    s.mutate(projects.update, { id, patch: { blocks: [] }, unset: ["brand"] });
+    const after = s.query(projects.get, { id }) as Doc;
+    expect(after.blocks).toEqual([]);
+    expect(after.brand).toBeUndefined();
+    const snap = s.query(api.site.snapshot, {}) as { collections: { projects: { id: string; blocks?: unknown[] }[] } };
+    expect(snap.collections.projects.find((p) => p.id === id)?.blocks).toEqual([]);
+  });
+
+  it("recusa bloco de página, campo inválido e marca sem contraste", async () => {
+    const s = await store();
+    const projects = api.collection("projects");
+    expect(() => s.mutate(projects.create, { title: t("Case"), blocks: [{ id: "h", type: "hero", visible: true, fields: {} }] })).toThrow(/Página inválida.*não cabe em um case/);
+    expect(() => s.mutate(projects.create, { title: t("Case"), blocks: [{ id: "p", type: "paleta", visible: true, fields: { colors: [{ name: t("A"), hex: "x" }] } }] })).toThrow(/Página inválida/);
+    expect(() => s.mutate(projects.create, { title: t("Case"), brand: { ...brand, light: { ...brand.light, foreground: "#cccccc" } } })).toThrow(/Cara do cliente inválida.*contraste/);
+    const id = s.mutate(projects.create, { title: t("Case") }) as string;
+    expect(() => s.mutate(projects.update, { id, patch: { brand: { ...brand, light: { ...brand.light, accent: "#fefefe" } } } })).toThrow(/destaque/);
+  });
+});
+
 describe("demonstração: depoimentos enviados, contatos e publicação", () => {
   it("aprovar cria o depoimento publicado; recusar apaga o envio", async () => {
     const s = await store();

@@ -6,14 +6,16 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ArrowLeft, Eye, EyeOff, Save, Trash2, Undo2 } from "lucide-react";
 import { validateFields, type FieldError } from "../../blocks/fields";
-import type { SeoFields } from "../../content/types";
+import type { BlockInstance, CaseBrand, RawProject, SeoFields } from "../../content/types";
 import { isValidSlug } from "../../convex/lib/slug";
 import { resolvePaths } from "../../render/collections";
 import { localizedPath, type Localized } from "../../i18n";
 import { api, type CollectionDoc } from "../data/api";
 import { useMutation, useQuery } from "../data/backend";
+import { BlockCatalog, BlockList } from "../editor/BlockList";
 import { EditorLocaleProvider, FieldsForm } from "../editor/fields";
-import { errorMessage, missingLocales, missingTranslations, prune, sameDraft, type Values } from "../editor/model";
+import { duplicateBlock, errorMessage, missingLocales, missingTranslations, newBlock, parseBlockErrors, prune, sameDraft, validateCaseBlocks, type BlockError, type Values } from "../editor/model";
+import { PreviewPane } from "../editor/PreviewPane";
 import { PageHeader } from "../Layout";
 import { Loading } from "../App";
 import { formatDate, textIn } from "../lib/format";
@@ -25,9 +27,13 @@ import { Button } from "../ui/button";
 import { Alert, Badge, Spinner } from "../ui/form";
 import { Switch, Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { itemImage, listHref, type CollectionConfig } from "./config";
+import { BrandPanel } from "./BrandPanel";
+import { brandProblems } from "./brand";
 import { allTags, planCreate, planUpdate, suggestSlug } from "./model";
 import { EditingLocaleBar, Section, SeoPanel, SlugPanel, TagsInput } from "./parts";
 import { PlanCheckout, PlanPrice } from "./PlanExtras";
+
+const NO_BLOCKS: BlockInstance[] = [];
 
 const SHELL_KEYS = ["tags", "featured", "seo", "priceCents", "currency"];
 
@@ -75,6 +81,7 @@ function Editor({ config, doc }: { config: CollectionConfig; doc?: CollectionDoc
   const unpublish = useMutation(col.unpublish);
   const remove = useMutation(col.remove);
   const siblings = useQuery(col.list, {});
+  const snapshot = useQuery(api.site.snapshot, {});
 
   const start = useMemo(() => (doc ? docToForm(config, doc) : initialForm(config, search.get("aba"))), []); // eslint-disable-line react-hooks/exhaustive-deps
   const [base, setBase] = useState<Values>(start);
@@ -83,6 +90,11 @@ function Editor({ config, doc }: { config: CollectionConfig; doc?: CollectionDoc
   const [errors, setErrors] = useState<{ fields: FieldError[]; slug?: string }>({ fields: [] });
   const [busy, setBusy] = useState<"save" | "publish" | "trash" | null>(null);
   const [tab, setTab] = useState("content");
+  // Projeto: corpo do case em blocos e a cara do cliente (o resto do formulário é o de sempre).
+  const isProject = config.name === "projects";
+  const [selected, setSelected] = useState<string | undefined>();
+  const [catalog, setCatalog] = useState(false);
+  const [blockErrors, setBlockErrors] = useState<BlockError[]>([]);
 
   const isNew = !doc;
   const published = doc?.published ?? false;
@@ -102,6 +114,16 @@ function Editor({ config, doc }: { config: CollectionConfig; doc?: CollectionDoc
 
   useEffect(() => (dirty ? block(`Há mudanças não salvas ${config.feminine ? "nesta" : "neste"} ${config.singular}. Sair mesmo assim?`) : undefined), [dirty, block, config.singular]);
 
+  const caseBlocks = (draft.blocks as BlockInstance[] | undefined) ?? NO_BLOCKS;
+  const setBlocks = useCallback(
+    (list: BlockInstance[]) => {
+      // Erros do bloco que a pessoa mexeu saem: a próxima tentativa de salvar confere de novo.
+      const changed = new Set(list.filter((b) => !caseBlocks.includes(b)).map((b) => b.id));
+      if (changed.size) setBlockErrors((e) => e.filter((x) => !x.blockId || !changed.has(x.blockId)));
+      set("blocks", list);
+    },
+    [caseBlocks, set],
+  );
   const fieldVals = useMemo(() => fieldValues(config, draft), [config, draft]);
   const missing = useMemo(() => missingTranslations(config.fields, fieldVals, panel.locales.locales), [config, fieldVals, panel.locales.locales]);
   const missingIn = missingLocales(missing);
@@ -116,6 +138,19 @@ function Editor({ config, doc }: { config: CollectionConfig; doc?: CollectionDoc
       toast.error(`${config.feminine ? "A" : "O"} ${config.singular} tem campos a corrigir.`);
       requestAnimationFrame(() => document.querySelector("[role=alert]")?.scrollIntoView({ block: "center", behavior: "smooth" }));
       return false;
+    }
+    if (isProject) {
+      const blockErrs = validateCaseBlocks(prune(caseBlocks), panel.blocks);
+      const brandIssues = brandProblems(draft.brand as CaseBrand | undefined);
+      if (blockErrs.length || brandIssues.length) {
+        setBlockErrors(blockErrs);
+        setTab("content");
+        const first = blockErrs[0];
+        if (first) setSelected(first.blockId ?? caseBlocks[first.index]?.id);
+        toast.error(blockErrs.length ? "O corpo do case tem campos a corrigir." : `A cara do cliente precisa de ajuste: ${brandIssues[0]!.message}.`);
+        requestAnimationFrame(() => document.querySelector("[role=alert]")?.scrollIntoView({ block: "center", behavior: "smooth" }));
+        return false;
+      }
     }
     setBusy("save");
     try {
@@ -138,11 +173,14 @@ function Editor({ config, doc }: { config: CollectionConfig; doc?: CollectionDoc
       }
       await update({ id: doc!._id, patch: plan.patch, ...(plan.unset.length ? { unset: plan.unset } : {}) });
       setErrors({ fields: [] });
+      setBlockErrors([]);
       setBase(draft);
       toast.success("Salvo.");
       return true;
     } catch (e) {
       const message = errorMessage(e);
+      const parsed = parseBlockErrors(e instanceof Error ? e.message : String(e));
+      if (parsed.length) setBlockErrors(parsed);
       if (/slug|endereço/i.test(message)) {
         setErrors({ fields: [], slug: message });
         setTab("seo");
@@ -152,7 +190,7 @@ function Editor({ config, doc }: { config: CollectionConfig; doc?: CollectionDoc
     } finally {
       setBusy(null);
     }
-  }, [config, draft, base, doc, isNew, create, update, navigate]);
+  }, [config, draft, base, doc, isNew, create, update, navigate, isProject, caseBlocks, panel.blocks]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -204,6 +242,13 @@ function Editor({ config, doc }: { config: CollectionConfig; doc?: CollectionDoc
   const siteName = panel.settings ? textIn(panel.settings.name, panel.locales.default, panel.locales.default) : "";
   const slugValue = typeof draft.slug === "string" ? draft.slug : "";
   const seo = draft.seo as SeoFields | undefined;
+  // O case em edição, como o site o leria (a prévia só desenha; nada vai para o banco).
+  const previewProject = useMemo<RawProject | undefined>(() => {
+    if (!isProject) return undefined;
+    const raw = prune(docToDoc(config, draft)) as Record<string, unknown>;
+    const slug = slugValue || (doc?.slug as string | undefined) || suggestSlug(draft.title as Localized<string>, panel.locales.default) || "previa";
+    return { ...raw, id: doc?._id ?? "novo", slug, title: (raw.title as Localized<string> | undefined) ?? {}, blocks: caseBlocks } as unknown as RawProject;
+  }, [isProject, config, draft, slugValue, doc, caseBlocks, panel.locales.default]);
   const hasSeoTab = !!(config.slug || config.seo);
   const fieldErrors = errors.fields;
 
@@ -258,7 +303,8 @@ function Editor({ config, doc }: { config: CollectionConfig; doc?: CollectionDoc
             </>
           }
         />
-        <div className="min-h-0 flex-1 overflow-y-auto">
+        <div className={cn("min-h-0 flex-1", isProject ? "grid lg:grid-cols-[minmax(420px,600px)_minmax(0,1fr)]" : "overflow-y-auto")}>
+          <div className={cn(isProject && "min-h-0 overflow-y-auto border-r")}>
           <div className="mx-auto max-w-3xl space-y-4 p-6">
             <EditingLocaleBar missingIn={missingIn} />
             <Tabs value={tab} onValueChange={setTab}>
@@ -282,6 +328,31 @@ function Editor({ config, doc }: { config: CollectionConfig; doc?: CollectionDoc
                       setDraft((d) => ({ ...omit(d, Object.keys(config.fields)), ...values }));
                     }} />
                 </Section>
+                {isProject && (
+                  <>
+                    <Section title="Corpo do case" description="Os blocos do case, na ordem em que aparecem na página, com os mesmos componentes das páginas do site.">
+                      <BlockList
+                        context="case"
+                        blocks={caseBlocks}
+                        onChange={setBlocks}
+                        selected={selected}
+                        onSelect={setSelected}
+                        errors={blockErrors}
+                        onAdd={() => setCatalog(true)}
+                        onDuplicate={(i) => {
+                          const copy = duplicateBlock(caseBlocks[i]!, caseBlocks.map((b) => b.id));
+                          const next = [...caseBlocks];
+                          next.splice(i + 1, 0, copy);
+                          setBlocks(next);
+                          setSelected(copy.id);
+                        }}
+                      />
+                    </Section>
+                    <Section title="Cara do cliente" description="Cores e fonte de título do cliente, só dentro deste case.">
+                      <BrandPanel brand={draft.brand as CaseBrand | undefined} onChange={(brand) => set("brand", brand)} title={label} />
+                    </Section>
+                  </>
+                )}
                 {config.name === "plans" && <PlanCheckout doc={doc} form={draft} dirty={dirty} />}
                 {(config.tags || config.featured) && (
                   <Section title="Organização">
@@ -342,8 +413,40 @@ function Editor({ config, doc }: { config: CollectionConfig; doc?: CollectionDoc
               </Alert>
             )}
           </div>
+          </div>
+          {isProject && (
+            <PreviewPane
+              className="hidden min-h-0 min-w-0 lg:flex"
+              snapshot={snapshot}
+              project={previewProject}
+              locale={locale}
+              locales={panel.locales.locales}
+              onLocale={setLocale}
+              selected={selected}
+              onSelect={(id) => {
+                setTab("content");
+                setSelected(id);
+                requestAnimationFrame(() => document.querySelector(`[data-block-id="${id}"]`)?.scrollIntoView({ block: "nearest", behavior: "smooth" }));
+              }}
+            />
+          )}
         </div>
       </div>
+      {catalog && (
+        <BlockCatalog
+          context="case"
+          onClose={() => setCatalog(false)}
+          onPick={(def) => {
+            const block = newBlock(def, caseBlocks.map((b) => b.id));
+            const at = selected ? caseBlocks.findIndex((b) => b.id === selected) + 1 : caseBlocks.length;
+            const next = [...caseBlocks];
+            next.splice(at || caseBlocks.length, 0, block);
+            setBlocks(next);
+            setSelected(block.id);
+            setCatalog(false);
+          }}
+        />
+      )}
     </EditorLocaleProvider>
   );
 }

@@ -1,5 +1,5 @@
 /** Configurações do site, plugins, catálogo de blocos e receitas, contatos e publicação. */
-import type { SiteKind } from "@rubrica/core";
+import type { BlockContext, SiteKind } from "@rubrica/core";
 import { can } from "@rubrica/core/convex/roles";
 import { RubricaError } from "../client";
 import { contentWarnings, diffValues, mergeFields } from "../diff";
@@ -193,15 +193,18 @@ export const siteTools: ToolDef[] = [
     name: "blocks_catalog",
     title: "Catálogo de blocos",
     description:
-      "Os tipos de bloco que o site aceita (os do núcleo e os próprios do projeto, filtrados pelo tipo do site e pelos plugins ligados): o que cada um faz, quando usar e quando não usar, com quais blocos combina, as variações do tema instalado e os campos. Passe `type` para ver o JSON Schema completo de um tipo.",
+      "Os tipos de bloco que o site aceita (os do núcleo e os próprios do projeto, filtrados pelo tipo do site e pelos plugins ligados): o que cada um faz, onde vale (`contexts`: page, case ou os dois), quando usar e quando não usar, com quais blocos combina, as variações do tema instalado e os campos. Passe `context` \"case\" para ver só os blocos do corpo de um case (ou \"page\" para os de página). Passe `type` para ver o JSON Schema completo de um tipo.",
     access: { login: false },
     input: () => ({
       type: "object",
-      properties: { type: prop.string('Tipo do bloco, ex.: "hero". Devolve a orientação, as variações e o JSON Schema dos campos.') },
+      properties: {
+        type: prop.string('Tipo do bloco, ex.: "hero". Devolve a orientação, as variações e o JSON Schema dos campos.'),
+        context: { type: "string", enum: ["page", "case"], description: "Só os blocos que valem neste contexto: page (páginas) ou case (corpo de um case de projeto)." },
+      },
       additionalProperties: false,
     }),
-    async handler(args: { type?: string }, ctx) {
-      const defs = catalogBlocks(ctx.state);
+    async handler(args: { type?: string; context?: BlockContext }, ctx) {
+      const defs = catalogBlocks(ctx.state, args.context);
       if (args.type) {
         const def = findBlock(ctx.state, args.type);
         if (!def) throw new ToolInputError(`Tipo de bloco desconhecido: ${args.type}. Tipos: ${ctx.state.catalog.blocks.map((b) => b.type).join(", ")}`);
@@ -209,6 +212,7 @@ export const siteTools: ToolDef[] = [
       }
       return {
         filteredBySite: !!ctx.state.settings,
+        ...(args.context ? { context: args.context } : {}),
         catalog: ctx.state.catalog.source,
         ...(ctx.state.catalog.source === "nucleo" ? { catalogNote: "Catálogo do núcleo: o backend não informou o dele (versão antiga ou sem login). Blocos próprios do projeto não aparecem; o backend ainda os aceita." } : {}),
         theme: themeSummary(ctx.state),

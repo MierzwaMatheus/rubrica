@@ -1,6 +1,8 @@
 # Plano de execução (`aplicar-plano`)
 
-As skills `rubrica-apresentacao`, `rubrica-case`, `rubrica-curriculo` e `rubrica-blog` não gravam nada. Elas montam o conteúdo, passam pela `rubrica-pilar` e entregam um **plano**: um JSON com cada escrita exata, em pt-BR e en-US. A `rubrica` aplica esse plano do jeito que ele está.
+As skills `rubrica-apresentacao`, `rubrica-curriculo` e `rubrica-blog` não gravam nada. Elas montam o conteúdo, passam pela `rubrica-pilar` e entregam um **plano**: um JSON com cada escrita exata, em pt-BR e en-US. A `rubrica` aplica esse plano do jeito que ele está.
+
+> **Cases não passam por plano.** Desde a 2.3.0 o corpo do case é feito de blocos, e a `rubrica-case` grava pelo MCP do Rubrica (`projects_*`, `block_*` com `project`, `media_upload`), com prévia e o "ok" da pessoa. O que está abaixo vale para as outras skills.
 
 ## Onde fica
 
@@ -22,16 +24,14 @@ Uma pasta por plano: `aaaa-mm-dd-<tipo>-<assunto>`. Os caminhos dentro do plano 
 ```json
 {
   "rubricaPlano": 1,
-  "origem": "rubrica-case",
-  "resumo": "Case do app de agendamento + destaque na home",
+  "origem": "rubrica-blog",
+  "resumo": "Imagem do app e textos do case",
   "convex": "https://<deployment>.convex.cloud",
   "passos": [
     { "id": "print1", "acao": "imagem", "descricao": "Tela principal do app",
       "arquivo": "tela.png", "alt": "Agenda semanal do app com horários livres em verde" },
-    { "acao": "mutation", "descricao": "Case do projeto",
-      "funcao": "projects:update",
-      "ler": { "funcao": "projects:getById", "args": { "id": "<_id>" } },
-      "args": { "id": "<_id>", "caseStudy": { "...": "objeto inteiro" } } }
+    { "acao": "textos", "descricao": "Botão do case",
+      "itens": [{ "key": "case.related", "ptBR": "Outros cases", "enUS": "More cases" }] }
   ]
 }
 ```

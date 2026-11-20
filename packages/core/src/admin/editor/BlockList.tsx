@@ -6,7 +6,7 @@
  */
 import { useRef, useState, type DragEvent, type KeyboardEvent } from "react";
 import { AlertTriangle, ChevronDown, ChevronUp, Copy, Eye, EyeOff, GripVertical, Plus, Trash2 } from "lucide-react";
-import type { BlockDefinition } from "../../blocks/define";
+import type { BlockContext, BlockDefinition } from "../../blocks/define";
 import type { FieldError } from "../../blocks/fields";
 import type { BlockInstance } from "../../content/types";
 import { variantsFor } from "../../theme/contract";
@@ -23,16 +23,18 @@ export function errorsForBlock(errors: readonly BlockError[], block: BlockInstan
   return errors.filter((e) => (e.blockId ? e.blockId === block.id : e.index === index)).map(({ path, message }) => ({ path, message }));
 }
 
-export function BlockCatalog({ onPick, onClose }: { onPick: (def: BlockDefinition) => void; onClose: () => void }) {
+export function BlockCatalog({ onPick, onClose, context }: { onPick: (def: BlockDefinition) => void; onClose: () => void; context?: BlockContext }) {
   const panel = usePanel();
   const [filter, setFilter] = useState("");
-  const blocks = availableBlocks(panel.blocks, panel.kind, panel.enabled).filter((b) => !filter || `${b.label} ${b.description} ${b.type}`.toLowerCase().includes(filter.toLowerCase()));
+  const blocks = availableBlocks(panel.blocks, panel.kind, panel.enabled, context).filter((b) => !filter || `${b.label} ${b.description} ${b.type}`.toLowerCase().includes(filter.toLowerCase()));
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Adicionar bloco</DialogTitle>
-          <DialogDescription>Os blocos que este site pode usar, pelo tipo ({panel.kind}) e pelos plugins ligados.</DialogDescription>
+          <DialogDescription>
+            Os blocos que {context === "case" ? "um case pode" : "este site pode"} usar, pelo tipo ({panel.kind}) e pelos plugins ligados.
+          </DialogDescription>
         </DialogHeader>
         <Input autoFocus placeholder="Buscar bloco" aria-label="Buscar bloco" value={filter} onChange={(e) => setFilter(e.target.value)} />
         <ul className="grid max-h-[60vh] gap-2 overflow-y-auto sm:grid-cols-2">
@@ -56,6 +58,7 @@ export function BlockCatalog({ onPick, onClose }: { onPick: (def: BlockDefinitio
 }
 
 interface CardProps {
+  context?: BlockContext;
   block: BlockInstance;
   index: number;
   count: number;
@@ -70,11 +73,11 @@ interface CardProps {
   setDragging(i: number | null): void;
 }
 
-function BlockCard({ block, index, count, open, errors, onToggle, onChange, onMove, onDuplicate, onRemove, dragging, setDragging }: CardProps) {
+function BlockCard({ context, block, index, count, open, errors, onToggle, onChange, onMove, onDuplicate, onRemove, dragging, setDragging }: CardProps) {
   const panel = usePanel();
   const { locale, locales } = useEditorLocale();
   const def = panel.blocks.find((b) => b.type === block.type);
-  const unavailable = blockUnavailableReason(def, panel.kind, panel.enabled);
+  const unavailable = blockUnavailableReason(def, panel.kind, panel.enabled, context);
   const missing = def ? missingTranslations(def.fields, block.fields, locales) : [];
   const missingIn = missingLocales(missing);
   const variants = variantsFor(panel.theme, block.type);
@@ -223,7 +226,10 @@ export function BlockList({
   errors,
   onAdd,
   onDuplicate,
+  context,
 }: {
+  /** `case`: corpo de um case (textos de "caso" no lugar de "página"). */
+  context?: BlockContext;
   blocks: BlockInstance[];
   onChange(blocks: BlockInstance[]): void;
   selected?: string;
@@ -253,11 +259,12 @@ export function BlockList({
       <p className="sr-only" aria-live="polite">
         {announce}
       </p>
-      {blocks.length === 0 && <p className="rounded-md border border-dashed p-4 text-center text-sm text-muted-foreground">A página ainda não tem blocos.</p>}
-      <ol ref={listRef} className="space-y-2" aria-label="Blocos da página">
+      {blocks.length === 0 && <p className="rounded-md border border-dashed p-4 text-center text-sm text-muted-foreground">{context === "case" ? "O case ainda não tem blocos." : "A página ainda não tem blocos."}</p>}
+      <ol ref={listRef} className="space-y-2" aria-label={context === "case" ? "Blocos do case" : "Blocos da página"}>
         {blocks.map((block, index) => (
           <BlockCard
             key={block.id}
+            context={context}
             block={block}
             index={index}
             count={blocks.length}

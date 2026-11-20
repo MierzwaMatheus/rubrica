@@ -36,6 +36,9 @@ const LONG =
   "Desenvolvimento de produtos digitais com responsabilidade, pesquisa contínua com as pessoas que usam o serviço, decisões registradas e entregas pequenas que chegam ao ar toda semana, sem perder de vista a acessibilidade, a performance e a manutenção do que já foi construído.";
 
 /** Texto com até `max` caracteres, cortado no fim de uma palavra. */
+/** Cores de exemplo (campos `color`): uma por item, alternando. */
+const SAMPLE_COLORS = ["#a4471a", "#f7efe1", "#e9a15a", "#2a1e16", "#f5ead9", "#ffffff"];
+
 function longText(max = 320): string {
   const limit = Math.min(max, 320);
   let text = LONG;
@@ -115,6 +118,8 @@ function sampleValue(key: string, def: FieldDef, c: SampleContext): unknown {
         label: localized(full ? "Quero conversar sobre um projeto novo" : "Ver", c.locales),
         href: "/contato",
       };
+    case "color":
+      return SAMPLE_COLORS[(c.item ?? c.instance) % SAMPLE_COLORS.length];
     case "list": {
       const count = full ? Math.min(def.max ?? 6, 12) : Math.max(def.min ?? 1, 1);
       return Array.from({ length: count }, (_, i) => sampleFields(def.of, { ...c, item: i }));

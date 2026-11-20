@@ -14,7 +14,7 @@
  * - Ids dos documentos de tabelas 1:1 (usuários, posts, projetos…) são mantidos, para as
  *   referências (autor, papel, imagem) continuarem valendo depois do import.
  */
-import { defaultUiText, isWhatsAppNumber, normalizeWhatsAppNumber, validateBlock, type Locale, type Recipe, type RecipeBlock } from "@rubrica/core";
+import { defaultUiText, isWhatsAppNumber, normalizeWhatsAppNumber, sectionToBlock, validateBlock, type Locale, type Recipe, type RecipeBlock } from "@rubrica/core";
 import { blockIds, isLocalizedValue, localizeRecipeValue, navigationFromPages } from "@rubrica/core/seed";
 import { CORE_PLUGINS, V1_PLUGIN_RENAMES } from "@rubrica/core/plugins";
 import { CORE_BLOCKS } from "@rubrica/core/blocks";
@@ -427,7 +427,8 @@ function convertProjects(ctx: Ctx, docs: Doc[]): Doc[] {
 
     const cs = d.caseStudy as Doc | undefined;
     const csEn = (d.caseStudyTranslations as Doc | undefined)?.enUS as Doc | undefined;
-    const sections: Doc[] = [];
+    // O corpo do case da v1 vira blocos `texto` (um por campo e o depoimento), no contrato da 2.3.0.
+    const sections: { title: Loc; body: Loc }[] = [];
     if (cs) {
       for (const s of CASE_SECTIONS) {
         const body = mapLoc(loc(cs[s.field], { enUS: csEn?.[s.field] }), toHtml);
@@ -460,7 +461,7 @@ function convertProjects(ctx: Ctx, docs: Doc[]): Doc[] {
       title: loc(d.title, d.titleTranslations),
       summary: loc(d.description, d.descriptionTranslations),
       content: mapLoc(loc(d.longDescription, d.longDescriptionTranslations), toHtml),
-      sections: sections.length ? sections : undefined,
+      blocks: sections.length ? sections.map((sec, i) => sectionToBlock(sec, i)) : undefined,
       metrics: metrics.length ? metrics : undefined,
       cover,
       gallery: gallery.length ? gallery : undefined,

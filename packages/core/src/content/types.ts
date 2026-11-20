@@ -92,6 +92,28 @@ export interface RawPost extends Base {
   author?: string;
 }
 
+/** Cores de um modo do case com a cara do cliente, em `#rrggbb`. */
+export interface CaseBrandColors {
+  background: string;
+  foreground: string;
+  accent: string;
+}
+
+/**
+ * "Case com a cara do cliente": as cores da marca do cliente (claro e, opcional, escuro)
+ * e a fonte de título valem só dentro do case; cabeçalho e rodapé seguem o tema do site.
+ * O contraste é conferido ao salvar (`validateBrand` em theme/brand.ts).
+ */
+export interface CaseBrand {
+  /** Desligado guarda as cores sem aplicar. Padrão: ligado. */
+  enabled?: boolean;
+  light: CaseBrandColors;
+  /** Sem ele, o modo escuro usa as mesmas cores do claro. */
+  dark?: CaseBrandColors;
+  /** Família do Google Fonts para os títulos do case (baixada no build). */
+  fontDisplay?: string;
+}
+
 export interface CaseSection {
   title: Localized<string>;
   body: Localized<string>;
@@ -104,7 +126,18 @@ export interface RawProject extends Base {
   summary?: Localized<string>;
   /** HTML longo do case, quando não usa seções. */
   content?: Localized<string>;
+  /**
+   * @deprecated Desde a 2.3.0 o corpo do case é `blocks`. Continua sendo lido (vira blocos
+   * `texto` no render, por `sectionsToBlocks`) até a migração `projects-sections-to-blocks`.
+   */
   sections?: CaseSection[];
+  /**
+   * Corpo do case em blocos, o mesmo motor das páginas (contexto `case`: sem hero, os
+   * blocos começam no h2). Quando existe, substitui `content` e `sections` no render.
+   */
+  blocks?: BlockInstance[];
+  /** Cores (e fonte de título) do cliente, aplicadas só dentro do case. */
+  brand?: CaseBrand;
   cover?: RawImage;
   gallery?: RawImage[];
   client?: string;

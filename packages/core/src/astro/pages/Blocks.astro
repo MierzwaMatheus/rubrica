@@ -1,0 +1,36 @@
+---
+/**
+ * O laço único de blocos (páginas e corpo do case): o componente de cada bloco (projeto >
+ * tema > núcleo), em HTML estático; o bloco interativo com ilha registrada leva a ilha no
+ * slot `island`, hidratada quando aparece (`client:visible`).
+ *
+ * `page`: o contato "só na janela" não sai na página (a janela de contato mostra o
+ * formulário dele). No case, o contato nem entra (`contexts: ["page"]`).
+ */
+import Island from "../../islands/Island";
+import { componentFor, hasIsland, islandProps, onlyInDialog } from "../runtime";
+import { islandNameFor } from "../../islands";
+import type { ResolvedBlock } from "../../render/blocks";
+import type { RenderContext } from "../../theme/contract";
+
+interface Props {
+  blocks: ResolvedBlock[];
+  ctx: RenderContext;
+  context: "page" | "case";
+}
+const { blocks, ctx, context } = Astro.props;
+---
+
+{
+  blocks.map((b) => {
+    const Block = componentFor(b.type);
+    if (context === "page" && onlyInDialog(b, ctx)) return null;
+    return b.interactive && hasIsland(b.type) ? (
+      <Block id={b.id} variant={b.variant} fields={b.fields} items={b.items} headingLevel={b.headingLevel} index={b.index} total={b.total} ctx={ctx}>
+        <Island slot="island" client:visible name={islandNameFor(b.type)} props={islandProps(b, ctx)} />
+      </Block>
+    ) : (
+      <Block id={b.id} variant={b.variant} fields={b.fields} items={b.items} headingLevel={b.headingLevel} index={b.index} total={b.total} ctx={ctx} />
+    );
+  })
+}

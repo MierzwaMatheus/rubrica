@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import { fixtureSource } from "../src/data/source";
 import { buildSite, onlyInDialog, type BuiltSite } from "../src/render/site";
 import { CORE_BLOCKS, comparativoPlanos, incorporacao, linhaDoTempo, video } from "../src/blocks/catalog";
+import { antesDepois, imagens, paleta, tipografia, variacoesMarca } from "../src/blocks/catalog/marca";
 import { validateBlock } from "../src/blocks/define";
 import { preparePageBlocks } from "../src/convex/lib/blocks";
 import { CORE_PLUGINS } from "../src/plugins/registry";
@@ -13,6 +14,11 @@ import { defineTheme, resolveVariant, type BlockProps } from "../src/theme/contr
 import { DEFAULT_BLOCKS, DefaultShell, VideoFrame } from "../src/components";
 import { parseVideoUrl } from "../src/blocks/media";
 import VideoIsland from "../src/islands/video";
+import ComparadorIsland from "../src/islands/comparador";
+import ImagensIsland from "../src/islands/imagens";
+import { contrastGrade, fontStack, fontVar, hexToRgb, typeWeights } from "../src/components/blocks/marca";
+import { videoChapters } from "../src/components/blocks/media";
+import { islandNameFor } from "../src/islands";
 import { CORE_ISLANDS, ISLAND_META } from "../src/islands";
 import { uiKeysWithPrefix } from "../src/i18n/ui-texts";
 
@@ -232,5 +238,199 @@ describe("comparativo de planos", () => {
   it("sem planos ou sem recursos, nada", async () => {
     const ctx = (await load("empresa")).context("pt-BR", "/");
     expect(render("comparativo-planos", { ctx, fields: { rows: [{ label: "x" }] } as never })).toBe("");
+  });
+});
+
+// ── Blocos de marca (contrato 1.4) ──────────────────────────────────────────
+
+const ctxPt = async () => (await load("pessoal")).context("pt-BR", "/");
+const image = (src: string, alt = "") => ({ src, alt, width: 800, height: 600 });
+
+describe("antes e depois", () => {
+  const fields = { before: image("/a.svg", "Logo antigo"), after: image("/b.svg", "Marca nova") };
+
+  it("sem JavaScript: duas figuras com os rótulos padrão, na ordem antes → depois, e a legenda", async () => {
+    const ctx = await ctxPt();
+    const html = render("antes-depois", { ctx, fields: { ...fields, caption: "De 2009 a 2026", presentation: "lado-a-lado" } });
+    expect(html).toContain("rb-before-after__figure--before");
+    expect(html.indexOf("Antes")).toBeLessThan(html.indexOf("Depois"));
+    expect(html.indexOf('alt="Logo antigo"')).toBeLessThan(html.indexOf('alt="Marca nova"'));
+    expect(html).toContain('<figcaption class="rb-before-after__caption">De 2009 a 2026</figcaption>');
+    expect(render("antes-depois", { ctx, fields: { ...fields, beforeLabel: "2009", afterLabel: "2026" } })).toContain(">2026</figcaption>");
+  });
+
+  it("sem uma das imagens, nada; a validação exige as duas", async () => {
+    expect(render("antes-depois", { ctx: await ctxPt(), fields: { before: fields.before } })).toBe("");
+    expect(validateBlock(antesDepois, { fields: {} }).map((e) => e.path).sort()).toEqual(["after", "before"]);
+  });
+
+  it("o comparador é ilha só nessa apresentação; antes de hidratar, a ilha mostra o mesmo par", async () => {
+    expect(antesDepois.islandWhen!({ presentation: "comparador" }, new Set())).toBe(true);
+    expect(antesDepois.islandWhen!({ presentation: "lado-a-lado" }, new Set())).toBe(false);
+    expect(islandNameFor("antes-depois")).toBe("comparador");
+    expect(CORE_ISLANDS.comparador).toBeDefined();
+    expect(uiKeysWithPrefix(ISLAND_META.comparador!.textPrefixes)).toEqual(expect.arrayContaining(["beforeAfter.before", "beforeAfter.after", "beforeAfter.slider"]));
+    const island = createElement("i", { "data-island": "1" });
+    expect(render("antes-depois", { ctx: await ctxPt(), fields, island })).toContain('data-island="1"');
+    const html = renderToStaticMarkup(createElement(ComparadorIsland, { fields, texts: { "beforeAfter.before": "Antes", "beforeAfter.after": "Depois" } }));
+    expect(html).toContain("rb-before-after__pair");
+    expect(html).not.toContain('type="range"');
+  });
+});
+
+describe("paleta", () => {
+  it("amostras com nome, HEX, RGB, papel e uso; texto sobre a amostra com o maior contraste", async () => {
+    const ctx = await ctxPt();
+    const colors = [
+      { name: "Crosta", hex: "#A4471A", role: "Principal", usage: "Títulos" },
+      { name: "Farinha", hex: "#f7efe1" },
+    ];
+    const html = render("paleta", { ctx, fields: { title: "Cores", colors, showContrast: true } });
+    expect((html.match(/<h3/g) ?? []).length).toBe(2);
+    expect(html).toContain("--swatch:#a4471a;color:#ffffff");
+    expect(html).toContain("--swatch:#f7efe1;color:#000000");
+    expect(html).toContain("#A4471A");
+    expect(html).toContain("164 71 26");
+    expect(html).toContain("Principal");
+    expect(html).toContain("Títulos");
+    expect(html).toContain("Contraste com branco");
+    expect(html).toContain("6,0:1");
+    expect(html).toContain('data-grade="aaa"');
+    expect(html).toContain('data-grade="fail"');
+  });
+
+  it("sem showContrast, sem a lista de contraste; cor inválida some; lista vazia, nada", async () => {
+    const ctx = await ctxPt();
+    const html = render("paleta", { ctx, fields: { colors: [{ name: "A", hex: "#000000" }, { name: "B", hex: "red" }], showContrast: false } });
+    expect(html).not.toContain("rb-palette__contrast");
+    expect((html.match(/rb-palette__swatch/g) ?? []).length).toBe(1);
+    expect(render("paleta", { ctx, fields: { colors: [] } })).toBe("");
+    expect(validateBlock(paleta, { fields: {} })[0]!.path).toBe("colors");
+  });
+
+  it("níveis WCAG e RGB", () => {
+    expect([7, 4.5, 3, 2.9].map(contrastGrade)).toEqual(["aaa", "aa", "large", "fail"]);
+    expect(hexToRgb("#ffffff")).toBe("255 255 255");
+  });
+});
+
+describe("tipografia", () => {
+  it("cada família na própria fonte, com papel, pesos e a amostra (ou o alfabeto)", async () => {
+    const ctx = await ctxPt();
+    const fonts = [{ family: "Space Grotesk", role: "Títulos", weights: "700, 400, 950", sample: "Peça sob medida" }, { family: "Fraunces" }];
+    const html = render("tipografia", { ctx, fields: { fonts } });
+    expect(html).toContain('--type-font:var(--rbf-f-space-grotesk, &quot;Space Grotesk&quot;, var(--rb-font-sans))');
+    expect(html).toContain("Peça sob medida");
+    expect(html).toContain("Aa Bb Cc");
+    expect(html).toContain("font-weight:400");
+    expect(html).toContain("font-weight:700");
+    expect(html).not.toContain("950");
+    expect(html.indexOf(">400<")).toBeLessThan(html.indexOf(">700<"));
+  });
+
+  it("com a amostra em imagem, mostra a imagem no lugar do texto", async () => {
+    const html = render("tipografia", { ctx: await ctxPt(), fields: { fonts: [{ family: "Fonte Própria", specimen: image("/f.png", "Amostra") }] } });
+    expect(html).toContain('alt="Amostra"');
+    expect(html).not.toContain("rb-type__sample");
+    expect(validateBlock(tipografia, { fields: {} })[0]!.path).toBe("fonts");
+  });
+
+  it("regras da variável e dos pesos", () => {
+    expect(fontVar("Big Shoulders Display")).toBe("--rbf-f-big-shoulders-display");
+    expect(fontVar("Fonte Ação")).toBe("--rbf-f-fonte-acao");
+    expect(fontStack('Bad"Name')).toBe('var(--rbf-f-bad-name, "BadName", var(--rb-font-sans))');
+    // A leitura é a do build (theme/fonts parseWeights); vazio ou sem peso válido: 400 e 700.
+    expect(typeWeights(undefined)).toEqual([400, 700]);
+    expect(typeWeights("negrito")).toEqual([400, 700]);
+    expect(typeWeights("800, 300, 300, 450")).toEqual([300, 800]);
+  });
+});
+
+describe("variações de marca", () => {
+  it("grade com colunas, a cor do item como fundo da prancha e o rótulo fora dela", async () => {
+    const ctx = await ctxPt();
+    const items = [
+      { image: image("/l.svg", "Logo"), label: "Principal", background: "#A4471A", note: "Uso preferencial" },
+      { image: image("/m.svg", "Logo mono") },
+    ];
+    const html = render("variacoes-marca", { ctx, fields: { items, columns: "4" } });
+    expect(html).toContain('data-columns="4"');
+    expect(html).toContain("--tile-bg:#a4471a");
+    expect((html.match(/--tile-bg/g) ?? []).length).toBe(1);
+    // rótulo e observação depois (fora) da prancha
+    expect(html).toMatch(/rb-brand-grid__tile[^]*<\/div><figcaption class="rb-brand-grid__caption"><span class="rb-brand-grid__label">Principal/);
+    expect(render("variacoes-marca", { ctx, fields: { items, columns: "9" } })).toContain('data-columns="3"');
+    expect(validateBlock(variacoesMarca, { fields: {} })[0]!.path).toBe("items");
+  });
+});
+
+describe("imagens", () => {
+  const items = [{ image: image("/anima.gif", "Animação"), caption: "Abertura" }, { image: image("/b.png", "Tela") }];
+
+  it("grade e mosaico sem ilha; o GIF vai como está, com legenda", async () => {
+    const ctx = await ctxPt();
+    for (const layout of ["grade", "mosaico"]) {
+      const html = render("imagens", { ctx, fields: { items, layout }, island: createElement("i", { "data-island": "1" }) });
+      expect(html).toContain(`data-layout="${layout}"`);
+      expect(html).toContain('src="/anima.gif"');
+      expect(html).toContain('<figcaption class="rb-images__caption">Abertura</figcaption>');
+      expect(html).not.toContain('data-island="1"');
+    }
+    expect(imagens.islandWhen!({ layout: "grade" }, new Set())).toBe(false);
+    expect(validateBlock(imagens, { fields: {} })[0]!.path).toBe("items");
+  });
+
+  it("carrossel: sem JavaScript, faixa rolável com foco; com a ilha, o carrossel com legendas e a imagem inteira", async () => {
+    const ctx = await ctxPt();
+    const html = render("imagens", { ctx, fields: { title: "Aplicações", items, layout: "carrossel" } });
+    expect(html).toContain('tabindex="0"');
+    expect(html).toContain('aria-label="Aplicações"');
+    expect(imagens.islandWhen!({ layout: "carrossel" }, new Set())).toBe(true);
+    expect(render("imagens", { ctx, fields: { items, layout: "carrossel" }, island: createElement("i", { "data-island": "1" }) })).toContain('data-island="1"');
+    expect(uiKeysWithPrefix(ISLAND_META.imagens!.textPrefixes)).toEqual(expect.arrayContaining(["gallery.expand", "gallery.prev", "gallery.next"]));
+    const island = renderToStaticMarkup(createElement(ImagensIsland, { fields: { title: "Aplicações", items }, texts: {} }));
+    expect(island).toContain('data-fit="contain"');
+    expect(island).toContain('aria-label="Aplicações"');
+    expect(island).toContain('<p class="rb-carousel__caption">Abertura</p>');
+    expect(island).toContain('src="/anima.gif"');
+  });
+});
+
+describe("capítulos do vídeo", () => {
+  const chapters = [
+    { start: "2:15", label: "Resultados" },
+    { start: "0:00", label: "Abertura" },
+    { start: "1:02:30", label: "Perguntas" },
+    { start: "x", label: "Inválido" },
+  ];
+
+  it("só os válidos, na ordem do tempo", () => {
+    expect(videoChapters(chapters).map((c) => [c.start, c.seconds])).toEqual([["0:00", 0], ["2:15", 135], ["1:02:30", 3750]]);
+    expect(videoChapters(undefined)).toEqual([]);
+  });
+
+  it("sem JavaScript: lista com tempo e nome, link para o provedor no tempo (YouTube t=, Vimeo #t=)", async () => {
+    const ctx = await ctxPt();
+    const html = render("video", { ctx, fields: { url: yt, chapters } });
+    expect(html).toContain('<nav class="rb-video__chapters" aria-label="Capítulos: YouTube">');
+    expect(html).toContain('href="https://www.youtube.com/watch?v=M7lc1UVf-VE&amp;t=135s"');
+    expect(html).toContain('href="https://www.youtube.com/watch?v=M7lc1UVf-VE"');
+    expect(html).toContain('aria-label="Ir para 2:15: Resultados (abre em nova aba)"');
+    expect(html).not.toContain("Inválido");
+    expect(html).toContain("data-chapters");
+    const vimeo = render("video", { ctx, fields: { url: "https://vimeo.com/76979871", chapters } });
+    expect(vimeo).toContain('href="https://vimeo.com/76979871#t=135s"');
+    expect(render("video", { ctx, fields: { url: yt } })).not.toContain("rb-video__chapters");
+  });
+
+  it("a ilha mostra os capítulos (links antes de hidratar) e o player começa no tempo do capítulo", () => {
+    const html = renderToStaticMarkup(createElement(VideoIsland, { fields: { url: yt, chapters }, texts: { "video.chapters": "Capítulos", "video.chapterAt": "Ir para {time}: {label}" } }));
+    expect(html).toContain("rb-video__chapterLink");
+    expect(html).toContain("t=135s");
+    const t = (k: string) => k;
+    const player = renderToStaticMarkup(createElement(VideoFrame, { video: { ...parseVideoUrl(yt)!, start: 135 }, name: "x", ratio: "16-9", mode: "player", t }));
+    expect(player).toContain("start=135");
+    const vimeo = renderToStaticMarkup(createElement(VideoFrame, { video: { ...parseVideoUrl("https://vimeo.com/76979871")!, start: 135 }, name: "x", ratio: "16-9", mode: "player", t }));
+    expect(vimeo).toContain("#t=135s");
   });
 });

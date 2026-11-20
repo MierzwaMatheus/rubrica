@@ -3,6 +3,7 @@
  * permissão) saem `<coleção>_list|get|create|update|publish`; remover e reordenar são
  * genéricas (`collection_remove`, `collection_reorder`).
  */
+import { validateBrand, type CaseBrand } from "@rubrica/core";
 import { can } from "@rubrica/core/convex/roles";
 import { RubricaError } from "../client";
 import { contentWarnings, diffValues, mergeFields } from "../diff";
@@ -62,6 +63,15 @@ function requireText(spec: CollectionSpec, data: Record<string, unknown>, only?:
     if (v && typeof v === "object" && filledLocales(v as Record<string, string>).length === 0) problems.push({ path: key, message: "preencha em pelo menos um idioma" });
   }
   return problems;
+}
+
+/** Marca do case: formato dos hex e contraste (texto/fundo ≥ 4,5; destaque/fundo ≥ 3), como o backend confere. */
+function brandProblems(brand: unknown): FieldProblem[] {
+  if (!brand || typeof brand !== "object") return [];
+  return validateBrand(brand as CaseBrand).map((i) => ({
+    path: i.path === "fontDisplay" || i.path === "light" || i.path === "dark" ? `brand.${i.path}` : `brand.${i.mode}.${i.path}`,
+    message: i.message,
+  }));
 }
 
 function fail(message: string, problems: FieldProblem[]): never {
@@ -128,7 +138,7 @@ export function collectionTools(spec: CollectionSpec): ToolDef[] {
       async handler(args: Record<string, unknown>, ctx) {
         const { published, ...fields } = args as { published?: boolean } & Record<string, unknown>;
         const locales = siteLocales(ctx.state);
-        const problems = [...validateAgainst(collectionFieldsSchema(spec, { locales }), fields), ...requireText(spec, fields)];
+        const problems = [...validateAgainst(collectionFieldsSchema(spec, { locales }), fields), ...requireText(spec, fields), ...(spec.name === "projects" ? brandProblems(fields.brand) : [])];
         if (problems.length) fail(`${Name} inválido`, problems);
         return commit(ctx, {
           summary: `Criar ${spec.singular} "${itemLabel(spec, fields, ctx.state.settings?.locales.default)}" (${published ? "publicado" : "rascunho"}).`,
@@ -169,6 +179,7 @@ export function collectionTools(spec: CollectionSpec): ToolDef[] {
         const current = await load(ctx, spec, { id: args.id });
         const merged = mergeFields(current, patch, locales, args.replaceLocales);
         problems.push(...requireText(spec, merged, new Set(Object.keys(patch))));
+        if (spec.name === "projects" && "brand" in patch) problems.push(...brandProblems(merged.brand));
         if (problems.length) fail(`${Name}: alteração inválida`, problems);
 
         const sent: Record<string, unknown> = {};

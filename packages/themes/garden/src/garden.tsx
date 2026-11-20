@@ -21,8 +21,8 @@ export type Stage = "seed" | "sprout" | "tree";
 export const RECENT_DAYS = 30;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-export function projectStage(project: { content?: string; sections: unknown[] }): Stage {
-  return project.content || project.sections.length > 0 ? "tree" : "sprout";
+export function projectStage(project: { hasCase: boolean }): Stage {
+  return project.hasCase ? "tree" : "sprout";
 }
 
 export function postStage(post: { publishedAt: string }, now: number = Date.now()): Stage {

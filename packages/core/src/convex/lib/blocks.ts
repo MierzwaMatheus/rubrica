@@ -3,7 +3,7 @@
  * (núcleo + blocos do projeto) com `validateBlock`, e o tipo precisa existir, valer
  * para o tipo do site e ter o plugin ligado.
  */
-import { validateBlock, type BlockDefinition } from "../../blocks/define";
+import { blockAllowedIn, validateBlock, type BlockContext, type BlockDefinition } from "../../blocks/define";
 import type { BlockInstance, SiteKind } from "../../content/types";
 import { sanitizeFields } from "./sanitize";
 
@@ -22,13 +22,32 @@ export interface PageBlockError {
 
 const BLOCK_ID = /^[A-Za-z0-9_-]{1,64}$/;
 
+/** Teto de blocos por página ou case, e do tamanho da lista (o documento do Convex tem 1 MB). */
+export const MAX_BLOCKS = 80;
+export const MAX_BLOCKS_BYTES = 800_000;
+
+/** Posição de inserção válida: inteiro de 0 ao tamanho da lista (sem ela, no fim). */
+export function insertionIndex(index: number | undefined, length: number): number {
+  if (index === undefined) return length;
+  if (!Number.isInteger(index) || index < 0 || index > length) throw new Error(`Posição inválida: ${index} (use de 0 a ${length})`);
+  return index;
+}
+
 export function findBlock(catalog: BlockCatalog, type: string): BlockDefinition | undefined {
   return catalog.blocks.find((b) => b.type === type);
 }
 
-/** Erros da lista de blocos. Lista vazia = válida. */
-export function validatePageBlocks(blocks: BlockInstance[], catalog: BlockCatalog): PageBlockError[] {
+/**
+ * Erros da lista de blocos. Lista vazia = válida. `context`: onde a lista vive
+ * (`"page"`, o padrão, ou o corpo de um `"case"`, que recusa hero, contato e cases).
+ */
+export function validatePageBlocks(blocks: BlockInstance[], catalog: BlockCatalog, context: BlockContext = "page"): PageBlockError[] {
   const errors: PageBlockError[] = [];
+  if (blocks.length > MAX_BLOCKS) errors.push({ index: MAX_BLOCKS, path: "", message: `no máximo ${MAX_BLOCKS} blocos (há ${blocks.length})` });
+  const bytes = JSON.stringify(blocks).length;
+  if (bytes > MAX_BLOCKS_BYTES) {
+    errors.push({ index: 0, path: "", message: `conteúdo grande demais (${Math.round(bytes / 1000)} KB; até ${MAX_BLOCKS_BYTES / 1000} KB): divida em menos blocos ou textos menores` });
+  }
   const seen = new Set<string>();
   blocks.forEach((block, index) => {
     const at = (path: string, message: string) => errors.push({ index, blockId: block.id, path, message });
@@ -40,6 +59,9 @@ export function validatePageBlocks(blocks: BlockInstance[], catalog: BlockCatalo
     if (!def) return at("type", `tipo de bloco desconhecido: "${block.type}"`);
     if (def.category !== "comum" && def.category !== catalog.kind) {
       return at("type", `o bloco ${def.type} é só de sites do tipo ${def.category}`);
+    }
+    if (!blockAllowedIn(def, context)) {
+      return at("type", `o bloco ${def.type} não vale ${context === "case" ? "dentro de um case" : "numa página"}`);
     }
     if (def.plugin && !catalog.enabledPlugins.has(def.plugin)) {
       return at("type", `o bloco ${def.type} precisa do plugin "${def.plugin}" ligado`);
@@ -56,9 +78,9 @@ export function formatBlockErrors(errors: PageBlockError[]): string {
 }
 
 /** Valida e devolve os blocos com o HTML dos campos `richText` sanitizado. Lança se houver erro. */
-export function preparePageBlocks(blocks: BlockInstance[], catalog: BlockCatalog): BlockInstance[] {
-  const errors = validatePageBlocks(blocks, catalog);
-  if (errors.length) throw new Error(`Página inválida: ${formatBlockErrors(errors)}`);
+export function preparePageBlocks(blocks: BlockInstance[], catalog: BlockCatalog, context: BlockContext = "page"): BlockInstance[] {
+  const errors = validatePageBlocks(blocks, catalog, context);
+  if (errors.length) throw new Error(`${context === "case" ? "Case inválido" : "Página inválida"}: ${formatBlockErrors(errors)}`);
   return blocks.map((block) => {
     const def = findBlock(catalog, block.type)!;
     return { ...block, fields: sanitizeFields(def.fields, block.fields) };

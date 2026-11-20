@@ -7,11 +7,13 @@
 import type { GetStaticPaths } from "astro";
 import Document from "./Document.astro";
 import ContactDialog from "./ContactDialog.astro";
+import Blocks from "./Blocks.astro";
 import Island from "../../islands/Island";
-import { loadSite, activeTheme, componentFor, hasIsland, islandProps, onlyInDialog, caseCarouselProps } from "../runtime";
-import { islandNameFor } from "../../islands";
+import { loadSite, activeTheme, activeFontPlan, caseCarouselProps } from "../runtime";
 import { templates, LocaleLinks, ColorToggleButton } from "../../components";
 import type { SiteRoute } from "../../render/site";
+import { brandCss } from "../../theme/brand";
+import { routeFontVars } from "../../theme/fonts";
 
 export const getStaticPaths = (async () => {
   const site = await loadSite();
@@ -27,9 +29,15 @@ const ctx = site.context(route.locale, route.url, route.alternates);
 const { Shell, Post, Case } = templates(activeTheme);
 const pageType = route.type;
 const carousel = route.type === "case" ? caseCarouselProps(route.project, ctx) : undefined;
+// Case com a cara do cliente: o CSS das cores (escopo `[data-rb-brand]`) vai no <head>.
+const brand = route.type === "case" ? route.brand : undefined;
+// Fontes de conteúdo que a rota usa (blocos tipografia, fonte do cliente): só elas no <head>.
+const bodyBlocks = route.type === "page" ? route.page.blocks : route.type === "case" ? route.blocks : [];
+const fontVars = routeFontVars(activeFontPlan, bodyBlocks, brand?.fontDisplay);
+const caseBody = route.type === "case" && route.blocks.length > 0;
 ---
 
-<Document route={route} ctx={ctx} settings={site.settings}>
+<Document route={route} ctx={ctx} settings={site.settings} fontVars={fontVars} css={brand && brandCss(brand)}>
   <Shell ctx={ctx} pageType={pageType} collections={site.collections(route.locale)}>
     <LocaleLinks slot="localeSwitcher" ctx={ctx} />
     {ctx.site.colorToggle && <ColorToggleButton slot="colorToggle" label={ctx.t("theme.toggle")} />}
@@ -37,30 +45,25 @@ const carousel = route.type === "case" ? caseCarouselProps(route.project, ctx) :
       route.type === "page" && (
         <>
           {route.page.needsHiddenH1 && <h1 class="rb-sr-only">{route.page.title}</h1>}
-          {route.page.blocks.map((b) => {
-            const Block = componentFor(b.type);
-            // Contato "só na janela": a janela de contato do tema (ContactDialog) mostra o formulário dele; na página não sai nada.
-            if (onlyInDialog(b, ctx)) return null;
-            return b.interactive && hasIsland(b.type) ? (
-              <Block id={b.id} variant={b.variant} fields={b.fields} items={b.items} headingLevel={b.headingLevel} index={b.index} total={b.total} ctx={ctx}>
-                <Island slot="island" client:visible name={islandNameFor(b.type)} props={islandProps(b, ctx)} />
-              </Block>
-            ) : (
-              <Block id={b.id} variant={b.variant} fields={b.fields} items={b.items} headingLevel={b.headingLevel} index={b.index} total={b.total} ctx={ctx} />
-            );
-          })}
+          <Blocks blocks={route.page.blocks} ctx={ctx} context="page" />
         </>
       )
     }
     {route.type === "post" && <Post post={route.post} html={route.post.content} related={route.related} relatedCase={route.relatedCase} ctx={ctx} />}
     {
       route.type === "case" &&
-        (carousel ? (
-          <Case project={route.project} related={route.related} next={route.next} ctx={ctx}>
-            <Island slot="carousel" client:visible name="carrossel" props={carousel} />
-          </Case>
+        (brand ? (
+          <div data-rb-brand data-rb-brand-font={brand.fontDisplay ? "" : undefined} class="rb-case-brand">
+            <Case project={route.project} related={route.related} next={route.next} brand={brand} ctx={ctx}>
+              {carousel && <Island slot="carousel" client:visible name="carrossel" props={carousel} />}
+              {caseBody && <Blocks slot="blocks" blocks={route.blocks} ctx={ctx} context="case" />}
+            </Case>
+          </div>
         ) : (
-          <Case project={route.project} related={route.related} next={route.next} ctx={ctx} />
+          <Case project={route.project} related={route.related} next={route.next} ctx={ctx}>
+            {carousel && <Island slot="carousel" client:visible name="carrossel" props={carousel} />}
+            {caseBody && <Blocks slot="blocks" blocks={route.blocks} ctx={ctx} context="case" />}
+          </Case>
         ))
     }
   </Shell>

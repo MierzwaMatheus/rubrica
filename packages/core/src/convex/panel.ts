@@ -5,6 +5,8 @@
  *   os erros estruturados (bloco, campo, mensagem). O painel precisa disso porque, em
  *   produção, o Convex esconde a mensagem dos erros lançados nas mutations: sem esta
  *   query, o editor não conseguiria apontar o campo com problema.
+ * - `validateProjectBlocks`: o mesmo para o corpo de um case (blocos no contexto "case") e
+ *   as cores do cliente (contraste), sem gravar.
  * - `mediaUsage`: onde uma imagem da biblioteca é usada (antes de apagar ou substituir).
  * - `replaceMedia`: troca o arquivo de uma imagem e atualiza toda referência a ele no
  *   conteúdo (páginas, coleções, configurações), para "substituir" não quebrar o site.
@@ -21,7 +23,9 @@ import { enabledPluginsFor, getSettingsDoc } from "./plugins";
 import type { RubricaRuntime } from "./runtime";
 import { COLLECTION_TABLES } from "./schema";
 import { mutation, query, type Id, type MutationCtx, type ReaderCtx } from "./server";
-import { vBlock, vLocalized } from "./validators";
+import { vBlock, vCaseBrand, vLocalized } from "./validators";
+import { validateBrand, type BrandIssue } from "../theme/brand";
+import type { CaseBrand } from "../content/types";
 import type { BlockInstance } from "../content/types";
 
 type Data = Record<string, unknown>;
@@ -107,6 +111,20 @@ async function usageOf(ctx: ReaderCtx, storageId: string): Promise<Usage[]> {
 
 export function panelFunctions(rt: RubricaRuntime) {
   return {
+    /** Erros do corpo do case (blocos) e da marca do cliente como ficariam, sem gravar. */
+    validateProjectBlocks: query({
+      args: { blocks: v.optional(v.array(vBlock)), brand: v.optional(vCaseBrand) },
+      handler: async (ctx, args): Promise<{ blockErrors: PageBlockError[]; brandIssues: BrandIssue[] }> => {
+        await requireRole(ctx, "content");
+        const settings = await getSettingsDoc(ctx);
+        const catalog = { blocks: rt.blocks, kind: settings?.kind ?? "pessoal", enabledPlugins: await enabledPluginsFor(ctx, rt, settings) } as const;
+        return {
+          blockErrors: validatePageBlocks((args.blocks ?? []) as BlockInstance[], catalog, "case"),
+          brandIssues: args.brand ? validateBrand(args.brand as CaseBrand) : [],
+        };
+      },
+    }),
+
     /**
      * Erros da página como ela ficaria, sem gravar. `blockErrors` vem no mesmo formato
      * de `validatePageBlocks` (índice e id do bloco, caminho do campo, mensagem).

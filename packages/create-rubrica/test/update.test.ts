@@ -89,6 +89,23 @@ describe("plano do update (puro)", () => {
     expect(text).not.toContain("minhas.ts");
   });
 
+  it("2.2.x → 2.3.0 lista a migração do case em blocos com o comando para rodar", async () => {
+    const { RUBRICA_DATA_MIGRATIONS } = await import("@rubrica/core/convex");
+    const plan = planUpdate({
+      packages: [{ pkg: "@rubrica/core", from: "2.2.1", to: "2.3.0" }],
+      modules: {},
+      convexOnDisk: {},
+      fromVersion: "2.2.1",
+      migrations: [...RUBRICA_DATA_MIGRATIONS] as never,
+      ejected: [],
+    });
+    expect(plan.migrations.map((m) => m.id)).toContain("projects-sections-to-blocks");
+    expect(formatPlan(plan)).toContain("npx convex run rubrica/collections:migrateSectionsToBlocks");
+    // Quem já está na 2.3.0 não vê a migração de novo.
+    const again = planUpdate({ packages: [{ pkg: "@rubrica/core", from: "2.3.0", to: "2.3.0" }], modules: {}, convexOnDisk: {}, fromVersion: "2.3.0", migrations: [...RUBRICA_DATA_MIGRATIONS] as never, ejected: [] });
+    expect(again.migrations.map((m) => m.id)).not.toContain("projects-sections-to-blocks");
+  });
+
   it("sem a lista do núcleo, não apaga nem cria módulos do convex/rubrica", () => {
     const disk = { ...convexFiles(CORE_MODULES), ...convexOwnedFiles() };
     const plan = planUpdate({ packages: [], modules: {}, convexOnDisk: disk, fromVersion: "2.0.0", migrations: [], ejected: [] });

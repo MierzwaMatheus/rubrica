@@ -384,3 +384,31 @@ article.rb-post.rb-container, article.rb-case.rb-container { max-width: 47rem; m
 
 /* faixa do celular: sem a edição, para o seletor de idioma e o tema caberem numa linha */
 @media (max-width: 479px) { .rb-mast__edition { display: none; } .rb-mast__strip { justify-content: center; } }
+
+/* Case com a cara do cliente: os tokens derivados dos --rb-* do :root são recalculados
+   dentro do escopo da marca (senão herdariam o valor já resolvido no :root). */
+[data-rb-brand] {
+  --mag-hair: color-mix(in srgb, var(--rb-fg) 22%, transparent);
+}
+
+/* ---------- corpo do case em blocos e blocos de marca ---------- */
+/* O ritmo entre os blocos do case é do corpo (--rb-case-gap), não da margem das seções. */
+.rb-mag .rb-main__inner .rb-case__body .rb-section + .rb-section { margin-top: 0; }
+.rb-mag .rb-case__body { --rb-case-gap: clamp(3rem, 6vw, 4.5rem); }
+.rb-mag .rb-case__body .rb-texto[data-variant="coluna"] { border-top: 0; padding-top: 0; }
+/* Pranchas como figuras de revista: sem cantos, fio fino e legenda em itálico. */
+.rb-mag .rb-before-after__image, .rb-mag .rb-images__image { border: 0; border-radius: 0; }
+.rb-mag .rb-before-after__caption, .rb-mag .rb-images__caption, .rb-mag .rb-brand-grid__note { font-style: italic; }
+.rb-mag .rb-before-after__label, .rb-mag .rb-type__role, .rb-mag .rb-video__chaptersTitle { font-family: var(--rb-font-mono); letter-spacing: 0.2em; }
+/* Paleta e tipografia: fios no lugar de caixas. */
+.rb-mag .rb-palette__swatch { border: 0; border-top: 2px solid var(--rb-fg); border-radius: 0; background: none; }
+.rb-mag .rb-palette__body { padding-inline: 0; }
+.rb-mag .rb-palette__name, .rb-mag .rb-type__family { font-family: var(--rb-font-display); font-weight: 500; }
+.rb-mag .rb-type__font { border: 0; border-top: 2px solid var(--rb-fg); border-bottom: 0.5px solid var(--mag-rule); border-radius: 0; background: none; padding-inline: 0; }
+.rb-mag .rb-type__weight { border-radius: 0; border-color: var(--mag-hair); background: none; }
+.rb-mag .rb-brand-grid__tile { border-radius: 0; }
+.rb-mag .rb-brand-grid__label { font-family: var(--rb-font-display); font-size: 1.05rem; font-weight: 500; }
+.rb-mag .rb-video__chapters { border: 0; border-top: 2px solid var(--rb-fg); border-radius: 0; background: none; padding-inline: 0; }
+.rb-mag .rb-video__chapterTime { border-radius: 0; background: none; border-color: var(--mag-rule); }
+/* O título da amostra herda a cor calculada para o fundo da amostra (o h3 do tema não pode trocá-la). */
+.rb-palette__chip .rb-palette__name { color: inherit; }

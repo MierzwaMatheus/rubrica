@@ -310,7 +310,7 @@ Templates opcionais para as páginas que não são feitas de blocos. Cada um ren
 | Template | Props |
 |---|---|
 | `post` | `post` (o `PostItem`), `html` (o corpo, já sanitizado no backend), `related`, `relatedCase` (opcional: o projeto com case que divide uma etiqueta com o post), `ctx` |
-| `case` | `project` (o `ProjectItem`, com as seções e os números do case em `metrics`), `related`, `next` (o próximo case, opcional), `carousel` (a ilha do carrossel, com `caseCarousel`), `ctx`. Os números saem prontos com `CaseMetrics` de `@rubrica/core/components` |
+| `case` | `project` (o `ProjectItem`, com os números do case em `metrics`), `blocks` (o corpo do case, já desenhado), `brand` (as cores do cliente, quando o case usa), `related`, `next` (o próximo case, opcional), `carousel` (a ilha do carrossel, com `caseCarousel`), `ctx`. Os números saem prontos com `CaseMetrics` de `@rubrica/core/components`. Veja [O template de case](#o-template-de-case) |
 | `notFound` | `ctx` |
 
 <!-- exemplo: tema/src/templates.tsx -->
@@ -329,6 +329,73 @@ export function FarolNotFound({ ctx }: NotFoundProps) {
 ```
 
 Sem template, valem os do núcleo (`DefaultPost`, `DefaultCase`, `DefaultNotFound`), estilizados pelo CSS do tema.
+
+## O template de case
+
+Desde a 2.3.0 (contrato 1.4) o corpo de um case é feito de **blocos**, o mesmo motor das páginas. O núcleo desenha os blocos com os componentes do seu tema, as variações e as ilhas, e entrega tudo pronto no slot `blocks`. O template só decide **onde** ele fica:
+
+<!-- exemplo: tema/src/case.tsx -->
+```tsx
+import type { CaseTemplateProps } from "@rubrica/core";
+import { CaseMetrics, Img } from "@rubrica/core/components";
+
+export function FarolCase({ project, blocks, related, ctx }: CaseTemplateProps) {
+  return (
+    <article className="farol-case">
+      <header>
+        <h1>{project.title}</h1>
+        {project.summary && <p>{project.summary}</p>}
+        {project.cover && <Img image={project.cover} priority sizes="100vw" />}
+      </header>
+      {blocks && <div className="farol-case__body">{blocks}</div>}
+      <CaseMetrics metrics={project.metrics} title={ctx.t("case.metrics")} />
+      {related.length > 0 && (
+        <aside>
+          <h2>{ctx.t("case.related")}</h2>
+          <ul>
+            {related.map((p) => (
+              <li key={p.id}>
+                <a href={p.url}>{p.title}</a>
+              </li>
+            ))}
+          </ul>
+        </aside>
+      )}
+    </article>
+  );
+}
+```
+
+O que o template precisa saber:
+
+- **O `h1` é do template.** Os blocos do case começam no `h2` (nada de `hero`, `contato` ou `cases` ali: esses só valem em páginas).
+- **`blocks` pode vir vazio** (`undefined`): um case sem corpo. Projetos que ainda não passaram pela migração chegam convertidos: o texto longo e as seções viram blocos `texto`, então o template não precisa tratar o formato antigo.
+- **`project.sections` e `project.content` estão obsoletos** (`@deprecated`). Seguem no `ProjectItem` por compatibilidade, mas um tema novo deve desenhar `blocks`. Se o seu tema (ou um tema de terceiros) ainda lê `project.sections`, o case sai sem o corpo novo: troque o laço das seções por `{blocks}`. Quem precisa de uma marcação diferente para cada seção ganha uma variação própria do bloco `texto`, e não um laço no template.
+- **O slot já é HTML pronto.** Não tente percorrer os blocos: a ordem, as ilhas e o `headingLevel` são do núcleo.
+
+### A cara do cliente
+
+Um case pode usar as **cores e a fonte de título do cliente** só dentro dele (campo `brand` do projeto; veja [Conteúdo](./conteudo.md#projetos-e-cases)). Quando isso acontece, o núcleo:
+
+1. envolve o template num `<div data-rb-brand>` e passa as cores resolvidas em `brand` (`light`, `dark` e `fontDisplay`, cada cor com o texto que vai sobre o destaque);
+2. troca, dentro desse `div`, os tokens `--rb-bg`, `--rb-fg`, `--rb-fg-strong`, `--rb-muted`, `--rb-surface`, `--rb-subtle`, `--rb-border`, `--rb-accent`, `--rb-accent-fg`, `--rb-accent-2` e `--rb-accent-2-fg` (e `--rb-font-display`, se há fonte do cliente), por modo claro e escuro;
+3. baixa a fonte de título no build, como as outras fontes do site (o navegador nunca fala com o Google Fonts).
+
+Cabeçalho e rodapé do site ficam fora do `div` e seguem o tema. O que o tema precisa fazer é **usar tokens, e não cores fixas**, dentro do template de case e do CSS que o estiliza. Uma cor escrita à mão (`#111`) não muda com a marca e pode ficar ilegível sobre o fundo do cliente. Quando o tema precisa reagir à marca, use o atributo: `[data-rb-brand] .farol-case__title { ... }`. A prop `brand` só serve para o raro caso de o template precisar dos valores (por exemplo, para desenhar um SVG).
+
+O núcleo só aplica a marca quando ela é válida: texto sobre o fundo com contraste de pelo menos 4,5:1 e destaque sobre o fundo com pelo menos 3:1, nos dois modos. Marca inválida ou desligada, e o case usa o tema.
+
+### Contrato 1.4
+
+A 2.3.0 sobe o contrato de blocos para **1.4**. É uma versão menor: tudo o que é novo é opcional, e os temas com `contract: "^1"` seguem valendo. O que entra:
+
+- `BlockDefinition.contexts` (`page`, `case`) e `blockAllowedIn`;
+- o campo `color` (`field.color`);
+- `CaseTemplateProps.blocks` e `CaseTemplateProps.brand`;
+- os blocos `antes-depois`, `paleta`, `tipografia`, `variacoes-marca` e `imagens`, e os capítulos do bloco `video`. Todos já têm componente padrão e CSS (`.rb-before-after`, `.rb-palette`, `.rb-type`, `.rb-brand-grid`, `.rb-images`), então herdam o visual do seu tema pelos tokens. Confira cada um na vitrine da bateria;
+- utilitários exportados: `resolveBlocks` (`render/blocks.ts`, o que desenha uma lista de blocos para um contexto) e `fontVarFor` (a variável CSS de uma fonte de conteúdo, `--rbf-f-<nome>`), para quem desenha um bloco com fonte própria.
+
+Para atualizar um tema existente: troque a leitura de `project.sections` por `blocks` no template de case, confira se o CSS do case usa só tokens e rode a bateria (`pnpm testar-tema`).
 
 ## Fontes
 

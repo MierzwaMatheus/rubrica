@@ -53,7 +53,7 @@ export function PosterPost({ post, html, related, ctx }: PostTemplateProps) {
   );
 }
 
-export function PosterCase({ project, related, ctx }: CaseTemplateProps) {
+export function PosterCase({ project, related, blocks, ctx }: CaseTemplateProps) {
   const facts = [
     [ctx.t("case.client"), project.client],
     [ctx.t("case.year"), project.year],
@@ -75,14 +75,7 @@ export function PosterCase({ project, related, ctx }: CaseTemplateProps) {
         )}
       </Head>
       {project.cover && <Img image={project.cover} className="poster-article-cover" priority sizes="(min-width: 960px) 1000px, 100vw" />}
-      {project.content && <Html html={project.content} className="poster-prose poster-article-body" />}
-      {project.sections.map((s, i) => (
-        <section key={i} className="poster-case-sec">
-          <h2 className="poster-lab">{s.title}</h2>
-          <Html html={s.body} className="poster-prose" />
-          {s.image && <Img image={s.image} className="poster-article-cover" sizes="(min-width: 960px) 1000px, 100vw" />}
-        </section>
-      ))}
+      {blocks && <div className="rb-case__body poster-case-blocks">{blocks}</div>}
       <CaseMetrics metrics={project.metrics} title={ctx.t("case.metrics")} className="poster-case-sec" />
       {project.links.length > 0 && (
         <div className="poster-btns poster-after">

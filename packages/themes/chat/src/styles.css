@@ -355,3 +355,26 @@ a.ct-card:hover .ct-go { color: var(--rb-fg); }
 .ct-core .rb-compare__scroll { background: var(--rb-surface); }
 .ct-core .rb-compare__corner, .ct-core .rb-compare__feature { background: var(--rb-surface); }
 .ct-core .rb-compare__hint { display: block; }
+
+/* ---------- blocos de marca e mídia: balões de conversa (canto do remetente menor) ---------- */
+/* O "antes" é a mensagem recebida (canto de baixo à esquerda reto); o "depois" é a resposta no balão da cor primária. */
+.ct-root .rb-before-after__figure, .ct-root .rb-images__figure, .ct-root .rb-brand-grid__figure { padding: 10px; background: var(--rb-surface); border: 1px solid var(--rb-border); border-radius: 18px 18px 18px 4px; align-content: start; }
+.ct-root .rb-before-after__figure--after { background: var(--rb-accent); color: var(--rb-accent-fg); border-color: var(--rb-accent); border-radius: 18px 18px 4px 18px; }
+.ct-root .rb-before-after__figure--after .rb-before-after__label { color: var(--rb-accent-fg); }
+.ct-root .rb-before-after__figure--after .rb-before-after__label::before { background: var(--rb-accent-fg); border-color: var(--rb-accent-fg); }
+.ct-root .rb-before-after__label { padding: 2px 6px 0; }
+.ct-root .rb-before-after__image, .ct-root .rb-images__image { border: 0; border-radius: 12px; }
+.ct-root .rb-before-after__caption { margin-top: 12px; padding: 10px 14px; width: fit-content; max-width: 100%; background: var(--rb-surface); border: 1px solid var(--rb-border); border-radius: 16px 16px 16px 4px; font-size: 14px; color: var(--rb-fg); }
+.ct-root .rb-images__caption, .ct-root .rb-brand-grid__caption { padding: 0 6px 4px; }
+.ct-root .rb-comparer__stage { border-radius: 18px; }
+.ct-root .rb-comparer__label { background: var(--rb-bg); }
+
+/* Paleta, tipografia e capítulos: cartões dentro da conversa, com o raio dos balões. */
+.ct-root .rb-palette__swatch, .ct-root .rb-type__font { border-radius: 18px 18px 18px 4px; }
+.ct-root .rb-palette__chip { box-shadow: none; }
+.ct-root .rb-palette__sample { border-radius: 10px; }
+.ct-root .rb-palette__grade { border-radius: 999px; }
+.ct-root .rb-type__weight { border-radius: 10px; }
+.ct-root .rb-brand-grid__tile { border-radius: 12px; }
+.ct-root .rb-video__frame { border-radius: 14px; }
+.ct-root .rb-video__chapters { border-radius: 18px 18px 18px 4px; }

@@ -5,7 +5,7 @@
  */
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Monitor, RefreshCw, Smartphone, Tablet } from "lucide-react";
-import type { PageRecord, SiteSettings } from "../../content/types";
+import type { PageRecord, RawProject, SiteSettings } from "../../content/types";
 import type { SiteSnapshot } from "../../data/source";
 import type { Locale } from "../../i18n";
 import { cn } from "../lib/utils";
@@ -23,7 +23,10 @@ type Device = (typeof DEVICES)[number]["id"];
 
 export interface PreviewPaneProps {
   snapshot: SiteSnapshot | undefined;
-  page: PageRecord;
+  /** A página em edição. Sem ela, a prévia mostra o `project`. */
+  page?: PageRecord;
+  /** O case em edição (projeto com `blocks` e `brand`): a prévia mostra a rota de case. */
+  project?: RawProject;
   locale: Locale;
   locales: Locale[];
   onLocale(locale: Locale): void;
@@ -33,7 +36,7 @@ export interface PreviewPaneProps {
   className?: string;
 }
 
-export function PreviewPane({ snapshot, page, locale, locales, onLocale, selected, onSelect, settings, className }: PreviewPaneProps) {
+export function PreviewPane({ snapshot, page, project, locale, locales, onLocale, selected, onSelect, settings, className }: PreviewPaneProps) {
   const frame = useRef<HTMLIFrameElement>(null);
   const box = useRef<HTMLDivElement>(null);
   const [ready, setReady] = useState(false);
@@ -73,9 +76,12 @@ export function PreviewPane({ snapshot, page, locale, locales, onLocale, selecte
     if (!ready || !snapshot) return;
     const scrollToSelected = selected !== lastSelected.current;
     lastSelected.current = selected;
-    const raf = requestAnimationFrame(() => send({ type: "rubrica:preview:draft", page, locale, settings, selected, scrollToSelected }));
+    const raf = requestAnimationFrame(() => {
+      if (project) send({ type: "rubrica:preview:case", project, locale, settings, selected, scrollToSelected });
+      else if (page) send({ type: "rubrica:preview:draft", page, locale, settings, selected, scrollToSelected });
+    });
     return () => cancelAnimationFrame(raf);
-  }, [ready, snapshot, page, locale, settings, selected, send]);
+  }, [ready, snapshot, page, project, locale, settings, selected, send]);
 
   useLayoutEffect(() => {
     const el = box.current;
@@ -149,7 +155,7 @@ export function PreviewPane({ snapshot, page, locale, locales, onLocale, selecte
           className="mx-auto h-full origin-top-left overflow-hidden rounded-md border bg-white shadow-sm"
           style={{ width, height: scale < 1 ? `${100 / scale}%` : "100%", transform: scale < 1 ? `scale(${scale})` : undefined, marginLeft: scale < 1 ? 0 : undefined }}
         >
-          <iframe key={nonce} ref={frame} src={PREVIEW_PATH} title="Prévia da página" className="block size-full border-0" onLoad={() => undefined} />
+          <iframe key={nonce} ref={frame} src={PREVIEW_PATH} title={project ? "Prévia do case" : "Prévia da página"} className="block size-full border-0" onLoad={() => undefined} />
         </div>
       </div>
     </section>

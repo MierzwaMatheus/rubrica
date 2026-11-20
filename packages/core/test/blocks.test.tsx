@@ -34,8 +34,8 @@ function render(type: string, props: Partial<BlockProps> & Pick<BlockProps, "ctx
 }
 
 describe("blocos padrão", () => {
-  it("há componente padrão para os 21 blocos do catálogo", () => {
-    expect(CORE_BLOCKS).toHaveLength(21);
+  it("há componente padrão para os 26 blocos do catálogo", () => {
+    expect(CORE_BLOCKS).toHaveLength(26);
     for (const b of CORE_BLOCKS) expect(DEFAULT_BLOCKS[b.type], b.type).toBeTypeOf("function");
   });
 
@@ -50,7 +50,7 @@ describe("blocos padrão", () => {
   it("cases: mostra a métrica do projeto só quando existe", async () => {
     const ctx = (await load("pessoal")).context("pt-BR", "/");
     const project = (metric?: { value: string; label: string }) => ({
-      id: "p1", slug: "p", url: "/portfolio/p", title: "Case", sections: [], gallery: [], links: [], tags: [], featured: false, seo: {}, ...(metric ? { metric } : {}),
+      id: "p1", slug: "p", url: "/portfolio/p", title: "Case", sections: [], hasCase: false, gallery: [], links: [], tags: [], featured: false, seo: {}, ...(metric ? { metric } : {}),
     });
     const withMetric = render("cases", { ctx, items: [project({ value: "~50", label: "skills em produção" })] as never });
     expect(withMetric).toContain("rb-card__metric");
@@ -132,7 +132,7 @@ describe("blocos padrão", () => {
 
   it("só os blocos interativos montam ilha, e só quando o recurso está ligado", async () => {
     const interactiveTypes = new Set(CORE_BLOCKS.filter((b) => b.interactive).map((b) => b.type));
-    expect([...interactiveTypes].sort()).toEqual(["contato", "curriculo", "depoimentos", "posts-recentes", "video"]);
+    expect([...interactiveTypes].sort()).toEqual(["antes-depois", "contato", "curriculo", "depoimentos", "imagens", "posts-recentes", "video"]);
     for (const kind of ["pessoal", "empresa"] as const) {
       const site = await load(kind);
       for (const route of site.routes) {
@@ -146,7 +146,7 @@ describe("blocos padrão", () => {
     }
     // bloco estático nunca renderiza a ilha, mesmo que ela seja passada
     const ctx = (await load("pessoal")).context("pt-BR", "/");
-    for (const type of ["hero", "texto", "numeros", "cases", "faq", "precos", "equipe"]) {
+    for (const type of ["hero", "texto", "numeros", "cases", "faq", "precos", "equipe", "paleta", "tipografia", "variacoes-marca"]) {
       expect(render(type, { ctx, island: ISLAND }), type).not.toContain(MARK);
     }
   });
@@ -271,7 +271,7 @@ describe("fixtures", () => {
 
 describe("ilhas", () => {
   it("cada bloco interativo tem ilha registrada", () => {
-    for (const type of ["contato", "curriculo", "depoimentos", "video"]) {
+    for (const type of ["contato", "curriculo", "depoimentos", "video", "antes-depois", "imagens"]) {
       const name = islandNameFor(type);
       expect(CORE_ISLANDS[name], name).toBeDefined();
       expect(ISLAND_META[name], name).toBeDefined();
@@ -325,6 +325,12 @@ describe("estilos", () => {
   it("blocks.css usa só tokens: nenhuma cor fixa", () => {
     expect(blocks).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
     expect(blocks).not.toMatch(/\brgba?\(/);
+  });
+
+  it("texto da paleta sem opacidade (ela derruba o contraste calculado dos tokens)", () => {
+    const rule = blocks.split("\n").find((l) => l.startsWith(".rb-palette__role "));
+    expect(rule).toBeDefined();
+    expect(rule).not.toMatch(/opacity/);
   });
 
   it("todo token --rb usado nos blocos está definido no base.css", () => {

@@ -208,12 +208,28 @@ export const vMetric = v.object({ value: v.string(), label: vLocalized });
 /** Um número do case ("Resultados em números"): valor, o que mede e, opcional, um ícone do Lucide. */
 export const vCaseMetric = v.object({ value: v.string(), label: vLocalized, icon: v.optional(v.string()) });
 
+/** Cores da marca do cliente num modo (hex `#rrggbb`; contraste conferido em `validateBrand`). */
+const vCaseBrandColors = v.object({ background: v.string(), foreground: v.string(), accent: v.string() });
+
+/** Marca do cliente no case (espelha `CaseBrand` de content/types.ts). */
+export const vCaseBrand = v.object({
+  enabled: v.optional(v.boolean()),
+  light: vCaseBrandColors,
+  dark: v.optional(vCaseBrandColors),
+  fontDisplay: v.optional(v.string()),
+});
+
 export const projectFields = {
   ...itemFields,
   title: vLocalized,
   summary: v.optional(vLocalized),
   content: v.optional(vLocalized),
+  /** @deprecated Formato antigo do corpo do case; a migração converte em `blocks`. */
   sections: v.optional(v.array(vCaseSection)),
+  /** Corpo do case: os mesmos blocos das páginas (sem hero, contato e cases). */
+  blocks: v.optional(v.array(vBlock)),
+  /** Cores e fonte de título do cliente, só dentro do case. */
+  brand: v.optional(vCaseBrand),
   cover: v.optional(vImage),
   gallery: v.optional(v.array(vImage)),
   client: v.optional(v.string()),

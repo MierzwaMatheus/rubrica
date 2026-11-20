@@ -1,0 +1,50 @@
+/*
+ * Case: o corpo em blocos do template padrão (`DefaultCase`, `.rb-case__body`) e o escopo
+ * da marca do cliente (`[data-rb-brand]`, que vale para todos os temas). Só tokens --rb-*.
+ *
+ * O corpo do case tem ritmo próprio: os blocos já vêm dentro do artigo (que é o container),
+ * então perdem o padding de seção e o container interno, e o espaço entre eles é um só.
+ * Texto corrido fica na largura de leitura; imagens, comparações, paletas e vídeos usam a
+ * largura toda e, em telas largas, as imagens passam um pouco das margens do texto.
+ */
+
+/* Marca do cliente: o brandCss troca os tokens no escopo; aqui o escopo pinta fundo e texto. */
+.rb-case-brand { background: var(--rb-bg); color: var(--rb-fg); padding: clamp(1.5rem, 4vw, 3rem) clamp(0.5rem, 2.5vw, 2rem); }
+/*
+ * A fonte de destaque do tema, guardada antes de o escopo da marca trocar --rb-font-display:
+ * é a reserva do brandCss quando a fonte do cliente não carrega.
+ */
+:root { --rb-font-display-theme: var(--rb-font-display); }
+/*
+ * Com a fonte do cliente, os títulos do case usam a fonte de destaque (a do cliente). Menos o
+ * nome de cada família no bloco tipografia, que sai na própria família (`.rb-type__family`).
+ */
+.rb-case-brand[data-rb-brand-font] :is(h1, h2, h3):not(.rb-type__family) { font-family: var(--rb-font-display); }
+
+.rb-case__body {
+  --rb-case-gap: clamp(2.5rem, 6vw, 4.5rem);
+  --rb-case-measure: 44rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--rb-case-gap);
+  margin-block: clamp(2rem, 5vw, 3.5rem);
+}
+/* O slot chega dentro de um elemento do Astro: ele não pode quebrar o fluxo do corpo. */
+.rb-case__body > :is(astro-slot, astro-static-slot) { display: contents; }
+.rb-case__body > * > .rb-section,
+.rb-case__body > .rb-section { padding-block: 0; }
+.rb-case__body .rb-section > .rb-container { max-width: none; padding-inline: 0; }
+.rb-case__body .rb-section__header { margin-bottom: 1.25rem; }
+
+/* Leitura: texto sem imagem ao lado, chamadas, listas e perguntas na largura de leitura. */
+.rb-case__body :is([data-block="texto"]:not(.rb-texto--media), [data-block="cta"], [data-block="lista-itens"], [data-block="faq"], [data-block="linha-do-tempo"]) > .rb-container {
+  max-width: var(--rb-case-measure);
+  /* Alinhado à esquerda dos outros blocos (o container centraliza por padrão). */
+  margin-inline: 0;
+}
+.rb-case__body [data-block="texto"] .rb-prose { max-width: none; }
+
+/* Mídia larga: em telas com folga, imagens e comparações saem um pouco da coluna do texto. */
+@media (min-width: 84rem) {
+  .rb-case__body :is([data-block="imagens"], [data-block="antes-depois"], [data-block="galeria"]) { margin-inline: -3rem; }
+}

@@ -7,6 +7,7 @@ import { CurriculoBlock } from "./blocks/resume";
 import { IncorporacaoBlock, VideoBlock } from "./blocks/media";
 import { LinhaDoTempoBlock } from "./blocks/timeline";
 import { ComparativoPlanosBlock } from "./blocks/compare";
+import { AntesDepoisBlock, ImagensBlock, PaletaBlock, TipografiaBlock, VariacoesMarcaBlock } from "./blocks/marca";
 import { DefaultCase, DefaultNotFound, DefaultPost, DefaultShell } from "./shell";
 
 export * from "./primitives";
@@ -18,8 +19,23 @@ export { CasesBlock, DepoimentosBlock, FaqBlock, PostsRecentesBlock, PrecosBlock
 export { ContatoBlock, LocalizacaoBlock } from "./blocks/contact";
 export { EquipeBlock, GaleriaBlock, ListaItensBlock, LogosClientesBlock, NumerosBlock, ServicosBlock } from "./blocks/lists";
 export { CurriculoBlock, groupResumeSkills, ResumeDescription, ResumeHeading, ResumePeriod } from "./blocks/resume";
-export { IncorporacaoBlock, VideoBlock, VideoFrame, videoName, videoPoster, videoRatio } from "./blocks/media";
-export type { VideoFrameProps } from "./blocks/media";
+export { IncorporacaoBlock, VideoBlock, VideoChapters, VideoFrame, VideoMedia, videoChapters, videoName, videoPoster, videoRatio } from "./blocks/media";
+export type { VideoChapter, VideoChaptersProps, VideoFrameProps, VideoMediaProps } from "./blocks/media";
+export {
+  AntesDepoisBlock,
+  BeforeAfterPair,
+  beforeAfterLabels,
+  contrastGrade,
+  fontStack,
+  fontVar,
+  hexToRgb,
+  ImagensBlock,
+  PaletaBlock,
+  TipografiaBlock,
+  typeWeights,
+  VariacoesMarcaBlock,
+} from "./blocks/marca";
+export type { BeforeAfterPairProps, ContrastGrade } from "./blocks/marca";
 export { LinhaDoTempoBlock } from "./blocks/timeline";
 export { ComparativoPlanosBlock } from "./blocks/compare";
 /** Utilitários puros dos blocos padrão, para os temas não copiarem. */
@@ -49,6 +65,11 @@ export const DEFAULT_BLOCKS: Partial<Record<string, BlockComponent>> = {
   incorporacao: IncorporacaoBlock,
   "linha-do-tempo": LinhaDoTempoBlock,
   "comparativo-planos": ComparativoPlanosBlock,
+  "antes-depois": AntesDepoisBlock,
+  paleta: PaletaBlock,
+  tipografia: TipografiaBlock,
+  "variacoes-marca": VariacoesMarcaBlock,
+  imagens: ImagensBlock,
 };
 
 /** Componente do bloco no tema, senão o padrão do núcleo, senão o genérico. */

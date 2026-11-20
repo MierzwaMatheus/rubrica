@@ -436,6 +436,7 @@ a.poster-row:focus-visible { outline: 3px solid var(--rb-accent-fg); outline-off
 .poster-facts dt { font-family: var(--rb-font-mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
 .poster-facts dd { margin: 0; font-weight: 800; text-align: right; }
 .poster-case-sec { margin-top: clamp(32px, 4vw, 56px); }
+.poster-case-blocks { margin-top: clamp(32px, 4vw, 56px); }
 .poster-related { margin-top: clamp(40px, 6vw, 72px); }
 .poster-notfound .poster-giant { line-height: .88; }
 
@@ -443,3 +444,54 @@ a.poster-row:focus-visible { outline: 3px solid var(--rb-accent-fg); outline-off
   .poster-root *, .poster-root *::before, .poster-root *::after { transition: none !important; animation: none !important; }
   .poster-btn:hover { transform: none; }
 }
+
+/* Case com a cara do cliente: a tinta do cartaz segue o texto do cliente dentro do escopo. */
+[data-rb-brand] { --poster-ink: var(--rb-fg); }
+
+/* ---------- blocos de marca e mídia: cartaz (fio grosso, caixa alta, tarjas chapadas) ---------- */
+/* Títulos dos blocos de marca e mídia: caixa alta pesada, com o fio grosso por cima. */
+.poster-root :is([data-block="antes-depois"], [data-block="paleta"], [data-block="tipografia"], [data-block="variacoes-marca"], [data-block="imagens"], [data-block="video"]) .rb-section__header { max-width: none; padding-top: 14px; border-top: var(--poster-rule) solid var(--rb-fg); }
+.poster-root :is([data-block="antes-depois"], [data-block="paleta"], [data-block="tipografia"], [data-block="variacoes-marca"], [data-block="imagens"], [data-block="video"]) h2.rb-section__title { font-family: var(--rb-font-sans); font-size: clamp(28px, 4.2vw, 56px); font-weight: 800; line-height: 1; letter-spacing: -.02em; text-transform: uppercase; }
+.poster-root :is([data-block="antes-depois"], [data-block="paleta"], [data-block="tipografia"], [data-block="variacoes-marca"], [data-block="imagens"], [data-block="video"]) .rb-section__intro { font-size: 17px; color: var(--rb-fg); }
+
+/* Antes e depois: duas chapas de fio grosso; os rótulos são tarjas invertidas. */
+.poster-root .rb-before-after__label { padding: 3px 10px; background: var(--rb-fg); color: var(--rb-bg); font-size: 12px; letter-spacing: .14em; }
+.poster-root .rb-before-after__label::before { display: none; }
+.poster-root .rb-before-after__figure--after .rb-before-after__label { background: var(--rb-accent); color: var(--rb-accent-fg); }
+.poster-root .rb-before-after__image, .poster-root .rb-images__image { border: var(--poster-rule) solid var(--rb-fg); border-radius: 0; }
+.poster-root .rb-before-after__figure--before .rb-before-after__image { filter: grayscale(1) contrast(1.1); }
+.poster-root .rb-before-after__caption, .poster-root .rb-images__caption, .poster-root .rb-brand-grid__note { font-family: var(--rb-font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--rb-fg); }
+.poster-root .rb-comparer__stage { border: var(--poster-rule) solid var(--rb-fg); border-radius: 0; }
+.poster-root .rb-comparer__label { border: 0; border-radius: 0; background: var(--rb-fg); color: var(--rb-bg); }
+.poster-root .rb-comparer__handle { width: 4px; margin-left: -2px; background: var(--rb-fg); box-shadow: 0 0 0 2px var(--rb-bg); }
+.poster-root .rb-comparer__handle::after { border-radius: 0; border: var(--poster-rule) solid var(--rb-fg); background: var(--rb-accent); box-shadow: none; }
+.poster-root .rb-comparer__handle::before { color: var(--rb-accent-fg); }
+
+/* Paleta: chapas de cor com fio grosso; o nome vira cartaz. */
+.poster-root .rb-palette__list { gap: 20px; }
+.poster-root .rb-palette__swatch, .poster-root .rb-type__font { border: var(--poster-rule) solid var(--rb-fg); border-radius: 0; background: var(--rb-bg); }
+.poster-root .rb-palette__chip { box-shadow: none; border-bottom: var(--poster-rule) solid var(--rb-fg); }
+.poster-root .rb-palette__name { font-family: var(--rb-font-sans); font-size: clamp(24px, 2.4vw, 34px); font-weight: 800; letter-spacing: -.02em; text-transform: uppercase; }
+.poster-root .rb-palette__role, .poster-root .rb-type__role { font-weight: 800; letter-spacing: .14em; color: inherit; }
+.poster-root .rb-type__role { color: var(--rb-fg); }
+.poster-root .rb-palette__contrast { border-top: 2px solid var(--rb-fg); }
+.poster-root .rb-palette__sample { border-radius: 0; box-shadow: inset 0 0 0 2px var(--rb-fg); }
+.poster-root .rb-palette__grade { border-radius: 0; border-width: 2px; text-transform: uppercase; }
+
+/* Tipografia: a amostra é o cartaz, em tamanho grande. */
+.poster-root .rb-type__list { gap: 20px; }
+.poster-root .rb-type__family { font-weight: 800; text-transform: uppercase; letter-spacing: -.01em; }
+.poster-root .rb-type__sample { font-size: clamp(2.2rem, 6.5vw, 4.5rem); }
+.poster-root .rb-type__sample[data-long] { font-size: clamp(1.6rem, 3.6vw, 2.6rem); }
+.poster-root .rb-type__weight { border: 2px solid var(--rb-fg); border-radius: 0; background: var(--rb-bg); }
+
+/* Variações e imagens: pranchas de fio grosso, legenda em caixa alta. */
+.poster-root .rb-brand-grid__tile { border: var(--poster-rule) solid var(--rb-fg); border-radius: 0; box-shadow: none; }
+.poster-root .rb-brand-grid__tile[data-bg] { border-color: var(--rb-fg); box-shadow: none; }
+.poster-root .rb-brand-grid__label { font-size: 15px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+
+/* Vídeo: moldura grossa e capítulos numa tarja. */
+.poster-root .rb-video__frame { border: var(--poster-rule) solid var(--rb-fg); border-radius: 0; }
+.poster-root .rb-video__chapters { border: var(--poster-rule) solid var(--rb-fg); border-radius: 0; background: var(--rb-bg); color: var(--rb-fg); }
+.poster-root .rb-video__chaptersTitle { color: var(--rb-fg); font-weight: 800; }
+.poster-root .rb-video__chapterTime { border-radius: 0; border: 2px solid var(--rb-fg); background: var(--rb-fg); color: var(--rb-bg); font-family: var(--rb-font-mono); }

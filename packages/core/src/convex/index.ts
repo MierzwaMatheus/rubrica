@@ -25,6 +25,7 @@ import { cronJobs, httpRouter } from "convex/server";
 import { auditFunctions } from "./audit";
 import { createAuth } from "./auth";
 import {
+  collectionsFunctions,
   faqFunctions,
   plansFunctions,
   postsFunctions,
@@ -76,6 +77,7 @@ export function createRubrica(config: RubricaConfig = {}) {
     pages: once(() => pagesFunctions(rt)),
     posts: once(() => postsFunctions(rt)),
     projects: once(() => projectsFunctions(rt)),
+    collections: once(() => collectionsFunctions(rt)),
     services: once(() => servicesFunctions(rt)),
     testimonials: once(() => testimonialsFunctions(rt)),
     faq: once(() => faqFunctions(rt)),
@@ -150,6 +152,9 @@ export function createRubrica(config: RubricaConfig = {}) {
     },
     get projects() {
       return modules.projects();
+    },
+    get collections() {
+      return modules.collections();
     },
     get services() {
       return modules.services();
@@ -229,6 +234,7 @@ export const RUBRICA_MODULES = [
   "pages",
   "posts",
   "projects",
+  "collections",
   "services",
   "testimonials",
   "faq",
@@ -261,6 +267,12 @@ export const RUBRICA_DATA_MIGRATIONS = [
     since: "2.1.2",
     description: "Normaliza a pasta das imagens migradas da v1 (\"portfolio/toca\" → \"/portfolio/toca\"), que não abriam no filtro de pastas",
     fn: "rubrica/media:normalizeFolders",
+  },
+  {
+    id: "projects-sections-to-blocks",
+    since: "2.3.0",
+    description: "Converte o corpo dos cases (texto longo e seções) em blocos, o formato da 2.3.0 que aceita vídeo, imagens, antes e depois e paleta dentro do case",
+    fn: "rubrica/collections:migrateSectionsToBlocks",
   },
 ] as const;
 

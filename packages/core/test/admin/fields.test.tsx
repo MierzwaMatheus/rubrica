@@ -167,3 +167,24 @@ describe("formulário gerado do schema", () => {
     expect(latest()).toEqual({ t: { "pt-BR": "Olá", en: "EN:Olá" } });
   });
 });
+
+describe("campo de cor", () => {
+  it("seletor e texto hex: normaliza, ignora o inválido, esvazia e avisa", () => {
+    const { latest } = setup({ c: field.color({ label: "Cor de fundo" }) }, { c: "#112233" });
+    const text = screen.getByLabelText("Cor de fundo") as HTMLInputElement;
+    expect(text.value).toBe("#112233");
+    expect(screen.getByLabelText("Cor de fundo: seletor de cor")).toMatchObject({ type: "color", value: "#112233" });
+    fireEvent.change(text, { target: { value: "#ABC" } });
+    expect(latest()).toEqual({ c: "#aabbcc" });
+    fireEvent.change(text, { target: { value: "#zz" } });
+    expect(latest()).toEqual({ c: "#aabbcc" });
+    expect(screen.getByRole("alert").textContent).toMatch(/hexadecimais/);
+    expect(text.getAttribute("aria-invalid")).toBe("true");
+    fireEvent.blur(text);
+    expect(text.value).toBe("#aabbcc");
+    fireEvent.change(screen.getByLabelText("Cor de fundo: seletor de cor"), { target: { value: "#00ff00" } });
+    expect(latest()).toEqual({ c: "#00ff00" });
+    fireEvent.change(text, { target: { value: "" } });
+    expect(latest()).toEqual({});
+  });
+});

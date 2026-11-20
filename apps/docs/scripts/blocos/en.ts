@@ -172,4 +172,51 @@ export const EN: Record<string, string> = {
     "A table that compares the plans feature by feature, on the pricing page, when the difference between them is in the details.",
   "Com um ou dois planos simples, precos basta. Não invente recursos nem valores.":
     "With one or two simple plans, precos is enough. Don't make up features or values.",
+  // Blocos de marca e mídia (contrato 1.4) e capítulos do vídeo
+  "Pontos do vídeo com nome: cada um abre o vídeo no tempo certo.": "Named points in the video: each one opens the video at the right time.",
+  "Ex.: 1:05 ou 1:02:30.": "E.g. 1:05 or 1:02:30.",
+  "Identificador para links na página (#marca). Opcional.": "Identifier for links within the page (#brand). Optional.",
+  "Duas imagens comparadas: como era e como ficou. Lado a lado ou num comparador deslizante.":
+    "Two images compared: how it was and how it turned out. Side by side or in a sliding comparer.",
+  "Mostrar a transformação de um trabalho: o logo antigo e a marca nova, a tela antiga e a nova, a fachada antes da reforma.":
+    "Showing the transformation of a piece of work: the old logo and the new brand, the old screen and the new one, the storefront before the renovation.",
+  "Para várias imagens sem comparação, use imagens; para as versões de um logo, variacoes-marca.":
+    "For several images with no comparison, use imagens; for the versions of a logo, variacoes-marca.",
+  'Sem ele, "Antes".': 'Without it, "Before".',
+  'Sem ele, "Depois".': 'Without it, "After".',
+  "O comparador sobrepõe as duas imagens; use imagens com a mesma proporção.":
+    "The comparer overlays the two images; use images with the same aspect ratio.",
+  "As cores de uma marca: nome, código, papel e o contraste de cada uma.":
+    "A brand's colors: name, code, role and the contrast of each one.",
+  "Apresentar as cores de uma identidade visual ou de um sistema de design, com o papel de cada cor.":
+    "Presenting the colors of a visual identity or a design system, with the role of each color.",
+  "Para mudar as cores do próprio site ou do case, use a aparência ou as cores do cliente no projeto.":
+    "To change the colors of the site itself or of the case, use the appearance settings or the client colors on the project.",
+  "Ex.: principal, apoio, fundo.": "E.g. primary, support, background.",
+  "As fontes de uma marca, com papel, pesos e uma amostra escrita na própria fonte.":
+    "A brand's fonts, with role, weights and a sample written in the font itself.",
+  "Apresentar as famílias tipográficas de uma identidade visual: a de títulos, a de texto, a de apoio.":
+    "Presenting the type families of a visual identity: the one for headings, the one for body text, the supporting one.",
+  "Para trocar a fonte do site, use a aparência. Fonte fora do Google Fonts: mande a amostra como imagem.":
+    "To change the site's font, use the appearance settings. A font outside Google Fonts: send the sample as an image.",
+  "Nome no Google Fonts (ex.: Oswald). O site baixa a fonte no build.":
+    "Name on Google Fonts (e.g. Oswald). The site downloads the font at build time.",
+  "Ex.: títulos, texto corrido.": "E.g. headings, body text.",
+  "Ex.: 400, 700. Sem eles, 400 e 700.": "E.g. 400, 700. Without them, 400 and 700.",
+  "Frase escrita na fonte. Sem ela, o alfabeto.": "A phrase written in the font. Without it, the alphabet.",
+  "Para fontes fora do Google Fonts, ou se a fonte não carregar.": "For fonts outside Google Fonts, or if the font fails to load.",
+  "As versões de um logo, cada uma sobre a sua cor de fundo: principal, reduzida, ícone, positivo e negativo.":
+    "The versions of a logo, each on its own background color: primary, reduced, icon, positive and negative.",
+  "Mostrar o sistema de um logo: versões (principal, reduzida, símbolo) e as cores em que cada uma pode aparecer.":
+    "Showing a logo's system: the versions (primary, reduced, symbol) and the colors each one may appear on.",
+  "Para logos de clientes atendidos, use logos-clientes; para fotos e telas, imagens.":
+    "For logos of clients served, use logos-clientes; for photos and screens, imagens.",
+  "Ex.: principal sobre farinha.": "E.g. primary on flour.",
+  "Sem ela, o fundo do site.": "Without it, the site's background.",
+  "Um conjunto de imagens com legenda: telas, mockups, grafismos, animações em GIF.":
+    "A set of images with captions: screens, mockups, graphic patterns, GIF animations.",
+  "Mostrar várias imagens de um trabalho dentro da narrativa: telas, mockups, aplicações da marca, animações curtas (GIF).":
+    "Showing several images of a piece of work within the narrative: screens, mockups, brand applications, short animations (GIF).",
+  "Para fotos do dia a dia da empresa (coleção de rotina), use galeria; para comparar duas imagens, antes-depois; para vídeo, video.":
+    "For everyday photos of the company (routine collection), use galeria; to compare two images, antes-depois; for video, video.",
 };

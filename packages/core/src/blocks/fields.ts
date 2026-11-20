@@ -8,6 +8,7 @@
  * - text/richText traduzíveis: `Localized<string>`; não traduzíveis: `string`
  * - image: `{ url, storageId?, alt?: Localized<string> }`
  * - link: `{ label: Localized<string>, href }`
+ * - color: `#rrggbb` (minúsculo, sem alfa)
  * - list: array de objetos com os campos de `of`
  */
 import type { Localized } from "../i18n";
@@ -51,6 +52,10 @@ export interface ImageField extends BaseField {
 export interface LinkField extends BaseField {
   kind: "link";
 }
+/** Cor em hexadecimal `#rrggbb` (paleta, fundo de uma variação de marca). */
+export interface ColorField extends BaseField {
+  kind: "color";
+}
 export interface ListField<Of extends FieldMap = FieldMap> extends BaseField {
   kind: "list";
   of: Of;
@@ -60,7 +65,18 @@ export interface ListField<Of extends FieldMap = FieldMap> extends BaseField {
   itemLabel?: string;
 }
 
-export type FieldDef = TextField | RichTextField | NumberField | BooleanField | SelectField | ImageField | LinkField | ListField;
+export type FieldDef = TextField | RichTextField | NumberField | BooleanField | SelectField | ImageField | LinkField | ColorField | ListField;
+
+/** `#rrggbb` (aceita maiúsculas na entrada; guarde com `normalizeHex`). */
+export const HEX_COLOR = /^#[0-9a-fA-F]{6}$/;
+/** `#ABC` ou `#AABBCC` → `#aabbcc`; inválido → undefined. */
+export function normalizeHex(value: string): string | undefined {
+  const v = value.trim();
+  const short = /^#?([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])$/.exec(v);
+  if (short) return `#${short[1]}${short[1]}${short[2]}${short[2]}${short[3]}${short[3]}`.toLowerCase();
+  const long = /^#?([0-9a-fA-F]{6})$/.exec(v);
+  return long ? `#${long[1]!.toLowerCase()}` : undefined;
+}
 export type FieldMap = Record<string, FieldDef>;
 
 // ── Construtores (inferem os tipos literais) ────────────────────────────────
@@ -73,6 +89,7 @@ export const field = {
   select: <const V extends string>(o: Omit<SelectField<V>, "kind">): SelectField<V> => ({ kind: "select", ...o }),
   image: (o: Omit<ImageField, "kind">): ImageField => ({ kind: "image", ...o }),
   link: (o: Omit<LinkField, "kind">): LinkField => ({ kind: "link", ...o }),
+  color: (o: Omit<ColorField, "kind">): ColorField => ({ kind: "color", ...o }),
   list: <const Of extends FieldMap>(o: Omit<ListField<Of>, "kind">): ListField<Of> => ({ kind: "list", ...o }),
 };
 
@@ -123,7 +140,9 @@ export type RawValue<F extends FieldDef> = F extends TextField | RichTextField
           ? RawImage
           : F extends LinkField
             ? RawLink
-            : F extends ListField<infer Of>
+            : F extends ColorField
+              ? string
+              : F extends ListField<infer Of>
               ? RawFields<Of>[]
               : never;
 
@@ -139,7 +158,9 @@ export type ResolvedValue<F extends FieldDef> = F extends TextField | RichTextFi
           ? ResolvedImage
           : F extends LinkField
             ? ResolvedLink
-            : F extends ListField<infer Of>
+            : F extends ColorField
+              ? string
+              : F extends ListField<infer Of>
               ? ResolvedFields<Of>[]
               : never;
 
@@ -221,6 +242,9 @@ function validateField(def: FieldDef, value: unknown, path: string, errors: Fiel
     case "link":
       if (!isObject(value) || typeof value.href !== "string" || !value.href) return fail("link sem endereço");
       if (!isLocalizedString(value.label)) fail("rótulo do link deve ser um texto por idioma");
+      return;
+    case "color":
+      if (typeof value !== "string" || !HEX_COLOR.test(value)) fail("cor em hexadecimal, como #7a1f2b");
       return;
     case "list": {
       if (!Array.isArray(value)) return fail("deve ser uma lista");

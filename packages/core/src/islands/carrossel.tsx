@@ -11,11 +11,20 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { ResolvedImage } from "../blocks/fields";
 import { makeT } from "./kit";
 
+/** Prefixos dos textos de interface que esta ilha recebe (`ISLAND_META`, `caseCarouselFor`). */
+export const CAROUSEL_TEXT_PREFIXES = ["gallery.", "case.gallery"];
+
 export interface CarouselIslandProps {
   images: ResolvedImage[];
   /** Nome do projeto: completa o texto alternativo das imagens sem descrição. */
   title: string;
   texts: Record<string, string>;
+  /** Legenda de cada imagem (mesma ordem), abaixo dela e na janela. Opcional. */
+  captions?: (string | undefined)[];
+  /** Nome da faixa para leitores de tela; sem ele, "Imagens do projeto". */
+  label?: string;
+  /** `cover` (padrão) recorta para 16:9; `contain` mostra a imagem inteira (marcas, GIFs). */
+  fit?: "cover" | "contain";
 }
 
 const SVG = { width: 20, height: 20, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, "aria-hidden": true, focusable: false };
@@ -41,7 +50,7 @@ const Close = () => (
   </svg>
 );
 
-export default function Carrossel({ images, title, texts }: CarouselIslandProps) {
+export default function Carrossel({ images, title, texts, captions, label, fit }: CarouselIslandProps) {
   const t = makeT(texts);
   const track = useRef<HTMLUListElement>(null);
   const dialog = useRef<HTMLDialogElement>(null);
@@ -83,8 +92,8 @@ export default function Carrossel({ images, title, texts }: CarouselIslandProps)
   const current = open !== null ? images[open] : undefined;
 
   return (
-    <div className="rb-carousel" data-ready={ready ? "" : undefined}>
-      <ul ref={track} className="rb-carousel__track" tabIndex={0} aria-label={t("case.gallery")} onScroll={updateEdges}>
+    <div className="rb-carousel" data-ready={ready ? "" : undefined} data-fit={fit === "contain" ? "contain" : undefined} data-captions={captions?.some(Boolean) ? "" : undefined}>
+      <ul ref={track} className="rb-carousel__track" tabIndex={0} aria-label={label || t("case.gallery")} onScroll={updateEdges}>
         {images.map((img, i) => (
           <li key={`${img.src}-${i}`} className="rb-carousel__slide">
             <img src={img.src} alt={alt(img, i)} width={img.width} height={img.height} loading="lazy" decoding="async" />
@@ -95,6 +104,7 @@ export default function Carrossel({ images, title, texts }: CarouselIslandProps)
                 </span>
               </button>
             )}
+            {captions?.[i] && <p className="rb-carousel__caption">{captions[i]}</p>}
           </li>
         ))}
       </ul>
@@ -141,6 +151,7 @@ export default function Carrossel({ images, title, texts }: CarouselIslandProps)
               </div>
               <div className="rb-lightbox__stage">
                 <img src={current.src} alt={alt(current, open)} />
+                {captions?.[open] && <p className="rb-lightbox__caption">{captions[open]}</p>}
                 {many && (
                   <>
                     <button type="button" className="rb-carousel__btn rb-lightbox__prev" onClick={() => step(-1)} aria-label={t("gallery.prev")}>

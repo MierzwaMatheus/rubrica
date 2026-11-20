@@ -4,6 +4,7 @@
  */
 import { localizedPath, pick, type Locale, type LocaleConfig, type Localized } from "../i18n";
 import type { FieldDef, FieldMap, RawImage, RawLink, ResolvedImage, ResolvedLink } from "../blocks/fields";
+import { HEX_COLOR } from "../blocks/fields";
 import { resolveWhatsAppHref, WHATSAPP_HREF } from "./sitewide";
 
 export interface ResolveOptions {
@@ -15,6 +16,12 @@ export interface ResolveOptions {
   whatsapp?: { number: string; message?: string };
   /** Id da janela de contato, quando o site tem uma: os links para o contato a abrem. */
   contactDialog?: string;
+  /**
+   * Projetos com corpo de case NESTE idioma (o `buildSite` calcula com `resolveBlocks` no
+   * contexto `case`). Dá o `hasCase` dos itens; sem ele (fora do build), vale a conta
+   * aproximada do `resolveProject`.
+   */
+  caseIds?: ReadonlySet<string>;
 }
 
 /** Links para o contato: a âncora do bloco (`#contato`, `/#contato`) ou o endereço `contato:`. */
@@ -74,6 +81,8 @@ function resolveValue(def: FieldDef, raw: unknown, opts: ResolveOptions): unknow
     case "boolean":
     case "select":
       return raw;
+    case "color":
+      return typeof raw === "string" && HEX_COLOR.test(raw) ? raw.toLowerCase() : undefined;
     case "image":
       return resolveImage(raw as RawImage, opts);
     case "link":

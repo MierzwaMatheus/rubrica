@@ -35,6 +35,11 @@ Precisa de uma seção que não está aqui? Veja [Criar um bloco](./criar-bloco.
 | [`incorporacao`](#incorporacao--incorporação) | Incorporação | Agenda, formulário, mapa ou player de outro serviço, por endereço, só dos provedores permitidos (Calendly, Cal.com, Google Agenda, Google Forms, Typeform, Tally, Google Maps, OpenStreetMap, Spotify, SoundCloud, Figma). | pessoal e empresa | — |
 | [`linha-do-tempo`](#linha-do-tempo--linha-do-tempo) | Linha do tempo | Marcos em ordem: história da empresa, trajetória, etapas de um projeto. | pessoal e empresa | — |
 | [`comparativo-planos`](#comparativo-planos--comparativo-de-planos) | Comparativo de planos | Tabela que compara os planos da coleção item a item (linhas = recursos, colunas = planos), com o botão de cada plano. | só empresa | `pricing` |
+| [`antes-depois`](#antes-depois--antes-e-depois) | Antes e depois | Duas imagens comparadas: como era e como ficou. Lado a lado ou num comparador deslizante. | pessoal e empresa | — |
+| [`paleta`](#paleta--paleta-de-cores) | Paleta de cores | As cores de uma marca: nome, código, papel e o contraste de cada uma. | pessoal e empresa | — |
+| [`tipografia`](#tipografia--tipografia) | Tipografia | As fontes de uma marca, com papel, pesos e uma amostra escrita na própria fonte. | pessoal e empresa | — |
+| [`variacoes-marca`](#variacoes-marca--variações-de-marca) | Variações de marca | As versões de um logo, cada uma sobre a sua cor de fundo: principal, reduzida, ícone, positivo e negativo. | pessoal e empresa | — |
+| [`imagens`](#imagens--imagens) | Imagens | Um conjunto de imagens com legenda: telas, mockups, grafismos, animações em GIF. | pessoal e empresa | — |
 
 ## `hero` — Hero
 
@@ -411,6 +416,9 @@ Vídeo do YouTube ou do Vimeo. Carrega leve: miniatura e botão de play, e o pla
 | `caption` | Legenda | texto | não | sim | Aparece abaixo do vídeo e dá nome ao botão de play e ao player para leitores de tela. Sem ela, vale o título; até 200 caracteres |
 | `poster` | Miniatura própria | imagem | não | o texto alternativo | Opcional no YouTube (sem ela, usa a miniatura do vídeo). No Vimeo, sem imagem aparece só o botão de play |
 | `aspect` | Proporção | opção | não | — | opções: `16:9` (16:9 (paisagem)), `4:3` (4:3), `1:1` (1:1 (quadrado)), `9:16` (9:16 (vertical, Shorts e Reels)); padrão: `16:9` |
+| `chapters` | Capítulos | lista | não | — | Pontos do vídeo com nome: cada um abre o vídeo no tempo certo; até 20 itens; cada item: "Capítulo" |
+| `chapters[].start` | Início (m:ss) | texto | sim | não | Ex.: 1:05 ou 1:02:30; até 8 caracteres |
+| `chapters[].label` | Nome | texto | sim | sim | até 80 caracteres |
 
 ## `incorporacao` — Incorporação
 
@@ -480,3 +488,118 @@ Tabela que compara os planos da coleção item a item (linhas = recursos, coluna
 | `rows[].cells[].value` | Valor | opção | não | — | opções: `sim` (✓ Incluso), `nao` (✗ Não incluso), `texto` (Texto); padrão: `sim` |
 | `rows[].cells[].text` | Texto | texto | não | sim | Para o valor "Texto" (ex.: até 5, ilimitado); até 60 caracteres |
 | `note` | Observação | texto longo | não | sim | até 300 caracteres |
+
+## `antes-depois` — Antes e depois
+
+Duas imagens comparadas: como era e como ficou. Lado a lado ou num comparador deslizante.
+
+- **Quando usar:** Mostrar a transformação de um trabalho: o logo antigo e a marca nova, a tela antiga e a nova, a fachada antes da reforma.
+- **Quando não usar:** Para várias imagens sem comparação, use imagens; para as versões de um logo, variacoes-marca.
+- **Combina com:** [`texto`](#texto--texto), [`variacoes-marca`](#variacoes-marca--variações-de-marca), [`paleta`](#paleta--paleta-de-cores)
+- **Tipo de site:** pessoal e empresa
+- **Plugin:** nenhum: sempre disponível
+- **JavaScript:** pode montar uma ilha (a parte interativa, com JavaScript no navegador); o resto é HTML estático
+- **Variações:** nenhuma: um desenho só em cada tema
+
+| Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
+|---|---|---|---|---|---|
+| `anchor` | Âncora | texto | não | não | Identificador para links na página (#marca). Opcional; até 40 caracteres |
+| `title` | Título | texto | não | sim | até 140 caracteres |
+| `intro` | Texto de apoio | texto longo | não | sim | até 400 caracteres |
+| `before` | Imagem de antes | imagem | sim | o texto alternativo | — |
+| `beforeLabel` | Rótulo de antes | texto | não | sim | Sem ele, "Antes"; até 40 caracteres |
+| `after` | Imagem de depois | imagem | sim | o texto alternativo | — |
+| `afterLabel` | Rótulo de depois | texto | não | sim | Sem ele, "Depois"; até 40 caracteres |
+| `caption` | Legenda | texto longo | não | sim | até 300 caracteres |
+| `presentation` | Apresentação | opção | não | — | O comparador sobrepõe as duas imagens; use imagens com a mesma proporção; opções: `comparador` (Comparador deslizante (sem JavaScript, lado a lado)), `lado-a-lado` (Lado a lado); padrão: `comparador` |
+
+## `paleta` — Paleta de cores
+
+As cores de uma marca: nome, código, papel e o contraste de cada uma.
+
+- **Quando usar:** Apresentar as cores de uma identidade visual ou de um sistema de design, com o papel de cada cor.
+- **Quando não usar:** Para mudar as cores do próprio site ou do case, use a aparência ou as cores do cliente no projeto.
+- **Combina com:** [`tipografia`](#tipografia--tipografia), [`variacoes-marca`](#variacoes-marca--variações-de-marca), [`antes-depois`](#antes-depois--antes-e-depois)
+- **Tipo de site:** pessoal e empresa
+- **Plugin:** nenhum: sempre disponível
+- **Variações:** nenhuma: um desenho só em cada tema
+
+| Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
+|---|---|---|---|---|---|
+| `anchor` | Âncora | texto | não | não | Identificador para links na página (#marca). Opcional; até 40 caracteres |
+| `title` | Título | texto | não | sim | até 140 caracteres |
+| `intro` | Texto de apoio | texto longo | não | sim | até 400 caracteres |
+| `colors` | Cores | lista | sim | — | de 1 a 12 itens; cada item: "Cor" |
+| `colors[].name` | Nome | texto | sim | sim | até 40 caracteres |
+| `colors[].hex` | Cor | cor | sim | — | — |
+| `colors[].role` | Papel | texto | não | sim | Ex.: principal, apoio, fundo; até 60 caracteres |
+| `colors[].usage` | Uso | texto longo | não | sim | até 200 caracteres |
+| `showContrast` | Mostrar o contraste com branco e preto | sim ou não | não | — | padrão: sim |
+
+## `tipografia` — Tipografia
+
+As fontes de uma marca, com papel, pesos e uma amostra escrita na própria fonte.
+
+- **Quando usar:** Apresentar as famílias tipográficas de uma identidade visual: a de títulos, a de texto, a de apoio.
+- **Quando não usar:** Para trocar a fonte do site, use a aparência. Fonte fora do Google Fonts: mande a amostra como imagem.
+- **Combina com:** [`paleta`](#paleta--paleta-de-cores), [`variacoes-marca`](#variacoes-marca--variações-de-marca)
+- **Tipo de site:** pessoal e empresa
+- **Plugin:** nenhum: sempre disponível
+- **Variações:** nenhuma: um desenho só em cada tema
+
+| Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
+|---|---|---|---|---|---|
+| `anchor` | Âncora | texto | não | não | Identificador para links na página (#marca). Opcional; até 40 caracteres |
+| `title` | Título | texto | não | sim | até 140 caracteres |
+| `intro` | Texto de apoio | texto longo | não | sim | até 400 caracteres |
+| `fonts` | Fontes | lista | sim | — | de 1 a 4 itens; cada item: "Fonte" |
+| `fonts[].family` | Família | texto | sim | não | Nome no Google Fonts (ex.: Oswald). O site baixa a fonte no build; até 60 caracteres |
+| `fonts[].role` | Papel | texto | não | sim | Ex.: títulos, texto corrido; até 60 caracteres |
+| `fonts[].weights` | Pesos | texto | não | não | Ex.: 400, 700. Sem eles, 400 e 700; até 40 caracteres |
+| `fonts[].sample` | Amostra | texto longo | não | sim | Frase escrita na fonte. Sem ela, o alfabeto; até 120 caracteres |
+| `fonts[].specimen` | Amostra em imagem | imagem | não | o texto alternativo | Para fontes fora do Google Fonts, ou se a fonte não carregar |
+
+## `variacoes-marca` — Variações de marca
+
+As versões de um logo, cada uma sobre a sua cor de fundo: principal, reduzida, ícone, positivo e negativo.
+
+- **Quando usar:** Mostrar o sistema de um logo: versões (principal, reduzida, símbolo) e as cores em que cada uma pode aparecer.
+- **Quando não usar:** Para logos de clientes atendidos, use logos-clientes; para fotos e telas, imagens.
+- **Combina com:** [`paleta`](#paleta--paleta-de-cores), [`antes-depois`](#antes-depois--antes-e-depois), [`tipografia`](#tipografia--tipografia)
+- **Tipo de site:** pessoal e empresa
+- **Plugin:** nenhum: sempre disponível
+- **Variações:** nenhuma: um desenho só em cada tema
+
+| Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
+|---|---|---|---|---|---|
+| `anchor` | Âncora | texto | não | não | Identificador para links na página (#marca). Opcional; até 40 caracteres |
+| `title` | Título | texto | não | sim | até 140 caracteres |
+| `intro` | Texto de apoio | texto longo | não | sim | até 400 caracteres |
+| `items` | Variações | lista | sim | — | de 1 a 24 itens; cada item: "Variação" |
+| `items[].image` | Imagem (SVG ou PNG transparente) | imagem | sim | o texto alternativo | — |
+| `items[].label` | Nome | texto | não | sim | Ex.: principal sobre farinha; até 60 caracteres |
+| `items[].background` | Cor de fundo | cor | não | — | Sem ela, o fundo do site |
+| `items[].note` | Observação | texto longo | não | sim | até 160 caracteres |
+| `columns` | Colunas | opção | não | — | opções: `2` (2), `3` (3), `4` (4); padrão: `3` |
+
+## `imagens` — Imagens
+
+Um conjunto de imagens com legenda: telas, mockups, grafismos, animações em GIF.
+
+- **Quando usar:** Mostrar várias imagens de um trabalho dentro da narrativa: telas, mockups, aplicações da marca, animações curtas (GIF).
+- **Quando não usar:** Para fotos do dia a dia da empresa (coleção de rotina), use galeria; para comparar duas imagens, antes-depois; para vídeo, video.
+- **Combina com:** [`texto`](#texto--texto), [`antes-depois`](#antes-depois--antes-e-depois), [`video`](#video--vídeo)
+- **Tipo de site:** pessoal e empresa
+- **Plugin:** nenhum: sempre disponível
+- **JavaScript:** pode montar uma ilha (a parte interativa, com JavaScript no navegador); o resto é HTML estático
+- **Variações:** nenhuma: um desenho só em cada tema
+
+| Campo | Rótulo no painel | Tipo | Obrigatório | Traduzível | Ajuda e limites |
+|---|---|---|---|---|---|
+| `anchor` | Âncora | texto | não | não | Identificador para links na página (#marca). Opcional; até 40 caracteres |
+| `title` | Título | texto | não | sim | até 140 caracteres |
+| `intro` | Texto de apoio | texto longo | não | sim | até 400 caracteres |
+| `items` | Imagens | lista | sim | — | de 1 a 30 itens; cada item: "Imagem" |
+| `items[].image` | Imagem | imagem | sim | o texto alternativo | — |
+| `items[].caption` | Legenda | texto | não | sim | até 200 caracteres |
+| `layout` | Disposição | opção | não | — | opções: `grade` (Grade), `mosaico` (Mosaico (a primeira maior)), `carrossel` (Carrossel (sem JavaScript, faixa com rolagem)); padrão: `grade` |

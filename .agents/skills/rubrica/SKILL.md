@@ -43,6 +43,8 @@ Esta skill **executa**: lê, grava e publica. Escrever conteúdo novo e longo é
 | Escrever um post do blog do zero | `rubrica-blog` |
 | Revisar qualquer texto antes de ir ao site (sinais de IA, fatos, tradução) | `rubrica-pilar` |
 
+O `rubrica-case` é a exceção: ele grava o case direto pelo MCP do Rubrica (corpo em blocos, `brand`), sem plano.
+
 Mudança pontual (trocar um botão, corrigir uma frase, ajustar uma cor, publicar um post pronto) continua aqui, direto. Na dúvida, pergunte se a pessoa quer só trocar o texto ou reescrever com calma.
 
 ## Aplicar um plano
@@ -92,12 +94,12 @@ São os textos de interface: títulos de seção, botões, menus, rótulos do fo
 As páginas são montadas para converter visitante em contato. Estes campos decidem o que aparece (em todos os layouts):
 - **Números do topo** (home e começo do currículo): bloco `home_metrics`, até 4 itens `[{ "value": "8+", "label": "anos de experiência", "labelTranslations": {"ptBR": "...", "enUS": "..."} }]`. Use `$RB home-definir home_metrics --valor '<json>'` (a lista inteira é substituída). Prefira resultados ("1.200 agendamentos/mês") a quantidades ("300 commits"). Lista vazia esconde a faixa.
 - **Princípios de trabalho** (seção "Como eu trabalho", que abre a página Sobre): bloco `work_principles`, `[{ "title", "description", "titleTranslations": {ptBR, enUS}, "descriptionTranslations": {ptBR, enUS} }]`, com `home-definir`.
-- **Cases em destaque na home:** os 3 primeiros projetos (menor `orderIndex`) que têm `slug` **e** `caseStudy`. Para mudar o destaque, mude o `orderIndex` (`projects:update` ou `projects:reorder`).
-- **Métrica do cartão:** a **primeira** de `caseStudy.metrics` aparece no cartão da home e do portfólio. Ponha primeiro um resultado.
-- **Categoria do projeto** (`category` + `categoryTranslations: {ptBR, enUS}`): vira o filtro do Portfólio. Texto curto. Sem categorias, o filtro some.
-- **Seções extras do case**, todas opcionais e só exibidas quando preenchidas, em `caseStudy` e em `caseStudyTranslations.ptBR/enUS`: `role` ("Meu papel"), `context` ("Antes", o estado inicial medido), `decisions` ("Decisões e trade-offs"), `learnings` ("Aprendizados"). Não invente fatos: o que a pessoa não contou fica vazio.
-- **Métricas e depoimento do case em inglês:** `caseStudyTranslations.ptBR/enUS.metrics` leva `[{label, value}]` na mesma ordem de `caseStudy.metrics` (sem `icon`). O depoimento fica em `caseStudy.testimonial` na língua original, com `lang: "pt-BR" | "en-US"` (sem valor, pt-BR), e a tradução só na outra língua, em `caseStudyTranslations.<outra>.testimonial: {text, role?}`; o site mostra um aviso de tradução e um botão "ver original".
-- No `projects:update`, `caseStudy` é substituído **inteiro** (problem, solution, results e metrics são obrigatórios): leia o projeto e mande o objeto completo. O mesmo vale para `caseStudyTranslations`.
+- **Cases em destaque na home:** os primeiros projetos em destaque (`featured`), na ordem da coleção. Para mudar, use `collection_reorder` (`collection: "projects"`) e `featured` no projeto (`projects_update`).
+- **Métrica do cartão:** o `metric` do projeto, ou, sem ele, o **primeiro** de `metrics` (`[{value, label, icon?}]`). Ponha primeiro um resultado.
+- **Categoria do projeto** (`category`, um texto por idioma `{"pt-BR", "en"}`): vira o filtro do Portfólio. Texto curto. Sem categorias, o filtro some.
+- **Corpo do case (v2, desde a 2.3.0):** é uma lista de **blocos**, os mesmos das páginas, gravada pelo MCP com `block_add` e as outras `block_*`, passando `project` (slug ou id) no lugar de `page`. O título do case é do template: o corpo começa no `h2`, e `hero`, `contato` e `cases` não valem ali (veja `blocks_catalog` com `context: "case"`). Blocos de marca e mídia: `antes-depois`, `paleta`, `tipografia`, `variacoes-marca`, `imagens` e `video` (só YouTube ou Vimeo, com capítulos; GIF para animação curta). Não invente fatos: o que a pessoa não contou fica fora. Os campos estão em `../rubrica-case/references/campos.md`.
+- **A cara do cliente:** `brand` no projeto (`projects_update`, `patch: {brand: {light: {background, foreground, accent}, dark?, fontDisplay?}}`) veste só o case com as cores e a fonte de título do cliente. O contraste é conferido ao gravar (texto/fundo ≥ 4,5:1, destaque/fundo ≥ 3:1, nos dois modos). O `rubrica-case` tem o roteiro de um case de identidade visual.
+- Textos do projeto e dos blocos são mapas por idioma (`{"pt-BR", "en"}`) e entram mesclados por idioma; listas e imagens são trocadas inteiras. O formato antigo do case (`content` e `sections`) é obsoleto: a migração do `update` o converte em blocos.
 - **Grupo da habilidade** (`resumeItems`, tipo `skill`): `content.group` ("Design", "Front-end"…) agrupa a stack no currículo; sem grupo, vai para "Stack". O nível (`level`) não aparece mais nas páginas. Tradução: `contentTranslations: { ptBR: {name, level, group}, enUS: {...} }`.
 - **Categoria do depoimento** (`category`): agrupa a página de depoimentos.
 

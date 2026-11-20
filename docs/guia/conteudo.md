@@ -42,6 +42,47 @@ Coleções são listas de itens com campos fixos, cada uma com a sua tela no pai
 
 Na linha de empresa também há os **dados da empresa** (razão social, CNPJ, endereço, horário, telefone, WhatsApp, mapa), um registro único que gera o rodapé e o dado estruturado `Organization`/`LocalBusiness` para o Google.
 
+## Projetos e cases
+
+Cada projeto tem uma página de **case**. Desde a 2.3.0 o corpo dela é feito de **blocos**, os mesmos das páginas, e não mais de seções fixas de título e texto. Isso permite contar o case do jeito que ele pede: texto, imagens, vídeo, antes e depois, paleta, tipografia.
+
+No editor do projeto (**Projetos**, no painel), o que fica em volta do corpo continua em campos: título, resumo, capa, cliente, ano, papel, categoria, links e números de destaque. O **Corpo do case** é o editor de blocos, igual ao de uma página, e há uma **prévia** do case como o visitante o vê, no tema em uso. O painel só oferece os blocos que valem num case: `hero`, `contato` e `cases` ficam de fora, porque o título da página é do template.
+
+### Blocos de marca e mídia
+
+Além dos blocos de texto, lista e números, o case aceita blocos pensados para trabalhos visuais (todos valem também nas páginas):
+
+| Bloco | Para quê |
+|---|---|
+| Antes e depois | Duas imagens comparadas: o logo antigo e a marca nova, a tela de antes e a de depois. Comparador deslizante (sem JavaScript, as duas ficam lado a lado) ou lado a lado |
+| Paleta de cores | As cores de uma marca, com nome, código, papel, uso e o contraste de cada uma |
+| Tipografia | As fontes de uma marca, cada uma escrita na própria fonte (do Google Fonts) ou numa imagem, para fontes de fora |
+| Variações de marca | As versões de um logo (principal, horizontal, só o símbolo, sobre fundo escuro), cada uma sobre a cor de fundo que quiser |
+| Imagens | Telas, mockups e aplicações da marca, em grade, mosaico ou carrossel, cada imagem com legenda |
+| Vídeo | Um vídeo do **YouTube ou do Vimeo**, com **capítulos** opcionais: pontos do vídeo com nome (`1:05`, `1:02:30`), e cada um abre o vídeo naquele ponto |
+
+Veja os campos de cada um no [catálogo de blocos](./blocos.md).
+
+Não há envio de vídeo para o site: o vídeo mora no YouTube ou no Vimeo e entra por link, o que mantém o site leve e rápido. Para uma **animação curta** (uma animação de logo, uma transição de tela), exporte um **GIF**, suba na biblioteca de imagens e use-o no bloco **Imagens** como qualquer outra imagem.
+
+### Case com a cara do cliente
+
+Um case pode vestir **as cores e a fonte de título do cliente** só dentro dele. O cabeçalho e o rodapé do site continuam com o seu tema. No editor do projeto, em **Cara do cliente**:
+
+1. ligue a opção;
+2. escolha o **fundo**, o **texto** e o **destaque** do modo claro (e, se quiser, os do escuro; sem eles, vale o mesmo do claro);
+3. escolha, se quiser, uma **fonte de título** do Google Fonts (o nome da família, como `Fraunces`). Ela é baixada no build.
+
+O painel mostra o contraste de cada cor enquanto você escolhe, e o painel e o MCP recusam a marca se o texto sobre o fundo tiver menos de **4,5:1** ou o destaque sobre o fundo, menos de **3:1**, em qualquer dos dois modos. É a regra que garante que o texto continue legível com qualquer marca. Com a opção desligada, as cores ficam guardadas sem aplicar (só o formato é conferido), para você ajustar com calma.
+
+### Cases criados antes da 2.3.0
+
+Os campos antigos (`content` e `sections`) continuam sendo lidos: o site mostra esses cases normalmente, com o texto convertido em blocos de texto na hora. Para passar o conteúdo de verdade para blocos, rode a migração do `update`. Veja [Atualizar o Rubrica](./atualizar.md#migração-dos-cases-230).
+
+### Pelo agente
+
+O [MCP](https://github.com/MierzwaMatheus/rubrica/blob/main/docs/v2/mcp.md) monta o corpo do case com as ferramentas `block_*`, passando `project` no lugar de `page`, e grava a cara do cliente no campo `brand` do projeto (`projects_update`).
+
 ## Outras telas do painel
 
 - **Aparência:** esquema de cores, modo, fontes e tokens do tema. Veja [Temas](./temas.md).

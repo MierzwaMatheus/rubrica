@@ -37,6 +37,21 @@ Na v2, atualizar é **subir a versão de um pacote**. O seu projeto não tem uma
 7. **Commit:** `chore: atualiza o Rubrica para a vX.Y.Z`.
 8. **Site no ar.** A produção só muda quando você publica (`npx create-rubrica publicar`, ou o merge na branch ligada à Vercel). Repasse o que as notas pedem: migrações e variáveis novas.
 
+## Migração dos cases (2.3.0)
+
+A 2.3.0 passa o corpo dos cases para **blocos**. O `update` lista a migração `projects-sections-to-blocks`, que converte o texto longo (`content`) e as seções (`sections`) de cada projeto em blocos `texto` e apaga os campos antigos. Ela é **idempotente**: rodar de novo não repete nada, e projetos que já têm blocos ficam como estão. Antes de rodar, o site já funciona: os cases no formato antigo continuam sendo lidos e aparecem normalmente.
+
+O `update --yes` roda a migração no Convex de **desenvolvimento**, depois de publicar o backend lá. Na **produção**, com o "ok" de quem cuida do site, publique o backend e rode a migração, nesta ordem:
+
+```bash
+npx convex deploy
+npx convex run --prod rubrica/collections:migrateSectionsToBlocks
+```
+
+O `convex deploy` publica sempre em produção, e a função nova só existe lá depois dele. A resposta é `{ migrated: <quantos projetos> }`. Depois, publique o site (`npx create-rubrica publicar`).
+
+Se o seu tema é de terceiros ou foi ejetado, confira também o template de case: ele precisa mostrar `blocks` no lugar de `sections`. Veja [O template de case](./criar-tema.md#o-template-de-case).
+
 ## Versões
 
 O núcleo e cada tema têm versões **independentes**, e o tema declara o contrato de blocos que usa (`contract: ^1`). Na prática:

@@ -130,7 +130,7 @@ As colunas "papel" dizem quem enxerga a ferramenta (permissões de `PERMISSIONS`
 | `whoami` | Projeto, Convex (dev/produção), conta, papel, site (tipo, idiomas, tema), plugins ligados e ferramentas disponíveis |
 | `login` | Confere a sessão e devolve a instrução do login no terminal |
 | `logout` | Encerra a sessão e apaga o token |
-| `blocks_catalog` | Tipos de bloco do site (núcleo e projeto, `origin`), com a orientação (`guidance`: quando usar, quando não usar, combina com), as variações do tema e os campos; com `type`, o JSON Schema de um tipo |
+| `blocks_catalog` | Tipos de bloco do site (núcleo e projeto, `origin`), com onde cada um vale (`contexts`: `page`, `case` ou os dois), a orientação (`guidance`: quando usar, quando não usar, combina com), as variações do tema e os campos; com `type`, o JSON Schema de um tipo; com `context` (`page` ou `case`), só os blocos que valem ali (o corpo de um case não aceita `hero`, `contato` nem `cases`) |
 | `page_recipes` | Receita do tema para o tipo do site: as páginas padrão e a ordem dos blocos de cada uma (com variação, fonte e se o bloco está disponível). Com `page` (caminho ou título), os campos de exemplo de uma página, nos idiomas do site |
 
 **Site** — `panel`: todo papel; `settings`: root e admin
@@ -145,6 +145,8 @@ As colunas "papel" dizem quem enxerga a ferramenta (permissões de `PERMISSIONS`
 
 **Páginas e blocos** — `pages`: root, admin, content-editor
 
+As ferramentas `block_*` mexem nos blocos de uma página (`page`: caminho ou id) **ou no corpo de um case** (`project`: slug ou id do projeto, de `projects_list`). Informe um dos dois. No case, o bloco é conferido contra o contexto `case` (o MCP e o backend recusam `hero`, `contato` e `cases`) e os blocos começam no `h2`.
+
 | Ferramenta | O que faz |
 |---|---|
 | `pages_list` / `pages_get` | Lista (caminho, idiomas, blocos) e lê uma página inteira |
@@ -152,7 +154,7 @@ As colunas "papel" dizem quem enxerga a ferramenta (permissões de `PERMISSIONS`
 | `pages_update` | Título (mesclado por idioma), caminho e SEO |
 | `pages_set_published` | Publica ou volta para rascunho |
 | `pages_remove` | Manda para a lixeira (só root restaura; páginas do sistema não saem) |
-| `block_add` | Acrescenta um bloco (tipado pelo catálogo) numa posição |
+| `block_add` | Acrescenta um bloco (tipado pelo catálogo) numa posição, de uma página (`page`) ou de um case (`project`) |
 | `block_update_fields` | Muda só alguns campos de um bloco (`fields`, `unset`, `variant`, `source`) |
 | `block_move` | Muda a posição de um bloco |
 | `block_set_visible` | Oculta ou mostra um bloco sem apagar |
@@ -164,8 +166,8 @@ As colunas "papel" dizem quem enxerga a ferramenta (permissões de `PERMISSIONS`
 |---|---|
 | `<coleção>_list` | Itens (id, nome, publicado, idiomas e idiomas que faltam); filtros `search`, `published`, `includeDeleted` |
 | `<coleção>_get` | Item inteiro, por `id` (ou `slug`, em posts e projetos) |
-| `<coleção>_create` | Cria o item. **Sempre rascunho**, a menos que `published: true` (o backend publicaria serviços, FAQ… por padrão; o MCP não) |
-| `<coleção>_update` | `patch` (mesclado por idioma), `unset` de opcionais |
+| `<coleção>_create` | Cria o item (em `projects`, com o mesmo conferido de `brand`). **Sempre rascunho**, a menos que `published: true` (o backend publicaria serviços, FAQ… por padrão; o MCP não) |
+| `<coleção>_update` | `patch` (mesclado por idioma), `unset` de opcionais. Em `projects`, o `brand` (a cara do cliente) é conferido antes: formato `#rrggbb` e contraste (texto sobre o fundo ≥ 4,5:1, destaque sobre o fundo ≥ 3:1, nos dois modos), com o caminho do problema (`brand.light.accent`). Com `brand.enabled: false`, só o formato |
 | `<coleção>_publish` | Publica ou despublica (`published: false`) |
 | `collection_remove` | Manda um item de qualquer coleção para a lixeira |
 | `collection_reorder` | Ordem dos itens |

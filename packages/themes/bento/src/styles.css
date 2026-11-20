@@ -383,3 +383,39 @@ a.bento-contact:hover { transform: translateY(-3px); }
   --bento-line: color-mix(in srgb, var(--rb-fg) 20%, transparent);
   --bento-chip: color-mix(in srgb, var(--rb-fg) 12%, transparent);
 }
+
+/* ---------- case em blocos e blocos de marca: cartões do bento ---------- */
+/* A largura de leitura alinha à esquerda, com o resto do corpo (não flutua no meio). */
+.rb-case__body > [data-block] > .rb-container { margin-inline: 0; }
+.rb-case__body { --rb-case-gap: clamp(2.25rem, 5vw, 3.5rem); }
+.rb-case__body .rb-section__title { letter-spacing: -0.02em; }
+
+/* Antes e depois: dois cartões lado a lado; o "depois" é o cartão da cor primária. */
+.rb-before-after__figure { padding: 0.875rem; border-radius: var(--bento-radius); background: var(--bento-card); align-content: start; }
+.rb-before-after__figure--after { background: var(--rb-accent); color: var(--rb-accent-fg); }
+.rb-before-after__figure--after .rb-before-after__label { color: var(--rb-accent-fg); }
+.rb-before-after__figure--after .rb-before-after__label::before { background: var(--rb-accent-fg); border-color: var(--rb-accent-fg); }
+.rb-before-after__image { border: 0; border-radius: calc(var(--bento-radius) - 0.5rem); }
+.rb-before-after__label { padding: 0.15rem 0.35rem 0; }
+.rb-before-after__caption { margin-top: 0.875rem; }
+.rb-comparer__stage { border: 0; border-radius: var(--bento-radius); }
+.rb-comparer__label { border: 0; background: var(--rb-bg); }
+
+/* Paleta, tipografia e capítulos: cartões com o raio do tema. */
+.rb-palette__list { gap: var(--bento-gap); }
+.rb-palette__swatch { border: 0; border-radius: var(--bento-radius); background: var(--bento-card); }
+.rb-palette__name { font-weight: 700; letter-spacing: -0.02em; }
+.rb-palette__sample { border-radius: 0.75rem; }
+.rb-palette__grade { border-radius: 0.5rem; }
+.rb-type__list { gap: var(--bento-gap); }
+.rb-type__font { border: 0; border-radius: var(--bento-radius); background: var(--bento-card); }
+.rb-type__weight { border: 0; border-radius: 0.75rem; background: var(--rb-bg); }
+.rb-video__chapters { border: 0; border-radius: var(--bento-radius); background: var(--bento-card); padding: 1rem; }
+.rb-video__frame { border: 0; border-radius: var(--bento-radius); }
+
+/* Variações e imagens: as pranchas são cartões com cantos grandes, legenda embaixo. */
+.rb-brand-grid__list, .rb-images[data-layout="grade"] .rb-images__list, .rb-images[data-layout="mosaico"] .rb-images__list { gap: var(--bento-gap); }
+.rb-brand-grid__figure, .rb-images__figure { padding: 0.75rem; border-radius: var(--bento-radius); background: var(--bento-card); align-content: start; }
+.rb-brand-grid__tile { border-radius: calc(var(--bento-radius) - 0.5rem); }
+.rb-brand-grid__caption, .rb-images__caption { padding: 0 0.25rem 0.25rem; }
+.rb-images__image { border: 0; border-radius: calc(var(--bento-radius) - 0.5rem); }

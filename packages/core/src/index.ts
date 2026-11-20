@@ -23,6 +23,15 @@ export {
 export { SCHEMES, SCHEME_TOKENS, DEFAULT_SCHEME_ID, getScheme, schemeCss, contrastRatio } from "./theme/schemes";
 export type { ColorScheme, SchemeMode, SchemeRole } from "./theme/schemes";
 export { planFonts, fontWeights, hasItalic, KNOWN_FONTS } from "./theme/fonts";
+/**
+ * Fontes de conteúdo (fonte do cliente no case, blocos `tipografia`): a variável CSS de
+ * cada família é `fontVarFor(family)`; use `font-family: var(<variável>, <reserva>)`.
+ */
+export { fontVarFor, BRAND_FONT_VAR, parseWeights, fontsInBlocks, planContentFonts, routeFontVars } from "./theme/fonts";
+export type { ContentFontUse, ContentFontsResult } from "./theme/fonts";
+/** Motor de blocos (páginas e corpo do case). */
+export { resolveBlocks } from "./render/blocks";
+export type { BlockEnv, BlockSite, ResolveBlocksOptions, ResolvedBlock, ResolvedBlocks } from "./render/blocks";
 /** Case com a cara do cliente: contraste, cores prontas e o CSS com escopo. */
 export {
   accentForeground,

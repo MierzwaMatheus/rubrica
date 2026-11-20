@@ -6,6 +6,7 @@
 import type { CaseBrand, CaseBrandColors } from "../content/types";
 import { HEX_COLOR } from "../blocks/fields";
 import { contrastRatio } from "./schemes";
+import { BRAND_FONT_VAR, fontVarFor } from "./fonts";
 
 /** Mínimos de contraste: texto normal (AA) e elementos de interface/texto grande. */
 export const BRAND_MIN_TEXT_CONTRAST = 4.5;
@@ -90,8 +91,11 @@ export function resolveBrand(brand: CaseBrand | undefined): ResolvedBrand | unde
 
 function declarations(c: ResolvedBrandColors, font?: string): string {
   const decls = [`--rb-bg:${c.background}`, `--rb-fg:${c.foreground}`, `--rb-accent:${c.accent}`, `--rb-accent-fg:${c.accentForeground}`];
-  // A família vem da Fonts API do Astro (a variável `--rbf-brand` é definida no build).
-  if (font) decls.push(`--rb-font-display:var(--rbf-brand, var(--rb-font-sans))`);
+  // A família vem da Fonts API do Astro, na variável da família (`fontVarFor`, planejada no
+  // build por `planContentFonts`). `--rbf-brand` aponta para ela só dentro do case: sem a
+  // fonte (família inexistente, download que falhou), a variável fica indefinida e os
+  // títulos caem na fonte do texto do tema.
+  if (font) decls.push(`${BRAND_FONT_VAR}:var(${fontVarFor(font)})`, `--rb-font-display:var(${BRAND_FONT_VAR}, var(--rb-font-sans))`);
   return decls.join(";");
 }
 

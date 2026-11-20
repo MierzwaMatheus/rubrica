@@ -2,6 +2,23 @@
 
 What changed in each version of Rubrica (core, themes and the `create-rubrica` CLI). Details for each one are in the [release notes](https://github.com/MierzwaMatheus/rubrica/releases). To update a v2 project, see [Updating Rubrica](./docs/guia/atualizar.md); to leave v1, [Migrating from v1](./docs/guia/migrar.md).
 
+## 2.3.0 — 2026-11-20
+
+The case body is now made of blocks, with brand and media blocks and the option to dress a case in the client's look. Everything is optional: a case in the old format keeps showing up. Theme contract 1.4.
+
+### New
+- **Case in blocks:** the project body uses the same blocks as pages (`blocks` on the project), without `hero`, `contato` and `cases`, starting at `h2`. In the panel, a block editor and a case preview right in the project.
+- **Brand and media blocks:** before and after (with a sliding comparison), color palette, typography, brand variations and images (grid, mosaic or carousel, with GIF for short animations). YouTube and Vimeo video gains chapters.
+- **A case in the client's look:** the client's colors (light and dark) and title font only inside the case (`brand` on the project). The minimum contrast is checked on save (4.5:1 for text, 3:1 for the accent) and the font is downloaded at build time.
+- **Blocks:** `contexts` (page, case or both) and the `color` field.
+- **Themes:** the case template receives `blocks` and `brand`, and the 14 themes get the case-in-blocks template and CSS.
+- **MCP:** the `block_*` tools accept `project` (a case body), `blocks_catalog` filters by `context` and the project's `brand` is validated before saving.
+- **`create-rubrica`:** the v1 converter carries cases over as blocks and `update` lists the data migration.
+
+### If you are updating
+- **Data migration:** `projects-sections-to-blocks` converts `content` and `sections` into `texto` blocks. `update` runs it on development; on production, after publishing the backend: `npx convex run --prod rubrica/collections:migrateSectionsToBlocks` (idempotent).
+- **Third-party and ejected themes:** `sections` and `content` are deprecated. The case template must show `blocks`. See [Creating a theme](./docs/guia/criar-tema.en.md#the-case-template).
+
 ## 2.2.0 — 2026-11-13
 
 The proposal, the acceptance page and the contract PDF are back to everything v1 had, with a new look in the theme's colors. Nothing changes for proposals that already set their own payment options and cancellation policy.

@@ -69,6 +69,13 @@ describe("resolveBlocks no contexto case", () => {
     expect(blocks).toEqual([]);
   });
 
+  it("no case, bloco de coleção vazio some mesmo quando todos estão vazios (na página fica)", () => {
+    const list = [block("p", "posts-recentes", { title: { "pt-BR": "Posts" } })];
+    const e = { ...env(), plugins: new Set(["portfolio", "blog"]) };
+    expect(resolveBlocks(list, e, { context: "case" }).blocks).toEqual([]);
+    expect(resolveBlocks(list, e, { context: "page" }).blocks.map((b) => b.id)).toEqual(["p"]);
+  });
+
   it("bloco invisível e de plugin desligado não entram", () => {
     const list = [
       block("x", "texto", { body: { "pt-BR": "<p>a</p>" } }, { visible: false }),
@@ -153,5 +160,54 @@ describe("rota do case", () => {
     const r = caseRoute([a, b, c], "/portfolio/a");
     expect(r.next?.id).toBe("antigo");
     expect(caseRoute([a, b, c], "/portfolio/antigo").next?.id).toBe("a");
+  });
+});
+
+describe("hasCase por idioma", () => {
+  const locs = (pt: string, en?: string) => (en ? { "pt-BR": pt, en } : { "pt-BR": pt });
+  const proj = (id: string, order: number, blocks: BlockInstance[], tags: string[] = []): RawProject =>
+    ({ id, slug: id, title: locs(id.toUpperCase(), `${id.toUpperCase()} en`), order, tags, blocks }) as RawProject;
+  // Só em português: em inglês o case não mostra nada.
+  const soPt = proj("so-pt", 1, [block("t", "texto", { body: locs("<p>só pt</p>") })], ["marca"]);
+  // Só blocos que o case recusa (hero) ou listas vazias: nunca tem corpo.
+  const soHero = proj("so-hero", 2, [block("h", "hero", { title: locs("Oi", "Hi") }), block("p", "posts-recentes", { title: locs("Posts", "Posts") })], ["marca"]);
+  const ambos = proj("ambos", 3, [block("t", "texto", { body: locs("<p>pt</p>", "<p>en</p>") })], ["marca"]);
+  const site = () => buildSite({ snapshot: snapshot([soPt, soHero, ambos]), theme, blocks: CORE_BLOCKS, plugins: CORE_PLUGINS });
+  const caseAt = (url: string) => {
+    const r = site().routes.find((x) => x.url === url);
+    if (r?.type !== "case") throw new Error(url);
+    return r;
+  };
+
+  it("conta só o que o case mostra no idioma", () => {
+    expect(caseAt("/portfolio/so-pt").project.hasCase).toBe(true);
+    expect(caseAt("/en/portfolio/so-pt").project.hasCase).toBe(false);
+    expect(caseAt("/portfolio/so-hero").project.hasCase).toBe(false);
+    expect(caseAt("/en/portfolio/so-hero").blocks).toEqual([]);
+    expect(caseAt("/en/portfolio/ambos").project.hasCase).toBe(true);
+  });
+
+  it("o próximo case pula o que não tem corpo no idioma", () => {
+    expect(caseAt("/portfolio/ambos").next?.id).toBe("so-pt");
+    expect(caseAt("/en/portfolio/ambos").next).toBeUndefined();
+    expect(caseAt("/en/portfolio/so-pt").next?.id).toBe("ambos");
+  });
+
+  it("o case relacionado do post também", () => {
+    const post = { id: "p1", slug: "p1", title: locs("Post", "Post"), content: locs("<p>x</p>", "<p>x</p>"), tags: ["marca"], published: true, publishedAt: 1 };
+    // Com o post, a lista de posts do `so-hero` deixaria de estar vazia: aqui ele só tem o hero.
+    const heroOnly = { ...soHero, blocks: soHero.blocks!.slice(0, 1) };
+    const built = buildSite({
+      snapshot: { ...snapshot([]), collections: { ...emptyCollections(), projects: [soPt, heroOnly, ambos], posts: [post as never] } },
+      theme,
+      blocks: CORE_BLOCKS,
+      plugins: CORE_PLUGINS,
+    });
+    const related = (url: string) => {
+      const r = built.routes.find((x) => x.url === url);
+      return r?.type === "post" ? r.relatedCase?.id : "sem rota";
+    };
+    expect(related("/blog/p1")).toBe("so-pt");
+    expect(related("/en/blog/p1")).toBe("ambos");
   });
 });

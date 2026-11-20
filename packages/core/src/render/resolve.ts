@@ -16,6 +16,12 @@ export interface ResolveOptions {
   whatsapp?: { number: string; message?: string };
   /** Id da janela de contato, quando o site tem uma: os links para o contato a abrem. */
   contactDialog?: string;
+  /**
+   * Projetos com corpo de case NESTE idioma (o `buildSite` calcula com `resolveBlocks` no
+   * contexto `case`). Dá o `hasCase` dos itens; sem ele (fora do build), vale a conta
+   * aproximada do `resolveProject`.
+   */
+  caseIds?: ReadonlySet<string>;
 }
 
 /** Links para o contato: a âncora do bloco (`#contato`, `/#contato`) ou o endereço `contato:`. */

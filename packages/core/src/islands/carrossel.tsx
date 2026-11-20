@@ -11,6 +11,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { ResolvedImage } from "../blocks/fields";
 import { makeT } from "./kit";
 
+/** Prefixos dos textos de interface que esta ilha recebe (`ISLAND_META`, `caseCarouselFor`). */
+export const CAROUSEL_TEXT_PREFIXES = ["gallery.", "case.gallery"];
+
 export interface CarouselIslandProps {
   images: ResolvedImage[];
   /** Nome do projeto: completa o texto alternativo das imagens sem descrição. */

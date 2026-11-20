@@ -1,5 +1,5 @@
 import type { ComponentType } from "react";
-import Carrossel from "./carrossel";
+import Carrossel, { CAROUSEL_TEXT_PREFIXES } from "./carrossel";
 import Comparador from "./comparador";
 import Contato from "./contato";
 import Curriculo from "./curriculo";
@@ -8,6 +8,7 @@ import Imagens from "./imagens";
 import PostsBusca from "./posts-busca";
 import Video from "./video";
 import { APP_ISLANDS, APP_TEXT_PREFIXES } from "./app";
+
 
 /**
  * Ilhas do núcleo, por nome. Um bloco `interactive` usa a ilha com o nome do seu tipo
@@ -42,7 +43,7 @@ export function islandNameFor(blockType: string): string {
  * de uma rota do app. Ilha do projeto sem entrada aqui recebe só o básico.
  */
 export const ISLAND_META: Record<string, { textPrefixes: string[]; items?: boolean; title?: string }> = {
-  carrossel: { textPrefixes: ["gallery.", "case.gallery"] },
+  carrossel: { textPrefixes: CAROUSEL_TEXT_PREFIXES },
   comparador: { textPrefixes: ["beforeAfter."] },
   imagens: { textPrefixes: ["gallery.", "case.gallery"] },
   contato: { textPrefixes: ["form.", "contactForm."] },

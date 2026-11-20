@@ -10,13 +10,16 @@ import { blockComponent, ColorToggleButton, LocaleLinks, SiteAnnouncement, siteW
 import { CORE_PLUGINS } from "../../plugins/registry";
 import { appearanceHead } from "../../theme/appearance";
 import type { BlockComponent } from "../../theme/contract";
-import { fontVarFor, planFonts } from "../../theme/fonts";
+import { planFonts } from "../../theme/fonts";
 import type { SiteSnapshot } from "../../data/source";
 import { isPreviewMessage, type FromPreview, type ToPreview } from "./protocol";
 import { resolveCasePreview, resolvePreview } from "./resolve";
 import type { ResolvedBlock } from "../../render/site";
 import type { RenderContext } from "../../theme/contract";
 import { brandCss } from "../../theme/brand";
+import Carrossel from "../../islands/carrossel";
+import { caseCarouselFor } from "../../islands/case-carousel";
+import { previewContentFonts } from "./fonts";
 
 const blocks = [...CORE_BLOCKS, ...(projectBlocks ?? []).filter((b) => !CORE_BLOCKS.some((c) => c.type === b.type))];
 
@@ -80,10 +83,6 @@ function BlockViews({ blocks: list, ctx }: { blocks: ResolvedBlock[]; ctx: Rende
   );
 }
 
-function fontHref(family: string): string {
-  return `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family).replace(/%20/g, "+")}:wght@400;600;700&display=swap`;
-}
-
 /**
  * A rota de case, como o `page.astro` do site: o template do tema com o corpo no slot
  * `blocks` (o mesmo laço da prévia de páginas) e, com a cara do cliente, dentro do wrapper
@@ -93,7 +92,10 @@ function CaseView({ result }: { result: Extract<ReturnType<typeof resolveCasePre
   const { Case } = templates(theme);
   const { ctx, brand } = result;
   const body = result.blocks.length > 0 ? <BlockViews blocks={result.blocks} ctx={ctx} /> : <div style={notice}>O case ainda não tem blocos visíveis.</div>;
-  const view = <Case project={result.project} related={result.related} next={result.next} blocks={body} brand={brand} ctx={ctx} />;
+  // Como o page.astro: tema com `caseCarousel` e projeto com imagens recebe o carrossel no slot.
+  const carouselProps = caseCarouselFor(theme, result.project, ctx);
+  const carousel = carouselProps ? <Carrossel {...carouselProps} /> : undefined;
+  const view = <Case project={result.project} related={result.related} next={result.next} blocks={body} carousel={carousel} brand={brand} ctx={ctx} />;
   if (!brand) return view;
   return (
     <div data-rb-brand="" {...(brand.fontDisplay ? { "data-rb-brand-font": "" } : {})} className="rb-case-brand">
@@ -190,11 +192,11 @@ export default function PreviewApp() {
       })
       .join(";");
     // Case com a cara do cliente: o CSS da marca (escopo `[data-rb-brand]`) vai no <head>, como
-    // no site. A família do cliente entra pelo Google Fonts na variável que o site recebe da Fonts API.
+    // no site. A família do cliente e as dos blocos tipografia entram pelo Google Fonts, nas
+    // variáveis que o site recebe da Fonts API (`fontVarFor`).
     const brand = result?.ok && "brand" in result ? result.brand : undefined;
-    const brandFont = brand?.fontDisplay;
-    const brandCssText = brand ? [brandCss(brand), brandFont ? `:root{${fontVarFor(brandFont)}:"${brandFont}",system-ui,sans-serif}` : ""].filter(Boolean).join("\n") : "";
-    style.textContent = [head.css, brandCssText, fontCss ? `:root[data-theme-id][data-color-mode][lang]{${fontCss}}` : ""].filter(Boolean).join("\n");
+    const content = previewContentFonts(shown, brand?.fontDisplay);
+    style.textContent = [head.css, brand ? brandCss(brand) : "", content.css, fontCss ? `:root[data-theme-id][data-color-mode][lang]{${fontCss}}` : ""].filter(Boolean).join("\n");
     let link = document.getElementById("rb-preview-fonts") as HTMLLinkElement | null;
     const families = plan.fonts.filter((f) => f.name && (f.name === appearance.fontSans || f.name === appearance.fontMono));
     const href = families.length
@@ -208,15 +210,19 @@ export default function PreviewApp() {
       link.href = href;
       document.head.appendChild(link);
     } else if (!href) link?.remove();
-    let brandLink = document.getElementById("rb-preview-brand-font") as HTMLLinkElement | null;
-    if (brandFont && (!brandLink || brandLink.href !== fontHref(brandFont))) {
-      brandLink?.remove();
-      brandLink = document.createElement("link");
-      brandLink.id = "rb-preview-brand-font";
-      brandLink.rel = "stylesheet";
-      brandLink.href = fontHref(brandFont);
-      document.head.appendChild(brandLink);
-    } else if (!brandFont) brandLink?.remove();
+    // Um <link> por família de conteúdo: tira os que saíram, põe os que faltam.
+    const wanted = new Set(content.hrefs);
+    for (const el of document.querySelectorAll<HTMLLinkElement>("link[data-rb-preview-content-font]")) {
+      if (wanted.has(el.dataset.rbPreviewContentFont!)) wanted.delete(el.dataset.rbPreviewContentFont!);
+      else el.remove();
+    }
+    for (const href of wanted) {
+      const el = document.createElement("link");
+      el.rel = "stylesheet";
+      el.href = href;
+      el.dataset.rbPreviewContentFont = href;
+      document.head.appendChild(el);
+    }
   });
 
   // Marca cada bloco e destaca o selecionado.

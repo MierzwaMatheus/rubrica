@@ -95,7 +95,7 @@ describe("blocos de marca (contrato 1.4)", () => {
   it("a lista principal de cada bloco é obrigatória: bloco sem itens não passa", () => {
     for (const [type, key] of [["paleta", "colors"], ["tipografia", "fonts"], ["variacoes-marca", "items"], ["imagens", "items"]] as const) {
       const def = byType.get(type)!;
-      expect(def.fields[key]!.required, type).toBe(true);
+      expect((def.fields as Record<string, { required?: boolean }>)[key]!.required, type).toBe(true);
       expect(validateBlock(def, { fields: {} }).map((e) => e.path), type).toContain(key);
       expect(validateBlock(def, { fields: { [key]: [] } }).length, type).toBeGreaterThan(0);
     }

@@ -107,6 +107,8 @@ export function fieldToSchema(def: FieldDef, opts: SchemaOptions = {}): JsonSche
       return imageSchema(opts, description);
     case "link":
       return linkSchema(opts, description);
+    case "color":
+      return { type: "string", pattern: "^#[0-9a-fA-F]{6}$", description: `${description}. Cor em hexadecimal, como #7a1f2b.` };
     case "list":
       return {
         type: "array",

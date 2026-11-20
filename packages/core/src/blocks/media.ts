@@ -301,3 +301,14 @@ export const EMBED_FRAME_SOURCES: readonly string[] = [...new Set(EMBED_PROVIDER
 
 /** Tudo o que os blocos do núcleo podem pôr num iframe: players de vídeo e provedores de incorporação. */
 export const BLOCK_FRAME_SOURCES: readonly string[] = [...VIDEO_FRAME_SOURCES, ...EMBED_FRAME_SOURCES];
+
+/** Início de um capítulo (`m:ss` ou `h:mm:ss`) em segundos; formato inválido → undefined. */
+export function chapterSeconds(start: unknown): number | undefined {
+  if (typeof start !== "string") return undefined;
+  const m = /^(?:(\d{1,2}):)?(\d{1,2}):([0-5]\d)$/.exec(start.trim());
+  if (!m) return undefined;
+  const h = m[1] ? Number(m[1]) : 0;
+  const min = Number(m[2]);
+  if (m[1] && min > 59) return undefined;
+  return h * 3600 + min * 60 + Number(m[3]);
+}

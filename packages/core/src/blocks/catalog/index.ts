@@ -6,7 +6,10 @@
  */
 import { defineBlock } from "../define";
 import { field } from "../fields";
-import { EMBED_PROVIDERS, parseEmbedUrl, parseVideoUrl } from "../media";
+import { chapterSeconds, EMBED_PROVIDERS, parseEmbedUrl, parseVideoUrl } from "../media";
+import { antesDepois, imagens, paleta, tipografia, variacoesMarca } from "./marca";
+
+export { antesDepois, imagens, paleta, tipografia, variacoesMarca } from "./marca";
 
 /** Domínios que os blocos põem em iframe (a CSP do CLI lê daqui) e o parse dos endereços. */
 export { BLOCK_FRAME_SOURCES, EMBED_PROVIDERS, parseEmbedUrl, parseVideoUrl } from "../media";
@@ -30,6 +33,7 @@ export const hero = defineBlock({
     pairsWith: ["numeros", "logos-clientes", "cases", "servicos"],
   },
   category: "comum",
+  contexts: ["page"],
   fields: {
     eyebrow: field.text({ label: "Sobretítulo", maxLength: 80 }),
     title: field.text({ label: "Título", required: true, maxLength: 160 }),
@@ -137,6 +141,7 @@ export const cases = defineBlock({
     pairsWith: ["depoimentos", "logos-clientes", "cta"],
   },
   category: "comum",
+  contexts: ["page"],
   plugin: "portfolio",
   source: { collections: ["projects"], default: { collection: "projects", featured: true, limit: 3, sort: "order" } },
   fields: {
@@ -272,6 +277,7 @@ export const contato = defineBlock({
     pairsWith: ["localizacao", "faq", "cta"],
   },
   category: "comum",
+  contexts: ["page"],
   interactive: true,
   islandWhen: (f, plugins) => f.mode !== "channels" && plugins.has("contact-wizard"),
   fields: {
@@ -469,6 +475,13 @@ export const logosClientes = defineBlock({
 
 const embedLabels = EMBED_PROVIDERS.map((p) => p.label).join(", ");
 
+const chapterLabel = (pt: string, en: string) => ({ "pt-BR": pt, en, "en-US": en, es: pt });
+const VIDEO_CHAPTERS_SAMPLE = [
+  { start: "0:00", label: chapterLabel("Abertura", "Opening") },
+  { start: "0:42", label: chapterLabel("Como funciona", "How it works") },
+  { start: "2:15", label: chapterLabel("Resultados", "Results") },
+];
+
 export const video = defineBlock({
   type: "video",
   label: "Vídeo",
@@ -512,10 +525,28 @@ export const video = defineBlock({
       ],
       default: "16:9",
     }),
+    chapters: field.list({
+      label: "Capítulos",
+      itemLabel: "Capítulo",
+      max: 20,
+      help: "Pontos do vídeo com nome: cada um abre o vídeo no tempo certo.",
+      of: {
+        start: field.text({ label: "Início (m:ss)", localized: false, required: true, maxLength: 8, help: "Ex.: 1:05 ou 1:02:30." }),
+        label: field.text({ label: "Nome", required: true, maxLength: 80 }),
+      },
+    }),
   },
-  validate: (f) => (parseVideoUrl(f.url) ? [] : [{ path: "url", message: "Endereço do vídeo: use um link do YouTube ou do Vimeo" }]),
+  validate: (f) => [
+    ...(parseVideoUrl(f.url) ? [] : [{ path: "url", message: "Endereço do vídeo: use um link do YouTube ou do Vimeo" }]),
+    ...(Array.isArray(f.chapters) ? f.chapters : []).flatMap((c, i) =>
+      chapterSeconds((c as { start?: unknown }).start) === undefined ? [{ path: `chapters.${i}.start`, message: "Início do capítulo: use m:ss ou h:mm:ss (ex.: 1:05)" }] : [],
+    ),
+  ],
   // Cheia com miniatura própria, curta com a do YouTube, Vimeo com e sem imagem.
-  sample: (_mode, i) => (i < 2 ? { url: "https://www.youtube.com/watch?v=M7lc1UVf-VE" } : { url: "https://vimeo.com/76979871", ...(i === 3 ? { poster: undefined } : {}) }),
+  sample: (mode, i) => ({
+    ...(i < 2 ? { url: "https://www.youtube.com/watch?v=M7lc1UVf-VE" } : { url: "https://vimeo.com/76979871", ...(i === 3 ? { poster: undefined } : {}) }),
+    chapters: mode === "cheio" ? VIDEO_CHAPTERS_SAMPLE : undefined,
+  }),
 });
 
 export const incorporacao = defineBlock({
@@ -688,6 +719,11 @@ export const CORE_BLOCKS = [
   incorporacao,
   linhaDoTempo,
   comparativoPlanos,
+  antesDepois,
+  paleta,
+  tipografia,
+  variacoesMarca,
+  imagens,
 ] as const;
 
 export type CoreBlock = (typeof CORE_BLOCKS)[number];

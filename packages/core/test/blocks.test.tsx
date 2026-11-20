@@ -50,7 +50,7 @@ describe("blocos padrão", () => {
   it("cases: mostra a métrica do projeto só quando existe", async () => {
     const ctx = (await load("pessoal")).context("pt-BR", "/");
     const project = (metric?: { value: string; label: string }) => ({
-      id: "p1", slug: "p", url: "/portfolio/p", title: "Case", sections: [], gallery: [], links: [], tags: [], featured: false, seo: {}, ...(metric ? { metric } : {}),
+      id: "p1", slug: "p", url: "/portfolio/p", title: "Case", sections: [], hasCase: false, gallery: [], links: [], tags: [], featured: false, seo: {}, ...(metric ? { metric } : {}),
     });
     const withMetric = render("cases", { ctx, items: [project({ value: "~50", label: "skills em produção" })] as never });
     expect(withMetric).toContain("rb-card__metric");

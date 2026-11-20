@@ -262,6 +262,12 @@ export const RUBRICA_DATA_MIGRATIONS = [
     description: "Normaliza a pasta das imagens migradas da v1 (\"portfolio/toca\" → \"/portfolio/toca\"), que não abriam no filtro de pastas",
     fn: "rubrica/media:normalizeFolders",
   },
+  {
+    id: "projects-sections-to-blocks",
+    since: "2.3.0",
+    description: "Converte o corpo dos cases (texto longo e seções) em blocos, o formato da 2.3.0 que aceita vídeo, imagens, antes e depois e paleta dentro do case",
+    fn: "rubrica/collections:migrateSectionsToBlocks",
+  },
 ] as const;
 
 export type { RubricaConfig } from "./runtime";

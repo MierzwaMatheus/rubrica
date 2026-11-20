@@ -3,6 +3,10 @@ import { validateFields, type FieldError, type FieldMap } from "./fields";
 
 export type BlockCategory = "comum" | SiteKind;
 
+/** Onde o bloco pode entrar: no corpo de uma página ou no corpo de um case (contrato 1.4). */
+export type BlockContext = "page" | "case";
+export const BLOCK_CONTEXTS: readonly BlockContext[] = ["page", "case"];
+
 /**
  * Orientação de uso do bloco, para quem monta a página (agentes pelo MCP, pessoas pela
  * documentação): quando usar, quando não usar e com quais blocos ele combina. Texto em
@@ -34,6 +38,11 @@ export interface BlockDefinition<M extends FieldMap = FieldMap> {
     /** Consulta usada quando o bloco é criado. */
     default: CollectionQuery;
   };
+  /**
+   * Onde o bloco pode entrar. Padrão: página e case. Blocos de abertura ou de navegação
+   * (hero, contato, lista de cases) ficam só em `page`: no case o h1 é do template.
+   */
+  contexts?: readonly BlockContext[];
   /** Plugin que precisa estar ligado para o bloco aparecer (ex.: `blog`). */
   plugin?: string;
   /**
@@ -79,6 +88,11 @@ export function defineBlock<const M extends FieldMap>(def: BlockDefinition<M>): 
   return def;
 }
 
+/** O bloco pode entrar nesse contexto (página ou case)? */
+export function blockAllowedIn(def: Pick<BlockDefinition, "contexts">, context: BlockContext): boolean {
+  return (def.contexts ?? BLOCK_CONTEXTS).includes(context);
+}
+
 export interface BlockValidationError extends FieldError {
   blockId?: string;
 }
@@ -114,6 +128,8 @@ export interface SerializedBlock {
   description: string;
   guidance?: BlockGuidance;
   category: BlockCategory;
+  /** Ausente = página e case. */
+  contexts?: readonly BlockContext[];
   fields: FieldMap;
   source?: BlockDefinition["source"];
   plugin?: string;
@@ -128,6 +144,7 @@ export function serializeBlock(def: BlockDefinition): SerializedBlock {
     description: def.description,
     ...(def.guidance && { guidance: def.guidance }),
     category: def.category,
+    ...(def.contexts && { contexts: def.contexts }),
     fields: def.fields,
     ...(def.source && { source: def.source }),
     ...(def.plugin && { plugin: def.plugin }),

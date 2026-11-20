@@ -4,6 +4,7 @@
  */
 import { localizedPath, pick, type Locale, type LocaleConfig, type Localized } from "../i18n";
 import type { FieldDef, FieldMap, RawImage, RawLink, ResolvedImage, ResolvedLink } from "../blocks/fields";
+import { HEX_COLOR } from "../blocks/fields";
 import { resolveWhatsAppHref, WHATSAPP_HREF } from "./sitewide";
 
 export interface ResolveOptions {
@@ -74,6 +75,8 @@ function resolveValue(def: FieldDef, raw: unknown, opts: ResolveOptions): unknow
     case "boolean":
     case "select":
       return raw;
+    case "color":
+      return typeof raw === "string" && HEX_COLOR.test(raw) ? raw.toLowerCase() : undefined;
     case "image":
       return resolveImage(raw as RawImage, opts);
     case "link":

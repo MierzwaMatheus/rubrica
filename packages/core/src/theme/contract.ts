@@ -21,9 +21,10 @@ import type { Locale, LocaleConfig } from "../i18n";
 import type { ResolvedImage, ResolvedLink } from "../blocks/fields";
 import type { NavItem, Organization, SiteKind, SocialLink } from "../content/types";
 import type { CollectionItems, PostItem, ProjectItem } from "../render/collections";
+import type { ResolvedBrand } from "./brand";
 
-/** Versão do contrato de blocos que este núcleo implementa (decisão 30). 1.1: vídeo, incorporação, linha do tempo e comparativo de planos. 1.2: orientação de uso dos blocos (`guidance`). 1.3: campos opcionais dos blocos (assistente por assuntos, busca e destaques do blog, números do case, mosaico, link dos depoimentos) e do tema (`caseCarousel`, `islandBlocks`, `next` e `relatedCase` nos templates). */
-export const CONTRACT_VERSION = "1.3.0";
+/** Versão do contrato de blocos que este núcleo implementa (decisão 30). 1.1: vídeo, incorporação, linha do tempo e comparativo de planos. 1.2: orientação de uso dos blocos (`guidance`). 1.3: campos opcionais dos blocos (assistente por assuntos, busca e destaques do blog, números do case, mosaico, link dos depoimentos) e do tema (`caseCarousel`, `islandBlocks`, `next` e `relatedCase` nos templates). 1.4: o corpo do case em blocos (`contexts`, slot `blocks` e `brand` no template de case), campo `color` e os blocos antes-depois, paleta, tipografia, variações de marca, imagens e capítulos no vídeo. */
+export const CONTRACT_VERSION = "1.4.0";
 
 export interface ResolvedNavItem {
   label: string;
@@ -200,6 +201,19 @@ export interface CaseTemplateProps {
    * (`caseCarousel`) e o projeto tem imagens. Sem JavaScript, é uma faixa com rolagem lateral.
    */
   carousel?: ReactNode;
+  /**
+   * O corpo do case já desenhado pelo núcleo: os blocos do projeto (contexto `case`), com
+   * os componentes do tema, as variações e as ilhas, começando no h2. Projetos ainda no
+   * formato antigo chegam aqui convertidos (`content` e `sections` viram blocos `texto`).
+   * Ausente = o case não tem corpo. Desenhe-o no lugar onde antes iam as seções.
+   */
+  blocks?: ReactNode;
+  /**
+   * Cores do cliente, quando o case usa "a cara do cliente". O núcleo já envolve o template
+   * num `<div data-rb-brand>` com as variáveis `--rb-bg/--rb-fg/--rb-accent/--rb-accent-fg`
+   * trocadas; o tema só precisa usar esses tokens (e não cores fixas) dentro do case.
+   */
+  brand?: ResolvedBrand;
   ctx: RenderContext;
 }
 

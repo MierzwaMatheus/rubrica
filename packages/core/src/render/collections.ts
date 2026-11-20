@@ -67,7 +67,10 @@ export interface ProjectItem {
   title: string;
   summary?: string;
   content?: string;
+  /** @deprecated Desde a 2.3.0 o corpo do case vem em blocos (`CaseTemplateProps.blocks`); use `hasCase`. */
   sections: CaseSectionItem[];
+  /** O projeto tem corpo de case (blocos visíveis, seções ou texto longo): vira página e entra no "próximo case". */
+  hasCase: boolean;
   cover?: ResolvedImage;
   gallery: ResolvedImage[];
   client?: string;
@@ -285,6 +288,7 @@ export function resolveProject(raw: RawProject, opts: ResolveOptions, paths: Col
     url: detailUrl(paths.projects, raw.slug, opts),
     title,
     sections,
+    hasCase: raw.blocks ? raw.blocks.some((b) => b.visible) : sections.length > 0 || !!pick(raw.content, opts.locale),
     gallery: images(raw.gallery, opts),
     links: links(raw.links, opts),
     metrics: caseMetrics(raw.metrics, opts),

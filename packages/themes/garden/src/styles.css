@@ -374,3 +374,10 @@ ul.gd-rich { list-style: disc; padding-left: 1.2em; }
   .gd-met { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .gd-met-v { font-size: 26px; }
 }
+
+/* Case com a cara do cliente: tokens derivados recalculados dentro do escopo da marca. */
+[data-rb-brand] {
+  --garden-ink: color-mix(in srgb, var(--rb-accent) 78%, var(--rb-fg));
+  --garden-soft: color-mix(in srgb, var(--rb-accent) 14%, transparent);
+  --garden-shadow: color-mix(in srgb, var(--rb-fg) 14%, transparent);
+}

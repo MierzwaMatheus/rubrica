@@ -15,6 +15,7 @@ import type * as rubrica_aiResumes from "../rubrica/aiResumes.js";
 import type * as rubrica_asaas from "../rubrica/asaas.js";
 import type * as rubrica_audit from "../rubrica/audit.js";
 import type * as rubrica_checkouts from "../rubrica/checkouts.js";
+import type * as rubrica_collections from "../rubrica/collections.js";
 import type * as rubrica_commerce from "../rubrica/commerce.js";
 import type * as rubrica_contacts from "../rubrica/contacts.js";
 import type * as rubrica_contractTemplates from "../rubrica/contractTemplates.js";
@@ -55,6 +56,7 @@ declare const fullApi: ApiFromModules<{
   "rubrica/asaas": typeof rubrica_asaas;
   "rubrica/audit": typeof rubrica_audit;
   "rubrica/checkouts": typeof rubrica_checkouts;
+  "rubrica/collections": typeof rubrica_collections;
   "rubrica/commerce": typeof rubrica_commerce;
   "rubrica/contacts": typeof rubrica_contacts;
   "rubrica/contractTemplates": typeof rubrica_contractTemplates;

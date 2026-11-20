@@ -5,28 +5,20 @@
  */
 import { localizedPath, pick, pickWithFallback, translatedLocales, type Locale } from "../i18n";
 import type { BlockDefinition } from "../blocks/define";
-import type { CollectionName, CollectionQuery, PageRecord, SiteSettings } from "../content/types";
+import type { PageRecord, SiteSettings } from "../content/types";
+import { sectionsToBlocks } from "../content/legacy";
 import type { SiteSnapshot } from "../data/source";
 import { enabledPlugins, type PluginDefinition } from "../plugins/contract";
-import { resolveVariant, type Alternate, type RenderContext, type ResolvedSite, type ShellCollections, type ThemeDefinition } from "../theme/contract";
+import type { Alternate, RenderContext, ResolvedSite, ShellCollections, ThemeDefinition } from "../theme/contract";
+import { resolveBrand, type ResolvedBrand } from "../theme/brand";
 import { queryCollection, resolvePaths, resolvePost, resolveProject, resolveSeo, type CollectionPaths, type PostItem, type ProjectItem, type ResolvedSeo } from "./collections";
-import { resolveFields, resolveHref, resolveImage, resolveLink, type ResolveOptions } from "./resolve";
+import { resolveHref, resolveImage, resolveLink, type ResolveOptions } from "./resolve";
+import { blockKindAllows, blockOff, resolveBlocks, type BlockSite, type ResolvedBlock } from "./blocks";
 import { defaultUiText } from "../i18n/ui-texts";
 import { formatSiteDate, siteTimeZone } from "./dates";
 import { announcementActive, siteWhatsAppNumber, whatsAppMessage, whatsAppUrl } from "./sitewide";
 
-export interface ResolvedBlock {
-  id: string;
-  type: string;
-  variant: string;
-  fields: Record<string, unknown>;
-  items: unknown[];
-  headingLevel: 1 | 2;
-  index: number;
-  /** Quantos blocos visíveis a página tem. */
-  total: number;
-  interactive: boolean;
-}
+export type { ResolvedBlock } from "./blocks";
 
 export interface ResolvedPage {
   id: string;
@@ -50,7 +42,19 @@ interface RouteBase {
 export type SiteRoute =
   | (RouteBase & { type: "page"; page: ResolvedPage })
   | (RouteBase & { type: "post"; post: PostItem; related: PostItem[]; relatedCase?: ProjectItem })
-  | (RouteBase & { type: "case"; project: ProjectItem; related: ProjectItem[]; next?: ProjectItem });
+  | (RouteBase & {
+      type: "case";
+      project: ProjectItem;
+      /**
+       * Corpo do case (contexto `case`, h2): os blocos do projeto ou, no formato antigo, o
+       * `content` e as `sections` convertidos em blocos `texto` (`sectionsToBlocks`).
+       */
+      blocks: ResolvedBlock[];
+      /** Cores e fonte do cliente, quando o case usa "a cara do cliente" (válidas e ligadas). */
+      brand?: ResolvedBrand;
+      related: ProjectItem[];
+      next?: ProjectItem;
+    });
 
 export interface BuildInput {
   snapshot: SiteSnapshot;
@@ -98,12 +102,12 @@ function themeText(theme: ThemeDefinition, key: string, locale: Locale): string 
 }
 
 /**
- * Próximo case na ordem do portfólio, com volta ao início, entre os projetos com seções de
- * case (como o "Próximo case" da v1). Projeto fora dessa lista aponta para o primeiro; com
+ * Próximo case na ordem do portfólio, com volta ao início, entre os projetos com corpo de
+ * case (`hasCase`, como o "Próximo case" da v1). Projeto fora dessa lista aponta para o primeiro; com
  * menos de dois cases, não há próximo.
  */
 export function nextCase(projects: readonly ProjectItem[], currentId: string): ProjectItem | undefined {
-  const cases = projects.filter((p) => p.sections.length > 0);
+  const cases = projects.filter((p) => p.hasCase);
   const idx = cases.findIndex((p) => p.id === currentId);
   if (idx === -1) return cases[0];
   if (cases.length < 2) return undefined;
@@ -168,20 +172,16 @@ export function buildSite(input: BuildInput): BuiltSite {
   // O período do aviso vale no instante do build: muda só na próxima publicação.
   const announcementOn = announcementActive(settings.announcement, input.now ?? Date.now());
 
-  const kindAllows = (def: BlockDefinition | undefined): def is BlockDefinition =>
-    !!def && (def.category === "comum" || def.category === settings.kind);
-
-  const collectionOn = (c: CollectionName) => {
-    const owner = input.plugins.find((p) => p.collections?.includes(c));
-    return !owner || plugins.has(owner.id);
+  const blockSite: BlockSite = {
+    kind: settings.kind,
+    theme,
+    definitions: blockDefs,
+    plugins,
+    pluginDefs: input.plugins,
+    collections: snapshot.collections,
+    paths,
   };
-
-  /** Bloco cujo plugin (ou o dono da coleção que ele lista) está desligado. */
-  const blockOff = (def: BlockDefinition, query: CollectionQuery | undefined) =>
-    (!!def.plugin && !plugins.has(def.plugin)) || (!!query && !collectionOn(query.collection));
-
-  const blockAllowed = (def: BlockDefinition | undefined, query?: CollectionQuery): def is BlockDefinition =>
-    kindAllows(def) && !blockOff(def, query);
+  const kindAllows = (def: BlockDefinition | undefined): def is BlockDefinition => blockKindAllows(blockSite, def);
 
   const norm = (path: string) => (path.length > 1 ? path.replace(/\/+$/, "") : path) || "/";
 
@@ -206,7 +206,7 @@ export function buildSite(input: BuildInput): BuiltSite {
     if (!visible.length) return false;
     return visible.every((b) => {
       const def = blockDefs.get(b.type)!;
-      return blockOff(def, b.source ?? def.source?.default);
+      return blockOff(blockSite, def, b.source ?? def.source?.default);
     });
   }
 
@@ -214,34 +214,7 @@ export function buildSite(input: BuildInput): BuiltSite {
     const title = pick(page.title, locale);
     if (!title) return undefined;
     const o = opts(locale);
-    const prepared = page.blocks
-      .filter((b) => b.visible)
-      .flatMap((b) => {
-        const def = blockDefs.get(b.type);
-        const query = b.source ?? def?.source?.default;
-        if (!blockAllowed(def, query)) return [];
-        const items = query ? queryCollection(query, snapshot.collections[query.collection] as never[], o, paths) : [];
-        const fields = resolveFields(def.fields, b.fields, o);
-        const optedOut = !!def.islandOptIn && !!theme.blocks?.[b.type] && !theme.islandBlocks?.includes(b.type);
-        const interactive = !!def.interactive && !optedOut && (def.islandWhen?.(fields, plugins) ?? true);
-        return [{ b, def, query, items, fields, interactive }];
-      });
-    // Bloco de coleção sem itens não vira título solto: some (um convite interativo, como o de
-    // depoimento, é conteúdo). Se sobrasse página vazia, os blocos ficam e o tema mostra o vazio padrão.
-    const withContent = prepared.filter((x) => !x.query || x.items.length > 0 || x.interactive);
-    const visible = withContent.length ? withContent : prepared;
-    const firstIsHero = visible[0]?.b.type === "hero";
-    const blocks = visible.map(({ b, def, items, fields, interactive }, index): ResolvedBlock => ({
-      id: b.id,
-      type: b.type,
-      variant: resolveVariant(theme, b.type, b.variant),
-      fields,
-      items,
-      headingLevel: index === 0 && firstIsHero ? 1 : 2,
-      index,
-      total: visible.length,
-      interactive,
-    }));
+    const { blocks, firstIsHero } = resolveBlocks(page.blocks, { ...blockSite, options: o }, { context: "page" });
     return { id: page.id, path: page.path, title, seo: resolveSeo(page.seo, o), blocks, needsHiddenH1: !firstIsHero };
   }
 
@@ -276,7 +249,7 @@ export function buildSite(input: BuildInput): BuiltSite {
 
   /**
    * Case relacionado ao post (como o da v1): o primeiro projeto, na ordem do portfólio, com
-   * case para ler (seções ou texto) que divide uma etiqueta com o post, sem diferenciar
+   * case para ler (`hasCase`) que divide uma etiqueta com o post, sem diferenciar
    * maiúsculas. Sem o plugin de portfólio, nenhum.
    */
   const withRelatedCase = (post: PostItem, locale: Locale): { relatedCase?: ProjectItem } => {
@@ -284,7 +257,7 @@ export function buildSite(input: BuildInput): BuiltSite {
     const tags = new Set(post.tags.map((t) => t.trim().toLowerCase()).filter(Boolean));
     if (!tags.size) return {};
     const hit = queryCollection({ collection: "projects", sort: "order" }, snapshot.collections.projects, opts(locale), paths).find(
-      (p) => (p.sections.length > 0 || !!p.content) && p.tags.some((t) => tags.has(t.trim().toLowerCase())),
+      (p) => p.hasCase && p.tags.some((t) => tags.has(t.trim().toLowerCase())),
     );
     return hit ? { relatedCase: hit } : {};
   };
@@ -317,17 +290,21 @@ export function buildSite(input: BuildInput): BuiltSite {
   if (plugins.has("portfolio")) {
     for (const raw of snapshot.collections.projects) {
       const byLocale = new Map(cfg.locales.map((l) => [l, resolveProject(raw, opts(l), paths)] as const));
+      const brand = resolveBrand(raw.brand);
       const available = cfg.locales.filter((l) => byLocale.get(l));
       for (const locale of available) {
         const project = byLocale.get(locale)!;
         const all = queryCollection({ collection: "projects", sort: "order" }, snapshot.collections.projects, opts(locale), paths);
         const related = all.filter((p) => p.id !== project.id).slice(0, 3);
         const next = nextCase(all, project.id);
+        const { blocks } = resolveBlocks(sectionsToBlocks(raw), { ...blockSite, options: opts(locale) }, { context: "case" });
         const r: SiteRoute = {
           type: "case",
           url: project.url,
           locale,
           project,
+          blocks,
+          ...(brand && { brand }),
           related,
           ...(next ? { next } : {}),
           alternates: alternatesFor(available, (l) => byLocale.get(l)!.url, locale),

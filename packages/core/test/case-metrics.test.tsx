@@ -56,7 +56,7 @@ describe("números do case", () => {
 });
 
 describe("próximo case", () => {
-  const p = (id: string, withCase = true) => ({ id, sections: withCase ? [{ title: "t", body: "b" }] : [] }) as unknown as ProjectItem;
+  const p = (id: string, withCase = true) => ({ id, sections: [], hasCase: withCase }) as unknown as ProjectItem;
   const list = [p("a"), p("b", false), p("c"), p("d")];
 
   it("o seguinte com case, com volta ao início, pulando os sem case", () => {

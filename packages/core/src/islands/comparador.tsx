@@ -5,11 +5,26 @@
  * do teclado (Page Up/Down, Home e End também), com o foco desenhado na alça.
  *
  * Antes de hidratar (e sem JavaScript) é o mesmo par lado a lado do bloco estático.
+ *
+ * O palco tem a altura reservada desde o primeiro quadro (`--ratio`, das medidas da imagem
+ * do antes, senão da do depois, senão 16:10 com recorte), para não saltar enquanto as
+ * imagens chegam. As imagens usam o mesmo `Img` do par (mesmo `src`, `sizes` e
+ * carregamento), então o navegador reaproveita o que já baixou.
  */
 import { useEffect, useState, type CSSProperties } from "react";
 import type { ResolvedImage } from "../blocks/fields";
 import { BeforeAfterPair, beforeAfterLabels } from "../components/blocks/before-after";
+import { Img } from "../components/primitives";
 import { makeT } from "./kit";
+
+/** Proporção reservada para o palco: a do antes, a do depois ou 16:10 (a imagem é recortada). */
+export function comparerRatio(before: Pick<ResolvedImage, "width" | "height">, after: Pick<ResolvedImage, "width" | "height">): string {
+  const of = (i: Pick<ResolvedImage, "width" | "height">) => (i.width && i.height ? `${i.width} / ${i.height}` : undefined);
+  return of(before) ?? of(after) ?? "16 / 10";
+}
+
+/** O mesmo `sizes` do par lado a lado: o navegador escolhe o mesmo arquivo e não baixa de novo. */
+const SIZES = "(min-width: 48rem) 50vw, 100vw";
 
 interface ComparadorProps {
   fields: { before?: ResolvedImage; after?: ResolvedImage; beforeLabel?: string; afterLabel?: string };
@@ -25,13 +40,12 @@ export default function Comparador({ fields, texts }: ComparadorProps) {
   if (!before || !after) return null;
   const labels = beforeAfterLabels(fields, t);
   if (!ready) return <BeforeAfterPair before={before} after={after} {...labels} />;
-  const ratio = before.width && before.height ? `${before.width} / ${before.height}` : undefined;
   return (
-    <div className="rb-comparer" style={{ "--pos": `${pos}%`, ...(ratio && { "--ratio": ratio }) } as CSSProperties}>
+    <div className="rb-comparer" style={{ "--pos": `${pos}%`, "--ratio": comparerRatio(before, after) } as CSSProperties}>
       <div className="rb-comparer__stage">
-        <img className="rb-comparer__before" src={before.src} alt={before.alt} width={before.width} height={before.height} decoding="async" />
+        <Img image={before} className="rb-comparer__before" sizes={SIZES} />
         <div className="rb-comparer__after">
-          <img src={after.src} alt={after.alt} width={after.width} height={after.height} decoding="async" />
+          <Img image={after} sizes={SIZES} />
         </div>
         <span className="rb-comparer__label rb-comparer__label--before">{labels.beforeLabel}</span>
         <span className="rb-comparer__label rb-comparer__label--after">{labels.afterLabel}</span>

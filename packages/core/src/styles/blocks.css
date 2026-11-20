@@ -399,6 +399,8 @@ button.rb-button { cursor: pointer; font: inherit; font-weight: 600; }
 }
 .rb-palette__role { margin: 0 0 auto; font-family: var(--rb-font-mono); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
 .rb-palette__name { margin: 0; font-family: var(--rb-font-display); font-size: 1.35rem; line-height: 1.15; overflow-wrap: anywhere; }
+/* O nome é um h3 sobre a amostra: herda a cor escolhida por contraste, mesmo em tema com cor global de títulos. */
+.rb-palette__chip .rb-palette__name { color: inherit; }
 .rb-palette__body { display: grid; gap: 0.85rem; padding: 1rem 1.1rem 1.15rem; flex: 1; align-content: start; }
 .rb-palette__codes { margin: 0; display: grid; gap: 0.3rem; font-family: var(--rb-font-mono); font-size: 0.85rem; }
 .rb-palette__codes > div { display: flex; justify-content: space-between; gap: 1rem; }

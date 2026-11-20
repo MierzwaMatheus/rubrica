@@ -96,8 +96,8 @@ function hasRequiredContent(def: BlockDefinition, fields: Record<string, unknown
  *
  * Bloco de coleção sem itens não vira título solto: some (um convite interativo, como o de
  * depoimento, é conteúdo). Se sobrasse página vazia, os blocos ficam e o tema mostra o
- * vazio padrão. No case, um bloco sem nenhum campo obrigatório no idioma (seção sem
- * tradução) também some, como as seções antigas.
+ * vazio padrão (só na página: no case eles somem). No case, um bloco sem nenhum campo
+ * obrigatório no idioma (seção sem tradução) também some, como as seções antigas.
  */
 export function resolveBlocks(instances: readonly BlockInstance[], env: BlockEnv, { context }: ResolveBlocksOptions): ResolvedBlocks {
   const { theme, definitions, plugins, options, collections, paths } = env;
@@ -116,7 +116,9 @@ export function resolveBlocks(instances: readonly BlockInstance[], env: BlockEnv
       return [{ b, query, items, fields, interactive }];
     });
   const withContent = prepared.filter((x) => !x.query || x.items.length > 0 || x.interactive);
-  const visible = withContent.length ? withContent : prepared;
+  // Na página, sobrar só blocos de coleção vazios ainda mostra o vazio padrão do tema. No
+  // case, não: um corpo só de listas vazias é um case sem corpo (e não conta em `hasCase`).
+  const visible = withContent.length || context === "case" ? withContent : prepared;
   const firstIsHero = context === "page" && visible[0]?.b.type === "hero";
   const blocks = visible.map(({ b, items, fields, interactive }, index): ResolvedBlock => ({
     id: b.id,

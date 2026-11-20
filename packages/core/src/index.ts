@@ -27,7 +27,7 @@ export { planFonts, fontWeights, hasItalic, KNOWN_FONTS } from "./theme/fonts";
  * Fontes de conteúdo (fonte do cliente no case, blocos `tipografia`): a variável CSS de
  * cada família é `fontVarFor(family)`; use `font-family: var(<variável>, <reserva>)`.
  */
-export { fontVarFor, BRAND_FONT_VAR, parseWeights, fontsInBlocks, planContentFonts, routeFontVars } from "./theme/fonts";
+export { fontVarFor, BRAND_FONT_VAR, parseWeights, fontsInBlocks, planContentFonts, routeFontVars, isSafeFamily } from "./theme/fonts";
 export type { ContentFontUse, ContentFontsResult } from "./theme/fonts";
 /** Motor de blocos (páginas e corpo do case). */
 export { resolveBlocks } from "./render/blocks";

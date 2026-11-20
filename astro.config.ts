@@ -6,8 +6,19 @@
  * (site.json, pages.json, collections/*.json), para ver o site sem banco.
  */
 import { defineConfig } from "astro/config";
+import type { AstroIntegration } from "astro";
 import rubrica from "@rubrica/core/astro";
 import { components as ownComponents } from "./src/blocks";
+
+/** Vercel Web Analytics e Speed Insights em todas as páginas (o Rubrica só traz o Umami). */
+const vercelInsights: AstroIntegration = {
+  name: "vercel-insights",
+  hooks: {
+    "astro:config:setup": ({ injectScript }) => {
+      injectScript("page", `import "/src/lib/vercel-insights.ts";`);
+    },
+  },
+};
 
 export default defineConfig({
   site: "https://www.mmlo.com.br",
@@ -25,5 +36,6 @@ export default defineConfig({
       },
       // rubrica:ejetados:fim
     }),
+    vercelInsights,
   ],
 });

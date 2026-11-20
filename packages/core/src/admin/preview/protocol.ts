@@ -2,7 +2,7 @@
  * Mensagens entre o painel e o iframe da prévia (`/admin/preview`). Mesma origem nos
  * dois lados: quem recebe confere `event.origin` e o `source`.
  */
-import type { PageRecord, SiteSettings } from "../../content/types";
+import type { PageRecord, RawProject, SiteSettings } from "../../content/types";
 import type { SiteSnapshot } from "../../data/source";
 import type { Locale } from "../../i18n";
 
@@ -12,7 +12,9 @@ export type ToPreview =
   /** Base publicada (muda pouco): manda uma vez e quando o backend atualiza. */
   | { type: "rubrica:preview:base"; snapshot: SiteSnapshot }
   /** Rascunho (muda a cada tecla). */
-  | { type: "rubrica:preview:draft"; page: PageRecord; locale: Locale; settings?: SiteSettings; selected?: string; scrollToSelected?: boolean };
+  | { type: "rubrica:preview:draft"; page: PageRecord; locale: Locale; settings?: SiteSettings; selected?: string; scrollToSelected?: boolean }
+  /** Rascunho de um case (projeto com `blocks` e `brand`), renderizado na rota de case. */
+  | { type: "rubrica:preview:case"; project: RawProject; locale: Locale; settings?: SiteSettings; selected?: string; scrollToSelected?: boolean };
 
 export type FromPreview =
   | { type: "rubrica:preview:ready" }

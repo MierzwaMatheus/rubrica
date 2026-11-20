@@ -6,6 +6,7 @@
  */
 import { field, type FieldMap } from "../../blocks/fields";
 import type { CollectionName } from "../../content/types";
+import { needsSectionsMigration, sectionsToBlocks } from "../../content/legacy";
 import type { Localized } from "../../i18n";
 import type { Values } from "../editor/model";
 import { PERIOD_LABELS, textIn } from "../lib/format";
@@ -103,17 +104,9 @@ const PROJECT_FIELDS: FieldMap = {
   category: field.text({ label: "Categoria", maxLength: 60, help: "Uma por projeto (ex.: Produto, Site institucional). Alguns temas agrupam o portfólio por ela." }),
   metricValue: field.text({ label: "Número de destaque", localized: false, maxLength: 12, help: "Aparece no card do case. Ex.: ~50, 3x, 98%." }),
   metricLabel: field.text({ label: "O que o número mede", maxLength: 60, help: "Ex.: skills em produção. Sem os dois, o card não mostra o número." }),
-  content: field.richText({ label: "Texto do case", help: "Use quando o case é um texto corrido. Com seções, deixe vazio." }),
-  sections: field.list({
-    label: "Seções do case",
-    itemLabel: "Seção",
-    help: "Contexto, decisões, resultado… Cada uma aparece em ordem na página do case.",
-    of: {
-      title: field.text({ label: "Título da seção", required: true, maxLength: 100 }),
-      body: field.richText({ label: "Texto", required: true }),
-      image: field.image({ label: "Imagem da seção" }),
-    },
-  }),
+  // O corpo do case (`blocks`) e a cara do cliente (`brand`) não são campos simples: o editor
+  // de projeto os desenha à parte (editor de blocos e painel de cores). `content` e `sections`,
+  // do formato antigo, ficam fora do formulário e seguem no documento até a migração.
   metrics: field.list({
     label: "Resultados em números",
     itemLabel: "Número",
@@ -229,8 +222,12 @@ function dropEmpty(values: Values): Values {
 
 function projectToForm(doc: Doc): Values {
   const { gallery, metric, ...rest } = doc as Doc & { gallery?: unknown[]; metric?: { value?: string; label?: Localized<string> } };
+  // Projeto no formato antigo (seções/texto, sem `blocks`): o editor mostra os blocos já
+  // convertidos; ao salvar uma mudança no corpo, grava `blocks` (os campos antigos ficam).
+  const legacy = needsSectionsMigration(doc as never) ? sectionsToBlocks(doc as never) : undefined;
   return dropEmpty({
     ...rest,
+    ...(legacy ? { blocks: legacy } : {}),
     gallery: gallery?.map((image) => ({ image })),
     metricValue: metric?.value,
     metricLabel: metric?.label,
@@ -291,9 +288,9 @@ export const COLLECTION_CONFIGS: Record<CollectionName, CollectionConfig> = {
     title: "Projetos",
     singular: "projeto",
     plural: "projetos",
-    description: "Cases e projetos, com seções, galeria, número de destaque e SEO.",
+    description: "Cases e projetos, com o corpo em blocos, a cara do cliente, galeria, número de destaque e SEO.",
     fields: PROJECT_FIELDS,
-    docKeys: ["title", "summary", "cover", "client", "year", "role", "category", "metric", "content", "sections", "metrics", "gallery", "links", "tags", "featured", "seo"],
+    docKeys: ["title", "summary", "cover", "client", "year", "role", "category", "metric", "content", "sections", "blocks", "brand", "metrics", "gallery", "links", "tags", "featured", "seo"],
     required: ["title"],
     slug: true,
     seo: true,

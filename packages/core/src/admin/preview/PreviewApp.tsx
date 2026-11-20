@@ -13,7 +13,10 @@ import type { BlockComponent } from "../../theme/contract";
 import { planFonts } from "../../theme/fonts";
 import type { SiteSnapshot } from "../../data/source";
 import { isPreviewMessage, type FromPreview, type ToPreview } from "./protocol";
-import { resolvePreview } from "./resolve";
+import { resolveCasePreview, resolvePreview } from "./resolve";
+import type { ResolvedBlock } from "../../render/site";
+import type { RenderContext } from "../../theme/contract";
+import { brandCss, type ResolvedBrand } from "../../theme/brand";
 
 const blocks = [...CORE_BLOCKS, ...(projectBlocks ?? []).filter((b) => !CORE_BLOCKS.some((c) => c.type === b.type))];
 
@@ -49,6 +52,78 @@ const notice = {
   fontSize: "0.95rem",
 } as const;
 
+type DraftMessage = Extract<ToPreview, { type: "rubrica:preview:draft" | "rubrica:preview:case" }>;
+
+/** Os blocos desenhados com os componentes do tema (página ou corpo do case). */
+function BlockViews({ blocks: list, ctx }: { blocks: ResolvedBlock[]; ctx: RenderContext }) {
+  return (
+    <>
+      {list.map((b) => {
+        const Block = componentFor(b.type);
+        return (
+          <BlockBoundary key={b.id} type={b.type}>
+            <Block
+              id={b.id}
+              variant={b.variant}
+              fields={b.fields}
+              items={b.items}
+              headingLevel={b.headingLevel}
+              index={b.index}
+              total={b.total}
+              ctx={ctx}
+              island={b.interactive && !enhancedOnly.has(b.type) ? <div style={notice}>Parte interativa (formulário, envio): funciona no site publicado.</div> : undefined}
+            />
+          </BlockBoundary>
+        );
+      })}
+    </>
+  );
+}
+
+function fontHref(family: string): string {
+  return `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family).replace(/%20/g, "+")}:wght@400;600;700&display=swap`;
+}
+
+/**
+ * A rota de case: o template do tema com o corpo em blocos e a marca do cliente. O núcleo
+ * (frente A) envolve o template em `<div data-rb-brand>` e passa `blocks` e `brand`; enquanto
+ * o template do tema não desenha o slot `blocks`, os blocos entram logo abaixo dele.
+ * TODO(frente A): com o slot nos templates, o desvio (`slotUsed`) e o estilo do wrapper saem.
+ */
+function CaseView({ result }: { result: Extract<ReturnType<typeof resolveCasePreview>, { ok: true }> }) {
+  const { Case } = templates(theme);
+  const { ctx, brand } = result;
+  const [slotUsed, setSlotUsed] = useState(true);
+  useLayoutEffect(() => {
+    setSlotUsed(!!document.querySelector("[data-rb-case-blocks]"));
+  });
+  const empty = result.blocks.length === 0;
+  const body = (marker: boolean) => (
+    <div {...(marker ? { "data-rb-case-blocks": "" } : { "data-rb-case-fallback": "" })}>
+      {empty ? <div style={notice}>O case ainda não tem blocos visíveis.</div> : <BlockViews blocks={result.blocks} ctx={ctx} />}
+    </div>
+  );
+  const content = (
+    <>
+      <Case project={result.project} related={result.related} next={result.next} blocks={body(true)} brand={brand} ctx={ctx} />
+      {!slotUsed && body(false)}
+    </>
+  );
+  if (!brand) return content;
+  return <BrandWrapper brand={brand}>{content}</BrandWrapper>;
+}
+
+function BrandWrapper({ brand, children }: { brand: ResolvedBrand; children: ReactNode }) {
+  const font = brand.fontDisplay;
+  return (
+    <div data-rb-brand="" style={{ background: "var(--rb-bg)", color: "var(--rb-fg)" }}>
+      <style>{[brandCss(brand), font ? `[data-rb-brand]{--rbf-brand:"${font}",system-ui,sans-serif}` : ""].filter(Boolean).join("\n")}</style>
+      {font && <link rel="stylesheet" href={fontHref(font)} />}
+      {children}
+    </div>
+  );
+}
+
 function post(message: FromPreview) {
   window.parent?.postMessage(message, window.location.origin);
 }
@@ -60,12 +135,12 @@ function blockElement(id: string, anchor: unknown): HTMLElement | null {
 
 export default function PreviewApp() {
   const [base, setBase] = useState<SiteSnapshot>();
-  const [draft, setDraft] = useState<Extract<ToPreview, { type: "rubrica:preview:draft" }>>();
+  const [draft, setDraft] = useState<DraftMessage>();
 
   useEffect(() => {
     const onMessage = (event: MessageEvent) => {
       if (event.origin !== window.location.origin || event.source !== window.parent) return;
-      if (!isPreviewMessage<ToPreview>(event.data, ["rubrica:preview:base", "rubrica:preview:draft"])) return;
+      if (!isPreviewMessage<ToPreview>(event.data, ["rubrica:preview:base", "rubrica:preview:draft", "rubrica:preview:case"])) return;
       if (event.data.type === "rubrica:preview:base") setBase(event.data.snapshot);
       else setDraft(event.data);
     };
@@ -89,7 +164,14 @@ export default function PreviewApp() {
     };
   }, []);
 
-  const result = base && draft ? resolvePreview({ snapshot: base, page: draft.page, locale: draft.locale, settings: draft.settings, theme, blocks, plugins: CORE_PLUGINS }) : undefined;
+  const result =
+    base && draft
+      ? draft.type === "rubrica:preview:case"
+        ? resolveCasePreview({ snapshot: base, project: draft.project, locale: draft.locale, settings: draft.settings, theme, blocks, plugins: CORE_PLUGINS })
+        : resolvePreview({ snapshot: base, page: draft.page, locale: draft.locale, settings: draft.settings, theme, blocks, plugins: CORE_PLUGINS })
+      : undefined;
+  /** Blocos que a prévia mostra (os da página ou o corpo do case). */
+  const shown: ResolvedBlock[] = result?.ok ? ("blocks" in result ? result.blocks : result.page.blocks) : [];
   const settings = draft?.settings ?? base?.site;
 
   // Documento como o Document.astro do site: idioma, modo de cor e tokens do painel.
@@ -148,7 +230,7 @@ export default function PreviewApp() {
   // Marca cada bloco e destaca o selecionado.
   useLayoutEffect(() => {
     if (!result?.ok) return;
-    for (const b of result.page.blocks) {
+    for (const b of shown) {
       const el = blockElement(b.id, b.fields.anchor);
       if (!el) continue;
       el.dataset.rbPreviewId = b.id;
@@ -160,7 +242,7 @@ export default function PreviewApp() {
 
   useEffect(() => {
     if (!draft?.scrollToSelected || !draft.selected || !result?.ok) return;
-    const b = result.page.blocks.find((x) => x.id === draft.selected);
+    const b = shown.find((x) => x.id === draft.selected);
     if (b) blockElement(b.id, b.fields.anchor)?.scrollIntoView({ behavior: "smooth", block: "nearest" });
     // Só quando a seleção muda, não a cada tecla.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -169,38 +251,28 @@ export default function PreviewApp() {
   if (!result) return <div style={notice}>Carregando a prévia…</div>;
   if (!result.ok) return <div style={notice}>{result.message}</div>;
 
-  const { ctx, page, collections } = result;
+  const { ctx, collections } = result;
   const { Shell } = templates(theme);
+  const isCase = "blocks" in result;
   return (
     <>
       <SiteAnnouncement ctx={ctx} />
       <Shell
         ctx={ctx}
-        pageType="page"
+        pageType={isCase ? "case" : "page"}
         collections={collections}
         localeSwitcher={<LocaleLinks ctx={ctx} />}
         colorToggle={ctx.site.colorToggle ? <ColorToggleButton label={ctx.t("theme.toggle")} /> : undefined}
       >
-        {page.needsHiddenH1 && <h1 className="rb-sr-only">{page.title}</h1>}
-        {page.blocks.length === 0 && <div style={notice}>Página sem blocos visíveis.</div>}
-        {page.blocks.map((b) => {
-          const Block = componentFor(b.type);
-          return (
-            <BlockBoundary key={b.id} type={b.type}>
-              <Block
-                id={b.id}
-                variant={b.variant}
-                fields={b.fields}
-                items={b.items}
-                headingLevel={b.headingLevel}
-                index={b.index}
-                total={b.total}
-                ctx={ctx}
-                island={b.interactive && !enhancedOnly.has(b.type) ? <div style={notice}>Parte interativa (formulário, envio): funciona no site publicado.</div> : undefined}
-              />
-            </BlockBoundary>
-          );
-        })}
+        {"blocks" in result ? (
+          <CaseView result={result} />
+        ) : (
+          <>
+            {result.page.needsHiddenH1 && <h1 className="rb-sr-only">{result.page.title}</h1>}
+            {result.page.blocks.length === 0 && <div style={notice}>Página sem blocos visíveis.</div>}
+            <BlockViews blocks={result.page.blocks} ctx={ctx} />
+          </>
+        )}
       </Shell>
       <WhatsAppFloat ctx={ctx} />
     </>

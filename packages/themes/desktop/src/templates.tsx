@@ -81,7 +81,7 @@ function Facts({ project, ctx }: { project: CaseTemplateProps["project"]; ctx: R
   );
 }
 
-export function DesktopCase({ project, related, ctx }: CaseTemplateProps) {
+export function DesktopCase({ project, related, blocks, ctx }: CaseTemplateProps) {
   return (
     <>
       <Window id="case" type="case" bar={ctx.t("desktop.file.case")} labelledBy="case-h">
@@ -98,14 +98,7 @@ export function DesktopCase({ project, related, ctx }: CaseTemplateProps) {
               <Img image={project.cover} priority sizes="(min-width: 1024px) 860px, 100vw" />
             </div>
           )}
-          {project.content && <Html html={project.content} className="rb-prose dk-prose" />}
-          {project.sections.map((s, i) => (
-            <section key={i} className="dk-doc__section">
-              <h2>{s.title}</h2>
-              <Html html={s.body} className="rb-prose dk-prose" />
-              {s.image && <Img image={s.image} className="dk-frame" sizes="(min-width: 1024px) 800px, 100vw" />}
-            </section>
-          ))}
+          {blocks && <div className="rb-case__body dk-doc__blocks">{blocks}</div>}
           <CaseMetrics metrics={project.metrics} title={ctx.t("case.metrics")} className="dk-doc__section" />
           {project.links.length > 0 && (
             <ButtonRow>

@@ -1,8 +1,10 @@
 import type { ComponentType } from "react";
 import Carrossel from "./carrossel";
+import Comparador from "./comparador";
 import Contato from "./contato";
 import Curriculo from "./curriculo";
 import DepoimentoEnvio from "./depoimento-envio";
+import Imagens from "./imagens";
 import PostsBusca from "./posts-busca";
 import Video from "./video";
 import { APP_ISLANDS, APP_TEXT_PREFIXES } from "./app";
@@ -15,9 +17,11 @@ import { APP_ISLANDS, APP_TEXT_PREFIXES } from "./app";
  */
 export const CORE_ISLANDS: Record<string, ComponentType<any>> = {
   carrossel: Carrossel,
+  comparador: Comparador,
   contato: Contato,
   curriculo: Curriculo,
   "depoimento-envio": DepoimentoEnvio,
+  imagens: Imagens,
   "posts-recentes": PostsBusca,
   video: Video,
   // Páginas do app (rotas `kind: "app"` dos plugins), carregadas sob demanda.
@@ -25,7 +29,7 @@ export const CORE_ISLANDS: Record<string, ComponentType<any>> = {
 };
 
 /** Bloco → ilha, quando o nome difere do tipo do bloco. */
-export const ISLAND_FOR_BLOCK: Record<string, string> = { depoimentos: "depoimento-envio" };
+export const ISLAND_FOR_BLOCK: Record<string, string> = { depoimentos: "depoimento-envio", "antes-depois": "comparador" };
 
 export function islandNameFor(blockType: string): string {
   return ISLAND_FOR_BLOCK[blockType] ?? blockType;
@@ -39,6 +43,8 @@ export function islandNameFor(blockType: string): string {
  */
 export const ISLAND_META: Record<string, { textPrefixes: string[]; items?: boolean; title?: string }> = {
   carrossel: { textPrefixes: ["gallery.", "case.gallery"] },
+  comparador: { textPrefixes: ["beforeAfter."] },
+  imagens: { textPrefixes: ["gallery.", "case.gallery"] },
   contato: { textPrefixes: ["form.", "contactForm."] },
   curriculo: { textPrefixes: ["resume."], items: true },
   "depoimento-envio": { textPrefixes: ["form.", "testimonialForm."] },

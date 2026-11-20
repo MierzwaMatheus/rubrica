@@ -88,3 +88,25 @@ describe("serializeBlock", () => {
     }
   });
 });
+
+describe("blocos de marca (contrato 1.4)", () => {
+  const byType = new Map(CORE_BLOCKS.map((b) => [b.type, b]));
+
+  it("a lista principal de cada bloco é obrigatória: bloco sem itens não passa", () => {
+    for (const [type, key] of [["paleta", "colors"], ["tipografia", "fonts"], ["variacoes-marca", "items"], ["imagens", "items"]] as const) {
+      const def = byType.get(type)!;
+      expect((def.fields as Record<string, { required?: boolean }>)[key]!.required, type).toBe(true);
+      expect(validateBlock(def, { fields: {} }).map((e) => e.path), type).toContain(key);
+      expect(validateBlock(def, { fields: { [key]: [] } }).length, type).toBeGreaterThan(0);
+    }
+  });
+
+  it("valem na página e no case; antes-depois e imagens melhoram com ilha, o resto é estático", () => {
+    for (const type of ["antes-depois", "paleta", "tipografia", "variacoes-marca", "imagens"]) {
+      const def = byType.get(type)!;
+      expect(def.contexts, type).toBeUndefined();
+      expect(!!def.interactive, type).toBe(type === "antes-depois" || type === "imagens");
+      if (def.interactive) expect(def.enhances, type).toBe(true);
+    }
+  });
+});

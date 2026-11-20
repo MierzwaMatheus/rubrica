@@ -7,6 +7,9 @@ import { SHOWCASE_EMPTY_TAG, SHOWCASE_PREFIX, showcaseBlocks, showcasePages, wit
 import { CORE_RECIPES } from "../src/theme/recipes";
 import type { SiteSettings } from "../src/content/types";
 import type { Recipe } from "../src/theme/contract";
+import { existsSync } from "node:fs";
+import { KNOWN_FONTS } from "../src/theme/fonts";
+import { fileURLToPath } from "node:url";
 
 const defs = new Map(CORE_BLOCKS.map((b) => [b.type, b]));
 const site = (kind: "pessoal" | "empresa"): Pick<SiteSettings, "kind" | "locales" | "plugins"> => ({
@@ -84,5 +87,30 @@ describe("showcasePages", () => {
     const snapshot = await withShowcase(base, {}, CORE_BLOCKS).load();
     expect(snapshot.pages.length).toBeGreaterThan(10);
     expect(snapshot.pages.every((p) => p.path.startsWith(SHOWCASE_PREFIX))).toBe(true);
+  });
+
+  it("blocos de marca: exemplos válidos, com imagens que existem na demo (inclui um GIF) e fontes conhecidas", () => {
+    const pub = (url: string) => fileURLToPath(new URL(`../../../apps/demo/public${url}`, import.meta.url));
+    const urls: string[] = [];
+    const collect = (v: unknown): void => {
+      if (Array.isArray(v)) v.forEach(collect);
+      else if (v && typeof v === "object") {
+        const o = v as Record<string, unknown>;
+        if (typeof o.url === "string") urls.push(o.url);
+        Object.values(o).forEach(collect);
+      }
+    };
+    for (const type of ["antes-depois", "paleta", "tipografia", "variacoes-marca", "imagens"]) {
+      const blocks = showcaseBlocks(defs.get(type)!, {}, ["pt-BR", "en"]);
+      expect(blocks.length, type).toBeGreaterThanOrEqual(2);
+      for (const b of blocks) {
+        expect(validateBlock(defs.get(type)!, b), `${type} ${b.id}`).toEqual([]);
+        collect(b.fields);
+      }
+    }
+    expect(urls.some((u) => u.endsWith(".gif"))).toBe(true);
+    for (const u of new Set(urls)) expect(existsSync(pub(u)), u).toBe(true);
+    const fonts = showcaseBlocks(defs.get("tipografia")!, {}, ["pt-BR"]).flatMap((b) => (b.fields.fonts as { family: string; specimen?: unknown }[]).filter((f) => !f.specimen).map((f) => f.family));
+    for (const f of fonts) expect(KNOWN_FONTS, f).toContain(f);
   });
 });

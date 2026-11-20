@@ -146,7 +146,7 @@ export async function resolvePage(client: RubricaClient, ref: string): Promise<P
   const page = ref.startsWith("/")
     ? await client.query<PageDoc | null>("rubrica/pages:getByPath", { path: ref })
     : await client.query<PageDoc | null>("rubrica/pages:get", { id: ref }).catch((e) => {
-        if (e instanceof RubricaError && /ID|id/.test(e.message)) return null;
+        if (isInvalidIdError(e)) return null;
         throw e;
       });
   if (!page) throw new RubricaError(`Página não encontrada: ${ref}. Use pages_list para ver os caminhos e ids.`, "validation");
@@ -226,15 +226,32 @@ export const targetProps = {
 const PAGE_FN = { upsert: "rubrica/pages:upsertBlock", reorder: "rubrica/pages:reorderBlocks", visible: "rubrica/pages:setBlockVisible", remove: "rubrica/pages:removeBlock" } as const;
 const PROJECT_FN = { upsert: BACKEND.upsertProjectBlock, reorder: BACKEND.reorderProjectBlocks, visible: BACKEND.setProjectBlockVisible, remove: BACKEND.removeProjectBlock } as const;
 
-/** `ref`: slug ou id do projeto. */
+/**
+ * O texto não é um id da tabela: o Convex recusa o argumento no validador `v.id(...)`. No
+ * deployment: "Value does not match validator. Path: .id ... Validator: v.id(\"projects\")";
+ * no convex-test: "Validator error: Expected ID for table ...". Só esse erro vira "procure
+ * pelo slug"; qualquer outro (permissão, rede, servidor) sobe.
+ */
+export function isInvalidIdError(e: unknown): boolean {
+  return e instanceof RubricaError && e.kind === "validation" && /Validator: v\.id\(|Expected ID for table/.test(e.message);
+}
+
+/**
+ * `ref`: slug ou id do projeto. Pelo slug, a lixeira também conta: um projeto ativo vence um
+ * apagado com o mesmo slug, e um que só existe na lixeira volta com `deletedAt` (quem chama
+ * recusa com "está na lixeira", em vez de dizer que não existe).
+ */
 export async function resolveProject(client: RubricaClient, ref: string): Promise<ProjectDoc> {
   let found: ProjectDoc | null = null;
   try {
     found = await client.query<ProjectDoc | null>("rubrica/projects:get", { id: ref });
   } catch (e) {
-    if (!(e instanceof RubricaError && /ID|id/.test(e.message))) throw e;
+    if (!isInvalidIdError(e)) throw e;
   }
-  if (!found) found = (await client.query<ProjectDoc[]>("rubrica/projects:list", {})).find((p) => p.slug === ref) ?? null;
+  if (!found) {
+    const bySlug = (await client.query<ProjectDoc[]>("rubrica/projects:list", { includeDeleted: true })).filter((p) => p.slug === ref);
+    found = bySlug.find((p) => !p.deletedAt) ?? bySlug[0] ?? null;
+  }
   if (!found) throw new RubricaError(`Projeto não encontrado: ${ref}. Use projects_list para ver os slugs e ids.`, "validation");
   return found;
 }

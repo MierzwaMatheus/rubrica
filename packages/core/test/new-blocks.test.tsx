@@ -16,7 +16,7 @@ import { parseVideoUrl } from "../src/blocks/media";
 import VideoIsland from "../src/islands/video";
 import ComparadorIsland from "../src/islands/comparador";
 import ImagensIsland from "../src/islands/imagens";
-import { contrastGrade, fontStack, fontVar, hexToRgb, parseWeights } from "../src/components/blocks/marca";
+import { contrastGrade, fontStack, fontVar, hexToRgb, typeWeights } from "../src/components/blocks/marca";
 import { videoChapters } from "../src/components/blocks/media";
 import { islandNameFor } from "../src/islands";
 import { CORE_ISLANDS, ISLAND_META } from "../src/islands";
@@ -339,8 +339,10 @@ describe("tipografia", () => {
     expect(fontVar("Big Shoulders Display")).toBe("--rbf-f-big-shoulders-display");
     expect(fontVar("Fonte Ação")).toBe("--rbf-f-fonte-acao");
     expect(fontStack('Bad"Name')).toBe('var(--rbf-f-bad-name, "BadName", var(--rb-font-sans))');
-    expect(parseWeights(undefined)).toEqual([400, 700]);
-    expect(parseWeights("800, 300, 300, 450")).toEqual([300, 800]);
+    // A leitura é a do build (theme/fonts parseWeights); vazio ou sem peso válido: 400 e 700.
+    expect(typeWeights(undefined)).toEqual([400, 700]);
+    expect(typeWeights("negrito")).toEqual([400, 700]);
+    expect(typeWeights("800, 300, 300, 450")).toEqual([300, 800]);
   });
 });
 
@@ -410,7 +412,7 @@ describe("capítulos do vídeo", () => {
   it("sem JavaScript: lista com tempo e nome, link para o provedor no tempo (YouTube t=, Vimeo #t=)", async () => {
     const ctx = await ctxPt();
     const html = render("video", { ctx, fields: { url: yt, chapters } });
-    expect(html).toContain('<nav class="rb-video__chapters" aria-label="Capítulos">');
+    expect(html).toContain('<nav class="rb-video__chapters" aria-label="Capítulos: YouTube">');
     expect(html).toContain('href="https://www.youtube.com/watch?v=M7lc1UVf-VE&amp;t=135s"');
     expect(html).toContain('href="https://www.youtube.com/watch?v=M7lc1UVf-VE"');
     expect(html).toContain('aria-label="Ir para 2:15: Resultados (abre em nova aba)"');

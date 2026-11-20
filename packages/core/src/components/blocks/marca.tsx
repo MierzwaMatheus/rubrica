@@ -9,7 +9,7 @@ import { HEX_COLOR } from "../../blocks/fields";
 import type { antesDepois, imagens, paleta, tipografia, variacoesMarca } from "../../blocks/catalog/marca";
 import { accentForeground } from "../../theme/brand";
 import { contrastRatio } from "../../theme/schemes";
-import { fontVarFor } from "../../theme/fonts";
+import { fontVarFor, parseWeights } from "../../theme/fonts";
 import type { BlockProps } from "../../theme/contract";
 import { Heading, Img, Section, SectionHeader } from "../primitives";
 import { BeforeAfterPair, beforeAfterLabels } from "./before-after";
@@ -144,10 +144,13 @@ export function fontStack(family: string): string {
   return `var(${fontVar(family)}, "${name}", var(--rb-font-sans))`;
 }
 
-/** `"400, 700"` → `[400, 700]`. Só pesos de 100 a 900; sem nenhum válido, 400 e 700. */
-export function parseWeights(raw: string | undefined): number[] {
-  const out = [...new Set((raw ?? "").match(/\d{3}/g)?.map(Number) ?? [])].filter((w) => w >= 100 && w <= 900 && w % 100 === 0).sort((a, b) => a - b);
-  return out.length ? out : [400, 700];
+/**
+ * Pesos a mostrar: os do campo (`parseWeights`, a mesma leitura do build) ou, sem nenhum
+ * válido, 400 e 700.
+ */
+export function typeWeights(raw: string | undefined): number[] {
+  const weights = parseWeights(raw);
+  return weights.length ? weights : [400, 700];
 }
 
 /** Tipografia: cada família com papel, pesos e uma amostra grande na própria fonte. */
@@ -161,7 +164,7 @@ export function TipografiaBlock({ id, variant, fields, headingLevel, ctx }: Bloc
       <div className="rb-type">
         <ul className="rb-type__list">
           {fonts.map((f, i) => {
-            const weights = parseWeights(f.weights);
+            const weights = typeWeights(f.weights);
             const style = { "--type-font": fontStack(f.family) } as CSSProperties;
             return (
               <li key={`${i}-${f.family}`} className="rb-type__font" style={style} data-specimen={f.specimen ? "" : undefined}>

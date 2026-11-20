@@ -159,7 +159,7 @@ export function buildSite(input: BuildInput): BuiltSite {
   const whatsappNumber = siteWhatsAppNumber(settings);
   // Janela de contato: o tema pede e o plugin de contato está ligado (não depende de um bloco).
   const contactDialog = theme.contactDialog && plugins.has("contact-wizard") ? CONTACT_DIALOG_ID : undefined;
-  const opts = (locale: Locale): ResolveOptions => {
+  const baseOpts = (locale: Locale): ResolveOptions => {
     const message = whatsAppMessage(settings, locale);
     return {
       locale,
@@ -169,6 +169,28 @@ export function buildSite(input: BuildInput): BuiltSite {
       ...(contactDialog && { contactDialog }),
     };
   };
+  /**
+   * Corpo de cada case por idioma, resolvido uma vez (a rota do case reusa). Daqui sai o
+   * `hasCase` (`caseIds` nas opções): um projeto tem case no idioma quando sobra algum bloco
+   * depois do `resolveBlocks` no contexto `case`, ou seja, blocos que valem no case com os
+   * campos obrigatórios no idioma. Calcular aqui, com o catálogo, é o único jeito correto: um
+   * helper sem catálogo em `collections.ts` não sabe quais campos são obrigatórios nem quais
+   * tipos o case recusa (incluindo blocos do projeto). Os corpos usam as opções sem `caseIds`
+   * (no case não há bloco que liste projetos: `cases` é só de página).
+   */
+  const caseBodies = new Map<Locale, { blocks: Map<string, ResolvedBlock[]>; ids: Set<string> }>();
+  const caseBodiesIn = (locale: Locale) => {
+    let entry = caseBodies.get(locale);
+    if (!entry) {
+      const env = { ...blockSite, options: baseOpts(locale) };
+      const blocks = new Map(snapshot.collections.projects.map((raw) => [raw.id, resolveBlocks(sectionsToBlocks(raw), env, { context: "case" }).blocks] as const));
+      entry = { blocks, ids: new Set([...blocks].filter(([, b]) => b.length > 0).map(([id]) => id)) };
+      caseBodies.set(locale, entry);
+    }
+    return entry;
+  };
+  const opts = (locale: Locale): ResolveOptions => ({ ...baseOpts(locale), caseIds: caseBodiesIn(locale).ids });
+
   // O período do aviso vale no instante do build: muda só na próxima publicação.
   const announcementOn = announcementActive(settings.announcement, input.now ?? Date.now());
 
@@ -297,7 +319,7 @@ export function buildSite(input: BuildInput): BuiltSite {
         const all = queryCollection({ collection: "projects", sort: "order" }, snapshot.collections.projects, opts(locale), paths);
         const related = all.filter((p) => p.id !== project.id).slice(0, 3);
         const next = nextCase(all, project.id);
-        const { blocks } = resolveBlocks(sectionsToBlocks(raw), { ...blockSite, options: opts(locale) }, { context: "case" });
+        const blocks = caseBodiesIn(locale).blocks.get(raw.id) ?? [];
         const r: SiteRoute = {
           type: "case",
           url: project.url,

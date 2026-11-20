@@ -2,6 +2,9 @@
 import { describe, expect, it } from "vitest";
 import { accentForeground, brandCss, resolveBrand, validateBrand } from "../src/theme/brand";
 import { contrastRatio } from "../src/theme/schemes";
+import { isSafeFamily } from "../src/theme/fonts";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import type { CaseBrand } from "../src/content/types";
 
 const light = { background: "#FFFFFF", foreground: "#1A1A1A", accent: "#7A1F2B" };
@@ -25,6 +28,13 @@ describe("validateBrand", () => {
   it("cor fora do formato e fonte com caracteres estranhos", () => {
     expect(validateBrand({ light: { ...light, accent: "vermelho" } }).map((i) => i.path)).toEqual(["accent"]);
     expect(validateBrand({ light, fontDisplay: "Fonte; }" }).map((i) => i.path)).toEqual(["fontDisplay"]);
+  });
+
+  it("nome da família: a mesma regra do build (isSafeFamily)", () => {
+    for (const name of ["Source Serif 4", "Big Shoulders Display", "Noto Sans JP", "Font.Name-x_y", "Fonte; }", "a\"b", "", " ", "x".repeat(65)]) {
+      const ok = validateBrand({ light, fontDisplay: name }).length === 0;
+      expect(ok, name).toBe(isSafeFamily(name));
+    }
   });
 
   it("sem cores do modo claro, é obrigatório", () => {
@@ -81,7 +91,8 @@ describe("brandCss", () => {
   it("fonte do cliente: --rbf-brand aponta para a variável da família; reserva na fonte do texto", () => {
     for (const rule of rules) {
       expect(rule).toContain("--rbf-brand:var(--rbf-f-big-shoulders-display)");
-      expect(rule).toContain("--rb-font-display:var(--rbf-brand, var(--rb-font-sans))");
+      // Sem a fonte do cliente, volta para a de destaque do tema (não para a do texto).
+      expect(rule).toContain("--rb-font-display:var(--rbf-brand, var(--rb-font-display-theme))");
     }
     expect(brandCss(resolveBrand({ light })!)).not.toContain("--rb-font-display");
   });
@@ -101,7 +112,41 @@ describe("brandCss", () => {
     expect(tight).toContain("--rb-muted:#767676");
   });
 
+  it("sucesso, erro e a terceira cor legíveis no fundo do cliente, perto do tom original", () => {
+    const token = (rule: string, name: string) => rule.match(new RegExp(`${name}:(#[0-9a-f]{6})`))![1]!;
+    // Marca clara num site escuro: o escuro repete o claro, e os tons do tema escuro (claros) sumiriam.
+    const pale = brandCss(resolveBrand({ light: { background: "#fbf7ef", foreground: "#1c1a17", accent: "#7a1f2b" } })!).split("\n");
+    // Marca escura: os tons partem dos do fundo escuro.
+    const deep = brandCss(resolveBrand({ light, dark: { background: "#0b2a1f", foreground: "#f2f2f2", accent: "#e8a0aa" } })!).split("\n");
+    for (const [rule, bg] of [[pale[0]!, "#fbf7ef"], [pale[1]!, "#fbf7ef"], [deep[0]!, "#0b2a1f"], [deep[1]!, "#ffffff"]] as const) {
+      const surface = token(rule, "--rb-surface");
+      for (const name of ["--rb-success", "--rb-danger", "--rb-accent-3"]) {
+        const tone = token(rule, name);
+        expect(contrastRatio(tone, bg), `${name} ${bg}`).toBeGreaterThanOrEqual(4.5);
+        expect(contrastRatio(tone, surface), `${name} ${bg}`).toBeGreaterThanOrEqual(4.5);
+      }
+    }
+    // Quando o tom original já passa, ele fica como está.
+    expect(pale[0]).toContain("--rb-success:#0a6b3a");
+    expect(pale[0]).toContain("--rb-danger:#b42318");
+    expect(deep[0]).toContain("--rb-success:#7ee2a8");
+  });
+
   it("nada sai do escopo do case", () => {
     expect(css).not.toMatch(/:root\{|:root\[data-scheme\]\{/);
+  });
+});
+
+describe("case.css", () => {
+  const css = readFileSync(fileURLToPath(new URL("../src/styles/case.css", import.meta.url)), "utf-8");
+
+  it("a fonte do cliente nos títulos não pega o nome da família do bloco tipografia", () => {
+    const rule = css.split("\n").find((l) => l.includes("[data-rb-brand-font]") && l.includes("font-family"));
+    expect(rule).toBeDefined();
+    expect(rule).toContain(":not(.rb-type__family)");
+  });
+
+  it("guarda a fonte de destaque do tema no :root, a reserva do brandCss", () => {
+    expect(css).toMatch(/:root \{ --rb-font-display-theme: var\(--rb-font-display\); \}/);
   });
 });

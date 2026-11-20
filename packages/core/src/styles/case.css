@@ -10,8 +10,16 @@
 
 /* Marca do cliente: o brandCss troca os tokens no escopo; aqui o escopo pinta fundo e texto. */
 .rb-case-brand { background: var(--rb-bg); color: var(--rb-fg); padding: clamp(1.5rem, 4vw, 3rem) clamp(0.5rem, 2.5vw, 2rem); }
-/* Com a fonte do cliente, os títulos do case usam a fonte de destaque (a do cliente). */
-.rb-case-brand[data-rb-brand-font] :is(h1, h2, h3) { font-family: var(--rb-font-display); }
+/*
+ * A fonte de destaque do tema, guardada antes de o escopo da marca trocar --rb-font-display:
+ * é a reserva do brandCss quando a fonte do cliente não carrega.
+ */
+:root { --rb-font-display-theme: var(--rb-font-display); }
+/*
+ * Com a fonte do cliente, os títulos do case usam a fonte de destaque (a do cliente). Menos o
+ * nome de cada família no bloco tipografia, que sai na própria família (`.rb-type__family`).
+ */
+.rb-case-brand[data-rb-brand-font] :is(h1, h2, h3):not(.rb-type__family) { font-family: var(--rb-font-display); }
 
 .rb-case__body {
   --rb-case-gap: clamp(2.5rem, 6vw, 4.5rem);

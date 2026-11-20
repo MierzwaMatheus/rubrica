@@ -2,7 +2,6 @@
  * Coleções do conteúdo: campos (os validadores do Convex do backend), permissão e
  * plugin de cada uma. As ferramentas de coleção saem daqui.
  */
-import { v } from "convex/values";
 import type { CollectionName } from "@rubrica/core";
 import type { Permission } from "@rubrica/core/convex/roles";
 import {
@@ -15,7 +14,6 @@ import {
   serviceFields,
   teamMemberFields,
   testimonialFields,
-  vBlock,
 } from "@rubrica/core/convex/validators";
 import { validatorsToSchema, type JsonSchema, type SchemaOptions } from "./json-schema";
 
@@ -37,20 +35,6 @@ export interface CollectionSpec {
   requiredText: string[];
   descriptions: Record<string, string>;
 }
-
-const vBrandColors = v.object({ background: v.string(), foreground: v.string(), accent: v.string() });
-
-/**
- * Campos do projeto com o corpo em blocos e a marca do cliente (2.3.0). Vêm dos validadores
- * do núcleo quando ele já os declara; senão, daqui (mesmo formato de `CaseBrand`).
- */
-const caseProjectFields: Record<string, unknown> = {
-  ...projectFields,
-  blocks: (projectFields as Record<string, unknown>).blocks ?? v.optional(v.array(vBlock)),
-  brand:
-    (projectFields as Record<string, unknown>).brand ??
-    v.optional(v.object({ enabled: v.optional(v.boolean()), light: vBrandColors, dark: v.optional(vBrandColors), fontDisplay: v.optional(v.string()) })),
-};
 
 const common: Record<string, string> = {
   order: "Posição na lista (menor primeiro). Se faltar, vai para o fim.",
@@ -85,7 +69,7 @@ export const COLLECTION_SPECS: Record<CollectionName, CollectionSpec> = {
     name: "projects",
     label: "projetos e cases",
     singular: "projeto",
-    fields: caseProjectFields,
+    fields: projectFields,
     permission: "content",
     plugin: "portfolio",
     slug: true,

@@ -1,6 +1,7 @@
 // @vitest-environment edge-runtime
 import { beforeEach, describe, expect, it } from "vitest";
-import { BACKEND } from "../src/tools/shared";
+import { BACKEND, resolveProject } from "../src/tools/shared";
+import { RubricaError, type RubricaClient } from "../src/client";
 import { call, runtimeFor, seedSettings, setup, type RuntimeExtras, type T } from "./backend";
 
 const hero = { id: "h1", type: "hero", fields: { title: { "pt-BR": "Olá", en: "Hi" } } };
@@ -254,5 +255,43 @@ describe("blocos de um case pelo MCP", () => {
     // texto não tem regras do backend: nenhuma consulta de validação
     await call(runtime, "block_add", { project: "marca-x", block: { type: "texto", fields: { body: { "pt-BR": "<p>a</p>" } } } });
     expect(fake.validated).toEqual([]);
+  });
+});
+
+describe("resolveProject e resolvePage: id, slug e lixeira", () => {
+  const invalidId = new RubricaError('Value does not match validator.\nPath: .id\nValue: "marca-x"\nValidator: v.id("projects")', "validation");
+  const clientWith = (get: () => Promise<unknown>, list: unknown[]) =>
+    ({
+      query: (path: string, args?: Record<string, unknown>) => {
+        if (path === "rubrica/projects:get") return get();
+        if (path === "rubrica/projects:list") return Promise.resolve(args?.includeDeleted ? list : list.filter((p) => !(p as { deletedAt?: number }).deletedAt));
+        throw new Error(path);
+      },
+    }) as unknown as RubricaClient;
+
+  it("só o erro de id inválido cai para o slug; outros erros sobem", async () => {
+    const active = { _id: "p1", slug: "marca-x", title: {} };
+    expect((await resolveProject(clientWith(() => Promise.reject(invalidId), [active]), "marca-x"))._id).toBe("p1");
+    const forbidden = new RubricaError("Sem permissão para ler o id pedido", "forbidden");
+    await expect(resolveProject(clientWith(() => Promise.reject(forbidden), [active]), "marca-x")).rejects.toBe(forbidden);
+    const server = new RubricaError("Falhou ao ler o ID", "server");
+    await expect(resolveProject(clientWith(() => Promise.reject(server), [active]), "marca-x")).rejects.toBe(server);
+  });
+
+  it("pelo slug: o ativo vence o da lixeira; só na lixeira, volta apagado (e o alvo recusa)", async () => {
+    const trashed = { _id: "p0", slug: "marca-x", title: {}, deletedAt: 1 };
+    const active = { _id: "p1", slug: "marca-x", title: {} };
+    expect((await resolveProject(clientWith(() => Promise.reject(invalidId), [trashed, active]), "marca-x"))._id).toBe("p1");
+    const onlyTrash = await resolveProject(clientWith(() => Promise.reject(invalidId), [trashed]), "marca-x");
+    expect(onlyTrash).toMatchObject({ _id: "p0", deletedAt: 1 });
+  });
+
+  it("no backend de verdade, um id inválido de página vira 'não encontrada'", async () => {
+    const t = setup();
+    await seedSettings(t);
+    const { runtime } = await runtimeFor(t, "content-editor");
+    const r = await call(runtime, "pages_get", { page: "nao-e-um-id" });
+    expect(r.isError).toBe(true);
+    expect(r.body.error).toContain("Página não encontrada");
   });
 });

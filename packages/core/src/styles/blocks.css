@@ -473,7 +473,7 @@ button.rb-button { cursor: pointer; font: inherit; font-weight: 600; }
 .rb-images[data-layout="grade"] .rb-images__image { aspect-ratio: 4 / 3; object-fit: contain; }
 .rb-images[data-layout="mosaico"] .rb-images__list { display: grid; gap: 1rem; grid-template-columns: minmax(0, 1fr); }
 .rb-images[data-layout="mosaico"] .rb-images__figure { grid-template-rows: minmax(0, 1fr) auto; }
-.rb-images[data-layout="mosaico"] .rb-images__image { height: 100%; object-fit: cover; aspect-ratio: 4 / 3; }
+.rb-images[data-layout="mosaico"] .rb-images__image { height: 100%; object-fit: contain; aspect-ratio: 4 / 3; }
 /* Mosaico em 4 colunas: a primeira ocupa 2×2 e as quatro seguintes fecham o quadrado ao lado. */
 @media (min-width: 48rem) {
   .rb-images[data-layout="mosaico"] .rb-images__list { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: minmax(10rem, auto); }
@@ -508,8 +508,8 @@ button.rb-button { cursor: pointer; font: inherit; font-weight: 600; }
   .rb-video__layout[data-chapters] { grid-template-columns: minmax(0, 1fr) 19rem; align-items: start; }
   .rb-video__layout[data-chapters]:is([data-ratio="16-9"], [data-ratio="4-3"]) .rb-video { max-width: none; }
   .rb-video__layout[data-chapters]:is([data-ratio="9-16"], [data-ratio="1-1"]) { grid-template-columns: auto minmax(0, 22rem); justify-content: start; }
-  .rb-video__layout[data-chapters]:is([data-ratio="9-16"], [data-ratio="1-1"]) .rb-video { width: min(100vw - 4rem, var(--rb-video-w, 36rem)); }
-  .rb-video__layout[data-chapters][data-ratio="9-16"] .rb-video { --rb-video-w: 22rem; }
+  .rb-video__layout[data-chapters]:is([data-ratio="9-16"], [data-ratio="1-1"]) .rb-video { width: min(100vw - 4rem, var(--video-w, 36rem)); }
+  .rb-video__layout[data-chapters][data-ratio="9-16"] .rb-video { --video-w: 22rem; }
 }
 .rb-video__chapters { min-width: 0; border: 1px solid var(--rb-border); border-radius: var(--rb-radius); background: var(--rb-surface); padding: 0.75rem; }
 .rb-video__chaptersTitle { margin: 0.25rem 0.5rem 0.5rem; font-family: var(--rb-font-mono); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--rb-muted); }

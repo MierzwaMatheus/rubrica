@@ -4,7 +4,7 @@
  * traduzir, erros por campo e operações na lista de blocos. Sem React: testável e
  * usada também pelo backend de demonstração.
  */
-import type { BlockDefinition } from "../../blocks/define";
+import { blockAllowedIn, validateBlock, type BlockContext, type BlockDefinition } from "../../blocks/define";
 import type { FieldDef, FieldError, FieldMap } from "../../blocks/fields";
 import type { BlockInstance, SeoFields, SiteKind } from "../../content/types";
 import type { Locale, Localized } from "../../i18n";
@@ -240,17 +240,36 @@ export function errorMessage(error: unknown): string {
 
 // ── Catálogo e resumo ───────────────────────────────────────────────────────
 
-/** Blocos que a página pode receber: do tipo do site e com o plugin ligado. */
-export function availableBlocks(blocks: readonly BlockDefinition[], kind: SiteKind, enabled: ReadonlySet<string>): BlockDefinition[] {
-  return blocks.filter((b) => (b.category === "comum" || b.category === kind) && (!b.plugin || enabled.has(b.plugin)));
+/**
+ * Blocos que a página (ou o case) pode receber: do tipo do site, com o plugin ligado e,
+ * quando há `context`, que aceitam esse contexto (`hero`, `contato` e `cases` não cabem no case).
+ */
+export function availableBlocks(blocks: readonly BlockDefinition[], kind: SiteKind, enabled: ReadonlySet<string>, context?: BlockContext): BlockDefinition[] {
+  return blocks.filter((b) => (b.category === "comum" || b.category === kind) && (!b.plugin || enabled.has(b.plugin)) && (!context || blockAllowedIn(b, context)));
 }
 
-/** Por que um bloco da página não aparece no site (outro tipo de site, plugin desligado). */
-export function blockUnavailableReason(def: BlockDefinition | undefined, kind: SiteKind, enabled: ReadonlySet<string>): string | undefined {
+/** Por que um bloco da página não aparece no site (outro tipo de site, plugin desligado, contexto). */
+export function blockUnavailableReason(def: BlockDefinition | undefined, kind: SiteKind, enabled: ReadonlySet<string>, context?: BlockContext): string | undefined {
   if (!def) return "Tipo de bloco desconhecido";
   if (def.category !== "comum" && def.category !== kind) return `Só existe em sites do tipo ${def.category}`;
   if (def.plugin && !enabled.has(def.plugin)) return `Precisa do plugin "${def.plugin}" ligado`;
+  if (context && !blockAllowedIn(def, context)) return context === "case" ? "Este bloco só existe em páginas, não em cases" : "Este bloco só existe em cases";
   return undefined;
+}
+
+/**
+ * Confere os blocos de um case contra o catálogo (campos, fonte, contexto), sem backend:
+ * o mesmo formato de erro do editor de páginas, para apontar o bloco e o campo.
+ */
+export function validateCaseBlocks(blocks: readonly BlockInstance[], defs: readonly BlockDefinition[]): BlockError[] {
+  const out: BlockError[] = [];
+  blocks.forEach((block, index) => {
+    const def = defs.find((d) => d.type === block.type);
+    if (!def) return void out.push({ index, blockId: block.id, path: "type", message: `tipo de bloco desconhecido: ${block.type}` });
+    if (!blockAllowedIn(def, "case")) return void out.push({ index, blockId: block.id, path: "type", message: `o bloco ${def.label} não cabe em um case` });
+    for (const e of validateBlock(def, block)) out.push({ index, blockId: block.id, path: e.path, message: e.message });
+  });
+  return out;
 }
 
 function textOf(value: unknown, locale: Locale): string | undefined {

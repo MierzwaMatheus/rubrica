@@ -327,6 +327,12 @@ describe("estilos", () => {
     expect(blocks).not.toMatch(/\brgba?\(/);
   });
 
+  it("texto da paleta sem opacidade (ela derruba o contraste calculado dos tokens)", () => {
+    const rule = blocks.split("\n").find((l) => l.startsWith(".rb-palette__role "));
+    expect(rule).toBeDefined();
+    expect(rule).not.toMatch(/opacity/);
+  });
+
   it("todo token --rb usado nos blocos está definido no base.css", () => {
     const used = new Set([...blocks.matchAll(/var\((--rb-[a-z-]+)/g)].map((m) => m[1]!));
     for (const token of used) expect(css, token).toContain(`${token}:`);

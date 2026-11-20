@@ -9,6 +9,7 @@ import { HEX_COLOR } from "../../blocks/fields";
 import type { antesDepois, imagens, paleta, tipografia, variacoesMarca } from "../../blocks/catalog/marca";
 import { accentForeground } from "../../theme/brand";
 import { contrastRatio } from "../../theme/schemes";
+import { fontVarFor } from "../../theme/fonts";
 import type { BlockProps } from "../../theme/contract";
 import { Heading, Img, Section, SectionHeader } from "../primitives";
 import { BeforeAfterPair, beforeAfterLabels } from "./before-after";
@@ -134,21 +135,8 @@ export function PaletaBlock({ id, variant, fields, headingLevel, ctx }: BlockPro
 
 // ── Tipografia ──────────────────────────────────────────────────────────────
 
-/**
- * Variável CSS da fonte de uma família de conteúdo (`--rbf-f-big-shoulders-display`); fica
- * indefinida quando o build não baixou a família.
- * TODO(integração): trocar por `fontVarFor` de `theme/fonts.ts` (frente A; mesma regra).
- */
-export function fontVar(family: string): string {
-  const slug = family
-    .trim()
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-  return `--rbf-f-${slug || "x"}`;
-}
+/** Variável CSS da fonte de uma família de conteúdo (a mesma regra do build: `fontVarFor`). */
+export const fontVar = fontVarFor;
 
 /** Pilha da família: a variável que o build define, o nome da família (se instalada) e a fonte do tema. */
 export function fontStack(family: string): string {

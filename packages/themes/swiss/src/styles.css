@@ -330,3 +330,10 @@ body { font-family: var(--rb-font-sans); -webkit-font-smoothing: antialiased; }
 .sw-f-note { color: var(--rb-muted); }
 @media (max-width: 959px) { .sw-f { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 599px) { .sw-f { grid-template-columns: 1fr; } .sw-f-end { text-align: left; } }
+
+/* Case com a cara do cliente: tokens derivados recalculados dentro do escopo da marca. */
+[data-rb-brand] {
+  --sw-inv-muted: color-mix(in srgb, var(--rb-bg) 72%, var(--rb-fg));
+  --sw-soft: color-mix(in srgb, var(--rb-fg) 38%, transparent);
+  --sw-line: color-mix(in srgb, var(--rb-fg) 13%, transparent);
+}

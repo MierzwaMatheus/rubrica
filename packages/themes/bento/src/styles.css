@@ -374,3 +374,12 @@ a.bento-contact:hover { transform: translateY(-3px); }
 .rb-prose :not(pre) > code { padding: 0.125rem 0.3rem; border-radius: 0.3rem; background: var(--bento-chip); font-size: 0.875em; }
 .rb-related { margin-top: 3rem; }
 .rb-notfound { padding-block: 4rem; }
+
+/* Case com a cara do cliente: os tokens derivados dos --rb-* do :root são recalculados
+   dentro do escopo da marca (senão herdariam o valor já resolvido no :root). */
+[data-rb-brand] {
+  --bento-card: color-mix(in srgb, var(--rb-fg) 6%, var(--rb-bg));
+  --bento-card-strong: color-mix(in srgb, var(--rb-fg) 10%, var(--rb-bg));
+  --bento-line: color-mix(in srgb, var(--rb-fg) 20%, transparent);
+  --bento-chip: color-mix(in srgb, var(--rb-fg) 12%, transparent);
+}

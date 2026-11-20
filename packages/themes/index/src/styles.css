@@ -373,3 +373,10 @@ body { font-family: var(--rb-font-sans); -webkit-font-smoothing: antialiased; }
   .ix-main > .rb-post > *, .ix-main > .rb-case > *, .ix .rb-notfound { margin-left: 0; }
   .ix-f { flex-direction: column; align-items: flex-start; }
 }
+
+/* Case com a cara do cliente: os tokens derivados dos --rb-* do :root são recalculados
+   dentro do escopo da marca (senão herdariam o valor já resolvido no :root). */
+[data-rb-brand] {
+  --ix-invert-muted: color-mix(in srgb, var(--rb-bg) 78%, var(--rb-fg));
+  --ix-shadow: color-mix(in srgb, var(--rb-fg) 24%, transparent);
+}

@@ -504,3 +504,42 @@ ul.dk-li__desc { padding-left: 18px; list-style: disc; }
   --dk-dot: color-mix(in srgb, var(--rb-fg) 16%, transparent);
   --dk-hover: color-mix(in srgb, var(--rb-fg) 8%, var(--rb-surface));
 }
+
+/* ---------- case com a cara do cliente e blocos de marca ---------- */
+/* O escopo da marca é um div entre as janelas: devolve o espaço entre elas (o gap era do .dk-wins). */
+.dk .rb-case-brand { width: 100%; }
+.dk .rb-case-brand > .dk-win + .dk-win { margin-top: 32px; }
+/* Dentro do documento do case, as janelas de bloco ocupam a largura do papel (sem as larguras da home). */
+.dk-doc__blocks.rb-case__body { --rb-case-gap: 28px; }
+.dk-doc__blocks .dk-win[data-block] { --dk-w: 100%; margin-left: 0; width: 100%; }
+/* O nome da cor herda a cor do chip (o título do tema pintaria de tinta sobre fundo escuro). */
+.dk .rb-palette__chip .rb-palette__name { color: inherit; }
+
+/* Antes e depois, imagens e variações: figuras como "fotos" de janela, com moldura de 2px e sombra dura. */
+.dk .rb-before-after__image, .dk .rb-images__image { border: 2px solid var(--dk-line); border-radius: 0; box-shadow: 3px 3px 0 var(--dk-shadow); background: var(--rb-bg); }
+.dk .rb-before-after__figure--before .rb-before-after__image { filter: grayscale(1); }
+.dk .rb-before-after__label { font-family: var(--rb-font-mono); font-size: 12px; color: var(--rb-fg); }
+.dk .rb-before-after__label::before { border-radius: 0; width: 10px; height: 10px; border-width: 2px; }
+.dk .rb-before-after__caption, .dk .rb-images__caption, .dk .rb-brand-grid__note { font-family: var(--rb-font-mono); font-size: 12.5px; }
+.dk .rb-comparer__stage { border: 2px solid var(--dk-line); border-radius: 0; box-shadow: 3px 3px 0 var(--dk-shadow); }
+.dk .rb-comparer__label { border: 2px solid var(--dk-line); border-radius: 0; background: var(--rb-surface); }
+.dk .rb-comparer__handle { background: var(--dk-line); box-shadow: none; }
+.dk .rb-comparer__handle::after { border: 2px solid var(--dk-line); border-radius: 0; background: var(--rb-accent); box-shadow: 2px 2px 0 var(--dk-shadow); }
+.dk .rb-comparer__handle::before { color: var(--rb-accent-fg); }
+
+/* Paleta e tipografia: "cartões de cor" e fichas de fonte, no mesmo traço das janelas. */
+.dk .rb-palette__swatch, .dk .rb-type__font { border: 2px solid var(--dk-line); border-radius: 0; box-shadow: 3px 3px 0 var(--dk-shadow); background: var(--rb-surface); }
+.dk .rb-palette__list, .dk .rb-type__list { gap: 22px; }
+.dk .rb-palette__chip { box-shadow: none; border-bottom: 2px solid var(--dk-line); }
+.dk .rb-palette__sample { border-radius: 0; box-shadow: inset 0 0 0 2px var(--dk-line); }
+.dk .rb-palette__grade, .dk .rb-type__weight { border-radius: 0; border-width: 2px; }
+.dk .rb-type__weight { border-style: solid; border-color: var(--dk-line); background: var(--rb-surface); }
+.dk .rb-type__role { color: var(--rb-fg); font-weight: 800; }
+.dk .rb-brand-grid__tile { border: 2px solid var(--dk-line); border-radius: 0; box-shadow: 3px 3px 0 var(--dk-shadow); }
+.dk .rb-brand-grid__tile[data-bg] { border-color: var(--dk-line); }
+.dk .rb-brand-grid__label { font-family: var(--rb-font-mono); font-size: 13px; }
+
+/* Vídeo: o player é uma janela; os capítulos, a lista de arquivos ao lado. */
+.dk .rb-video__frame { border: 2px solid var(--dk-line); border-radius: 0; box-shadow: 3px 3px 0 var(--dk-shadow); }
+.dk .rb-video__chapters { border: 2px solid var(--dk-line); border-radius: 0; background: var(--rb-surface); box-shadow: 3px 3px 0 var(--dk-shadow); }
+.dk .rb-video__chapterTime { border-radius: 0; font-family: var(--rb-font-mono); }

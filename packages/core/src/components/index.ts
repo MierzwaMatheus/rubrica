@@ -31,8 +31,8 @@ export {
   hexToRgb,
   ImagensBlock,
   PaletaBlock,
-  parseWeights,
   TipografiaBlock,
+  typeWeights,
   VariacoesMarcaBlock,
 } from "./blocks/marca";
 export type { BeforeAfterPairProps, ContrastGrade } from "./blocks/marca";

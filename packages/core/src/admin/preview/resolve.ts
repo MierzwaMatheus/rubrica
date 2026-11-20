@@ -3,14 +3,14 @@
  * resolve no build (`render/site`), sobre o snapshot publicado. O rascunho não vai ao
  * site: só existe na memória do painel e no iframe da prévia.
  */
-import { blockAllowedIn, type BlockDefinition } from "../../blocks/define";
+import type { BlockDefinition } from "../../blocks/define";
 import type { PageRecord, RawProject, SiteSettings } from "../../content/types";
 import type { SiteSnapshot } from "../../data/source";
 import { localizedPath, pick, type Locale } from "../../i18n";
 import type { PluginDefinition } from "../../plugins/contract";
 import type { ProjectItem } from "../../render/collections";
 import { buildSite, homeShowsAvailability, type ResolvedBlock, type ResolvedPage } from "../../render/site";
-import { resolveBrand, type ResolvedBrand } from "../../theme/brand";
+import type { ResolvedBrand } from "../../theme/brand";
 import type { RenderContext, ShellCollections, ThemeDefinition } from "../../theme/contract";
 
 export interface PreviewInput {
@@ -87,17 +87,10 @@ export type CasePreviewResult =
     }
   | { ok: false; reason: "untranslated" | "disabled" | "error"; message: string };
 
-/** Página-ferramenta que carrega os blocos do case pelo resolvedor de páginas. */
-const CASE_BODY_PAGE = "__rubrica-case-preview";
-
 /**
  * Prévia do case (o rascunho do projeto sobre o snapshot publicado): monta a rota de case
- * com o motor do site e devolve o corpo em blocos e a marca já resolvidos.
- *
- * TODO(frente A): hoje `buildSite` não resolve `project.blocks`; os blocos passam por uma
- * página-ferramenta (`CASE_BODY_PAGE`) só para reaproveitar o resolvedor de blocos de página.
- * Quando a rota de case trouxer `blocks: ResolvedBlock[]` e `brand` (render/blocks.ts,
- * `resolveBlocks`), troque o trecho marcado abaixo por `route.blocks` e `route.brand`.
+ * com o motor do site (`buildSite`) e devolve o corpo em blocos (contexto `case`) e a marca
+ * já resolvidos, como o site os desenha.
  */
 export function resolveCasePreview(input: CasePreviewInput): CasePreviewResult {
   const site = input.settings ?? input.snapshot.site;
@@ -107,19 +100,12 @@ export function resolveCasePreview(input: CasePreviewInput): CasePreviewResult {
   void _content;
   void _sections;
   const raw: RawProject = { ...rest, blocks: input.project.blocks ?? [] };
-  const defs = new Map(input.blocks.map((b) => [b.type, b]));
-  const body = (raw.blocks ?? []).filter((b) => {
-    const def = defs.get(b.type);
-    return !def || blockAllowedIn(def, "case");
-  });
-  const titles = Object.fromEntries(site.locales.locales.map((l) => [l, "Prévia do case"]));
-  const bodyPage: PageRecord = { id: CASE_BODY_PAGE, path: `/${CASE_BODY_PAGE}`, title: titles, blocks: body, published: true, updatedAt: 0 };
   const projects = input.snapshot.collections.projects;
   const at = projects.findIndex((p) => p.id === raw.id);
   const withDraft = at < 0 ? [...projects, raw] : projects.map((p, i) => (i === at ? raw : p));
   try {
     const built = buildSite({
-      snapshot: { ...input.snapshot, site, pages: [bodyPage], collections: { ...input.snapshot.collections, projects: withDraft } },
+      snapshot: { ...input.snapshot, site, collections: { ...input.snapshot.collections, projects: withDraft } },
       theme: input.theme,
       blocks: input.blocks,
       plugins: input.plugins,
@@ -133,13 +119,9 @@ export function resolveCasePreview(input: CasePreviewInput): CasePreviewResult {
         message: untitled ? `O case não existe em ${locale}: falta o título nesse idioma (decisão 28).` : "O plugin de portfólio está desligado: o site não tem página de case.",
       };
     }
-    // TODO(frente A): trocar por `route.blocks` e `route.brand`.
-    const bodyRoute = built.routes.find((r) => r.type === "page" && r.page.id === CASE_BODY_PAGE && r.locale === locale);
-    const blocks = bodyRoute?.type === "page" ? bodyRoute.page.blocks.map((b) => ({ ...b, headingLevel: 2 as const })) : [];
-    const brand = resolveBrand(raw.brand);
     const ctx = built.context(locale, route.url, route.alternates);
     ctx.site.availability = homeShowsAvailability(input.snapshot.pages);
-    return { ok: true, project: route.project, related: route.related, ...(route.next ? { next: route.next } : {}), blocks, ...(brand ? { brand } : {}), ctx, url: route.url, collections: built.collections(locale) };
+    return { ok: true, project: route.project, related: route.related, ...(route.next ? { next: route.next } : {}), blocks: route.blocks, ...(route.brand ? { brand: route.brand } : {}), ctx, url: route.url, collections: built.collections(locale) };
   } catch (e) {
     return { ok: false, reason: "error", message: (e as Error).message.replace("[rubrica] ", "") };
   }

@@ -175,6 +175,22 @@ describe("prévia do case", () => {
     expect(none.brand).toBeUndefined();
   });
 
+  it("o próximo case segue `hasCase`: o projeto sem corpo não entra, o rascunho com corpo entra", async () => {
+    const { snapshot } = await draft({});
+    const outros = snapshot.collections.projects.slice(1);
+    const vazio = { ...outros[0]!, blocks: [], sections: [], content: undefined } as RawProject;
+    const comCorpo = { id: "rascunho", slug: "rascunho", title: t("Rascunho"), blocks: [texto("a")] } as RawProject;
+    const sem = { ...snapshot, collections: { ...snapshot.collections, projects: [vazio, comCorpo] } };
+    // Só o rascunho tem corpo: com menos de dois cases não há próximo.
+    const sozinho = resolveCasePreview({ snapshot: sem, project: comCorpo, locale: "pt-BR", ...base });
+    if (!sozinho.ok) throw new Error(sozinho.message);
+    expect(sozinho.next).toBeUndefined();
+    const dois = { ...snapshot, collections: { ...snapshot.collections, projects: [{ ...vazio, blocks: [texto("b")] } as RawProject, comCorpo] } };
+    const par = resolveCasePreview({ snapshot: dois, project: comCorpo, locale: "pt-BR", ...base });
+    if (!par.ok) throw new Error(par.message);
+    expect(par.next?.id).toBe(vazio.id);
+  });
+
   it("projeto novo (ainda não existe no snapshot) e idioma sem título", async () => {
     const { snapshot } = await draft({});
     const novo = { id: "novo", slug: "case-novo", title: t("Case novo"), blocks: [texto("a")] } as RawProject;

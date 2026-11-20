@@ -473,8 +473,8 @@ export function CurriculoBlock({ id, variant, fields, items, headingLevel, ctx, 
 /** Etiquetas que o cartão do portfólio mostra; o resto vira "+N", como na v1. */
 export const CASE_TAGS_SHOWN = 3;
 
-/** Projeto com página de case (seções), como o `hasCaseStudy` da v1. */
-const hasCase = (p: ProjectItem) => p.sections.length > 0;
+/** Projeto com página de case (blocos), como o `hasCaseStudy` da v1. */
+const hasCase = (p: ProjectItem) => p.hasCase;
 
 function CaseMetric({ metric }: { metric: ProjectItem["metric"] }) {
   return metric ? (

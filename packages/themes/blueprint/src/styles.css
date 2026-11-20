@@ -293,8 +293,11 @@ body { font-family: var(--rb-font-sans); }
 .bp-doc__body { margin-top: 1.6rem; max-width: 46rem; font-size: 1rem; line-height: 1.7; color: var(--rb-fg); }
 .bp-doc__body a { color: var(--rb-accent); }
 .bp-doc__body img { border: 1.5px solid var(--rb-fg); }
-.bp-doc__section { margin-top: 2rem; }
-.bp-doc__section .bp-h2 { display: flex; align-items: center; gap: 0.7rem; }
+/* Corpo em blocos: cada bloco numera o próprio título com um contador (o círculo do .bp-n). */
+.bp-doc__blocks { counter-reset: bp-sec; margin-top: 2rem; }
+.bp-doc__blocks section[data-block] { counter-increment: bp-sec; }
+.bp-doc__blocks section[data-block] :is(.bp-h2, .rb-section__title) { display: flex; align-items: center; gap: 0.7rem; }
+.bp-doc__blocks section[data-block] :is(.bp-h2, .rb-section__title)::before { content: counter(bp-sec); display: inline-flex; align-items: center; justify-content: center; min-width: 1.5rem; height: 1.5rem; padding: 0 0.3rem; border-radius: 999px; border: 1.5px solid var(--bp-mark); color: var(--bp-ink); background: var(--rb-bg); font-family: var(--rb-font-mono); font-size: 0.7rem; font-weight: 600; flex: none; line-height: 1; }
 .bp-doc__img { display: block; margin-top: 1rem; border: 1.5px solid var(--rb-fg); }
 .bp-related { margin-top: 2rem; }
 
@@ -367,4 +370,16 @@ body { font-family: var(--rb-font-sans); }
   .bp-table--stack caption { display: block; width: 100%; }
   .bp-table--stack td.bp-half { display: inline-block; width: 50%; vertical-align: top; }
   .bp-table--stack td[data-label]::before { content: attr(data-label); display: block; font-family: var(--rb-font-mono); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--rb-muted); }
+}
+
+/* Case com a cara do cliente: tokens derivados recalculados dentro do escopo da marca
+   (os do .bp-app herdariam o valor já resolvido com as cores do tema). */
+[data-rb-brand] {
+  --bp-g1: color-mix(in srgb, var(--rb-fg) 6%, transparent);
+  --bp-g2: color-mix(in srgb, var(--rb-fg) 13%, transparent);
+  --bp-ink: color-mix(in srgb, var(--rb-accent) 42%, var(--rb-fg));
+  --bp-mark: color-mix(in srgb, var(--rb-accent) 72%, var(--rb-fg));
+  --bp-hatch: color-mix(in srgb, var(--rb-fg) 24%, transparent);
+  --bp-rule: color-mix(in srgb, var(--rb-fg) 28%, transparent);
+  --bp-paper: color-mix(in srgb, var(--rb-bg) 88%, transparent);
 }

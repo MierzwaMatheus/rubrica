@@ -436,6 +436,7 @@ a.poster-row:focus-visible { outline: 3px solid var(--rb-accent-fg); outline-off
 .poster-facts dt { font-family: var(--rb-font-mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
 .poster-facts dd { margin: 0; font-weight: 800; text-align: right; }
 .poster-case-sec { margin-top: clamp(32px, 4vw, 56px); }
+.poster-case-blocks { margin-top: clamp(32px, 4vw, 56px); }
 .poster-related { margin-top: clamp(40px, 6vw, 72px); }
 .poster-notfound .poster-giant { line-height: .88; }
 
@@ -443,3 +444,6 @@ a.poster-row:focus-visible { outline: 3px solid var(--rb-accent-fg); outline-off
   .poster-root *, .poster-root *::before, .poster-root *::after { transition: none !important; animation: none !important; }
   .poster-btn:hover { transform: none; }
 }
+
+/* Case com a cara do cliente: a tinta do cartaz segue o texto do cliente dentro do escopo. */
+[data-rb-brand] { --poster-ink: var(--rb-fg); }

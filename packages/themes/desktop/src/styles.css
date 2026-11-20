@@ -396,6 +396,8 @@ ul.dk-li__desc { padding-left: 18px; list-style: disc; }
 .dk-doc { display: flex; flex-direction: column; gap: 18px; padding: 26px 30px 32px; }
 .dk-doc__header { display: flex; flex-direction: column; gap: 10px; }
 .dk-doc__title { margin: 0; font-size: clamp(28px, 3.4vw, 42px); line-height: 1.1; font-weight: 700; overflow-wrap: anywhere; }
+.dk-doc__blocks { margin-block: 14px 0; }
+.dk-doc__blocks :is(h2, .rb-section__title) { font-size: 22px; margin: 8px 0 10px; }
 .dk-doc__section h2 { font-size: 22px; margin: 8px 0 10px; }
 .dk-doc__section .dk-frame { margin-top: 14px; }
 .dk-prose { max-width: 70ch; font-size: 16px; line-height: 1.7; }
@@ -492,4 +494,13 @@ ul.dk-li__desc { padding-left: 18px; list-style: disc; }
   .dk-doc { padding: 20px 16px 24px; }
   .dk-facts > div + div { border-left: 0; }
   .dk-foot { padding: 0 16px 20px; }
+}
+
+/* Case com a cara do cliente: os tokens derivados dos --rb-* do :root são recalculados
+   dentro do escopo da marca (senão herdariam o valor já resolvido no :root). */
+[data-rb-brand] {
+  --dk-line: var(--rb-fg);
+  --dk-shadow: color-mix(in srgb, var(--rb-fg) 85%, transparent);
+  --dk-dot: color-mix(in srgb, var(--rb-fg) 16%, transparent);
+  --dk-hover: color-mix(in srgb, var(--rb-fg) 8%, var(--rb-surface));
 }

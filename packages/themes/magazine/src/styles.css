@@ -384,3 +384,9 @@ article.rb-post.rb-container, article.rb-case.rb-container { max-width: 47rem; m
 
 /* faixa do celular: sem a edição, para o seletor de idioma e o tema caberem numa linha */
 @media (max-width: 479px) { .rb-mast__edition { display: none; } .rb-mast__strip { justify-content: center; } }
+
+/* Case com a cara do cliente: os tokens derivados dos --rb-* do :root são recalculados
+   dentro do escopo da marca (senão herdariam o valor já resolvido no :root). */
+[data-rb-brand] {
+  --mag-hair: color-mix(in srgb, var(--rb-fg) 22%, transparent);
+}

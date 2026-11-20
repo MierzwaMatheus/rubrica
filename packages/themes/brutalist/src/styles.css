@@ -311,3 +311,9 @@ button.rb-button { font: 700 13px/1.3 var(--rb-font-mono); }
 
 /* ---------- movimento ---------- */
 @media (prefers-reduced-motion: reduce) { .br-cursor { animation: none; } }
+
+/* Case com a cara do cliente: os tokens derivados dos --rb-* do :root são recalculados
+   dentro do escopo da marca (senão herdariam o valor já resolvido no :root). */
+[data-rb-brand] {
+  --br-line: 1px solid var(--rb-fg);
+}

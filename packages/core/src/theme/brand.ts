@@ -38,7 +38,7 @@ export function accentForeground(accent: string): string {
   return contrastRatio(accent, "#ffffff") >= contrastRatio(accent, "#000000") ? "#ffffff" : "#000000";
 }
 
-function checkMode(colors: CaseBrandColors | undefined, mode: BrandMode, issues: BrandIssue[]): void {
+function checkMode(colors: CaseBrandColors | undefined, mode: BrandMode, issues: BrandIssue[], contrast: boolean): void {
   if (!colors) {
     if (mode === "light") issues.push({ mode, path: "light", message: "cores do modo claro: obrigatórias" });
     return;
@@ -50,7 +50,7 @@ function checkMode(colors: CaseBrandColors | undefined, mode: BrandMode, issues:
       valid = false;
     }
   }
-  if (!valid) return;
+  if (!valid || !contrast) return;
   const text = contrastRatio(colors.foreground, colors.background);
   if (text < BRAND_MIN_TEXT_CONTRAST) {
     issues.push({ mode, path: "foreground", message: `texto sobre o fundo com contraste ${text.toFixed(2)}:1 (mínimo ${BRAND_MIN_TEXT_CONTRAST}:1)` });
@@ -61,11 +61,16 @@ function checkMode(colors: CaseBrandColors | undefined, mode: BrandMode, issues:
   }
 }
 
-/** Problemas da marca (formato e contraste, nos dois modos). Lista vazia = pode salvar. */
+/**
+ * Problemas da marca (formato e contraste, nos dois modos). Lista vazia = pode salvar.
+ * Marca desligada (`enabled: false`) guarda as cores sem aplicar: só o formato é conferido,
+ * para dar para desligar uma marca em ajuste.
+ */
 export function validateBrand(brand: CaseBrand): BrandIssue[] {
   const issues: BrandIssue[] = [];
-  checkMode(brand.light, "light", issues);
-  if (brand.dark) checkMode(brand.dark, "dark", issues);
+  const contrast = brand.enabled !== false;
+  checkMode(brand.light, "light", issues, contrast);
+  if (brand.dark) checkMode(brand.dark, "dark", issues, contrast);
   if (brand.fontDisplay !== undefined && !/^[A-Za-z0-9 ]{1,60}$/.test(brand.fontDisplay.trim())) {
     issues.push({ mode: "light", path: "fontDisplay", message: "fonte: o nome da família no Google Fonts (letras, números e espaços)" });
   }
@@ -80,7 +85,7 @@ function resolveColors(c: CaseBrandColors): ResolvedBrandColors {
 
 /** Marca pronta para o render; desligada ou inválida → undefined (o case usa o tema). */
 export function resolveBrand(brand: CaseBrand | undefined): ResolvedBrand | undefined {
-  if (!brand || brand.enabled === false || validateBrand(brand).length > 0) return undefined;
+  if (!brand || brand.enabled === false || validateBrand(brand).length > 0) return undefined; // desligada: só guarda
   const light = resolveColors(brand.light);
   const out: ResolvedBrand = { light, dark: brand.dark ? resolveColors(brand.dark) : light };
   const font = brand.fontDisplay?.trim();

@@ -4,6 +4,7 @@
  * importam daqui.
  */
 // @ts-expect-error módulo virtual da integração
+import { caseCarouselFor } from "../islands/case-carousel";
 import { theme, source, projectBlocks, projectComponents, fontPlan } from "virtual:rubrica/config";
 // @ts-expect-error módulo virtual da integração
 import { islands } from "virtual:rubrica/islands";
@@ -93,11 +94,7 @@ export function islandProps(block: { id: string; type: string; fields: Record<st
  * galeria) e os textos. Sem o tema pedir (`caseCarousel`) ou sem imagens, não há ilha.
  */
 export function caseCarouselProps(project: ProjectItem, ctx: RenderContext): CarouselIslandProps | undefined {
-  if (!activeTheme.caseCarousel) return undefined;
-  const images = [...(project.cover ? [project.cover] : []), ...project.gallery];
-  if (images.length === 0) return undefined;
-  const texts = Object.fromEntries(uiKeysWithPrefix(ISLAND_META.carrossel?.textPrefixes ?? []).map((k) => [k, ctx.t(k)]));
-  return { images, title: project.title, texts };
+  return caseCarouselFor(activeTheme, project, ctx);
 }
 
 /**

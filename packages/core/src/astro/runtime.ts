@@ -4,12 +4,12 @@
  * importam daqui.
  */
 // @ts-expect-error módulo virtual da integração
-import { caseCarouselFor } from "../islands/case-carousel";
 import { theme, source, projectBlocks, projectComponents, fontPlan } from "virtual:rubrica/config";
 // @ts-expect-error módulo virtual da integração
 import { islands } from "virtual:rubrica/islands";
 import { adminBackend } from "virtual:rubrica/admin";
 import { CORE_BLOCKS } from "../blocks/catalog";
+import { caseCarouselFor } from "../islands/case-carousel";
 import type { BlockDefinition } from "../blocks/define";
 import type { DataSource } from "../data/source";
 import { CORE_PLUGINS } from "../plugins/registry";

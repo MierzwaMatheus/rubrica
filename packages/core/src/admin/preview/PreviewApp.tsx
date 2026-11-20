@@ -10,13 +10,13 @@ import { blockComponent, ColorToggleButton, LocaleLinks, SiteAnnouncement, siteW
 import { CORE_PLUGINS } from "../../plugins/registry";
 import { appearanceHead } from "../../theme/appearance";
 import type { BlockComponent } from "../../theme/contract";
-import { planFonts } from "../../theme/fonts";
+import { fontVarFor, planFonts } from "../../theme/fonts";
 import type { SiteSnapshot } from "../../data/source";
 import { isPreviewMessage, type FromPreview, type ToPreview } from "./protocol";
 import { resolveCasePreview, resolvePreview } from "./resolve";
 import type { ResolvedBlock } from "../../render/site";
 import type { RenderContext } from "../../theme/contract";
-import { brandCss, type ResolvedBrand } from "../../theme/brand";
+import { brandCss } from "../../theme/brand";
 
 const blocks = [...CORE_BLOCKS, ...(projectBlocks ?? []).filter((b) => !CORE_BLOCKS.some((c) => c.type === b.type))];
 
@@ -85,41 +85,19 @@ function fontHref(family: string): string {
 }
 
 /**
- * A rota de case: o template do tema com o corpo em blocos e a marca do cliente. O núcleo
- * (frente A) envolve o template em `<div data-rb-brand>` e passa `blocks` e `brand`; enquanto
- * o template do tema não desenha o slot `blocks`, os blocos entram logo abaixo dele.
- * TODO(frente A): com o slot nos templates, o desvio (`slotUsed`) e o estilo do wrapper saem.
+ * A rota de case, como o `page.astro` do site: o template do tema com o corpo no slot
+ * `blocks` (o mesmo laço da prévia de páginas) e, com a cara do cliente, dentro do wrapper
+ * `data-rb-brand`. O CSS da marca (`brandCss`) vai no `<head>`, no efeito do `PreviewApp`.
  */
 function CaseView({ result }: { result: Extract<ReturnType<typeof resolveCasePreview>, { ok: true }> }) {
   const { Case } = templates(theme);
   const { ctx, brand } = result;
-  const [slotUsed, setSlotUsed] = useState(true);
-  useLayoutEffect(() => {
-    setSlotUsed(!!document.querySelector("[data-rb-case-blocks]"));
-  });
-  const empty = result.blocks.length === 0;
-  const body = (marker: boolean) => (
-    <div {...(marker ? { "data-rb-case-blocks": "" } : { "data-rb-case-fallback": "" })}>
-      {empty ? <div style={notice}>O case ainda não tem blocos visíveis.</div> : <BlockViews blocks={result.blocks} ctx={ctx} />}
-    </div>
-  );
-  const content = (
-    <>
-      <Case project={result.project} related={result.related} next={result.next} blocks={body(true)} brand={brand} ctx={ctx} />
-      {!slotUsed && body(false)}
-    </>
-  );
-  if (!brand) return content;
-  return <BrandWrapper brand={brand}>{content}</BrandWrapper>;
-}
-
-function BrandWrapper({ brand, children }: { brand: ResolvedBrand; children: ReactNode }) {
-  const font = brand.fontDisplay;
+  const body = result.blocks.length > 0 ? <BlockViews blocks={result.blocks} ctx={ctx} /> : <div style={notice}>O case ainda não tem blocos visíveis.</div>;
+  const view = <Case project={result.project} related={result.related} next={result.next} blocks={body} brand={brand} ctx={ctx} />;
+  if (!brand) return view;
   return (
-    <div data-rb-brand="" style={{ background: "var(--rb-bg)", color: "var(--rb-fg)" }}>
-      <style>{[brandCss(brand), font ? `[data-rb-brand]{--rbf-brand:"${font}",system-ui,sans-serif}` : ""].filter(Boolean).join("\n")}</style>
-      {font && <link rel="stylesheet" href={fontHref(font)} />}
-      {children}
+    <div data-rb-brand="" {...(brand.fontDisplay ? { "data-rb-brand-font": "" } : {})} className="rb-case-brand">
+      {view}
     </div>
   );
 }
@@ -211,7 +189,12 @@ export default function PreviewApp() {
         return name ? [`${token}:"${name}",${fallback}`] : [];
       })
       .join(";");
-    style.textContent = [head.css, fontCss ? `:root[data-theme-id][data-color-mode][lang]{${fontCss}}` : ""].filter(Boolean).join("\n");
+    // Case com a cara do cliente: o CSS da marca (escopo `[data-rb-brand]`) vai no <head>, como
+    // no site. A família do cliente entra pelo Google Fonts na variável que o site recebe da Fonts API.
+    const brand = result?.ok && "brand" in result ? result.brand : undefined;
+    const brandFont = brand?.fontDisplay;
+    const brandCssText = brand ? [brandCss(brand), brandFont ? `:root{${fontVarFor(brandFont)}:"${brandFont}",system-ui,sans-serif}` : ""].filter(Boolean).join("\n") : "";
+    style.textContent = [head.css, brandCssText, fontCss ? `:root[data-theme-id][data-color-mode][lang]{${fontCss}}` : ""].filter(Boolean).join("\n");
     let link = document.getElementById("rb-preview-fonts") as HTMLLinkElement | null;
     const families = plan.fonts.filter((f) => f.name && (f.name === appearance.fontSans || f.name === appearance.fontMono));
     const href = families.length
@@ -225,6 +208,15 @@ export default function PreviewApp() {
       link.href = href;
       document.head.appendChild(link);
     } else if (!href) link?.remove();
+    let brandLink = document.getElementById("rb-preview-brand-font") as HTMLLinkElement | null;
+    if (brandFont && (!brandLink || brandLink.href !== fontHref(brandFont))) {
+      brandLink?.remove();
+      brandLink = document.createElement("link");
+      brandLink.id = "rb-preview-brand-font";
+      brandLink.rel = "stylesheet";
+      brandLink.href = fontHref(brandFont);
+      document.head.appendChild(brandLink);
+    } else if (!brandFont) brandLink?.remove();
   });
 
   // Marca cada bloco e destaca o selecionado.

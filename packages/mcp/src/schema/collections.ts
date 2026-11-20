@@ -2,6 +2,7 @@
  * Coleções do conteúdo: campos (os validadores do Convex do backend), permissão e
  * plugin de cada uma. As ferramentas de coleção saem daqui.
  */
+import { v } from "convex/values";
 import type { CollectionName } from "@rubrica/core";
 import type { Permission } from "@rubrica/core/convex/roles";
 import {
@@ -14,6 +15,7 @@ import {
   serviceFields,
   teamMemberFields,
   testimonialFields,
+  vBlock,
 } from "@rubrica/core/convex/validators";
 import { validatorsToSchema, type JsonSchema, type SchemaOptions } from "./json-schema";
 
@@ -35,6 +37,20 @@ export interface CollectionSpec {
   requiredText: string[];
   descriptions: Record<string, string>;
 }
+
+const vBrandColors = v.object({ background: v.string(), foreground: v.string(), accent: v.string() });
+
+/**
+ * Campos do projeto com o corpo em blocos e a marca do cliente (2.3.0). Vêm dos validadores
+ * do núcleo quando ele já os declara; senão, daqui (mesmo formato de `CaseBrand`).
+ */
+const caseProjectFields: Record<string, unknown> = {
+  ...projectFields,
+  blocks: (projectFields as Record<string, unknown>).blocks ?? v.optional(v.array(vBlock)),
+  brand:
+    (projectFields as Record<string, unknown>).brand ??
+    v.optional(v.object({ enabled: v.optional(v.boolean()), light: vBrandColors, dark: v.optional(vBrandColors), fontDisplay: v.optional(v.string()) })),
+};
 
 const common: Record<string, string> = {
   order: "Posição na lista (menor primeiro). Se faltar, vai para o fim.",
@@ -69,7 +85,7 @@ export const COLLECTION_SPECS: Record<CollectionName, CollectionSpec> = {
     name: "projects",
     label: "projetos e cases",
     singular: "projeto",
-    fields: projectFields,
+    fields: caseProjectFields,
     permission: "content",
     plugin: "portfolio",
     slug: true,
@@ -79,10 +95,24 @@ export const COLLECTION_SPECS: Record<CollectionName, CollectionSpec> = {
       ...common,
       title: "Nome do projeto.",
       summary: "Resumo de uma frase (cartão da lista).",
-      content: "Case em HTML, quando não usa seções.",
-      sections: "Seções do case (contexto, decisões, resultado), em ordem.",
-      "sections[].title": "Título da seção.",
-      "sections[].body": "Corpo da seção em HTML.",
+      content: "Formato antigo: case em HTML corrido. Para casos novos, use `blocks`.",
+      blocks:
+        "Corpo do case em blocos, como o de uma página (texto, vídeo, imagens, paleta, tipografia, antes-depois...). Monte pelas ferramentas block_add, block_update_fields, block_move, block_set_visible e block_remove com `project` (slug ou id); blocks_catalog com context \"case\" mostra os blocos que valem aqui (sem hero, contato nem cases). O h1 é do template: o corpo começa no h2.",
+      sections: "Formato antigo (seções de título e corpo): use `blocks`. Continua sendo lido até a migração para blocos.",
+      "sections[].title": "Título da seção (formato antigo).",
+      "sections[].body": "Corpo da seção em HTML (formato antigo).",
+      brand:
+        "A cara do cliente: cores e fonte da marca dele, só dentro do case (cabeçalho e rodapé seguem o tema do site). Cores em hex (#rrggbb) por modo. Contraste mínimo: 4,5:1 entre texto e fundo e 3:1 entre destaque e fundo; conferido antes de gravar.",
+      "brand.enabled": "false guarda as cores sem aplicar. Padrão: ligado.",
+      "brand.light": "Cores do modo claro (obrigatório quando há brand).",
+      "brand.light.background": "Fundo, hex #rrggbb.",
+      "brand.light.foreground": "Texto, hex #rrggbb (contraste ≥ 4,5:1 com o fundo).",
+      "brand.light.accent": "Destaque (botões, links), hex #rrggbb (contraste ≥ 3:1 com o fundo).",
+      "brand.dark": "Cores do modo escuro. Sem ele, o escuro usa as do claro.",
+      "brand.dark.background": "Fundo, hex #rrggbb.",
+      "brand.dark.foreground": "Texto, hex #rrggbb (contraste ≥ 4,5:1 com o fundo).",
+      "brand.dark.accent": "Destaque, hex #rrggbb (contraste ≥ 3:1 com o fundo).",
+      "brand.fontDisplay": "Fonte dos títulos do case: o nome da família no Google Fonts (ex.: Playfair Display).",
       cover: "Imagem de capa.",
       gallery: "Imagens do projeto.",
       client: "Nome do cliente.",

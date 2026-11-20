@@ -5,7 +5,7 @@ import { vSeoJson } from "../schema/settings";
 import { contentWarnings, diffValues, mergeFields } from "../diff";
 import { RubricaError } from "../client";
 import { siteLocales, type SiteState } from "../state";
-import { assertValid, blocksFor, checkBlocks, checkWithBackend, variantsOf, filledLocales, pageRefProp, pageSummary, prop, resolvePage, toBlock, type PageDoc } from "./shared";
+import { assertValid, blocksFor, checkBlocks, checkWithBackend, variantsOf, filledLocales, pageRefProp, pageSummary, prop, resolvePage, targetProps, toBlock, resolveBlockTarget, type PageDoc } from "./shared";
 import { commit, ToolInputError, type ToolDef } from "./types";
 
 /** Schema de um bloco com o catálogo do site e as variações do tema. */
@@ -24,6 +24,9 @@ function titleOf(value: Record<string, string>, locales: string[]): void {
   const unknown = Object.keys(value).filter((l) => locales.length && !locales.includes(l));
   if (unknown.length) throw new ToolInputError(`title: idioma fora da lista do site (${locales.join(", ")}): ${unknown.join(", ")}`, [{ path: "title", message: "idioma desconhecido" }]);
 }
+
+/** Blocos de página pedem o papel `pages`; os de case, `content` (o alvo é conferido na hora). */
+const BLOCK_ACCESS = { permission: ["pages", "content"] } as const;
 
 export const pagesTools: ToolDef[] = [
   {
@@ -201,34 +204,34 @@ export const pagesTools: ToolDef[] = [
     name: "block_add",
     title: "Adicionar bloco",
     description:
-      "Acrescenta um bloco a uma página, na posição pedida (padrão: no fim). Os campos são conferidos com o schema do bloco (veja blocks_catalog). Textos vão por idioma: conteúdo sem tradução não aparece no idioma.",
-    access: { permission: "pages" },
+      "Acrescenta um bloco a uma página (`page`) ou ao corpo de um case (`project`), na posição pedida (padrão: no fim). Os campos são conferidos com o schema do bloco (veja blocks_catalog). Textos vão por idioma: conteúdo sem tradução não aparece no idioma.",
+    access: BLOCK_ACCESS,
     write: true,
     input: ({ state, typed }) => ({
       type: "object",
       properties: {
-        page: pageRefProp,
+        ...targetProps,
         block: blockSchema(state, typed),
         index: { type: "integer", minimum: 0, description: "Posição (0 = primeiro). Padrão: no fim." },
       },
-      required: ["page", "block"],
+      required: ["block"],
       additionalProperties: false,
     }),
-    async handler(args: { page: string; block: Partial<BlockInstance> & { type: string }; index?: number }, ctx) {
+    async handler(args: { page?: string; project?: string; block: Partial<BlockInstance> & { type: string }; index?: number }, ctx) {
       const locales = siteLocales(ctx.state);
-      const page = await resolvePage(ctx.client, args.page);
+      const page = await resolveBlockTarget(ctx, args);
       const block = toBlock(args.block);
-      if (page.blocks.some((b) => b.id === block.id)) throw new ToolInputError(`Já existe um bloco ${block.id} nesta página. Para mudar, use block_update_fields.`);
-      const check = await checkWithBackend(ctx.client, [block], ctx.state, checkBlocks([block], ctx.state));
+      if (page.blocks.some((b) => b.id === block.id)) throw new ToolInputError(`Já existe um bloco ${block.id} neste alvo. Para mudar, use block_update_fields.`);
+      const check = await checkWithBackend(ctx.client, [block], ctx.state, checkBlocks([block], ctx.state, page.context), page.context);
       assertValid(check);
       const index = Math.min(args.index ?? page.blocks.length, page.blocks.length);
       return commit(ctx, {
-        summary: `Adicionar o bloco ${block.type} (${block.id}) na posição ${index} de ${page.path}.`,
+        summary: `Adicionar o bloco ${block.type} (${block.id}) na posição ${index} de ${page.label}.`,
         changes: diffValues(undefined, { block }, locales),
         warnings: [...check.warnings, ...contentWarnings(block.fields, locales, "fields")],
         info: { blockId: block.id },
         apply: async () => {
-          await ctx.client.mutation("rubrica/pages:upsertBlock", { id: page._id, block, index });
+          await page.write(ctx.client, "upsert", { block, index });
           return { blockId: block.id };
         },
       });
@@ -238,13 +241,13 @@ export const pagesTools: ToolDef[] = [
     name: "block_update_fields",
     title: "Atualizar campos de um bloco",
     description:
-      "Muda campos de um bloco existente. Só os campos citados mudam; um texto por idioma é mesclado (mandar só {en: ...} não apaga o pt-BR; use replaceLocales para trocar o texto inteiro). Listas e imagens são trocadas inteiras. `unset` apaga campos opcionais.",
-    access: { permission: "pages" },
+      "Muda campos de um bloco existente (de uma página ou de um case). Só os campos citados mudam; um texto por idioma é mesclado (mandar só {en: ...} não apaga o pt-BR; use replaceLocales para trocar o texto inteiro). Listas e imagens são trocadas inteiras. `unset` apaga campos opcionais.",
+    access: BLOCK_ACCESS,
     write: true,
     input: ({ state }) => ({
       type: "object",
       properties: {
-        page: pageRefProp,
+        ...targetProps,
         blockId: prop.string("Id do bloco (de pages_get)."),
         fields: { type: "object", description: "Campos a mudar, no formato do bloco (blocks_catalog mostra o schema do tipo). Só os citados." },
         unset: { type: "array", items: { type: "string" }, description: "Campos opcionais a apagar." },
@@ -252,17 +255,17 @@ export const pagesTools: ToolDef[] = [
         source: { type: "object", description: "Troca a consulta da coleção do bloco (collection, ids, featured, tags, limit, sort)." },
         replaceLocales: prop.bool(`Troca os textos por idioma inteiros em vez de mesclar. Idiomas do site: ${siteLocales(state).join(", ") || "veja whoami"}.`),
       },
-      required: ["page", "blockId"],
+      required: ["blockId"],
       additionalProperties: false,
     }),
     async handler(
-      args: { page: string; blockId: string; fields?: Record<string, unknown>; unset?: string[]; variant?: string; source?: BlockInstance["source"]; replaceLocales?: boolean },
+      args: { page?: string; project?: string; blockId: string; fields?: Record<string, unknown>; unset?: string[]; variant?: string; source?: BlockInstance["source"]; replaceLocales?: boolean },
       ctx,
     ) {
       const locales = siteLocales(ctx.state);
-      const page = await resolvePage(ctx.client, args.page);
+      const page = await resolveBlockTarget(ctx, args);
       const current = page.blocks.find((b) => b.id === args.blockId);
-      if (!current) throw new RubricaError(`Bloco não encontrado: ${args.blockId}. Blocos da página: ${page.blocks.map((b) => b.id).join(", ") || "(nenhum)"}`, "validation");
+      if (!current) throw new RubricaError(`Bloco não encontrado: ${args.blockId}. ${page.blocksOf}: ${page.blocks.map((b) => b.id).join(", ") || "(nenhum)"}`, "validation");
       let fields = mergeFields(current.fields, args.fields ?? {}, locales, args.replaceLocales);
       for (const key of args.unset ?? []) {
         if (key in (args.fields ?? {})) throw new ToolInputError(`O campo "${key}" está em fields e em unset.`);
@@ -276,15 +279,15 @@ export const pagesTools: ToolDef[] = [
         ...(args.source ? { source: args.source } : {}),
       };
       if (next.variant === undefined) delete next.variant;
-      const check = await checkWithBackend(ctx.client, [next], ctx.state, checkBlocks([next], ctx.state));
+      const check = await checkWithBackend(ctx.client, [next], ctx.state, checkBlocks([next], ctx.state, page.context), page.context);
       assertValid(check);
       const changes = diffValues({ fields: current.fields, variant: current.variant, source: current.source }, { fields: next.fields, variant: next.variant, source: next.source }, locales);
       return commit(ctx, {
-        summary: `Atualizar o bloco ${current.type} (${current.id}) de ${page.path}: ${changes.length} mudança(s).`,
+        summary: `Atualizar o bloco ${current.type} (${current.id}) de ${page.label}: ${changes.length} mudança(s).`,
         changes,
         warnings: [...check.warnings, ...contentWarnings(next.fields, locales, "fields")],
         apply: async () => {
-          if (changes.length) await ctx.client.mutation("rubrica/pages:upsertBlock", { id: page._id, block: next });
+          if (changes.length) await page.write(ctx.client, "upsert", { block: next });
         },
       });
     },
@@ -292,17 +295,17 @@ export const pagesTools: ToolDef[] = [
   {
     name: "block_move",
     title: "Mover bloco",
-    description: "Muda a posição de um bloco na página (0 = primeiro). A ordem dos outros se mantém.",
-    access: { permission: "pages" },
+    description: "Muda a posição de um bloco na página ou no case (0 = primeiro). A ordem dos outros se mantém.",
+    access: BLOCK_ACCESS,
     write: true,
     input: () => ({
       type: "object",
-      properties: { page: pageRefProp, blockId: prop.string("Id do bloco."), toIndex: { type: "integer", minimum: 0, description: "Nova posição (0 = primeiro)." } },
-      required: ["page", "blockId", "toIndex"],
+      properties: { ...targetProps, blockId: prop.string("Id do bloco."), toIndex: { type: "integer", minimum: 0, description: "Nova posição (0 = primeiro)." } },
+      required: ["blockId", "toIndex"],
       additionalProperties: false,
     }),
-    async handler(args: { page: string; blockId: string; toIndex: number }, ctx) {
-      const page = await resolvePage(ctx.client, args.page);
+    async handler(args: { page?: string; project?: string; blockId: string; toIndex: number }, ctx) {
+      const page = await resolveBlockTarget(ctx, args);
       const from = page.blocks.findIndex((b) => b.id === args.blockId);
       if (from < 0) throw new RubricaError(`Bloco não encontrado: ${args.blockId}`, "validation");
       const ids = page.blocks.map((b) => b.id);
@@ -310,12 +313,12 @@ export const pagesTools: ToolDef[] = [
       ids.splice(Math.min(args.toIndex, ids.length), 0, args.blockId);
       const same = ids.every((id, i) => id === page.blocks[i]!.id);
       return commit(ctx, {
-        summary: same ? "O bloco já está nessa posição." : `Mover o bloco ${args.blockId} de ${from} para ${ids.indexOf(args.blockId)} em ${page.path}.`,
+        summary: same ? "O bloco já está nessa posição." : `Mover o bloco ${args.blockId} de ${from} para ${ids.indexOf(args.blockId)} em ${page.label}.`,
         info: { order: { before: page.blocks.map((b) => b.id), after: ids } },
         changes: same ? [] : [{ path: "blocks.order", op: "change", before: page.blocks.map((b) => b.id), after: ids }],
-        warnings: ids[0] !== args.blockId && page.blocks[0]?.type === "hero" && ids[0] !== page.blocks[0].id ? ["O hero deixaria de ser o primeiro bloco: o h1 da página passa a ser oculto."] : [],
+        warnings: page.kind === "page" && ids[0] !== args.blockId && page.blocks[0]?.type === "hero" && ids[0] !== page.blocks[0].id ? ["O hero deixaria de ser o primeiro bloco: o h1 da página passa a ser oculto."] : [],
         apply: async () => {
-          if (!same) await ctx.client.mutation("rubrica/pages:reorderBlocks", { id: page._id, blockIds: ids });
+          if (!same) await page.write(ctx.client, "reorder", { blockIds: ids });
         },
       });
     },
@@ -324,23 +327,23 @@ export const pagesTools: ToolDef[] = [
     name: "block_set_visible",
     title: "Ocultar ou mostrar bloco",
     description: "Liga ou desliga um bloco sem apagar (bloco oculto não vai ao site, mas o conteúdo fica).",
-    access: { permission: "pages" },
+    access: BLOCK_ACCESS,
     write: true,
     input: () => ({
       type: "object",
-      properties: { page: pageRefProp, blockId: prop.string("Id do bloco."), visible: { type: "boolean", description: "true mostra; false oculta." } },
-      required: ["page", "blockId", "visible"],
+      properties: { ...targetProps, blockId: prop.string("Id do bloco."), visible: { type: "boolean", description: "true mostra; false oculta." } },
+      required: ["blockId", "visible"],
       additionalProperties: false,
     }),
-    async handler(args: { page: string; blockId: string; visible: boolean }, ctx) {
-      const page = await resolvePage(ctx.client, args.page);
+    async handler(args: { page?: string; project?: string; blockId: string; visible: boolean }, ctx) {
+      const page = await resolveBlockTarget(ctx, args);
       const block = page.blocks.find((b) => b.id === args.blockId);
       if (!block) throw new RubricaError(`Bloco não encontrado: ${args.blockId}`, "validation");
       return commit(ctx, {
-        summary: `${args.visible ? "Mostrar" : "Ocultar"} o bloco ${block.type} (${block.id}) em ${page.path}.`,
+        summary: `${args.visible ? "Mostrar" : "Ocultar"} o bloco ${block.type} (${block.id}) em ${page.label}.`,
         changes: diffValues({ visible: block.visible }, { visible: args.visible }),
         apply: async () => {
-          if (block.visible !== args.visible) await ctx.client.mutation("rubrica/pages:setBlockVisible", { id: page._id, blockId: block.id, visible: args.visible });
+          if (block.visible !== args.visible) await page.write(ctx.client, "visible", { blockId: block.id, visible: args.visible });
         },
       });
     },
@@ -348,26 +351,26 @@ export const pagesTools: ToolDef[] = [
   {
     name: "block_remove",
     title: "Remover bloco",
-    description: "Apaga um bloco da página (não há lixeira para blocos: para só tirar do site, use block_set_visible).",
-    access: { permission: "pages" },
+    description: "Apaga um bloco da página ou do case (não há lixeira para blocos: para só tirar do site, use block_set_visible).",
+    access: BLOCK_ACCESS,
     write: true,
     destructive: true,
     input: () => ({
       type: "object",
-      properties: { page: pageRefProp, blockId: prop.string("Id do bloco.") },
-      required: ["page", "blockId"],
+      properties: { ...targetProps, blockId: prop.string("Id do bloco.") },
+      required: ["blockId"],
       additionalProperties: false,
     }),
-    async handler(args: { page: string; blockId: string }, ctx) {
-      const page = await resolvePage(ctx.client, args.page);
+    async handler(args: { page?: string; project?: string; blockId: string }, ctx) {
+      const page = await resolveBlockTarget(ctx, args);
       const block = page.blocks.find((b) => b.id === args.blockId);
       if (!block) throw new RubricaError(`Bloco não encontrado: ${args.blockId}`, "validation");
       return commit(ctx, {
-        summary: `Remover o bloco ${block.type} (${block.id}) de ${page.path}. Sem desfazer.`,
+        summary: `Remover o bloco ${block.type} (${block.id}) de ${page.label}. Sem desfazer.`,
         info: { removed: block },
-        warnings: block.type === "hero" ? ["Remover o hero tira o h1 da página (o núcleo põe um h1 oculto)."] : [],
+        warnings: page.kind === "page" && block.type === "hero" ? ["Remover o hero tira o h1 da página (o núcleo põe um h1 oculto)."] : [],
         apply: async () => {
-          await ctx.client.mutation("rubrica/pages:removeBlock", { id: page._id, blockId: block.id });
+          await page.write(ctx.client, "remove", { blockId: block.id });
         },
       });
     },

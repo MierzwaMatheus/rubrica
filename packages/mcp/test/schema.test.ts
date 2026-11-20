@@ -100,3 +100,25 @@ describe("JSON Schema das coleções (dos validadores do Convex)", () => {
     expect(schema.properties.b.enum).toEqual(["x", "y"]);
   });
 });
+
+describe("projetos: corpo em blocos e marca do cliente", () => {
+  const schema = () => collectionFieldsSchema(COLLECTION_SPECS.projects, { locales: ["pt-BR"] }) as any;
+
+  it("expõe blocks e brand, com as descrições em pt-BR", () => {
+    const props = schema().properties;
+    expect(props.blocks.type).toBe("array");
+    expect(props.blocks.description).toContain("block_add");
+    expect(props.blocks.description).toContain("project");
+    expect(props.brand.description).toMatch(/4,5:1/);
+    expect(props.brand.description).toMatch(/3:1/);
+    expect(props.brand.properties.fontDisplay.description).toContain("Google Fonts");
+    expect(props.brand.properties.light.properties.accent.description).toContain("#rrggbb");
+    expect(props.sections.description).toContain("blocks");
+  });
+
+  it("o schema é compilável e aceita uma marca válida", () => {
+    const validate = ajv.compile(schema());
+    expect(validate({ title: { "pt-BR": "X" }, brand: { light: { background: "#ffffff", foreground: "#111111", accent: "#cc3300" }, fontDisplay: "Playfair Display" } })).toBe(true);
+    expect(validate({ title: { "pt-BR": "X" }, brand: { light: { background: "#ffffff" } } })).toBe(false);
+  });
+});

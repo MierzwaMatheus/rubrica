@@ -1,7 +1,7 @@
-/** Números do case (`metrics`), o próximo case e o carrossel das telas. */
+/** Números do case (`metrics`), o próximo case, o carrossel das telas e o template padrão. */
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { CaseMetrics, LucideIcon, lucideIcon } from "../src/components";
+import { CaseMetrics, DefaultCase, LucideIcon, lucideIcon } from "../src/components";
 import { resolveProject, type ProjectItem } from "../src/render/collections";
 import { nextCase } from "../src/render/site";
 import type { RawProject } from "../src/content/types";
@@ -86,5 +86,23 @@ describe("ilha do carrossel", () => {
 
   it("sem imagens, nada", () => {
     expect(renderToStaticMarkup(<Carrossel images={[]} title="x" texts={texts} />)).toBe("");
+  });
+});
+
+describe("template de case padrão", () => {
+  const ctx = { t: (k: string) => k, href: (p: string) => p, formatDate: (d: string) => d } as unknown as Parameters<typeof DefaultCase>[0]["ctx"];
+  const project = { ...resolveProject({ ...raw, sections: [{ title: { "pt-BR": "Antiga" }, body: { "pt-BR": "<p>x</p>" } }] }, opts("pt-BR"))!, content: "<p>Texto antigo</p>" };
+
+  it("desenha o corpo do slot blocks, entre o cabeçalho e os números", () => {
+    const html = renderToStaticMarkup(<DefaultCase project={project} related={[]} ctx={ctx} blocks={<section className="rb-section">Corpo</section>} />);
+    expect(html).toContain('<div class="rb-case__body"><section class="rb-section">Corpo</section></div>');
+    expect(html.indexOf("rb-case__body")).toBeLessThan(html.indexOf("rb-case__metrics"));
+    // content e sections não são mais lidos pelo template: chegam como blocos.
+    expect(html).not.toContain("Texto antigo");
+    expect(html).not.toContain("Antiga");
+  });
+
+  it("sem corpo, sem o wrapper", () => {
+    expect(renderToStaticMarkup(<DefaultCase project={project} related={[]} ctx={ctx} />)).not.toContain("rb-case__body");
   });
 });

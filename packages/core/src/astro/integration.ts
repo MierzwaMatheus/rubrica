@@ -16,7 +16,7 @@ import { fileURLToPath } from "node:url";
 import { isAbsolute, resolve } from "node:path";
 import { fixtureSource, type DataSource } from "../data/source";
 import type { ThemeFonts } from "../theme/contract";
-import { planFonts, type FontPlan } from "../theme/fonts";
+import { planContentFonts, planFonts, type FontPlan } from "../theme/fonts";
 import tailwindcss from "@tailwindcss/vite";
 import { convexSource, findConvexUrl } from "../data/convex";
 import { devFsAllow, findApiUrl, projectEnv } from "./env";
@@ -111,6 +111,15 @@ interface DevContent {
   themeFonts: ThemeFonts | undefined;
 }
 
+/**
+ * Fontes do build: as do site (aparência ou tema) e as de conteúdo (fonte do cliente nos
+ * cases, blocos `tipografia`), cada uma na sua variável.
+ */
+function sitePlan(snapshot: SiteSnapshot, themeFonts: ThemeFonts | undefined): { plan: FontPlan; warnings: string[] } {
+  const content = planContentFonts({ pages: snapshot.pages, projects: snapshot.collections.projects });
+  return { plan: { ...planFonts(snapshot.site.appearance, themeFonts), content: content.fonts }, warnings: content.warnings };
+}
+
 const blogEnabled = (s: SiteSnapshot) => enabledPlugins(CORE_PLUGINS, s.site.kind, s.site.plugins).has("blog");
 
 export default function rubrica(options: RubricaOptions): AstroIntegration {
@@ -122,7 +131,7 @@ export default function rubrica(options: RubricaOptions): AstroIntegration {
   return {
     name: "@rubrica/core",
     hooks: {
-      async "astro:config:setup"({ config, command, updateConfig, injectRoute }) {
+      async "astro:config:setup"({ config, command, updateConfig, injectRoute, logger }) {
         const root = fileURLToPath(config.root);
         const abs = (p: string) => (isAbsolute(p) ? p : resolve(root, p));
         const spec = (s: string) => (s.startsWith(".") ? abs(s) : s);
@@ -161,7 +170,9 @@ export default function rubrica(options: RubricaOptions): AstroIntegration {
         // no build e serve local; o <head> só recebe `<Font>` (ver Document.astro).
         const snapshot = await loadSource(source, abs, convexUrl).load();
         const themeFonts = readThemeFonts(options.theme, root);
-        const fontPlan: FontPlan = planFonts(snapshot.site.appearance, themeFonts);
+        const { plan: fontPlan, warnings: fontWarnings } = sitePlan(snapshot, themeFonts);
+        // Fonte de conteúdo com problema não para o build: avisa e segue (o componente cai na reserva).
+        for (const w of fontWarnings) logger.warn(w);
         if (command === "dev") dev = { source, abs, convexUrl, snapshot, themeFonts };
 
         const modules: Record<string, string> = {
@@ -203,7 +214,8 @@ export default function rubrica(options: RubricaOptions): AstroIntegration {
           trailingSlash: "never",
           build: { format: "directory" },
           integrations: [react()],
-          fonts: fontPlan.fonts.map((f) => ({
+          // Família que o Google não tem: a Fonts API avisa e segue, sem `@font-face`.
+          fonts: [...fontPlan.fonts, ...(fontPlan.content ?? [])].map((f) => ({
             provider: fontProviders.google(),
             name: f.name,
             cssVariable: f.cssVariable,
@@ -272,7 +284,7 @@ export default function rubrica(options: RubricaOptions): AstroIntegration {
         if (appPages.length) server.middlewares.use(appRewriteMiddleware(appPages));
         if (!dev) return;
         const { source, abs, convexUrl, snapshot, themeFonts } = dev;
-        const fontsKey = (s: SiteSnapshot) => JSON.stringify(planFonts(s.site.appearance, themeFonts));
+        const fontsKey = (s: SiteSnapshot) => JSON.stringify(sitePlan(s, themeFonts).plan);
         const track = contentChangeTracker({
           initial: snapshot,
           onChange() {
@@ -281,7 +293,7 @@ export default function rubrica(options: RubricaOptions): AstroIntegration {
           },
           warn: (message) => logger.warn(message),
           restartNotices: [
-            { key: fontsKey, message: "as fontes da aparência mudaram: reinicie o dev para carregá-las (o resto do conteúdo já está atualizado)." },
+            { key: fontsKey, message: "as fontes mudaram (aparência, fonte do cliente ou bloco tipografia): reinicie o dev para carregá-las (o resto do conteúdo já está atualizado)." },
             { key: (s) => String(blogEnabled(s)), message: "o plugin do blog foi ligado ou desligado: reinicie o dev para atualizar as rotas do RSS." },
           ],
         });

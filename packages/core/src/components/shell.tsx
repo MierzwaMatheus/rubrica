@@ -136,7 +136,11 @@ export function DefaultPost({ post, html, related, ctx }: PostTemplateProps) {
   );
 }
 
-export function DefaultCase({ project, related, ctx }: CaseTemplateProps) {
+/**
+ * Case padrão: cabeçalho (título, resumo, fatos, capa), o corpo em blocos (slot `blocks`,
+ * já desenhado pelo núcleo, a partir do h2), os números, os links e os relacionados.
+ */
+export function DefaultCase({ project, related, blocks, ctx }: CaseTemplateProps) {
   return (
     <article className="rb-case rb-container">
       <header className="rb-case__header">
@@ -164,14 +168,7 @@ export function DefaultCase({ project, related, ctx }: CaseTemplateProps) {
         </dl>
         {project.cover && <Img image={project.cover} className="rb-case__cover" priority sizes="(min-width: 960px) 1000px, 100vw" />}
       </header>
-      {project.content && <Html html={project.content} className="rb-prose" />}
-      {project.sections.map((s, i) => (
-        <section key={i} className="rb-case__section">
-          <h2>{s.title}</h2>
-          <Html html={s.body} className="rb-prose" />
-          {s.image && <Img image={s.image} />}
-        </section>
-      ))}
+      {blocks && <div className="rb-case__body">{blocks}</div>}
       <CaseMetrics metrics={project.metrics} title={ctx.t("case.metrics")} />
       {project.links.length > 0 && (
         <div className="rb-actions">

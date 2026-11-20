@@ -529,9 +529,9 @@ As cores de uma marca: nome, código, papel e o contraste de cada uma.
 | `anchor` | Âncora | texto | não | não | Identificador para links na página (#marca). Opcional; até 40 caracteres |
 | `title` | Título | texto | não | sim | até 140 caracteres |
 | `intro` | Texto de apoio | texto longo | não | sim | até 400 caracteres |
-| `colors` | Cores | lista | não | — | de 1 a 12 itens; cada item: "Cor" |
+| `colors` | Cores | lista | sim | — | de 1 a 12 itens; cada item: "Cor" |
 | `colors[].name` | Nome | texto | sim | sim | até 40 caracteres |
-| `colors[].hex` | Cor | undefined | sim | — | — |
+| `colors[].hex` | Cor | cor | sim | — | — |
 | `colors[].role` | Papel | texto | não | sim | Ex.: principal, apoio, fundo; até 60 caracteres |
 | `colors[].usage` | Uso | texto longo | não | sim | até 200 caracteres |
 | `showContrast` | Mostrar o contraste com branco e preto | sim ou não | não | — | padrão: sim |
@@ -552,8 +552,8 @@ As fontes de uma marca, com papel, pesos e uma amostra escrita na própria fonte
 | `anchor` | Âncora | texto | não | não | Identificador para links na página (#marca). Opcional; até 40 caracteres |
 | `title` | Título | texto | não | sim | até 140 caracteres |
 | `intro` | Texto de apoio | texto longo | não | sim | até 400 caracteres |
-| `fonts` | Fontes | lista | não | — | de 1 a 4 itens; cada item: "Fonte" |
-| `fonts[].family` | Família | texto | sim | não | Nome no Google Fonts (ex.: Big Shoulders Display). O site baixa a fonte no build; até 60 caracteres |
+| `fonts` | Fontes | lista | sim | — | de 1 a 4 itens; cada item: "Fonte" |
+| `fonts[].family` | Família | texto | sim | não | Nome no Google Fonts (ex.: Oswald). O site baixa a fonte no build; até 60 caracteres |
 | `fonts[].role` | Papel | texto | não | sim | Ex.: títulos, texto corrido; até 60 caracteres |
 | `fonts[].weights` | Pesos | texto | não | não | Ex.: 400, 700. Sem eles, 400 e 700; até 40 caracteres |
 | `fonts[].sample` | Amostra | texto longo | não | sim | Frase escrita na fonte. Sem ela, o alfabeto; até 120 caracteres |
@@ -575,10 +575,10 @@ As versões de um logo, cada uma sobre a sua cor de fundo: principal, reduzida, 
 | `anchor` | Âncora | texto | não | não | Identificador para links na página (#marca). Opcional; até 40 caracteres |
 | `title` | Título | texto | não | sim | até 140 caracteres |
 | `intro` | Texto de apoio | texto longo | não | sim | até 400 caracteres |
-| `items` | Variações | lista | não | — | de 1 a 24 itens; cada item: "Variação" |
+| `items` | Variações | lista | sim | — | de 1 a 24 itens; cada item: "Variação" |
 | `items[].image` | Imagem (SVG ou PNG transparente) | imagem | sim | o texto alternativo | — |
-| `items[].label` | Nome | texto | não | sim | Ex.: principal sobre bordô; até 60 caracteres |
-| `items[].background` | Cor de fundo | undefined | não | — | Sem ela, o fundo do site |
+| `items[].label` | Nome | texto | não | sim | Ex.: principal sobre farinha; até 60 caracteres |
+| `items[].background` | Cor de fundo | cor | não | — | Sem ela, o fundo do site |
 | `items[].note` | Observação | texto longo | não | sim | até 160 caracteres |
 | `columns` | Colunas | opção | não | — | opções: `2` (2), `3` (3), `4` (4); padrão: `3` |
 
@@ -599,7 +599,7 @@ Um conjunto de imagens com legenda: telas, mockups, grafismos, animações em GI
 | `anchor` | Âncora | texto | não | não | Identificador para links na página (#marca). Opcional; até 40 caracteres |
 | `title` | Título | texto | não | sim | até 140 caracteres |
 | `intro` | Texto de apoio | texto longo | não | sim | até 400 caracteres |
-| `items` | Imagens | lista | não | — | de 1 a 30 itens; cada item: "Imagem" |
+| `items` | Imagens | lista | sim | — | de 1 a 30 itens; cada item: "Imagem" |
 | `items[].image` | Imagem | imagem | sim | o texto alternativo | — |
 | `items[].caption` | Legenda | texto | não | sim | até 200 caracteres |
 | `layout` | Disposição | opção | não | — | opções: `grade` (Grade), `mosaico` (Mosaico (a primeira maior)), `carrossel` (Carrossel (sem JavaScript, faixa com rolagem)); padrão: `grade` |

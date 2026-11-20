@@ -50,17 +50,23 @@ export interface VideoFrameProps {
   mode: "link" | "button" | "player";
   t: T;
   onPlay?: () => void;
+  /**
+   * Chave do iframe do player: mudou, o iframe remonta (recarrega no tempo de `video.start`)
+   * sem remontar o resto (a figura, os capítulos e o botão em foco).
+   */
+  reload?: number;
   /** Recebe o iframe do player (a ilha põe o foco nele). Função, não `Ref`: o tipo não depende da cópia do @types/react do projeto. */
   frameRef?: (el: HTMLIFrameElement | null) => void;
 }
 
 /** Moldura do vídeo, pura: o bloco usa no HTML estático e a ilha usa depois de hidratar. */
-export function VideoFrame({ video, poster, name, ratio, mode, t, onPlay, frameRef }: VideoFrameProps) {
+export function VideoFrame({ video, poster, name, ratio, mode, t, onPlay, reload, frameRef }: VideoFrameProps) {
   const provider = VIDEO_PROVIDER_LABELS[video.provider];
   if (mode === "player") {
     return (
       <div className="rb-video__frame" data-ratio={ratio}>
         <iframe
+          key={reload}
           ref={frameRef}
           className="rb-video__player"
           src={videoEmbedUrl(video)}
@@ -128,18 +134,23 @@ export interface VideoChaptersProps {
   /** `link`: abre o vídeo no provedor, no tempo (sem JavaScript). `button`: a ilha pula o player. */
   mode: "link" | "button";
   t: T;
+  /** Nome do vídeo (legenda, título ou provedor): torna único o rótulo da lista na página. */
+  name: string;
   /** Nível do título "Capítulos". */
   level: 2 | 3;
-  /** Capítulo tocando (segundos), para `aria-current`. */
+  /**
+   * Último capítulo escolhido (segundos), para `aria-current`. Não é "o que está tocando"
+   * (o player segue sozinho), por isso o rótulo diz "último capítulo escolhido".
+   */
   current?: number;
   onChapter?: (seconds: number) => void;
 }
 
 /** Lista de capítulos (tempo e nome). Sem JavaScript, cada um é um link para o vídeo no tempo. */
-export function VideoChapters({ video, chapters, mode, t, level, current, onChapter }: VideoChaptersProps) {
+export function VideoChapters({ video, chapters, mode, t, name, level, current, onChapter }: VideoChaptersProps) {
   if (chapters.length === 0) return null;
   return (
-    <nav className="rb-video__chapters" aria-label={t("video.chapters")}>
+    <nav className="rb-video__chapters" aria-label={t("video.chaptersOf", { name })}>
       <Heading level={level} className="rb-video__chaptersTitle">
         {t("video.chapters")}
       </Heading>
@@ -168,7 +179,7 @@ export function VideoChapters({ video, chapters, mode, t, level, current, onChap
                 <button
                   type="button"
                   className="rb-video__chapterLink"
-                  aria-label={label}
+                  aria-label={current === c.seconds ? t("video.chapterChosen", { label }) : label}
                   aria-current={current === c.seconds ? "true" : undefined}
                   onClick={() => onChapter?.(c.seconds)}
                 >
@@ -209,6 +220,7 @@ export function VideoMedia({ caption, chapters, level, current, onChapter, ...fr
         chapters={chapters}
         mode={frame.mode === "link" ? "link" : "button"}
         t={frame.t}
+        name={frame.name}
         level={level}
         current={current}
         onChapter={onChapter}

@@ -410,7 +410,7 @@ describe("capítulos do vídeo", () => {
   it("sem JavaScript: lista com tempo e nome, link para o provedor no tempo (YouTube t=, Vimeo #t=)", async () => {
     const ctx = await ctxPt();
     const html = render("video", { ctx, fields: { url: yt, chapters } });
-    expect(html).toContain('<nav class="rb-video__chapters" aria-label="Capítulos">');
+    expect(html).toContain('<nav class="rb-video__chapters" aria-label="Capítulos: YouTube">');
     expect(html).toContain('href="https://www.youtube.com/watch?v=M7lc1UVf-VE&amp;t=135s"');
     expect(html).toContain('href="https://www.youtube.com/watch?v=M7lc1UVf-VE"');
     expect(html).toContain('aria-label="Ir para 2:15: Resultados (abre em nova aba)"');

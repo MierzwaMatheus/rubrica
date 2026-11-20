@@ -362,6 +362,8 @@ export const DEFAULT_UI_TEXTS: Record<string, Localized<string>> = {
   "video.player": { pt: "Vídeo: {title}", en: "Video: {title}", es: "Video: {title}" },
   "video.chapters": { pt: "Capítulos", en: "Chapters", es: "Capítulos" },
   "video.chapterAt": { pt: "Ir para {time}: {label}", en: "Jump to {time}: {label}", es: "Ir a {time}: {label}" },
+  "video.chaptersOf": { pt: "Capítulos: {name}", en: "Chapters: {name}", es: "Capítulos: {name}" },
+  "video.chapterChosen": { pt: "{label} (último capítulo escolhido)", en: "{label} (last chapter chosen)", es: "{label} (último capítulo elegido)" },
   "beforeAfter.before": { pt: "Antes", en: "Before", es: "Antes" },
   "beforeAfter.after": { pt: "Depois", en: "After", es: "Después" },
   "beforeAfter.slider": { pt: "Arraste para comparar o antes e o depois", en: "Drag to compare before and after", es: "Arrastra para comparar el antes y el después" },

@@ -39,6 +39,8 @@
 /* Leitura: texto sem imagem ao lado, chamadas, listas e perguntas na largura de leitura. */
 .rb-case__body :is([data-block="texto"]:not(.rb-texto--media), [data-block="cta"], [data-block="lista-itens"], [data-block="faq"], [data-block="linha-do-tempo"]) > .rb-container {
   max-width: var(--rb-case-measure);
+  /* Alinhado à esquerda dos outros blocos (o container centraliza por padrão). */
+  margin-inline: 0;
 }
 .rb-case__body [data-block="texto"] .rb-prose { max-width: none; }
 

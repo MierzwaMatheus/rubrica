@@ -78,18 +78,21 @@ describe("tabelas 1:1", () => {
     expect(deleted!.deletedAt).toBeDefined();
   });
 
-  it("projetos: case em seções, métricas, depoimento, links, categoria e destaque", () => {
+  it("projetos: case em blocos, métricas, depoimento, links, categoria e destaque", () => {
     const [app, marca] = r.tables.projects!;
     expect(app!.featured).toBe(true);
     expect(app!.summary).toEqual({ "pt-BR": "Redesenho do fluxo de agendamento.", en: "Booking flow redesign." });
     expect(app!.content).toEqual({ "pt-BR": "<p>Primeiro parágrafo.</p><p>Segundo parágrafo.</p>" });
     expect(app!.role).toEqual({ "pt-BR": "Designer líder", en: "Lead designer" });
-    const titles = (app!.sections as { title: Record<string, string> }[]).map((s) => s.title["pt-BR"]);
-    expect(titles).toEqual(["Antes", "O Problema", "A Solução", "Os Resultados", "Depoimento"]);
-    const sections = app!.sections as { body: Record<string, string> }[];
-    expect(sections[1]!.body).toEqual({ "pt-BR": "<p>Muitas faltas.</p>", en: "<p>Many no-shows.</p>" });
-    expect(sections[0]!.body).toEqual({ "pt-BR": "<p>Agenda em papel.</p>" });
-    expect(sections[4]!.body.en).toContain("It changed the clinic.");
+    expect(app!.sections).toBeUndefined();
+    const blocks = app!.blocks as { id: string; type: string; visible: boolean; fields: { title: Record<string, string>; body: Record<string, string> } }[];
+    expect(blocks.map((b) => b.id)).toEqual(["secao-1", "secao-2", "secao-3", "secao-4", "secao-5"]);
+    expect(blocks.every((b) => b.type === "texto" && b.visible)).toBe(true);
+    expect(blocks.map((b) => b.fields.title["pt-BR"])).toEqual(["Antes", "O Problema", "A Solução", "Os Resultados", "Depoimento"]);
+    expect(blocks[1]!.fields.body).toEqual({ "pt-BR": "<p>Muitas faltas.</p>", en: "<p>Many no-shows.</p>" });
+    expect(blocks[0]!.fields.body).toEqual({ "pt-BR": "<p>Agenda em papel.</p>" });
+    expect(blocks[4]!.fields.body.en).toContain("<blockquote>");
+    expect(blocks[4]!.fields.body.en).toContain("It changed the clinic.");
     // Números do case num campo próprio, com o ícone da v1 e o inglês pela posição (sem par, só pt).
     expect(app!.metrics).toEqual([
       { value: "−40%", label: { "pt-BR": "faltas", en: "no-shows" }, icon: "TrendingDown" },

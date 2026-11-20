@@ -89,7 +89,7 @@ export const RULES: Rule[] = [
       return `Na v2 a página é uma lista de blocos (${PAGE_BLOCKS[page]}), editada no painel. Seção que não existe no catálogo: bloco próprio em src/blocks/. Marcação diferente de um bloco que existe: npx create-rubrica ejetar <bloco>.`;
     },
   },
-  { test: (p) => /^src\/pages\/(BlogPost|ProjectCaseStudy|NotFound)\.tsx$/.test(p), area: "template do tema", suggestion: () => "Post, case e 404 são templates do tema na v2 (ainda não se ejetam): leve o ajuste para o tema ou abra uma issue." },
+  { test: (p) => /^src\/pages\/(BlogPost|ProjectCaseStudy|NotFound)\.tsx$/.test(p), area: "template do tema", suggestion: () => "Post, case e 404 são templates do tema na v2 (ainda não se ejetam): leve o ajuste para o tema ou abra uma issue. O corpo do case é uma lista de blocos (os campos do case da v1 viram blocos de texto), editada no painel." },
   { test: (p) => /^src\/pages\/admin\//.test(p), area: "painel", suggestion: () => "O painel vem do @rubrica/core na v2. Tela própria: abra uma issue ou um plugin; ajuste de texto: Textos." },
   { test: (p, k) => /^src\/components\/[^/]+\.tsx$/.test(p) && k === "novo", area: "componente próprio", suggestion: () => "Vira bloco próprio em src/blocks/ (definição com defineBlock + componente React puro, só props)." },
   { test: (p) => /^src\/components\/(ui|admin)\//.test(p), area: "componentes base", suggestion: () => "Componentes base da v1 (shadcn, painel) não vão para a v2. Se um bloco próprio usa, copie o necessário para src/blocks/." },

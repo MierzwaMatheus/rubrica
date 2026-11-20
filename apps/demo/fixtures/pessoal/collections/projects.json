@@ -272,12 +272,12 @@
             "en": "The same idea, drawn to be read from afar and up close."
           },
           "before": {
-            "url": "/img/logo-1.svg",
+            "url": "/img/marca/antes.svg",
             "width": 800,
-            "height": 500,
+            "height": 600,
             "alt": {
-              "pt-BR": "Exemplo do logo antigo da padaria",
-              "en": "Example of the bakery's old logo"
+              "pt-BR": "Logo antigo: um círculo azul com um triângulo e o nome em letra comum",
+              "en": "Old logo: a blue circle with a triangle and the name in a plain font"
             }
           },
           "beforeLabel": {
@@ -285,12 +285,12 @@
             "en": "Before"
           },
           "after": {
-            "url": "/img/logo-2.svg",
+            "url": "/img/marca/depois.svg",
             "width": 800,
-            "height": 500,
+            "height": 600,
             "alt": {
-              "pt-BR": "Exemplo da marca nova da padaria",
-              "en": "Example of the bakery's new mark"
+              "pt-BR": "Marca nova: o selo cor de crosta com a espiga de trigo sobre farinha",
+              "en": "New brand: the crust-colored seal with a wheat ear on flour"
             }
           },
           "afterLabel": {
@@ -439,12 +439,12 @@
           "items": [
             {
               "image": {
-                "url": "/img/logo-1.svg",
-                "width": 160,
-                "height": 48,
+                "url": "/img/marca/principal-crosta.svg",
+                "width": 480,
+                "height": 220,
                 "alt": {
-                  "pt-BR": "Versão principal",
-                  "en": "Main version"
+                  "pt-BR": "Selo e nome em cor de crosta",
+                  "en": "Seal and name in crust color"
                 }
               },
               "label": {
@@ -459,12 +459,12 @@
             },
             {
               "image": {
-                "url": "/img/logo-2.svg",
-                "width": 160,
-                "height": 48,
+                "url": "/img/marca/principal-farinha.svg",
+                "width": 480,
+                "height": 220,
                 "alt": {
-                  "pt-BR": "Versão positiva",
-                  "en": "Positive version"
+                  "pt-BR": "Selo e nome em tons de farinha",
+                  "en": "Seal and name in flour tones"
                 }
               },
               "label": {
@@ -479,12 +479,12 @@
             },
             {
               "image": {
-                "url": "/img/logo-3.svg",
-                "width": 160,
-                "height": 48,
+                "url": "/img/marca/principal-farinha.svg",
+                "width": 480,
+                "height": 220,
                 "alt": {
-                  "pt-BR": "Versão negativa",
-                  "en": "Negative version"
+                  "pt-BR": "Selo e nome em tons de farinha, para fundo escuro",
+                  "en": "Seal and name in flour tones, for dark backgrounds"
                 }
               },
               "label": {
@@ -499,12 +499,12 @@
             },
             {
               "image": {
-                "url": "/img/logo-4.svg",
-                "width": 160,
-                "height": 48,
+                "url": "/img/marca/simbolo.svg",
+                "width": 220,
+                "height": 160,
                 "alt": {
-                  "pt-BR": "Símbolo",
-                  "en": "Symbol"
+                  "pt-BR": "Símbolo: o selo com a espiga de trigo",
+                  "en": "Symbol: the seal with the wheat ear"
                 }
               },
               "label": {
@@ -533,12 +533,12 @@
           "items": [
             {
               "image": {
-                "url": "/img/cover-1.svg",
-                "width": 800,
-                "height": 500,
+                "url": "/img/marca/selo-animado.gif",
+                "width": 480,
+                "height": 300,
                 "alt": {
-                  "pt-BR": "Exemplo de aplicação em sacola",
-                  "en": "Example applied to a paper bag"
+                  "pt-BR": "Animação do selo: os pontos de mel giram e a espiga cresce",
+                  "en": "Seal animation: honey dots spin and the wheat ear grows"
                 }
               },
               "caption": {
@@ -548,12 +548,12 @@
             },
             {
               "image": {
-                "url": "/img/cover-2.svg",
+                "url": "/img/marca/mockup.svg",
                 "width": 800,
-                "height": 500,
+                "height": 600,
                 "alt": {
-                  "pt-BR": "Exemplo de aplicação na fachada",
-                  "en": "Example applied to the storefront"
+                  "pt-BR": "Tela do site novo com o cabeçalho cor de crosta",
+                  "en": "The new website with the crust-colored header"
                 }
               },
               "caption": {
@@ -563,12 +563,12 @@
             },
             {
               "image": {
-                "url": "/img/cover-3.svg",
+                "url": "/img/marca/grafismo.svg",
                 "width": 800,
-                "height": 500,
+                "height": 600,
                 "alt": {
-                  "pt-BR": "Exemplo de adesivo",
-                  "en": "Example sticker"
+                  "pt-BR": "Grafismo de espigas de trigo cor de mel e farinha sobre crosta",
+                  "en": "Wheat-ear pattern in honey and flour over crust"
                 }
               },
               "caption": {

@@ -337,3 +337,26 @@ body { font-family: var(--rb-font-sans); -webkit-font-smoothing: antialiased; }
   --sw-soft: color-mix(in srgb, var(--rb-fg) 38%, transparent);
   --sw-line: color-mix(in srgb, var(--rb-fg) 13%, transparent);
 }
+
+/* ---------- corpo do case em blocos e blocos de marca ---------- */
+/* Cada bloco já é uma faixa com fio de 2px e capítulo numerado: o espaço é do padding da faixa. */
+.sw-main .rb-case__body { --rb-case-gap: 0; gap: 0; margin-block: 2rem 0; border-top: 2px solid var(--rb-fg); }
+.sw-main .rb-case__body .rb-section { padding-block: 32px; }
+.sw-main .rb-case__body .rb-section:last-child { border-bottom: 0; }
+.sw-main .rb-case__body .rb-container { padding-inline: 0; }
+/* Pranchas e amostras: planas, grade reta, fios de 2px, rótulos em caixa alta. */
+.sw .rb-before-after__image, .sw .rb-images__image { border: 0; border-radius: 0; }
+.sw .rb-before-after__label, .sw .rb-comparer__label, .sw .rb-type__role, .sw .rb-video__chaptersTitle { font-weight: 700; font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; }
+.sw .rb-comparer__label { border-radius: 0; }
+.sw .rb-palette__list { gap: 0; border-top: 2px solid var(--rb-fg); border-left: 1px solid var(--rb-fg); }
+.sw .rb-palette__swatch { border: 0; border-right: 1px solid var(--rb-fg); border-bottom: 1px solid var(--rb-fg); border-radius: 0; background: none; }
+.sw .rb-palette__name, .sw .rb-type__family { font-weight: 800; letter-spacing: -0.03em; }
+.sw .rb-type__font { border: 0; border-top: 2px solid var(--rb-fg); border-radius: 0; background: none; padding-inline: 0; }
+.sw .rb-type__list { gap: 0; }
+.sw .rb-type__sample { font-weight: 800; letter-spacing: -0.04em; }
+.sw .rb-palette__grade, .sw .rb-video__chapterTime, .sw .rb-type__weight, .sw .rb-palette__sample { border-radius: 0; }
+.sw .rb-brand-grid__tile { border-radius: 0; }
+.sw .rb-brand-grid__label { font-weight: 800; text-transform: uppercase; font-size: 12px; letter-spacing: 0.06em; }
+.sw .rb-video__chapters { border: 0; border-top: 2px solid var(--rb-fg); border-radius: 0; background: none; }
+.sw .rb-video__chapterLink[aria-current="true"], .sw .rb-video__chapterLink:hover { background: var(--rb-fg); color: var(--rb-bg); box-shadow: none; }
+.sw .rb-video__chapterLink:hover .rb-video__chapterTime, .sw .rb-video__chapterLink[aria-current="true"] .rb-video__chapterTime { background: var(--rb-accent); color: var(--rb-accent-fg); }

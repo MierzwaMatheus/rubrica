@@ -176,13 +176,15 @@ export function translationFunctions(rt: RubricaRuntime) {
           args.to,
         );
         if (!applied.length) return { applied };
-        if (args.target.kind === "page" && patch.blocks) {
+        // Blocos de páginas e do corpo dos cases (contexto "case"): a tradução também passa pela validação e pela sanitização.
+        const isCase = args.target.kind === "collection" && args.target.collection === "projects";
+        if ((args.target.kind === "page" || isCase) && patch.blocks) {
           const settings = await getSettingsDoc(ctx);
-          patch.blocks = preparePageBlocks(patch.blocks as BlockInstance[], {
-            blocks: rt.blocks,
-            kind: settings?.kind ?? "pessoal",
-            enabledPlugins: await enabledPluginsFor(ctx, rt, settings),
-          });
+          patch.blocks = preparePageBlocks(
+            patch.blocks as BlockInstance[],
+            { blocks: rt.blocks, kind: settings?.kind ?? "pessoal", enabledPlugins: await enabledPluginsFor(ctx, rt, settings) },
+            isCase ? "case" : "page",
+          );
         }
         const now = Date.now();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

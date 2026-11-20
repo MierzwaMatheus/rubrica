@@ -21,7 +21,7 @@ import type { RubricaRuntime } from "./runtime";
 import { mutation, query, type Doc, type Id, type MutationCtx } from "./server";
 import { vBlock, vLocalized, vSeo } from "./validators";
 
-async function catalogFor(ctx: MutationCtx, rt: RubricaRuntime): Promise<{ catalog: BlockCatalog; reserved: string[]; detailBases: string[] }> {
+export async function catalogFor(ctx: MutationCtx, rt: RubricaRuntime): Promise<{ catalog: BlockCatalog; reserved: string[]; detailBases: string[] }> {
   const settings = await getSettingsDoc(ctx);
   const catalog: BlockCatalog = {
     blocks: rt.blocks,

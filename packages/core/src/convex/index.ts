@@ -25,6 +25,7 @@ import { cronJobs, httpRouter } from "convex/server";
 import { auditFunctions } from "./audit";
 import { createAuth } from "./auth";
 import {
+  collectionsFunctions,
   faqFunctions,
   plansFunctions,
   postsFunctions,
@@ -76,6 +77,7 @@ export function createRubrica(config: RubricaConfig = {}) {
     pages: once(() => pagesFunctions(rt)),
     posts: once(() => postsFunctions(rt)),
     projects: once(() => projectsFunctions(rt)),
+    collections: once(() => collectionsFunctions(rt)),
     services: once(() => servicesFunctions(rt)),
     testimonials: once(() => testimonialsFunctions(rt)),
     faq: once(() => faqFunctions(rt)),
@@ -150,6 +152,9 @@ export function createRubrica(config: RubricaConfig = {}) {
     },
     get projects() {
       return modules.projects();
+    },
+    get collections() {
+      return modules.collections();
     },
     get services() {
       return modules.services();
@@ -229,6 +234,7 @@ export const RUBRICA_MODULES = [
   "pages",
   "posts",
   "projects",
+  "collections",
   "services",
   "testimonials",
   "faq",

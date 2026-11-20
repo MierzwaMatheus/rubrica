@@ -22,6 +22,17 @@ export interface PageBlockError {
 
 const BLOCK_ID = /^[A-Za-z0-9_-]{1,64}$/;
 
+/** Teto de blocos por página ou case, e do tamanho da lista (o documento do Convex tem 1 MB). */
+export const MAX_BLOCKS = 80;
+export const MAX_BLOCKS_BYTES = 800_000;
+
+/** Posição de inserção válida: inteiro de 0 ao tamanho da lista (sem ela, no fim). */
+export function insertionIndex(index: number | undefined, length: number): number {
+  if (index === undefined) return length;
+  if (!Number.isInteger(index) || index < 0 || index > length) throw new Error(`Posição inválida: ${index} (use de 0 a ${length})`);
+  return index;
+}
+
 export function findBlock(catalog: BlockCatalog, type: string): BlockDefinition | undefined {
   return catalog.blocks.find((b) => b.type === type);
 }
@@ -32,6 +43,11 @@ export function findBlock(catalog: BlockCatalog, type: string): BlockDefinition 
  */
 export function validatePageBlocks(blocks: BlockInstance[], catalog: BlockCatalog, context: BlockContext = "page"): PageBlockError[] {
   const errors: PageBlockError[] = [];
+  if (blocks.length > MAX_BLOCKS) errors.push({ index: MAX_BLOCKS, path: "", message: `no máximo ${MAX_BLOCKS} blocos (há ${blocks.length})` });
+  const bytes = JSON.stringify(blocks).length;
+  if (bytes > MAX_BLOCKS_BYTES) {
+    errors.push({ index: 0, path: "", message: `conteúdo grande demais (${Math.round(bytes / 1000)} KB; até ${MAX_BLOCKS_BYTES / 1000} KB): divida em menos blocos ou textos menores` });
+  }
   const seen = new Set<string>();
   blocks.forEach((block, index) => {
     const at = (path: string, message: string) => errors.push({ index, blockId: block.id, path, message });

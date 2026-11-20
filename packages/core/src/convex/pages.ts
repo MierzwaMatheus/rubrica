@@ -13,7 +13,7 @@ import { localePrefix } from "../i18n";
 import { resolvePaths } from "../render/collections";
 import { requireRole } from "./auth";
 import { logUserAction } from "./audit";
-import { assertValidPagePath, preparePageBlocks, type BlockCatalog } from "./lib/blocks";
+import { assertValidPagePath, insertionIndex, preparePageBlocks, type BlockCatalog } from "./lib/blocks";
 import { cleanByValidator } from "./lib/clean";
 import { anyText, filledLocales } from "./lib/text";
 import { enabledPluginsFor, getSettingsDoc } from "./plugins";
@@ -233,7 +233,7 @@ export function pagesFunctions(rt: RubricaRuntime) {
         const blocks = [...page.blocks] as BlockInstance[];
         const at = blocks.findIndex((b) => b.id === args.block.id);
         if (at >= 0) blocks[at] = args.block;
-        else blocks.splice(args.index ?? blocks.length, 0, args.block);
+        else blocks.splice(insertionIndex(args.index, blocks.length), 0, args.block);
         await saveBlocks(ctx, page, blocks, userId, at >= 0 ? "page.block_updated" : "page.block_added");
         return null;
       },

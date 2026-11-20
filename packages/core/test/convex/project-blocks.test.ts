@@ -71,13 +71,48 @@ describe("corpo do case em blocos", () => {
       await ctx.db.insert("projects", { title: { "pt-BR": "Velho" }, slug: "velho", order: 0, published: true, createdAt: 1, content: { "pt-BR": "<p>Texto</p>" }, sections: [{ title: { "pt-BR": "Etapa" }, body: { "pt-BR": "<p>x</p>" } }] } as never);
       await ctx.db.insert("projects", { title: { "pt-BR": "Novo" }, slug: "novo", order: 1, published: true, createdAt: 1 } as never);
     });
-    expect(await t.mutation(internal.rubrica.collections.migrateSectionsToBlocks, {})).toEqual({ migrated: 1 });
+    expect(await t.mutation(internal.rubrica.collections.migrateSectionsToBlocks, {})).toEqual({ migrated: 1, failed: [] });
     const docs = await t.run((ctx) => ctx.db.query("projects").collect());
     const old = docs.find((d) => d.slug === "velho")!;
     expect(old.blocks?.map((b: P) => b.id)).toEqual(["conteudo", "secao-1"]);
     expect(old.sections).toBeUndefined();
     expect(old.content).toBeUndefined();
-    expect(await t.mutation(internal.rubrica.collections.migrateSectionsToBlocks, {})).toEqual({ migrated: 0 });
+    expect(await t.mutation(internal.rubrica.collections.migrateSectionsToBlocks, {})).toEqual({ migrated: 0, failed: [] });
+  });
+
+  it("a migração limpa o formato antigo de quem já tem blocos e não grava o que não valida", async () => {
+    await t.run(async (ctx) => {
+      await ctx.db.insert("projects", { title: { "pt-BR": "Misto" }, slug: "misto", order: 0, published: true, createdAt: 1, blocks: [texto("x")], content: { "pt-BR": "<p>velho</p>" } } as never);
+      await ctx.db.insert("projects", { title: { "pt-BR": "Longo" }, slug: "longo", order: 1, published: true, createdAt: 1, sections: [{ title: { "pt-BR": "T".repeat(200) }, body: { "pt-BR": "<p>corpo</p>" } }, { title: { "pt-BR": "Vazia" }, body: { "pt-BR": "" } }] } as never);
+    });
+    const out = await t.mutation(internal.rubrica.collections.migrateSectionsToBlocks, {});
+    expect(out).toEqual({ migrated: 2, failed: [] });
+    const docs = await t.run((ctx) => ctx.db.query("projects").collect());
+    const misto = docs.find((d) => d.slug === "misto")!;
+    expect(misto.content).toBeUndefined();
+    expect(misto.blocks?.map((b: P) => b.id)).toEqual(["x"]);
+    const longo = docs.find((d) => d.slug === "longo")!;
+    // Título longo vai para o corpo como h2; a seção sem corpo sai.
+    expect(longo.blocks).toHaveLength(1);
+    expect((longo.blocks![0] as P).fields.title).toBeUndefined();
+    expect((longo.blocks![0] as P).fields.body["pt-BR"]).toMatch(/^<h2>T+<\/h2><p>corpo<\/p>$/);
+  });
+
+  it("mutation fina num projeto antigo preserva o corpo convertido e apaga o formato antigo", async () => {
+    const projectId = await t.run((ctx) =>
+      ctx.db.insert("projects", { title: { "pt-BR": "Velho" }, slug: "velho2", order: 0, published: true, createdAt: 1, sections: [{ title: { "pt-BR": "Etapa" }, body: { "pt-BR": "<p>x</p>" } }] } as never),
+    );
+    await editor.mutation(api.rubrica.collections.upsertProjectBlock, { projectId: projectId as never, block: texto("novo") });
+    const doc = (await t.run((ctx) => ctx.db.get(projectId))) as P;
+    expect(doc.blocks.map((b: P) => b.id)).toEqual(["secao-1", "novo"]);
+    expect(doc.sections).toBeUndefined();
+  });
+
+  it("recusa posição inválida e listas grandes demais", async () => {
+    const projectId = (await editor.mutation(api.rubrica.projects.create, project({ blocks: [texto("a")] }))) as never;
+    await expect(editor.mutation(api.rubrica.collections.upsertProjectBlock, { projectId, block: texto("b"), index: -1 })).rejects.toThrow(/Posição inválida/);
+    const many = Array.from({ length: 81 }, (_, i) => texto(`b${i}`));
+    await expect(editor.mutation(api.rubrica.projects.create, project({ blocks: many }))).rejects.toThrow(/no máximo 80 blocos/);
   });
 
   it("está declarada para o update do CLI", () => {

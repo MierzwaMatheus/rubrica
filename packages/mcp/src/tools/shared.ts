@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { blockAllowedIn, validateBlock, type BlockContext, type BlockInstance, type VariantOption } from "@rubrica/core";
+import { blockAllowedIn, sectionsToBlocks, validateBlock, type BlockContext, type BlockInstance, type VariantOption } from "@rubrica/core";
 import { can } from "@rubrica/core/convex/roles";
 import type { CatalogBlock } from "../catalog";
 import { RubricaError, type RubricaClient } from "../client";
@@ -266,7 +266,8 @@ export async function resolveBlockTarget(ctx: ToolContext, args: { page?: string
     context: "case",
     id: project._id,
     label: `o case ${project.slug ?? project._id}`,
-    blocks: project.blocks ?? [],
+    // Projeto ainda no formato antigo: o corpo chega convertido, como o backend grava.
+    blocks: sectionsToBlocks(project as never),
     blocksOf: "Blocos do case",
     write: (client, op, a) => client.mutation(PROJECT_FN[op], { [BACKEND.projectIdArg]: project._id, ...a }),
   };

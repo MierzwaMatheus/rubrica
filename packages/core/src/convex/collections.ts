@@ -18,8 +18,8 @@ import { anyText, filledLocales } from "./lib/text";
 import { assertValidSlug, uniqueSlug } from "./lib/slug";
 import type { Permission } from "./lib/roles";
 import { catalogFor } from "./pages";
-import { preparePageBlocks } from "./lib/blocks";
-import { needsSectionsMigration, sectionsToBlocks } from "../content/legacy";
+import { insertionIndex, preparePageBlocks } from "./lib/blocks";
+import { sectionsToBlocks } from "../content/legacy";
 import { getSettingsDoc, pluginForCollection, requirePlugin } from "./plugins";
 import type { RubricaRuntime } from "./runtime";
 import { internalMutation, mutation, query, type Doc, type Id, type MutationCtx } from "./server";
@@ -343,7 +343,8 @@ export function projectsFunctions(rt: RubricaRuntime) {
     prepareAsync: async (ctx, data) => {
       if (!data.blocks) return data;
       const { catalog } = await catalogFor(ctx, rt);
-      return { ...data, blocks: preparePageBlocks(data.blocks as BlockInstance[], catalog, "case") };
+      // Corpo em blocos gravado: o formato antigo sai do documento (não fica duplicado).
+      return { ...data, blocks: preparePageBlocks(data.blocks as BlockInstance[], catalog, "case"), content: undefined, sections: undefined };
     },
   });
 }
@@ -368,13 +369,16 @@ export function collectionsFunctions(rt: RubricaRuntime) {
     return doc;
   }
   const label = (doc: Doc<"projects">) => ({ type: "projects" as const, id: String(doc._id), label: anyText(doc.title) });
-  const blocksOf = (doc: Doc<"projects">) => (doc.blocks ?? []) as BlockInstance[];
+  /** Corpo atual do case; projeto ainda no formato antigo chega convertido (a gravação apaga os campos antigos). */
+  const blocksOf = (doc: Doc<"projects">) => sectionsToBlocks(doc as never) as BlockInstance[];
+  /** Campos do formato antigo, apagados sempre que o corpo em blocos é gravado. */
+  const LEGACY_UNSET = { sections: undefined, content: undefined } as const;
 
   /** Valida o corpo resultante (contexto case), sanitiza e grava. */
   async function saveBlocks(ctx: MutationCtx, doc: Doc<"projects">, blocks: BlockInstance[], userId: Id<"users">, event: string, extra?: Data) {
     const { catalog } = await catalogFor(ctx, rt);
     const prepared = preparePageBlocks(blocks, catalog, "case");
-    await ctx.db.patch(doc._id, { blocks: prepared as Doc<"projects">["blocks"], updatedAt: Date.now(), updatedBy: userId });
+    await ctx.db.patch(doc._id, { ...LEGACY_UNSET, blocks: prepared as Doc<"projects">["blocks"], updatedAt: Date.now(), updatedBy: userId });
     await logUserAction(ctx, userId, event, label(doc), extra);
   }
 
@@ -388,7 +392,7 @@ export function collectionsFunctions(rt: RubricaRuntime) {
         const blocks = [...blocksOf(doc)];
         const at = blocks.findIndex((b) => b.id === args.block.id);
         if (at >= 0) blocks[at] = args.block as BlockInstance;
-        else blocks.splice(args.index ?? blocks.length, 0, args.block as BlockInstance);
+        else blocks.splice(insertionIndex(args.index, blocks.length), 0, args.block as BlockInstance);
         await saveBlocks(ctx, doc, blocks, userId, at >= 0 ? "project.block_updated" : "project.block_added", { blockId: args.block.id });
         return null;
       },
@@ -405,7 +409,7 @@ export function collectionsFunctions(rt: RubricaRuntime) {
         if (args.blockIds.length !== blocks.length || new Set(args.blockIds).size !== args.blockIds.length || args.blockIds.some((id) => !byId.has(id))) {
           throw new Error("A nova ordem precisa ter todos os blocos do case, uma vez cada");
         }
-        await ctx.db.patch(doc._id, { blocks: args.blockIds.map((id) => byId.get(id)!) as Doc<"projects">["blocks"], updatedAt: Date.now(), updatedBy: userId });
+        await ctx.db.patch(doc._id, { ...LEGACY_UNSET, blocks: args.blockIds.map((id) => byId.get(id)!) as Doc<"projects">["blocks"], updatedAt: Date.now(), updatedBy: userId });
         await logUserAction(ctx, userId, "project.blocks_reordered", label(doc));
         return null;
       },
@@ -419,7 +423,7 @@ export function collectionsFunctions(rt: RubricaRuntime) {
         const doc = await loadProject(ctx, args.projectId);
         const blocks = blocksOf(doc);
         if (!blocks.some((b) => b.id === args.blockId)) throw new Error(`Bloco não encontrado: ${args.blockId}`);
-        await ctx.db.patch(doc._id, { blocks: blocks.map((b) => (b.id === args.blockId ? { ...b, visible: args.visible } : b)) as Doc<"projects">["blocks"], updatedAt: Date.now(), updatedBy: userId });
+        await ctx.db.patch(doc._id, { ...LEGACY_UNSET, blocks: blocks.map((b) => (b.id === args.blockId ? { ...b, visible: args.visible } : b)) as Doc<"projects">["blocks"], updatedAt: Date.now(), updatedBy: userId });
         await logUserAction(ctx, userId, args.visible ? "project.block_shown" : "project.block_hidden", label(doc), { blockId: args.blockId });
         return null;
       },
@@ -432,7 +436,7 @@ export function collectionsFunctions(rt: RubricaRuntime) {
         const doc = await loadProject(ctx, args.projectId);
         const blocks = blocksOf(doc);
         if (!blocks.some((b) => b.id === args.blockId)) throw new Error(`Bloco não encontrado: ${args.blockId}`);
-        await ctx.db.patch(doc._id, { blocks: blocks.filter((b) => b.id !== args.blockId) as Doc<"projects">["blocks"], updatedAt: Date.now(), updatedBy: userId });
+        await ctx.db.patch(doc._id, { ...LEGACY_UNSET, blocks: blocks.filter((b) => b.id !== args.blockId) as Doc<"projects">["blocks"], updatedAt: Date.now(), updatedBy: userId });
         await logUserAction(ctx, userId, "project.block_removed", label(doc), { blockId: args.blockId });
         return null;
       },
@@ -445,17 +449,28 @@ export function collectionsFunctions(rt: RubricaRuntime) {
     migrateSectionsToBlocks: internalMutation({
       args: {},
       handler: async (ctx) => {
+        const { catalog } = await catalogFor(ctx, rt);
         let migrated = 0;
+        const failed: { id: string; title: string; errors: string }[] = [];
         for (const doc of await ctx.db.query("projects").collect()) {
-          if (!needsSectionsMigration(doc as never)) continue;
-          await ctx.db.patch(doc._id, {
-            blocks: sectionsToBlocks(doc as never) as Doc<"projects">["blocks"],
-            sections: undefined,
-            content: undefined,
-          });
-          migrated++;
+          const legacy = doc.content !== undefined || doc.sections !== undefined;
+          if (!legacy) continue;
+          // Já tem blocos (salvo pelo painel antes da migração): só tira o formato antigo.
+          if (doc.blocks) {
+            await ctx.db.patch(doc._id, LEGACY_UNSET);
+            migrated++;
+            continue;
+          }
+          try {
+            const blocks = preparePageBlocks(sectionsToBlocks(doc as never) as BlockInstance[], catalog, "case");
+            await ctx.db.patch(doc._id, { ...LEGACY_UNSET, blocks: blocks as Doc<"projects">["blocks"] });
+            migrated++;
+          } catch (e) {
+            // Não grava o que não valida: o projeto fica como estava (o site segue convertendo no render).
+            failed.push({ id: String(doc._id), title: anyText(doc.title) ?? "", errors: e instanceof Error ? e.message : String(e) });
+          }
         }
-        return { migrated };
+        return { migrated, failed };
       },
     }),
   };

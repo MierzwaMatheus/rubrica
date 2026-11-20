@@ -86,6 +86,21 @@ describe("brandCss", () => {
     expect(brandCss(resolveBrand({ light })!)).not.toContain("--rb-font-display");
   });
 
+  it("texto secundário, superfície e linhas derivados das cores do cliente, com contraste", () => {
+    const token = (rule: string, name: string) => rule.match(new RegExp(`${name}:(#[0-9a-f]{6})`))![1]!;
+    for (const [rule, bg] of [[rules[0]!, "#121212"], [rules[1]!, "#ffffff"]] as const) {
+      const muted = token(rule, "--rb-muted");
+      expect(contrastRatio(muted, bg)).toBeGreaterThanOrEqual(4.5);
+      expect(contrastRatio(muted, token(rule, "--rb-surface"))).toBeGreaterThanOrEqual(4.5);
+      expect(muted).not.toBe(token(rule, "--rb-fg"));
+    }
+    expect(rules[0]).toContain("color-scheme:dark");
+    expect(rules[1]).toContain("color-scheme:light");
+    // No limite (texto com 4.5:1 exato), o secundário é o próprio texto.
+    const tight = brandCss(resolveBrand({ light: { background: "#ffffff", foreground: "#767676", accent: "#767676" } })!);
+    expect(tight).toContain("--rb-muted:#767676");
+  });
+
   it("nada sai do escopo do case", () => {
     expect(css).not.toMatch(/:root\{|:root\[data-scheme\]\{/);
   });

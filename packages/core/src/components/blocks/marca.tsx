@@ -112,9 +112,8 @@ export function PaletaBlock({ id, variant, fields, headingLevel, ctx }: BlockPro
                         const grade = contrastGrade(value);
                         return (
                           <li key={key} className="rb-palette__ratio" data-grade={grade}>
-                            <span className="rb-palette__sample" style={{ background: hex, color: text }} aria-hidden="true">
-                              {ctx.t("palette.sample")}
-                            </span>
+                            {/* Demonstração visual (pode reprovar de propósito): desenhada pelo CSS, fora da árvore de texto. */}
+                            <span className="rb-palette__sample" style={{ background: hex, color: text }} data-sample={ctx.t("palette.sample")} aria-hidden="true" />
                             <span className="rb-palette__ratioLabel">{ctx.t(key)}</span>
                             <span className="rb-palette__ratioValue">{`${ratio.format(Math.floor(value * 10) / 10)}:1`}</span>
                             <span className="rb-palette__grade">{gradeLabel(grade, ctx.t)}</span>

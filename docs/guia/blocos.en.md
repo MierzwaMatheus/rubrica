@@ -35,11 +35,11 @@ Need a section that isn't here? See [Create a block](./criar-bloco.md).
 | [`incorporacao`](#incorporacao--incorporação) | Incorporação | A calendar, form, map or player from another service, by address, only from the allowed providers (Calendly, Cal.com, Google Calendar, Google Forms, Typeform, Tally, Google Maps, OpenStreetMap, Spotify, SoundCloud, Figma). | personal and company | — |
 | [`linha-do-tempo`](#linha-do-tempo--linha-do-tempo) | Linha do tempo | Milestones in order: the company's history, a career path, the stages of a project. | personal and company | — |
 | [`comparativo-planos`](#comparativo-planos--comparativo-de-planos) | Comparativo de planos | A table that compares the collection's plans item by item (rows = features, columns = plans), with each plan's button. | company only | `pricing` |
-| [`antes-depois`](#antes-depois--antes-e-depois) | Antes e depois | Duas imagens comparadas: como era e como ficou. Lado a lado ou num comparador deslizante. | personal and company | — |
-| [`paleta`](#paleta--paleta-de-cores) | Paleta de cores | As cores de uma marca: nome, código, papel e o contraste de cada uma. | personal and company | — |
-| [`tipografia`](#tipografia--tipografia) | Tipografia | As fontes de uma marca, com papel, pesos e uma amostra escrita na própria fonte. | personal and company | — |
-| [`variacoes-marca`](#variacoes-marca--variações-de-marca) | Variações de marca | As versões de um logo, cada uma sobre a sua cor de fundo: principal, reduzida, ícone, positivo e negativo. | personal and company | — |
-| [`imagens`](#imagens--imagens) | Imagens | Um conjunto de imagens com legenda: telas, mockups, grafismos, animações em GIF. | personal and company | — |
+| [`antes-depois`](#antes-depois--antes-e-depois) | Antes e depois | Two images compared: how it was and how it turned out. Side by side or in a sliding comparer. | personal and company | — |
+| [`paleta`](#paleta--paleta-de-cores) | Paleta de cores | A brand's colors: name, code, role and the contrast of each one. | personal and company | — |
+| [`tipografia`](#tipografia--tipografia) | Tipografia | A brand's fonts, with role, weights and a sample written in the font itself. | personal and company | — |
+| [`variacoes-marca`](#variacoes-marca--variações-de-marca) | Variações de marca | The versions of a logo, each on its own background color: primary, reduced, icon, positive and negative. | personal and company | — |
+| [`imagens`](#imagens--imagens) | Imagens | A set of images with captions: screens, mockups, graphic patterns, GIF animations. | personal and company | — |
 
 ## `hero` — Hero
 
@@ -416,8 +416,8 @@ A YouTube or Vimeo video. Loads light: a thumbnail and a play button, and the pl
 | `caption` | Legenda | text | no | yes | Shown below the video and names the play button and the player for screen readers. Without it, the title is used; up to 200 characters |
 | `poster` | Miniatura própria | image | no | the alt text | Optional on YouTube (without it, the video's thumbnail is used). On Vimeo, without an image only the play button shows |
 | `aspect` | Proporção | choice | no | — | options: `16:9` (16:9 (paisagem)), `4:3` (4:3), `1:1` (1:1 (quadrado)), `9:16` (9:16 (vertical, Shorts e Reels)); default: `16:9` |
-| `chapters` | Capítulos | list | no | — | Pontos do vídeo com nome: cada um abre o vídeo no tempo certo; up to 20 items; each item: "Capítulo" |
-| `chapters[].start` | Início (m:ss) | text | yes | no | Ex.: 1:05 ou 1:02:30; up to 8 characters |
+| `chapters` | Capítulos | list | no | — | Named points in the video: each one opens the video at the right time; up to 20 items; each item: "Capítulo" |
+| `chapters[].start` | Início (m:ss) | text | yes | no | E.g. 1:05 or 1:02:30; up to 8 characters |
 | `chapters[].label` | Nome | text | yes | yes | up to 80 characters |
 
 ## `incorporacao` — Incorporação
@@ -491,10 +491,10 @@ A table that compares the collection's plans item by item (rows = features, colu
 
 ## `antes-depois` — Antes e depois
 
-Duas imagens comparadas: como era e como ficou. Lado a lado ou num comparador deslizante.
+Two images compared: how it was and how it turned out. Side by side or in a sliding comparer.
 
-- **When to use:** Mostrar a transformação de um trabalho: o logo antigo e a marca nova, a tela antiga e a nova, a fachada antes da reforma.
-- **When not to use:** Para várias imagens sem comparação, use imagens; para as versões de um logo, variacoes-marca.
+- **When to use:** Showing the transformation of a piece of work: the old logo and the new brand, the old screen and the new one, the storefront before the renovation.
+- **When not to use:** For several images with no comparison, use imagens; for the versions of a logo, variacoes-marca.
 - **Pairs well with:** [`texto`](#texto--texto), [`variacoes-marca`](#variacoes-marca--variações-de-marca), [`paleta`](#paleta--paleta-de-cores)
 - **Site type:** personal and company
 - **Plugin:** none: always available
@@ -503,22 +503,22 @@ Duas imagens comparadas: como era e como ficou. Lado a lado ou num comparador de
 
 | Field | Panel label | Type | Required | Translatable | Help and limits |
 |---|---|---|---|---|---|
-| `anchor` | Âncora | text | no | no | Identificador para links na página (#marca). Opcional; up to 40 characters |
+| `anchor` | Âncora | text | no | no | Identifier for links within the page (#brand). Optional; up to 40 characters |
 | `title` | Título | text | no | yes | up to 140 characters |
 | `intro` | Texto de apoio | long text | no | yes | up to 400 characters |
 | `before` | Imagem de antes | image | yes | the alt text | — |
-| `beforeLabel` | Rótulo de antes | text | no | yes | Sem ele, "Antes"; up to 40 characters |
+| `beforeLabel` | Rótulo de antes | text | no | yes | Without it, "Before"; up to 40 characters |
 | `after` | Imagem de depois | image | yes | the alt text | — |
-| `afterLabel` | Rótulo de depois | text | no | yes | Sem ele, "Depois"; up to 40 characters |
+| `afterLabel` | Rótulo de depois | text | no | yes | Without it, "After"; up to 40 characters |
 | `caption` | Legenda | long text | no | yes | up to 300 characters |
-| `presentation` | Apresentação | choice | no | — | O comparador sobrepõe as duas imagens; use imagens com a mesma proporção; options: `comparador` (Comparador deslizante (sem JavaScript, lado a lado)), `lado-a-lado` (Lado a lado); default: `comparador` |
+| `presentation` | Apresentação | choice | no | — | The comparer overlays the two images; use images with the same aspect ratio; options: `comparador` (Comparador deslizante (sem JavaScript, lado a lado)), `lado-a-lado` (Lado a lado); default: `comparador` |
 
 ## `paleta` — Paleta de cores
 
-As cores de uma marca: nome, código, papel e o contraste de cada uma.
+A brand's colors: name, code, role and the contrast of each one.
 
-- **When to use:** Apresentar as cores de uma identidade visual ou de um sistema de design, com o papel de cada cor.
-- **When not to use:** Para mudar as cores do próprio site ou do case, use a aparência ou as cores do cliente no projeto.
+- **When to use:** Presenting the colors of a visual identity or a design system, with the role of each color.
+- **When not to use:** To change the colors of the site itself or of the case, use the appearance settings or the client colors on the project.
 - **Pairs well with:** [`tipografia`](#tipografia--tipografia), [`variacoes-marca`](#variacoes-marca--variações-de-marca), [`antes-depois`](#antes-depois--antes-e-depois)
 - **Site type:** personal and company
 - **Plugin:** none: always available
@@ -526,22 +526,22 @@ As cores de uma marca: nome, código, papel e o contraste de cada uma.
 
 | Field | Panel label | Type | Required | Translatable | Help and limits |
 |---|---|---|---|---|---|
-| `anchor` | Âncora | text | no | no | Identificador para links na página (#marca). Opcional; up to 40 characters |
+| `anchor` | Âncora | text | no | no | Identifier for links within the page (#brand). Optional; up to 40 characters |
 | `title` | Título | text | no | yes | up to 140 characters |
 | `intro` | Texto de apoio | long text | no | yes | up to 400 characters |
-| `colors` | Cores | list | no | — | 1 to 12 items; each item: "Cor" |
+| `colors` | Cores | list | yes | — | 1 to 12 items; each item: "Cor" |
 | `colors[].name` | Nome | text | yes | yes | up to 40 characters |
-| `colors[].hex` | Cor | undefined | yes | — | — |
-| `colors[].role` | Papel | text | no | yes | Ex.: principal, apoio, fundo; up to 60 characters |
+| `colors[].hex` | Cor | color | yes | — | — |
+| `colors[].role` | Papel | text | no | yes | E.g. primary, support, background; up to 60 characters |
 | `colors[].usage` | Uso | long text | no | yes | up to 200 characters |
 | `showContrast` | Mostrar o contraste com branco e preto | yes or no | no | — | default: yes |
 
 ## `tipografia` — Tipografia
 
-As fontes de uma marca, com papel, pesos e uma amostra escrita na própria fonte.
+A brand's fonts, with role, weights and a sample written in the font itself.
 
-- **When to use:** Apresentar as famílias tipográficas de uma identidade visual: a de títulos, a de texto, a de apoio.
-- **When not to use:** Para trocar a fonte do site, use a aparência. Fonte fora do Google Fonts: mande a amostra como imagem.
+- **When to use:** Presenting the type families of a visual identity: the one for headings, the one for body text, the supporting one.
+- **When not to use:** To change the site's font, use the appearance settings. A font outside Google Fonts: send the sample as an image.
 - **Pairs well with:** [`paleta`](#paleta--paleta-de-cores), [`variacoes-marca`](#variacoes-marca--variações-de-marca)
 - **Site type:** personal and company
 - **Plugin:** none: always available
@@ -549,22 +549,22 @@ As fontes de uma marca, com papel, pesos e uma amostra escrita na própria fonte
 
 | Field | Panel label | Type | Required | Translatable | Help and limits |
 |---|---|---|---|---|---|
-| `anchor` | Âncora | text | no | no | Identificador para links na página (#marca). Opcional; up to 40 characters |
+| `anchor` | Âncora | text | no | no | Identifier for links within the page (#brand). Optional; up to 40 characters |
 | `title` | Título | text | no | yes | up to 140 characters |
 | `intro` | Texto de apoio | long text | no | yes | up to 400 characters |
-| `fonts` | Fontes | list | no | — | 1 to 4 items; each item: "Fonte" |
-| `fonts[].family` | Família | text | yes | no | Nome no Google Fonts (ex.: Big Shoulders Display). O site baixa a fonte no build; up to 60 characters |
-| `fonts[].role` | Papel | text | no | yes | Ex.: títulos, texto corrido; up to 60 characters |
-| `fonts[].weights` | Pesos | text | no | no | Ex.: 400, 700. Sem eles, 400 e 700; up to 40 characters |
-| `fonts[].sample` | Amostra | long text | no | yes | Frase escrita na fonte. Sem ela, o alfabeto; up to 120 characters |
-| `fonts[].specimen` | Amostra em imagem | image | no | the alt text | Para fontes fora do Google Fonts, ou se a fonte não carregar |
+| `fonts` | Fontes | list | yes | — | 1 to 4 items; each item: "Fonte" |
+| `fonts[].family` | Família | text | yes | no | Name on Google Fonts (e.g. Oswald). The site downloads the font at build time; up to 60 characters |
+| `fonts[].role` | Papel | text | no | yes | E.g. headings, body text; up to 60 characters |
+| `fonts[].weights` | Pesos | text | no | no | E.g. 400, 700. Without them, 400 and 700; up to 40 characters |
+| `fonts[].sample` | Amostra | long text | no | yes | A phrase written in the font. Without it, the alphabet; up to 120 characters |
+| `fonts[].specimen` | Amostra em imagem | image | no | the alt text | For fonts outside Google Fonts, or if the font fails to load |
 
 ## `variacoes-marca` — Variações de marca
 
-As versões de um logo, cada uma sobre a sua cor de fundo: principal, reduzida, ícone, positivo e negativo.
+The versions of a logo, each on its own background color: primary, reduced, icon, positive and negative.
 
-- **When to use:** Mostrar o sistema de um logo: versões (principal, reduzida, símbolo) e as cores em que cada uma pode aparecer.
-- **When not to use:** Para logos de clientes atendidos, use logos-clientes; para fotos e telas, imagens.
+- **When to use:** Showing a logo's system: the versions (primary, reduced, symbol) and the colors each one may appear on.
+- **When not to use:** For logos of clients served, use logos-clientes; for photos and screens, imagens.
 - **Pairs well with:** [`paleta`](#paleta--paleta-de-cores), [`antes-depois`](#antes-depois--antes-e-depois), [`tipografia`](#tipografia--tipografia)
 - **Site type:** personal and company
 - **Plugin:** none: always available
@@ -572,22 +572,22 @@ As versões de um logo, cada uma sobre a sua cor de fundo: principal, reduzida, 
 
 | Field | Panel label | Type | Required | Translatable | Help and limits |
 |---|---|---|---|---|---|
-| `anchor` | Âncora | text | no | no | Identificador para links na página (#marca). Opcional; up to 40 characters |
+| `anchor` | Âncora | text | no | no | Identifier for links within the page (#brand). Optional; up to 40 characters |
 | `title` | Título | text | no | yes | up to 140 characters |
 | `intro` | Texto de apoio | long text | no | yes | up to 400 characters |
-| `items` | Variações | list | no | — | 1 to 24 items; each item: "Variação" |
+| `items` | Variações | list | yes | — | 1 to 24 items; each item: "Variação" |
 | `items[].image` | Imagem (SVG ou PNG transparente) | image | yes | the alt text | — |
-| `items[].label` | Nome | text | no | yes | Ex.: principal sobre bordô; up to 60 characters |
-| `items[].background` | Cor de fundo | undefined | no | — | Sem ela, o fundo do site |
+| `items[].label` | Nome | text | no | yes | E.g. primary on flour; up to 60 characters |
+| `items[].background` | Cor de fundo | color | no | — | Without it, the site's background |
 | `items[].note` | Observação | long text | no | yes | up to 160 characters |
 | `columns` | Colunas | choice | no | — | options: `2` (2), `3` (3), `4` (4); default: `3` |
 
 ## `imagens` — Imagens
 
-Um conjunto de imagens com legenda: telas, mockups, grafismos, animações em GIF.
+A set of images with captions: screens, mockups, graphic patterns, GIF animations.
 
-- **When to use:** Mostrar várias imagens de um trabalho dentro da narrativa: telas, mockups, aplicações da marca, animações curtas (GIF).
-- **When not to use:** Para fotos do dia a dia da empresa (coleção de rotina), use galeria; para comparar duas imagens, antes-depois; para vídeo, video.
+- **When to use:** Showing several images of a piece of work within the narrative: screens, mockups, brand applications, short animations (GIF).
+- **When not to use:** For everyday photos of the company (routine collection), use galeria; to compare two images, antes-depois; for video, video.
 - **Pairs well with:** [`texto`](#texto--texto), [`antes-depois`](#antes-depois--antes-e-depois), [`video`](#video--vídeo)
 - **Site type:** personal and company
 - **Plugin:** none: always available
@@ -596,10 +596,10 @@ Um conjunto de imagens com legenda: telas, mockups, grafismos, animações em GI
 
 | Field | Panel label | Type | Required | Translatable | Help and limits |
 |---|---|---|---|---|---|
-| `anchor` | Âncora | text | no | no | Identificador para links na página (#marca). Opcional; up to 40 characters |
+| `anchor` | Âncora | text | no | no | Identifier for links within the page (#brand). Optional; up to 40 characters |
 | `title` | Título | text | no | yes | up to 140 characters |
 | `intro` | Texto de apoio | long text | no | yes | up to 400 characters |
-| `items` | Imagens | list | no | — | 1 to 30 items; each item: "Imagem" |
+| `items` | Imagens | list | yes | — | 1 to 30 items; each item: "Imagem" |
 | `items[].image` | Imagem | image | yes | the alt text | — |
 | `items[].caption` | Legenda | text | no | yes | up to 200 characters |
 | `layout` | Disposição | choice | no | — | options: `grade` (Grade), `mosaico` (Mosaico (a primeira maior)), `carrossel` (Carrossel (sem JavaScript, faixa com rolagem)); default: `grade` |

@@ -37,7 +37,7 @@ const LONG =
 
 /** Texto com até `max` caracteres, cortado no fim de uma palavra. */
 /** Cores de exemplo (campos `color`): uma por item, alternando. */
-const SAMPLE_COLORS = ["#7a1f2b", "#f4ead5", "#b8893b", "#1f2328", "#2f6f5e", "#ffffff"];
+const SAMPLE_COLORS = ["#a4471a", "#f7efe1", "#e9a15a", "#2a1e16", "#f5ead9", "#ffffff"];
 
 function longText(max = 320): string {
   const limit = Math.min(max, 320);

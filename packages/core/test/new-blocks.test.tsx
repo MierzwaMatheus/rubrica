@@ -282,19 +282,19 @@ describe("paleta", () => {
   it("amostras com nome, HEX, RGB, papel e uso; texto sobre a amostra com o maior contraste", async () => {
     const ctx = await ctxPt();
     const colors = [
-      { name: "Bordô", hex: "#7A1F2B", role: "Principal", usage: "Títulos" },
-      { name: "Marfim", hex: "#f4ead5" },
+      { name: "Crosta", hex: "#A4471A", role: "Principal", usage: "Títulos" },
+      { name: "Farinha", hex: "#f7efe1" },
     ];
     const html = render("paleta", { ctx, fields: { title: "Cores", colors, showContrast: true } });
     expect((html.match(/<h3/g) ?? []).length).toBe(2);
-    expect(html).toContain("--swatch:#7a1f2b;color:#ffffff");
-    expect(html).toContain("--swatch:#f4ead5;color:#000000");
-    expect(html).toContain("#7A1F2B");
-    expect(html).toContain("122 31 43");
+    expect(html).toContain("--swatch:#a4471a;color:#ffffff");
+    expect(html).toContain("--swatch:#f7efe1;color:#000000");
+    expect(html).toContain("#A4471A");
+    expect(html).toContain("164 71 26");
     expect(html).toContain("Principal");
     expect(html).toContain("Títulos");
     expect(html).toContain("Contraste com branco");
-    expect(html).toContain("10,2:1");
+    expect(html).toContain("6,0:1");
     expect(html).toContain('data-grade="aaa"');
     expect(html).toContain('data-grade="fail"');
   });
@@ -348,12 +348,12 @@ describe("variações de marca", () => {
   it("grade com colunas, a cor do item como fundo da prancha e o rótulo fora dela", async () => {
     const ctx = await ctxPt();
     const items = [
-      { image: image("/l.svg", "Logo"), label: "Principal", background: "#7A1F2B", note: "Uso preferencial" },
+      { image: image("/l.svg", "Logo"), label: "Principal", background: "#A4471A", note: "Uso preferencial" },
       { image: image("/m.svg", "Logo mono") },
     ];
     const html = render("variacoes-marca", { ctx, fields: { items, columns: "4" } });
     expect(html).toContain('data-columns="4"');
-    expect(html).toContain("--tile-bg:#7a1f2b");
+    expect(html).toContain("--tile-bg:#a4471a");
     expect((html.match(/--tile-bg/g) ?? []).length).toBe(1);
     // rótulo e observação depois (fora) da prancha
     expect(html).toMatch(/rb-brand-grid__tile[^]*<\/div><figcaption class="rb-brand-grid__caption"><span class="rb-brand-grid__label">Principal/);

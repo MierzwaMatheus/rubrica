@@ -17,18 +17,18 @@ import { defineBlock } from "../define";
 import { field } from "../fields";
 
 
-// ── Exemplos da vitrine (marca fictícia "Tornearia Faísca"; imagens em apps/demo/public/img/marca) ──
+// ── Exemplos da vitrine (marca fictícia "Padaria Fermento Lento"; imagens em apps/demo/public/img/marca) ──
 
 const M = "/img/marca";
 const img = (file: string, width: number, height: number, alt: string) => ({ url: `${M}/${file}`, width, height, alt: { "*": alt } });
 const L = (text: string) => ({ "*": text });
 const LOGO_ITEMS = [
-  { image: img("principal-bordo.svg", 480, 220, "Placa da Tornearia Faísca em bordô com friso de latão"), label: L("Principal sobre marfim"), background: "#f4ead5", note: L("Uso preferencial: fachada, papelaria e site.") },
-  { image: img("principal-marfim.svg", 480, 220, "Placa da Tornearia Faísca em marfim com letras bordô"), label: L("Principal sobre grafite"), background: "#2a1a1c", note: L("Para fundos escuros e fotos noturnas.") },
-  { image: img("reduzida.svg", 300, 200, "Versão reduzida da placa com a sigla TFA"), label: L("Reduzida"), background: "#b8893b", note: L("Abaixo de 120 px de largura.") },
-  { image: img("simbolo.svg", 220, 160, "Símbolo: a letra F numa placa pequena"), label: L("Símbolo"), background: "#7a1f2b", note: L("Avatar, favicon e carimbo.") },
-  { image: img("mono-preto.svg", 480, 220, "Placa em preto e branco"), label: L("Monocromática"), background: "#ffffff", note: L("Impressão a uma cor e gravação.") },
-  { image: img("mono-branco.svg", 480, 220, "Placa em branco com letras pretas"), label: L("Monocromática negativa"), background: "#000000" },
+  { image: img("principal-crosta.svg", 480, 220, "Selo redondo da Padaria Fermento Lento, cor de crosta, com uma espiga de trigo e o nome ao lado"), label: L("Principal sobre farinha"), background: "#f7efe1", note: L("Uso preferencial: embalagem, papelaria e site.") },
+  { image: img("principal-farinha.svg", 480, 220, "Selo da Padaria Fermento Lento em tons de farinha, para fundos escuros"), label: L("Principal sobre forno"), background: "#1f1712", note: L("Para fundos escuros e fotos noturnas.") },
+  { image: img("reduzida.svg", 300, 200, "Versão reduzida: selo escuro com a espiga e a sigla PFL"), label: L("Reduzida"), background: "#e9a15a", note: L("Abaixo de 120 px de largura.") },
+  { image: img("simbolo.svg", 220, 160, "Símbolo: o selo com a espiga de trigo"), label: L("Símbolo"), background: "#a4471a", note: L("Avatar, favicon e carimbo.") },
+  { image: img("mono-preto.svg", 480, 220, "Selo e nome em preto"), label: L("Monocromática"), background: "#ffffff", note: L("Impressão a uma cor e carimbo.") },
+  { image: img("mono-branco.svg", 480, 220, "Selo e nome em branco"), label: L("Monocromática negativa"), background: "#000000" },
 ];
 
 const heading = field.text({ label: "Título", maxLength: 140 });
@@ -75,7 +75,7 @@ export const antesDepois = defineBlock({
   // Cheio: o comparador com rótulos e legenda; curto: lado a lado, rótulos padrão.
   sample: (mode) => ({
     before: img("antes.svg", 800, 600, "Logo antigo: um círculo azul com um triângulo e o nome em letra comum"),
-    after: img("depois.svg", 800, 600, "Marca nova: a placa bordô da Tornearia Faísca sobre marfim"),
+    after: img("depois.svg", 800, 600, "Marca nova: o selo cor de crosta da Padaria Fermento Lento sobre farinha"),
     beforeLabel: mode === "cheio" ? L("Logo de 2009") : undefined,
     afterLabel: mode === "cheio" ? L("Marca de 2026") : undefined,
   }),
@@ -114,13 +114,13 @@ export const paleta = defineBlock({
     colors:
       mode === "cheio"
         ? [
-            { name: L("Bordô oficina"), hex: "#7a1f2b", role: L("Principal"), usage: L("Placa, títulos e chamadas. A cor que todo mundo lembra.") },
-            { name: L("Marfim"), hex: "#f4ead5", role: L("Fundo"), usage: L("Fundo do site, papelaria e o texto sobre o bordô.") },
-            { name: L("Latão"), hex: "#b8893b", role: L("Destaque"), usage: L("Frisos, ícones e detalhes. Nunca em texto pequeno.") },
-            { name: L("Grafite"), hex: "#1f2328", role: L("Texto"), usage: L("Texto corrido e fundos escuros.") },
-            { name: L("Verde garagem"), hex: "#2f6f5e", role: L("Apoio"), usage: L("Avisos de pronto para retirar.") },
+            { name: L("Crosta"), hex: "#a4471a", role: L("Principal"), usage: L("Selo, títulos e chamadas. A cor que todo mundo lembra.") },
+            { name: L("Farinha"), hex: "#f7efe1", role: L("Fundo"), usage: L("Fundo do site, embalagem e o texto sobre a crosta.") },
+            { name: L("Mel"), hex: "#e9a15a", role: L("Destaque"), usage: L("Frisos, ícones e detalhes. Nunca em texto pequeno.") },
+            { name: L("Café"), hex: "#2a1e16", role: L("Texto"), usage: L("Texto corrido e fundos escuros.") },
+            { name: L("Massa"), hex: "#f5ead9", role: L("Apoio"), usage: L("Cartões, faixas e áreas de destaque suave.") },
           ]
-        : [{ name: L("Bordô"), hex: "#7a1f2b" }],
+        : [{ name: L("Crosta"), hex: "#a4471a" }],
   }),
 });
 
@@ -163,10 +163,10 @@ export const tipografia = defineBlock({
     fonts:
       mode === "cheio"
         ? [
-            { family: "Bricolage Grotesque", role: L("Títulos e placa"), weights: "400, 800", sample: L("Peça sob medida desde 1987") },
-            { family: "Space Grotesk", role: L("Texto corrido"), weights: "400, 500, 700", sample: L("O torno não tem pressa: cada peça sai medida, conferida e com garantia.") },
-            { family: "JetBrains Mono", role: L("Códigos e etiquetas"), weights: "400, 700", sample: L("OS-1987 · Ø 42 mm · 0,01") },
-            { family: "Faísca Serif", role: L("Apoio (fonte própria, em imagem)"), weights: "400", specimen: img("especime.svg", 800, 300, "Amostra da fonte Faísca Serif: Ag Faísca e o alfabeto") },
+            { family: "Bricolage Grotesque", role: L("Títulos e selo"), weights: "400, 800", sample: L("Pão de fermentação lenta, desde 1987") },
+            { family: "Space Grotesk", role: L("Texto corrido"), weights: "400, 500, 700", sample: L("A massa não tem pressa: cada fornada descansa a noite toda antes de ir ao forno.") },
+            { family: "JetBrains Mono", role: L("Etiquetas e preços"), weights: "400, 700", sample: L("LOTE 1987 · R$ 18,00") },
+            { family: "Fermento Serif", role: L("Apoio (fonte própria, em imagem)"), weights: "400", specimen: img("especime.svg", 800, 300, "Amostra da fonte Fermento Serif: Ag, o nome e o alfabeto") },
           ]
         : [{ family: "Fraunces" }],
   }),
@@ -194,7 +194,7 @@ export const variacoesMarca = defineBlock({
       max: 24,
       of: {
         image: field.image({ label: "Imagem (SVG ou PNG transparente)", required: true }),
-        label: field.text({ label: "Nome", maxLength: 60, help: "Ex.: principal sobre bordô." }),
+        label: field.text({ label: "Nome", maxLength: 60, help: "Ex.: principal sobre farinha." }),
         background: field.color({ label: "Cor de fundo", help: "Sem ela, o fundo do site." }),
         note: field.text({ label: "Observação", multiline: true, maxLength: 160 }),
       },
@@ -256,10 +256,10 @@ export const imagens = defineBlock({
   // Inclui um GIF animado: a imagem vai como está, sem conversão.
   sample: (mode) => {
     const all = [
-      { image: img("placa-animada.gif", 480, 300, "Animação da placa: o friso de latão corre e os parafusos piscam"), caption: L("Animação de abertura (GIF)") },
-      { image: img("mockup.svg", 800, 600, "Tela do site novo com o cabeçalho bordô"), caption: L("Site: página inicial") },
-      { image: img("grafismo.svg", 800, 600, "Grafismo de círculos de latão sobre bordô"), caption: L("Grafismo: arruelas") },
-      { image: img("depois.svg", 800, 600, "A placa aplicada sobre marfim com hachuras"), caption: L("Aplicação na fachada") },
+      { image: img("selo-animado.gif", 480, 300, "Animação do selo: os pontos de mel giram em volta e a espiga de trigo cresce"), caption: L("Animação de abertura (GIF)") },
+      { image: img("mockup.svg", 800, 600, "Tela do site novo com o cabeçalho cor de crosta"), caption: L("Site: página inicial") },
+      { image: img("grafismo.svg", 800, 600, "Grafismo de espigas de trigo cor de mel e farinha sobre crosta"), caption: L("Grafismo: espigas") },
+      { image: img("depois.svg", 800, 600, "O selo aplicado sobre farinha, com o nome embaixo"), caption: L("Aplicação na embalagem") },
       { image: img("antes.svg", 800, 600, "O logo antigo, para referência") },
     ];
     return { items: mode === "cheio" ? all : all.slice(0, 4).map(({ image }) => ({ image })) };

@@ -2,6 +2,23 @@
 
 O que mudou em cada versão do Rubrica (núcleo, temas e CLI `create-rubrica`). Detalhes de cada uma nas [notas da release](https://github.com/MierzwaMatheus/rubrica/releases). Para atualizar um projeto v2, veja [Atualizar o Rubrica](./docs/guia/atualizar.md); para sair da v1, [Migrar da v1](./docs/guia/migrar.md).
 
+## 2.3.0 — 2026-11-20
+
+O corpo do case passa a ser feito de blocos, com blocos de marca e mídia e a opção de vestir o case com a cara do cliente. Tudo é opcional: um case no formato antigo continua aparecendo. Contrato de tema 1.4.
+
+### Novidades
+- **Case em blocos:** o corpo do projeto usa os mesmos blocos das páginas (`blocks` no projeto), sem `hero`, `contato` e `cases`, a partir do `h2`. No painel, editor de blocos e prévia do case no próprio projeto.
+- **Blocos de marca e mídia:** antes e depois (com comparador deslizante), paleta de cores, tipografia, variações de marca e imagens (grade, mosaico ou carrossel, com GIF para animações curtas). O vídeo do YouTube e do Vimeo ganha capítulos.
+- **Case com a cara do cliente:** cores (claro e escuro) e fonte de título do cliente só dentro do case (`brand` no projeto). O contraste mínimo é conferido ao salvar (4,5:1 no texto, 3:1 no destaque) e a fonte é baixada no build.
+- **Blocos:** `contexts` (página, case ou os dois) e o campo `color`.
+- **Temas:** o template de case recebe `blocks` e `brand`, e os 14 temas ganham o template e o CSS do case em blocos.
+- **MCP:** as ferramentas `block_*` aceitam `project` (o corpo de um case), `blocks_catalog` filtra por `context` e o `brand` do projeto é validado antes de gravar.
+- **`create-rubrica`:** o conversor da v1 leva os cases para blocos e o `update` lista a migração dos dados.
+
+### Para quem atualiza
+- **Migração de dados:** `projects-sections-to-blocks` converte `content` e `sections` em blocos `texto`. O `update` a roda no desenvolvimento; na produção, depois de publicar o backend: `npx convex run --prod rubrica/collections:migrateSectionsToBlocks` (idempotente).
+- **Temas de terceiros e ejetados:** `sections` e `content` ficam obsoletos. O template de case deve mostrar `blocks`. Veja [Criar um tema](./docs/guia/criar-tema.md#o-template-de-case).
+
 ## 2.2.0 — 2026-11-13
 
 A proposta, o aceite e o contrato em PDF voltam a ter tudo o que a v1 tinha, com um visual novo nas cores do tema. Nada muda para quem já preenche as próprias formas de pagamento e a própria política de rescisão.

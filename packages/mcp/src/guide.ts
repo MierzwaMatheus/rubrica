@@ -1,5 +1,5 @@
 /** Regras de escrita, o catálogo e as receitas, em texto: instruções do servidor, recursos e prompts. */
-import type { RecipeBlock, RecipePage, SiteKind } from "@rubrica/core";
+import { blockAllowedIn, BLOCK_CONTEXTS, type BlockContext, type RecipeBlock, type RecipePage, type SiteKind } from "@rubrica/core";
 import { guidanceText, type CatalogBlock } from "./catalog";
 import { blockFieldsSchema } from "./schema/json-schema";
 import { blocksFor, findBlock, variantList, variantsOf } from "./tools/shared";
@@ -16,6 +16,12 @@ Montar páginas:
 - blocks_catalog traz os blocos que ESTE site aceita (os do núcleo e os próprios do projeto), com "quando usar", "quando não usar", "combina com" e as variações do tema instalado. Escolha os blocos por essa orientação, não só pelo nome.
 - page_recipes traz a receita do tema para o tipo do site: a lista de blocos de cada página padrão (Início, Sobre/Quem somos, Serviços, Contato...). Para uma página desse tipo, proponha a partir da receita e ajuste ao objetivo; para outra, combine blocos pelo "combina com".
 - variant só aceita as variações que o tema declara para o bloco (blocks_catalog lista; a primeira é a padrão). Sem variant, vale a padrão.
+
+Montar um case (projeto do portfólio):
+- O corpo do case é em BLOCOS, como o de uma página: use block_add, block_update_fields, block_move, block_set_visible e block_remove com "project" (slug ou id, de projects_list) no lugar de "page". blocks_catalog com context "case" lista só os blocos que valem no case (hero, contato e cases são só de páginas e são recusados).
+- No case o h1 é do template (o título do projeto): NÃO use hero e comece o corpo pelo h2. Capa, cliente, ano, papel e números continuam nos campos do projeto (projects_update); "sections" e "content" são o formato antigo: para casos novos use "blocks".
+- Para um case de identidade visual use os blocos de marca: antes-depois (logo antigo → novo), paleta, tipografia, variacoes-marca e imagens. Vídeo só por YouTube ou Vimeo (sem upload), com capítulos em "m:ss"; animação curta entra como GIF pela biblioteca de imagens.
+- A cara do cliente: "brand" no projeto (projects_update) com cores hex do cliente para o modo claro e, se quiser, o escuro (fundo, texto, destaque) e a fonte dos títulos (Google Fonts). Contraste mínimo 4,5:1 entre texto e fundo e 3:1 entre destaque e fundo; a ferramenta confere antes de gravar. As cores valem só dentro do case.
 
 Regras de escrita:
 - Texto traduzível é um mapa por idioma ({"pt-BR": "...", "en": "..."}). Escreva em todos os idiomas do site na mesma gravação; conteúdo sem tradução num idioma NÃO aparece nesse idioma.
@@ -67,13 +73,19 @@ export function writingGuide(): string {
 // ── Catálogo ────────────────────────────────────────────────────────────────
 
 /** Blocos que o agente deve ver: os do site (com login) ou o catálogo inteiro. */
-export function catalogBlocks(state: SiteState): CatalogBlock[] {
-  return state.settings ? blocksFor(state) : state.catalog.blocks;
+export function catalogBlocks(state: SiteState, context?: BlockContext): CatalogBlock[] {
+  const defs = state.settings ? blocksFor(state) : state.catalog.blocks;
+  return context ? defs.filter((d) => blockAllowedIn(d, context)) : defs;
 }
 
 export function themeSummary(state: SiteState) {
   const t = state.theme;
   return { id: t.id, ...(t.label ? { label: t.label } : {}), package: t.package, source: t.source, ...(t.problem ? { problem: t.problem } : {}) };
+}
+
+/** Onde o bloco vale: `page`, `case` ou os dois (padrão). */
+export function contextsOf(def: Pick<CatalogBlock, "contexts">): BlockContext[] {
+  return [...(def.contexts ?? BLOCK_CONTEXTS)];
 }
 
 /** Resumo de um bloco para a lista do catálogo. */
@@ -86,6 +98,7 @@ export function blockSummary(def: CatalogBlock, state: SiteState) {
     description: def.description,
     ...(def.guidance ? { guidance: def.guidance } : {}),
     category: def.category,
+    contexts: contextsOf(def),
     ...(def.plugin ? { plugin: def.plugin } : {}),
     ...(def.source ? { source: def.source.collections } : {}),
     ...(variants.length ? { variants: variants.map((v, i) => ({ value: v.value, label: v.label, ...(i === 0 ? { default: true } : {}) })) } : {}),
@@ -103,6 +116,7 @@ export function blockDetail(def: CatalogBlock, state: SiteState) {
     description: def.description,
     guidance: def.guidance ?? null,
     category: def.category,
+    contexts: contextsOf(def),
     plugin: def.plugin ?? null,
     source: def.source ?? null,
     variants: variants.map((v, i) => ({ value: v.value, label: v.label, ...(i === 0 ? { default: true } : {}) })),

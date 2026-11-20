@@ -34,7 +34,7 @@ describe("ferramentas por papel", () => {
     const tools = await names(t, "blog-editor");
     expect(tools).toContain("posts_create");
     expect(tools).toContain("media_upload");
-    for (const n of ["pages_list", "projects_list", "faq_create", "texts_set", "site_update"]) expect(tools, n).not.toContain(n);
+    for (const n of ["pages_list", "projects_list", "faq_create", "texts_set", "site_update", "block_add", "block_remove"]) expect(tools, n).not.toContain(n);
   });
 
   it("proposal-editor e comercial não veem páginas nem posts", async () => {

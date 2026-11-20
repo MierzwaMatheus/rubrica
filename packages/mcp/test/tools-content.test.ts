@@ -154,3 +154,26 @@ describe("site_publish", () => {
     expect(client.writes()).toEqual([]);
   });
 });
+
+describe("marca do case", () => {
+  let t: T;
+  beforeEach(async () => {
+    t = setup();
+    await seedSettings(t, { plugins: { portfolio: true } });
+  });
+
+  it("projects_create e projects_update conferem a marca do cliente antes de gravar", async () => {
+    const { runtime, client } = await runtimeFor(t, "content-editor");
+    const pobre = { light: { background: "#ffffff", foreground: "#cccccc", accent: "#eeeeee" } };
+    const r = await call(runtime, "projects_create", { title: { "pt-BR": "Marca" }, brand: pobre, dryRun: false });
+    expect(r.isError).toBe(true);
+    expect(r.body.problems.map((p: { path: string }) => p.path)).toEqual(expect.arrayContaining(["brand.light.foreground", "brand.light.accent"]));
+    expect(r.body.error).toContain("contraste");
+    expect(client.writes()).toEqual([]);
+    await call(runtime, "projects_create", { title: { "pt-BR": "Marca" }, dryRun: false });
+    const id = (await call(runtime, "projects_list")).body.items[0].id;
+    const u = await call(runtime, "projects_update", { id, patch: { brand: { light: { background: "#fff", foreground: "#000", accent: "#00f" } } } });
+    expect(u.isError).toBe(true);
+    expect(u.body.problems?.map((p: { path: string }) => p.path)).toEqual(expect.arrayContaining(["brand.light.background"]));
+  });
+});

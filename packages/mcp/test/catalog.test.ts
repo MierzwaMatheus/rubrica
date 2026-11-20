@@ -99,6 +99,22 @@ describe("catálogo do backend do projeto", () => {
     expect(client.writes().filter((w) => w.path === "rubrica/pages:upsertBlock")).toEqual([]);
   });
 
+  it("mostra os contextos de cada bloco e filtra por context", async () => {
+    const { runtime } = await runtimeFor(t, "content-editor");
+    const all = (await call(runtime, "blocks_catalog")).body;
+    const byType = (cat: { blocks: { type: string; contexts: string[] }[] }, type: string) => cat.blocks.find((b) => b.type === type);
+    expect(byType(all as never, "hero")!.contexts).toEqual(["page"]);
+    expect(byType(all as never, "texto")!.contexts).toEqual(["page", "case"]);
+    const forCase = (await call(runtime, "blocks_catalog", { context: "case" })).body;
+    const types = forCase.blocks.map((b: { type: string }) => b.type);
+    expect(forCase.context).toBe("case");
+    expect(types).toContain("texto");
+    for (const out of ["hero", "contato", "cases"]) expect(types, out).not.toContain(out);
+    const forPage = (await call(runtime, "blocks_catalog", { context: "page" })).body;
+    expect(forPage.blocks.map((b: { type: string }) => b.type)).toContain("hero");
+    expect((await call(runtime, "blocks_catalog", { type: "hero" })).body.contexts).toEqual(["page"]);
+  });
+
   it("tipo fora do catálogo do backend é recusado com a lista de tipos", async () => {
     const { runtime } = await runtimeFor(t, "content-editor", {}, { intercept: projectBackend });
     await call(runtime, "pages_create", { path: "/x", title: { "pt-BR": "X" }, dryRun: false });

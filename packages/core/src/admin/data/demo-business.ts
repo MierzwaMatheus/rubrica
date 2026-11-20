@@ -7,10 +7,13 @@
 import { assertValidSlug, slugify } from "../../convex/lib/slug";
 import { validateDiscount } from "../../convex/commerce/lib/proposalDiscount";
 import type { Permission, Role } from "../../convex/lib/roles";
-import type { BlockInstance, CollectionName } from "../../content/types";
+import { blockAllowedIn } from "../../blocks/define";
+import { CORE_BLOCKS } from "../../blocks/catalog";
+import type { BlockInstance, CaseBrand, CollectionName } from "../../content/types";
 import { COLLECTIONS } from "../../content/types";
 import type { Localized } from "../../i18n";
 import type { PluginDefinition } from "../../plugins/contract";
+import { brandProblems } from "../collections/brand";
 
 type Data = Record<string, unknown>;
 export type DemoDoc = Data & { _id: string; _creationTime: number };
@@ -169,6 +172,22 @@ export function businessHandlers(host: BusinessHost): { queries: Handlers; mutat
     const taken = (slug: string, except?: string) => items().some((d) => d.slug === slug && d._id !== except);
     const check = (data: Data, creating: boolean) => {
       for (const key of rules.required) if ((creating || key in data) && !hasText(data[key])) throw new Error(`${key}: preencha em pelo menos um idioma`);
+      if (name === "projects") checkCase(data);
+    };
+    /** Corpo do case (`blocks`, só blocos que aceitam o contexto `case`) e a cara do cliente (`brand`). */
+    const checkCase = (data: Data) => {
+      if (data.blocks !== undefined) {
+        const list = data.blocks as BlockInstance[];
+        list.forEach((block, i) => {
+          const def = CORE_BLOCKS.find((d) => d.type === block.type);
+          if (def && !blockAllowedIn(def, "case")) throw new Error(`Página inválida: bloco ${i + 1} (${block.id}) type: o bloco ${block.type} não cabe em um case`);
+        });
+        data.blocks = host.prepareBlocks(list);
+      }
+      if (data.brand !== undefined) {
+        const issues = brandProblems(data.brand as CaseBrand);
+        if (issues.length) throw new Error(`Cara do cliente inválida: ${issues.map((i) => i.message).join("; ")}`);
+      }
     };
     const nextOrder = () => items().reduce((max, d) => Math.max(max, typeof d.order === "number" ? d.order : -1), -1) + 1;
 

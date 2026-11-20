@@ -1,12 +1,12 @@
 /**
  * Formulário gerado do schema de campos (`blocks/fields.ts`): um controle por tipo
- * (text, richText, number, boolean, select, image, link, list). Campos traduzíveis
+ * (text, richText, number, boolean, select, image, link, color, list). Campos traduzíveis
  * mostram abas por idioma, com um ponto nos idiomas que faltam traduzir. Os erros
  * chegam por caminho (`items.0.label`) e cada controle mostra os seus.
  */
 import { createContext, lazy, Suspense, useContext, useId, useState, type ReactNode } from "react";
 import { ChevronDown, ChevronUp, ImagePlus, Languages, Plus, Trash2, X } from "lucide-react";
-import type { FieldDef, FieldError, FieldMap, ImageField, LinkField, ListField, RawImage, RawLink, SelectField } from "../../blocks/fields";
+import { normalizeHex, type ColorField, type FieldDef, type FieldError, type FieldMap, type ImageField, type LinkField, type ListField, type RawImage, type RawLink, type SelectField } from "../../blocks/fields";
 import type { Locale, Localized } from "../../i18n";
 import { api, isMissingFunction } from "../data/api";
 import { useAction } from "../data/backend";
@@ -418,6 +418,84 @@ function LinkControl({ def, value, onChange, path, errors }: ControlProps<LinkFi
   );
 }
 
+/**
+ * Cor `#rrggbb`: seletor nativo + campo de texto com o hexadecimal. O texto aceita `#abc`
+ * e maiúsculas (guarda `#aabbcc`); enquanto o que se digita não é uma cor, o campo
+ * avisa e o valor guardado não muda. `label` nomeia os dois controles para leitores de tela.
+ */
+export function ColorInput({
+  id,
+  label,
+  value,
+  onChange,
+  invalid,
+  fallback = "#000000",
+}: {
+  id: string;
+  label: string;
+  value: string | undefined;
+  /** Cor normalizada, ou `undefined` quando a pessoa esvazia o campo. */
+  onChange: (value: string | undefined) => void;
+  invalid?: boolean;
+  /** Cor que o seletor mostra enquanto não há valor. */
+  fallback?: string;
+}) {
+  const [text, setText] = useState<string | null>(null);
+  const shown = text ?? value ?? "";
+  const bad = text !== null && text.trim() !== "" && !normalizeHex(text);
+  const message = `${id}-hex-erro`;
+  return (
+    <div className="space-y-1">
+      <div className="flex items-center gap-2">
+        <input
+          type="color"
+          aria-label={`${label}: seletor de cor`}
+          value={value && normalizeHex(value) ? value : fallback}
+          onChange={(e) => {
+            setText(null);
+            onChange(normalizeHex(e.target.value));
+          }}
+          className="h-9 w-12 shrink-0 cursor-pointer rounded-md border border-input bg-card p-1 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/40 focus-visible:outline-none"
+        />
+        <Input
+          id={id}
+          value={shown}
+          spellCheck={false}
+          autoComplete="off"
+          maxLength={7}
+          placeholder="#7a1f2b"
+          className="font-mono"
+          aria-invalid={invalid || bad || undefined}
+          aria-describedby={bad ? message : undefined}
+          onChange={(e) => {
+            const raw = e.target.value;
+            setText(raw);
+            if (raw.trim() === "") return onChange(undefined);
+            const hex = normalizeHex(raw);
+            if (hex) onChange(hex);
+          }}
+          onBlur={() => setText(null)}
+        />
+      </div>
+      {bad && (
+        <p id={message} className="text-xs text-destructive" role="alert">
+          Use três ou seis dígitos hexadecimais, como #7a1f2b.
+        </p>
+      )}
+    </div>
+  );
+}
+
+function ColorControl({ def, value, onChange, path, errors }: ControlProps<ColorField>) {
+  const id = useFieldId(path);
+  const own = errorsAt(errors, path);
+  return (
+    <FieldShell id={id} label={def.label} help={def.help} required={def.required} errors={own}>
+      <ColorInput id={id} label={def.label} value={typeof value === "string" ? value : undefined} invalid={own.length > 0} onChange={onChange} />
+    </FieldShell>
+  );
+}
+
 function ListControl({ def, value, onChange, path, errors, missing }: ControlProps<ListField>) {
   const id = useFieldId(path);
   const items = Array.isArray(value) ? (value as Values[]) : [];
@@ -505,6 +583,8 @@ export function FieldControl(props: ControlProps) {
       return <ImageControl {...(props as ControlProps<ImageField>)} />;
     case "link":
       return <LinkControl {...(props as ControlProps<LinkField>)} />;
+    case "color":
+      return <ColorControl {...(props as ControlProps<ColorField>)} />;
     case "list":
       return <ListControl {...(props as ControlProps<ListField>)} />;
   }

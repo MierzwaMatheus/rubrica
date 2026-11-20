@@ -136,17 +136,19 @@ export function PaletaBlock({ id, variant, fields, headingLevel, ctx }: BlockPro
 // ── Tipografia ──────────────────────────────────────────────────────────────
 
 /**
- * Variável CSS da fonte de uma família (`--rbf-big-shoulders-display`).
- * TODO(frente A): trocar por `fontVarFor` de `theme/fonts.ts` quando existir (mesma regra).
+ * Variável CSS da fonte de uma família de conteúdo (`--rbf-f-big-shoulders-display`); fica
+ * indefinida quando o build não baixou a família.
+ * TODO(integração): trocar por `fontVarFor` de `theme/fonts.ts` (frente A; mesma regra).
  */
 export function fontVar(family: string): string {
   const slug = family
+    .trim()
+    .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
-  return `--rbf-${slug}`;
+  return `--rbf-f-${slug || "x"}`;
 }
 
 /** Pilha da família: a variável que o build define, o nome da família (se instalada) e a fonte do tema. */
@@ -200,7 +202,9 @@ export function TipografiaBlock({ id, variant, fields, headingLevel, ctx }: Bloc
                 {f.specimen ? (
                   <Img image={f.specimen} className="rb-type__specimen" sizes="(min-width: 60rem) 40rem, 100vw" />
                 ) : (
-                  <p className="rb-type__sample">{f.sample || ctx.t("type.alphabet")}</p>
+                  <p className="rb-type__sample" data-long={(f.sample ?? "").length > 48 ? "" : undefined}>
+                    {f.sample || ctx.t("type.alphabet")}
+                  </p>
                 )}
               </li>
             );

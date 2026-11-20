@@ -150,7 +150,7 @@ export const tipografia = defineBlock({
           localized: false,
           required: true,
           maxLength: 60,
-          help: "Nome no Google Fonts (ex.: Big Shoulders Display). O site baixa a fonte no build.",
+          help: "Nome no Google Fonts (ex.: Oswald). O site baixa a fonte no build.",
         }),
         role: field.text({ label: "Papel", maxLength: 60, help: "Ex.: títulos, texto corrido." }),
         weights: field.text({ label: "Pesos", localized: false, maxLength: 40, help: "Ex.: 400, 700. Sem eles, 400 e 700." }),
@@ -163,11 +163,12 @@ export const tipografia = defineBlock({
     fonts:
       mode === "cheio"
         ? [
-            { family: "Big Shoulders Display", role: L("Títulos e placa"), weights: "400, 800", sample: L("Peça sob medida desde 1987") },
-            { family: "Barlow", role: L("Texto corrido"), weights: "400, 500, 700", sample: L("O torno não tem pressa: cada peça sai medida, conferida e com garantia.") },
+            { family: "Bricolage Grotesque", role: L("Títulos e placa"), weights: "400, 800", sample: L("Peça sob medida desde 1987") },
+            { family: "Space Grotesk", role: L("Texto corrido"), weights: "400, 500, 700", sample: L("O torno não tem pressa: cada peça sai medida, conferida e com garantia.") },
+            { family: "JetBrains Mono", role: L("Códigos e etiquetas"), weights: "400, 700", sample: L("OS-1987 · Ø 42 mm · 0,01") },
             { family: "Faísca Serif", role: L("Apoio (fonte própria, em imagem)"), weights: "400", specimen: img("especime.svg", 800, 300, "Amostra da fonte Faísca Serif: Ag Faísca e o alfabeto") },
           ]
-        : [{ family: "Barlow" }],
+        : [{ family: "Fraunces" }],
   }),
 });
 

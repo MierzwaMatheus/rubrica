@@ -18,7 +18,7 @@
     "@rubrica/core": "^2.2.0",
     "@rubrica/theme-cyberpunk": "^2.1.0",
     "astro": "^7.4.0",
-    "convex": "^1.49.0",
+    "convex": "^1.51.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },

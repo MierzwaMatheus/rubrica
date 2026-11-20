@@ -138,12 +138,40 @@ Run `pnpm dev` (and `pnpm dev:convex`, so the backend knows the new block). In t
 | `fields` | The fields (below) |
 | `plugin` | Optional. Id of a core plugin (`blog`, `portfolio`...): with it off, the block disappears from the panel and the site |
 | `source` | Optional. To list items from a core collection: `{ collections: ["projects"], default: { collection: "projects", limit: 3, sort: "order" } }`. The component gets the items in `items`. The default collection must be among the allowed ones |
+| `contexts` | Optional. Where the block can go: `["page"]` (pages only), `["case"]` (case body only) or both. Without it, it works in both. See [In pages and in cases](#in-pages-and-in-cases) |
 | `interactive` | Optional. The block needs JavaScript in the browser. See [Block with JavaScript](#block-with-javascript) |
 | `islandWhen` | Optional, with `interactive`. A function that takes the fields and the enabled plugins and says whether the island mounts (e.g. only with a button turned on). Without it, it always mounts |
 
 `defineBlock` checks the `type` and the default collection and throws a clear error if something is wrong, at build time.
 
 **Variants** are not part of the definition: they belong to the theme, and a theme only declares variants for blocks it knows. In an own block, when you want more than one design, use a `select` field (like `layout` in the example).
+
+## In pages and in cases
+
+A block can be used in two places: in **pages** (`page`) and in the **body of a case** (`case`), the detail page of a project, which since 2.3.0 is also made of blocks. By default a block works in both. The `contexts` option narrows it down:
+
+<!-- exemplo: projeto/src/blocks/contexts.ts -->
+```ts
+import { defineBlock, field } from "@rubrica/core";
+
+export const clientStrip = defineBlock({
+  type: "faixa-cliente",
+  label: "Client strip",
+  description: "The client's name and field, at the top of the case.",
+  category: "comum",
+  contexts: ["case"],
+  fields: {
+    name: field.text({ label: "Client", localized: false, maxLength: 80 }),
+  },
+});
+```
+
+Two case rules apply to every block:
+
+- **In a case, the page title belongs to the template.** That is why `hero`, `contato` and `cases` only work in pages, and case blocks start at `h2`: the component's `headingLevel` is always `2`.
+- **It needs content.** In a case, a block with no required field filled in the page's language disappears, like the old sections with no translation.
+
+The panel and the MCP only offer the block where it is valid, and the backend rejects a block in the wrong context. To see the blocks for a case body, use the MCP `blocks_catalog` with `context: "case"`.
 
 ## The fields: `field.*`
 
@@ -162,6 +190,7 @@ Every field takes:
 | `field.select` | `options` (`[{ value, label }]`, required), `default` | The chosen `value` | The `value`, typed from the options (with no value, the `default`) |
 | `field.image` | — | `{ url, storageId?, alt?, width?, height? }`, with `alt` per language | `{ src, alt, width?, height? }`: render it with `<Img image={...} />` |
 | `field.link` | — | `{ label, href }`, with `label` per language | `{ label, href, external }`. An internal path already carries the language prefix |
+| `field.color` | — | A six-digit hexadecimal color (`#7a1f2b`) | A lowercase `string` (`#7a1f2b`) |
 | `field.list` | `of` (the fields of each item, required), `min`, `max`, `itemLabel` | A list of objects with the fields in `of` | A list of resolved objects |
 
 Worth knowing:

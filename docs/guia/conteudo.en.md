@@ -42,6 +42,47 @@ Collections are lists of items with fixed fields, each with its own panel screen
 
 The company line also has **company data** (legal name, tax id, address, hours, phone, WhatsApp, map), a single record that builds the footer and the `Organization`/`LocalBusiness` structured data for Google.
 
+## Projects and cases
+
+Each project has a **case** page. Since 2.3.0 its body is made of **blocks**, the same ones as pages, instead of fixed title-and-text sections. That lets you tell the case the way it needs: text, images, video, before and after, palette, typography.
+
+In the project editor (**Projects**, in the panel), what surrounds the body is still fields: title, summary, cover, client, year, role, category, links and highlight numbers. The **Case body** is the block editor, the same as a page's, and there is a **preview** of the case as the visitor sees it, in the theme in use. The panel only offers blocks that work in a case: `hero`, `contato` and `cases` are left out, because the page title belongs to the template.
+
+### Brand and media blocks
+
+Besides the text, list and number blocks, a case accepts blocks made for visual work (all of them also work in pages):
+
+| Block | What for |
+|---|---|
+| Before and after | Two images compared: the old logo and the new brand, the old screen and the new one. A sliding comparison (without JavaScript, the two sit side by side) or side by side |
+| Color palette | A brand's colors, with name, code, role, usage and the contrast of each |
+| Typography | A brand's fonts, each one written in its own font (from Google Fonts) or in an image, for outside fonts |
+| Brand variations | The versions of a logo (main, horizontal, symbol only, on a dark background), each one over any background color |
+| Images | Screens, mockups and brand applications, in a grid, mosaic or carousel, each image with a caption |
+| Video | A **YouTube or Vimeo** video, with optional **chapters**: named points in the video (`1:05`, `1:02:30`), each one opening the video at that point |
+
+See each block's fields in the [block catalog](./blocos.md).
+
+There is no video upload to the site: the video lives on YouTube or Vimeo and comes in by link, which keeps the site light and fast. For a **short animation** (a logo animation, a screen transition), export a **GIF**, upload it to the image library and use it in the **Images** block like any other image.
+
+### A case in the client's look
+
+A case can wear **the client's colors and title font** only inside it. The site header and footer keep your theme. In the project editor, under **Client's look**:
+
+1. turn the option on;
+2. pick the **background**, **text** and **accent** for light mode (and, if you want, the dark ones; without them the light ones apply);
+3. optionally pick a Google Fonts **title font** (the family name, like `Fraunces`). It is downloaded at build time.
+
+The panel shows the contrast of each color as you pick, and the panel and the MCP reject the brand if the text over the background has less than **4.5:1** or the accent over the background less than **3:1**, in either mode. That rule keeps the text readable with any brand. With the option off, the colors are kept without being applied (only the format is checked), so you can adjust at your own pace.
+
+### Cases created before 2.3.0
+
+The old fields (`content` and `sections`) are still read: the site shows those cases normally, with the text converted into text blocks on the fly. To move the content into blocks for real, run the migration that `update` lists. See [Updating Rubrica](./atualizar.md#migrating-cases-230).
+
+### Through the agent
+
+The [MCP](https://github.com/MierzwaMatheus/rubrica/blob/main/docs/v2/mcp.md) builds the case body with the `block_*` tools, passing `project` instead of `page`, and saves the client's look in the project's `brand` field (`projects_update`).
+
 ## Other panel screens
 
 - **Appearance:** color scheme, mode, fonts and theme tokens. See [Themes](./temas.md).

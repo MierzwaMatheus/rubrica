@@ -42,8 +42,8 @@ Lista viva do que falta para a v2 estável, vinda das revisões. Cada item sai d
 - Utilitários exportados em `@rubrica/core/components` e os tipos de item de coleção (`PostItem`, `ProjectItem`…) na raiz do `@rubrica/core`.
 
 ## Painel (coleções e negócio)
-- **Imagens no corpo dos textos**: o TipTap do painel não tem a extensão de imagem; capa, galeria e imagens das seções do case passam pela biblioteca, mas o corpo de posts e páginas não aceita imagem inline.
-- **Prévia ao vivo de posts e cases**: o editor de coleções mostra a prévia do Google, não a página de detalhe renderizada (a prévia do painel só renderiza páginas de blocos).
+- **Imagens no corpo dos textos**: o TipTap do painel não tem a extensão de imagem; capa, galeria e imagens dos blocos do case passam pela biblioteca, mas o corpo de posts e páginas não aceita imagem inline.
+- **Prévia ao vivo de posts**: o editor de posts mostra a prévia do Google, não a página de detalhe renderizada. (A prévia do case, com o corpo em blocos e a cara do cliente, existe desde a 2.3.0.)
 - **Tradução em lote**: o botão "traduzir" é por campo; traduzir um item inteiro de uma vez (`translation.translateDocument`) ainda não tem tela.
 - **Currículos com IA**: a tela lista e gera, mas não abre nem baixa o PDF do currículo gerado.
 

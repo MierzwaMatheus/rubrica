@@ -311,7 +311,7 @@ Optional templates for the pages that aren't made of blocks. Each one renders it
 | Template | Props |
 |---|---|
 | `post` | `post` (the `PostItem`), `html` (the body, already sanitized in the backend), `related`, `relatedCase` (optional: the project with a case study that shares a tag with the post), `ctx` |
-| `case` | `project` (the `ProjectItem`, with the case sections and its numbers in `metrics`), `related`, `next` (the next case study, optional), `carousel` (the carousel island, with `caseCarousel`), `ctx`. `CaseMetrics` from `@rubrica/core/components` renders the numbers |
+| `case` | `project` (the `ProjectItem`, with its numbers in `metrics`), `blocks` (the case body, already drawn), `brand` (the client's colors, when the case uses them), `related`, `next` (the next case study, optional), `carousel` (the carousel island, with `caseCarousel`), `ctx`. `CaseMetrics` from `@rubrica/core/components` renders the numbers. See [The case template](#the-case-template) |
 | `notFound` | `ctx` |
 
 <!-- exemplo: tema/src/templates.tsx -->
@@ -330,6 +330,73 @@ export function FarolNotFound({ ctx }: NotFoundProps) {
 ```
 
 Without a template, the core's apply (`DefaultPost`, `DefaultCase`, `DefaultNotFound`), styled by the theme's CSS.
+
+## The case template
+
+Since 2.3.0 (contract 1.4) a case body is made of **blocks**, the same engine as pages. The core draws the blocks with your theme's components, variants and islands, and hands them over ready in the `blocks` slot. The template only decides **where** it goes:
+
+<!-- exemplo: tema/src/case.tsx -->
+```tsx
+import type { CaseTemplateProps } from "@rubrica/core";
+import { CaseMetrics, Img } from "@rubrica/core/components";
+
+export function FarolCase({ project, blocks, related, ctx }: CaseTemplateProps) {
+  return (
+    <article className="farol-case">
+      <header>
+        <h1>{project.title}</h1>
+        {project.summary && <p>{project.summary}</p>}
+        {project.cover && <Img image={project.cover} priority sizes="100vw" />}
+      </header>
+      {blocks && <div className="farol-case__body">{blocks}</div>}
+      <CaseMetrics metrics={project.metrics} title={ctx.t("case.metrics")} />
+      {related.length > 0 && (
+        <aside>
+          <h2>{ctx.t("case.related")}</h2>
+          <ul>
+            {related.map((p) => (
+              <li key={p.id}>
+                <a href={p.url}>{p.title}</a>
+              </li>
+            ))}
+          </ul>
+        </aside>
+      )}
+    </article>
+  );
+}
+```
+
+What the template needs to know:
+
+- **The `h1` belongs to the template.** Case blocks start at `h2` (no `hero`, `contato` or `cases` there: those only work in pages).
+- **`blocks` can be empty** (`undefined`): a case with no body. Projects that have not been migrated yet arrive converted: the long text and the sections become `texto` blocks, so the template does not need to handle the old format.
+- **`project.sections` and `project.content` are deprecated** (`@deprecated`). They stay on the `ProjectItem` for compatibility, but a new theme should draw `blocks`. If your theme (or a third-party one) still reads `project.sections`, the case comes out without the new body: replace the loop over sections with `{blocks}`. If you need different markup for each section, give the `texto` block its own variant instead of looping in the template.
+- **The slot is ready-made HTML.** Do not try to walk the blocks: the order, the islands and the `headingLevel` belong to the core.
+
+### The client's look
+
+A case can use the **client's colors and title font** only inside it (the project's `brand` field; see [Content](./conteudo.md#projects-and-cases)). When it does, the core:
+
+1. wraps the template in a `<div data-rb-brand>` and passes the resolved colors in `brand` (`light`, `dark` and `fontDisplay`, each color with the text that goes over the accent);
+2. swaps, inside that `div`, the tokens `--rb-bg`, `--rb-fg`, `--rb-fg-strong`, `--rb-muted`, `--rb-surface`, `--rb-subtle`, `--rb-border`, `--rb-accent`, `--rb-accent-fg`, `--rb-accent-2` and `--rb-accent-2-fg` (and `--rb-font-display`, if there is a client font), for light and dark mode;
+3. downloads the title font at build time, like the other site fonts (the browser never talks to Google Fonts).
+
+The site header and footer stay outside the `div` and follow the theme. What the theme must do is **use tokens, not fixed colors**, inside the case template and the CSS that styles it. A hand-written color (`#111`) does not change with the brand and can become unreadable over the client's background. When the theme needs to react to the brand, use the attribute: `[data-rb-brand] .farol-case__title { ... }`. The `brand` prop is only for the rare case where the template needs the values themselves (for example, to draw an SVG).
+
+The core only applies the brand when it is valid: text over the background with a contrast of at least 4.5:1 and accent over the background of at least 3:1, in both modes. An invalid or turned-off brand, and the case uses the theme.
+
+### Contract 1.4
+
+2.3.0 raises the block contract to **1.4**. It is a minor version: everything new is optional, and themes with `contract: "^1"` keep working. What comes in:
+
+- `BlockDefinition.contexts` (`page`, `case`) and `blockAllowedIn`;
+- the `color` field (`field.color`);
+- `CaseTemplateProps.blocks` and `CaseTemplateProps.brand`;
+- the `antes-depois` (before and after), `paleta` (palette), `tipografia` (typography), `variacoes-marca` (brand variations) and `imagens` (images) blocks, and the chapters of the `video` block. All have a default component and CSS (`.rb-before-after`, `.rb-palette`, `.rb-type`, `.rb-brand-grid`, `.rb-images`), so they inherit your theme's look through tokens. Check each one in the battery's showcase;
+- exported utilities: `resolveBlocks` (`render/blocks.ts`, which draws a list of blocks for a context) and `fontVarFor` (the CSS variable of a content font, `--rbf-f-<name>`), for whoever draws a block with its own font.
+
+To update an existing theme: replace the reading of `project.sections` with `blocks` in the case template, check that the case CSS uses only tokens and run the battery (`pnpm testar-tema`).
 
 ## Fonts
 

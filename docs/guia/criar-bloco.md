@@ -138,12 +138,40 @@ Rode `pnpm dev` (e `pnpm dev:convex`, para o backend conhecer o bloco novo). No 
 | `fields` | Os campos (abaixo) |
 | `plugin` | Opcional. Id de um plugin do núcleo (`blog`, `portfolio`...): com ele desligado, o bloco some do painel e do site |
 | `source` | Opcional. Para listar itens de uma coleção do núcleo: `{ collections: ["projects"], default: { collection: "projects", limit: 3, sort: "order" } }`. O componente recebe os itens em `items`. A coleção padrão precisa estar entre as permitidas |
+| `contexts` | Opcional. Onde o bloco pode entrar: `["page"]` (só páginas), `["case"]` (só o corpo de um case) ou os dois. Sem ele, vale nos dois. Veja [Em páginas e em cases](#em-páginas-e-em-cases) |
 | `interactive` | Opcional. O bloco precisa de JavaScript no navegador. Veja [Bloco com JavaScript](#bloco-com-javascript) |
 | `islandWhen` | Opcional, com `interactive`. Função que recebe os campos e os plugins ligados e diz se a ilha monta (ex.: só com um botão ligado). Sem ela, monta sempre |
 
 `defineBlock` confere o `type` e a coleção padrão e lança um erro claro se algo estiver errado, já no build.
 
 **Variações** não são da definição: são do tema, e o tema só declara variações dos blocos que conhece. Num bloco próprio, quando quiser mais de um desenho, use um campo `select` (como o `layout` do exemplo).
+
+## Em páginas e em cases
+
+Um bloco pode ser usado em dois lugares: nas **páginas** (`page`) e no **corpo de um case** (`case`), a página de detalhe de um projeto, que desde a 2.3.0 também é feita de blocos. Por padrão, o bloco vale nos dois. A opção `contexts` restringe:
+
+<!-- exemplo: projeto/src/blocks/contexts.ts -->
+```ts
+import { defineBlock, field } from "@rubrica/core";
+
+export const faixaCliente = defineBlock({
+  type: "faixa-cliente",
+  label: "Faixa do cliente",
+  description: "Nome e ramo do cliente, no alto do case.",
+  category: "comum",
+  contexts: ["case"],
+  fields: {
+    name: field.text({ label: "Cliente", localized: false, maxLength: 80 }),
+  },
+});
+```
+
+Duas regras do case valem para qualquer bloco:
+
+- **No case, o título da página é do template.** Por isso `hero`, `contato` e `cases` só valem em páginas, e os blocos do case começam no `h2`: o `headingLevel` do componente é sempre `2`.
+- **Ele precisa de conteúdo.** No case, um bloco que não tem nenhum campo obrigatório preenchido no idioma da página some, como as seções antigas sem tradução.
+
+O painel e o MCP só oferecem o bloco onde ele vale, e o backend recusa um bloco no contexto errado. Para ver os blocos do corpo de um case, use o `blocks_catalog` do MCP com `context: "case"`.
 
 ## Os campos: `field.*`
 
@@ -162,6 +190,7 @@ Todo campo aceita:
 | `field.select` | `options` (`[{ value, label }]`, obrigatório), `default` | O `value` escolhido | O `value`, com o tipo das opções (sem valor, o `default`) |
 | `field.image` | — | `{ url, storageId?, alt?, width?, height? }`, com o `alt` por idioma | `{ src, alt, width?, height? }`: mostre com `<Img image={...} />` |
 | `field.link` | — | `{ label, href }`, com o `label` por idioma | `{ label, href, external }`. Caminho interno já vem com o prefixo do idioma |
+| `field.color` | — | Uma cor em hexadecimal de seis dígitos (`#7a1f2b`) | `string` em minúsculas (`#7a1f2b`) |
 | `field.list` | `of` (os campos de cada item, obrigatório), `min`, `max`, `itemLabel` | Uma lista de objetos com os campos de `of` | Uma lista de objetos já resolvidos |
 
 O que vale saber:

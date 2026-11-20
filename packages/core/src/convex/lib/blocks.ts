@@ -3,7 +3,7 @@
  * (núcleo + blocos do projeto) com `validateBlock`, e o tipo precisa existir, valer
  * para o tipo do site e ter o plugin ligado.
  */
-import { validateBlock, type BlockDefinition } from "../../blocks/define";
+import { blockAllowedIn, validateBlock, type BlockContext, type BlockDefinition } from "../../blocks/define";
 import type { BlockInstance, SiteKind } from "../../content/types";
 import { sanitizeFields } from "./sanitize";
 
@@ -26,8 +26,11 @@ export function findBlock(catalog: BlockCatalog, type: string): BlockDefinition 
   return catalog.blocks.find((b) => b.type === type);
 }
 
-/** Erros da lista de blocos. Lista vazia = válida. */
-export function validatePageBlocks(blocks: BlockInstance[], catalog: BlockCatalog): PageBlockError[] {
+/**
+ * Erros da lista de blocos. Lista vazia = válida. `context`: onde a lista vive
+ * (`"page"`, o padrão, ou o corpo de um `"case"`, que recusa hero, contato e cases).
+ */
+export function validatePageBlocks(blocks: BlockInstance[], catalog: BlockCatalog, context: BlockContext = "page"): PageBlockError[] {
   const errors: PageBlockError[] = [];
   const seen = new Set<string>();
   blocks.forEach((block, index) => {
@@ -40,6 +43,9 @@ export function validatePageBlocks(blocks: BlockInstance[], catalog: BlockCatalo
     if (!def) return at("type", `tipo de bloco desconhecido: "${block.type}"`);
     if (def.category !== "comum" && def.category !== catalog.kind) {
       return at("type", `o bloco ${def.type} é só de sites do tipo ${def.category}`);
+    }
+    if (!blockAllowedIn(def, context)) {
+      return at("type", `o bloco ${def.type} não vale ${context === "case" ? "dentro de um case" : "numa página"}`);
     }
     if (def.plugin && !catalog.enabledPlugins.has(def.plugin)) {
       return at("type", `o bloco ${def.type} precisa do plugin "${def.plugin}" ligado`);
@@ -56,9 +62,9 @@ export function formatBlockErrors(errors: PageBlockError[]): string {
 }
 
 /** Valida e devolve os blocos com o HTML dos campos `richText` sanitizado. Lança se houver erro. */
-export function preparePageBlocks(blocks: BlockInstance[], catalog: BlockCatalog): BlockInstance[] {
-  const errors = validatePageBlocks(blocks, catalog);
-  if (errors.length) throw new Error(`Página inválida: ${formatBlockErrors(errors)}`);
+export function preparePageBlocks(blocks: BlockInstance[], catalog: BlockCatalog, context: BlockContext = "page"): BlockInstance[] {
+  const errors = validatePageBlocks(blocks, catalog, context);
+  if (errors.length) throw new Error(`${context === "case" ? "Case inválido" : "Página inválida"}: ${formatBlockErrors(errors)}`);
   return blocks.map((block) => {
     const def = findBlock(catalog, block.type)!;
     return { ...block, fields: sanitizeFields(def.fields, block.fields) };

@@ -18,6 +18,7 @@ import type * as rubrica_audit from "../rubrica/audit.js";
 import type * as rubrica_checkouts from "../rubrica/checkouts.js";
 import type * as rubrica_commerce from "../rubrica/commerce.js";
 import type * as rubrica_contacts from "../rubrica/contacts.js";
+import type * as rubrica_collections from "../rubrica/collections.js";
 import type * as rubrica_contractTemplates from "../rubrica/contractTemplates.js";
 import type * as rubrica_faq from "../rubrica/faq.js";
 import type * as rubrica_media from "../rubrica/media.js";
@@ -60,6 +61,7 @@ import type * as rubrica_users from "../rubrica/users.js";
 "rubrica/checkouts": typeof rubrica_checkouts,
 "rubrica/commerce": typeof rubrica_commerce,
 "rubrica/contacts": typeof rubrica_contacts,
+"rubrica/collections": typeof rubrica_collections,
 "rubrica/contractTemplates": typeof rubrica_contractTemplates,
 "rubrica/faq": typeof rubrica_faq,
 "rubrica/media": typeof rubrica_media,

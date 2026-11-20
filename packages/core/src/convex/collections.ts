@@ -7,7 +7,8 @@
  * `removePermanently` (as duas últimas só root). Posts e projetos têm slug estável.
  */
 import { v, type GenericValidator, type PropertyValidators } from "convex/values";
-import type { CollectionName } from "../content/types";
+import type { BlockInstance, CaseBrand, CollectionName } from "../content/types";
+import { validateBrand } from "../theme/brand";
 import type { Localized } from "../i18n";
 import { requireRole } from "./auth";
 import { logUserAction } from "./audit";
@@ -16,9 +17,12 @@ import { sanitizeLocalizedHtml } from "./lib/sanitize";
 import { anyText, filledLocales } from "./lib/text";
 import { assertValidSlug, uniqueSlug } from "./lib/slug";
 import type { Permission } from "./lib/roles";
+import { catalogFor } from "./pages";
+import { preparePageBlocks } from "./lib/blocks";
+import { needsSectionsMigration, sectionsToBlocks } from "../content/legacy";
 import { getSettingsDoc, pluginForCollection, requirePlugin } from "./plugins";
 import type { RubricaRuntime } from "./runtime";
-import { mutation, query, type Id, type MutationCtx } from "./server";
+import { internalMutation, mutation, query, type Doc, type Id, type MutationCtx } from "./server";
 import { COLLECTION_TABLES, type CollectionTable } from "./schema";
 import {
   faqFields,
@@ -30,6 +34,7 @@ import {
   serviceFields,
   teamMemberFields,
   testimonialFields,
+  vBlock,
 } from "./validators";
 
 type Data = Record<string, unknown>;
@@ -50,6 +55,11 @@ export interface CollectionSpec<F extends PropertyValidators, E extends Property
   label: (doc: Data) => Localized<string> | string | undefined;
   /** Sanitiza o HTML dos campos ricos. */
   sanitize?: (data: Data) => Data;
+  /**
+   * Passo assíncrono depois do `sanitize`, com acesso ao banco (projetos: confere os
+   * blocos do case contra o catálogo do site). Roda na criação e na edição.
+   */
+  prepareAsync?: (ctx: MutationCtx, data: Data) => Promise<Data>;
   /** Campos a mais ao publicar (posts: data da primeira publicação). */
   onPublish?: (doc: Data, now: number) => Data;
 }
@@ -97,6 +107,10 @@ export function collectionFunctions<F extends PropertyValidators, E extends Prop
     return out;
   }
 
+  async function prepareWith(ctx: MutationCtx, data: Data): Promise<Data> {
+    return spec.prepareAsync ? spec.prepareAsync(ctx, data) : data;
+  }
+
   async function slugTaken(ctx: MutationCtx, slug: string, except?: string): Promise<boolean> {
     const found = await db(ctx)
       .query(table)
@@ -132,7 +146,7 @@ export function collectionFunctions<F extends PropertyValidators, E extends Prop
     handler: async (ctx, rawArgs): Promise<Id<CollectionTable>> => {
       const { userId } = await guardWrite(ctx);
       const { published, ...input } = rawArgs as Data & { published?: boolean };
-      const data = prepare(input, true);
+      const data = await prepareWith(ctx, prepare(input, true));
       if (spec.slug) {
         const given = typeof data.slug === "string" ? data.slug : undefined;
         if (given) {
@@ -167,7 +181,7 @@ export function collectionFunctions<F extends PropertyValidators, E extends Prop
     handler: async (ctx, args) => {
       const { userId } = await guardWrite(ctx);
       const current = await load(ctx, args.id);
-      const patch = prepare(args.patch as Data, false);
+      const patch = await prepareWith(ctx, prepare(args.patch as Data, false));
       for (const key of args.unset ?? []) {
         if (!removable.has(key)) throw new Error(`O campo "${key}" não pode ser apagado`);
         if (key in patch) throw new Error(`O campo "${key}" está no patch e no unset`);
@@ -270,9 +284,28 @@ const slugArg = { slug: v.optional(v.string()) };
 const sanitizePost = (data: Data): Data =>
   data.content ? { ...data, content: sanitizeLocalizedHtml(data.content as Localized<string>) } : data;
 
+/** Hex em minúsculas e contraste conferido nos dois modos; recusa com a lista dos problemas. */
+function prepareBrand(brand: CaseBrand): CaseBrand {
+  const lower = (c: CaseBrand["light"]) => ({
+    background: c.background.trim().toLowerCase(),
+    foreground: c.foreground.trim().toLowerCase(),
+    accent: c.accent.trim().toLowerCase(),
+  });
+  const out: CaseBrand = { ...brand, light: lower(brand.light) };
+  if (brand.dark) out.dark = lower(brand.dark);
+  if (brand.fontDisplay !== undefined) out.fontDisplay = brand.fontDisplay.trim();
+  const issues = validateBrand(out);
+  if (issues.length) {
+    const where = (mode: string) => (mode === "dark" ? "modo escuro" : "modo claro");
+    throw new Error(`Cores do cliente inválidas: ${issues.map((i) => `${where(i.mode)}, ${i.message}`).join("; ")}`);
+  }
+  return out;
+}
+
 const sanitizeProject = (data: Data): Data => {
   const out = { ...data };
   if (out.content) out.content = sanitizeLocalizedHtml(out.content as Localized<string>);
+  if (out.brand) out.brand = prepareBrand(out.brand as CaseBrand);
   if (Array.isArray(out.sections)) {
     out.sections = (out.sections as Data[]).map((s) => ({ ...s, body: sanitizeLocalizedHtml(s.body as Localized<string>) }));
   }
@@ -306,7 +339,126 @@ export function projectsFunctions(rt: RubricaRuntime) {
     requiredText: ["title"],
     label: (d) => d.title as Localized<string>,
     sanitize: sanitizeProject,
+    // O corpo do case usa o catálogo das páginas, no contexto "case" (sem hero, contato e cases).
+    prepareAsync: async (ctx, data) => {
+      if (!data.blocks) return data;
+      const { catalog } = await catalogFor(ctx, rt);
+      return { ...data, blocks: preparePageBlocks(data.blocks as BlockInstance[], catalog, "case") };
+    },
   });
+}
+
+/**
+ * Módulo `collections`: mutations finas de blocos do case (`upsertProjectBlock`,
+ * `reorderProjectBlocks`, `setProjectBlockVisible`, `removeProjectBlock`, papel
+ * `content`) e a migração de dados da 2.3.0.
+ */
+export function collectionsFunctions(rt: RubricaRuntime) {
+  const plugin = pluginForCollection(rt, "projects");
+  const guardWrite = async (ctx: MutationCtx) => {
+    const actor = await requireRole(ctx, "content");
+    if (plugin) await requirePlugin(ctx, rt, plugin);
+    return actor;
+  };
+
+  async function loadProject(ctx: MutationCtx, id: Id<"projects">): Promise<Doc<"projects">> {
+    const doc = await ctx.db.get(id);
+    if (!doc) throw new Error("Projeto não encontrado");
+    if (doc.deletedAt !== undefined) throw new Error("O projeto está na lixeira");
+    return doc;
+  }
+  const label = (doc: Doc<"projects">) => ({ type: "projects" as const, id: String(doc._id), label: anyText(doc.title) });
+  const blocksOf = (doc: Doc<"projects">) => (doc.blocks ?? []) as BlockInstance[];
+
+  /** Valida o corpo resultante (contexto case), sanitiza e grava. */
+  async function saveBlocks(ctx: MutationCtx, doc: Doc<"projects">, blocks: BlockInstance[], userId: Id<"users">, event: string, extra?: Data) {
+    const { catalog } = await catalogFor(ctx, rt);
+    const prepared = preparePageBlocks(blocks, catalog, "case");
+    await ctx.db.patch(doc._id, { blocks: prepared as Doc<"projects">["blocks"], updatedAt: Date.now(), updatedBy: userId });
+    await logUserAction(ctx, userId, event, label(doc), extra);
+  }
+
+  return {
+    /** Acrescenta ou substitui um bloco do case (pelo id), validando só o corpo resultante. */
+    upsertProjectBlock: mutation({
+      args: { projectId: v.id("projects"), block: vBlock, index: v.optional(v.number()) },
+      handler: async (ctx, args) => {
+        const { userId } = await guardWrite(ctx);
+        const doc = await loadProject(ctx, args.projectId);
+        const blocks = [...blocksOf(doc)];
+        const at = blocks.findIndex((b) => b.id === args.block.id);
+        if (at >= 0) blocks[at] = args.block as BlockInstance;
+        else blocks.splice(args.index ?? blocks.length, 0, args.block as BlockInstance);
+        await saveBlocks(ctx, doc, blocks, userId, at >= 0 ? "project.block_updated" : "project.block_added", { blockId: args.block.id });
+        return null;
+      },
+    }),
+
+    /** Nova ordem dos blocos: a lista precisa ter exatamente os ids atuais. */
+    reorderProjectBlocks: mutation({
+      args: { projectId: v.id("projects"), blockIds: v.array(v.string()) },
+      handler: async (ctx, args) => {
+        const { userId } = await guardWrite(ctx);
+        const doc = await loadProject(ctx, args.projectId);
+        const blocks = blocksOf(doc);
+        const byId = new Map(blocks.map((b) => [b.id, b]));
+        if (args.blockIds.length !== blocks.length || new Set(args.blockIds).size !== args.blockIds.length || args.blockIds.some((id) => !byId.has(id))) {
+          throw new Error("A nova ordem precisa ter todos os blocos do case, uma vez cada");
+        }
+        await ctx.db.patch(doc._id, { blocks: args.blockIds.map((id) => byId.get(id)!) as Doc<"projects">["blocks"], updatedAt: Date.now(), updatedBy: userId });
+        await logUserAction(ctx, userId, "project.blocks_reordered", label(doc));
+        return null;
+      },
+    }),
+
+    /** Liga ou desliga um bloco sem apagar. */
+    setProjectBlockVisible: mutation({
+      args: { projectId: v.id("projects"), blockId: v.string(), visible: v.boolean() },
+      handler: async (ctx, args) => {
+        const { userId } = await guardWrite(ctx);
+        const doc = await loadProject(ctx, args.projectId);
+        const blocks = blocksOf(doc);
+        if (!blocks.some((b) => b.id === args.blockId)) throw new Error(`Bloco não encontrado: ${args.blockId}`);
+        await ctx.db.patch(doc._id, { blocks: blocks.map((b) => (b.id === args.blockId ? { ...b, visible: args.visible } : b)) as Doc<"projects">["blocks"], updatedAt: Date.now(), updatedBy: userId });
+        await logUserAction(ctx, userId, args.visible ? "project.block_shown" : "project.block_hidden", label(doc), { blockId: args.blockId });
+        return null;
+      },
+    }),
+
+    removeProjectBlock: mutation({
+      args: { projectId: v.id("projects"), blockId: v.string() },
+      handler: async (ctx, args) => {
+        const { userId } = await guardWrite(ctx);
+        const doc = await loadProject(ctx, args.projectId);
+        const blocks = blocksOf(doc);
+        if (!blocks.some((b) => b.id === args.blockId)) throw new Error(`Bloco não encontrado: ${args.blockId}`);
+        await ctx.db.patch(doc._id, { blocks: blocks.filter((b) => b.id !== args.blockId) as Doc<"projects">["blocks"], updatedAt: Date.now(), updatedBy: userId });
+        await logUserAction(ctx, userId, "project.block_removed", label(doc), { blockId: args.blockId });
+        return null;
+      },
+    }),
+
+    /**
+     * Migração de dados (2.3.0): `content` + `sections` dos cases viram `blocks` e os campos
+     * antigos são apagados. Idempotente; roda pelo `update` do CLI.
+     */
+    migrateSectionsToBlocks: internalMutation({
+      args: {},
+      handler: async (ctx) => {
+        let migrated = 0;
+        for (const doc of await ctx.db.query("projects").collect()) {
+          if (!needsSectionsMigration(doc as never)) continue;
+          await ctx.db.patch(doc._id, {
+            blocks: sectionsToBlocks(doc as never) as Doc<"projects">["blocks"],
+            sections: undefined,
+            content: undefined,
+          });
+          migrated++;
+        }
+        return { migrated };
+      },
+    }),
+  };
 }
 
 const simple = <F extends PropertyValidators>(

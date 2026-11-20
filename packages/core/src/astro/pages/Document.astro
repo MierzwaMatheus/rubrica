@@ -6,7 +6,7 @@
  * fluxos de uma pessoa só, e o botão fixo cobriria os botões do formulário no celular.
  */
 import "virtual:rubrica/styles";
-import { Font } from "astro:assets";
+import { Font, fontData } from "astro:assets";
 import { activeTheme, activeFontPlan, headOptions, loadSite } from "../runtime";
 import { appearanceHead } from "../../theme/appearance";
 import { fontPreloads } from "../../theme/fonts";
@@ -19,14 +19,21 @@ interface Props {
   route: HeadRoute;
   ctx: RenderContext;
   settings: SiteSettings;
+  /** Variáveis das fontes de conteúdo que a página usa (`routeFontVars`). */
+  fontVars?: string[];
+  /** CSS próprio da página (as cores do cliente no case, `brandCss`). */
+  css?: string | undefined;
 }
-const { route, ctx, settings } = Astro.props;
+const { route, ctx, settings, fontVars = [], css } = Astro.props;
 const head = renderHeadTags(buildHead(route, settings, ctx, headOptions(await loadSite())));
 const mode = settings.appearance.colorMode;
 const look = appearanceHead(settings, activeTheme, activeFontPlan);
 // Pré-carrega a fonte do texto e a de destaque do tema (títulos acima da dobra).
 const preloads = fontPreloads(activeFontPlan);
 const siteWide = route.type !== "app";
+// Fonte de conteúdo que o Google não tem (sem arquivo baixado): a variável fica indefinida
+// e o componente cai na reserva dele (fonte do tema, amostra em imagem).
+const contentFonts = fontVars.filter((v) => ((fontData as Record<string, unknown[] | undefined>)[v]?.length ?? 0) > 0);
 const siteWideAttrs = siteWide ? siteWideAttributes(ctx) : {};
 ---
 
@@ -37,7 +44,9 @@ const siteWideAttrs = siteWide ? siteWideAttributes(ctx) : {};
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <Fragment set:html={head} />
     {look.fonts.fonts.map((f) => <Font cssVariable={f.cssVariable as any} preload={preloads.has(f.cssVariable) ? preloads.get(f.cssVariable)!.map((weight) => ({ weight, style: "normal" as const, subset: "latin" })) : false} />)}
+    {contentFonts.map((v) => <Font cssVariable={v as any} preload={false} />)}
     {look.css && <style set:html={look.css} />}
+    {css && <style set:html={css} />}
     {settings.appearance.colorToggle && <script is:inline src="/_rubrica/color-mode.js" />}
   </head>
   <body>

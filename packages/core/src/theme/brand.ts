@@ -5,7 +5,8 @@
  */
 import type { CaseBrand, CaseBrandColors } from "../content/types";
 import { HEX_COLOR } from "../blocks/fields";
-import { contrastRatio } from "./schemes";
+import { contrastRatio, mixColors } from "./schemes";
+import { BRAND_FONT_VAR, fontVarFor } from "./fonts";
 
 /** Mínimos de contraste: texto normal (AA) e elementos de interface/texto grande. */
 export const BRAND_MIN_TEXT_CONTRAST = 4.5;
@@ -93,10 +94,47 @@ export function resolveBrand(brand: CaseBrand | undefined): ResolvedBrand | unde
   return out;
 }
 
+/** Superfícies e linhas: o fundo puxado um pouco para o texto (como os esquemas). */
+const SURFACE_MIX = 0.04;
+const SUBTLE_MIX = 0.08;
+const BORDER_MIX = 0.2;
+
+/**
+ * Texto secundário: o texto puxado para o fundo o quanto der sem cair de 4.5:1 sobre o fundo
+ * e sobre a superfície (no limite, o próprio texto). Sem isso, o `--rb-muted` do tema
+ * (pensado para o fundo dele) ficaria ilegível sobre o fundo do cliente.
+ */
+function mutedFor(c: ResolvedBrandColors, surface: string): string {
+  for (let t = 0.45; t > 0; t -= 0.05) {
+    const muted = mixColors(c.foreground, c.background, t);
+    if (contrastRatio(muted, c.background) >= BRAND_MIN_TEXT_CONTRAST && contrastRatio(muted, surface) >= BRAND_MIN_TEXT_CONTRAST) return muted;
+  }
+  return c.foreground;
+}
+
 function declarations(c: ResolvedBrandColors, font?: string): string {
-  const decls = [`--rb-bg:${c.background}`, `--rb-fg:${c.foreground}`, `--rb-accent:${c.accent}`, `--rb-accent-fg:${c.accentForeground}`];
-  // A família vem da Fonts API do Astro (a variável `--rbf-brand` é definida no build).
-  if (font) decls.push(`--rb-font-display:var(--rbf-brand, var(--rb-font-sans))`);
+  const surface = mixColors(c.background, c.foreground, SURFACE_MIX);
+  const light = contrastRatio(c.background, "#000000") > contrastRatio(c.background, "#ffffff");
+  const decls = [
+    `--rb-bg:${c.background}`,
+    `--rb-fg:${c.foreground}`,
+    `--rb-fg-strong:${c.foreground}`,
+    `--rb-muted:${mutedFor(c, surface)}`,
+    `--rb-surface:${surface}`,
+    `--rb-subtle:${mixColors(c.background, c.foreground, SUBTLE_MIX)}`,
+    `--rb-border:${mixColors(c.background, c.foreground, BORDER_MIX)}`,
+    `--rb-accent:${c.accent}`,
+    `--rb-accent-fg:${c.accentForeground}`,
+    // A segunda cor do tema pode virar texto ou botão: no case, ela segue o destaque do cliente.
+    `--rb-accent-2:${c.accent}`,
+    `--rb-accent-2-fg:${c.accentForeground}`,
+    `color-scheme:${light ? "light" : "dark"}`,
+  ];
+  // A família vem da Fonts API do Astro, na variável da família (`fontVarFor`, planejada no
+  // build por `planContentFonts`). `--rbf-brand` aponta para ela só dentro do case: sem a
+  // fonte (família inexistente, download que falhou), a variável fica indefinida e os
+  // títulos caem na fonte do texto do tema.
+  if (font) decls.push(`${BRAND_FONT_VAR}:var(${fontVarFor(font)})`, `--rb-font-display:var(${BRAND_FONT_VAR}, var(--rb-font-sans))`);
   return decls.join(";");
 }
 

@@ -190,5 +190,470 @@
       "pt-BR": "Sistema de design",
       "en": "Design system"
     }
+  },
+  {
+    "id": "proj4",
+    "slug": "padaria-fermento-lento",
+    "order": 4,
+    "featured": true,
+    "year": 2025,
+    "client": "Padaria Fermento Lento",
+    "tags": [
+      "identidade visual",
+      "padaria",
+      "marca"
+    ],
+    "cover": {
+      "url": "/img/cover-1.svg",
+      "width": 800,
+      "height": 500,
+      "alt": {
+        "pt-BR": "Exemplo de identidade visual da padaria",
+        "en": "Example of the bakery's visual identity"
+      }
+    },
+    "title": {
+      "pt-BR": "Identidade visual para a Padaria Fermento Lento",
+      "en": "Visual identity for Fermento Lento bakery"
+    },
+    "summary": {
+      "pt-BR": "Da marca antiga ao sistema completo: cores, tipografia e versões para fachada e embalagem.",
+      "en": "From the old logo to a full system: colours, type and versions for storefront and packaging."
+    },
+    "role": {
+      "pt-BR": "Designer de marca",
+      "en": "Brand designer"
+    },
+    "category": {
+      "pt-BR": "Identidade visual",
+      "en": "Brand identity"
+    },
+    "brand": {
+      "enabled": true,
+      "light": {
+        "background": "#f7efe1",
+        "foreground": "#2a1e16",
+        "accent": "#a4471a"
+      },
+      "dark": {
+        "background": "#1f1712",
+        "foreground": "#f5ead9",
+        "accent": "#e9a15a"
+      },
+      "fontDisplay": "Fraunces"
+    },
+    "blocks": [
+      {
+        "id": "contexto",
+        "type": "texto",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "Contexto",
+            "en": "Context"
+          },
+          "body": {
+            "pt-BR": "<p>A padaria abriu com um logo feito às pressas: um trigo desenhado em cinco traços, difícil de reproduzir numa sacola pequena.</p><p>O pedido foi uma marca que coubesse na fachada, no pão embalado e no celular, e que dissesse o que a casa faz: fermentação longa, sem pressa.</p>",
+            "en": "<p>The bakery opened with a logo drawn in a hurry: a wheat ear in five strokes, hard to reproduce on a small paper bag.</p><p>The brief was a mark that fits the storefront, the wrapped loaf and a phone screen, and says what the bakery does: long fermentation, no rush.</p>"
+          }
+        }
+      },
+      {
+        "id": "antes-depois",
+        "type": "antes-depois",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "Do logo antigo à marca nova",
+            "en": "From the old logo to the new mark"
+          },
+          "intro": {
+            "pt-BR": "A mesma ideia, desenhada para ser lida de longe e de perto.",
+            "en": "The same idea, drawn to be read from afar and up close."
+          },
+          "before": {
+            "url": "/img/logo-1.svg",
+            "width": 800,
+            "height": 500,
+            "alt": {
+              "pt-BR": "Exemplo do logo antigo da padaria",
+              "en": "Example of the bakery's old logo"
+            }
+          },
+          "beforeLabel": {
+            "pt-BR": "Antes",
+            "en": "Before"
+          },
+          "after": {
+            "url": "/img/logo-2.svg",
+            "width": 800,
+            "height": 500,
+            "alt": {
+              "pt-BR": "Exemplo da marca nova da padaria",
+              "en": "Example of the bakery's new mark"
+            }
+          },
+          "afterLabel": {
+            "pt-BR": "Depois",
+            "en": "After"
+          },
+          "caption": {
+            "pt-BR": "A palavra continua a mesma; a forma ficou uma só: o círculo vira a casca do pão.",
+            "en": "The name stays the same; the shape became one: the circle is now the bread crust."
+          },
+          "presentation": "comparador"
+        }
+      },
+      {
+        "id": "paleta",
+        "type": "paleta",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "Paleta",
+            "en": "Palette"
+          },
+          "intro": {
+            "pt-BR": "Quatro cores, uma por função. A farinha e o carvão sustentam o texto; o mel é o destaque.",
+            "en": "Four colours, one per role. Flour and charcoal carry the text; honey is the accent."
+          },
+          "colors": [
+            {
+              "name": {
+                "pt-BR": "Farinha",
+                "en": "Flour"
+              },
+              "hex": "#f4ead5",
+              "role": {
+                "pt-BR": "fundo",
+                "en": "background"
+              },
+              "usage": {
+                "pt-BR": "Fundos e embalagens de papel.",
+                "en": "Backgrounds and paper packaging."
+              }
+            },
+            {
+              "name": {
+                "pt-BR": "Crosta",
+                "en": "Crust"
+              },
+              "hex": "#9a4a1e",
+              "role": {
+                "pt-BR": "principal",
+                "en": "primary"
+              },
+              "usage": {
+                "pt-BR": "Logo, títulos e botões.",
+                "en": "Logo, headings and buttons."
+              }
+            },
+            {
+              "name": {
+                "pt-BR": "Mel",
+                "en": "Honey"
+              },
+              "hex": "#e0a526",
+              "role": {
+                "pt-BR": "destaque",
+                "en": "accent"
+              },
+              "usage": {
+                "pt-BR": "Selos, preços e chamadas.",
+                "en": "Badges, prices and calls to action."
+              }
+            },
+            {
+              "name": {
+                "pt-BR": "Carvão",
+                "en": "Charcoal"
+              },
+              "hex": "#2a2320",
+              "role": {
+                "pt-BR": "texto",
+                "en": "text"
+              },
+              "usage": {
+                "pt-BR": "Texto corrido e legendas.",
+                "en": "Body text and captions."
+              }
+            }
+          ],
+          "showContrast": true
+        }
+      },
+      {
+        "id": "tipografia",
+        "type": "tipografia",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "Tipografia",
+            "en": "Typography"
+          },
+          "intro": {
+            "pt-BR": "Duas famílias do Google Fonts: uma para dar personalidade, outra para ler sem cansar.",
+            "en": "Two Google Fonts families: one for personality, one for reading without fatigue."
+          },
+          "fonts": [
+            {
+              "family": "Fraunces",
+              "role": {
+                "pt-BR": "títulos",
+                "en": "headings"
+              },
+              "weights": "600, 700",
+              "sample": {
+                "pt-BR": "Pão de fermentação lenta, sem pressa.",
+                "en": "Slow-fermented bread, no rush."
+              }
+            },
+            {
+              "family": "Inter",
+              "role": {
+                "pt-BR": "texto corrido",
+                "en": "body text"
+              },
+              "weights": "400, 600",
+              "sample": {
+                "pt-BR": "Abrimos às 6h. Fornada da tarde às 16h.",
+                "en": "Open at 6am. Afternoon bake at 4pm."
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "variacoes",
+        "type": "variacoes-marca",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "Variações da marca",
+            "en": "Brand variations"
+          },
+          "intro": {
+            "pt-BR": "Cada versão tem a cor de fundo para a qual foi desenhada.",
+            "en": "Each version has the background colour it was drawn for."
+          },
+          "items": [
+            {
+              "image": {
+                "url": "/img/logo-1.svg",
+                "width": 160,
+                "height": 48,
+                "alt": {
+                  "pt-BR": "Versão principal",
+                  "en": "Main version"
+                }
+              },
+              "label": {
+                "pt-BR": "Principal sobre farinha",
+                "en": "Main on flour"
+              },
+              "background": "#f4ead5",
+              "note": {
+                "pt-BR": "Uso padrão: site, cardápio e fachada.",
+                "en": "Default use: website, menu and storefront."
+              }
+            },
+            {
+              "image": {
+                "url": "/img/logo-2.svg",
+                "width": 160,
+                "height": 48,
+                "alt": {
+                  "pt-BR": "Versão positiva",
+                  "en": "Positive version"
+                }
+              },
+              "label": {
+                "pt-BR": "Positivo sobre crosta",
+                "en": "Positive on crust"
+              },
+              "background": "#9a4a1e",
+              "note": {
+                "pt-BR": "Sacolas e adesivos.",
+                "en": "Bags and stickers."
+              }
+            },
+            {
+              "image": {
+                "url": "/img/logo-3.svg",
+                "width": 160,
+                "height": 48,
+                "alt": {
+                  "pt-BR": "Versão negativa",
+                  "en": "Negative version"
+                }
+              },
+              "label": {
+                "pt-BR": "Negativo sobre carvão",
+                "en": "Negative on charcoal"
+              },
+              "background": "#2a2320",
+              "note": {
+                "pt-BR": "Uniforme e lousa.",
+                "en": "Uniform and chalkboard."
+              }
+            },
+            {
+              "image": {
+                "url": "/img/logo-4.svg",
+                "width": 160,
+                "height": 48,
+                "alt": {
+                  "pt-BR": "Símbolo",
+                  "en": "Symbol"
+                }
+              },
+              "label": {
+                "pt-BR": "Símbolo sobre mel",
+                "en": "Symbol on honey"
+              },
+              "background": "#e0a526",
+              "note": {
+                "pt-BR": "Selo de perfil e favicon.",
+                "en": "Profile badge and favicon."
+              }
+            }
+          ],
+          "columns": "2"
+        }
+      },
+      {
+        "id": "mosaico",
+        "type": "imagens",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "Aplicações",
+            "en": "Applications"
+          },
+          "items": [
+            {
+              "image": {
+                "url": "/img/cover-1.svg",
+                "width": 800,
+                "height": 500,
+                "alt": {
+                  "pt-BR": "Exemplo de aplicação em sacola",
+                  "en": "Example applied to a paper bag"
+                }
+              },
+              "caption": {
+                "pt-BR": "Sacola de papel com o símbolo em crosta.",
+                "en": "Paper bag with the crust-coloured symbol."
+              }
+            },
+            {
+              "image": {
+                "url": "/img/cover-2.svg",
+                "width": 800,
+                "height": 500,
+                "alt": {
+                  "pt-BR": "Exemplo de aplicação na fachada",
+                  "en": "Example applied to the storefront"
+                }
+              },
+              "caption": {
+                "pt-BR": "Lousa da fachada com o cardápio do dia.",
+                "en": "Storefront chalkboard with the daily menu."
+              }
+            },
+            {
+              "image": {
+                "url": "/img/cover-3.svg",
+                "width": 800,
+                "height": 500,
+                "alt": {
+                  "pt-BR": "Exemplo de adesivo",
+                  "en": "Example sticker"
+                }
+              },
+              "caption": {
+                "pt-BR": "Adesivo de embalagem, versão em mel.",
+                "en": "Packaging sticker, honey version."
+              }
+            }
+          ],
+          "layout": "mosaico"
+        }
+      },
+      {
+        "id": "video",
+        "type": "video",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "O processo, em 3 minutos",
+            "en": "The process, in 3 minutes"
+          },
+          "url": "https://www.youtube.com/watch?v=M7lc1UVf-VE",
+          "caption": {
+            "pt-BR": "Vídeo de apresentação do processo (exemplo)",
+            "en": "Process presentation video (example)"
+          },
+          "aspect": "16:9",
+          "chapters": [
+            {
+              "start": "0:00",
+              "label": {
+                "pt-BR": "Ponto de partida",
+                "en": "Starting point"
+              }
+            },
+            {
+              "start": "0:50",
+              "label": {
+                "pt-BR": "Paleta e tipografia",
+                "en": "Palette and typography"
+              }
+            },
+            {
+              "start": "2:10",
+              "label": {
+                "pt-BR": "Aplicações",
+                "en": "Applications"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "numeros",
+        "type": "numeros",
+        "visible": true,
+        "fields": {
+          "title": {
+            "pt-BR": "Em números",
+            "en": "By the numbers"
+          },
+          "items": [
+            {
+              "value": "3",
+              "label": {
+                "pt-BR": "versões de logo testadas com a equipe",
+                "en": "logo versions tested with the team"
+              }
+            },
+            {
+              "value": "6",
+              "label": {
+                "pt-BR": "semanas da primeira reunião à aprovação",
+                "en": "weeks from first meeting to approval"
+              }
+            },
+            {
+              "value": "1",
+              "label": {
+                "pt-BR": "sistema de marca entregue ao time",
+                "en": "brand system handed to the team"
+              }
+            }
+          ]
+        }
+      }
+    ]
   }
 ]

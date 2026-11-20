@@ -60,7 +60,7 @@ function rowsOf(cells: StampCell[]): StampCell[][] {
   return rows;
 }
 
-export function BlueprintCase({ project, related, ctx }: CaseTemplateProps) {
+export function BlueprintCase({ project, related, blocks, ctx }: CaseTemplateProps) {
   const facts: StampCell[] = [
     ...(project.client ? [{ label: ctx.t("case.client"), value: project.client }] : []),
     ...(project.year ? [{ label: ctx.t("blueprint.year"), value: project.year }] : []),
@@ -90,19 +90,8 @@ export function BlueprintCase({ project, related, ctx }: CaseTemplateProps) {
           </div>
         )}
       </header>
-      {project.content && <Html html={project.content} className="rb-prose bp-doc__body" />}
-      {project.sections.map((s, i) => (
-        <section key={i} className="bp-doc__section">
-          <h2 className="bp-h2">
-            <span className="bp-n" aria-hidden="true">
-              {i + 1}
-            </span>
-            {s.title}
-          </h2>
-          <Html html={s.body} className="rb-prose bp-doc__body" />
-          {s.image && <Img image={s.image} className="bp-doc__img" sizes="(min-width: 960px) 800px, 100vw" />}
-        </section>
-      ))}
+      {/* Corpo em blocos do núcleo; a numeração das seções é um contador CSS (ver styles.css). */}
+      {blocks && <div className="rb-case__body bp-doc__blocks">{blocks}</div>}
       <CaseMetrics metrics={project.metrics} title={ctx.t("case.metrics")} className="bp-doc__metrics" />
       {project.links.length > 0 && (
         <div className="bp-row">

@@ -380,3 +380,20 @@ body { font-family: var(--rb-font-sans); -webkit-font-smoothing: antialiased; }
   --ix-invert-muted: color-mix(in srgb, var(--rb-bg) 78%, var(--rb-fg));
   --ix-shadow: color-mix(in srgb, var(--rb-fg) 24%, transparent);
 }
+
+/* ---------- corpo do case em blocos e blocos de marca ---------- */
+/* O corpo do case usa a largura do catálogo (depois do rótulo), com fios finos entre os blocos. */
+.ix-main > .rb-case > .rb-case__body { max-width: none; margin-right: 0; --rb-case-gap: 40px; }
+.ix .rb-case__body > * + *, .ix .rb-case__body > :is(astro-slot, astro-static-slot) > * + * { padding-top: calc(var(--rb-case-gap) * 0.6); border-top: 1px solid var(--rb-border); }
+.ix .rb-case__body .rb-section__title { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--rb-muted); }
+.ix .rb-case__body .rb-section__lead, .ix .rb-case__body .rb-section__subtitle { color: var(--rb-muted); font-size: 14px; }
+/* Pranchas e amostras: ângulos retos, fio de 1px, legendas pequenas. */
+.ix .rb-before-after__image, .ix .rb-images__image { border: 0; border-radius: 0; }
+.ix .rb-before-after__label, .ix .rb-type__role, .ix .rb-palette__role, .ix .rb-video__chaptersTitle { font-family: var(--rb-font-mono); font-size: 11px; letter-spacing: 0.1em; }
+.ix .rb-before-after__caption, .ix .rb-images__caption, .ix .rb-brand-grid__note { font-size: 13px; color: var(--rb-muted); }
+.ix .rb-palette__swatch, .ix .rb-type__font, .ix .rb-video__chapters { border: 1px solid var(--rb-fg); border-radius: 0; background: none; }
+.ix .rb-palette__name, .ix .rb-type__family { font-weight: 500; letter-spacing: -0.02em; }
+.ix .rb-palette__grade, .ix .rb-video__chapterTime, .ix .rb-type__weight, .ix .rb-palette__sample { border-radius: 0; }
+.ix .rb-brand-grid__tile { border-radius: 0; }
+.ix .rb-brand-grid__label { font-size: 13px; font-weight: 500; }
+.ix .rb-video__chapterLink:hover, .ix .rb-video__chapterLink[aria-current="true"] { background: var(--rb-fg); color: var(--rb-bg); box-shadow: none; }

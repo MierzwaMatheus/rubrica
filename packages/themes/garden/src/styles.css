@@ -381,3 +381,17 @@ ul.gd-rich { list-style: disc; padding-left: 1.2em; }
   --garden-soft: color-mix(in srgb, var(--rb-accent) 14%, transparent);
   --garden-shadow: color-mix(in srgb, var(--rb-fg) 14%, transparent);
 }
+
+/* ---------- corpo do case em blocos e blocos de marca ---------- */
+.gd-shared .rb-case__body { --rb-case-gap: clamp(2.25rem, 5vw, 3.5rem); }
+.gd-shared .rb-case__body .rb-section__title { font-size: 1.35rem; }
+/* Pranchas e amostras: cantos de 12px e sombra macia, como as pétalas do jardim. */
+.gd-shared .rb-before-after__image, .gd-shared .rb-images__image, .gd-shared .rb-comparer__stage { border-radius: 12px; border-color: var(--rb-border); box-shadow: 0 6px 18px var(--garden-shadow); }
+.gd-shared .rb-palette__swatch, .gd-shared .rb-type__font, .gd-shared .rb-video__chapters { border-radius: 14px; box-shadow: 0 6px 18px var(--garden-shadow); }
+.gd-shared .rb-brand-grid__tile { border-radius: 14px; box-shadow: 0 6px 18px var(--garden-shadow); }
+.gd-shared .rb-before-after__label, .gd-shared .rb-comparer__label { border-radius: 999px; }
+.gd-shared .rb-type__role, .gd-shared .rb-type__weight { color: var(--garden-ink); }
+.gd-shared .rb-type__role { color: var(--garden-ink); }
+.gd-shared .rb-video__chapterLink[aria-current="true"] { box-shadow: inset 3px 0 0 var(--rb-accent-2); }
+/* O título da amostra herda a cor calculada para o fundo da amostra (o h3 do tema não pode trocá-la). */
+.rb-palette__chip .rb-palette__name { color: inherit; }

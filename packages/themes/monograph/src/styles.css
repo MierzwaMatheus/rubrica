@@ -386,3 +386,32 @@ h1, h2, h3, h4 { font-family: var(--rb-font-display); color: var(--rb-fg-strong)
   --mn-dots: color-mix(in srgb, var(--rb-muted) 75%, transparent);
   --mn-wash: color-mix(in srgb, var(--rb-accent) 7%, var(--rb-bg));
 }
+
+/* ---------- corpo do case em blocos e blocos de marca ---------- */
+/* O artigo do case já é uma coluna de livro (56rem): cada bloco vira "rótulo | conteúdo", sem a margem. */
+.rb-case__body { --rb-case-gap: 0; margin-block: 0; gap: 0; }
+.rb-case__body .rb-section { border-bottom: 1px solid var(--rb-border); }
+.rb-case__body .rb-section:last-child { border-bottom: 0; }
+.rb-case__body .rb-section > .rb-container { padding: 40px 0; row-gap: 16px; }
+@media (min-width: 720px) {
+  .rb-case__body .rb-section > .rb-container { grid-template-columns: 8.5rem minmax(0, 1fr); column-gap: 24px; }
+  .rb-case__body .rb-section > .rb-container > * { grid-column: 2; }
+  .rb-case__body .rb-section__intro { grid-column: 2; grid-row: 1; }
+}
+.rb-case__body .rb-texto .rb-prose > p:first-child::first-letter { float: none; font-size: inherit; padding: 0; color: inherit; -webkit-initial-letter: normal; initial-letter: normal; }
+/* Pranchas e amostras: fio fino de livro, sem raios; legendas em itálico. */
+.rb-before-after__image, .rb-images__image { border: 1px solid var(--rb-border); border-radius: 0; }
+.rb-before-after__pair { grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 880px) { .rb-before-after__pair { grid-template-columns: 1fr 1fr; } }
+.rb-before-after__caption, .rb-images__caption, .rb-brand-grid__note { font-style: italic; }
+.rb-before-after__label, .rb-type__role, .rb-video__chaptersTitle { font-family: var(--rb-font-sans); letter-spacing: 0.14em; }
+.rb-palette__swatch, .rb-type__font, .rb-video__chapters { border-radius: 0; border-color: var(--rb-border); background: var(--mn-wash); }
+.rb-palette__name, .rb-type__family { font-family: var(--rb-font-display); font-weight: 600; }
+.rb-type__font { grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+.rb-type__sample { font-size: clamp(1.5rem, 3.4vw, 2.25rem); overflow-wrap: break-word; hyphens: auto; }
+.rb-brand-grid__tile, .rb-type__weight, .rb-palette__sample { border-radius: 0; }
+.rb-brand-grid__label { font-family: var(--rb-font-display); font-weight: 600; }
+.rb-video__layout[data-chapters] { grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 880px) { .rb-video__layout[data-chapters] { grid-template-columns: minmax(0, 1fr) 14rem; } }
+/* O título da amostra herda a cor calculada para o fundo da amostra (o h3 do tema não pode trocá-la). */
+.rb-palette__chip .rb-palette__name { color: inherit; }

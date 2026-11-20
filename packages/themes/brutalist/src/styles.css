@@ -317,3 +317,26 @@ button.rb-button { font: 700 13px/1.3 var(--rb-font-mono); }
 [data-rb-brand] {
   --br-line: 1px solid var(--rb-fg);
 }
+
+/* ---------- corpo do case em blocos e blocos de marca ---------- */
+.rb-case__body { --rb-case-gap: clamp(2rem, 5vw, 3rem); }
+.rb-case__body .rb-section { padding-block: 0; }
+.rb-case__body .rb-section__title { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--rb-accent); }
+.rb-case__body .rb-section__title::before { content: "─── [ "; color: var(--rb-accent-2); letter-spacing: 0; }
+.rb-case__body .rb-section__title::after { content: " ] ───"; color: var(--rb-accent-2); letter-spacing: 0; }
+/* Pranchas e amostras: borda de 2px e sombra dura, sem raio. */
+.rb-before-after__image, .rb-images__image, .rb-comparer__stage { border: 2px solid var(--rb-fg); border-radius: 0; box-shadow: 4px 4px 0 var(--rb-fg); }
+.rb-before-after__label, .rb-comparer__label { font-family: var(--rb-font-mono); font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; border-radius: 0; }
+.rb-before-after__figure--after .rb-before-after__label::before { background: var(--rb-accent-2); border-color: var(--rb-accent-2); }
+.rb-before-after__caption, .rb-images__caption, .rb-brand-grid__note { font-size: 12.5px; }
+.rb-palette__swatch, .rb-type__font, .rb-video__chapters { border: 2px solid var(--rb-fg); border-radius: 0; background: var(--rb-bg); box-shadow: 4px 4px 0 var(--rb-fg); }
+.rb-palette__chip { border-bottom: 2px solid var(--rb-fg); }
+.rb-palette__contrast { border-top: 1px dashed var(--rb-fg); }
+.rb-palette__grade, .rb-video__chapterTime, .rb-type__weight, .rb-palette__sample { border-radius: 0; border-width: 2px; }
+.rb-palette__name, .rb-type__family { font-weight: 700; }
+.rb-type__role { color: var(--rb-accent); }
+.rb-brand-grid__tile { border: 2px solid var(--rb-fg); border-radius: 0; box-shadow: 4px 4px 0 var(--rb-fg); }
+.rb-brand-grid__label { text-transform: uppercase; letter-spacing: 0.06em; font-size: 12px; }
+.rb-video__chapterLink:hover, .rb-video__chapterLink[aria-current="true"] { background: var(--rb-fg); color: var(--rb-bg); box-shadow: none; }
+.rb-video__chapterLink:hover .rb-video__chapterTime, .rb-video__chapterLink[aria-current="true"] .rb-video__chapterTime { background: var(--rb-accent); color: var(--rb-accent-fg); border-color: var(--rb-bg); }
+.rb-case__body { padding-right: 4px; }

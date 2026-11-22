@@ -21,7 +21,7 @@ const vercelInsights: AstroIntegration = {
 };
 
 export default defineConfig({
-  site: "https://www.mmlo.com.br",
+  site: "https://www.mmlo.app",
   integrations: [
     rubrica({
       // rubrica:tema:inicio
